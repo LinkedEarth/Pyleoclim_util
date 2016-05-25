@@ -12,7 +12,7 @@ setup(
     name = 'Pyleoclim',
     packages = ['Pyleoclim', 'pkg_resources'],
     version = 0.1,
-    license = 'GNU Public'
+    license = 'GNU Public',
     description = 'A Python package for paleoclimate data analysis',
     long_description = long_description,
     author = 'Deborah Khider',
