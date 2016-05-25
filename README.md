@@ -1,4 +1,65 @@
 # Pyleoclim
-Python Package for the Analysis of Paleoclimate Data
+**Python Package for the Analysis of Paleoclimate Data**
 
-This version includes basic functionality such as mapping and plotting. Check the Jupyter Notebook for a documentation of the various functions.
+About the current version: This version includes basic functionality such as mapping and plotting. Check the Jupyter Notebook for a documentation of the various functions.
+
+More advanced functionalities are currently under development.
+
+## What is it?
+
+Pyleoclim is a Python package for the analyses of paleoclimate data.
+
+## Installation
+
+Python v3.5+ is required.
+
+Pyleoclim is published through PyPi and easily installed via `pip`
+```
+pip install Pyleoclim
+```
+
+## Quickstart guide
+
+1. Open your command line application (Terminal or Command Prompt).
+
+2. Install with command: `pip install Pyleoclim`
+
+3. Wait for installation to complete, then:
+
+    3a. Import the package into your favorite Python environment (we recommend the use of Spyder, which comes standard with the Anaconda package)
+
+    3b. Use Jupyter Notebook to go through the tutorial contained in the `PyleoclimQuickstart.ipynb` Notebook, which can be downloaded [here](https://github.com/LinkedEarth/Pyleoclim_util).
+
+## Features
+
+- Mapping
+    - Map all the records by proxy time
+    - Map a specific record
+- Plotting
+    - Plot time series of a specific record
+
+## Requirements
+
+- LiPD v0.1+
+- pandas v0.18+
+- numpy v1.11+
+- matplotlib v1.5+
+- Cartopy v0.13+
+
+## Further information
+
+GitHub: https://github.com/LinkedEarth/Pyleoclim_util
+
+LinkedEarth: http://linked.earth
+
+Python and Anaconda: http://conda.pydata.org/docs/test-drive.html
+
+Jupyter Notebook: http://jupyter.org
+
+## Contact
+
+Please report issues to <linkedearth@gmail.com>
+
+## License
+
+The project is licensed under the GNU Public License. Please refer to the file call license.
