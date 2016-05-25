@@ -9,7 +9,7 @@ setup(
     version = 0.1,
     license = 'GNU Public',
     description = 'A Python package for paleoclimate data analysis',
-    long_description = open('README.md').read() if exists("README.md") else "",
+    long_description = open('README.md').read(),
     author = 'Deborah Khider',
     author_email = 'dkhider@gmail.com',
     url = 'https://github.com/LinkedEarth/Pyleoclim_util/Pyleoclim',
