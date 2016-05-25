@@ -1,11 +1,11 @@
-from distutils.core import setup
+from distutils.core import setup, find_packages
 import os
 import sys
 import io
 
 setup(
     name = 'Pyleoclim',
-    packages = ['Pyleoclim', 'pkg_resources'],
+    packages = find_packages(),
     version = 0.1,
     license = 'GNU Public',
     description = 'A Python package for paleoclimate data analysis',
