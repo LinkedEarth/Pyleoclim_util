@@ -1,4 +1,4 @@
-from disutils.core import setup
+from distutils.core import setup
 
 setup(
     name = 'Pyleoclim',
@@ -10,5 +10,5 @@ setup(
     url = 'https://github.com/LinkedEarth/Pyleoclim_util/Pyleoclim',
     download_url = 'https://github.com/LinkedEarth/Pyleoclim_util/Pyleoclim/tarball/0.1',
     keywords = ['Paleoclimate, Data Analysis'],
-    classifiers = [],    
+    classifiers = [],
 )
