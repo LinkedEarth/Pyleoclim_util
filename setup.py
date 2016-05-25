@@ -6,7 +6,7 @@ import io
 setup(
     name = 'Pyleoclim',
     packages = find_packages(),
-    version = 0.1.1,
+    version = '0.1.1',
     license = 'GNU Public',
     description = 'A Python package for paleoclimate data analysis',
     long_description = open('README.md').read(),
