@@ -1,0 +1,5 @@
+LiPD>=0.1.2.7
+pandas>=0.18.1
+numpy>=1.11.0
+matplotlib>=1.5.1
+Cartopy>=0.13.1
