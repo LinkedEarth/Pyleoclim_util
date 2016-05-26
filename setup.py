@@ -6,7 +6,7 @@ import io
 setup(
     name = 'Pyleoclim',
     packages = find_packages(),
-    version = '0.1.3',
+    version = '0.1.4',
     license = 'GNU Public',
     description = 'A Python package for paleoclimate data analysis',
     author = 'Deborah Khider',
@@ -20,6 +20,5 @@ setup(
     "pandas>=0.18.1",
     "numpy>=1.11.0",
     "matplotlib>=1.5.1",
-    "Cartopy>=0.13.1"
     ]
 )
