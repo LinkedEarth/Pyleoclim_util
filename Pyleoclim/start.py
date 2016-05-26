@@ -7,8 +7,8 @@ Created on Wed May 11 10:51:35 2016
 """
 # Import the needed modules
 from lipd.start import *
-import Pyleoclim.pkg_resources.MapLipd as MapLipd
-import Pyleoclim.pkg_resources.PlotLipd as PlotLipd
+import pyleoclim.pkg_resources.MapLipd as MapLipd
+import pyleoclim.pkg_resources.PlotLipd as PlotLipd
 
 
 # load the LiPD files
@@ -32,7 +32,7 @@ def MapaLipd(name="",gridlines = False, borders = True, \
     map1 = MapLipd.MakeMap()
     map1.map_aLiPD(name,gridlines, borders, topo, markersize, marker, \
         saveFig)
-    
+
 # PLOT TIME SERIES
 
 def PlotaLipd(filename = "", \
@@ -41,7 +41,6 @@ def PlotaLipd(filename = "", \
     """
     Plot one particular LiPD record
     """
-    
+
     plot1 = PlotLipd.MakePlot()
     plot1.plot_aLiPD(filename, plot_style, x_min, x_max, saveFig)
-            
