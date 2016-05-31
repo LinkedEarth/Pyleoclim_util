@@ -7,32 +7,16 @@ import path
 version = '0.1.5'
 
 # Read the readme file contents into variable
-if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
-    os.system('pandoc README.md -f markdown -t rst -s -o README.txt')
-
+os.system('pandoc README.md -f markdown -t rst -s -o README.txt')
 readme_file = io.open('README.txt', encoding='utf-8')
+
 # Fallback long_description in case errors with readme file.
 long_description = "Welcome to Pyleoclim. Please reference the README file in the package for information"
 with readme_file:
     long_description = readme_file.read()
 
-# Publish the package to the live server
-if sys.argv[-1] == 'publish':
-    # Register the tarball, upload it, and trash the temp readme rst file
-    os.system('python3 setup.py register')
-    os.system('python3 setup.py sdist upload')
-    os.remove('README.txt')
-    sys.exit()
-
-# Publish the package to the test server
-elif sys.argv[-1] == 'publishtest':
-    # Create dist tarball, register it to test site, upload tarball, and remove temp readme file
-    os.system('python3 setup.py sdist')
-    os.system('python3 setup.py register -r https://testpypi.python.org/pypi')
-    os.system('twine upload -r test dist/LiPD-' + version + '.tar.gz')
-    # Trash the temp rst readme file
-    os.remove('README.txt')
-    sys.exit()
+# Remove the text file once the description is added
+os.remove('README.txt')
 
 setup(
     name = 'Pyleoclim',
