@@ -6,7 +6,6 @@ import path
 
 version = '0.1.5'
 
-here = path.abspath(path.dirname(__file__))
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
     os.system('pandoc README.md -f markdown -t rst -s -o README.txt')
