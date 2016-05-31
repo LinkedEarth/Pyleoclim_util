@@ -46,6 +46,13 @@ pip install Pyleoclim
 - matplotlib v1.5+
 - Cartopy v0.13+
 
+The installer will automatically check for the needed updates ***except*** for Cartopy.
+
+<div class="alert alert-warning" role="alert" style="margin: 10px">
+<p><b>NOTE</p>
+<p>Cartopy does not install properly through pip. The recommended method is through <a href="http://conda.pydata.org/miniconda.html"> Conda</a>. See the instructions on the <a href="http://scitools.org.uk/cartopy/docs/latest/installing.html"> developer website</a>.</p>
+</div>
+
 ## Further information
 
 GitHub: https://github.com/LinkedEarth/Pyleoclim_util
