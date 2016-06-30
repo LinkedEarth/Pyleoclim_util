@@ -53,3 +53,262 @@
 2016-05-26 12:42:13,213 [INFO] directory: enter set_source
 2016-05-26 12:42:14,679 [INFO] directory: 4: notebook 
 2016-05-26 12:42:14,679 [INFO] directory: exit set_source
+2016-06-02 13:18:09,198 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp4f605h_r
+2016-06-02 13:18:09,198 [INFO] LiPD_Library: LiPD Library created
+2016-06-02 13:18:09,198 [INFO] directory: enter set_source
+2016-06-02 13:18:10,965 [INFO] directory: 4: notebook 
+2016-06-02 13:18:10,965 [INFO] directory: exit set_source
+2016-06-02 13:40:29,540 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmplw9naxlj
+2016-06-02 13:40:29,540 [INFO] LiPD_Library: LiPD Library created
+2016-06-02 13:40:29,541 [INFO] directory: enter set_source
+2016-06-02 13:40:31,147 [INFO] directory: 4: notebook 
+2016-06-02 13:40:31,147 [INFO] directory: exit set_source
+2016-06-02 14:29:46,177 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpofjpsqf9
+2016-06-02 14:29:46,177 [INFO] LiPD_Library: LiPD Library created
+2016-06-02 14:29:46,177 [INFO] directory: enter set_source
+2016-06-02 14:29:47,509 [INFO] directory: 4: notebook 
+2016-06-02 14:29:47,509 [INFO] directory: exit set_source
+2016-06-02 14:49:58,355 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpvfexdaca
+2016-06-02 14:49:58,356 [INFO] LiPD_Library: LiPD Library created
+2016-06-02 14:49:58,356 [INFO] directory: enter set_source
+2016-06-02 14:49:59,638 [INFO] directory: 4: notebook 
+2016-06-02 14:49:59,639 [INFO] directory: exit set_source
+2016-06-03 13:37:27,850 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpwihp2e99
+2016-06-03 13:37:27,850 [INFO] LiPD_Library: LiPD Library created
+2016-06-03 13:37:27,851 [INFO] directory: enter set_source
+2016-06-03 13:37:34,440 [INFO] directory: 4: notebook 
+2016-06-03 13:37:34,440 [INFO] directory: exit set_source
+2016-06-07 11:09:39,373 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpynnty96o
+2016-06-07 11:09:39,373 [INFO] LiPD_Library: LiPD Library created
+2016-06-07 11:09:39,373 [INFO] directory: enter set_source
+2016-06-07 11:09:41,155 [INFO] directory: 2: browse
+2016-06-07 11:09:41,155 [INFO] directory: enter browse_dialog
+2016-06-07 11:10:00,112 [INFO] directory: chose path: /Users/deborahkhider/Documents/MATLAB/LiPD-utilities/Matlab
+2016-06-07 11:10:00,114 [INFO] directory: exit browse_dialog
+2016-06-07 11:10:00,116 [INFO] directory: exit set_source
+2016-06-07 11:12:32,782 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp5_c_5dgg
+2016-06-07 11:12:32,783 [INFO] LiPD_Library: LiPD Library created
+2016-06-07 11:12:32,783 [INFO] directory: enter set_source
+2016-06-07 11:12:34,322 [INFO] directory: 2: browse
+2016-06-07 11:12:34,322 [INFO] directory: enter browse_dialog
+2016-06-07 11:12:45,489 [INFO] directory: chose path: /Users/deborahkhider/Documents/MATLAB/LiPD-utilities/Matlab
+2016-06-07 11:12:45,489 [INFO] directory: exit browse_dialog
+2016-06-07 11:12:45,491 [INFO] directory: exit set_source
+2016-06-07 11:43:18,912 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpwpl9kc3k
+2016-06-07 11:43:18,912 [INFO] LiPD_Library: LiPD Library created
+2016-06-07 11:43:18,913 [INFO] directory: enter set_source
+2016-06-07 11:43:20,596 [INFO] directory: 2: browse
+2016-06-07 11:43:20,596 [INFO] directory: enter browse_dialog
+2016-06-07 11:44:03,142 [INFO] directory: chose path: /Users/deborahkhider/Documents/MATLAB/LiPD-utilities/Matlab
+2016-06-07 11:44:03,143 [INFO] directory: exit browse_dialog
+2016-06-07 11:44:03,144 [INFO] directory: exit set_source
+2016-06-07 14:19:38,200 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpbjatepan
+2016-06-07 14:19:38,200 [INFO] LiPD_Library: LiPD Library created
+2016-06-07 14:19:38,200 [INFO] directory: enter set_source
+2016-06-07 14:19:44,588 [INFO] directory: 2: browse
+2016-06-07 14:19:44,588 [INFO] directory: enter browse_dialog
+2016-06-07 14:20:13,085 [INFO] directory: chose path: /Users/deborahkhider/Documents/MATLAB/LiPD-utilities/Matlab
+2016-06-07 14:20:13,085 [INFO] directory: exit browse_dialog
+2016-06-07 14:20:13,087 [INFO] directory: exit set_source
+2016-06-08 10:38:51,589 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmph6xwtgz1
+2016-06-08 10:38:51,590 [INFO] LiPD_Library: LiPD Library created
+2016-06-08 10:38:51,590 [INFO] directory: enter set_source
+2016-06-08 10:38:52,981 [INFO] directory: 4: notebook 
+2016-06-08 10:38:52,981 [INFO] directory: exit set_source
+2016-06-08 14:03:03,418 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp8dqnt2vr
+2016-06-08 14:03:03,418 [INFO] LiPD_Library: LiPD Library created
+2016-06-08 14:03:03,418 [INFO] directory: enter set_source
+2016-06-08 14:03:05,290 [INFO] directory: 4: notebook 
+2016-06-08 14:03:05,290 [INFO] directory: exit set_source
+2016-06-08 14:04:33,663 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpb44telxl
+2016-06-08 14:04:33,664 [INFO] LiPD_Library: LiPD Library created
+2016-06-08 14:04:33,664 [INFO] directory: enter set_source
+2016-06-08 14:04:35,173 [INFO] directory: 2: browse
+2016-06-08 14:04:35,174 [INFO] directory: enter browse_dialog
+2016-06-08 14:04:49,696 [INFO] directory: chose path: 
+2016-06-08 14:04:49,697 [INFO] directory: exit browse_dialog
+2016-06-08 14:05:25,689 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpdagxvx5k
+2016-06-08 14:05:25,689 [INFO] LiPD_Library: LiPD Library created
+2016-06-08 14:05:25,689 [INFO] directory: enter set_source
+2016-06-08 14:05:27,262 [INFO] directory: 2: browse
+2016-06-08 14:05:27,262 [INFO] directory: enter browse_dialog
+2016-06-08 14:06:07,805 [INFO] directory: chose path: /Users/deborahkhider/Documents/MATLAB/LiPD-utilities/Matlab
+2016-06-08 14:06:07,806 [INFO] directory: exit browse_dialog
+2016-06-08 14:06:07,808 [INFO] directory: exit set_source
+2016-06-08 15:25:10,736 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp78oi0pgk
+2016-06-08 15:25:10,736 [INFO] LiPD_Library: LiPD Library created
+2016-06-08 15:25:10,736 [INFO] directory: enter set_source
+2016-06-08 15:25:13,676 [INFO] directory: 4: notebook 
+2016-06-08 15:25:13,676 [INFO] directory: exit set_source
+2016-06-09 10:00:46,119 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpfz7jx1nn
+2016-06-09 10:00:46,120 [INFO] LiPD_Library: LiPD Library created
+2016-06-09 10:00:46,120 [INFO] directory: enter set_source
+2016-06-09 10:00:47,880 [INFO] directory: 2: browse
+2016-06-09 10:00:47,881 [INFO] directory: enter browse_dialog
+2016-06-09 10:01:23,417 [INFO] directory: chose path: /Users/deborahkhider/Documents/MATLAB/LiPD-utilities/Matlab
+2016-06-09 10:01:23,417 [INFO] directory: exit browse_dialog
+2016-06-09 10:01:23,419 [INFO] directory: exit set_source
+2016-06-09 10:15:00,053 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpcvr2nh4u
+2016-06-09 10:15:00,053 [INFO] LiPD_Library: LiPD Library created
+2016-06-09 10:15:00,053 [INFO] directory: enter set_source
+2016-06-09 10:15:01,812 [INFO] directory: 4: notebook 
+2016-06-09 10:15:01,812 [INFO] directory: exit set_source
+2016-06-09 15:28:41,743 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp7n1d2w3g
+2016-06-09 15:28:41,743 [INFO] LiPD_Library: LiPD Library created
+2016-06-09 15:28:41,743 [INFO] directory: enter set_source
+2016-06-09 15:28:43,773 [INFO] directory: 4: notebook 
+2016-06-09 15:28:43,774 [INFO] directory: exit set_source
+2016-06-10 12:52:56,090 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpof9jrv9n
+2016-06-10 12:52:56,090 [INFO] LiPD_Library: LiPD Library created
+2016-06-10 12:52:56,091 [INFO] directory: enter set_source
+2016-06-10 12:52:57,225 [INFO] directory: 4: notebook 
+2016-06-10 12:52:57,225 [INFO] directory: exit set_source
+2016-06-10 13:30:11,528 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpad_hpygb
+2016-06-10 13:30:11,528 [INFO] LiPD_Library: LiPD Library created
+2016-06-10 13:30:11,528 [INFO] directory: enter set_source
+2016-06-10 13:30:13,724 [INFO] directory: 2: browse
+2016-06-10 13:30:13,725 [INFO] directory: enter browse_dialog
+2016-06-10 13:30:22,691 [INFO] directory: chose path: /Users/deborahkhider/Downloads
+2016-06-10 13:30:22,693 [INFO] directory: exit browse_dialog
+2016-06-10 13:30:22,694 [INFO] directory: exit set_source
+2016-06-20 13:53:43,858 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp3ih90q_4
+2016-06-20 13:53:43,859 [INFO] LiPD_Library: LiPD Library created
+2016-06-20 13:53:43,859 [INFO] directory: enter set_source
+2016-06-20 13:53:45,277 [INFO] directory: 2: browse
+2016-06-20 13:53:45,277 [INFO] directory: enter browse_dialog
+2016-06-20 13:53:51,121 [INFO] directory: chose path: /Users/deborahkhider/Downloads
+2016-06-20 13:53:51,122 [INFO] directory: exit browse_dialog
+2016-06-20 13:53:51,124 [INFO] directory: exit set_source
+2016-06-21 17:13:37,406 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpab23ggl5
+2016-06-21 17:13:37,407 [INFO] LiPD_Library: LiPD Library created
+2016-06-21 17:13:37,407 [INFO] directory: enter set_source
+2016-06-21 17:13:38,987 [INFO] directory: 2: browse
+2016-06-21 17:13:38,987 [INFO] directory: enter browse_dialog
+2016-06-21 17:13:44,134 [INFO] directory: chose path: /Users/deborahkhider/Downloads
+2016-06-21 17:13:44,134 [INFO] directory: exit browse_dialog
+2016-06-21 17:13:44,136 [INFO] directory: exit set_source
+2016-06-21 17:18:57,629 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpiwdmjpfn
+2016-06-21 17:18:57,630 [INFO] LiPD_Library: LiPD Library created
+2016-06-21 17:18:57,630 [INFO] directory: enter set_source
+2016-06-21 17:18:58,905 [INFO] directory: 2: browse
+2016-06-21 17:18:58,905 [INFO] directory: enter browse_dialog
+2016-06-21 17:19:03,699 [INFO] directory: chose path: /Users/deborahkhider/Downloads
+2016-06-21 17:19:03,700 [INFO] directory: exit browse_dialog
+2016-06-21 17:19:03,701 [INFO] directory: exit set_source
+2016-06-23 13:43:57,613 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp_vjovctd
+2016-06-23 13:43:57,614 [INFO] LiPD_Library: LiPD Library created
+2016-06-23 13:43:57,614 [INFO] directory: enter set_source
+2016-06-23 13:43:58,742 [INFO] directory: 4: notebook 
+2016-06-23 13:43:58,742 [INFO] directory: exit set_source
+2016-06-27 16:24:34,251 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmprl_6og5r
+2016-06-27 16:24:34,253 [INFO] LiPD_Library: LiPD Library created
+2016-06-27 16:24:34,253 [INFO] directory: enter set_source
+2016-06-27 16:24:35,817 [INFO] directory: 2: browse
+2016-06-27 16:24:35,818 [INFO] directory: enter browse_dialog
+2016-06-27 16:24:45,475 [INFO] directory: chose path: /Users/deborahkhider/Downloads
+2016-06-27 16:24:45,475 [INFO] directory: exit browse_dialog
+2016-06-27 16:24:45,477 [INFO] directory: exit set_source
+2016-06-27 16:29:03,440 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp9_4mr50i
+2016-06-27 16:29:03,441 [INFO] LiPD_Library: LiPD Library created
+2016-06-27 16:29:03,441 [INFO] directory: enter set_source
+2016-06-27 16:29:04,916 [INFO] directory: 2: browse
+2016-06-27 16:29:04,916 [INFO] directory: enter browse_dialog
+2016-06-27 16:29:29,045 [INFO] directory: chose path: /Users/deborahkhider/Documents/Documents/LinkedEarth/LiPD/Excel_to_LiPD
+2016-06-27 16:29:29,046 [INFO] directory: exit browse_dialog
+2016-06-27 16:29:29,048 [INFO] directory: exit set_source
+2016-06-28 13:45:07,528 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpp7rn5nza
+2016-06-28 13:45:07,529 [INFO] LiPD_Library: LiPD Library created
+2016-06-28 13:45:07,529 [INFO] directory: enter set_source
+2016-06-28 13:45:10,527 [INFO] directory: 2: browse
+2016-06-28 13:45:10,528 [INFO] directory: enter browse_dialog
+2016-06-28 13:45:24,104 [INFO] directory: chose path: /Users/deborahkhider/Documents/Documents/LinkedEarth/LiPD/Excel_to_LiPD
+2016-06-28 13:45:24,105 [INFO] directory: exit browse_dialog
+2016-06-28 13:45:24,107 [INFO] directory: exit set_source
+2016-06-28 14:16:22,210 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp9m8dct7i
+2016-06-28 14:16:22,210 [INFO] LiPD_Library: LiPD Library created
+2016-06-28 14:16:22,211 [INFO] directory: enter set_source
+2016-06-28 14:16:24,162 [INFO] directory: 2: browse
+2016-06-28 14:16:24,162 [INFO] directory: enter browse_dialog
+2016-06-28 14:16:43,969 [INFO] directory: chose path: /Users/deborahkhider/Documents/Documents/LinkedEarth/LiPD/LiPD files
+2016-06-28 14:16:43,970 [INFO] directory: exit browse_dialog
+2016-06-28 14:16:43,972 [INFO] directory: exit set_source
+2016-06-29 11:44:15,712 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpeberqpia
+2016-06-29 11:44:15,713 [INFO] LiPD_Library: LiPD Library created
+2016-06-29 11:44:15,713 [INFO] directory: enter set_source
+2016-06-29 11:44:17,084 [INFO] directory: 2: browse
+2016-06-29 11:44:17,084 [INFO] directory: enter browse_dialog
+2016-06-29 11:44:35,187 [INFO] directory: chose path: /Users/deborahkhider/Documents/Documents/LinkedEarth/LiPD/Excel_to_LiPD
+2016-06-29 11:44:35,187 [INFO] directory: exit browse_dialog
+2016-06-29 11:44:35,189 [INFO] directory: exit set_source
+2016-06-29 13:35:48,671 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpmulr3h05
+2016-06-29 13:35:48,671 [INFO] LiPD_Library: LiPD Library created
+2016-06-29 13:35:48,671 [INFO] directory: enter set_source
+2016-06-29 13:35:51,253 [INFO] directory: 2: browse
+2016-06-29 13:35:51,253 [INFO] directory: enter browse_dialog
+2016-06-29 13:36:05,891 [INFO] directory: chose path: /Users/deborahkhider/Documents/Documents/LinkedEarth/LiPD/Excel_to_LiPD
+2016-06-29 13:36:05,892 [INFO] directory: exit browse_dialog
+2016-06-29 13:36:05,894 [INFO] directory: exit set_source
+2016-06-29 13:37:14,857 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpjpxi3avt
+2016-06-29 13:37:14,857 [INFO] LiPD_Library: LiPD Library created
+2016-06-29 13:37:14,857 [INFO] directory: enter set_source
+2016-06-29 13:37:16,078 [INFO] directory: 2: browse
+2016-06-29 13:37:16,078 [INFO] directory: enter browse_dialog
+2016-06-29 13:37:28,530 [INFO] directory: chose path: /Users/deborahkhider/Documents/Documents/LinkedEarth/LiPD/Excel_to_LiPD/new files
+2016-06-29 13:37:28,531 [INFO] directory: exit browse_dialog
+2016-06-29 13:37:28,533 [INFO] directory: exit set_source
+2016-06-29 13:54:14,344 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpz88bmh53
+2016-06-29 13:54:14,344 [INFO] LiPD_Library: LiPD Library created
+2016-06-29 13:54:14,344 [INFO] directory: enter set_source
+2016-06-29 13:54:15,868 [INFO] directory: 2: browse
+2016-06-29 13:54:15,868 [INFO] directory: enter browse_dialog
+2016-06-29 13:54:31,456 [INFO] directory: chose path: /Users/deborahkhider/Documents/Documents/LinkedEarth/LiPD/NOAA Text
+2016-06-29 13:54:31,457 [INFO] directory: exit browse_dialog
+2016-06-29 13:54:31,460 [INFO] directory: exit set_source
+2016-06-29 14:46:44,652 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp3956ulg6
+2016-06-29 14:46:44,653 [INFO] LiPD_Library: LiPD Library created
+2016-06-29 14:46:44,653 [INFO] directory: enter set_source
+2016-06-29 14:46:45,866 [INFO] directory: 2: browse
+2016-06-29 14:46:45,866 [INFO] directory: enter browse_dialog
+2016-06-29 14:46:57,530 [INFO] directory: chose path: /Users/deborahkhider/Documents/Documents/LinkedEarth/LiPD/NOAA Text
+2016-06-29 14:46:57,530 [INFO] directory: exit browse_dialog
+2016-06-29 14:46:57,532 [INFO] directory: exit set_source
+2016-06-30 13:21:18,575 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpw19sozzh
+2016-06-30 13:21:18,575 [INFO] LiPD_Library: LiPD Library created
+2016-06-30 13:21:18,575 [INFO] directory: enter set_source
+2016-06-30 13:21:21,297 [INFO] directory: 4: notebook 
+2016-06-30 13:21:21,298 [INFO] directory: exit set_source
+2016-06-30 13:27:31,976 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp99jghthw
+2016-06-30 13:27:31,977 [INFO] LiPD_Library: LiPD Library created
+2016-06-30 13:27:31,977 [INFO] directory: enter set_source
+2016-06-30 13:27:33,586 [INFO] directory: 4: notebook 
+2016-06-30 13:27:33,587 [INFO] directory: exit set_source
+2016-06-30 13:32:44,832 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpp50h0go3
+2016-06-30 13:32:44,832 [INFO] LiPD_Library: LiPD Library created
+2016-06-30 13:32:44,832 [INFO] directory: enter set_source
+2016-06-30 13:32:46,774 [INFO] directory: 4: notebook 
+2016-06-30 13:32:46,774 [INFO] directory: exit set_source
+2016-06-30 13:35:53,361 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpb0a6cbac
+2016-06-30 13:35:53,361 [INFO] LiPD_Library: LiPD Library created
+2016-06-30 13:35:53,361 [INFO] directory: enter set_source
+2016-06-30 13:35:55,582 [INFO] directory: 4: notebook 
+2016-06-30 13:35:55,582 [INFO] directory: exit set_source
+2016-06-30 13:38:02,270 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp0u50crbx
+2016-06-30 13:38:02,270 [INFO] LiPD_Library: LiPD Library created
+2016-06-30 13:38:02,270 [INFO] directory: enter set_source
+2016-06-30 13:38:03,642 [INFO] directory: 4: notebook 
+2016-06-30 13:38:03,642 [INFO] directory: exit set_source
+2016-06-30 13:41:05,178 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmphrq8rpcm
+2016-06-30 13:41:05,179 [INFO] LiPD_Library: LiPD Library created
+2016-06-30 13:41:05,179 [INFO] directory: enter set_source
+2016-06-30 13:41:06,063 [INFO] directory: 4: notebook 
+2016-06-30 13:41:06,063 [INFO] directory: exit set_source
+2016-06-30 16:08:07,391 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpqwd10sse
+2016-06-30 16:08:07,391 [INFO] LiPD_Library: LiPD Library created
+2016-06-30 16:08:07,391 [INFO] directory: enter set_source
+2016-06-30 16:08:08,833 [INFO] directory: 4: notebook 
+2016-06-30 16:08:08,833 [INFO] directory: exit set_source
+2016-06-30 16:09:12,618 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpmgu8kdyn
+2016-06-30 16:09:12,618 [INFO] LiPD_Library: LiPD Library created
+2016-06-30 16:09:12,618 [INFO] directory: enter set_source
+2016-06-30 16:09:14,255 [INFO] directory: 4: notebook 
+2016-06-30 16:09:14,255 [INFO] directory: exit set_source

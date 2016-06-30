@@ -36,11 +36,15 @@ class MakeMap(object):
             d = getMetadata(i)
             self.data.iloc[index,0]=d['geo']['geometry']['coordinates'][1]
             self.data.iloc[index,1]=d['geo']['geometry']['coordinates'][0]
+            # check that archiveType is present
+            if 'archiveType' in d:
             #TODO: Fix LiPD. For now override ice core as glacier ice
-            if d['archiveType'] == 'ice core':
-                self.data.iloc[index,2]='glacier ice'
+                if d['archiveType'] == 'ice core':
+                    self.data.iloc[index,2]='glacier ice'
+                else:
+                    self.data.iloc[index,2]=d['archiveType']
             else:
-                self.data.iloc[index,2]=d['archiveType']
+                self.data.iloc[index,2]='unknown'
             self.data.iloc[index,3]=i
             index+=1       
         
@@ -87,7 +91,7 @@ class MakeMap(object):
                     transform=ccrs.Geodetic(),
                     label = archiveType)
                 already_plotted.append(archiveType)
-            elif archiveType not in plot_default:
+            elif archiveType not in self.plot_default:
                 ax.scatter(self.data[self.data['C']==archiveType]['A'],
                     self.data[self.data['C']==archiveType]['B'],
                     s = markersize,
@@ -119,10 +123,10 @@ class MakeMap(object):
             name = self.data.iloc[answer]['D']
     
         if self.data[self.data['D']==name].empty:
-            print("ERROR: The name you have entered is " +
+            sys.exit("ERROR: The name you have entered is " +
             "not in the current directory. Make sure you entered "+
             "the name with the .lpd extension.")
-            sys.exit(0)
+        
     
         record = self.data[self.data['D']==name]
         ax = plt.axes(projection=ccrs.Orthographic(record['A'].iloc[0], \
