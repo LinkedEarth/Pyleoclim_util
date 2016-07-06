@@ -36,14 +36,14 @@ class MakePlot(object):
             filename = list_record[num_ans]
    
         # Extract the data into several DataFrames        
-        df_meta_ts, df_data_ts, df_chron_ts = ts_to_df(self.time_series,
+        dfs_ts = ts_to_df(self.time_series,
                                                filename)
 
         #Look for the variable name in the columns of the dataframe
-        y_axis = [col for col in df_data_ts.columns \
+        y_axis = [col for col in dfs_ts['paleoData'].columns \
             if filename.split('_')[2] in col][0]
         
-        x_axis = [col for col in df_data_ts.columns \
+        x_axis = [col for col in dfs_ts['paleoData'].columns \
             if 'age' in col or 'year' in col or 'depth' in col]
 
         #Check for time representation
@@ -58,7 +58,7 @@ class MakePlot(object):
     
         # Make the plot
         plt.style.use(plot_style)
-        plt.plot(df_data_ts[x_axis], df_data_ts[y_axis])
+        plt.plot(dfs_ts['paleoData'][x_axis], dfs_ts['paleoData'][y_axis])
         plt.xlabel(x_axis)
         plt.ylabel(y_axis)
         xmin, xmax = plt.xlim()
