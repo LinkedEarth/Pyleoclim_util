@@ -70,3 +70,7 @@ Please report issues to <linkedearth@gmail.com>
 ## License
 
 The project is licensed under the GNU Public License. Please refer to the file call license.
+
+## Disclaimer
+
+This material is based upon work supported by the National Science Foundation under Grant Number ICER-1541029. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the investigators and do not necessarily reflect the views of the National Science Foundation.
