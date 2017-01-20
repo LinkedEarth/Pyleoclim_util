@@ -4,7 +4,7 @@ import sys
 import io
 import path
 
-version = '0.1.0'
+version = '0.1.1'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
