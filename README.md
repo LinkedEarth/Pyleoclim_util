@@ -60,14 +60,7 @@ pip install Pyleoclim
 
 The installer will automatically check for the needed updates ***except*** for Cartopy.
 
-<<<<<<< HEAD
-Cartopy does not install properly through pip. The recommended method is through <a href="http://conda.pydata.org/miniconda.html"> Conda</a>. See the instructions on the <a href="http://scitools.org.uk/cartopy/docs/latest/installing.html"> developer website.
-=======
-<div class="alert alert-warning" role="alert" style="margin: 10px">
-<p><b>NOTE</b></p>
-<p>Cartopy does not install properly through pip. The recommended method is through <a href="http://conda.pydata.org/miniconda.html"> Conda</a>. See the instructions on the <a href="http://scitools.org.uk/cartopy/docs/latest/installing.html"> developer website</a>.</p>
-</div>
->>>>>>> origin/master
+Cartopy doesn't install properly through pip. Use <a href="http://conda.pydata.org/miniconda.html"> Conda</a>. See the instructions on the <a href="http://scitools.org.uk/cartopy/docs/latest/installing.html"> developer website.
 
 ### <a name="further_info">Further information</a>
 
