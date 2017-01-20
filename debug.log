@@ -330,3 +330,57 @@
 2016-07-06 14:23:54,895 [INFO] directory: enter set_source
 2016-07-06 14:23:56,550 [INFO] directory: 4: notebook 
 2016-07-06 14:23:56,550 [INFO] directory: exit set_source
+2017-01-19 12:56:39,178 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpyegdbrx0
+2017-01-19 12:56:39,178 [INFO] LiPD_Library: LiPD Library created
+2017-01-19 12:56:39,178 [INFO] directory: enter set_src_or_dst
+2017-01-19 12:56:45,209 [INFO] directory: enter browse_dialog
+2017-01-19 12:57:04,859 [INFO] directory: chosen path: /Users/deborahkhider/Documents/Python/Test Codes, chosen file: ['/Users/deborahkhider/Documents/Python/Test Codes/MD98-2170.Stott.2004.lpd']
+2017-01-19 12:57:04,859 [INFO] directory: exit browse_dialog_file
+2017-01-19 13:42:40,982 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp9honxisd
+2017-01-19 13:42:40,982 [INFO] LiPD_Library: LiPD Library created
+2017-01-19 13:42:40,982 [INFO] directory: enter set_src_or_dst
+2017-01-19 13:42:44,579 [INFO] directory: 2: browse
+2017-01-19 13:42:44,579 [INFO] directory: enter browse_dialog
+2017-01-19 13:42:52,278 [INFO] directory: chosen path: /Users/deborahkhider/Documents/Python/Test Codes
+2017-01-19 13:42:52,278 [INFO] directory: exit browse_dialog
+2017-01-19 13:42:52,279 [INFO] directory: exit set_src_or_dst
+2017-01-19 13:42:52,279 [INFO] directory: enter list_files
+2017-01-19 13:42:52,279 [INFO] directory: exit list_files
+2017-01-19 13:42:52,279 [INFO] directory: enter list_files
+2017-01-19 13:42:52,279 [INFO] directory: exit list_files
+2017-01-19 13:42:52,280 [INFO] directory: enter list_files
+2017-01-19 13:42:52,280 [INFO] directory: exit list_files
+2017-01-19 13:42:52,280 [INFO] directory: enter list_files
+2017-01-19 13:42:52,280 [INFO] directory: exit list_files
+2017-01-19 13:44:26,418 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpe90xbmcd
+2017-01-19 13:44:26,419 [INFO] LiPD_Library: LiPD Library created
+2017-01-19 13:44:26,419 [INFO] directory: enter set_src_or_dst
+2017-01-19 13:44:29,437 [INFO] directory: 2: browse
+2017-01-19 13:44:29,437 [INFO] directory: enter browse_dialog
+2017-01-19 13:44:36,955 [INFO] directory: chosen path: /Users/deborahkhider/Documents/Python/Test Codes
+2017-01-19 13:44:36,955 [INFO] directory: exit browse_dialog
+2017-01-19 13:44:36,956 [INFO] directory: exit set_src_or_dst
+2017-01-19 13:44:36,956 [INFO] directory: enter list_files
+2017-01-19 13:44:36,957 [INFO] directory: exit list_files
+2017-01-19 13:44:36,957 [INFO] directory: enter list_files
+2017-01-19 13:44:36,957 [INFO] directory: exit list_files
+2017-01-19 13:44:36,957 [INFO] directory: enter list_files
+2017-01-19 13:44:36,957 [INFO] directory: exit list_files
+2017-01-19 13:44:36,957 [INFO] directory: enter list_files
+2017-01-19 13:44:36,957 [INFO] directory: exit list_files
+2017-01-19 15:20:03,632 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpwjx8fmud
+2017-01-19 15:20:03,632 [INFO] LiPD_Library: LiPD Library created
+2017-01-19 15:20:03,632 [INFO] directory: enter set_src_or_dst
+2017-01-19 15:20:07,195 [INFO] directory: 2: browse
+2017-01-19 15:20:07,195 [INFO] directory: enter browse_dialog
+2017-01-19 15:20:15,682 [INFO] directory: chosen path: /Users/deborahkhider/Documents/Python/Test Codes
+2017-01-19 15:20:15,682 [INFO] directory: exit browse_dialog
+2017-01-19 15:20:15,683 [INFO] directory: exit set_src_or_dst
+2017-01-19 15:20:15,683 [INFO] directory: enter list_files
+2017-01-19 15:20:15,684 [INFO] directory: exit list_files
+2017-01-19 15:20:15,684 [INFO] directory: enter list_files
+2017-01-19 15:20:15,684 [INFO] directory: exit list_files
+2017-01-19 15:20:15,684 [INFO] directory: enter list_files
+2017-01-19 15:20:15,684 [INFO] directory: exit list_files
+2017-01-19 15:20:15,684 [INFO] directory: enter list_files
+2017-01-19 15:20:15,685 [INFO] directory: exit list_files

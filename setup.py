@@ -4,7 +4,7 @@ import sys
 import io
 import path
 
-version = '0.1.8'
+version = '1.0.0'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
@@ -48,9 +48,9 @@ setup(
     keywords = ['Paleoclimate, Data Analysis'],
     classifiers = [],
     install_requires = [
-    "LiPD>=0.1.2.7",
-    "pandas>=0.18.1",
-    "numpy>=1.11.0",
-    "matplotlib>=1.5.1",
+    "LiPD>=0.1.8.1",
+    "pandas>=0.19.2",
+    "numpy>=1.12.0",
+    "matplotlib>=2.0.0",
     ]
 )
