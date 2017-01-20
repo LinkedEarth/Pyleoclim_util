@@ -4,7 +4,7 @@ import sys
 import io
 import path
 
-version = '0.1.1'
+version = '0.1.0'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
@@ -35,7 +35,7 @@ elif sys.argv[-1] == 'publishtest':
     sys.exit()
 
 setup(
-    name = 'Pyleoclim',
+    name = 'pyleoclim',
     packages = find_packages(),
     version = version,
     license = 'GNU Public',
