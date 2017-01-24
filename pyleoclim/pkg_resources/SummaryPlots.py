@@ -25,12 +25,29 @@ from .Basic import *
 class SummaryPlots(object):
 
     def __init__(self,time_series,plot_default):
+        """
+        Passes the dictionary of timeseries and the color palette
+        """
         self.TS = time_series
         self.default = plot_default
         
     def getMetadata(self, time_series):
         """
         Get the necessary metadata to be printed out automatically
+        Arguments:
+          - time_series: a specific timeseries object
+        Outputs:
+          - A dictionary containing the following metadata:
+            - archiveType
+            - Authors (if more than 2, replace by et al.
+            - PublicationYear
+            - Publication DOI
+            - Variable Name
+            - Units
+            - Climate Interpretation
+            - Calibration Equation
+            - Calibration References
+            - Calibration Notes
         """
         # Get all the necessary information
         # Top level information
@@ -145,6 +162,11 @@ class SummaryPlots(object):
         """
         Get the necessary information for the TS plots/necessary to allow for
         axes spec
+        Arguments:
+         - a single timeseries object. By default, will prompt the user
+         - x-axis: The representation against which to plot the paleo-data. Options are "age",
+    "year", and "depth". Default is to let the system choose if only one available or prompt
+    the user.
         """
         # Get the data
         if not new_timeseries:
@@ -204,6 +226,8 @@ class SummaryPlots(object):
     def agemodelData(self, new_timeseries =""):
         """
         Get the necessary information for the agemodel plot
+        Arguments:
+          - new_timeseries: a single timeseries object. By default, will prompt the user
         """
     
         # Get the data
@@ -264,7 +288,25 @@ class SummaryPlots(object):
     def basic(self,x_axis="", new_timeseries = "", saveFig = True,
                      format = "eps", dir = "figures"):
         """
-        Make a basic summary plot 
+        Makes a basic summary plot
+        1. The time series
+        2. Location map
+        3. Age-Depth profile if both are available from the paleodata
+        4. Metadata
+
+        **Note**: The plots use default setting from the MapLiPD and plotTS method.
+    
+        Arguments:
+        - timeseries: By default, will prompt for one.
+        - x-axis: The representation against which to plot the paleo-data. Options are "age",
+       "year", and "depth". Default is to let the system choose if only one available or prompt
+       the user.
+        - saveFig: default is to save the figure
+        - dir: the full path of the directory in which to save the figure. If not provided, creates
+        a default folder called 'figures' in the LiPD working directory (lipd.path). 
+        - format: One of the file extensions supported by the active backend. Default is "eps".
+        Most backend support png, pdf, ps, eps, and svg.
+        
         """
     
         # get the timeseries

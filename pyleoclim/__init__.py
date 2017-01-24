@@ -31,9 +31,11 @@ from .pkg_resources.SummaryPlots import *
 lpd.loadLipds()
 
 # Get the timeseries objects
+
 time_series = lpd.extractTs()
 
 # Set the default palette for plots
+
 plot_default = {'ice/rock': ['#FFD600','h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
@@ -50,13 +52,14 @@ plot_default = {'ice/rock': ['#FFD600','h'],
 # Mapping
 def MapAll(markersize = int(50), saveFig = True, dir="", format='eps'):
     """
-    Map all the available LiPD files by archiveType.
+    Map all the available records loaded into the LiPD working directory by archiveType.
     Arguments:
-      - marersize: default is 50
+      - markersize: default is 50
       - saveFig: default is to save the figure
-      - dir: the name of the folder in the current directory. If not provided, creates
-      a folder called 'figures'
-      - format: the format in which to save the map. The default is eps
+      - dir: the full path of the directory in which to save the figure. If not provided, creates
+      a default folder called 'figures' in the LiPD working directory (lipd.path). 
+      - format: One of the file extensions supported by the active backend. Default is "eps".
+      Most backend support png, pdf, ps, eps, and svg. 
     """
     map1 = Map(plot_default)
     map1.map_all(markersize=markersize, saveFig = saveFig, dir=dir, format=format)
@@ -65,20 +68,22 @@ def MapLiPD(name="",gridlines = False, borders = True, \
         topo = True, markersize = int(100), marker = "default", \
         saveFig = True, dir = "", format="eps"):
     """
-    Makes a map of a single record
+    Makes a map for a single record. 
     Arguments:
-     - name: the name of the LiPD file. WITH THE .LPD extension. If not provided
-     will prompt the user for one
-     - gridlines: default is none. Change to TRUE to get gridlines
-     - borders: The adminsitrative borders. Default is TRUE
-     - topo: The topography. Default is TRUE
-     - markersize: defualt is 100
-     - marker: a list containing the color and shape of the marker. Default is by archiveType.
-     Type pyleo.plot_default to get a list by archiveType
+     - name: the name of the LiPD file. **WITH THE .LPD EXTENSION!**.
+     If not provided, will prompt the user for one.
+     - gridlines: Gridlines as provided by cartopy. Default is none (False).
+     - borders: Pre-defined country boundaries fron Natural Earth datasets (http://www.naturalearthdata.com).
+     Default is on (True). 
+     - topo: Add the downsampled version of the Natural Earth shaded relief raster. Default is on (True)
+     - markersize: default is 100
+     - marker: a string (or list) containing the color and shape of the marker. Default is by archiveType.
+     Type pyleo.plot_default to see the default palette. 
      - saveFig: default is to save the figure
-     - dir: the name of the folder in the current directory. If not provided, creates
-      a folder called 'figures'
-     - format: the format in which to save the map. The default is eps.
+     - dir: the full path of the directory in which to save the figure. If not provided, creates
+      a default folder called 'figures' in the LiPD working directory (lipd.path).  
+     - format: One of the file extensions supported by the active backend. Default is "eps".
+      Most backend support png, pdf, ps, eps, and svg.
     """
     map1 = Map(plot_default)
     map1.map_one(name=name,gridlines = gridlines, borders = borders, \
@@ -91,19 +96,20 @@ def plotTS(timeseries = "", x_axis = "", markersize = 50,\
             marker = "default", saveFig = True, dir = "figures",\
             format="eps"):
     """
-    Plot a single time series
+    Plot a single time series. 
     Arguments:
-    - A timeseries. Be default, will prompt the user for one
+    - A timeseries: By default, will prompt the user for one. 
     - x_axis: The representation against which to plot the paleo-data. Options are "age",
-    "year", and "depth". Default is to let the system choose if only available or prompt
-    the user
-    - markersize: default is 50
-    - marker: a list of color and shape. Default uses the archive palette. Enter
-    pyleo.plot_default for details
+    "year", and "depth". Default is to let the system choose if only one available or prompt
+    the user. 
+    - markersize: default is 50. 
+    - marker: a string (or list) containing the color and shape of the marker. Default is by archiveType.
+     Type pyleo.plot_default to see the default palette.
     - saveFig: default is to save the figure
-    - dir: the name of the folder in the current directory. If not provided, creates
-      a folder called 'figures'
-    - format: the format in which to save the map. The default is eps.
+    - dir: the full path of the directory in which to save the figure. If not provided, creates
+      a default folder called 'figures' in the LiPD working directory (lipd.path). 
+    - format: One of the file extensions supported by the active backend. Default is "eps".
+      Most backend support png, pdf, ps, eps, and svg.
     """
     plot1 = Plot(plot_default, time_series)
     plot1.plotoneTSO(new_timeseries = timeseries, x_axis = x_axis, markersize = markersize,\
@@ -114,7 +120,7 @@ def plotTS(timeseries = "", x_axis = "", markersize = 50,\
 
 def TSstats(timeseries=""):
     """
-    Return the mean and standard deviation of the timeseries
+    Return the mean and standard deviation of the paleoData values of a timeseries
     Arguments:
     - Timeseries: sytem will prompt for one if not given
     """
@@ -124,20 +130,20 @@ def TSstats(timeseries=""):
 
 def TSbin(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
     """
-    Bin the values of the timeseries
+    Bin the paleoData values of the timeseries
     Arguments:
-            - Timeseries. Default is blank, will prompt for it
-            - x-axis: the time or depth index to use for binning. Valid keys
-            inlude: depth, age, and year. 
-            - bin_size: the size of the bins to be used. If not given, 
-            the function will prompt the user
-            - start: where the bins should start. Default is the minimum 
-            - end: where the bins should end. Default is the maximum
+      - Timeseries. By default, will prompt the user for one.
+      - x-axis: The representation against which to plot the paleo-data. Options are "age",
+    "year", and "depth". Default is to let the system choose if only one available or prompt
+    the user. 
+      - bin_size: the size of the bins to be used. By default, will prompt for one
+      - start: Start time/age/depth. Default is the minimum 
+      - end: End time/age/depth. Default is the maximum
     Outputs:
-           - binned_data: the binned output
-           - bins: the bins (centered on the median, i.e. the 100-200 bin is 150)
-           - n: number of data points in each bin
-           - error: the standard error on the mean in each bin
+      - binned_data: the binned output
+      - bins: the bins (centered on the median, i.e. the 100-200 bin is 150)
+      - n: number of data points in each bin
+      - error: the standard error on the mean in each bin
     """
     if not timeseries:
         timeseries = getTSO(time_series)
@@ -149,16 +155,16 @@ def TSinterp(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
     """
     Simple linear interpolation
     Arguments:
-            - Timeseries. Default is blank, will prompt for it
-            - x-axis: the time or depth index to use for binning. Valid keys
-            inlude: depth, age, and year. 
-            - interp_step: the step size. If not given, 
-            the function will prompt the user
-            - start: where the interpolation should start. Default is the minimum 
-            - end: where the interpolation should end. Default is the maximum
+      - Timeseries. Default is blank, will prompt for it
+      - x-axis: The representation against which to plot the paleo-data. Options are "age",
+    "year", and "depth". Default is to let the system choose if only one available or prompt
+    the user. 
+      - interp_step: the step size. By default, will prompt the user. 
+      - start: Start time/age/depth. Default is the minimum 
+      - end: End time/age/depth. Default is the maximum
     Outputs:
-           - interp_age: the interpolated age according to the end/start and time step
-           - interp_values: the interpolated values
+      - interp_age: the interpolated age/year/depth according to the end/start and time step
+      - interp_values: the interpolated values
     """
     if not timeseries:
         timeseries = getTSO(time_series)
@@ -176,7 +182,18 @@ def BasicSummary(timeseries = "", x_axis="", saveFig = True,
     3. Age-Depth profile if both are available from the paleodata
     4. Metadata
 
-    Save the figures into a local directory if prompted    
+    **Note**: The plots use default setting from the MapLiPD and plotTS method.
+    
+    Arguments:
+      - timeseries: By default, will prompt for one.
+      - x-axis: The representation against which to plot the paleo-data. Options are "age",
+    "year", and "depth". Default is to let the system choose if only one available or prompt
+    the user.
+      - saveFig: default is to save the figure
+      - dir: the full path of the directory in which to save the figure. If not provided, creates
+      a default folder called 'figures' in the LiPD working directory (lipd.path). 
+      - format: One of the file extensions supported by the active backend. Default is "eps".
+      Most backend support png, pdf, ps, eps, and svg.
     """
     plt1 = SummaryPlots(time_series, plot_default)
     plt1.basic(x_axis=x_axis, new_timeseries = timeseries, saveFig=saveFig,\

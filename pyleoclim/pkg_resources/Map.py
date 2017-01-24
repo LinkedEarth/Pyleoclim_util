@@ -4,7 +4,9 @@ Created on Thu Apr 21 11:00:07 2016
 
 @author: deborahkhider
 
-Mapping functions 
+Mapping functions.
+
+Uses the LiPD files directly rather than timeseries objects
 
 """
 
@@ -29,6 +31,14 @@ class Map(object):
     """
 
     def __init__(self, plot_default):
+        """
+        Passes the default color palette
+        Opens the LiPD files loaded in the workspace and grabs the following metadata:
+        1. Latitude
+        2. Longitude
+        3. archiveType
+        4. The filename
+        """
         
         # Organize the data        
 
@@ -50,7 +60,14 @@ class Map(object):
   
     def map_all(self, markersize = int(50), saveFig = True, dir="", format='eps'):
         """        
-        Make a map of all available records
+        Map all the available records loaded into the LiPD working directory by archiveType.
+        Arguments:
+          - markersize: default is 50
+          - saveFig: default is to save the figure
+          - dir: the full path of the directory in which to save the figure. If not provided, creates
+          a default folder called 'figures' in the LiPD working directory (lipd.path). 
+          - format: One of the file extensions supported by the active backend. Default is "eps".
+          Most backend support png, pdf, ps, eps, and svg.
         """
         ax = plt.axes(projection=ccrs.Robinson())
         ax.set_global()
@@ -96,7 +113,22 @@ class Map(object):
         topo = True, markersize = int(100), marker = "default", \
         saveFig = True, dir = "", format="eps"):
         """
-        Map one particular record. 
+        Makes a map for a single record. 
+        Arguments:
+         - name: the name of the LiPD file. **WITH THE .LPD EXTENSION!**.
+         If not provided, will prompt the user for one.
+         - gridlines: Gridlines as provided by cartopy. Default is none (False).
+         - borders: Pre-defined country boundaries fron Natural Earth datasets (http://www.naturalearthdata.com).
+         Default is on (True). 
+         - topo: Add the downsampled version of the Natural Earth shaded relief raster. Default is on (True)
+         - markersize: default is 100
+         - marker: a string (or list) containing the color and shape of the marker. Default is by archiveType.
+         Type pyleo.plot_default to see the default palette. 
+         - saveFig: default is to save the figure
+         - dir: the full path of the directory in which to save the figure. If not provided, creates
+          a default folder called 'figures' in the LiPD working directory (lipd.path).  
+         - format: One of the file extensions supported by the active backend. Default is "eps".
+          Most backend support png, pdf, ps, eps, and svg.
         """
         # Check whether the record name was provided
         if not name:

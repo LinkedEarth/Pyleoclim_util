@@ -4,7 +4,9 @@ Created on Mon Nov 21 13:07:07 2016
 
 @author: deborahkhider
 
-LiPD file manipulations. Except for maps, most manipulations are done on the time series objects
+LiPD file manipulations. Except for maps, most manipulations are done on the timeseries objects.
+
+See the LiPD documentation for more information on timeseries objects (TSO)
 
 """
 
@@ -19,12 +21,17 @@ import os
 from matplotlib import gridspec
 
 """
-The following functions handle creating new directories and saving figures/logs
+The following functions handle creating new directories and saving figures and logs
 """
 
 def createdir(path, foldername):
     """
-    create a new folder in the working directory
+    create a new folder in a working directory
+    Arguments:
+      - path: the path to the new folder.
+      - foldername: the name of the folder to be created
+    Outputs:
+      - newdir: the full path to the new directory
     """
 
     if not os.path.exists(path+'/'+foldername):
@@ -36,11 +43,13 @@ def createdir(path, foldername):
 
 def saveFigure(name, format="eps",dir=""):
     """
-    Save the figures if asked
-    Input:
-        name: name of the file
-        format: the chosen format (default is eps)
-        dir: the directory in which to save the file (default is a "figures" folder in the LiPD file directory)
+    Save the figures 
+    Arguments:
+      - name: name of the file
+      - format: One of the file extensions supported by the active backend. Default is "eps".
+      Most backend support png, pdf, ps, eps, and svg.
+      - dir: the name of the folder in the LiPD working directory. If not provided, creates
+      a default folder called 'figures'.
     """
     if not dir:
         newdir = createdir(lpd.path,"figures")            
@@ -56,7 +65,7 @@ The following functions handle the LiPD files
     
 def enumerateLipds():
     """
-    enumerate the LiPDs loaded in the workspace
+    enumerate the LiPD files loaded in the workspace
     """
     lipd_in_directory = lpd.getLipdNames()
     print("Below are the available records")
@@ -67,6 +76,8 @@ def promptforLipd():
     """
     Ask the user to select a LiPD file from a list
     Use this function in conjunction with enumerateLipds()
+    Outputs:
+      - the index of the LiPD file
     """
     select_lipd = int(input("Enter the number of the file you wish to analyze: "))
     return select_lipd 
@@ -78,7 +89,9 @@ The following functions work at the variables level
 def promptforVariable():
     """
     Ask the user to select the variable they are interested in.
-    Use this function in conjunction with readHeaders or getTSO
+    Use this function in conjunction with readHeaders() or getTSO()
+    Outputs:
+      - The index of the variable
     """
     select_var = int(input("Enter the number of the variable you wish to use: ")) 
     return select_var
@@ -87,9 +100,11 @@ def valuesloc(dataframe, missing_value = "NaN", var_idx = 1):
     """
     Look for the indexes where there are no missing values for the variable
     Inputs:
-        - Dataframe
-        - missing_value: how are the missing value represented. Default is NaN
-        - var_idx: the column number (default is the second column)
+      - A Panda Dataframe
+      - missing_value: how are the missing value represented. Default is NaN
+      - var_idx: the column number in which to look for the missing values (default is the second column)
+    Outputs:
+      - val_idx: the indices of the lines in the dataframe containing the actual values
     """
     
     # Get the index with the appropriate values
@@ -105,7 +120,15 @@ def valuesloc(dataframe, missing_value = "NaN", var_idx = 1):
 
     return val_idx
 
-def TSOxaxis(time_series): 
+def TSOxaxis(time_series):
+    """
+    Prompt the user to choose a x-axis representation for the timeseries.
+    Inputs:
+     - A timeseries object
+    Outputs:
+     - x_axis: the values for the x-axis representation.
+     - label: returns either "age", "year", or "depth"
+    """
     if "depth" in time_series.keys() and "age" in time_series.keys() or\
             "depth" in time_series.keys() and "year" in time_series.keys():
         print("Do you want to plot vs time or depth?")
@@ -153,6 +176,9 @@ The following functions handle the time series objects
 def enumerateTSO(time_series):
     """
     Enumerate the available time series objects
+    Arguments:
+     - A dictionary of available timeseries objects. To use the timeseries loaded upon initiation of the
+     pyleoclim package, use pyleo.time_series. 
     """
     available_y = []
     dataSetName =[]
@@ -168,7 +194,11 @@ def enumerateTSO(time_series):
 
 def getTSO(time_series):
     """
-    Get a specific time series object
+    Get a specific timeseries object from a dictionary of timeseries
+    Arguments:
+     - A dictionary of timeseries.
+    Outputs:
+     - A single timeseries object from the dictionary
     """        
     enumerateTSO(time_series)
     select_TSO = promptforVariable()
@@ -177,6 +207,15 @@ def getTSO(time_series):
     return new_TSO
 
 def TStoDF(time_series, x_axis = ""):
+    """
+    Create a dataframe from a timeseries object with two colums: depth/age representation
+    and the paleoData values
+    Arguments:
+    - A timeseries object
+    - x-axis: The representation against which to plot the paleo-data. Options are "age",
+    "year", and "depth". Default is to let the system choose if only one available or prompt
+    the user.
+    """
     if not x_axis:
         x_axis, label = TSOxaxis(time_series)
     elif x_axis == "year":
@@ -201,6 +240,10 @@ Handle mapping to LinkedEarth Ontology if needed
 def LiPDtoOntology(archiveType):
     """
     Transform the archiveType from their LiPD name to their ontology counterpart
+    Arguments:
+      - archiveType from the LiPD file
+    Output:
+      - arhciveType according to the ontology
     """
     #Align with the ontology
     if archiveType.lower()== "ice core":
