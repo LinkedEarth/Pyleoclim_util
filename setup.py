@@ -4,7 +4,7 @@ import sys
 import io
 import path
 
-version = '0.1.0'
+version = '0.1.1'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
@@ -44,11 +44,11 @@ setup(
     author = 'Deborah Khider',
     author_email = 'dkhider@gmail.com',
     url = 'https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
-    download_url = 'https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim/tarball/0.1',
+    download_url = 'https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim/tarball/0.2.0',
     keywords = ['Paleoclimate, Data Analysis'],
     classifiers = [],
     install_requires = [
-    "LiPD>=0.1.8.1",
+    "LiPD=0.1.8.2",
     "pandas>=0.19.2",
     "numpy>=1.12.0",
     "matplotlib>=2.0.0",

@@ -11,6 +11,7 @@
 
 * [What is it?](#what)
 * [Installation](#install)
+* [Version Information](#version)
 * [Quickstart Guide](#quickstart)
 * [Requirements](#req)
 * [Further information](#further_info)
@@ -18,7 +19,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.1.0
+Current Version: 0.1.1
 
 ### <a name = "what">What is it?</a>
 
@@ -26,21 +27,25 @@ Pyleoclim is a Python package primarily geared towards the analysis and visualiz
 
 The packages assumes that data are stored in the Linked Paleo Data ([LiPD](http://www.clim-past.net/12/1093/2016/)) format and makes extensive use of the [LiPD utilities](http://nickmckay.github.io/LiPD-utilities/). The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses very much like [GeoChronR](http://nickmckay.github.io/GeoChronR/).
 
-**Current capabilities**: 
+**Current capabilities**:
  - binning
- - interpolation 
+ - interpolation
  - plotting maps, timeseries, and basic age model information
  - paleo-aware correlation analysis (isopersistent, isospectral and classical t-test)
 
-**Future capabilities**: 
+**Future capabilities**:
  - spectral analysis (Multi-Taper Method, Lomb-Scargle)
  - weighted wavelet Z transform (WWZ)
  - cross-wavelet analysis
  - index reconstruction
  - climate reconstruction
  - ensemble methods for all of the above
- 
+
  If you have specific requests, please contact linkedearth@gmail.com
+
+### <a name = "version">Version Information</a>
+0.1.1: Freezes the package before to version 0.1.8.2 of LiPD utilities
+0.1.0: First release
 
 ### <a name = "install"> Installation </a>
 
@@ -67,7 +72,7 @@ pip install pyleoclim
 
 ### <a name="req">Requirements</a>
 
-- LiPD v0.1.8+
+- LiPD v0.1.8.2
 - pandas v0.19+
 - numpy v1.12+
 - matplotlib v2.0+
