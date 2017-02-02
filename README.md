@@ -1,7 +1,7 @@
-[![PyPI](https://img.shields.io/pypi/dm/pyleoclim.svg?maxAge=2592000)](https://pypi.python.org/pypi/Pyleoclim)
-[![PyPI](https://img.shields.io/pypi/v/pyleoclim.svg?maxAge=2592000)]()
+[![PyPI](https://img.shields.io/pypi/dm/pyleoclim.svg)](https://pypi.python.org/pypi/Pyleoclim)
+[![PyPI](https://img.shields.io/pypi/v/pyleoclim.svg)]()
 [![PyPI](https://img.shields.io/badge/python-3.5-yellow.svg)]()
-[![license](https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg?maxAge=2592000)]()
+[![license](https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg)]()
 
 #Pyleoclim
 

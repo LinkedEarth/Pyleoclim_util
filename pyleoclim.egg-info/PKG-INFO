@@ -1,12 +1,12 @@
 Metadata-Version: 1.1
 Name: pyleoclim
-Version: 0.1.0
+Version: 0.1.1
 Summary: A Python package for paleoclimate data analysis
 Home-page: https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim
 Author: Deborah Khider
 Author-email: dkhider@gmail.com
 License: GNU Public
-Download-URL: https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim/tarball/0.1
+Download-URL: https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.1.1
 Description: |PyPI| |PyPI| |PyPI| |license|
         
         Pyleoclim
@@ -18,6 +18,7 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         
         -  `What is it? <#what>`__
         -  `Installation <#install>`__
+        -  `Version Information <#version>`__
         -  `Quickstart Guide <#quickstart>`__
         -  `Requirements <#req>`__
         -  `Further information <#further_info>`__
@@ -25,12 +26,41 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         -  `License <#license>`__
         -  `Disclaimer <#disclaimer>`__
         
-        Current Version: 0.1.0
+        Current Version: 0.1.1
         
         What is it?
         -----------
         
-        Pyleoclim is a Python package for the analyses of paleoclimate data.
+        Pyleoclim is a Python package primarily geared towards the analysis and
+        visualization of paleoclimate data. Such data often come in the form of
+        timeseries with missing values and age uncertainties, and the package
+        includes several-low level methods to deal with these issues, as well as
+        high-level methods that re-use those to perform scientific workflows.
+        
+        The packages assumes that data are stored in the Linked Paleo Data
+        (`LiPD <http://www.clim-past.net/12/1093/2016/>`__) format and makes
+        extensive use of the `LiPD
+        utilities <http://nickmckay.github.io/LiPD-utilities/>`__. The package
+        is aware of age ensembles stored via LiPD and uses them for
+        time-uncertain analyses very much like
+        `GeoChronR <http://nickmckay.github.io/GeoChronR/>`__.
+        
+        **Current capabilities**: - binning - interpolation - plotting maps,
+        timeseries, and basic age model information - paleo-aware correlation
+        analysis (isopersistent, isospectral and classical t-test)
+        
+        **Future capabilities**: - spectral analysis (Multi-Taper Method,
+        Lomb-Scargle) - weighted wavelet Z transform (WWZ) - cross-wavelet
+        analysis - index reconstruction - climate reconstruction - ensemble
+        methods for all of the above
+        
+        If you have specific requests, please contact linkedearth@gmail.com
+        
+        Version Information
+        -------------------
+        
+        0.1.1: Freezes the package before to version 0.1.8.2 of LiPD utilities
+        0.1.0: First release
         
          Installation 
         --------------
@@ -68,7 +98,7 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         Requirements
         ------------
         
-        -  LiPD v0.1.8+
+        -  LiPD v0.1.8.2
         -  pandas v0.19+
         -  numpy v1.12+
         -  matplotlib v2.0+
@@ -111,9 +141,9 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         the investigators and do not necessarily reflect the views of the
         National Science Foundation.
         
-        .. |PyPI| image:: https://img.shields.io/pypi/dm/Pyleoclim.svg?maxAge=2592000
+        .. |PyPI| image:: https://img.shields.io/pypi/dm/pyleoclim.svg?maxAge=2592000
            :target: https://pypi.python.org/pypi/Pyleoclim
-        .. |PyPI| image:: https://img.shields.io/pypi/v/Pyleoclim.svg?maxAge=2592000
+        .. |PyPI| image:: https://img.shields.io/pypi/v/pyleoclim.svg?maxAge=2592000
            :target: 
         .. |PyPI| image:: https://img.shields.io/badge/python-3.5-yellow.svg
            :target: 
