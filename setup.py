@@ -44,7 +44,7 @@ setup(
     author = 'Deborah Khider',
     author_email = 'dkhider@gmail.com',
     url = 'https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
-    download_url = 'https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim/tarball/0.2.0',
+    download_url = 'https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim/tarball/0.1.1',
     keywords = ['Paleoclimate, Data Analysis'],
     classifiers = [],
     install_requires = [
