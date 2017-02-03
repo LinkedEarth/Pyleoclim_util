@@ -34,7 +34,7 @@ class Plot(object):
         self.default = plot_default    
     
     def plotoneTSO(self, new_timeseries = "", x_axis = "", markersize = 50,\
-                   marker = "default", saveFig = True, dir = "figures",\
+                   marker = "default", saveFig = False, dir = "",\
                    format="eps"):
         """
         Plot a timeseries object:
@@ -46,7 +46,7 @@ class Plot(object):
          - markersize: default is 50. 
          - marker: a string (or list) containing the color and shape of the marker. Default is by archiveType.
          Type pyleo.plot_default to see the default palette.
-         - saveFig: default is to save the figure
+         - saveFig: default is to not save the figure
          - dir: the full path of the directory in which to save the figure. If not provided, creates
          a default folder called 'figures' in the LiPD working directory (lipd.path). 
          - format: One of the file extensions supported by the active backend. Default is "eps".
@@ -106,6 +106,7 @@ class Plot(object):
                 y_axis_label = new_timeseries["paleoData_variableName"]
         
         #Make the plot
+        fig = plt.figure()
         plt.style.use("ggplot")
         if marker == "default":
             marker = [self.default[archiveType][0],self.default[archiveType][1]]
@@ -141,14 +142,16 @@ class Plot(object):
         
         #Save the figure if asked
         if saveFig == True:
-            name = '/plot_timeseries_'+new_timeseries["dataSetName"]+\
+            name = 'plot_timeseries_'+new_timeseries["dataSetName"]+\
                 "_"+y_axis_label
             saveFigure(name,format,dir)
         else:
             plt.show()
 
+        return fig
+    
     def agemodelplot(self, new_timeseries = "", markersize = 50,\
-                   marker = "default", saveFig = True, dir = "figures",
+                   marker = "default", saveFig = True, dir = "",
                    format="eps" ):
         """
         Make a simple age-depth profile
@@ -159,7 +162,7 @@ class Plot(object):
          - markersize: default is 50. 
          - marker: a string (or list) containing the color and shape of the marker. Default is by archiveType.
          Type pyleo.plot_default to see the default palette.
-         - saveFig: default is to save the figure
+         - saveFig: default is to not save the figure
          - dir: the full path of the directory in which to save the figure. If not provided, creates
          a default folder called 'figures' in the LiPD working directory (lipd.path). 
          - format: One of the file extensions supported by the active backend. Default is "eps".
@@ -220,6 +223,7 @@ class Plot(object):
         archiveType = LiPDtoOntology(new_timeseries["archiveType"]) 
         
         # Make the plot
+        fig = plt.figure()
         plt.style.use("ggplot")
         if marker == "default":
             plt.plot(x,y,
@@ -235,7 +239,9 @@ class Plot(object):
         
         #Save the figure if asked
         if saveFig == True:
-            name = '/plot_agemodel_'+new_timeseries["dataSetName"]
+            name = 'plot_agemodel_'+new_timeseries["dataSetName"]
             saveFigure(name,format,dir)
         else:
             plt.show()
+
+        return fig    

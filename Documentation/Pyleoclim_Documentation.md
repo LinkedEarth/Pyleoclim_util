@@ -1,4 +1,4 @@
-#Pyleoclim Documentation
+#Pyleoclim Documentation v0.1.2
 
 **Index**
 * [User Guide](#user_guide)
@@ -21,7 +21,7 @@ To help you get started with Pyleoclim, refer to the Jupyter Notebook on our <a 
 #### `MapAll()`
 This function maps all the LiPD records in the working directory according to archiveType. It uses a default palette color accessible by typing `pyleo.plot_default`
 
-Synthax: `pyleoclim.MapAll(markersize = int(50), saveFig = True, dir = "", format = "eps")`
+Synthax: `fig = pyleoclim.MapAll(markersize = 50, saveFig = False, dir = "", format = "eps")`
 
 Optional arguments:
 * `markersize`: default is 50
@@ -29,21 +29,30 @@ Optional arguments:
 * `dir`: a folder in the current directory, where the various figures can be saved. If left blank, a folder named `figures` will be automatically created
 * `format`: One of the file extensions supported by the active backend. Default is `eps`. Most backends support `png`, `pdf`, `ps`, and `svg`.
 
+Returns: `fig`
+
 #### `MapLiPD()`
 This function maps one particular LiPD record stored in the working directory.
 
-Synthax: `pyleoclim.MapLiPD(name="",gridlines = False, borders = True, topo = True, markersize = int(100), marker = "default", saveFig = True, dir = "", format = "eps")`
+Synthax: `fig = pyleoclim.MapLiPD(name="", countries = True, counties = False, \
+        rivers = False, states = False, background = "shadedrelief",\
+        scale = 0.5, markersize = 50, marker = "default", \
+        saveFig = False, dir = "", format="eps")`
 
 Optional arguments:
-* `name`: Name of the LiPD record of interest, ***including the extension***! If you need a list of the records name you can either use `showLipds()` or leave the name blank. You'll be prompted to choose the record from a list.
-* `gridlines`: Default is False.
-* `borders`: Administrative borders. Default is `True`
-* `topo`: Default cartopy topography. Default is `True`
-* `markersize`: Default is 100
-* `marker`: Pyleoclim comes with default marker shape and color for the various archives. If you wish to change the default marker, enter the color and shape (**in this order**). For instance to use a red square, use `'rs'`
-*  `saveFig`: if `True`, saves the map into the `dir` folder in the current working directory.
-* `dir`: a folder in the current directory, where the various figures can be saved. If left blank, a folder named `figures` will be automatically created
-* `format`: One of the file extensions supported by the active backend. Default is `eps`. Most backends support `png`, `pdf`, `ps`, and `svg`.
+* `name`: the name of the LiPD file. **WITH THE .LPD EXTENSION!**. If not provided, will prompt the user for one.
+* `countries`: Draws the country borders. Default is on (True).
+* `counties`: Draws the USA counties. Default is off (False).
+* `states`: Draws the American and Australian states borders. Default is off (False)
+* `background`: Plots one of the following images on the map: bluemarble, etopo, shadedrelief, or none (filled continents). Default is shadedrelief
+* `scale`: useful to downgrade the original image resolution to speed up the process. Default is 0.5.
+* `markersize`: default is 100
+* `marker`: a string (or list) containing the color and shape of the marker. Default is by archiveType. Type pyleo.plot_default to see the default palette.
+* `saveFig`: default is to not save the figure
+* `dir`: the full path of the directory in which to save the figure. If not provided, creates a default folder called 'figures' in the LiPD working directory (lipd.path).  
+* `format`: One of the file extensions supported by the active backend. Default is "eps". Most backend support png, pdf, ps, eps, and svg.
+
+Returns: `fig`
 
 ### <a id="plotting">Plotting</a>
 
@@ -52,7 +61,7 @@ Optional arguments:
 Plot a time series.
 
 Synthax:
-`pyleoclim.PlotTS(timeseries = "", x_axis = "", markersize = 50, marker = "default", saveFig = True, dir = "figures", format="eps")`
+`fig = pyleoclim.PlotTS(timeseries = "", x_axis = "", markersize = 50, marker = "default", saveFig = False, dir = "figures", format="eps")`
 
 Optional arguments:
 * `timeseries`: A timeseries object as defined in LiPD. If left blank, you'll be prompted to choose the record from a list.
@@ -62,6 +71,8 @@ Optional arguments:
 *  `saveFig`: if `True`, saves the map into the `dir` folder in the current working directory.
 * `dir`: a folder in the current directory, where the various figures can be saved. If left blank, a folder named `figures` will be automatically created
 * `format`: One of the file extensions supported by the active backend. Default is `eps`. Most backends support `png`, `pdf`, `ps`, and `svg`.
+
+Returns: `fig`
 
 #### <a id="summaryplt">Summary Plots</a>
 
@@ -75,13 +86,15 @@ This functions plots:
 3. Age/depth profile if both are available in the paleoDataTable
 4. Metadata information
 
-Synthax: `pyleoclim.BasicSummary(timeseries = "", x_axis="", saveFig = True, format = "eps", dir = "figures")`
+Synthax: `fig  = pyleoclim.BasicSummary(timeseries = "", x_axis="", saveFig = False, format = "eps", dir = "figures")`
 
 * `timeseries`: A timeseries object as defined in LiPD. If left blank, you'll be prompted to choose the record from a list.
 * `x-axis`: The representation against which to plot the paleo-data. Options are "age","year", and "depth". Default is to let the system choose if only one available or prompt the user.  
-*  `saveFig`: if `True`, saves the map into the `dir` folder in the current working directory.
+* `saveFig`: if `True`, saves the map into the `dir` folder in the current working directory.
 * `dir`: a folder in the current directory, where the various figures can be saved. If left blank, a folder named `figures` will be automatically created
 * `format`: One of the file extensions supported by the active backend. Default is `eps`. Most backends support `png`, `pdf`, `ps`, and `svg`.
+
+Returns: `fig`
 
 ### <a id="basic">Basic functionalities</a>
 #### `TSstats()`

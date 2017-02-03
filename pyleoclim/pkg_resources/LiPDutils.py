@@ -120,7 +120,7 @@ def valuesloc(dataframe, missing_value = "NaN", var_idx = 1):
 
     return val_idx
 
-def TSOxaxis(time_series):
+def TSOxaxis(timeseries):
     """
     Prompt the user to choose a x-axis representation for the timeseries.
     Inputs:
@@ -129,41 +129,41 @@ def TSOxaxis(time_series):
      - x_axis: the values for the x-axis representation.
      - label: returns either "age", "year", or "depth"
     """
-    if "depth" in time_series.keys() and "age" in time_series.keys() or\
-            "depth" in time_series.keys() and "year" in time_series.keys():
+    if "depth" in timeseries.keys() and "age" in timeseries.keys() or\
+            "depth" in timeseries.keys() and "year" in timeseries.keys():
         print("Do you want to plot vs time or depth?")
         choice = int(input("Enter 0 for time and 1 for depth: "))
         if choice == 0:
-            if "age" in time_series.keys() and "year" in time_series.keys():
+            if "age" in timeseries.keys() and "year" in timeseries.keys():
                 print("Do you want to use age or year?")
                 choice2 = int(input("Enter 0 for age and 1 for year: "))
                 if choice2 == 0:
-                    x_axis = time_series["age"]
+                    x_axis = timeseries["age"]
                     label = "age"
                 elif choice2 == 1:
-                    x_axis = time_series["year"]
+                    x_axis = timeseries["year"]
                     label = "year"
                 else:
                     sys.exit("Enter 0 or 1")
-            elif "age" in time_series.keys():
-                x_axis = time_series["age"]
+            elif "age" in timeseries.keys():
+                x_axis = timeseries["age"]
                 label = "age"
-            elif "year" in time_series.keys():
-                x_axis = time_series["year"]
+            elif "year" in timeseries.keys():
+                x_axis = timeseries["year"]
                 label = "year"            
         elif choice == 1:
-            x_axis = time_series["depth"]
+            x_axis = timeseries["depth"]
             label = "depth"
         else: 
             sys.exit("Enter 0 or 1")
-    elif "depth" in time_series.keys():
-        x_axis =  time_series["depth"]
+    elif "depth" in timeseries.keys():
+        x_axis =  timeseries["depth"]
         label = "depth"
-    elif "age" in time_series.keys():
-        x_axis = time_series["age"]
+    elif "age" in timeseries.keys():
+        x_axis = timeseries["age"]
         label = "age"
-    elif "year" in time_series.keys():
-        x_axis = time_series["year"]
+    elif "year" in timeseries.keys():
+        x_axis = timeseries["year"]
         label = "year" 
     else: 
         sys.exist("No age or depth information available")
@@ -173,7 +173,7 @@ def TSOxaxis(time_series):
 """
 The following functions handle the time series objects
 """
-def enumerateTSO(time_series):
+def enumerateTSO(timeseries_list):
     """
     Enumerate the available time series objects
     Arguments:
@@ -182,7 +182,7 @@ def enumerateTSO(time_series):
     """
     available_y = []
     dataSetName =[]
-    for index,val in enumerate(time_series):
+    for index,val in enumerate(timeseries_list):
         for key, value in val.items():
             if 'dataSetName' in key:
                 dataSetName.append(value)
@@ -192,7 +192,7 @@ def enumerateTSO(time_series):
     for idx,val in enumerate(available_y):
         print(idx,': ',dataSetName[idx], ': ', val)     
 
-def getTSO(time_series):
+def getTSO(timeseries_list):
     """
     Get a specific timeseries object from a dictionary of timeseries
     Arguments:
@@ -200,13 +200,13 @@ def getTSO(time_series):
     Outputs:
      - A single timeseries object from the dictionary
     """        
-    enumerateTSO(time_series)
+    enumerateTSO(timeseries_list)
     select_TSO = promptforVariable()
-    new_TSO = time_series[select_TSO]
+    new_TSO = timeseries_list[select_TSO]
 
     return new_TSO
 
-def TStoDF(time_series, x_axis = ""):
+def TStoDF(timeseries, x_axis = ""):
     """
     Create a dataframe from a timeseries object with two colums: depth/age representation
     and the paleoData values
@@ -217,20 +217,20 @@ def TStoDF(time_series, x_axis = ""):
     the user.
     """
     if not x_axis:
-        x_axis, label = TSOxaxis(time_series)
+        x_axis, label = TSOxaxis(timeseries)
     elif x_axis == "year":
-        x_axis = time_series["year"]
+        x_axis = timeseries["year"]
         label = "year"
     elif x_axis == "age":
-        x_axis = time_series["age"]
+        x_axis = timeseries["age"]
         label= "age"
     elif x_axis == "depth":
-        x_axis = time_series["depth"]
+        x_axis = timeseries["depth"]
         label= "depth"
     else:
         sys.exit("Please enter 'depth' or 'age'")
     dataframe = pd.DataFrame({label:x_axis,
-                          'y-axis':time_series["paleoData_values"]}) 
+                          'y-axis':timeseries["paleoData_values"]}) 
 
     return dataframe    
 

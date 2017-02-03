@@ -12,8 +12,7 @@ import lipd as lpd
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import cartopy
-import cartopy.crs as ccrs
+from mpl_toolkits.basemap import Basemap
 import sys
 import os
 from matplotlib import gridspec
@@ -24,11 +23,11 @@ from .Basic import *
 
 class SummaryPlots(object):
 
-    def __init__(self,time_series,plot_default):
+    def __init__(self,timeseries_dict,plot_default):
         """
         Passes the dictionary of timeseries and the color palette
         """
-        self.TS = time_series
+        self.TS = timeseries_dict
         self.default = plot_default
         
     def getMetadata(self, time_series):
@@ -286,7 +285,7 @@ class SummaryPlots(object):
         return x, y, x_axis_label, y_axis_label, archiveType
         
     def basic(self,x_axis="", new_timeseries = "", saveFig = True,
-                     format = "eps", dir = "figures"):
+                     format = "eps", dir = ""):
         """
         Makes a basic summary plot
         1. The time series
@@ -301,7 +300,7 @@ class SummaryPlots(object):
         - x-axis: The representation against which to plot the paleo-data. Options are "age",
        "year", and "depth". Default is to let the system choose if only one available or prompt
        the user.
-        - saveFig: default is to save the figure
+        - saveFig: default is to not save the figure
         - dir: the full path of the directory in which to save the figure. If not provided, creates
         a default folder called 'figures' in the LiPD working directory (lipd.path). 
         - format: One of the file extensions supported by the active backend. Default is "eps".
@@ -363,18 +362,16 @@ class SummaryPlots(object):
         lon = new_timeseries["geo_meanLon"]
     
         #Make the map
-        ax2 = fig.add_subplot(gs[1,0],projection=ccrs.Orthographic(lon,lat))
-        ax2.stock_img()
-        ax2.add_feature(cartopy.feature.LAND, 
-                       edgecolor='black', facecolor='none')
-        ax2.add_feature(cartopy.feature.BORDERS, linestyle='-')
-        ax2.set_global()
-        ax2.scatter(lon,lat,
+        ax2 = fig.add_subplot(gs[1,0])
+        map = Basemap(projection='ortho', lon_0=lon, lat_0=lat)
+        map.drawcoastlines()
+        map.shadedrelief(scale=0.5)
+        map.drawcountries()
+        X,Y = map(lon,lat)
+        map.scatter(X,Y,
                    s = 150,
-                   facecolor = self.default[archiveType][0],
-                   edgecolor = 'k',
-                   marker = self.default[archiveType][1],
-                   transform=ccrs.Geodetic())
+                   color = self.default[archiveType][0],
+                   marker = self.default[archiveType][1])
         
         #Make the age model plot
         if "age" in new_timeseries.keys() and "depth" in new_timeseries.keys()\
@@ -416,3 +413,5 @@ class SummaryPlots(object):
             saveFigure(name,format,dir)
         else:
             plt.show()
+
+        return fig    

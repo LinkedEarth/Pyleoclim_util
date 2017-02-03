@@ -24,40 +24,40 @@ from .LiPDutils import *
 
 class Basic(object):
     
-    def __init__(self,time_series):
+    def __init__(self,timeseries_dict):
         """
         Pass the time_series dictionary into the Basic object
         """
-        self.TS = time_series
+        self.TS = timeseries_dict
 
     @staticmethod
-    def getValues(new_timeseries):
+    def getValues(timeseries):
         """
         Get the paleoData values from the timeseries object
         Arguments:
         - new_timeseries: a single timeseries object. Use getTSO() to get one from the dictionary
         """
         values_key =[]
-        for key, val in new_timeseries.items():
+        for key, val in timeseries.items():
             if "values" in key.lower():
                 values_key.append(key)
         
-        values = new_timeseries[values_key[0]]
+        values = timeseries[values_key[0]]
 
         return values             
     
         
-    def simpleStats(self, new_timeseries=""):
+    def simpleStats(self, timeseries=""):
         """
         Compute the mean and standard deviation of a time series
         Arguments:
         - new_timeseries: a single timeseries. Will prompt for one if not available
         """        
         # get the values
-        if not new_timeseries:
-            new_timeseries = getTSO(self.TS)
+        if not timeseries:
+            timeseries = getTSO(self.TS)
 
-        values = Basic.getValues(new_timeseries)    
+        values = Basic.getValues(timeseries)    
      
         mean = np.nanmean(values)
         std = np.nanstd(values) 
@@ -65,7 +65,7 @@ class Basic(object):
         return mean, std
     
     @staticmethod    
-    def bin_data(new_timeseries, x_axis = "", bin_size = "", start = "", end = ""):
+    def bin_data(timeseries, x_axis = "", bin_size = "", start = "", end = ""):
         """
         Bin the data.
         Arguments:
@@ -84,30 +84,36 @@ class Basic(object):
         """
         
         # Get the values
-        values = Basic.getValues(new_timeseries)
+        values = Basic.getValues(timeseries)
         
         # Get the time (or depth) representation
         if not x_axis:
-            time, label = TSOxaxis(new_timeseries)
+            time, label = TSOxaxis(timeseries)
         elif x_axis == 'age':
-            time = new_timeseries['age']
+            time = timeseries['age']
             label = 'age'
         elif x_axis == "year":
-            time = new_timeseries['year']
+            time = timeseries['year']
             label = 'year'
         elif x_axis == 'depth':
-            time = new_timeseries['depth']
+            time = timeseries['depth']
             label = 'depth'
         else:
             sys.exit("Enter either 'age', 'year', or 'depth'")
             
         # Get the units
         if label == "age":
-            units = new_timeseries["ageUnits"]
+            if "ageUnits" in timeseries.keys():
+                units = timeseries["ageUnits"]
+            else: units = 'NA'    
         elif label == "year":
-            units = new_timeseries["yearUnits"]
+            if "yearUnits" in timeseries.keys():
+                units = timeseries["yearUnits"]
+            else: units = 'NA'
         elif label == "depth":
-            units = new_timeseries["depthUnits"]
+            if "depthUnits" in timeseries.keys():
+                units = timeseries["depthUnits"]
+            else: units = 'NA'
 
         # Check for bin_size, startdate and enddate
         if not bin_size:
@@ -139,7 +145,7 @@ class Basic(object):
         return bins, binned_data, n, error
 
     @staticmethod
-    def interp_data(new_timeseries, x_axis = "", interp_step="",start ="",\
+    def interp_data(timeseries, x_axis = "", interp_step="",start ="",\
                     end =""):
         """
         Linear interpolation of the paleodata
@@ -157,29 +163,35 @@ class Basic(object):
         """
             
         # Get the values and age
-        values = Basic.getValues(new_timeseries)
+        values = Basic.getValues(timeseries)
         # Get the time (or depth) representation
         if not x_axis:
-            time, label = TSOxaxis(new_timeseries)
+            time, label = TSOxaxis(timeseries)
         elif x_axis == 'age':
-            time = new_timeseries['age']
+            time = timeseries['age']
             label = 'age'
         elif x_axis == "year":
-            time = new_timeseries['year']
+            time = timeseries['year']
             label = 'year'
         elif x_axis == 'depth':
-            time = new_timeseries['depth']
+            time = timeseries['depth']
             label = 'depth'
         else:
             sys.exit("Enter either 'age', 'year', or 'depth'")
             
         # Get the units
         if label == "age":
-            units = new_timeseries["ageUnits"]
+            if "ageUnits" in timeseries.keys():
+                units = timeseries["ageUnits"]
+            else: units = 'NA'    
         elif label == "year":
-            units = new_timeseries["yearUnits"]
+            if "yearUnits" in timeseries.keys():
+                units = timeseries["yearUnits"]
+            else: units = 'NA'
         elif label == "depth":
-            units = new_timeseries["depthUnits"]
+            if "depthUnits" in timeseries.keys():
+                units = timeseries["depthUnits"]
+            else: units = 'NA'
 
         # Check for interp_step, startdate and enddate
         if not interp_step:

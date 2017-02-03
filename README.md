@@ -19,7 +19,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.1.1
+Current Version: 0.1.2
 
 ### <a name = "what">What is it?</a>
 
@@ -44,6 +44,7 @@ The packages assumes that data are stored in the Linked Paleo Data ([LiPD](http:
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>
+0.1.2: Compatible with LiPD utilities version 0.1.8.3. Uses basemap instead of cartopy
 0.1.1: Freezes the package before to version 0.1.8.2 of LiPD utilities
 0.1.0: First release
 
@@ -72,15 +73,13 @@ pip install pyleoclim
 
 ### <a name="req">Requirements</a>
 
-- LiPD v0.1.8.2
+- LiPD v0.1.8.3
 - pandas v0.19+
 - numpy v1.12+
 - matplotlib v2.0+
-- Cartopy v0.13+
+- Basemap v1.0.7+
 
-The installer will automatically check for the needed updates ***except*** for Cartopy.
-
-Cartopy doesn't install properly through pip. Use <a href="http://conda.pydata.org/miniconda.html"> Conda</a>. See the instructions on the <a href="http://scitools.org.uk/cartopy/docs/latest/installing.html"> developer website.
+The installer will automatically check for the needed updates
 
 ### <a name="further_info">Further information</a>
 
