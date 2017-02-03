@@ -1,12 +1,12 @@
 Metadata-Version: 1.1
 Name: pyleoclim
-Version: 0.1.1
+Version: 0.1.2
 Summary: A Python package for paleoclimate data analysis
 Home-page: https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim
 Author: Deborah Khider
 Author-email: dkhider@gmail.com
 License: GNU Public
-Download-URL: https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.1.1
+Download-URL: https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.1.2
 Description: |PyPI| |PyPI| |PyPI| |license|
         
         Pyleoclim
@@ -26,7 +26,7 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         -  `License <#license>`__
         -  `Disclaimer <#disclaimer>`__
         
-        Current Version: 0.1.1
+        Current Version: 0.1.2
         
         What is it?
         -----------
@@ -59,8 +59,9 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         Version Information
         -------------------
         
-        0.1.1: Freezes the package before to version 0.1.8.2 of LiPD utilities
-        0.1.0: First release
+        0.1.2: Compatible with LiPD utilities version 0.1.8.3. Uses basemap
+        instead of cartopy 0.1.1: Freezes the package before to version 0.1.8.2
+        of LiPD utilities 0.1.0: First release
         
          Installation 
         --------------
@@ -98,17 +99,13 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         Requirements
         ------------
         
-        -  LiPD v0.1.8.2
+        -  LiPD v0.1.8.3
         -  pandas v0.19+
         -  numpy v1.12+
         -  matplotlib v2.0+
-        -  Cartopy v0.13+
+        -  Basemap v1.0.7+
         
         The installer will automatically check for the needed updates
-        ***except*** for Cartopy.
-        
-        Cartopy doesn't install properly through pip. Use Conda. See the
-        instructions on the developer website.
         
         Further information
         -------------------
@@ -141,13 +138,13 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         the investigators and do not necessarily reflect the views of the
         National Science Foundation.
         
-        .. |PyPI| image:: https://img.shields.io/pypi/dm/pyleoclim.svg?maxAge=2592000
+        .. |PyPI| image:: https://img.shields.io/pypi/dm/pyleoclim.svg
            :target: https://pypi.python.org/pypi/Pyleoclim
-        .. |PyPI| image:: https://img.shields.io/pypi/v/pyleoclim.svg?maxAge=2592000
+        .. |PyPI| image:: https://img.shields.io/pypi/v/pyleoclim.svg
            :target: 
         .. |PyPI| image:: https://img.shields.io/badge/python-3.5-yellow.svg
            :target: 
-        .. |license| image:: https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg?maxAge=2592000
+        .. |license| image:: https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg
            :target:
         
 Keywords: Paleoclimate, Data Analysis
