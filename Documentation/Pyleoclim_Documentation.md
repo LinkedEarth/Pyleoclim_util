@@ -1,4 +1,4 @@
-#Pyleoclim Documentation v0.1.2
+#Pyleoclim Documentation v0.1.3
 
 **Index**
 * [User Guide](#user_guide)

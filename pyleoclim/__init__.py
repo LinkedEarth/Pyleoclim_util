@@ -27,7 +27,7 @@ from .pkg_resources.Basic import *
 from .pkg_resources.SummaryPlots import *
 
 # Load the LiPDs present in the directory
-def openLiPD(path="",timeseries_list=""):
+def openLiPDs(path="",timeseries_list=""):
     """
     Load and extract the timeseries object from the LiPD files
     Arguments:
@@ -37,14 +37,12 @@ def openLiPD(path="",timeseries_list=""):
     """
     if not path and not timeseries_list:
         global lipd_path
-        lipd_path = lpd.loadPath()
-        lpd.loadLipds()
+        lipd_path = lpd.readLipds()
         global time_series
         time_series = lpd.extractTs()
     elif not timeseries_list:
         global lipd_path
-        lipd_path = lpd.loadPath(path)
-        lpd.loadLipds()
+        lipd_path = lpd.readLipds(path)
         global time_series
         time_series = lpd.extractTs()
     elif not path:
@@ -85,7 +83,7 @@ def MapAll(markersize = 50, saveFig = False, dir="", format='eps'):
     """
     # Make sure there are LiPD files to plot
     if not 'time_series' in globals():
-        openLiPD()
+        openLiPDs()
         
     map1 = Map(plot_default)
     fig =  map1.map_all(markersize=markersize, saveFig = saveFig, dir=dir, format=format)
@@ -119,7 +117,7 @@ def MapLiPD(name="", countries = True, counties = False, \
     # Make sure there are LiPD files to plot
 
     if not 'time_series' in globals():
-        openLiPD()
+        openLiPDs()
         
     map1 = Map(plot_default)
     fig =  map1.map_one(name=name,countries = countries, counties = counties, \
@@ -151,7 +149,7 @@ def plotTS(timeseries = "", x_axis = "", markersize = 50,\
       Most backend support png, pdf, ps, eps, and svg.
     """
     if not 'time_series' in globals():
-        openLiPD()
+        openLiPDs()
         
     plot1 = Plot(plot_default, time_series)
     fig = plot1.plotoneTSO(new_timeseries = timeseries, x_axis = x_axis, markersize = markersize,\
@@ -169,7 +167,7 @@ def TSstats(timeseries=""):
     - Timeseries: sytem will prompt for one if not given
     """
     if not 'time_series' in globals():
-        openLiPD()
+        openLiPDs()
      
     basic1 = Basic(time_series)
     mean, std = basic1.simpleStats(timeseries = timeseries)
@@ -193,7 +191,7 @@ def TSbin(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
       - error: the standard error on the mean in each bin
     """
     if not 'time_series' in globals():
-        openLiPD()
+        openLiPDs()
 
     if not timeseries:
         timeseries = getTSO(time_series)
@@ -218,7 +216,7 @@ def TSinterp(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
       - interp_values: the interpolated values
     """
     if not 'time_series' in globals():
-        openLiPD()
+        openLiPDs()
 
     if not timeseries:
         timeseries = getTSO(time_series)
@@ -251,7 +249,7 @@ def BasicSummary(timeseries = "", x_axis="", saveFig = False,
       Most backend support png, pdf, ps, eps, and svg.
     """
     if not 'time_series' in globals():
-        openLiPD()
+        openLiPDs()
         
     plt1 = SummaryPlots(time_series, plot_default)
     fig = plt1.basic(x_axis=x_axis, new_timeseries = timeseries, saveFig=saveFig,\
