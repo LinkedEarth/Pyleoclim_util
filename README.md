@@ -34,12 +34,13 @@ The packages assumes that data are stored in the Linked Paleo Data ([LiPD](http:
  - paleo-aware correlation analysis (isopersistent, isospectral and classical t-test)
 
 **Future capabilities**:
+ - paleo-aware singular spectrum analysis (AR(1) null eigenvalue identification, missing data)
  - spectral analysis (Multi-Taper Method, Lomb-Scargle)
  - weighted wavelet Z transform (WWZ)
  - cross-wavelet analysis
  - index reconstruction
  - climate reconstruction
- - ensemble methods for all of the above
+ - ensemble methods for most of the above
 
  If you have specific requests, please contact linkedearth@gmail.com
 
