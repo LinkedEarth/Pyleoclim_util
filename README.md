@@ -23,9 +23,9 @@ Current Version: 0.1.3
 
 ### <a name = "what">What is it?</a>
 
-Pyleoclim is a Python package primarily geared towards the analysis and visualization of paleoclimate data. Such data often come in the form of timeseries with missing values and age uncertainties, and the package includes several-low level methods to deal with these issues, as well as high-level methods that re-use those to perform scientific workflows.
+Pyleoclim is a Python package primarily geared towards the analysis and visualization of paleoclimate data. Such data often come in the form of timeseries with missing values and age uncertainties, and the package includes several low-level methods to deal with these issues, as well as high-level methods that re-use those to perform scientific workflows.
 
-The packages assumes that data are stored in the Linked Paleo Data ([LiPD](http://www.clim-past.net/12/1093/2016/)) format and makes extensive use of the [LiPD utilities](http://nickmckay.github.io/LiPD-utilities/). The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses very much like [GeoChronR](http://nickmckay.github.io/GeoChronR/).
+The package assumes that data are stored in the Linked Paleo Data ([LiPD](http://www.clim-past.net/12/1093/2016/)) format and makes extensive use of the [LiPD utilities](http://nickmckay.github.io/LiPD-utilities/). The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses very much like [GeoChronR](http://nickmckay.github.io/GeoChronR/).
 
 **Current capabilities**:
  - binning
@@ -76,7 +76,7 @@ pip install pyleoclim
 
 ### <a name="req">Requirements</a>
 
-- LiPD v0.1.8.3
+- LiPD v0.1.8.5
 - pandas v0.19+
 - numpy v1.12+
 - matplotlib v2.0+
