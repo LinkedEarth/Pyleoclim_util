@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Mapping Module &mdash; Pyleoclim 0.1.3 documentation</title>
+    <title>Mapping Module &mdash; Pyleoclim 0.1.4 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.3',
+        VERSION:     '0.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Pyleoclim 0.1.3 documentation" href="index.html" />
+    <link rel="top" title="Pyleoclim 0.1.4 documentation" href="index.html" />
     <link rel="next" title="Timeseries Plots Module" href="TSPlots.html" />
     <link rel="prev" title="Basic Module" href="Basic.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="Basic.html" title="Basic Module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -88,35 +88,8 @@
 <dd><p>Create Maps using Basemap.</p>
 <p>Uses the default color palette: pyleoclim.plot_default</p>
 <dl class="method">
-<dt id="pyleoclim.Map.map_all">
-<code class="descname">map_all</code><span class="sig-paren">(</span><em>markersize=50</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Map.map_all" title="Permalink to this definition">¶</a></dt>
-<dd><p>Map all the available records loaded into the LiPD working directory by archiveType.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>markersize</strong> (<em>int</em>) &#8211; default is 50</li>
-<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to save the figure</li>
-<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the
-figure. If not provided, creates a default folder called
-&#8216;figures&#8217; in the LiPD working directory (lipd.path).</li>
-<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
-backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps,
-eps, and svg.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyleoclim.Map.map_one">
-<code class="descname">map_one</code><span class="sig-paren">(</span><em>name=''</em>, <em>countries=True</em>, <em>counties=False</em>, <em>rivers=False</em>, <em>states=False</em>, <em>background='shadedrelief'</em>, <em>scale=0.5</em>, <em>markersize=50</em>, <em>marker='default'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Map.map_one" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.Map.map_Lipd">
+<code class="descname">map_Lipd</code><span class="sig-paren">(</span><em>name=''</em>, <em>countries=True</em>, <em>counties=False</em>, <em>rivers=False</em>, <em>states=False</em>, <em>background='shadedrelief'</em>, <em>scale=0.5</em>, <em>markersize=50</em>, <em>marker='default'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Map.map_Lipd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes a map for a single record.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -155,6 +128,33 @@ eps, and svg.</li>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="pyleoclim.Map.map_all">
+<code class="descname">map_all</code><span class="sig-paren">(</span><em>markersize=50</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Map.map_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map all the available records loaded into the LiPD working directory by archiveType.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>markersize</strong> (<em>int</em>) &#8211; default is 50</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the
+figure. If not provided, creates a default folder called
+&#8216;figures&#8217; in the LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps,
+eps, and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -177,7 +177,7 @@ eps, and svg.</li>
         <li class="right" >
           <a href="Basic.html" title="Basic Module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

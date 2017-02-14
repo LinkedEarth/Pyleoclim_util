@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  13 FEB 2017 16:18
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  14 FEB 2017 15:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -975,7 +975,7 @@ LaTeX Font Info:    Try loading font information for TS1+ptm on input line 156.
 (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 ) [3]
-LaTeX Font Info:    Try loading font information for T1+pcr on input line 219.
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 220.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
@@ -984,34 +984,34 @@ File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 ]
 Chapter 2.
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 324.
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 325.
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
-(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 335.
+(Font)              Font shape `T1/pcr/m/sl' tried instead on input line 336.
 
-Underfull \hbox (badness 10000) in paragraph at lines 346--349
+Underfull \hbox (badness 10000) in paragraph at lines 347--350
 
  []
 
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <9> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 349.
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 350.
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <9> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 352.
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 353.
 [7]
-Underfull \hbox (badness 10000) in paragraph at lines 427--427
+Underfull \hbox (badness 10000) in paragraph at lines 433--433
 \T1/ptm/m/it/10 ground='shadedrelief'\T1/ptm/m/n/10 , \T1/ptm/m/it/10 scale=0.5
 \T1/ptm/m/n/10 , \T1/ptm/m/it/10 mark-er-size=50\T1/ptm/m/n/10 , \T1/ptm/m/it/1
 0 marker='default'\T1/ptm/m/n/10 , \T1/ptm/m/it/10 save-
  []
 
-[8]
-LaTeX Font Info:    Try loading font information for TS1+pcr on input line 539.
+[8] [9]
+LaTeX Font Info:    Try loading font information for TS1+pcr on input line 545.
 
  (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/ts1pcr.fd
 File: ts1pcr.fd 2001/06/04 font definitions for TS1/pcr.
 )
 LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 546.
- [9]
+(Font)              Font shape `T1/phv/b/n' tried instead on input line 552.
+
 [10] [11] [12] [13] [14
 
 ]
@@ -1019,19 +1019,11 @@ Chapter 3.
 [15] [16]
 Chapter 4.
 
-Underfull \hbox (badness 10000) in paragraph at lines 976--976
+Underfull \hbox (badness 10000) in paragraph at lines 950--950
 []\T1/ptm/m/it/10 name='`\T1/ptm/m/n/10 , \T1/ptm/m/it/10 coun-tries=True\T1/pt
 m/m/n/10 , \T1/ptm/m/it/10 coun-ties=False\T1/ptm/m/n/10 , \T1/ptm/m/it/10 rive
 rs=False\T1/ptm/m/n/10 , \T1/ptm/m/it/10 states=False\T1/ptm/m/n/10 , \T1/ptm/m
 /it/10 back-
- []
-
-
-Underfull \hbox (badness 7344) in paragraph at lines 976--976
-\T1/ptm/m/it/10 ground='shadedrelief'\T1/ptm/m/n/10 , \T1/ptm/m/it/10 scale=0.5
-\T1/ptm/m/n/10 , \T1/ptm/m/it/10 mark-er-size=50\T1/ptm/m/n/10 , \T1/ptm/m/it/1
-0 marker='default'\T1/ptm/m/n/10 , \T1/ptm/m/it/10 save-Fig=False\T1/ptm/m/n/10
- ,
  []
 
 [17
@@ -1057,24 +1049,24 @@ Chapter 8.
 ] [29
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1547.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1547.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1557.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1557.
  (./Pyleoclim.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1547.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1547.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1557.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1557.
 
 Package rerunfilecheck Info: File `Pyleoclim.out' has not changed.
-(rerunfilecheck)             Checksum: BEC1E309454514777C52C2867314CDC7;1691.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1547.
+(rerunfilecheck)             Checksum: 0E9B874F197CE4E35B4F45E98424E275;1691.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1557.
  ) 
 Here is how much of TeX's memory you used:
- 9685 strings out of 493089
- 137321 string characters out of 6134842
- 240761 words of memory out of 5000000
+ 9686 strings out of 493089
+ 137326 string characters out of 6134842
+ 238761 words of memory out of 5000000
  12750 multiletter control sequences out of 15000+600000
  68401 words of font info for 84 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 36i,12n,45p,398b,635s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,12n,45p,398b,633s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2015/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/local/texlive/2
 015/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2015/texm
@@ -1084,10 +1076,10 @@ ype1/urw/helvetic/uhvbo8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/u
 rw/helvetic/uhvr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/time
 s/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr8a.p
 fb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Pyleoclim.pdf (33 pages, 157689 bytes).
+Output written on Pyleoclim.pdf (33 pages, 157020 bytes).
 PDF statistics:
- 455 PDF objects out of 1000 (max. 8388607)
- 401 compressed objects within 5 object streams
- 113 named destinations out of 1000 (max. 500000)
+ 456 PDF objects out of 1000 (max. 8388607)
+ 402 compressed objects within 5 object streams
+ 114 named destinations out of 1000 (max. 500000)
  245 words of extra memory for PDF output out of 10000 (max. 10000000)
 

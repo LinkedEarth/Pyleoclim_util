@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Basic Module &mdash; Pyleoclim 0.1.3 documentation</title>
+    <title>Basic Module &mdash; Pyleoclim 0.1.4 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.3',
+        VERSION:     '0.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Pyleoclim 0.1.3 documentation" href="index.html" />
+    <link rel="top" title="Pyleoclim 0.1.4 documentation" href="index.html" />
     <link rel="next" title="Mapping Module" href="Mapping.html" />
     <link rel="prev" title="Main Functions" href="Main.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="Main.html" title="Main Functions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -85,12 +85,12 @@
 <p>This module contains methods for basic manipulation of the Paleo/Chron Data.</p>
 <dl class="class">
 <dt id="pyleoclim.Basic">
-<em class="property">class </em><code class="descclassname">pyleoclim.</code><code class="descname">Basic</code><span class="sig-paren">(</span><em>timeseries_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">pyleoclim.</code><code class="descname">Basic</code><span class="sig-paren">(</span><em>timeseries_list</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic" title="Permalink to this definition">¶</a></dt>
 <dd><p>Basic manipulation of timeseries for scientific purpose.</p>
 <p>Calculates statistics of timeseries, bin or interpolate data</p>
 <dl class="staticmethod">
-<dt id="pyleoclim.Basic.bin_data">
-<em class="property">static </em><code class="descname">bin_data</code><span class="sig-paren">(</span><em>timeseries</em>, <em>x_axis=''</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic.bin_data" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.Basic.bin_Ts">
+<em class="property">static </em><code class="descname">bin_Ts</code><span class="sig-paren">(</span><em>timeseries</em>, <em>x_axis=''</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic.bin_Ts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bin the PaleoData values</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -137,8 +137,8 @@ one from the dictionary</td>
 </dd></dl>
 
 <dl class="staticmethod">
-<dt id="pyleoclim.Basic.interp_data">
-<em class="property">static </em><code class="descname">interp_data</code><span class="sig-paren">(</span><em>timeseries</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic.interp_data" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.Basic.interp_Ts">
+<em class="property">static </em><code class="descname">interp_Ts</code><span class="sig-paren">(</span><em>timeseries</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic.interp_Ts" title="Permalink to this definition">¶</a></dt>
 <dd><p>Linear interpolation of the PaleoData values</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -203,7 +203,7 @@ if not available</td>
         <li class="right" >
           <a href="Main.html" title="Main Functions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -1,4 +1,4 @@
 Timeseries Plots Module
 =======================
 .. autoclass:: pyleoclim.Plot
-  :members: plotoneTSO, agemodelplot
+  :members: plot_Ts, plot_agemodel

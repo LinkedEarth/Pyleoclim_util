@@ -19,17 +19,17 @@ to the directory containing the LiPD files.
 
 This is done through the function pyleoclim.openLiPDs:
 
-.. autofunction:: pyleoclim.openLiPDs
+.. autofunction:: pyleoclim.openLipds
 
 Mapping
 ```````
-.. autofunction:: pyleoclim.MapAll
+.. autofunction:: pyleoclim.mapAll
 
-.. autofunction:: pyleoclim.MapLiPD
+.. autofunction:: pyleoclim.mapLipd
 
 Plotting
 ````````
-.. autofunction:: pyleoclim.plotTS
+.. autofunction:: pyleoclim.plotTs
 
 Summary Plots
 -------------
@@ -37,13 +37,13 @@ Summary Plots
 Summary plots are a special categories of plots enabled by Pyleoclim.
 They allow to plot specific information about a timeseries but are not customizable.
 
-.. autofunction:: pyleoclim.BasicSummary
+.. autofunction:: pyleoclim.basicSummary
 
 Statistics
 ``````````
 
-.. autofunction:: pyleoclim.TSstats
+.. autofunction:: pyleoclim.statsTs
 
-.. autofunction:: pyleoclim.TSbin
+.. autofunction:: pyleoclim.binTs
 
-.. autofunction:: pyleoclim.TSinterp
+.. autofunction:: pyleoclim.interpTs

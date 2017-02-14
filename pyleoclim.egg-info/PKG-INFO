@@ -1,12 +1,12 @@
 Metadata-Version: 1.1
 Name: pyleoclim
-Version: 0.1.3
+Version: 0.1.4
 Summary: A Python package for paleoclimate data analysis
 Home-page: https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim
 Author: Deborah Khider
 Author-email: dkhider@gmail.com
 License: GNU Public
-Download-URL: https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.1.3
+Download-URL: https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.1.4
 Description: |PyPI| |PyPI| |PyPI| |license|
         
         Pyleoclim
@@ -26,7 +26,7 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         -  `License <#license>`__
         -  `Disclaimer <#disclaimer>`__
         
-        Current Version: 0.1.3
+        Current Version: 0.1.4
         
         What is it?
         -----------
@@ -34,10 +34,10 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         Pyleoclim is a Python package primarily geared towards the analysis and
         visualization of paleoclimate data. Such data often come in the form of
         timeseries with missing values and age uncertainties, and the package
-        includes several-low level methods to deal with these issues, as well as
+        includes several low-level methods to deal with these issues, as well as
         high-level methods that re-use those to perform scientific workflows.
         
-        The packages assumes that data are stored in the Linked Paleo Data
+        The package assumes that data are stored in the Linked Paleo Data
         (`LiPD <http://www.clim-past.net/12/1093/2016/>`__) format and makes
         extensive use of the `LiPD
         utilities <http://nickmckay.github.io/LiPD-utilities/>`__. The package
@@ -49,17 +49,20 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         timeseries, and basic age model information - paleo-aware correlation
         analysis (isopersistent, isospectral and classical t-test)
         
-        **Future capabilities**: - spectral analysis (Multi-Taper Method,
-        Lomb-Scargle) - weighted wavelet Z transform (WWZ) - cross-wavelet
-        analysis - index reconstruction - climate reconstruction - ensemble
-        methods for all of the above
+        **Future capabilities**: - paleo-aware singular spectrum analysis (AR(1)
+        null eigenvalue identification, missing data) - spectral analysis
+        (Multi-Taper Method, Lomb-Scargle) - weighted wavelet Z transform (WWZ)
+        - cross-wavelet analysis - index reconstruction - climate reconstruction
+        - ensemble methods for most of the above
         
         If you have specific requests, please contact linkedearth@gmail.com
         
         Version Information
         -------------------
         
-        | 0.1.3: Compatible with LiPD utilities version 0.1.8.5.
+        | 0.1.4: Rename function using camel case and consistency with LiPD
+          utilities version 0.1.8.5 0.1.3: Compatible with LiPD utilities
+          version 0.1.8.5.
         | Function openLiPD() renamed openLiPDs()
         | 0.1.2: Compatible with LiPD utilities version 0.1.8.3. Uses basemap
           instead of cartopy
@@ -102,7 +105,7 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         Requirements
         ------------
         
-        -  LiPD v0.1.8.3
+        -  LiPD v0.1.8.5
         -  pandas v0.19+
         -  numpy v1.12+
         -  matplotlib v2.0+

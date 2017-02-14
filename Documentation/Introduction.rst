@@ -33,6 +33,7 @@ is aware of age ensembles stored via LiPD and uses them for time-uncertain analy
 
 Version Information
 ```````````````````
+| 0.1.4: Rename functions using camel case convention and consistency with LiPD utilities version 0.1.8.5
 | 0.1.3: Compatible with LiPD utilities version 0.1.8.5
 |        Function openLiPD() renamed openLiPDs()
 | 0.1.2: Compatible with LiPD utilities version 0.1.8.3
@@ -90,4 +91,4 @@ Disclaimer
 ``````````
 This material is based upon work supported by the U.S. National Science Foundation under Grant Number
 ICER-1541029. Any opinions, findings, and conclusions or recommendations expressed in this material are those
-of the investigators and do not necessarily reflect the views of the National Science Foundation.  
+of the investigators and do not necessarily reflect the views of the National Science Foundation.

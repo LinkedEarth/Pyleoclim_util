@@ -2,4 +2,4 @@ Summary Plots Module
 ====================
 
 .. autoclass:: pyleoclim.SummaryPlots
-  :members: getMetadata, TSdata, agemodelData, basic
+  :members: getMetadata, TsData, agemodelData, basic

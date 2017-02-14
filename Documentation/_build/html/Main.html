@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Main Functions &mdash; Pyleoclim 0.1.3 documentation</title>
+    <title>Main Functions &mdash; Pyleoclim 0.1.4 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.3',
+        VERSION:     '0.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Pyleoclim 0.1.3 documentation" href="index.html" />
+    <link rel="top" title="Pyleoclim 0.1.4 documentation" href="index.html" />
     <link rel="next" title="Basic Module" href="Basic.html" />
     <link rel="prev" title="Pyleoclim" href="Introduction.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -110,8 +110,8 @@ the selected LiPD files, which need to be passed to Pyleoclim along with the pat
 to the directory containing the LiPD files.</p>
 <p>This is done through the function pyleoclim.openLiPDs:</p>
 <dl class="function">
-<dt id="pyleoclim.openLiPDs">
-<code class="descclassname">pyleoclim.</code><code class="descname">openLiPDs</code><span class="sig-paren">(</span><em>path=''</em>, <em>timeseries_list=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.openLiPDs" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.openLipds">
+<code class="descclassname">pyleoclim.</code><code class="descname">openLipds</code><span class="sig-paren">(</span><em>path=''</em>, <em>ts_list=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.openLipds" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load and extract timeseries objects from LiPD files.</p>
 <p>Allows to load and extract timeseries objects into the workspace for use
 with Pyleoclim. This can be done by the user previously, using the LiPD
@@ -125,7 +125,7 @@ without arguments.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>path</strong> (<em>string</em>) &#8211; the path to the LiPD file. If not specified, will
 trigger the LiPD utilities GUI.</li>
-<li><strong>timeseries_list</strong> (<em>list</em>) &#8211; the list of available timeseries objects
+<li><strong>ts_list</strong> (<em>list</em>) &#8211; the list of available timeseries objects
 obtained from lipd.extractTs().</li>
 </ul>
 </td>
@@ -137,7 +137,7 @@ obtained from lipd.extractTs().</li>
 <p class="last">if specifying a list, path should also be specified.</p>
 </div>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pyleoclim</span><span class="o">.</span><span class="n">openLiPDs</span><span class="p">(</span><span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/Users/deborahkhider/Documents/LiPD&quot;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pyleoclim</span><span class="o">.</span><span class="n">openLipds</span><span class="p">(</span><span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/Users/deborahkhider/Documents/LiPD&quot;</span><span class="p">)</span>
 <span class="go">Found: 12 LiPD file(s)</span>
 <span class="go">processing: Crystal.McCabe-Glynn.2013.lpd</span>
 <span class="go">processing: MD01-2412.Harada.2006.lpd</span>
@@ -173,8 +173,8 @@ obtained from lipd.extractTs().</li>
 <div class="section" id="mapping">
 <h2>Mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="pyleoclim.MapAll">
-<code class="descclassname">pyleoclim.</code><code class="descname">MapAll</code><span class="sig-paren">(</span><em>markersize=50</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.MapAll" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.mapAll">
+<code class="descclassname">pyleoclim.</code><code class="descname">mapAll</code><span class="sig-paren">(</span><em>markersize=50</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.mapAll" title="Permalink to this definition">¶</a></dt>
 <dd><p>Map all the available records loaded into the workspace by archiveType.</p>
 <dl class="docutils">
 <dt>Map of all the records into the workspace by archiveType.</dt>
@@ -201,11 +201,15 @@ and svg.</li>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">mapAll</span><span class="p">()</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyleoclim.MapLiPD">
-<code class="descclassname">pyleoclim.</code><code class="descname">MapLiPD</code><span class="sig-paren">(</span><em>name=''</em>, <em>countries=True</em>, <em>counties=False</em>, <em>rivers=False</em>, <em>states=False</em>, <em>background='shadedrelief'</em>, <em>scale=0.5</em>, <em>markersize=50</em>, <em>marker='default'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.MapLiPD" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.mapLipd">
+<code class="descclassname">pyleoclim.</code><code class="descname">mapLipd</code><span class="sig-paren">(</span><em>name=''</em>, <em>countries=True</em>, <em>counties=False</em>, <em>rivers=False</em>, <em>states=False</em>, <em>background='shadedrelief'</em>, <em>scale=0.5</em>, <em>markersize=50</em>, <em>marker='default'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.mapLipd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Map for a single record</p>
 <p>Orthographic projection map of a single record.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -244,7 +248,7 @@ and svg.</li>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">MapAll</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">mapLipd</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -253,8 +257,8 @@ and svg.</li>
 <div class="section" id="plotting">
 <h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="pyleoclim.plotTS">
-<code class="descclassname">pyleoclim.</code><code class="descname">plotTS</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>markersize=50</em>, <em>marker='default'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.plotTS" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.plotTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">plotTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>markersize=50</em>, <em>marker='default'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.plotTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot a single time series.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -285,7 +289,7 @@ and svg.</li>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">plotTS</span><span class="p">(</span><span class="n">marker</span> <span class="o">=</span> <span class="s1">&#39;rs&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">plotTs</span><span class="p">(</span><span class="n">marker</span> <span class="o">=</span> <span class="s1">&#39;rs&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -295,8 +299,8 @@ and svg.</li>
 <p>Summary plots are a special categories of plots enabled by Pyleoclim.
 They allow to plot specific information about a timeseries but are not customizable.</p>
 <dl class="function">
-<dt id="pyleoclim.BasicSummary">
-<code class="descclassname">pyleoclim.</code><code class="descname">BasicSummary</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>saveFig=False</em>, <em>format='eps'</em>, <em>dir=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.BasicSummary" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.basicSummary">
+<code class="descclassname">pyleoclim.</code><code class="descname">basicSummary</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>saveFig=False</em>, <em>format='eps'</em>, <em>dir=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.basicSummary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes a basic summary plot</p>
 <p>Plots the following information: the time series, location map,
 Age-Depth profile if both are available from the paleodata, Metadata</p>
@@ -327,7 +331,7 @@ and svg.</li>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">pyleocli</span><span class="p">,</span><span class="n">BasicSummary</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">basicSummary</span><span class="p">()</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -337,8 +341,8 @@ and svg.</li>
 <div class="section" id="statistics">
 <h2>Statistics<a class="headerlink" href="#statistics" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="pyleoclim.TSstats">
-<code class="descclassname">pyleoclim.</code><code class="descname">TSstats</code><span class="sig-paren">(</span><em>timeseries=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.TSstats" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.statsTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">statsTs</code><span class="sig-paren">(</span><em>timeseries=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.statsTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the mean and standard deviation of a timeseries</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -351,7 +355,7 @@ and svg.</li>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mean</span><span class="p">,</span><span class="n">std</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">TSstats</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mean</span><span class="p">,</span><span class="n">std</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">statsTs</span><span class="p">()</span>
 <span class="go">0 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca</span>
 <span class="go">1 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O</span>
 <span class="go">2 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes</span>
@@ -397,8 +401,8 @@ and svg.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyleoclim.TSbin">
-<code class="descclassname">pyleoclim.</code><code class="descname">TSbin</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.TSbin" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.binTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">binTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.binTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bin the paleoData values of the timeseries</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -426,9 +430,9 @@ will prompt for one</li>
 </tbody>
 </table>
 <p class="rubric">Example</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">time_series</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">timeseries_list</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">bin_size</span> <span class="o">=</span> <span class="mi">200</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">bins</span><span class="p">,</span> <span class="n">binned_data</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">TSbin</span><span class="p">(</span><span class="n">timeseries</span> <span class="o">=</span> <span class="n">ts</span><span class="p">,</span> <span class="n">bin_size</span> <span class="o">=</span> <span class="n">bin_size</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bins</span><span class="p">,</span> <span class="n">binned_data</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">binTs</span><span class="p">(</span><span class="n">timeseries</span> <span class="o">=</span> <span class="n">ts</span><span class="p">,</span> <span class="n">bin_size</span> <span class="o">=</span> <span class="n">bin_size</span><span class="p">)</span>
 <span class="go">Do you want to plot vs time or depth?</span>
 <span class="go">Enter 0 for time and 1 for depth: 0</span>
 </pre></div>
@@ -465,8 +469,8 @@ will prompt for one</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyleoclim.TSinterp">
-<code class="descclassname">pyleoclim.</code><code class="descname">TSinterp</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.TSinterp" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.interpTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">interpTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.interpTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple linear interpolation</p>
 <p>Simple linear interpolation of the data using the numpy.interp method</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -493,9 +497,9 @@ and time step,</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">time_series</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">timeseries_list</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">interp_step</span> <span class="o">=</span> <span class="mi">200</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">interp_age</span><span class="p">,</span> <span class="n">interp_values</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">TSinterp</span><span class="p">(</span><span class="n">timeseries</span> <span class="o">=</span> <span class="n">ts</span><span class="p">,</span> <span class="n">interp_step</span> <span class="o">=</span> <span class="n">interp_step</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">interp_age</span><span class="p">,</span> <span class="n">interp_values</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">interpTs</span><span class="p">(</span><span class="n">timeseries</span> <span class="o">=</span> <span class="n">ts</span><span class="p">,</span> <span class="n">interp_step</span> <span class="o">=</span> <span class="n">interp_step</span><span class="p">)</span>
 <span class="go">Do you want to plot vs time or depth?</span>
 <span class="go">Enter 0 for time and 1 for depth: 0</span>
 </pre></div>
@@ -532,7 +536,7 @@ and time step,</p>
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

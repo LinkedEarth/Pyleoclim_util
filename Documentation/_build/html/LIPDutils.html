@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Manipulating LiPD files &mdash; Pyleoclim 0.1.3 documentation</title>
+    <title>Manipulating LiPD files &mdash; Pyleoclim 0.1.4 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.1.3',
+        VERSION:     '0.1.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="Pyleoclim 0.1.3 documentation" href="index.html" />
+    <link rel="top" title="Pyleoclim 0.1.4 documentation" href="index.html" />
     <link rel="prev" title="Summary Plots Module" href="SummaryPlots.html" /> 
   </head>
   <body role="document">
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="SummaryPlots.html" title="Summary Plots Module"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -91,8 +91,8 @@
 <div class="section" id="creating-directories-and-saving-figures">
 <h2>Creating directories and saving figures<a class="headerlink" href="#creating-directories-and-saving-figures" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="pyleoclim.createdir">
-<code class="descclassname">pyleoclim.</code><code class="descname">createdir</code><span class="sig-paren">(</span><em>path</em>, <em>foldername</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.createdir" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.createDir">
+<code class="descclassname">pyleoclim.</code><code class="descname">createDir</code><span class="sig-paren">(</span><em>path</em>, <em>foldername</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.createDir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new folder in a working directory</p>
 <p>Create a new folder in a working directory to save outputs from Pyleoclim.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -146,8 +146,8 @@ If not provided, creates a default folder called &#8216;figures&#8217;.</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyleoclim.promptforLipd">
-<code class="descclassname">pyleoclim.</code><code class="descname">promptforLipd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.promptforLipd" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.promptForLipd">
+<code class="descclassname">pyleoclim.</code><code class="descname">promptForLipd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.promptForLipd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prompt for a LiPD file</p>
 <p>Ask the user to select a LiPD file from a list
 Use this function in conjunction with enumerateLipds()</p>
@@ -165,8 +165,8 @@ Use this function in conjunction with enumerateLipds()</p>
 <div class="section" id="manipulating-variables-in-a-lipd-file">
 <h2>Manipulating Variables in a LiPD file<a class="headerlink" href="#manipulating-variables-in-a-lipd-file" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="pyleoclim.promptforVariable">
-<code class="descclassname">pyleoclim.</code><code class="descname">promptforVariable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.promptforVariable" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.promptForVariable">
+<code class="descclassname">pyleoclim.</code><code class="descname">promptForVariable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.promptForVariable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prompt for a specific variable</p>
 <p>Ask the user to select the variable they are interested in.
 Use this function in conjunction with readHeaders() or getTSO()</p>
@@ -181,8 +181,8 @@ Use this function in conjunction with readHeaders() or getTSO()</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyleoclim.valuesloc">
-<code class="descclassname">pyleoclim.</code><code class="descname">valuesloc</code><span class="sig-paren">(</span><em>dataframe</em>, <em>missing_value='NaN'</em>, <em>var_idx=1</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.valuesloc" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.valuesLoc">
+<code class="descclassname">pyleoclim.</code><code class="descname">valuesLoc</code><span class="sig-paren">(</span><em>dataframe</em>, <em>missing_value='NaN'</em>, <em>var_idx=1</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.valuesLoc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove missing values flag</p>
 <p>Look for the indexes where there are no missing values for the variable</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -206,8 +206,8 @@ values (default is the second column)</li>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyleoclim.TSOxaxis">
-<code class="descclassname">pyleoclim.</code><code class="descname">TSOxaxis</code><span class="sig-paren">(</span><em>timeseries</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.TSOxaxis" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.xAxisTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">xAxisTs</code><span class="sig-paren">(</span><em>timeseries</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.xAxisTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prompt the user to choose a x-axis representation for the timeseries.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -226,8 +226,8 @@ values (default is the second column)</li>
 <div class="section" id="manipulating-timeseries-objects">
 <h2>Manipulating timeseries objects<a class="headerlink" href="#manipulating-timeseries-objects" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="pyleoclim.enumerateTSO">
-<code class="descclassname">pyleoclim.</code><code class="descname">enumerateTSO</code><span class="sig-paren">(</span><em>timeseries_list</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.enumerateTSO" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.enumerateTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">enumerateTs</code><span class="sig-paren">(</span><em>timeseries_list</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.enumerateTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerate the available time series objects</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -242,8 +242,8 @@ pyleoclim package, use pyleo.time_series.</td>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyleoclim.getTSO">
-<code class="descclassname">pyleoclim.</code><code class="descname">getTSO</code><span class="sig-paren">(</span><em>timeseries_list</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.getTSO" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.getTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">getTs</code><span class="sig-paren">(</span><em>timeseries_list</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.getTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a specific timeseries object from a dictionary of timeseries</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -260,8 +260,8 @@ pyleoclim package, use pyleo.time_series.</td>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyleoclim.TStoDF">
-<code class="descclassname">pyleoclim.</code><code class="descname">TStoDF</code><span class="sig-paren">(</span><em>timeseries</em>, <em>x_axis=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.TStoDF" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.TsToDf">
+<code class="descclassname">pyleoclim.</code><code class="descname">TsToDf</code><span class="sig-paren">(</span><em>timeseries</em>, <em>x_axis=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.TsToDf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Timeseries to Dataframe</p>
 <p>Create a dataframe from a timeseries object with two colums:
 depth/age representation and the paleoData values</p>
@@ -269,12 +269,16 @@ depth/age representation and the paleoData values</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>timeseries</strong> &#8211; A timeseries object</li>
 <li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
 Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default is to let the
 system choose if only one available or prompt the user.</li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A Pandas Dataframe with two columns - the x-axis representation
+(&#8220;year&#8221;, &#8220;age&#8221;, or &#8220;depth&#8221;) and the PaleoDataValues</p>
 </td>
 </tr>
 </tbody>
@@ -285,8 +289,8 @@ system choose if only one available or prompt the user.</li>
 <div class="section" id="handling-mapping-to-linkedearth-ontology">
 <h2>Handling mapping to LinkedEarth Ontology<a class="headerlink" href="#handling-mapping-to-linkedearth-ontology" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="pyleoclim.LiPDtoOntology">
-<code class="descclassname">pyleoclim.</code><code class="descname">LiPDtoOntology</code><span class="sig-paren">(</span><em>archiveType</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LiPDtoOntology" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.LipdToOntology">
+<code class="descclassname">pyleoclim.</code><code class="descname">LipdToOntology</code><span class="sig-paren">(</span><em>archiveType</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdToOntology" title="Permalink to this definition">¶</a></dt>
 <dd><p>standardize archiveType</p>
 <p>Transform the archiveType from their LiPD name to their ontology counterpart</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -319,7 +323,7 @@ system choose if only one available or prompt the user.</li>
         <li class="right" >
           <a href="SummaryPlots.html" title="Summary Plots Module"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
