@@ -19,7 +19,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.1.3
+Current Version: 0.1.4
 
 ### <a name = "what">What is it?</a>
 
@@ -45,6 +45,7 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>
+0.1.4: Rename function using camel case and consistency with LiPD utilities version 0.1.8.5
 0.1.3: Compatible with LiPD utilities version 0.1.8.5.  
 Function openLiPD() renamed openLiPDs()  
 0.1.2: Compatible with LiPD utilities version 0.1.8.3. Uses basemap instead of cartopy  
