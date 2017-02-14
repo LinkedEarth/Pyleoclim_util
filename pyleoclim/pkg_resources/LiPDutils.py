@@ -19,11 +19,14 @@ import sys
 import os
 from matplotlib import gridspec
 
+#Import internal packages to pyleoclim
+import pyleoclim 
+
 """
 The following functions handle creating new directories and saving figures and logs
 """
 
-def createdir(path, foldername):
+def createDir(path, foldername):
     """Create a new folder in a working directory
     
     Create a new folder in a working directory to save outputs from Pyleoclim.
@@ -60,7 +63,7 @@ def saveFigure(name, format="eps",dir=""):
             
     """
     if not dir:
-        newdir = createdir(lpd.path,"figures")            
+        newdir = createDir(pyleoclim.lipd_path,"figures")            
         plt.savefig(newdir+'/'+name+'.'+format,\
                     bbox_inches='tight',pad_inches = 0.25)
     else:
@@ -80,7 +83,7 @@ def enumerateLipds():
     for idx, val in enumerate(lipd_in_directory):
         print(idx,': ',val)   
 
-def promptforLipd():
+def promptForLipd():
     """Prompt for a LiPD file
     
     Ask the user to select a LiPD file from a list
@@ -97,7 +100,7 @@ def promptforLipd():
 The following functions work at the variables level
 """
         
-def promptforVariable():
+def promptForVariable():
     """Prompt for a specific variable
     
     Ask the user to select the variable they are interested in.
@@ -110,7 +113,7 @@ def promptforVariable():
     select_var = int(input("Enter the number of the variable you wish to use: ")) 
     return select_var
                       
-def valuesloc(dataframe, missing_value = "NaN", var_idx = 1):
+def valuesLoc(dataframe, missing_value = "NaN", var_idx = 1):
     """Remove missing values flag
     
     Look for the indexes where there are no missing values for the variable
@@ -140,7 +143,7 @@ def valuesloc(dataframe, missing_value = "NaN", var_idx = 1):
 
     return val_idx
 
-def TSOxaxis(timeseries):
+def xAxisTs(timeseries):
     """ Prompt the user to choose a x-axis representation for the timeseries.
     
     Args:
@@ -195,7 +198,7 @@ def TSOxaxis(timeseries):
 """
 The following functions handle the time series objects
 """
-def enumerateTSO(timeseries_list):
+def enumerateTs(timeseries_list):
     """Enumerate the available time series objects
     
     Args:
@@ -216,7 +219,7 @@ def enumerateTSO(timeseries_list):
     for idx,val in enumerate(available_y):
         print(idx,': ',dataSetName[idx], ': ', val)     
 
-def getTSO(timeseries_list):
+def getTs(timeseries_list):
     """Get a specific timeseries object from a dictionary of timeseries
     
     Args:
@@ -228,13 +231,13 @@ def getTSO(timeseries_list):
         A single timeseries object 
         
     """        
-    enumerateTSO(timeseries_list)
-    select_TSO = promptforVariable()
-    new_TSO = timeseries_list[select_TSO]
+    enumerateTs(timeseries_list)
+    select_TSO = promptForVariable()
+    timeseries = timeseries_list[select_TSO]
 
-    return new_TSO
+    return timeseries
 
-def TStoDF(timeseries, x_axis = ""):
+def TsToDf(timeseries, x_axis = ""):
     """ Timeseries to Dataframe
     
     Create a dataframe from a timeseries object with two colums: 
@@ -245,10 +248,14 @@ def TStoDF(timeseries, x_axis = ""):
         x-axis (str): The representation against which to plot the paleo-data. 
             Options are "age", "year", and "depth". Default is to let the 
             system choose if only one available or prompt the user.
+    
+    Returns:
+        A Pandas Dataframe with two columns - the x-axis representation
+        ("year", "age", or "depth") and the PaleoDataValues        
             
     """
     if not x_axis:
-        x_axis, label = TSOxaxis(timeseries)
+        x_axis, label = xAxisTs(timeseries)
     elif x_axis == "year":
         x_axis = timeseries["year"]
         label = "year"
@@ -268,7 +275,7 @@ def TStoDF(timeseries, x_axis = ""):
 """ 
 Handle mapping to LinkedEarth Ontology if needed
 """    
-def LiPDtoOntology(archiveType):
+def LipdToOntology(archiveType):
     """ standardize archiveType
     
     Transform the archiveType from their LiPD name to their ontology counterpart

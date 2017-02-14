@@ -4,7 +4,7 @@ Created on Wed May 11 10:42:34 2016
 
 @author: deborahkhider
 
-Initializes the Pyleoclim module
+Initializes the Pyleoclim package
 
 """
 #Import all the needed packages
@@ -27,7 +27,7 @@ from .pkg_resources.Basic import *
 from .pkg_resources.SummaryPlots import *
 
 # Load the LiPDs present in the directory
-def openLiPDs(path="",timeseries_list=""):
+def openLipds(path="",ts_list=""):
     """Load and extract timeseries objects from LiPD files.
     
     Allows to load and extract timeseries objects into the workspace for use
@@ -39,14 +39,14 @@ def openLiPDs(path="",timeseries_list=""):
     Args:  
         path (string): the path to the LiPD file. If not specified, will 
             trigger the LiPD utilities GUI.
-        timeseries_list (list): the list of available timeseries objects 
+        ts_list (list): the list of available timeseries objects 
             obtained from lipd.extractTs(). 
 
     Warning: 
         if specifying a list, path should also be specified. 
     
     Examples:
-        >>> pyleoclim.openLiPDs(path = "/Users/deborahkhider/Documents/LiPD")
+        >>> pyleoclim.openLipds(path = "/Users/deborahkhider/Documents/LiPD")
         Found: 12 LiPD file(s)
         processing: Crystal.McCabe-Glynn.2013.lpd
         processing: MD01-2412.Harada.2006.lpd
@@ -76,23 +76,23 @@ def openLiPDs(path="",timeseries_list=""):
         Process Complete
 
     """
-    if not path and not timeseries_list:
+    if not path and not ts_list:
         global lipd_path
         lipd_path = lpd.readLipds()
-        global time_series
-        time_series = lpd.extractTs()
-    elif not timeseries_list:
+        global timeseries_list
+        timeseries_list = lpd.extractTs()
+    elif not ts_list:
         global lipd_path
         lipd_path = lpd.readLipds(path)
-        global time_series
-        time_series = lpd.extractTs()
+        global timeseries_list
+        timeseries_list = lpd.extractTs()
     elif not path:
         sys.exit("If specifying a list of timeseries, also need to specify path")
     else:
         global lipd_path
         lipd_path = path
-        global time_series
-        time_series = timeseries_list       
+        global timeseries_list
+        timeseries_list = ts_list    
         
 # Set the default palette for plots
 
@@ -110,7 +110,7 @@ plot_default = {'ice/rock': ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*']} 
 
 # Mapping
-def MapAll(markersize = 50, saveFig = False, dir="", format='eps'):
+def mapAll(markersize = 50, saveFig = False, dir="", format='eps'):
     """Map all the available records loaded into the workspace by archiveType.
     
     Map of all the records into the workspace by archiveType. 
@@ -128,18 +128,21 @@ def MapAll(markersize = 50, saveFig = False, dir="", format='eps'):
     
     Returns:
         The figure
+    
+    Examples:
+        >>> fig = pyleoclim.mapAll()
         
     """
     # Make sure there are LiPD files to plot
-    if not 'time_series' in globals():
-        openLiPDs()
+    if not 'timeseries_list' in globals():
+        openLipds()
         
     map1 = Map(plot_default)
     fig =  map1.map_all(markersize=markersize, saveFig = saveFig, dir=dir, format=format)
 
     return fig
 
-def MapLiPD(name="", countries = True, counties = False, \
+def mapLipd(name="", countries = True, counties = False, \
         rivers = False, states = False, background = "shadedrelief",\
         scale = 0.5, markersize = 50, marker = "default", \
         saveFig = False, dir = "", format="eps"):
@@ -175,16 +178,16 @@ def MapLiPD(name="", countries = True, counties = False, \
         The figure
         
     Examples:
-        >>> fig = pyleoclim.MapAll(markersize=100)               
+        >>> fig = pyleoclim.mapLipd(markersize=100)               
         
     """
     # Make sure there are LiPD files to plot
 
-    if not 'time_series' in globals():
-        openLiPDs()
+    if not 'timeseries_list' in globals():
+        openLipds()
         
     map1 = Map(plot_default)
-    fig =  map1.map_one(name=name,countries = countries, counties = counties, \
+    fig =  map1.map_Lipd(name=name,countries = countries, counties = counties, \
         rivers = rivers, states = states, background = background,\
         scale = scale, markersize = markersize, marker = marker, \
         saveFig = saveFig, dir = dir, format=format)
@@ -193,7 +196,7 @@ def MapLiPD(name="", countries = True, counties = False, \
 
 # Plotting
 
-def plotTS(timeseries = "", x_axis = "", markersize = 50,\
+def plotTs(timeseries = "", x_axis = "", markersize = 50,\
             marker = "default", saveFig = False, dir = "",\
             format="eps"):
     """Plot a single time series. 
@@ -219,14 +222,15 @@ def plotTS(timeseries = "", x_axis = "", markersize = 50,\
         The figure. 
     
     Examples:
-        >>> fig = pyleoclim.plotTS(marker = 'rs')
+        >>> fig = pyleoclim.plotTs(marker = 'rs')
         
     """
-    if not 'time_series' in globals():
-        openLiPDs()
+    if not 'timeseries_list' in globals():
+        openLipds()
         
-    plot1 = Plot(plot_default, time_series)
-    fig = plot1.plotoneTSO(new_timeseries = timeseries, x_axis = x_axis, markersize = markersize,\
+    plot1 = Plot(plot_default, timeseries_list)
+    fig = plot1.plot_Ts(timeseries = timeseries, x_axis = x_axis,\
+                   markersize = markersize,\
                    marker = marker, saveFig = saveFig, dir = dir,\
                    format=format)
 
@@ -234,7 +238,7 @@ def plotTS(timeseries = "", x_axis = "", markersize = 50,\
 
 # Statistics
 
-def TSstats(timeseries=""):
+def statsTs(timeseries=""):
     """ Calculate the mean and standard deviation of a timeseries
     
     Args:
@@ -244,7 +248,7 @@ def TSstats(timeseries=""):
         The mean and standard deviation
         
     Examples:
-        >>> mean,std = pyleoclim.TSstats()
+        >>> mean,std = pyleoclim.statsTs()
         0 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca
         1 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O
         2 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
@@ -285,14 +289,14 @@ def TSstats(timeseries=""):
         0.0821452359532
             
     """
-    if not 'time_series' in globals():
-        openLiPDs()
+    if not 'timeseries_list' in globals():
+        openLipds()
      
-    basic1 = Basic(time_series)
+    basic1 = Basic(timeseries_list)
     mean, std = basic1.simpleStats(timeseries = timeseries)
     return mean, std
 
-def TSbin(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
+def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
     """Bin the paleoData values of the timeseries
     
     Args:
@@ -312,9 +316,9 @@ def TSbin(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
         error- the standard error on the mean in each bin\n
     
     Example:
-        >>> ts = pyleoclim.time_series[28]
+        >>> ts = pyleoclim.timeseries_list[28]
         >>> bin_size = 200
-        >>> bins, binned_data, n, error = pyleoclim.TSbin(timeseries = ts, bin_size = bin_size)
+        >>> bins, binned_data, n, error = pyleoclim.binTs(timeseries = ts, bin_size = bin_size)
         Do you want to plot vs time or depth?
         Enter 0 for time and 1 for depth: 0
         
@@ -346,17 +350,18 @@ def TSbin(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
         26.5, 26.100000000000001]
         
     """
-    if not 'time_series' in globals():
-        openLiPDs()
+    if not 'timeseries_list' in globals():
+        openLipds()
 
     if not timeseries:
-        timeseries = getTSO(time_series)
+        timeseries = getTs(timeseries_list)
                 
-    bins, binned_data, n, error = Basic.bin_data(timeseries = timeseries,\
+    bins, binned_data, n, error = Basic.bin_Ts(timeseries = timeseries,\
                 x_axis = x_axis, bin_size = bin_size, start = start, end = end)
+    
     return bins, binned_data, n, error
 
-def TSinterp(timeseries="", x_axis = "", interp_step = "", start = "", end = ""):
+def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = ""):
     """Simple linear interpolation
     
     Simple linear interpolation of the data using the numpy.interp method
@@ -376,9 +381,9 @@ def TSinterp(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
         interp_values - the interpolated values
         
     Examples:
-        >>> ts = pyleoclim.time_series[28]
+        >>> ts = pyleoclim.timeseries_list[28]
         >>> interp_step = 200
-        >>> interp_age, interp_values = pyleoclim.TSinterp(timeseries = ts, interp_step = interp_step)
+        >>> interp_age, interp_values = pyleoclim.interpTs(timeseries = ts, interp_step = interp_step)
         Do you want to plot vs time or depth?
         Enter 0 for time and 1 for depth: 0
         
@@ -390,18 +395,19 @@ def TSinterp(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
          1.16054494]
       
     """
-    if not 'time_series' in globals():
-        openLiPDs()
+    if not 'timeseries_list' in globals():
+        openLipds()
 
     if not timeseries:
-        timeseries = getTSO(time_series)
+        timeseries = getTs(timeseries_list)
         
-    interp_age, interp_values = Basic.interp_data(timeseries = timeseries,\
+    interp_age, interp_values = Basic.interp_Ts(timeseries = timeseries,\
                 x_axis = x_axis, interp_step = interp_step, start= start, end=end)
+    
     return interp_age, interp_values
     
 # SummaryPlots
-def BasicSummary(timeseries = "", x_axis="", saveFig = False,
+def basicSummary(timeseries = "", x_axis="", saveFig = False,
                      format = "eps", dir = ""):
     """ Makes a basic summary plot
     
@@ -428,14 +434,14 @@ def BasicSummary(timeseries = "", x_axis="", saveFig = False,
         The figure.
         
     Examples:
-        >>> fig = pyleoclim.BasicSummary()
+        >>> fig = pyleoclim.basicSummary()
         
     """
-    if not 'time_series' in globals():
-        openLiPDs()
+    if not 'timeseries_list' in globals():
+        openLipds()
         
-    plt1 = SummaryPlots(time_series, plot_default)
-    fig = plt1.basic(x_axis=x_axis, new_timeseries = timeseries, saveFig=saveFig,\
+    plt1 = SummaryPlots(timeseries_list, plot_default)
+    fig = plt1.basic(x_axis=x_axis, timeseries = timeseries, saveFig=saveFig,\
                format = format, dir = dir)
 
     return fig

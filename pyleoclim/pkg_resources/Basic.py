@@ -28,9 +28,9 @@ class Basic(object):
     
     """
     
-    def __init__(self,timeseries_dict):
+    def __init__(self,timeseries_list):
 
-        self.TS = timeseries_dict
+        self.TS = timeseries_list
 
     @staticmethod
     def getValues(timeseries):
@@ -60,7 +60,7 @@ class Basic(object):
         """        
         # get the values
         if not timeseries:
-            timeseries = getTSO(self.TS)
+            timeseries = getTs(self.TS)
 
         values = Basic.getValues(timeseries)    
      
@@ -70,7 +70,7 @@ class Basic(object):
         return mean, std
     
     @staticmethod    
-    def bin_data(timeseries, x_axis = "", bin_size = "", start = "", end = ""):
+    def bin_Ts(timeseries, x_axis = "", bin_size = "", start = "", end = ""):
         """Bin the PaleoData values
         
         Args:
@@ -97,7 +97,7 @@ class Basic(object):
         
         # Get the time (or depth) representation
         if not x_axis:
-            time, label = TSOxaxis(timeseries)
+            time, label = xAxisTs(timeseries)
         elif x_axis == 'age':
             time = timeseries['age']
             label = 'age'
@@ -154,7 +154,7 @@ class Basic(object):
         return bins, binned_data, n, error
 
     @staticmethod
-    def interp_data(timeseries, x_axis = "", interp_step="",start ="",\
+    def interp_Ts(timeseries, x_axis = "", interp_step="",start ="",\
                     end =""):
         """Linear interpolation of the PaleoData values
         
@@ -179,7 +179,7 @@ class Basic(object):
         values = Basic.getValues(timeseries)
         # Get the time (or depth) representation
         if not x_axis:
-            time, label = TSOxaxis(timeseries)
+            time, label = xAxisTs(timeseries)
         elif x_axis == 'age':
             time = timeseries['age']
             label = 'age'

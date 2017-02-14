@@ -26,16 +26,16 @@ class SummaryPlots(object):
     
     """
     
-    def __init__(self,timeseries_dict,plot_default):
+    def __init__(self,timeseries_list,plot_default):
        
-        self.TS = timeseries_dict
+        self.TS = timeseries_list
         self.default = plot_default
         
-    def getMetadata(self, time_series):
+    def getMetadata(self, timeseries):
         """ Get the necessary metadata to be printed out automatically
         
         Args:
-            time_series: a specific timeseries object
+            timeseries: a specific timeseries object
             
         Returns:
             A dictionary containing the following metadata:\n
@@ -53,13 +53,13 @@ class SummaryPlots(object):
         """
         # Get all the necessary information
         # Top level information
-        if "archiveType" in time_series.keys():
-            archiveType = time_series["archiveType"]
+        if "archiveType" in timeseries.keys():
+            archiveType = timeseries["archiveType"]
         else:
             archiveType = "NA"
             
-        if "pub1_author" in time_series.keys():
-            authors = time_series["pub1_author"]
+        if "pub1_author" in timeseries.keys():
+            authors = timeseries["pub1_author"]
         else:
             authors = "NA"
         
@@ -68,37 +68,37 @@ class SummaryPlots(object):
         if  len(idx)>2:
             authors = authors[0:idx[1]+1] + "et al."
         
-        if "pub1_pubYear" in time_series.keys():
-            Year = str(time_series["pub1_pubYear"])
+        if "pub1_pubYear" in timeseries.keys():
+            Year = str(timeseries["pub1_pubYear"])
         else:
             Year = "NA"
         
-        if "pub1_DOI" in time_series.keys():
-            DOI = time_series["pub1_DOI"]  
+        if "pub1_DOI" in timeseries.keys():
+            DOI = timeseries["pub1_DOI"]  
         else:
             DOI = "NA"
         
-        if "paleoData_onInferredVariableProperty" in time_series.keys():
-            Variable = time_series["paleoData_onInferredVariableProperty"]
-        elif "paleoData_onProxyObservationProperty" in time_series.keys():
-            Variable = time_series["paleoData_onProxyObservationProperty"]
+        if "paleoData_onInferredVariableProperty" in timeseries.keys():
+            Variable = timeseries["paleoData_onInferredVariableProperty"]
+        elif "paleoData_onProxyObservationProperty" in timeseries.keys():
+            Variable = timeseries["paleoData_onProxyObservationProperty"]
         else:
-            Variable = time_series["paleoData_variableName"]
+            Variable = timeseries["paleoData_variableName"]
         
-        if "paleoData_units" in time_series.keys():
-            units = time_series["paleoData_units"]
+        if "paleoData_units" in timeseries.keys():
+            units = timeseries["paleoData_units"]
         else:
             units = "NA"
         
         #Climate interpretation information
-        if "paleoData_isotopeInterpretation" in time_series.keys():
-            interpretation = time_series["paleoData_isotopeInterpretation"]
+        if "paleoData_isotopeInterpretation" in timeseries.keys():
+            interpretation = timeseries["paleoData_isotopeInterpretation"]
             ClimateVar = interpretation["name"]
             Detail = interpretation["detail"]
             Seasonality = interpretation["seasonality"]
             Direction = interpretation["interpretationDirection"]
-        elif "paleoData_climateInterpretation" in time_series.keys():
-            interpretation = time_series["paleoData_climateInterpretation"]
+        elif "paleoData_climateInterpretation" in timeseries.keys():
+            interpretation = timeseries["paleoData_climateInterpretation"]
             ClimateVar = interpretation["name"]
             Detail = interpretation["detail"]
             Seasonality = interpretation["seasonality"]
@@ -111,23 +111,23 @@ class SummaryPlots(object):
         
         # Check that it's not in the old format
         
-        if ClimateVar == "NA" and "climateInterpretation_variable" in time_series.keys():
-            ClimateVar = time_series["climateInterpretation_variable"] 
-        if Detail == "NA" and "climateInterpretation_variableDetail" in time_series.keys():
-            Detail = time_series["climateInterpretation_variableDetail"]
-        if Seasonality == "NA" and "climateInterpretation_seasonality" in time_series.keys(): 
-            Seasonality = time_series["climateInterpretation_seasonality"]
-        if Direction == "NA" and "climateInterpretation_interpDirection" in time_series.keys():
-            Direction = time_series["climateInterpretation_interpDirection"]       
+        if ClimateVar == "NA" and "climateInterpretation_variable" in timeseries.keys():
+            ClimateVar = timeseries["climateInterpretation_variable"] 
+        if Detail == "NA" and "climateInterpretation_variableDetail" in timeseries.keys():
+            Detail = timeseries["climateInterpretation_variableDetail"]
+        if Seasonality == "NA" and "climateInterpretation_seasonality" in timeseries.keys(): 
+            Seasonality = timeseries["climateInterpretation_seasonality"]
+        if Direction == "NA" and "climateInterpretation_interpDirection" in timeseries.keys():
+            Direction = timeseries["climateInterpretation_interpDirection"]       
             
         # Calibration information
-        if "calibration_equation" in time_series.keys():
-            Calibration_equation = time_series["calibration_equation"]
+        if "calibration_equation" in timeseries.keys():
+            Calibration_equation = timeseries["calibration_equation"]
         else:
             Calibration_equation = "NA"
             
-        if  "calibration_calibrationReferences" in time_series.keys():
-            ref = time_series["calibration_calibrationReferences"]
+        if  "calibration_calibrationReferences" in timeseries.keys():
+            ref = timeseries["calibration_calibrationReferences"]
             if "author" in ref.keys():
                 ref_author = ref["author"][0] # get the first author
             else:
@@ -136,8 +136,8 @@ class SummaryPlots(object):
                 ref_year = str(ref["publicationYear"])
             else: ref_year="NA"
             Calibration_notes = ref_author +"."+ref_year
-        elif "calibration_notes" in time_series.keys():
-            Calibration_notes = time_series["calibration_notes"]  
+        elif "calibration_notes" in timeseries.keys():
+            Calibration_notes = timeseries["calibration_notes"]  
         else: Calibration_notes = "NA"
         
         #Truncate the notes if too long
@@ -160,14 +160,14 @@ class SummaryPlots(object):
         
         return dict_out
     
-    def TSdata(self,new_timeseries ="", x_axis = ""):
+    def TsData(self,timeseries ="", x_axis = ""):
         """ Get the PaleoData with age/depth information
         
         Get the necessary information for the TS plots/necessary to allow for
         axes specification
         
         Args:
-            new_timeseries: a single timeseries object. 
+            timeseries: a single timeseries object. 
                 By default, will prompt the user
             x-axis (str): The representation against which to plot the 
                 paleo-data. Options are "age", "year", and "depth". 
@@ -182,15 +182,15 @@ class SummaryPlots(object):
             
         """
         # Get the data
-        if not new_timeseries:
-            new_timeseries = getTSO(self.TS)
+        if not timeseries:
+            timeseries = getTs(self.TS)
         
-        dataframe = TStoDF(new_timeseries, x_axis)
-        val_idx = valuesloc(dataframe)
+        dataframe = TsToDf(timeseries, x_axis)
+        val_idx = valuesLoc(dataframe)
         dataframe = dataframe.iloc[val_idx,:]
 
         # Get the archiveType and make sure it aligns with the ontology
-        archiveType = LiPDtoOntology(new_timeseries["archiveType"])
+        archiveType = LipdToOntology(timeseries["archiveType"])
         
         # Get the labels for the axis
         # x-axis label
@@ -199,53 +199,53 @@ class SummaryPlots(object):
             headers.append(key)
 
         if "age" in headers:
-            if "ageUnits" in new_timeseries.keys():
-                x_axis_label = new_timeseries["ageUnits"]
+            if "ageUnits" in timeseries.keys():
+                x_axis_label = timeseries["ageUnits"]
             else:
                 x_axis_label = "Age"
         elif "year" in headers:
-            if "yearUnits" in new_timeseries.keys():
-                x_axis_label = new_timeseries["yearUnits"]
+            if "yearUnits" in timeseries.keys():
+                x_axis_label = timeseries["yearUnits"]
             else:
                 x_axis_label = "Year"
         else:
-            if "depthUnits" in new_timeseries.keys():
-                x_axis_label = "Depth (" + new_timeseries["depthUnits"] + ")"
+            if "depthUnits" in timeseries.keys():
+                x_axis_label = "Depth (" + timeseries["depthUnits"] + ")"
             else:
                 x_axis_label = "Depth"
         
         # get the y-axis label                           
-        if "paleoData_onInferredVariableProperty" in new_timeseries.keys():
-            if "paleoData_units" in new_timeseries.keys():
-                y_axis_label = new_timeseries["paleoData_onInferredVariableProperty"] \
-                    + " (" + new_timeseries["paleoData_units"] + ")" 
+        if "paleoData_onInferredVariableProperty" in timeseries.keys():
+            if "paleoData_units" in timeseries.keys():
+                y_axis_label = timeseries["paleoData_onInferredVariableProperty"] \
+                    + " (" + timeseries["paleoData_units"] + ")" 
             else:
-                y_axis_label = new_timeseries["paleoData_onInferredVariableProperty"]             
-        elif "paleoData_onProxyObservationProperty" in new_timeseries.keys():
-            if "paleoData_units" in new_timeseries.keys():
-                y_axis_label = new_timeseries["paleoData_onProxyObservationProperty"] \
-                    + " (" + new_timeseries["paleoData_units"] + ")"  
+                y_axis_label = timeseries["paleoData_onInferredVariableProperty"]             
+        elif "paleoData_onProxyObservationProperty" in timeseries.keys():
+            if "paleoData_units" in timeseries.keys():
+                y_axis_label = timeseries["paleoData_onProxyObservationProperty"] \
+                    + " (" + timeseries["paleoData_units"] + ")"  
             else: 
-                y_axis_label = new_timeseries["paleoData_onProxyObservationProperty"]     
+                y_axis_label = timeseries["paleoData_onProxyObservationProperty"]     
         else:
-            if "paleoData_units" in new_timeseries.keys():
-                y_axis_label = new_timeseries["paleoData_variableName"] \
-                    + " (" + new_timeseries["paleoData_units"] + ")"  
+            if "paleoData_units" in timeseries.keys():
+                y_axis_label = timeseries["paleoData_variableName"] \
+                    + " (" + timeseries["paleoData_units"] + ")"  
             else:
-                y_axis_label = new_timeseries["paleoData_variableName"]
+                y_axis_label = timeseries["paleoData_variableName"]
 
         return dataframe, archiveType, x_axis_label, y_axis_label, headers
 
-    def agemodelData(self, new_timeseries =""):
+    def agemodelData(self, timeseries =""):
         """Get the necessary information for the agemodel plot
         
         Args:
-            new_timeseries: a single timeseries object. By default, will 
+            timeseries: a single timeseries object. By default, will 
                 prompt the user
                 
         Returns:
-            x - the depth values \n
-            y - the age values \n
+            depth - the depth values \n
+            age - the age values \n
             x_axis_label - the label for the x-axis \n
             y_axis_label - the label for the y-axis \n
             archiveType - the archiveType (for default plot settings)
@@ -253,61 +253,61 @@ class SummaryPlots(object):
         """
     
         # Get the data
-        if not new_timeseries:
-            new_timeseries = getTSO(self.TS)
-        if not "age" in new_timeseries.keys() and not "year" in new_timeseries.keys():
+        if not timeseries:
+            timeseries = getTs(self.TS)
+        if not "age" in timeseries.keys() and not "year" in timeseries.keys():
             sys.exit("No time information")
-        elif not "depth" in new_timeseries.keys():
+        elif not "depth" in timeseries.keys():
             sys.exit("No depth information")
         else:
-            if "age" in new_timeseries.keys() and "year" in new_timeseries.keys():
+            if "age" in timeseries.keys() and "year" in timeseries.keys():
                 print("Do you want to use age or year?")
                 choice = int(input("Enter 0 for age and 1 for year: "))
                 if choice == 0:
-                    y = new_timeseries['age']
-                    if "ageUnits" in new_timeseries.keys():
+                    age = timeseries['age']
+                    if "ageUnits" in timeseries.keys():
                         y_axis_label = "Calendar Age (" +\
-                                        new_timeseries["ageUnits"] +")"
+                                        timeseries["ageUnits"] +")"
                     else:
                         y_axis_label = "Calendar Age"
                 elif choice == 1:
-                    y = new_timeseries['year']
-                    if "yearUnits" in new_timeseries.keys():
+                    age = timeseries['year']
+                    if "yearUnits" in timeseries.keys():
                         y_axis_label = "Year (" +\
-                                        new_timeseries["yearUnits"] +")"
+                                        timeseries["yearUnits"] +")"
                     else:
                         y_axis_label = "Year"
                 else:
                     sys.exit("Enter 0 or 1")
                     
-            if "age" in new_timeseries.keys():
-                y = new_timeseries['age']
-                if "ageUnits" in new_timeseries.keys():
+            if "age" in timeseries.keys():
+                age = timeseries['age']
+                if "ageUnits" in timeseries.keys():
                     y_axis_label = "Calendar Age (" +\
-                            new_timeseries["ageUnits"] +")"
+                            timeseries["ageUnits"] +")"
                 else:
                     y_axis_label = "Calendar Age"
                     
-            if "year" in new_timeseries.keys():
-                y = new_timeseries['year']
-                if "yearUnits" in new_timeseries.keys():
+            if "year" in timeseries.keys():
+                age = timeseries['year']
+                if "yearUnits" in timeseries.keys():
                     y_axis_label = "Year (" +\
-                            new_timeseries["ageUnits"] +")"
+                            timeseries["ageUnits"] +")"
                 else:
                     y_axis_label = "Year"
                     
-            x = new_timeseries['depth']
-            if "depthUnits" in new_timeseries.keys():
-                x_axis_label = "Depth (" + new_timeseries["depthUnits"] + ")"
+            depth = timeseries['depth']
+            if "depthUnits" in timeseries.keys():
+                x_axis_label = "Depth (" + timeseries["depthUnits"] + ")"
             else:
                 x_axis_label = "Depth"
         
         # Get the archiveType and make sure it aligns with the ontology
-        archiveType = LiPDtoOntology(new_timeseries["archiveType"]) 
+        archiveType = LipdToOntology(timeseries["archiveType"]) 
         
-        return x, y, x_axis_label, y_axis_label, archiveType
+        return depth, age, x_axis_label, y_axis_label, archiveType
         
-    def basic(self,x_axis="", new_timeseries = "", saveFig = True,
+    def basic(self,x_axis="", timeseries = "", saveFig = False,
                      format = "eps", dir = ""):
         """ Makes a basic summary plot
         
@@ -336,8 +336,8 @@ class SummaryPlots(object):
         """
     
         # get the timeseries
-        if not new_timeseries:
-            new_timeseries = getTSO(self.TS)
+        if not timeseries:
+            timeseries = getTs(self.TS)
         
         # Create the figure
         fig = plt.figure(figsize=(11,8))
@@ -346,7 +346,7 @@ class SummaryPlots(object):
         
         # Get the necessary metadata
         dataframe, archiveType, x_axis_label, y_axis_label, headers = \
-            self.TSdata(new_timeseries=new_timeseries, x_axis=x_axis)
+            self.TsData(timeseries=timeseries, x_axis=x_axis)
         
         # Make the time series plot
         ax1 = fig.add_subplot(gs[0,:-1])
@@ -379,14 +379,14 @@ class SummaryPlots(object):
         plt.ylabel(y_axis_label)  
         ax1.legend(loc=3, scatterpoints=1, fancybox=True, shadow=True, \
                    fontsize=10)
-        plt.title(new_timeseries["dataSetName"], fontsize = 14, \
+        plt.title(timeseries["dataSetName"], fontsize = 14, \
                   fontweight = "bold")
 
         # Plot the map
         # Get the coordinates. 
         
-        lat = new_timeseries["geo_meanLat"]  
-        lon = new_timeseries["geo_meanLon"]
+        lat = timeseries["geo_meanLat"]  
+        lon = timeseries["geo_meanLon"]
     
         #Make the map
         ax2 = fig.add_subplot(gs[1,0])
@@ -401,11 +401,11 @@ class SummaryPlots(object):
                    marker = self.default[archiveType][1])
         
         #Make the age model plot
-        if "age" in new_timeseries.keys() and "depth" in new_timeseries.keys()\
-          or "year" in new_timeseries.keys() and "depth" in new_timeseries.keys():
+        if "age" in timeseries.keys() and "depth" in timeseries.keys()\
+          or "year" in timeseries.keys() and "depth" in timeseries.keys():
             #Get the metadata
             x, y, x_axis_label2, y_axis_label2, archiveType = \
-              self.agemodelData(new_timeseries=new_timeseries)
+              self.agemodelData(timeseries=timeseries)
             #Make the plot
             ax3 = fig.add_subplot(gs[1,1])
             plt.style.use("ggplot")
@@ -416,7 +416,7 @@ class SummaryPlots(object):
             print("No age or depth information available, skipping age model plot")
         
         # Add the metadata
-        dict_out = self.getMetadata(new_timeseries)
+        dict_out = self.getMetadata(timeseries)
         textstr = "archiveType: " + dict_out["archiveType"]+"\n"+"\n"+\
                   "Authors: " + dict_out["authors"]+"\n"+"\n"+\
                   "Year: " + dict_out["Year"]+"\n"+"\n"+\
@@ -435,8 +435,8 @@ class SummaryPlots(object):
                                          
         
         if saveFig == True:
-            name = 'SummaryPlot_'+new_timeseries["dataSetName"]+"_"+\
-                new_timeseries["paleoData_variableName"]
+            name = 'SummaryPlot_'+timeseries["dataSetName"]+"_"+\
+                timeseries["paleoData_variableName"]
             saveFigure(name,format,dir)
         else:
             plt.show()

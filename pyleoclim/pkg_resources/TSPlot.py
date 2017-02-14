@@ -25,19 +25,19 @@ class Plot(object):
     """ Plot a timeseries
     """
 
-    def __init__(self, plot_default,time_series):
+    def __init__(self, plot_default,timeseries_list):
         
 
-        self.TS= time_series
+        self.TS= timeseries_list
         self.default = plot_default    
     
-    def plotoneTSO(self, new_timeseries = "", x_axis = "", markersize = 50,\
+    def plot_Ts(self, timeseries = "", x_axis = "", markersize = 50,\
                    marker = "default", saveFig = False, dir = "",\
                    format="eps"):
         """ Plot a timeseries object
         
         Args:
-            new_timeseries: A timeseries. By default, will prompt the user for one. 
+            timeseries: A timeseries. By default, will prompt the user for one. 
             x_axis (str): The representation against which to plot the 
                 paleo-data. Options are "age", "year", and "depth". 
                 Default is to let the system choose if only one available or
@@ -59,15 +59,15 @@ class Plot(object):
             
         """
         # Get the data
-        if not new_timeseries:
-            new_timeseries = getTSO(self.TS)
+        if not timeseries:
+            timeseries = getTs(self.TS)
         
-        dataframe = TStoDF(new_timeseries, x_axis)
-        val_idx = valuesloc(dataframe)
+        dataframe = TsToDf(timeseries, x_axis)
+        val_idx = valuesLoc(dataframe)
         dataframe = dataframe.iloc[val_idx,:]
 
         # Get the archiveType and make sure it aligns with the ontology
-        archiveType = LiPDtoOntology(new_timeseries["archiveType"])
+        archiveType = LipdToOntology(timeseries["archiveType"])
         
         # Get the labels for the axis
         # x-axis label
@@ -76,40 +76,40 @@ class Plot(object):
             headers.append(key)
 
         if "age" in headers:
-            if "ageUnits" in new_timeseries.keys():
-                x_axis_label = new_timeseries["ageUnits"]
+            if "ageUnits" in timeseries.keys():
+                x_axis_label = timeseries["ageUnits"]
             else:
                 x_axis_label = "Age"
         elif "year" in headers:
-            if "yearUnits" in new_timeseries.keys():
-                x_axis_label = new_timeseries["yearUnits"]
+            if "yearUnits" in timeseries.keys():
+                x_axis_label = timeseries["yearUnits"]
             else:
                 x_axis_label = "Year"
         else:
-            if "depthUnits" in new_timeseries.keys():
-                x_axis_label = "Depth (" + new_timeseries["depthUnits"] + ")"
+            if "depthUnits" in timeseries.keys():
+                x_axis_label = "Depth (" + timeseries["depthUnits"] + ")"
             else:
                 x_axis_label = "Depth"
         
         # get the y-axis label                           
-        if "paleoData_onInferredVariableProperty" in new_timeseries.keys():
-            if "paleoData_units" in new_timeseries.keys():
-                y_axis_label = new_timeseries["paleoData_onInferredVariableProperty"] \
-                    + " (" + new_timeseries["paleoData_units"] + ")" 
+        if "paleoData_onInferredVariableProperty" in timeseries.keys():
+            if "paleoData_units" in timeseries.keys():
+                y_axis_label = timeseries["paleoData_onInferredVariableProperty"] \
+                    + " (" + timeseries["paleoData_units"] + ")" 
             else:
-                y_axis_label = new_timeseries["paleoData_onInferredVariableProperty"]             
-        elif "paleoData_onProxyObservationProperty" in new_timeseries.keys():
-            if "paleoData_units" in new_timeseries.keys():
-                y_axis_label = new_timeseries["paleoData_onProxyObservationProperty"] \
-                    + " (" + new_timeseries["paleoData_units"] + ")"  
+                y_axis_label = timeseries["paleoData_onInferredVariableProperty"]             
+        elif "paleoData_onProxyObservationProperty" in timeseries.keys():
+            if "paleoData_units" in timeseries.keys():
+                y_axis_label = timeseries["paleoData_onProxyObservationProperty"] \
+                    + " (" + timeseries["paleoData_units"] + ")"  
             else: 
-                y_axis_label = new_timeseries["paleoData_onProxyObservationProperty"]     
+                y_axis_label = timeseries["paleoData_onProxyObservationProperty"]     
         else:
-            if "paleoData_units" in new_timeseries.keys():
-                y_axis_label = new_timeseries["paleoData_variableName"] \
-                    + " (" + new_timeseries["paleoData_units"] + ")"  
+            if "paleoData_units" in timeseries.keys():
+                y_axis_label = timeseries["paleoData_variableName"] \
+                    + " (" + timeseries["paleoData_units"] + ")"  
             else:
-                y_axis_label = new_timeseries["paleoData_variableName"]
+                y_axis_label = timeseries["paleoData_variableName"]
         
         #Make the plot
         fig = plt.figure()
@@ -148,7 +148,7 @@ class Plot(object):
         
         #Save the figure if asked
         if saveFig == True:
-            name = 'plot_timeseries_'+new_timeseries["dataSetName"]+\
+            name = 'plot_timeseries_'+timeseries["dataSetName"]+\
                 "_"+y_axis_label
             saveFigure(name,format,dir)
         else:
@@ -156,13 +156,13 @@ class Plot(object):
 
         return fig
     
-    def agemodelplot(self, new_timeseries = "", markersize = 50,\
+    def plot_agemodel(self, timeseries = "", markersize = 50,\
                    marker = "default", saveFig = True, dir = "",
                    format="eps" ):
         """ Make a simple age-depth profile
         
         Args:
-            new_timeseries: A timeseries. By default, will prompt the user for one. 
+            timeseries: A timeseries. By default, will prompt the user for one. 
             markersize (int): default is 50. 
             marker (str): a string (or list) containing the color and shape of
                 the marker. Default is by archiveType. Type pyleo.plot_default 
@@ -180,58 +180,58 @@ class Plot(object):
             
         """
         # Get the data
-        if not new_timeseries:
-            new_timeseries = getTSO(self.TS)
+        if not timeseries:
+            timeseries = getTs(self.TS)
             
-        if not "age" in new_timeseries.keys() and not "year" in new_timeseries.keys():
+        if not "age" in timeseries.keys() and not "year" in timeseries.keys():
             sys.exit("No time information")
-        elif not "depth" in new_timeseries.keys():
+        elif not "depth" in timeseries.keys():
             sys.exit("No depth information")
         else:
-            if "age" in new_timeseries.keys() and "year" in new_timeseries.keys():
+            if "age" in timeseries.keys() and "year" in timeseries.keys():
                 print("Do you want to use age or year?")
                 choice = int(input("Enter 0 for age and 1 for year: "))
                 if choice == 0:
-                    y = new_timeseries['age']
-                    if "ageUnits" in new_timeseries.keys():
+                    y = timeseries['age']
+                    if "ageUnits" in timeseries.keys():
                         y_axis_label = "Calendar Age (" +\
-                                        new_timeseries["ageUnits"] +")"
+                                        timeseries["ageUnits"] +")"
                     else:
                         y_axis_label = "Calendar Age"
                 elif choice == 1:
-                    y = new_timeseries['year']
-                    if "yearUnits" in new_timeseries.keys():
+                    y = timeseries['year']
+                    if "yearUnits" in timeseries.keys():
                         y_axis_label = "Year (" +\
-                                        new_timeseries["yearUnits"] +")"
+                                        timeseries["yearUnits"] +")"
                     else:
                         y_axis_label = "Year"
                 else:
                     sys.exit("Enter 0 or 1")
                     
-            if "age" in new_timeseries.keys():
-                y = new_timeseries['age']
-                if "ageUnits" in new_timeseries.keys():
+            if "age" in timeseries.keys():
+                y = timeseries['age']
+                if "ageUnits" in timeseries.keys():
                     y_axis_label = "Calendar Age (" +\
-                            new_timeseries["ageUnits"] +")"
+                            timeseries["ageUnits"] +")"
                 else:
                     y_axis_label = "Calendar Age"
                     
-            if "year" in new_timeseries.keys():
-                y = new_timeseries['year']
-                if "yearUnits" in new_timeseries.keys():
+            if "year" in timeseries.keys():
+                y = timeseries['year']
+                if "yearUnits" in timeseries.keys():
                     y_axis_label = "Year (" +\
-                            new_timeseries["ageUnits"] +")"
+                            timeseries["ageUnits"] +")"
                 else:
                     y_axis_label = "Year"
                     
-            x = new_timeseries['depth']
-            if "depthUnits" in new_timeseries.keys():
-                x_axis_label = "Depth (" + new_timeseries["depthUnits"] + ")"
+            x = timeseries['depth']
+            if "depthUnits" in timeseries.keys():
+                x_axis_label = "Depth (" + timeseries["depthUnits"] + ")"
             else:
                 x_axis_label = "Depth"
         
         # Get the archiveType and make sure it aligns with the ontology
-        archiveType = LiPDtoOntology(new_timeseries["archiveType"]) 
+        archiveType = LipdToOntology(timeseries["archiveType"]) 
         
         # Make the plot
         fig = plt.figure()
@@ -250,7 +250,7 @@ class Plot(object):
         
         #Save the figure if asked
         if saveFig == True:
-            name = 'plot_agemodel_'+new_timeseries["dataSetName"]
+            name = 'plot_agemodel_'+timeseries["dataSetName"]
             saveFigure(name,format,dir)
         else:
             plt.show()

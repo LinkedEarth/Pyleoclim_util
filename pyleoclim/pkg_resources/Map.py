@@ -48,7 +48,7 @@ class Map(object):
             self.data.iloc[idx,0]=d['geo']['geometry']['coordinates'][1]
             self.data.iloc[idx,1]=d['geo']['geometry']['coordinates'][0]
             # Put the archiveType in
-            self.data.iloc[idx,2] = LiPDtoOntology(d['archiveType'])
+            self.data.iloc[idx,2] = LipdToOntology(d['archiveType'])
             self.data.iloc[idx,3]=val
   
     def map_all(self, markersize = 50, saveFig = False, dir="", format='eps'):
@@ -105,7 +105,7 @@ class Map(object):
 
         return fig    
 
-    def map_one(self, name="", countries = True, counties = False, \
+    def map_Lipd(self, name="", countries = True, counties = False, \
         rivers = False, states = False, background = "shadedrelief",\
         scale = 0.5, markersize = 50, marker = "default", \
         saveFig = False, dir = "", format="eps"):
@@ -142,7 +142,7 @@ class Map(object):
         # Check whether the record name was provided
         if not name:
             enumerateLipds()
-            selection = promptforLipd()
+            selection = promptForLipd()
             dataset = self.data.iloc[selection]['name']
         else:
             dataset = name
