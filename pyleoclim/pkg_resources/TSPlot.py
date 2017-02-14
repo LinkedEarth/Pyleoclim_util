@@ -12,8 +12,7 @@ import lipd as lpd
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import cartopy
-import cartopy.crs as ccrs
+from mpl_toolkits.basemap import Basemap
 import sys
 import os
 from matplotlib import gridspec
@@ -23,12 +22,11 @@ from .LiPDutils import *
 from .Basic import *
 
 class Plot(object):
+    """ Plot a timeseries
+    """
 
     def __init__(self, plot_default,time_series):
-        """
-        Pass the default palette and the dictionary of timeseries to
-        the Plot object
-        """
+        
 
         self.TS= time_series
         self.default = plot_default    
@@ -36,21 +34,29 @@ class Plot(object):
     def plotoneTSO(self, new_timeseries = "", x_axis = "", markersize = 50,\
                    marker = "default", saveFig = False, dir = "",\
                    format="eps"):
-        """
-        Plot a timeseries object:
-        Arguments:
-         - new_timeseries: A timeseries: By default, will prompt the user for one. 
-         - x_axis: The representation against which to plot the paleo-data. Options are "age",
-       "year", and "depth". Default is to let the system choose if only one available or prompt
-        the user. 
-         - markersize: default is 50. 
-         - marker: a string (or list) containing the color and shape of the marker. Default is by archiveType.
-         Type pyleo.plot_default to see the default palette.
-         - saveFig: default is to not save the figure
-         - dir: the full path of the directory in which to save the figure. If not provided, creates
-         a default folder called 'figures' in the LiPD working directory (lipd.path). 
-         - format: One of the file extensions supported by the active backend. Default is "eps".
-         Most backend support png, pdf, ps, eps, and svg.
+        """ Plot a timeseries object
+        
+        Args:
+            new_timeseries: A timeseries. By default, will prompt the user for one. 
+            x_axis (str): The representation against which to plot the 
+                paleo-data. Options are "age", "year", and "depth". 
+                Default is to let the system choose if only one available or
+                prompt the user. 
+            markersize (int): default is 50. 
+            marker (str): a string (or list) containing the color and shape of
+                the marker. Default is by archiveType.Type pyleo.plot_default 
+                to see the default palette.
+            saveFig (bool): default is to not save the figure
+            dir (str): the full path of the directory in which to save the 
+                figure. If not provided, creates a default folder called 
+                'figures' in the LiPD working directory (lipd.path). 
+            format (str): One of the file extensions supported by the active
+                backend. Default is "eps". Most backend support png, pdf, ps, eps, 
+                and svg.
+            
+        Returns:
+            The figure
+            
         """
         # Get the data
         if not new_timeseries:
@@ -153,20 +159,25 @@ class Plot(object):
     def agemodelplot(self, new_timeseries = "", markersize = 50,\
                    marker = "default", saveFig = True, dir = "",
                    format="eps" ):
-        """
-        Make a simple age-depth profile
-        Arguments:
-               Plot a timeseries object:
-        Arguments:
-         - new_timeseries: A timeseries: By default, will prompt the user for one. 
-         - markersize: default is 50. 
-         - marker: a string (or list) containing the color and shape of the marker. Default is by archiveType.
-         Type pyleo.plot_default to see the default palette.
-         - saveFig: default is to not save the figure
-         - dir: the full path of the directory in which to save the figure. If not provided, creates
-         a default folder called 'figures' in the LiPD working directory (lipd.path). 
-         - format: One of the file extensions supported by the active backend. Default is "eps".
-         Most backend support png, pdf, ps, eps, and svg.
+        """ Make a simple age-depth profile
+        
+        Args:
+            new_timeseries: A timeseries. By default, will prompt the user for one. 
+            markersize (int): default is 50. 
+            marker (str): a string (or list) containing the color and shape of
+                the marker. Default is by archiveType. Type pyleo.plot_default 
+                to see the default palette.
+            saveFig (bool): default is to not save the figure
+            dir (str): the full path of the directory in which to save the figure. 
+                If not provided, creates a default folder called 'figures' in
+                the LiPD working directory (lipd.path). 
+            format (str): One of the file extensions supported by the active 
+                backend. Default is "eps". Most backend support png, pdf, ps, 
+                eps, and svg.
+                
+        Returns:
+            The figure 
+            
         """
         # Get the data
         if not new_timeseries:

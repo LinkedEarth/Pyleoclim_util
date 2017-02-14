@@ -24,19 +24,13 @@ from .LiPDutils import *
 from .Basic import *
 
 class Map(object):
-    """
-    Create Maps using cartopy
+    """ Create Maps using Basemap. 
+    
+    Uses the default color palette: pyleoclim.plot_default
+    
     """
 
     def __init__(self, plot_default):
-        """
-        Passes the default color palette
-        Opens the LiPD files loaded in the workspace and grabs the following metadata:
-        1. Latitude
-        2. Longitude
-        3. archiveType
-        4. The filename
-        """
         
         # Organize the data        
 
@@ -58,15 +52,21 @@ class Map(object):
             self.data.iloc[idx,3]=val
   
     def map_all(self, markersize = 50, saveFig = False, dir="", format='eps'):
-        """        
-        Map all the available records loaded into the LiPD working directory by archiveType.
-        Arguments:
-          - markersize: default is 50
-          - saveFig: default is to save the figure
-          - dir: the full path of the directory in which to save the figure. If not provided, creates
-          a default folder called 'figures' in the LiPD working directory (lipd.path). 
-          - format: One of the file extensions supported by the active backend. Default is "eps".
-          Most backend support png, pdf, ps, eps, and svg.
+        """Map all the available records loaded into the LiPD working directory by archiveType.        
+        
+        Args:
+            markersize (int): default is 50
+            saveFig (bool): default is to save the figure
+            dir (str): the full path of the directory in which to save the 
+                figure. If not provided, creates a default folder called 
+                'figures' in the LiPD working directory (lipd.path). 
+            format (str): One of the file extensions supported by the active 
+                backend. Default is "eps". Most backend support png, pdf, ps, 
+                eps, and svg.
+                
+        Returns:
+            The figure                
+                
         """
         fig = plt.figure()
         map = Basemap(projection='robin',lon_0 = 0, lat_0 = 0)
@@ -109,25 +109,35 @@ class Map(object):
         rivers = False, states = False, background = "shadedrelief",\
         scale = 0.5, markersize = 50, marker = "default", \
         saveFig = False, dir = "", format="eps"):
-        """
-        Makes a map for a single record. 
-        Arguments:
-         - name: the name of the LiPD file. **WITH THE .LPD EXTENSION!**.
-         If not provided, will prompt the user for one.
-         - countries: Draws the country borders. Default is on (True).
-         - counties: Draws the USA counties. Default is off (False).
-         - states: Draws the American and Australian states borders. Default is off (False)
-         - background: Plots one of the following images on the map: bluemarble, etopo, shadedrelief,
-         or none (filled continents). Default is shadedrelief
-         - scale: useful to downgrade the original image resolution to speed up the process. Default is 0.5.
-         - markersize: default is 100
-         - marker: a string (or list) containing the color and shape of the marker. Default is by archiveType.
-         Type pyleo.plot_default to see the default palette. 
-         - saveFig: default is to not save the figure
-         - dir: the full path of the directory in which to save the figure. If not provided, creates
-          a default folder called 'figures' in the LiPD working directory (lipd.path).  
-         - format: One of the file extensions supported by the active backend. Default is "eps".
-          Most backend support png, pdf, ps, eps, and svg.
+        """ Makes a map for a single record.
+         
+        Args:
+            name (str) : the name of the LiPD file. **WITH THE 
+                .LPD EXTENSION!**.If not provided, will prompt the user for one.
+            countries (bool): Draws the country borders. Default is on (True).
+            counties (bool): Draws the USA counties. Default is off (False).
+            states (bool): Draws the American and Australian states borders. 
+                Default is off (False)
+            background (str): Plots one of the following images on the map: 
+                bluemarble, etopo, shadedrelief, or none (filled continents). 
+                Default is shadedrelief
+            scale (float): useful to downgrade the original image resolution 
+                to speed up the process. Default is 0.5.
+            markersize (int): default is 100
+            marker (str): a string (or list) containing the color and shape of 
+                the marker. Default is by archiveType. Type pyleo.plot_default
+                to see the default palette. 
+            saveFig (bool): default is to not save the figure
+            dir (str): the full path of the directory in which to save the 
+                figure. If not provided, creates a default folder called 
+                'figures' in the LiPD working directory (lipd.path).  
+            format (str): One of the file extensions supported by the active
+                backend. Default is "eps". Most backend support png, pdf, ps, 
+                eps, and svg.
+                
+        Returns:
+            The Figure
+                
         """
         # Check whether the record name was provided
         if not name:

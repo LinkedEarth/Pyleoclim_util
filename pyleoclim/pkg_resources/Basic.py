@@ -13,8 +13,7 @@ import lipd as lpd
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import cartopy
-import cartopy.crs as ccrs
+from mpl_toolkits.basemap import Basemap
 import sys
 import os
 from matplotlib import gridspec
@@ -23,19 +22,23 @@ from matplotlib import gridspec
 from .LiPDutils import *
 
 class Basic(object):
+    """ Basic manipulation of timeseries for scientific purpose.
+    
+    Calculates statistics of timeseries, bin or interpolate data
+    
+    """
     
     def __init__(self,timeseries_dict):
-        """
-        Pass the time_series dictionary into the Basic object
-        """
+
         self.TS = timeseries_dict
 
     @staticmethod
     def getValues(timeseries):
-        """
-        Get the paleoData values from the timeseries object
-        Arguments:
-        - new_timeseries: a single timeseries object. Use getTSO() to get one from the dictionary
+        """Get the paleoData values from the timeseries object
+        
+        Args:
+            timeseries: a single timeseries object. Use getTSO() to get
+                one from the dictionary
         """
         values_key =[]
         for key, val in timeseries.items():
@@ -48,10 +51,12 @@ class Basic(object):
     
         
     def simpleStats(self, timeseries=""):
-        """
-        Compute the mean and standard deviation of a time series
-        Arguments:
-        - new_timeseries: a single timeseries. Will prompt for one if not available
+        """ Compute the mean and standard deviation of a time series
+        
+        Args:
+            timeseries: a single timeseries. Will prompt for one 
+                if not available
+                
         """        
         # get the values
         if not timeseries:
@@ -66,21 +71,25 @@ class Basic(object):
     
     @staticmethod    
     def bin_data(timeseries, x_axis = "", bin_size = "", start = "", end = ""):
-        """
-        Bin the data.
-        Arguments:
-         - new_timeseries: a single timeseries object. Use getTSO() to get one.
-         - x-axis: The representation against which to plot the paleo-data. Options are "age",
-       "year", and "depth". Default is to let the system choose if only one available or prompt
-       the user. 
-        - bin_size: the size of the bins to be used. By default, will prompt for one
-        - start: Start time/age/depth. Default is the minimum 
-        - end: End time/age/depth. Default is the maximum
-        Outputs:
-        - binned_data: the binned output
-        - bins: the bins (centered on the median, i.e. the 100-200 bin is 150)
-        - n: number of data points in each bin
-        - error: the standard error on the mean in each bin
+        """Bin the PaleoData values
+        
+        Args:
+            timeseries: a single timeseries object. Use getTSO() to get one.
+            x-axis (str): The representation against which to plot the 
+                paleo-data. Options are "age", "year", and "depth". Default
+                is to let the system choose if only one available or prompt 
+                the user. 
+            bin_size (float): the size of the bins to be used. 
+                By default, will prompt for one
+            start (float): Start time/age/depth. Default is the minimum 
+            end (float): End time/age/depth. Default is the maximum
+            
+        Returnss:
+            binned_data - the binned output \n
+            bins - the bins (centered on the median, i.e. the 100-200 bin is 150) \n
+            n - number of data points in each bin \n
+            error - the standard error on the mean in each bin
+            
         """
         
         # Get the values
@@ -147,19 +156,23 @@ class Basic(object):
     @staticmethod
     def interp_data(timeseries, x_axis = "", interp_step="",start ="",\
                     end =""):
-        """
-        Linear interpolation of the paleodata
-        Arguments:
-         - Timeseries. Default is blank, will prompt for it
-         - x-axis: The representation against which to plot the paleo-data. Options are "age",
-       "year", and "depth". Default is to let the system choose if only one available or prompt
-       the user. 
-         - interp_step: the step size. By default, will prompt the user. 
-         - start: Start time/age/depth. Default is the minimum 
-         - end: End time/age/depth. Default is the maximum
-        Outputs:
-         - interp_age: the interpolated age/year/depth according to the end/start and time step
-         - interp_values: the interpolated values
+        """Linear interpolation of the PaleoData values
+        
+        Args:
+            timeseries: a timeseries object. Default is blank, will prompt for it
+            x-axis (str): The representation against which to plot the 
+                paleo-data. Options are "age", "year", and "depth". 
+                Default is to let the system choose if only one available 
+                or prompt the user. 
+            interp_step (float): the step size. By default, will prompt the user. 
+            start (float): Start time/age/depth. Default is the minimum 
+            end (float): End time/age/depth. Default is the maximum
+            
+        Returns:
+            interp_age - the interpolated age/year/depth according to 
+            the end/start and time step \n
+            interp_values - the interpolated values
+            
         """
             
         # Get the values and age

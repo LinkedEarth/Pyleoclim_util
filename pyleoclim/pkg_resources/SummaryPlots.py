@@ -22,31 +22,34 @@ from .LiPDutils import *
 from .Basic import *
 
 class SummaryPlots(object):
-
+    """Plots various summary figures for a LiPD record
+    
+    """
+    
     def __init__(self,timeseries_dict,plot_default):
-        """
-        Passes the dictionary of timeseries and the color palette
-        """
+       
         self.TS = timeseries_dict
         self.default = plot_default
         
     def getMetadata(self, time_series):
-        """
-        Get the necessary metadata to be printed out automatically
-        Arguments:
-          - time_series: a specific timeseries object
-        Outputs:
-          - A dictionary containing the following metadata:
-            - archiveType
-            - Authors (if more than 2, replace by et al.
-            - PublicationYear
-            - Publication DOI
-            - Variable Name
-            - Units
-            - Climate Interpretation
-            - Calibration Equation
-            - Calibration References
-            - Calibration Notes
+        """ Get the necessary metadata to be printed out automatically
+        
+        Args:
+            time_series: a specific timeseries object
+            
+        Returns:
+            A dictionary containing the following metadata:\n
+            archiveType \n
+            Authors (if more than 2, replace by et al. \n
+            PublicationYear \n
+            Publication DOI \n
+            Variable Name \n
+            Units \n
+            Climate Interpretation \n
+            Calibration Equation \n
+            Calibration References \n
+            Calibration Notes \n
+            
         """
         # Get all the necessary information
         # Top level information
@@ -158,14 +161,25 @@ class SummaryPlots(object):
         return dict_out
     
     def TSdata(self,new_timeseries ="", x_axis = ""):
-        """
+        """ Get the PaleoData with age/depth information
+        
         Get the necessary information for the TS plots/necessary to allow for
-        axes spec
-        Arguments:
-         - a single timeseries object. By default, will prompt the user
-         - x-axis: The representation against which to plot the paleo-data. Options are "age",
-    "year", and "depth". Default is to let the system choose if only one available or prompt
-    the user.
+        axes specification
+        
+        Args:
+            new_timeseries: a single timeseries object. 
+                By default, will prompt the user
+            x-axis (str): The representation against which to plot the 
+                paleo-data. Options are "age", "year", and "depth". 
+                Default is to let the system choose if only one available 
+                or prompt the user.
+        Returns:
+            dataframe - a dataframe containg the x- and y-values \n
+            archiveType - the archiveType (for plot settings) \n
+            x_axis_label - the label for the x-axis \n
+            y_axis_label - the label for the y-axis \n
+            headers - the headers of the dataframe
+            
         """
         # Get the data
         if not new_timeseries:
@@ -223,10 +237,19 @@ class SummaryPlots(object):
         return dataframe, archiveType, x_axis_label, y_axis_label, headers
 
     def agemodelData(self, new_timeseries =""):
-        """
-        Get the necessary information for the agemodel plot
-        Arguments:
-          - new_timeseries: a single timeseries object. By default, will prompt the user
+        """Get the necessary information for the agemodel plot
+        
+        Args:
+            new_timeseries: a single timeseries object. By default, will 
+                prompt the user
+                
+        Returns:
+            x - the depth values \n
+            y - the age values \n
+            x_axis_label - the label for the x-axis \n
+            y_axis_label - the label for the y-axis \n
+            archiveType - the archiveType (for default plot settings)
+            
         """
     
         # Get the data
@@ -286,25 +309,29 @@ class SummaryPlots(object):
         
     def basic(self,x_axis="", new_timeseries = "", saveFig = True,
                      format = "eps", dir = ""):
-        """
-        Makes a basic summary plot
-        1. The time series
-        2. Location map
-        3. Age-Depth profile if both are available from the paleodata
-        4. Metadata
+        """ Makes a basic summary plot
+        
+        Plots the following information: the time series, location map, 
+        Age-Depth profile if both are available from the paleodata, Metadata
 
-        **Note**: The plots use default setting from the MapLiPD and plotTS method.
+        Notes: 
+            The plots use default settings from the MapLiPD and plotTS methods.
     
         Arguments:
-        - timeseries: By default, will prompt for one.
-        - x-axis: The representation against which to plot the paleo-data. Options are "age",
-       "year", and "depth". Default is to let the system choose if only one available or prompt
-       the user.
-        - saveFig: default is to not save the figure
-        - dir: the full path of the directory in which to save the figure. If not provided, creates
-        a default folder called 'figures' in the LiPD working directory (lipd.path). 
-        - format: One of the file extensions supported by the active backend. Default is "eps".
-        Most backend support png, pdf, ps, eps, and svg.
+            new_timeseries: By default, will prompt for one.
+            x-axis (str): The representation against which to plot the paleo-data.
+                Options are "age", "year", and "depth". Default is to let the 
+                system choose if only one available or prompt the user.
+            saveFig (bool): default is to not save the figure
+            dir (str): the full path of the directory in which to save the figure.
+                If not provided, creates a default folder called 'figures' in the 
+                LiPD working directory (lipd.path). 
+            format (str): One of the file extensions supported by the active 
+                backend. Default is "eps". Most backend support png, pdf, ps, eps, 
+                and svg.
+        
+        Returns:
+            The figure.
         
         """
     

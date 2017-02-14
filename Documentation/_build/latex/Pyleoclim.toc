@@ -1,0 +1,38 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Pyleoclim}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}What is it?}{3}{section.1.1}
+\contentsline {section}{\numberline {1.2}Version Information}{3}{section.1.2}
+\contentsline {section}{\numberline {1.3}Installation}{4}{section.1.3}
+\contentsline {section}{\numberline {1.4}Quickstart guide}{4}{section.1.4}
+\contentsline {section}{\numberline {1.5}Requirements}{4}{section.1.5}
+\contentsline {section}{\numberline {1.6}Further information}{4}{section.1.6}
+\contentsline {section}{\numberline {1.7}Contact}{4}{section.1.7}
+\contentsline {section}{\numberline {1.8}License}{4}{section.1.8}
+\contentsline {section}{\numberline {1.9}Disclaimer}{5}{section.1.9}
+\contentsline {chapter}{\numberline {2}Main Functions}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}Getting started}{7}{section.2.1}
+\contentsline {paragraph}{Examples}{7}{paragraph*.4}
+\contentsline {section}{\numberline {2.2}Mapping}{8}{section.2.2}
+\contentsline {paragraph}{Examples}{9}{paragraph*.7}
+\contentsline {section}{\numberline {2.3}Plotting}{9}{section.2.3}
+\contentsline {paragraph}{Examples}{9}{paragraph*.9}
+\contentsline {subsection}{\numberline {2.3.1}Summary Plots}{10}{subsection.2.3.1}
+\contentsline {paragraph}{Notes}{10}{paragraph*.11}
+\contentsline {paragraph}{Examples}{10}{paragraph*.12}
+\contentsline {section}{\numberline {2.4}Statistics}{10}{section.2.4}
+\contentsline {paragraph}{Examples}{10}{paragraph*.14}
+\contentsline {paragraph}{Example}{12}{paragraph*.16}
+\contentsline {paragraph}{Examples}{13}{paragraph*.18}
+\contentsline {chapter}{\numberline {3}Basic Module}{15}{chapter.3}
+\contentsline {chapter}{\numberline {4}Mapping Module}{17}{chapter.4}
+\contentsline {chapter}{\numberline {5}Timeseries Plots Module}{19}{chapter.5}
+\contentsline {chapter}{\numberline {6}Summary Plots Module}{21}{chapter.6}
+\contentsline {paragraph}{Notes}{22}{paragraph*.34}
+\contentsline {chapter}{\numberline {7}Manipulating LiPD files}{23}{chapter.7}
+\contentsline {section}{\numberline {7.1}Creating directories and saving figures}{23}{section.7.1}
+\contentsline {section}{\numberline {7.2}Manipulating LiPD files}{23}{section.7.2}
+\contentsline {section}{\numberline {7.3}Manipulating Variables in a LiPD file}{24}{section.7.3}
+\contentsline {section}{\numberline {7.4}Manipulating timeseries objects}{24}{section.7.4}
+\contentsline {section}{\numberline {7.5}Handling mapping to LinkedEarth Ontology}{25}{section.7.5}
+\contentsline {chapter}{\numberline {8}Indices and tables}{27}{chapter.8}
+\contentsline {chapter}{Index}{29}{section*.47}

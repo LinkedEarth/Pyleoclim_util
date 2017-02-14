@@ -14,8 +14,7 @@ import lipd as lpd
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import cartopy
-import cartopy.crs as ccrs
+from mpl_toolkits.basemap import Basemap
 import sys
 import os
 from matplotlib import gridspec
@@ -25,13 +24,17 @@ The following functions handle creating new directories and saving figures and l
 """
 
 def createdir(path, foldername):
-    """
-    create a new folder in a working directory
-    Arguments:
-      - path: the path to the new folder.
-      - foldername: the name of the folder to be created
-    Outputs:
-      - newdir: the full path to the new directory
+    """Create a new folder in a working directory
+    
+    Create a new folder in a working directory to save outputs from Pyleoclim.
+    
+    Args:
+        path(str): the path to the new folder.
+        foldername(str): the name of the folder to be created
+        
+    Returns:
+        newdir - the full path to the new directory
+        
     """
 
     if not os.path.exists(path+'/'+foldername):
@@ -42,14 +45,19 @@ def createdir(path, foldername):
     return newdir 
 
 def saveFigure(name, format="eps",dir=""):
-    """
-    Save the figures 
-    Arguments:
-      - name: name of the file
-      - format: One of the file extensions supported by the active backend. Default is "eps".
-      Most backend support png, pdf, ps, eps, and svg.
-      - dir: the name of the folder in the LiPD working directory. If not provided, creates
-      a default folder called 'figures'.
+    """Save a figure
+    
+    Save the figure in the directory. If not given, creates a folder in the 
+    lipd.path directory. 
+    
+    Args:
+        name (str): name of the file
+        format (str): One of the file extensions supported by the active 
+            backend. Default is "eps". Most backend support png, pdf, ps, eps,
+            and svg.
+        dir (str): the name of the folder in the LiPD working directory.
+            If not provided, creates a default folder called 'figures'.
+            
     """
     if not dir:
         newdir = createdir(lpd.path,"figures")            
@@ -64,8 +72,8 @@ The following functions handle the LiPD files
 """
     
 def enumerateLipds():
-    """
-    enumerate the LiPD files loaded in the workspace
+    """Enumerate the LiPD files loaded in the workspace
+    
     """
     lipd_in_directory = lpd.getLipdNames()
     print("Below are the available records")
@@ -73,11 +81,14 @@ def enumerateLipds():
         print(idx,': ',val)   
 
 def promptforLipd():
-    """
+    """Prompt for a LiPD file
+    
     Ask the user to select a LiPD file from a list
     Use this function in conjunction with enumerateLipds()
-    Outputs:
-      - the index of the LiPD file
+    
+    Returns:
+        The index of the LiPD file
+        
     """
     select_lipd = int(input("Enter the number of the file you wish to analyze: "))
     return select_lipd 
@@ -87,24 +98,33 @@ The following functions work at the variables level
 """
         
 def promptforVariable():
-    """
+    """Prompt for a specific variable
+    
     Ask the user to select the variable they are interested in.
     Use this function in conjunction with readHeaders() or getTSO()
-    Outputs:
-      - The index of the variable
+    
+    Returns:
+        The index of the variable
+        
     """
     select_var = int(input("Enter the number of the variable you wish to use: ")) 
     return select_var
                       
 def valuesloc(dataframe, missing_value = "NaN", var_idx = 1):
-    """
+    """Remove missing values flag
+    
     Look for the indexes where there are no missing values for the variable
-    Inputs:
-      - A Panda Dataframe
-      - missing_value: how are the missing value represented. Default is NaN
-      - var_idx: the column number in which to look for the missing values (default is the second column)
-    Outputs:
-      - val_idx: the indices of the lines in the dataframe containing the actual values
+    
+    Args:
+        dataframe: a Pandas Dataframe
+        missing_value (str or float): how are the missing value represented. 
+            Default is NaN
+        var_idx (int): the column number in which to look for the missing 
+            values (default is the second column)
+            
+    Returns:
+        val_idx - the indices of the lines in the dataframe containing the actual values
+            
     """
     
     # Get the index with the appropriate values
@@ -121,13 +141,15 @@ def valuesloc(dataframe, missing_value = "NaN", var_idx = 1):
     return val_idx
 
 def TSOxaxis(timeseries):
-    """
-    Prompt the user to choose a x-axis representation for the timeseries.
-    Inputs:
-     - A timeseries object
-    Outputs:
-     - x_axis: the values for the x-axis representation.
-     - label: returns either "age", "year", or "depth"
+    """ Prompt the user to choose a x-axis representation for the timeseries.
+    
+    Args:
+        timeseries: a timeseries object
+        
+    Returns:
+        x_axis - the values for the x-axis representation, \n
+        label - returns either "age", "year", or "depth"
+        
     """
     if "depth" in timeseries.keys() and "age" in timeseries.keys() or\
             "depth" in timeseries.keys() and "year" in timeseries.keys():
@@ -174,11 +196,13 @@ def TSOxaxis(timeseries):
 The following functions handle the time series objects
 """
 def enumerateTSO(timeseries_list):
-    """
-    Enumerate the available time series objects
-    Arguments:
-     - A dictionary of available timeseries objects. To use the timeseries loaded upon initiation of the
-     pyleoclim package, use pyleo.time_series. 
+    """Enumerate the available time series objects
+    
+    Args:
+        timeseries_list: a  list of available timeseries objects. 
+            To use the timeseries loaded upon initiation of the 
+            pyleoclim package, use pyleo.time_series.
+            
     """
     available_y = []
     dataSetName =[]
@@ -193,12 +217,16 @@ def enumerateTSO(timeseries_list):
         print(idx,': ',dataSetName[idx], ': ', val)     
 
 def getTSO(timeseries_list):
-    """
-    Get a specific timeseries object from a dictionary of timeseries
-    Arguments:
-     - A dictionary of timeseries.
-    Outputs:
-     - A single timeseries object from the dictionary
+    """Get a specific timeseries object from a dictionary of timeseries
+    
+    Args:
+        timeseries_list: a  list of available timeseries objects. 
+            To use the timeseries loaded upon initiation of the 
+            pyleoclim package, use pyleo.time_series.
+            
+    Returns:
+        A single timeseries object 
+        
     """        
     enumerateTSO(timeseries_list)
     select_TSO = promptforVariable()
@@ -207,14 +235,17 @@ def getTSO(timeseries_list):
     return new_TSO
 
 def TStoDF(timeseries, x_axis = ""):
-    """
-    Create a dataframe from a timeseries object with two colums: depth/age representation
-    and the paleoData values
-    Arguments:
-    - A timeseries object
-    - x-axis: The representation against which to plot the paleo-data. Options are "age",
-    "year", and "depth". Default is to let the system choose if only one available or prompt
-    the user.
+    """ Timeseries to Dataframe
+    
+    Create a dataframe from a timeseries object with two colums: 
+    depth/age representation and the paleoData values
+    
+    Args:
+        timeseries: A timeseries object
+        x-axis (str): The representation against which to plot the paleo-data. 
+            Options are "age", "year", and "depth". Default is to let the 
+            system choose if only one available or prompt the user.
+            
     """
     if not x_axis:
         x_axis, label = TSOxaxis(timeseries)
@@ -238,12 +269,16 @@ def TStoDF(timeseries, x_axis = ""):
 Handle mapping to LinkedEarth Ontology if needed
 """    
 def LiPDtoOntology(archiveType):
-    """
+    """ standardize archiveType
+    
     Transform the archiveType from their LiPD name to their ontology counterpart
-    Arguments:
-      - archiveType from the LiPD file
-    Output:
-      - arhciveType according to the ontology
+    
+    Args:
+        archiveType (STR): name of the archiveType from the LiPD file
+        
+    Returns:
+        archiveType according to the ontology
+        
     """
     #Align with the ontology
     if archiveType.lower()== "ice core":

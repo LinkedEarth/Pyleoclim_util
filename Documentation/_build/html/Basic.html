@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Basic Module &mdash; Pyleoclim 0.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Pyleoclim 0.1.3 documentation" href="index.html" />
+    <link rel="next" title="Mapping Module" href="Mapping.html" />
+    <link rel="prev" title="Main Functions" href="Main.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Mapping.html" title="Mapping Module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Main.html" title="Main Functions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Main.html"
+                        title="previous chapter">Main Functions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Mapping.html"
+                        title="next chapter">Mapping Module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Basic.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="basic-module">
+<h1>Basic Module<a class="headerlink" href="#basic-module" title="Permalink to this headline">¶</a></h1>
+<p>This module contains methods for basic manipulation of the Paleo/Chron Data.</p>
+<dl class="class">
+<dt id="pyleoclim.Basic">
+<em class="property">class </em><code class="descclassname">pyleoclim.</code><code class="descname">Basic</code><span class="sig-paren">(</span><em>timeseries_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic manipulation of timeseries for scientific purpose.</p>
+<p>Calculates statistics of timeseries, bin or interpolate data</p>
+<dl class="staticmethod">
+<dt id="pyleoclim.Basic.bin_data">
+<em class="property">static </em><code class="descname">bin_data</code><span class="sig-paren">(</span><em>timeseries</em>, <em>x_axis=''</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic.bin_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bin the PaleoData values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>timeseries</strong> &#8211; a single timeseries object. Use getTSO() to get one.</li>
+<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to plot the
+paleo-data. Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default
+is to let the system choose if only one available or prompt
+the user.</li>
+<li><strong>bin_size</strong> (<em>float</em>) &#8211; the size of the bins to be used.
+By default, will prompt for one</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; Start time/age/depth. Default is the minimum</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; End time/age/depth. Default is the maximum</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returnss:</dt>
+<dd><p class="first">binned_data - the binned output</p>
+<p>bins - the bins (centered on the median, i.e. the 100-200 bin is 150)</p>
+<p>n - number of data points in each bin</p>
+<p class="last">error - the standard error on the mean in each bin</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyleoclim.Basic.getValues">
+<em class="property">static </em><code class="descname">getValues</code><span class="sig-paren">(</span><em>timeseries</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic.getValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the paleoData values from the timeseries object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeseries</strong> &#8211; a single timeseries object. Use getTSO() to get
+one from the dictionary</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="pyleoclim.Basic.interp_data">
+<em class="property">static </em><code class="descname">interp_data</code><span class="sig-paren">(</span><em>timeseries</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic.interp_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linear interpolation of the PaleoData values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries</strong> &#8211; a timeseries object. Default is blank, will prompt for it</li>
+<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to plot the
+paleo-data. Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;.
+Default is to let the system choose if only one available
+or prompt the user.</li>
+<li><strong>interp_step</strong> (<em>float</em>) &#8211; the step size. By default, will prompt the user.</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; Start time/age/depth. Default is the minimum</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; End time/age/depth. Default is the maximum</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>interp_age - the interpolated age/year/depth according to
+the end/start and time step</p>
+<p>interp_values - the interpolated values</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyleoclim.Basic.simpleStats">
+<code class="descname">simpleStats</code><span class="sig-paren">(</span><em>timeseries=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic.simpleStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the mean and standard deviation of a time series</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeseries</strong> &#8211; a single timeseries. Will prompt for one
+if not available</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Mapping.html" title="Mapping Module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Main.html" title="Main Functions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2017, Deborah Khider, Julien Emile-Geay.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

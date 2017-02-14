@@ -1,0 +1,543 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Main Functions &mdash; Pyleoclim 0.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Pyleoclim 0.1.3 documentation" href="index.html" />
+    <link rel="next" title="Basic Module" href="Basic.html" />
+    <link rel="prev" title="Pyleoclim" href="Introduction.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Basic.html" title="Basic Module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Introduction.html" title="Pyleoclim"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Main Functions</a><ul>
+<li><a class="reference internal" href="#getting-started">Getting started</a></li>
+<li><a class="reference internal" href="#mapping">Mapping</a></li>
+<li><a class="reference internal" href="#plotting">Plotting</a><ul>
+<li><a class="reference internal" href="#summary-plots">Summary Plots</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#statistics">Statistics</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Introduction.html"
+                        title="previous chapter">Pyleoclim</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Basic.html"
+                        title="next chapter">Basic Module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Main.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="main-functions">
+<h1>Main Functions<a class="headerlink" href="#main-functions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="getting-started">
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>Pyleoclim relies heavily on the concept of timeseries objects introduced in
+<a class="reference external" href="http://www.clim-past.net/12/1093/2016/">LiPD</a> and implemented in the
+<a class="reference external" href="http://nickmckay.github.io/LiPD-utilities/">LiPD utilities</a>.</p>
+<p>Briefly, timeseries objects are dictionaries containing the ChronData values and
+PaleoData values as well as the metadata associated with the record. If one record
+has three ProxyObservations (e.g., Mg/Ca, d18O, d13C) then it will have three timeseries
+objects, one for each of the observations.</p>
+<p>The LiPD utilities function lipd.extractTs() returns a list of dictionaries for
+the selected LiPD files, which need to be passed to Pyleoclim along with the path
+to the directory containing the LiPD files.</p>
+<p>This is done through the function pyleoclim.openLiPDs:</p>
+<dl class="function">
+<dt id="pyleoclim.openLiPDs">
+<code class="descclassname">pyleoclim.</code><code class="descname">openLiPDs</code><span class="sig-paren">(</span><em>path=''</em>, <em>timeseries_list=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.openLiPDs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load and extract timeseries objects from LiPD files.</p>
+<p>Allows to load and extract timeseries objects into the workspace for use
+with Pyleoclim. This can be done by the user previously, using the LiPD
+utilities and passed into the function&#8217;s argumenta. If no timeseries objects
+are found by other functions, this function will be triggered automatically
+without arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<em>string</em>) &#8211; the path to the LiPD file. If not specified, will
+trigger the LiPD utilities GUI.</li>
+<li><strong>timeseries_list</strong> (<em>list</em>) &#8211; the list of available timeseries objects
+obtained from lipd.extractTs().</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">if specifying a list, path should also be specified.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pyleoclim</span><span class="o">.</span><span class="n">openLiPDs</span><span class="p">(</span><span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/Users/deborahkhider/Documents/LiPD&quot;</span><span class="p">)</span>
+<span class="go">Found: 12 LiPD file(s)</span>
+<span class="go">processing: Crystal.McCabe-Glynn.2013.lpd</span>
+<span class="go">processing: MD01-2412.Harada.2006.lpd</span>
+<span class="go">processing: MD98-2170.Stott.2004.lpd</span>
+<span class="go">processing: MD982176.Stott.2004.lpd</span>
+<span class="go">processing: O2kLR-EmeraldBasin.Sachs.2007.lpd</span>
+<span class="go">processing: Ocean2kHR-AtlanticBahamasTOTORosenheim2005.lpd</span>
+<span class="go">processing: Ocean2kHR-AtlanticCapeVerdeMoses2006.lpd</span>
+<span class="go">processing: Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003.lpd</span>
+<span class="go">processing: Ocean2kHR-AtlanticPrincipeSwart1998.lpd</span>
+<span class="go">processing: Ocean2kHR-PacificClippertonClipp2bWu2014.lpd</span>
+<span class="go">processing: Ocean2kHR-PacificNauruGuilderson1999.lpd</span>
+<span class="go">processing: ODP1098B.lpd</span>
+<span class="go">extracting: ODP1098B.lpd</span>
+<span class="go">extracting: MD98-2170.Stott.2004.lpd</span>
+<span class="go">extracting: Ocean2kHR-PacificClippertonClipp2bWu2014.lpd</span>
+<span class="go">extracting: Ocean2kHR-AtlanticBahamasTOTORosenheim2005.lpd</span>
+<span class="go">extracting: Ocean2kHR-AtlanticPrincipeSwart1998.lpd</span>
+<span class="go">extracting: Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003.lpd</span>
+<span class="go">extracting: MD982176.Stott.2004.lpd</span>
+<span class="go">extracting: Ocean2kHR-PacificNauruGuilderson1999.lpd</span>
+<span class="go">extracting: O2kLR-EmeraldBasin.Sachs.2007.lpd</span>
+<span class="go">extracting: Crystal.McCabe-Glynn.2013.lpd</span>
+<span class="go">extracting: Ocean2kHR-AtlanticCapeVerdeMoses2006.lpd</span>
+<span class="go">extracting: MD01-2412.Harada.2006.lpd</span>
+<span class="go">Finished time series: 31 objects</span>
+<span class="go">Process Complete</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="mapping">
+<h2>Mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyleoclim.MapAll">
+<code class="descclassname">pyleoclim.</code><code class="descname">MapAll</code><span class="sig-paren">(</span><em>markersize=50</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.MapAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map all the available records loaded into the workspace by archiveType.</p>
+<dl class="docutils">
+<dt>Map of all the records into the workspace by archiveType.</dt>
+<dd>Uses the default color palette. Enter pyleoclim.plot_default for detail.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>markersize</strong> (<em>int</em>) &#8211; The size of the markers. Default is 50</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; Default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; The absolute path of the directory in which to save the
+figure. If not provided, creates a default folder called &#8216;figures&#8217;
+in the LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.MapLiPD">
+<code class="descclassname">pyleoclim.</code><code class="descname">MapLiPD</code><span class="sig-paren">(</span><em>name=''</em>, <em>countries=True</em>, <em>counties=False</em>, <em>rivers=False</em>, <em>states=False</em>, <em>background='shadedrelief'</em>, <em>scale=0.5</em>, <em>markersize=50</em>, <em>marker='default'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.MapLiPD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Map for a single record</p>
+<p>Orthographic projection map of a single record.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<em>str</em>) &#8211; the name of the LiPD file. <strong>WITH THE .LPD EXTENSION!</strong>.
+If not provided, will prompt the user for one</li>
+<li><strong>countries</strong> (<em>bool</em>) &#8211; Draws the country borders. Default is on (True).</li>
+<li><strong>counties</strong> (<em>bool</em>) &#8211; Draws the USA counties. Default is off (False).</li>
+<li><strong>states</strong> (<em>bool</em>) &#8211; Draws the American and Australian states borders.
+Default is off (False)</li>
+<li><strong>background</strong> (<em>str</em>) &#8211; Plots one of the following images on the map:
+bluemarble, etopo, shadedrelief, or none (filled continents).
+Default is shadedrelief</li>
+<li><strong>scale</strong> (<em>float</em>) &#8211; useful to downgrade the original image resolution to
+speed up the process. Default is 0.5.</li>
+<li><strong>markersize</strong> (<em>int</em>) &#8211; default is 100</li>
+<li><strong>marker</strong> (<em>str</em>) &#8211; a string (or list) containing the color and shape of the
+marker. Default is by archiveType. Type pyleo.plot_default to see
+the default palette.</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the figure.
+If not provided, creates a default folder called &#8216;figures&#8217; in the
+LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">MapAll</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyleoclim.plotTS">
+<code class="descclassname">pyleoclim.</code><code class="descname">plotTS</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>markersize=50</em>, <em>marker='default'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.plotTS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a single time series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries</strong> (<em>A</em>) &#8211; By default, will prompt the user for one.</li>
+<li><strong>x_axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
+Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default is to let the
+system choose if only one available or prompt the user.</li>
+<li><strong>markersize</strong> (<em>int</em>) &#8211; default is 50.</li>
+<li><strong>marker</strong> (<em>str</em>) &#8211; a string (or list) containing the color and shape of the
+marker. Default is by archiveType. Type pyleo.plot_default to see
+the default palette.</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the figure.
+If not provided, creates a default folder called &#8216;figures&#8217; in the
+LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">plotTS</span><span class="p">(</span><span class="n">marker</span> <span class="o">=</span> <span class="s1">&#39;rs&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="section" id="summary-plots">
+<h3>Summary Plots<a class="headerlink" href="#summary-plots" title="Permalink to this headline">¶</a></h3>
+<p>Summary plots are a special categories of plots enabled by Pyleoclim.
+They allow to plot specific information about a timeseries but are not customizable.</p>
+<dl class="function">
+<dt id="pyleoclim.BasicSummary">
+<code class="descclassname">pyleoclim.</code><code class="descname">BasicSummary</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>saveFig=False</em>, <em>format='eps'</em>, <em>dir=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.BasicSummary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a basic summary plot</p>
+<p>Plots the following information: the time series, location map,
+Age-Depth profile if both are available from the paleodata, Metadata</p>
+<p class="rubric">Notes</p>
+<p>The plots use default settings from the MapLiPD and plotTS methods.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries</strong> &#8211; By default, will prompt for one.</li>
+<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
+Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default is to let the
+system choose if only one available or prompt the user.</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the figure.
+If not provided, creates a default folder called &#8216;figures&#8217; in the
+LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">pyleocli</span><span class="p">,</span><span class="n">BasicSummary</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="statistics">
+<h2>Statistics<a class="headerlink" href="#statistics" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyleoclim.TSstats">
+<code class="descclassname">pyleoclim.</code><code class="descname">TSstats</code><span class="sig-paren">(</span><em>timeseries=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.TSstats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the mean and standard deviation of a timeseries</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeseries</strong> &#8211; sytem will prompt for one if not given</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The mean and standard deviation</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mean</span><span class="p">,</span><span class="n">std</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">TSstats</span><span class="p">()</span>
+<span class="go">0 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca</span>
+<span class="go">1 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O</span>
+<span class="go">2 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes</span>
+<span class="go">3 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature</span>
+<span class="go">4 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37</span>
+<span class="go">5 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes</span>
+<span class="go">6 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature</span>
+<span class="go">7 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37</span>
+<span class="go">8 :  ODP1098B :  SST</span>
+<span class="go">9 :  ODP1098B :  TEX86</span>
+<span class="go">10 :  MD01-2412.Harada.2006 :  calyrbp</span>
+<span class="go">11 :  MD01-2412.Harada.2006 :  sst</span>
+<span class="go">12 :  MD01-2412.Harada.2006 :  uk37</span>
+<span class="go">13 :  Crystal.McCabe-Glynn.2013 :  s180carbVPDB</span>
+<span class="go">14 :  Crystal.McCabe-Glynn.2013 :  sst.anom</span>
+<span class="go">15 :  Ocean2kHR-AtlanticCapeVerdeMoses2006 :  d18O</span>
+<span class="go">16 :  Ocean2kHR-PacificNauruGuilderson1999 :  d13C</span>
+<span class="go">17 :  Ocean2kHR-PacificNauruGuilderson1999 :  d18O</span>
+<span class="go">18 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  d18O</span>
+<span class="go">19 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  Sr_Ca</span>
+<span class="go">20 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d13C</span>
+<span class="go">21 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d18O</span>
+<span class="go">22 :  MD98-2170.Stott.2004 :  d18o</span>
+<span class="go">23 :  MD98-2170.Stott.2004 :  RMSE</span>
+<span class="go">24 :  MD98-2170.Stott.2004 :  mg</span>
+<span class="go">25 :  MD98-2170.Stott.2004 :  d18ow</span>
+<span class="go">26 :  Ocean2kHR-PacificClippertonClipp2bWu2014 :  Sr_Ca</span>
+<span class="go">27 :  MD982176.Stott.2004 :  Mg/Ca-g.rub</span>
+<span class="go">28 :  MD982176.Stott.2004 :  sst</span>
+<span class="go">29 :  MD982176.Stott.2004 :  d18Ob.rub</span>
+<span class="go">30 :  MD982176.Stott.2004 :  d18Ow-s</span>
+<span class="go">Enter the number of the variable you wish to use: 12</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">mean</span><span class="p">)</span>
+<span class="go">0.401759365994</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">std</span><span class="p">)</span>
+<span class="go">0.0821452359532</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.TSbin">
+<code class="descclassname">pyleoclim.</code><code class="descname">TSbin</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.TSbin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bin the paleoData values of the timeseries</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>By default, will prompt the user for one.</strong> (<em>timeseries.</em>) &#8211; </li>
+<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
+Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default is to let the
+system  choose if only one available or prompt the user.</li>
+<li><strong>bin_size</strong> (<em>float</em>) &#8211; the size of the bins to be used. By default,
+will prompt for one</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; Start time/age/depth. Default is the minimum</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; End time/age/depth. Default is the maximum</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>binned_data- the binned output,</p>
+<p>bins-  the bins (centered on the median, i.e. the 100-200 bin is 150),</p>
+<p>n-  number of data points in each bin,</p>
+<p>error- the standard error on the mean in each bin</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">time_series</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bin_size</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bins</span><span class="p">,</span> <span class="n">binned_data</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">TSbin</span><span class="p">(</span><span class="n">timeseries</span> <span class="o">=</span> <span class="n">ts</span><span class="p">,</span> <span class="n">bin_size</span> <span class="o">=</span> <span class="n">bin_size</span><span class="p">)</span>
+<span class="go">Do you want to plot vs time or depth?</span>
+<span class="go">Enter 0 for time and 1 for depth: 0</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">bins</span><span class="p">)</span>
+<span class="go">[   239.3    439.3    639.3 ...,  14439.3  14639.3  14839.3]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">binned_data</span><span class="p">)</span>
+<span class="go">[28.440000000000005, 28.920000000000005, 28.657142857142862,</span>
+<span class="go">28.939999999999998, 28.733333333333334, 28.949999999999999, 28.75,</span>
+<span class="go">28.899999999999999, 28.75, 28.566666666666663, 28.800000000000001,</span>
+<span class="go">29.049999999999997, 29.233333333333334, 29.274999999999999,</span>
+<span class="go">29.057142857142857, 28.699999999999999, 29.433333333333334,</span>
+<span class="go">28.575000000000003, 28.733333333333331, 28.48, 28.733333333333331,</span>
+<span class="go">28.766666666666666, 29.166666666666668, 29.18, 29.600000000000001,</span>
+<span class="go">29.300000000000001, 28.949999999999999, 29.475000000000001,</span>
+<span class="go">29.333333333333332, 29.800000000000001, 29.016666666666666,</span>
+<span class="go">29.349999999999998, 29.485714285714288, 28.850000000000001,</span>
+<span class="go">29.366666666666664, 28.699999999999999, 29.233333333333334,</span>
+<span class="go">29.366666666666664, 29.5, 29.350000000000001, 29.699999999999999,</span>
+<span class="go">29.300000000000001, 29.233333333333334, 29.300000000000001,</span>
+<span class="go">29.300000000000001, 29.600000000000001, 28.950000000000003,</span>
+<span class="go">29.166666666666668, 28.799999999999997, 28.975000000000001,</span>
+<span class="go">29.033333333333331, 28.649999999999999, 28.450000000000003,</span>
+<span class="go">28.533333333333331, 28.599999999999998, 28.25, 28.0,</span>
+<span class="go">28.550000000000001, 28.799999999999997, 28.350000000000001,</span>
+<span class="go">27.699999999999999, 27.149999999999999, 27.666666666666668,</span>
+<span class="go">26.800000000000001, 26.700000000000003, 26.800000000000001,</span>
+<span class="go">26.5, 26.850000000000001, 26.5, 26.5, 26.0, 26.899999999999999,</span>
+<span class="go">26.5, 26.100000000000001]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.TSinterp">
+<code class="descclassname">pyleoclim.</code><code class="descname">TSinterp</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.TSinterp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple linear interpolation</p>
+<p>Simple linear interpolation of the data using the numpy.interp method</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>Default is blank, will prompt for it</strong> (<em>timeseries.</em>) &#8211; </li>
+<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
+Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default is to let the
+system choose if only one available or prompt the user.</li>
+<li><strong>interp_step</strong> (<em>float</em>) &#8211; the step size. By default, will prompt the user.</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; Start time/age/depth. Default is the minimum</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; End time/age/depth. Default is the maximum</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>interp_age - the interpolated age/year/depth according to the end/start
+and time step,</p>
+<p>interp_values - the interpolated values</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ts</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">time_series</span><span class="p">[</span><span class="mi">28</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">interp_step</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">interp_age</span><span class="p">,</span> <span class="n">interp_values</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">TSinterp</span><span class="p">(</span><span class="n">timeseries</span> <span class="o">=</span> <span class="n">ts</span><span class="p">,</span> <span class="n">interp_step</span> <span class="o">=</span> <span class="n">interp_step</span><span class="p">)</span>
+<span class="go">Do you want to plot vs time or depth?</span>
+<span class="go">Enter 0 for time and 1 for depth: 0</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">interp_age</span><span class="p">)</span>
+<span class="go">[   139.3    339.3    539.3 ...,  14339.3  14539.3  14739.3]</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">interp_values</span><span class="p">)</span>
+<span class="go">[ 0.188       0.05981567 -0.04020261 ...,  1.20834663  1.47751854</span>
+<span class="go"> 1.16054494]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Basic.html" title="Basic Module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Introduction.html" title="Pyleoclim"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2017, Deborah Khider, Julien Emile-Geay.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>
