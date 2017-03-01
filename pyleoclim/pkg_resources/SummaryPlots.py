@@ -16,6 +16,7 @@ from mpl_toolkits.basemap import Basemap
 import sys
 import os
 from matplotlib import gridspec
+import seaborn as sns
 
 #Import internal packages to pyleoclim
 from .LiPDutils import *
@@ -303,7 +304,7 @@ class SummaryPlots(object):
                 x_axis_label = "Depth"
         
         # Get the archiveType and make sure it aligns with the ontology
-        archiveType = LipdToOntology(timeseries["archiveType"]) 
+        archiveType = LipdToOntology(timeseries["archiveType"])
         
         return depth, age, x_axis_label, y_axis_label, archiveType
         
@@ -318,8 +319,8 @@ class SummaryPlots(object):
             The plots use default settings from the MapLiPD and plotTS methods.
     
         Arguments:
-            new_timeseries: By default, will prompt for one.
-            x-axis (str): The representation against which to plot the paleo-data.
+            timeseries: By default, will prompt for one.
+            x_axis (str): The representation against which to plot the paleo-data.
                 Options are "age", "year", and "depth". Default is to let the 
                 system choose if only one available or prompt the user.
             saveFig (bool): default is to not save the figure
@@ -433,6 +434,153 @@ class SummaryPlots(object):
                   "    Notes: " + dict_out["Calibration_notes"]  
         plt.figtext(0.75, 0.4, textstr, fontsize = 12)
                                          
+        if saveFig == True:
+            name = 'SummaryPlot_'+timeseries["dataSetName"]+"_"+\
+                timeseries["paleoData_variableName"]
+            saveFigure(name,format,dir)
+        else:
+            plt.show()
+
+        return fig
+        
+    def basic2(self,x_axis="", timeseries = "", saveFig = False,
+                 format = "eps", dir = ""):
+        """ Second type of basic summary plot
+        
+        Plots the following information: the time series, a histogram of
+        the PaleoData_values, location map, age-depth profile if both are
+        available from the paleodata, metadata about the record.
+        
+        Args:
+            timeseries: a timeseries object. By default, will prompt for one
+            x_axis (str): The representation against which to plot the paleo-data.
+                Options are "age", "year", and "depth". Default is to let the 
+                system choose if only one available or prompt the user.
+            saveFig (bool): default is to not save the figure
+            dir (str): the full path of the directory in which to save the figure.
+                If not provided, creates a default folder called 'figures' in the 
+                LiPD working directory (lipd.path). 
+            format (str): One of the file extensions supported by the active 
+                backend. Default is "eps". Most backend support png, pdf, ps, eps, 
+                and svg.
+        
+        Returns:
+            The figure
+            
+        """
+        # get the timeseries:
+        if not timeseries:
+            timeseries = getTs(self.TS)
+        
+        # Create the figure
+        fig = plt.figure(figsize=(11,8))
+        gs = gridspec.GridSpec(2, 5)
+        gs.update(left=0, right =1.1)
+        
+        # Get the necessary metadata
+        dataframe, archiveType, x_axis_label, y_axis_label, headers = \
+            self.TsData(timeseries=timeseries, x_axis=x_axis)
+        
+        # Make the timeseries plot
+        ax1 = fig.add_subplot(gs[0,:-3])    
+        plt.style.use("ggplot")
+        marker = [self.default[archiveType][0],self.default[archiveType][1]]
+        markersize = 50
+        if "year" in headers:
+            ax1.scatter(dataframe['year'],dataframe['y-axis'],
+                        s = markersize,
+                        facecolor = 'none',
+                        edgecolor = 'k',
+                        marker = 'o',
+                        label = 'original')
+            ax1.plot(dataframe['year'],dataframe['y-axis'],
+                    color = marker[0],
+                    linewidth = 1.0,
+                    label = 'interpolated')
+        elif "age" in headers:
+            ax1.scatter(dataframe['age'],dataframe['y-axis'],
+                        s = markersize,
+                        facecolor = 'none',
+                        edgecolor = 'k',
+                        marker = 'o',
+                        label = 'original')
+            ax1.plot(dataframe['age'],dataframe['y-axis'],
+                    color = marker[0],
+                    linewidth = 1.0,
+                    label = 'interpolated')
+        plt.xlabel(x_axis_label)
+        plt.ylabel(y_axis_label) 
+        axes = plt.gca()
+        ymin, ymax = axes.get_ylim() 
+        ax1.legend(loc=3, scatterpoints=1, fancybox=True, shadow=True, \
+                   fontsize=10)
+        plt.title(timeseries["dataSetName"], fontsize = 14, \
+                  fontweight = "bold")
+        
+        
+        # Plot the map
+        # Get the coordinates. 
+        
+        lat = timeseries["geo_meanLat"]  
+        lon = timeseries["geo_meanLon"]
+        
+        #Make the map
+        ax2 = fig.add_subplot(gs[1,0])
+        map = Basemap(projection='ortho', lon_0=lon, lat_0=lat)
+        map.drawcoastlines()
+        map.shadedrelief(scale=0.5)
+        map.drawcountries()
+        X,Y = map(lon,lat)
+        map.scatter(X,Y,
+                   s = 150,
+                   color = self.default[archiveType][0],
+                   marker = self.default[archiveType][1])
+        
+        #Make the age model plot
+        if "age" in timeseries.keys() and "depth" in timeseries.keys()\
+          or "year" in timeseries.keys() and "depth" in timeseries.keys():
+            #Get the metadata
+            x, y, x_axis_label2, y_axis_label2, archiveType = \
+              self.agemodelData(timeseries=timeseries)
+            #Make the plot
+            ax3 = fig.add_subplot(gs[1,2])
+            plt.style.use("ggplot")
+            ax3.plot(x,y, color = marker[0], linewidth = 1.0)
+            plt.xlabel(x_axis_label2)
+            plt.ylabel(y_axis_label2)
+        else:
+            print("No age or depth information available, skipping age model plot")
+        
+        # Add the metadata
+        dict_out = self.getMetadata(timeseries)
+        textstr = "archiveType: " + dict_out["archiveType"]+"\n"+"\n"+\
+                  "Authors: " + dict_out["authors"]+"\n"+"\n"+\
+                  "Year: " + dict_out["Year"]+"\n"+"\n"+\
+                  "DOI: " + dict_out["DOI"]+"\n"+"\n"+\
+                  "Variable: " + dict_out["Variable"]+"\n"+"\n"+\
+                  "units: " + dict_out["units"]+"\n"+"\n"+\
+                  "Climate Interpretation: " +"\n"+\
+                  "    Climate Variable: " + dict_out["Climate_Variable"] +"\n"+\
+                  "    Detail: " + dict_out["Detail"]+"\n"+\
+                  "    Seasonality: " + dict_out["Seasonality"]+"\n"+\
+                  "    Direction: " + dict_out["Interpretation_Direction"]+"\n \n"+\
+                  "Calibration: \n" + \
+                  "    Equation: " + dict_out["Calibration_equation"] + "\n" +\
+                  "    Notes: " + dict_out["Calibration_notes"]  
+        plt.figtext(0.7, 0.4, textstr, fontsize = 12)
+        
+        # Add the histogram and kernel density estimate
+        ax4 = fig.add_subplot(gs[0,2])
+        # get the data and remove NaNs
+        data = np.asarray(timeseries['paleoData_values'])
+        data = data[~np.isnan(data)]           
+        
+        sns.distplot(data, vertical=True, color = marker[0],\
+                     hist_kws = {"label":"Histogram"}, \
+                     kde_kws = {"label":"KDE fit"})
+        plt.xlabel('PDF')
+        ax4.set_ylim([ymin,ymax])
+        ax4.set_yticklabels([])
         
         if saveFig == True:
             name = 'SummaryPlot_'+timeseries["dataSetName"]+"_"+\
@@ -441,4 +589,4 @@ class SummaryPlots(object):
         else:
             plt.show()
 
-        return fig    
+        return fig

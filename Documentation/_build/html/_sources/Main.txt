@@ -51,3 +51,5 @@ Statistics
 .. autofunction:: pyleoclim.binTs
 
 .. autofunction:: pyleoclim.interpTs
+
+.. autofunction:: pyleoclim.corrSigTs

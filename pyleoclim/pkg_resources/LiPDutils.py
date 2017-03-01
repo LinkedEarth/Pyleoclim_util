@@ -156,7 +156,7 @@ def xAxisTs(timeseries):
     """
     if "depth" in timeseries.keys() and "age" in timeseries.keys() or\
             "depth" in timeseries.keys() and "year" in timeseries.keys():
-        print("Do you want to plot vs time or depth?")
+        print("Do you want to use time or depth?")
         choice = int(input("Enter 0 for time and 1 for depth: "))
         if choice == 0:
             if "age" in timeseries.keys() and "year" in timeseries.keys():

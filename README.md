@@ -82,6 +82,10 @@ pip install pyleoclim
 - numpy v1.12+
 - matplotlib v2.0+
 - Basemap v1.0.7+
+- scipy >=0.17.0
+- statsmodel>=0.6.1
+- seaborn>=0.7.0
+- scikit-learn>=0.17.1
 
 The installer will automatically check for the needed updates
 

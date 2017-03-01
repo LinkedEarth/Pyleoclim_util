@@ -52,6 +52,10 @@ setup(
     "pandas>=0.19.2",
     "numpy>=1.12.0",
     "matplotlib>=2.0.0",
-    "basemap>=1.0.7"
+    "basemap>=1.0.7",
+    "scipy>=0.17.0",
+    "statsmodel>=0.6.1",
+    "seaborn>=0.7.0",
+    "scikit-learn>=0.17.1"
     ]
 )

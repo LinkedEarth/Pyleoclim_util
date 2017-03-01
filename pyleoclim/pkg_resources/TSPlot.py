@@ -16,6 +16,7 @@ from mpl_toolkits.basemap import Basemap
 import sys
 import os
 from matplotlib import gridspec
+import seaborn as sns
 
 #Import internal packages to pyleoclim
 from .LiPDutils import *
@@ -255,4 +256,181 @@ class Plot(object):
         else:
             plt.show()
 
-        return fig    
+        return fig
+        
+    def plot_hist(self,timeseries = "", bins = None, hist = True, \
+                 kde = True, rug = False, fit = None, hist_kws = {"label":"hist"},\
+                 kde_kws = {"label":"kde"}, rug_kws = {"label":"rug"}, \
+                 fit_kws = {"label":"fit"}, color = None, vertical = False, \
+                 norm_hist = True, legend = True, saveFig = False, \
+                 format = "eps", dir=""):
+        """ Plot a univariate distribution of the PaleoData values
+            
+        This function is based on the seaborn displot function, which is
+        itself a combination of the matplotlib hist function with the 
+        seaborn kdeplot() and rugplot() functions. It can also fit 
+        scipy.stats distributions and plot the estimated PDF over the data.
+            
+        Args:
+            timeseries: A timeseries. By default, will prompt the user for one.
+            bins (int): Specification of hist bins following matplotlib(hist), 
+                or None to use Freedman-Diaconis rule
+            hist (bool): Whether to plot a (normed) histogram    
+            kde (bool): Whether to plot a gaussian kernel density estimate
+            rug (bool): Whether to draw a rugplot on the support axis
+            fit: Random variable object. An object with fit method, returning 
+                a tuple that can be passed to a pdf method of positional 
+                arguments following a grid of values to evaluate the pdf on.
+            {hist, kde, rug, fit}_kws: Dictionaries. Keyword arguments for 
+                underlying plotting functions. If modifying the dictionary, make
+                sure the labels "hist", "kde", "rug" and "fit" are still passed.
+            color (str): matplotlib color. Color to plot everything but the
+                fitted curve in.
+            vertical (bool): if True, oberved values are on y-axis.
+            norm_hist (bool): If True (default), the histrogram height shows
+                a density rather than a count. This is implied if a KDE or 
+                fitted density is plotted
+            legend (bool): If true, plots a default legend
+            saveFig (bool): default is to not save the figure
+            dir (str): the full path of the directory in which to save the figure.
+                If not provided, creates a default folder called 'figures' in the 
+                LiPD working directory (lipd.path). 
+            format (str): One of the file extensions supported by the active 
+                backend. Default is "eps". Most backend support png, pdf, ps, eps,
+                and svg.
+            
+        Returns
+            fig - The figure
+                
+        """
+        # Get the data
+        if not timeseries:
+            timeseries = getTs(self.TS)
+            
+        # Remove NaNs
+        data = np.asarray(timeseries['paleoData_values'])
+        data =data[~np.isnan(data)]
+        
+        # Get the axis label
+        if "paleoData_onProxyObservationProperty" in timeseries.keys():
+            if "paleoData_units" in timeseries.keys():
+                axis_label = timeseries["paleoData_onProxyObservationProperty"] + " (" + \
+                      timeseries["paleoData_units"] + ")"  
+            else:
+                axis_label = timeseries["paleoData_onProxyObservationProperty"]
+        elif "paleoData_onInferredVariableProperty" in timeseries.keys():
+            if "paleoData_units" in timeseries.keys():
+                axis_label = timeseries["paleoData_onInferredVariableProperty"] + " (" + \
+                      timeseries["paleoData_units"] + ")"  
+            else:
+                axis_label = timeseries["paleoData_onInferredVariableProperty"]
+        else:
+            if "paleoData_units" in timeseries.keys():
+                axis_label = timeseries["paleoData_variableName"] + " (" + \
+                      timeseries["paleoData_units"] + ")"  
+            else:
+                axis_label = timeseries["paleoData_variableName"]
+
+        # Choose the color by archiveType
+        if color == None:
+            archiveType = LipdToOntology(timeseries["archiveType"])
+            color = self.default[archiveType][0]                   
+       
+        # Make the plot
+        fig = plt.figure()
+        if legend == True:
+            ax = sns.distplot(data,bins=bins, hist=hist, kde=kde, rug=rug,\
+                          fit=fit, hist_kws = {"label":"hist"},\
+                          kde_kws = {"label":"kde"},rug_kws = {"label":"rug"},\
+                          axlabel = axis_label, color = color, \
+                          vertical = vertical, norm_hist = norm_hist)         
+                    
+            # Work on the legend
+            # Handles first
+            handles, labels = ax.get_legend_handles_labels()
+            
+            if 'hist' in labels:
+                handle_hist = handles[labels.index('hist')]
+            else:
+                handle_hist = None
+            if 'kde' in labels:                          
+                handle_kde = handles[labels.index('kde')]
+            else:
+                handle_kde = None
+                
+            if 'rug' in labels:                         
+                handle_rug = handles[labels.index('rug')]
+            else:
+                handle_rug = None 
+                
+            if 'fit' in labels:
+                handle_fit = handles[labels.index('fit')]
+            else:
+                handle_fit = None
+                
+            handles2 = [handle_hist,handle_kde,handle_rug,handle_fit]                     
+            handles2 = list(filter(None, handles2)) # Remove None   
+                
+            # Labels second
+            if hist == True:
+                leg1 = 'Histogram'
+            else:
+                leg1 = None
+            
+            if kde == True:
+                leg2 = 'KDE fit'
+            else:
+                leg2 = None
+            
+            if rug == True:
+                leg3 = 'Indiv. Obs.'
+            else:
+                leg3 = None
+            
+            if fit == True:
+                leg4 = 'Fit'
+            else:
+                leg4 = None
+            
+            legend_str = [leg1,leg2,leg3,leg4]  
+            legend_str = list(filter(None, legend_str)) # Remove None
+            
+            # Update the legend handles
+            ax.legend(handles2, legend_str)
+            
+            # Add a label to the PDF axis
+            if vertical == True:
+                plt.xlabel('PDF')
+            else:
+                plt.ylabel('PDF')
+        
+        else:
+            ax = sns.distplot(data,bins=bins, hist=hist, kde=kde, rug=rug,\
+                          fit=fit, hist_kws = {"label":"hist"},\
+                          kde_kws = {"label":"kde"},rug_kws = {"label":"rug"},\
+                          axlabel = axis_label, color = color, \
+                          vertical = vertical, norm_hist = norm_hist)
+            
+            # Add a label to the PDF axis
+            if vertical == True:
+                plt.xlabel('PDF')
+            else:
+                plt.ylabel('PDF')
+                
+        #Save the figure if asked
+        if saveFig == True:
+            name = 'plot_agemodel_'+timeseries["dataSetName"]
+            saveFigure(name,format,dir)
+        else:
+            plt.show()    
+         
+        return fig
+                
+                           
+                       
+
+                         
+                                     
+            
+            
+            

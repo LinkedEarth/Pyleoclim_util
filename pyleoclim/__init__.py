@@ -18,6 +18,13 @@ from mpl_toolkits.basemap import Basemap
 import sys
 import os
 from matplotlib import gridspec
+from scipy.stats import pearsonr
+from scipy.stats.mstats import gmean
+from scipy.stats import t as stu
+from scipy.stats import gaussian_kde
+import statsmodels.api as sm
+from sklearn import preprocessing
+import seaborn as sns
 
 #Import internal packages to pyleoclim
 from .pkg_resources.Map import *
@@ -92,7 +99,7 @@ def openLipds(path="",ts_list=""):
         global lipd_path
         lipd_path = path
         global timeseries_list
-        timeseries_list = ts_list    
+        timeseries_list = ts_list       
         
 # Set the default palette for plots
 
@@ -236,6 +243,65 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
 
     return fig
 
+def histTs(timeseries = "", bins = None, hist = True, \
+             kde = True, rug = False, fit = None, hist_kws = {"label":"hist"},\
+             kde_kws = {"label":"kde"}, rug_kws = {"label":"rug"}, \
+             fit_kws = {"label":"fit"}, color = None, vertical = False, \
+             norm_hist = True, legend = True, saveFig = False, format ="eps",\
+             dir = ""):
+    """ Plot a univariate distribution of the PaleoData values
+    
+    This function is based on the seaborn displot function, which is
+    itself a combination of the matplotlib hist function with the 
+    seaborn kdeplot() and rugplot() functions. It can also fit 
+    scipy.stats distributions and plot the estimated PDF over the data.
+    
+    Args:
+        timeseries: A timeseries. By default, will prompt the user for one.
+        bins (int): Specification of hist bins following matplotlib(hist), 
+            or None to use Freedman-Diaconis rule
+        hist (bool): Whether to plot a (normed) histogram    
+        kde (bool): Whether to plot a gaussian kernel density estimate
+        rug (bool): Whether to draw a rugplot on the support axis
+        fit: Random variable object. An object with fit method, returning 
+            a tuple that can be passed to a pdf method of positional 
+            arguments following a grid of values to evaluate the pdf on.
+        {hist, kde, rug, fit}_kws: Dictionaries. Keyword arguments for 
+            underlying plotting functions. If modifying the dictionary, make
+            sure the labels "hist", "kde", "rug" and "fit" are still passed.
+        color (str): matplotlib color. Color to plot everything but the
+            fitted curve in.
+        vertical (bool): if True, oberved values are on y-axis.
+        norm_hist (bool): If True (default), the histrogram height shows
+            a density rather than a count. This is implied if a KDE or 
+            fitted density is plotted
+        legend (bool): If true, plots a default legend
+        saveFig (bool): default is to not save the figure
+        dir (str): the full path of the directory in which to save the figure.
+            If not provided, creates a default folder called 'figures' in the 
+            LiPD working directory (lipd.path). 
+        format (str): One of the file extensions supported by the active 
+            backend. Default is "eps". Most backend support png, pdf, ps, eps,
+            and svg.
+            
+    Returns
+        fig - The figure
+    
+    Examples:
+        >>> fig = pyleoclim.histTs(vertical = True)    
+    """    
+    if not 'timeseries_list' in globals():
+        openLipds()
+        
+    plot1 = Plot(plot_default, timeseries_list)
+    fig = plot1.plot_hist(timeseries = timeseries, bins = bins, hist = hist, \
+                 kde = kde, rug = rug, fit = fit, hist_kws = hist_kws,\
+                 kde_kws = kde_kws, rug_kws = rug_kws, \
+                 fit_kws = fit_kws, color = color, vertical = vertical, \
+                 norm_hist = norm_hist, legend = legend)
+    
+    return fig
+
 # Statistics
 
 def statsTs(timeseries=""):
@@ -245,57 +311,197 @@ def statsTs(timeseries=""):
         timeseries: sytem will prompt for one if not given
         
     Returns:
-        The mean and standard deviation
+        the mean, median, min, max, standard deviation and the
+        inter-quartile range (IQR) of a timeseries.
         
     Examples:
-        >>> mean,std = pyleoclim.statsTs()
-        0 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca
-        1 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O
-        2 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
-        3 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
-        4 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
-        5 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
-        6 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
-        7 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
-        8 :  ODP1098B :  SST
-        9 :  ODP1098B :  TEX86
-        10 :  MD01-2412.Harada.2006 :  calyrbp
-        11 :  MD01-2412.Harada.2006 :  sst
+        >>> mean, median, min_, max_, std, IQR = pyleo.statsTs()
+        0 :  Ocean2kHR-AtlanticCapeVerdeMoses2006 :  d18O
+        1 :  ODP1098B :  SST
+        2 :  ODP1098B :  TEX86
+        3 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  d18O
+        4 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  Sr_Ca
+        5 :  Ocean2kHR-PacificClippertonClipp2bWu2014 :  Sr_Ca
+        6 :  Crystal.McCabe-Glynn.2013 :  sst.anom
+        7 :  Crystal.McCabe-Glynn.2013 :  s180carbVPDB
+        8 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O
+        9 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca
+        10 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d13C
+        11 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d18O
         12 :  MD01-2412.Harada.2006 :  uk37
-        13 :  Crystal.McCabe-Glynn.2013 :  s180carbVPDB
-        14 :  Crystal.McCabe-Glynn.2013 :  sst.anom
-        15 :  Ocean2kHR-AtlanticCapeVerdeMoses2006 :  d18O
-        16 :  Ocean2kHR-PacificNauruGuilderson1999 :  d13C
-        17 :  Ocean2kHR-PacificNauruGuilderson1999 :  d18O
-        18 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  d18O
-        19 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  Sr_Ca
-        20 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d13C
-        21 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d18O
-        22 :  MD98-2170.Stott.2004 :  d18o
-        23 :  MD98-2170.Stott.2004 :  RMSE
-        24 :  MD98-2170.Stott.2004 :  mg
-        25 :  MD98-2170.Stott.2004 :  d18ow
-        26 :  Ocean2kHR-PacificClippertonClipp2bWu2014 :  Sr_Ca
-        27 :  MD982176.Stott.2004 :  Mg/Ca-g.rub
-        28 :  MD982176.Stott.2004 :  sst
-        29 :  MD982176.Stott.2004 :  d18Ob.rub
-        30 :  MD982176.Stott.2004 :  d18Ow-s
-        Enter the number of the variable you wish to use: 12
+        13 :  MD01-2412.Harada.2006 :  sst
+        14 :  MD01-2412.Harada.2006 :  calyrbp
+        15 :  MD98-2170.Stott.2004 :  mg
+        16 :  MD98-2170.Stott.2004 :  RMSE
+        17 :  MD98-2170.Stott.2004 :  d18ow
+        18 :  MD98-2170.Stott.2004 :  d18o
+        19 :  MD982176.Stott.2004 :  d18Ow-s
+        20 :  MD982176.Stott.2004 :  sst
+        21 :  MD982176.Stott.2004 :  d18Ob.rub
+        22 :  MD982176.Stott.2004 :  Mg/Ca-g.rub
+        23 :  Ocean2kHR-PacificNauruGuilderson1999 :  d13C
+        24 :  Ocean2kHR-PacificNauruGuilderson1999 :  d18O
+        25 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
+        26 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
+        27 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
+        28 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
+        29 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
+        30 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
+        Enter the number of the variable you wish to use: 13
         
         >>> print(mean)
-        0.401759365994
+        10.6708933718
+        
+        >>> print(median)
+        11.0
+        
+        >>> print(min_)
+        5.0
+        
+        >>> print(max_)
+        16.2
         
         >>> print(std)
-        0.0821452359532
+        2.41519924361
+        
+        >>> print(IQR)
+        3.9
             
     """
     if not 'timeseries_list' in globals():
         openLipds()
      
     basic1 = Basic(timeseries_list)
-    mean, std = basic1.simpleStats(timeseries = timeseries)
-    return mean, std
+    mean, median, min_, max_, std, IQR = basic1.simpleStats(timeseries = timeseries)
+    return mean, median, min_, max_, std, IQR
 
+def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
+                 interp_step = "", start = "", end = "", nsim = 1000, \
+                 method = 'isospectral', alpha = 0.5):
+    """ Estimates the significance of correlations between non IID timeseries.
+
+        Function written by. F. Zhu.
+
+        Args:
+            timeseries1, timeseries2: timeseries object. Default is blank.
+            x-axis (str): The representation against which to express the
+                paleo-data. Options are "age", "year", and "depth".
+                Default is to let the system choose if only one available
+                or prompt the user.
+            interp_step (float): the step size. By default, will prompt the user.
+            start (float): Start time/age/depth. Default is the maximum of
+                the minima of the two timeseries
+            end (float): End time/age/depth. Default is the minimum of the
+                maxima of the two timeseries
+            nsim (int): the number of simulations. Default is 1000
+            method (str): method use to estimate the correlation and significance.
+                Available methods include:
+                    - 'ttest': T-test where the degrees of freedom are corrected for
+                    the effect of serial correlation \n
+                    - 'isopersistant': AR(1) modeling of the two timeseries \n
+                    - 'isospectral' (default): phase randomization of original
+                    inputs.
+                The T-test is parametric test, hence cheap but usually wrong 
+                    except in idyllic circumstances.
+                The others are non-parametric, but their computational 
+                    requirements scales with nsim.
+            alpha (float): significance level for critical value estimation. Default is 0.05
+
+        Returns:
+            r (float) - correlation between the two timeseries \n
+            sig (bool) -  Returns True if significant, False otherwise \n
+            p (real) - the p-value
+            
+        Examples:
+            >>> r, sig, p = pyleoclim.corrSigTs()
+            0 :  Ocean2kHR-PacificClippertonClipp2bWu2014 :  Sr_Ca
+            1 :  Ocean2kHR-PacificNauruGuilderson1999 :  d18O
+            2 :  Ocean2kHR-PacificNauruGuilderson1999 :  d13C
+            3 :  MD982176.Stott.2004 :  sst
+            4 :  MD982176.Stott.2004 :  d18Ob.rub
+            5 :  MD982176.Stott.2004 :  d18Ow-s
+            6 :  MD982176.Stott.2004 :  Mg/Ca-g.rub
+            7 :  ODP1098B :  TEX86
+            8 :  ODP1098B :  SST
+            9 :  Ocean2kHR-AtlanticCapeVerdeMoses2006 :  d18O
+            10 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
+            11 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
+            12 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
+            13 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
+            14 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
+            15 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
+            16 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O
+            17 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca
+            18 :  MD98-2170.Stott.2004 :  d18o
+            19 :  MD98-2170.Stott.2004 :  RMSE
+            20 :  MD98-2170.Stott.2004 :  d18ow
+            21 :  MD98-2170.Stott.2004 :  mg
+            22 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d18O
+            23 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d13C
+            24 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  Sr_Ca
+            25 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  d18O
+            26 :  MD01-2412.Harada.2006 :  uk37
+            27 :  MD01-2412.Harada.2006 :  sst
+            28 :  MD01-2412.Harada.2006 :  calyrbp
+            29 :  Crystal.McCabe-Glynn.2013 :  sst.anom
+            30 :  Crystal.McCabe-Glynn.2013 :  s180carbVPDB
+            Enter the number of the variable you wish to use: 19
+            0 :  Ocean2kHR-PacificClippertonClipp2bWu2014 :  Sr_Ca
+            1 :  Ocean2kHR-PacificNauruGuilderson1999 :  d18O
+            2 :  Ocean2kHR-PacificNauruGuilderson1999 :  d13C
+            3 :  MD982176.Stott.2004 :  sst
+            4 :  MD982176.Stott.2004 :  d18Ob.rub
+            5 :  MD982176.Stott.2004 :  d18Ow-s
+            6 :  MD982176.Stott.2004 :  Mg/Ca-g.rub
+            7 :  ODP1098B :  TEX86
+            8 :  ODP1098B :  SST
+            9 :  Ocean2kHR-AtlanticCapeVerdeMoses2006 :  d18O
+            10 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
+            11 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
+            12 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
+            13 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
+            14 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
+            15 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
+            16 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O
+            17 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca
+            18 :  MD98-2170.Stott.2004 :  d18o
+            19 :  MD98-2170.Stott.2004 :  RMSE
+            20 :  MD98-2170.Stott.2004 :  d18ow
+            21 :  MD98-2170.Stott.2004 :  mg
+            22 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d18O
+            23 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d13C
+            24 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  Sr_Ca
+            25 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  d18O
+            26 :  MD01-2412.Harada.2006 :  uk37
+            27 :  MD01-2412.Harada.2006 :  sst
+            28 :  MD01-2412.Harada.2006 :  calyrbp
+            29 :  Crystal.McCabe-Glynn.2013 :  sst.anom
+            30 :  Crystal.McCabe-Glynn.2013 :  s180carbVPDB
+            Enter the number of the variable you wish to use: 3
+            The two timeseries do not contain the same number of points. Interpolating...
+            Do you want to use time or depth?
+            Enter 0 for time and 1 for depth: 0
+        
+            >>> print(p)
+            0.004
+        
+            >>> print(r)
+            0.723075099334
+        
+            >>> print(sig)
+            True
+    """    
+    if not 'timeseries_list' in globals():
+        openLipds()
+        
+    corr1 = Correlation(timeseries_list)
+    r, sig, p = corr1.corr_sig(timeseries1 = timeseries1, \
+                               timeseries2 = timeseries2, x_axis = x_axis, \
+                 interp_step = interp_step, start = start, end = end, \
+                 nsim = 1000, method = 'isospectral', alpha = 0.5)
+
+    return r, sig, p    
+    
 def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
     """Bin the paleoData values of the timeseries
     
@@ -446,3 +652,42 @@ def basicSummary(timeseries = "", x_axis="", saveFig = False,
 
     return fig
 
+def basicSummary2(timeseries = "", x_axis="", saveFig = False,
+                     format = "eps", dir = ""):
+    """ Second type of basic summary plot
+    
+    Plots the following information: the time series, a histogram of
+    the PaleoData_values, location map, age-depth profile if both are
+    available from the paleodata, metadata about the record.
+
+    Notes: 
+        The plots use default settings from the MapLiPD and plotTS methods.
+    
+    Arguments:
+        timeseries: By default, will prompt for one.
+        x-axis (str): The representation against which to plot the paleo-data.
+            Options are "age", "year", and "depth". Default is to let the 
+            system choose if only one available or prompt the user.
+        saveFig (bool): default is to not save the figure
+        dir (str): the full path of the directory in which to save the figure.
+            If not provided, creates a default folder called 'figures' in the 
+            LiPD working directory (lipd.path). 
+        format (str): One of the file extensions supported by the active 
+            backend. Default is "eps". Most backend support png, pdf, ps, eps, 
+            and svg.
+        
+    Returns:
+        The figure.
+        
+    Examples:
+        >>> fig = pyleoclim.basicSummary2()
+        
+    """
+    if not 'timeseries_list' in globals():
+        openLipds()
+        
+    plt1 = SummaryPlots(timeseries_list, plot_default)
+    fig = plt1.basic2(x_axis=x_axis, timeseries = timeseries, saveFig=saveFig,\
+               format = format, dir = dir)
+
+    return fig

@@ -625,6 +625,144 @@ and time step,</p>
 </div>
 </dd></dl>
 
+<dl class="function">
+<dt id="pyleoclim.corrSigTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">corrSigTs</code><span class="sig-paren">(</span><em>timeseries1=''</em>, <em>timeseries2=''</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em>, <em>nsim=1000</em>, <em>method='isospectral'</em>, <em>alpha=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.corrSigTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimates the significance of correlations between non IID timeseries.</p>
+<p>Function written by. F. Zhu.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries2</strong> (<em>timeseries1,</em>) &#8211; timeseries object. Default is blank.</li>
+<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to express the
+paleo-data. Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;.
+Default is to let the system choose if only one available
+or prompt the user.</li>
+<li><strong>interp_step</strong> (<em>float</em>) &#8211; the step size. By default, will prompt the user.</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; Start time/age/depth. Default is the maximum of
+the minima of the two timeseries</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; End time/age/depth. Default is the minimum of the
+maxima of the two timeseries</li>
+<li><strong>nsim</strong> (<em>int</em>) &#8211; the number of simulations. Default is 1000</li>
+<li><strong>method</strong> (<em>str</em>) &#8211; <p>method use to estimate the correlation and significance.
+Available methods include:</p>
+<blockquote>
+<div><ul>
+<li>&#8216;ttest&#8217;: T-test where the degrees of freedom are corrected for</li>
+</ul>
+<p>the effect of serial correlation</p>
+<ul>
+<li>&#8216;isopersistant&#8217;: AR(1) modeling of the two timeseries</li>
+<li>&#8216;isospectral&#8217; (default): phase randomization of original</li>
+</ul>
+<p>inputs.</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>The T-test is parametric test, hence cheap but usually wrong</dt>
+<dd>except in idyllic circumstances.</dd>
+<dt>The others are non-parametric, but their computational</dt>
+<dd>requirements scales with nsim.</dd>
+</dl>
+</li>
+<li><strong>alpha</strong> (<em>float</em>) &#8211; significance level for critical value estimation. Default is 0.05</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>r (float) - correlation between the two timeseries</p>
+<p>sig (bool) -  Returns True if significant, False otherwise</p>
+<p>p (real) - the p-value</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">corrSigTs</span><span class="p">()</span>
+<span class="go">0 :  Ocean2kHR-PacificClippertonClipp2bWu2014 :  Sr_Ca</span>
+<span class="go">1 :  Ocean2kHR-PacificNauruGuilderson1999 :  d18O</span>
+<span class="go">2 :  Ocean2kHR-PacificNauruGuilderson1999 :  d13C</span>
+<span class="go">3 :  MD982176.Stott.2004 :  sst</span>
+<span class="go">4 :  MD982176.Stott.2004 :  d18Ob.rub</span>
+<span class="go">5 :  MD982176.Stott.2004 :  d18Ow-s</span>
+<span class="go">6 :  MD982176.Stott.2004 :  Mg/Ca-g.rub</span>
+<span class="go">7 :  ODP1098B :  TEX86</span>
+<span class="go">8 :  ODP1098B :  SST</span>
+<span class="go">9 :  Ocean2kHR-AtlanticCapeVerdeMoses2006 :  d18O</span>
+<span class="go">10 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature</span>
+<span class="go">11 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37</span>
+<span class="go">12 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes</span>
+<span class="go">13 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature</span>
+<span class="go">14 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37</span>
+<span class="go">15 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes</span>
+<span class="go">16 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O</span>
+<span class="go">17 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca</span>
+<span class="go">18 :  MD98-2170.Stott.2004 :  d18o</span>
+<span class="go">19 :  MD98-2170.Stott.2004 :  RMSE</span>
+<span class="go">20 :  MD98-2170.Stott.2004 :  d18ow</span>
+<span class="go">21 :  MD98-2170.Stott.2004 :  mg</span>
+<span class="go">22 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d18O</span>
+<span class="go">23 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d13C</span>
+<span class="go">24 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  Sr_Ca</span>
+<span class="go">25 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  d18O</span>
+<span class="go">26 :  MD01-2412.Harada.2006 :  uk37</span>
+<span class="go">27 :  MD01-2412.Harada.2006 :  sst</span>
+<span class="go">28 :  MD01-2412.Harada.2006 :  calyrbp</span>
+<span class="go">29 :  Crystal.McCabe-Glynn.2013 :  sst.anom</span>
+<span class="go">30 :  Crystal.McCabe-Glynn.2013 :  s180carbVPDB</span>
+<span class="go">Enter the number of the variable you wish to use: 19</span>
+<span class="go">0 :  Ocean2kHR-PacificClippertonClipp2bWu2014 :  Sr_Ca</span>
+<span class="go">1 :  Ocean2kHR-PacificNauruGuilderson1999 :  d18O</span>
+<span class="go">2 :  Ocean2kHR-PacificNauruGuilderson1999 :  d13C</span>
+<span class="go">3 :  MD982176.Stott.2004 :  sst</span>
+<span class="go">4 :  MD982176.Stott.2004 :  d18Ob.rub</span>
+<span class="go">5 :  MD982176.Stott.2004 :  d18Ow-s</span>
+<span class="go">6 :  MD982176.Stott.2004 :  Mg/Ca-g.rub</span>
+<span class="go">7 :  ODP1098B :  TEX86</span>
+<span class="go">8 :  ODP1098B :  SST</span>
+<span class="go">9 :  Ocean2kHR-AtlanticCapeVerdeMoses2006 :  d18O</span>
+<span class="go">10 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature</span>
+<span class="go">11 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37</span>
+<span class="go">12 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes</span>
+<span class="go">13 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature</span>
+<span class="go">14 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37</span>
+<span class="go">15 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes</span>
+<span class="go">16 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O</span>
+<span class="go">17 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca</span>
+<span class="go">18 :  MD98-2170.Stott.2004 :  d18o</span>
+<span class="go">19 :  MD98-2170.Stott.2004 :  RMSE</span>
+<span class="go">20 :  MD98-2170.Stott.2004 :  d18ow</span>
+<span class="go">21 :  MD98-2170.Stott.2004 :  mg</span>
+<span class="go">22 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d18O</span>
+<span class="go">23 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d13C</span>
+<span class="go">24 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  Sr_Ca</span>
+<span class="go">25 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  d18O</span>
+<span class="go">26 :  MD01-2412.Harada.2006 :  uk37</span>
+<span class="go">27 :  MD01-2412.Harada.2006 :  sst</span>
+<span class="go">28 :  MD01-2412.Harada.2006 :  calyrbp</span>
+<span class="go">29 :  Crystal.McCabe-Glynn.2013 :  sst.anom</span>
+<span class="go">30 :  Crystal.McCabe-Glynn.2013 :  s180carbVPDB</span>
+<span class="go">Enter the number of the variable you wish to use: 3</span>
+<span class="go">The two timeseries do not contain the same number of points. Interpolating...</span>
+<span class="go">Do you want to use time or depth?</span>
+<span class="go">Enter 0 for time and 1 for depth: 0</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="go">0.004</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="go">0.723075099334</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </div>
 </div>
 
