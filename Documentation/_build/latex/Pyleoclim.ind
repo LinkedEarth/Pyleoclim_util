@@ -8,33 +8,39 @@
   \bigletter B
   \item Basic (class in pyleoclim), \hyperpage{15}
   \item basic() (pyleoclim.SummaryPlots method), \hyperpage{21}
-  \item basicSummary() (in module pyleoclim), \hyperpage{10}
+  \item basic2() (pyleoclim.SummaryPlots method), \hyperpage{22}
+  \item basicSummary() (in module pyleoclim), \hyperpage{11}
+  \item basicSummary2() (in module pyleoclim), \hyperpage{11}
   \item bin\_Ts() (pyleoclim.Basic static method), \hyperpage{15}
-  \item binTs() (in module pyleoclim), \hyperpage{11}
+  \item binTs() (in module pyleoclim), \hyperpage{13}
 
   \indexspace
   \bigletter C
-  \item createDir() (in module pyleoclim), \hyperpage{23}
+  \item createDir() (in module pyleoclim), \hyperpage{25}
 
   \indexspace
   \bigletter E
-  \item enumerateLipds() (in module pyleoclim), \hyperpage{23}
-  \item enumerateTs() (in module pyleoclim), \hyperpage{24}
+  \item enumerateLipds() (in module pyleoclim), \hyperpage{25}
+  \item enumerateTs() (in module pyleoclim), \hyperpage{26}
 
   \indexspace
   \bigletter G
   \item getMetadata() (pyleoclim.SummaryPlots method), \hyperpage{22}
-  \item getTs() (in module pyleoclim), \hyperpage{24}
+  \item getTs() (in module pyleoclim), \hyperpage{26}
   \item getValues() (pyleoclim.Basic static method), \hyperpage{15}
+
+  \indexspace
+  \bigletter H
+  \item histTs() (in module pyleoclim), \hyperpage{10}
 
   \indexspace
   \bigletter I
   \item interp\_Ts() (pyleoclim.Basic static method), \hyperpage{15}
-  \item interpTs() (in module pyleoclim), \hyperpage{12}
+  \item interpTs() (in module pyleoclim), \hyperpage{14}
 
   \indexspace
   \bigletter L
-  \item LipdToOntology() (in module pyleoclim), \hyperpage{25}
+  \item LipdToOntology() (in module pyleoclim), \hyperpage{27}
 
   \indexspace
   \bigletter M
@@ -46,35 +52,37 @@
 
   \indexspace
   \bigletter O
+  \item onCommonXAxis() (pyleoclim.Basic static method), \hyperpage{16}
   \item openLipds() (in module pyleoclim), \hyperpage{7}
 
   \indexspace
   \bigletter P
   \item Plot (class in pyleoclim), \hyperpage{19}
   \item plot\_agemodel() (pyleoclim.Plot method), \hyperpage{19}
+  \item plot\_hist() (pyleoclim.Plot method), \hyperpage{20}
   \item plot\_Ts() (pyleoclim.Plot method), \hyperpage{19}
   \item plotTs() (in module pyleoclim), \hyperpage{9}
-  \item promptForLipd() (in module pyleoclim), \hyperpage{23}
-  \item promptForVariable() (in module pyleoclim), \hyperpage{24}
+  \item promptForLipd() (in module pyleoclim), \hyperpage{25}
+  \item promptForVariable() (in module pyleoclim), \hyperpage{26}
 
   \indexspace
   \bigletter S
-  \item saveFigure() (in module pyleoclim), \hyperpage{23}
+  \item saveFigure() (in module pyleoclim), \hyperpage{25}
   \item simpleStats() (pyleoclim.Basic method), \hyperpage{16}
-  \item statsTs() (in module pyleoclim), \hyperpage{10}
+  \item statsTs() (in module pyleoclim), \hyperpage{12}
   \item SummaryPlots (class in pyleoclim), \hyperpage{21}
 
   \indexspace
   \bigletter T
   \item TsData() (pyleoclim.SummaryPlots method), \hyperpage{21}
-  \item TsToDf() (in module pyleoclim), \hyperpage{24}
+  \item TsToDf() (in module pyleoclim), \hyperpage{26}
 
   \indexspace
   \bigletter V
-  \item valuesLoc() (in module pyleoclim), \hyperpage{24}
+  \item valuesLoc() (in module pyleoclim), \hyperpage{26}
 
   \indexspace
   \bigletter X
-  \item xAxisTs() (in module pyleoclim), \hyperpage{24}
+  \item xAxisTs() (in module pyleoclim), \hyperpage{26}
 
 \end{theindex}

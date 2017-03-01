@@ -17,23 +17,26 @@
 \contentsline {paragraph}{Examples}{9}{paragraph*.8}
 \contentsline {section}{\numberline {2.3}Plotting}{9}{section.2.3}
 \contentsline {paragraph}{Examples}{10}{paragraph*.10}
-\contentsline {subsection}{\numberline {2.3.1}Summary Plots}{10}{subsection.2.3.1}
-\contentsline {paragraph}{Notes}{10}{paragraph*.12}
-\contentsline {paragraph}{Examples}{10}{paragraph*.13}
-\contentsline {section}{\numberline {2.4}Statistics}{10}{section.2.4}
+\contentsline {paragraph}{Examples}{10}{paragraph*.12}
+\contentsline {subsection}{\numberline {2.3.1}Summary Plots}{11}{subsection.2.3.1}
+\contentsline {paragraph}{Notes}{11}{paragraph*.14}
 \contentsline {paragraph}{Examples}{11}{paragraph*.15}
-\contentsline {paragraph}{Example}{12}{paragraph*.17}
-\contentsline {paragraph}{Examples}{13}{paragraph*.19}
+\contentsline {paragraph}{Notes}{11}{paragraph*.17}
+\contentsline {paragraph}{Examples}{12}{paragraph*.18}
+\contentsline {section}{\numberline {2.4}Statistics}{12}{section.2.4}
+\contentsline {paragraph}{Examples}{12}{paragraph*.20}
+\contentsline {paragraph}{Example}{13}{paragraph*.22}
+\contentsline {paragraph}{Examples}{14}{paragraph*.24}
 \contentsline {chapter}{\numberline {3}Basic Module}{15}{chapter.3}
 \contentsline {chapter}{\numberline {4}Mapping Module}{17}{chapter.4}
 \contentsline {chapter}{\numberline {5}Timeseries Plots Module}{19}{chapter.5}
 \contentsline {chapter}{\numberline {6}Summary Plots Module}{21}{chapter.6}
-\contentsline {paragraph}{Notes}{22}{paragraph*.35}
-\contentsline {chapter}{\numberline {7}Manipulating LiPD files}{23}{chapter.7}
-\contentsline {section}{\numberline {7.1}Creating directories and saving figures}{23}{section.7.1}
-\contentsline {section}{\numberline {7.2}Manipulating LiPD files}{23}{section.7.2}
-\contentsline {section}{\numberline {7.3}Manipulating Variables in a LiPD file}{24}{section.7.3}
-\contentsline {section}{\numberline {7.4}Manipulating timeseries objects}{24}{section.7.4}
-\contentsline {section}{\numberline {7.5}Handling mapping to LinkedEarth Ontology}{25}{section.7.5}
-\contentsline {chapter}{\numberline {8}Indices and tables}{27}{chapter.8}
-\contentsline {chapter}{Index}{29}{section*.48}
+\contentsline {paragraph}{Notes}{22}{paragraph*.42}
+\contentsline {chapter}{\numberline {7}Manipulating LiPD files}{25}{chapter.7}
+\contentsline {section}{\numberline {7.1}Creating directories and saving figures}{25}{section.7.1}
+\contentsline {section}{\numberline {7.2}Manipulating LiPD files}{25}{section.7.2}
+\contentsline {section}{\numberline {7.3}Manipulating Variables in a LiPD file}{26}{section.7.3}
+\contentsline {section}{\numberline {7.4}Manipulating timeseries objects}{26}{section.7.4}
+\contentsline {section}{\numberline {7.5}Handling mapping to LinkedEarth Ontology}{27}{section.7.5}
+\contentsline {chapter}{\numberline {8}Indices and tables}{29}{chapter.8}
+\contentsline {chapter}{Index}{31}{section*.56}

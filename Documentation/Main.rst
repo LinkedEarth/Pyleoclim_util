@@ -31,6 +31,8 @@ Plotting
 ````````
 .. autofunction:: pyleoclim.plotTs
 
+.. autofunction:: pyleoclim.histTs
+
 Summary Plots
 -------------
 
@@ -38,6 +40,8 @@ Summary plots are a special categories of plots enabled by Pyleoclim.
 They allow to plot specific information about a timeseries but are not customizable.
 
 .. autofunction:: pyleoclim.basicSummary
+
+.. autofunction:: pyleoclim.basicSummary2
 
 Statistics
 ``````````

@@ -152,6 +152,56 @@ eps, and svg.</li>
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="pyleoclim.Plot.plot_hist">
+<code class="descname">plot_hist</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>bins=None</em>, <em>hist=True</em>, <em>kde=True</em>, <em>rug=False</em>, <em>fit=None</em>, <em>hist_kws={'label': 'hist'}</em>, <em>kde_kws={'label': 'kde'}</em>, <em>rug_kws={'label': 'rug'}</em>, <em>fit_kws={'label': 'fit'}</em>, <em>color=None</em>, <em>vertical=False</em>, <em>norm_hist=True</em>, <em>legend=True</em>, <em>saveFig=False</em>, <em>format='eps'</em>, <em>dir=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Plot.plot_hist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a univariate distribution of the PaleoData values</p>
+<p>This function is based on the seaborn displot function, which is
+itself a combination of the matplotlib hist function with the
+seaborn kdeplot() and rugplot() functions. It can also fit
+scipy.stats distributions and plot the estimated PDF over the data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>timeseries</strong> &#8211; A timeseries. By default, will prompt the user for one.</li>
+<li><strong>bins</strong> (<em>int</em>) &#8211; Specification of hist bins following matplotlib(hist),
+or None to use Freedman-Diaconis rule</li>
+<li><strong>hist</strong> (<em>bool</em>) &#8211; Whether to plot a (normed) histogram</li>
+<li><strong>kde</strong> (<em>bool</em>) &#8211; Whether to plot a gaussian kernel density estimate</li>
+<li><strong>rug</strong> (<em>bool</em>) &#8211; Whether to draw a rugplot on the support axis</li>
+<li><strong>fit</strong> &#8211; Random variable object. An object with fit method, returning
+a tuple that can be passed to a pdf method of positional
+arguments following a grid of values to evaluate the pdf on.</li>
+<li><strong>kde, rug, fit}_kws</strong> (<em>{hist,</em>) &#8211; Dictionaries. Keyword arguments for
+underlying plotting functions. If modifying the dictionary, make
+sure the labels &#8220;hist&#8221;, &#8220;kde&#8221;, &#8220;rug&#8221; and &#8220;fit&#8221; are still passed.</li>
+<li><strong>color</strong> (<em>str</em>) &#8211; matplotlib color. Color to plot everything but the
+fitted curve in.</li>
+<li><strong>vertical</strong> (<em>bool</em>) &#8211; if True, oberved values are on y-axis.</li>
+<li><strong>norm_hist</strong> (<em>bool</em>) &#8211; If True (default), the histrogram height shows
+a density rather than a count. This is implied if a KDE or
+fitted density is plotted</li>
+<li><strong>legend</strong> (<em>bool</em>) &#8211; If true, plots a default legend</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the figure.
+If not provided, creates a default folder called &#8216;figures&#8217; in the
+LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>fig - The figure</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>

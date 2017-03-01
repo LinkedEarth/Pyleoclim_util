@@ -145,7 +145,7 @@ one from the dictionary</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>timeseries</strong> &#8211; a timeseries object. Default is blank, will prompt for it</li>
+<li><strong>timeseries</strong> &#8211; a timeseries object. Use getTSO() to get one.</li>
 <li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to plot the
 paleo-data. Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;.
 Default is to let the system choose if only one available
@@ -166,6 +166,41 @@ the end/start and time step</p>
 </table>
 </dd></dl>
 
+<dl class="staticmethod">
+<dt id="pyleoclim.Basic.onCommonXAxis">
+<em class="property">static </em><code class="descname">onCommonXAxis</code><span class="sig-paren">(</span><em>timeseries1</em>, <em>timeseries2</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic.onCommonXAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Places two timeseries on a common x-axis</p>
+<p>Interpolate the PaleoDataValues of two timeseries on a common x-axis.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries1</strong> &#8211; a timeseries object. Use getTSO() to get one.</li>
+<li><strong>timeseries2</strong> &#8211; a timeseries object. Use getTSO() to get one.</li>
+<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to express the
+paleo-data. Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;.
+Default is to let the system choose if only one available
+or prompt the user.</li>
+<li><strong>interp_step</strong> (<em>float</em>) &#8211; the step size. By default, will prompt the user.</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; Start time/age/depth. Default is the maximum of
+the minima of the two timeseries</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; End time/age/depth. Default is the minimum of the
+maxima of the two timeseries</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>interp_age - the interpolated age/year/depth according to
+the end/start and time step</p>
+<p>interp_values1 - the interpolated values for the first timeseries</p>
+<p>interp_values2 - the interpolated values for the second timeseries</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="pyleoclim.Basic.simpleStats">
 <code class="descname">simpleStats</code><span class="sig-paren">(</span><em>timeseries=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Basic.simpleStats" title="Permalink to this definition">¶</a></dt>
@@ -176,6 +211,8 @@ the end/start and time step</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeseries</strong> &#8211; a single timeseries. Will prompt for one
 if not available</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the mean, median, min, max, standard deviation and IQR of a timeseries.</td>
 </tr>
 </tbody>
 </table>

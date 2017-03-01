@@ -2,14 +2,17 @@
 \indexentry{mapAll() (in module pyleoclim)|hyperpage}{8}
 \indexentry{mapLipd() (in module pyleoclim)|hyperpage}{8}
 \indexentry{plotTs() (in module pyleoclim)|hyperpage}{9}
-\indexentry{basicSummary() (in module pyleoclim)|hyperpage}{10}
-\indexentry{statsTs() (in module pyleoclim)|hyperpage}{10}
-\indexentry{binTs() (in module pyleoclim)|hyperpage}{11}
-\indexentry{interpTs() (in module pyleoclim)|hyperpage}{12}
+\indexentry{histTs() (in module pyleoclim)|hyperpage}{10}
+\indexentry{basicSummary() (in module pyleoclim)|hyperpage}{11}
+\indexentry{basicSummary2() (in module pyleoclim)|hyperpage}{11}
+\indexentry{statsTs() (in module pyleoclim)|hyperpage}{12}
+\indexentry{binTs() (in module pyleoclim)|hyperpage}{13}
+\indexentry{interpTs() (in module pyleoclim)|hyperpage}{14}
 \indexentry{Basic (class in pyleoclim)|hyperpage}{15}
 \indexentry{bin\_Ts() (pyleoclim.Basic static method)|hyperpage}{15}
 \indexentry{getValues() (pyleoclim.Basic static method)|hyperpage}{15}
 \indexentry{interp\_Ts() (pyleoclim.Basic static method)|hyperpage}{15}
+\indexentry{onCommonXAxis() (pyleoclim.Basic static method)|hyperpage}{16}
 \indexentry{simpleStats() (pyleoclim.Basic method)|hyperpage}{16}
 \indexentry{Map (class in pyleoclim)|hyperpage}{17}
 \indexentry{map\_Lipd() (pyleoclim.Map method)|hyperpage}{17}
@@ -17,19 +20,21 @@
 \indexentry{Plot (class in pyleoclim)|hyperpage}{19}
 \indexentry{plot\_Ts() (pyleoclim.Plot method)|hyperpage}{19}
 \indexentry{plot\_agemodel() (pyleoclim.Plot method)|hyperpage}{19}
+\indexentry{plot\_hist() (pyleoclim.Plot method)|hyperpage}{20}
 \indexentry{SummaryPlots (class in pyleoclim)|hyperpage}{21}
 \indexentry{TsData() (pyleoclim.SummaryPlots method)|hyperpage}{21}
 \indexentry{agemodelData() (pyleoclim.SummaryPlots method)|hyperpage}{21}
 \indexentry{basic() (pyleoclim.SummaryPlots method)|hyperpage}{21}
+\indexentry{basic2() (pyleoclim.SummaryPlots method)|hyperpage}{22}
 \indexentry{getMetadata() (pyleoclim.SummaryPlots method)|hyperpage}{22}
-\indexentry{createDir() (in module pyleoclim)|hyperpage}{23}
-\indexentry{saveFigure() (in module pyleoclim)|hyperpage}{23}
-\indexentry{enumerateLipds() (in module pyleoclim)|hyperpage}{23}
-\indexentry{promptForLipd() (in module pyleoclim)|hyperpage}{23}
-\indexentry{promptForVariable() (in module pyleoclim)|hyperpage}{24}
-\indexentry{valuesLoc() (in module pyleoclim)|hyperpage}{24}
-\indexentry{xAxisTs() (in module pyleoclim)|hyperpage}{24}
-\indexentry{enumerateTs() (in module pyleoclim)|hyperpage}{24}
-\indexentry{getTs() (in module pyleoclim)|hyperpage}{24}
-\indexentry{TsToDf() (in module pyleoclim)|hyperpage}{24}
-\indexentry{LipdToOntology() (in module pyleoclim)|hyperpage}{25}
+\indexentry{createDir() (in module pyleoclim)|hyperpage}{25}
+\indexentry{saveFigure() (in module pyleoclim)|hyperpage}{25}
+\indexentry{enumerateLipds() (in module pyleoclim)|hyperpage}{25}
+\indexentry{promptForLipd() (in module pyleoclim)|hyperpage}{25}
+\indexentry{promptForVariable() (in module pyleoclim)|hyperpage}{26}
+\indexentry{valuesLoc() (in module pyleoclim)|hyperpage}{26}
+\indexentry{xAxisTs() (in module pyleoclim)|hyperpage}{26}
+\indexentry{enumerateTs() (in module pyleoclim)|hyperpage}{26}
+\indexentry{getTs() (in module pyleoclim)|hyperpage}{26}
+\indexentry{TsToDf() (in module pyleoclim)|hyperpage}{26}
+\indexentry{LipdToOntology() (in module pyleoclim)|hyperpage}{27}

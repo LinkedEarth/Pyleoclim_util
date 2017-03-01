@@ -152,8 +152,8 @@ Age-Depth profile if both are available from the paleodata, Metadata</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>new_timeseries</strong> &#8211; By default, will prompt for one.</li>
-<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
+<li><strong>timeseries</strong> &#8211; By default, will prompt for one.</li>
+<li><strong>x_axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
 Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default is to let the
 system choose if only one available or prompt the user.</li>
 <li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
@@ -167,6 +167,39 @@ and svg.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyleoclim.SummaryPlots.basic2">
+<code class="descname">basic2</code><span class="sig-paren">(</span><em>x_axis=''</em>, <em>timeseries=''</em>, <em>saveFig=False</em>, <em>format='eps'</em>, <em>dir=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.SummaryPlots.basic2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Second type of basic summary plot</p>
+<p>Plots the following information: the time series, a histogram of
+the PaleoData_values, location map, age-depth profile if both are
+available from the paleodata, metadata about the record.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries</strong> &#8211; a timeseries object. By default, will prompt for one</li>
+<li><strong>x_axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
+Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default is to let the
+system choose if only one available or prompt the user.</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the figure.
+If not provided, creates a default folder called &#8216;figures&#8217; in the
+LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure</p>
 </td>
 </tr>
 </tbody>
