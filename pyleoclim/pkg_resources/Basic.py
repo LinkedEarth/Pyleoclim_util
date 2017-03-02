@@ -23,6 +23,7 @@ from scipy.stats import t as stu
 from scipy.stats import gaussian_kde
 import statsmodels.api as sm
 from sklearn import preprocessing
+import progressbar
 
 #Import internal packages to pyleoclim
 from .LiPDutils import *
@@ -697,8 +698,20 @@ class Correlation(object):
         fft_recblk = np.fft.fft(recblk)
     
         surrblk = np.zeros((nfrms, nsurr))
+        
+        pbar = progressbar.ProgressBar(
+                widgets=[
+                    ' Surrogates generating... (',
+                    progressbar.SimpleProgress(),
+                    ') [',
+                    progressbar.Percentage(), '] ',
+                    progressbar.Bar(),
+                    ' (', progressbar.ETA(), ') '
+                ],
+                redirect_stdout=True
+            )
     
-        for k in np.arange(nsurr):
+        for k in pbar(np.arange(nsurr)):
             ph_rnd = np.random.rand(len_ser)
     
             # Create the random phases for all the time series

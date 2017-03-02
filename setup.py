@@ -57,5 +57,7 @@ setup(
     "statsmodel>=0.6.1",
     "seaborn>=0.7.0",
     "scikit-learn>=0.17.1"
+    "nitime>=0.7",
+    "progressbar2>=3.12.0"
     ]
 )

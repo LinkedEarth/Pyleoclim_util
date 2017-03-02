@@ -25,6 +25,7 @@ from scipy.stats import gaussian_kde
 import statsmodels.api as sm
 from sklearn import preprocessing
 import seaborn as sns
+import progressbar
 
 #Import internal packages to pyleoclim
 from .pkg_resources.Map import *
