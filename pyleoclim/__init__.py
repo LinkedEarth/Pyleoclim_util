@@ -84,22 +84,18 @@ def openLipds(path="",ts_list=""):
         Process Complete
 
     """
+    global lipd_path
+    global timeseries_list
     if not path and not ts_list:
-        global lipd_path
         lipd_path = lpd.readLipds()
-        global timeseries_list
         timeseries_list = lpd.extractTs()
     elif not ts_list:
-        global lipd_path
         lipd_path = lpd.readLipds(path)
-        global timeseries_list
         timeseries_list = lpd.extractTs()
     elif not path:
         sys.exit("If specifying a list of timeseries, also need to specify path")
     else:
-        global lipd_path
         lipd_path = path
-        global timeseries_list
         timeseries_list = ts_list       
         
 # Set the default palette for plots
