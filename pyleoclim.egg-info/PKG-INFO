@@ -1,12 +1,12 @@
 Metadata-Version: 1.1
 Name: pyleoclim
-Version: 0.1.4
+Version: 0.2.0
 Summary: A Python package for paleoclimate data analysis
 Home-page: https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim
 Author: Deborah Khider
 Author-email: dkhider@gmail.com
 License: GNU Public
-Download-URL: https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.1.4
+Download-URL: https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.2.0
 Description: |PyPI| |PyPI| |PyPI| |license|
         
         Pyleoclim
@@ -26,7 +26,7 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         -  `License <#license>`__
         -  `Disclaimer <#disclaimer>`__
         
-        Current Version: 0.1.4
+        Current Version: 0.2.0
         
         What is it?
         -----------
@@ -60,9 +60,11 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         Version Information
         -------------------
         
-        | 0.1.4: Rename function using camel case and consistency with LiPD
-          utilities version 0.1.8.5 0.1.3: Compatible with LiPD utilities
-          version 0.1.8.5.
+        | 0.2.0: Restructure the package so that the main functions can be
+          called without the use of a LiPD files and associated timeseries
+          objects. 0.1.4: Rename function using camel case and consistency with
+          LiPD utilities version 0.1.8.5
+        | 0.1.3: Compatible with LiPD utilities version 0.1.8.5.
         | Function openLiPD() renamed openLiPDs()
         | 0.1.2: Compatible with LiPD utilities version 0.1.8.3. Uses basemap
           instead of cartopy
@@ -72,7 +74,7 @@ Description: |PyPI| |PyPI| |PyPI| |license|
          Installation 
         --------------
         
-        Python v3.5+ is required.
+        Python v3.5 is required. Not fully compatible with Python v3.6
         
         Pyleoclim is published through PyPi and easily installed via ``pip``
         
@@ -105,11 +107,16 @@ Description: |PyPI| |PyPI| |PyPI| |license|
         Requirements
         ------------
         
-        -  LiPD v0.1.8.5
+        -  LiPD v0.2.0.2
         -  pandas v0.19+
         -  numpy v1.12+
         -  matplotlib v2.0+
         -  Basemap v1.0.7+
+        -  scipy >=0.19.0
+        -  statsmodel>=0.8.0
+        -  seaborn>=0.7.0
+        -  scikit-learn>=0.17.1
+        -  progressbar2>=3.12.0
         
         The installer will automatically check for the needed updates
         
