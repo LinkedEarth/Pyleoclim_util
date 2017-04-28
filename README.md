@@ -74,7 +74,8 @@ pip install pyleoclim
 
     3b. Use Jupyter Notebook to go through the tutorial contained in the `PyleoclimQuickstart.ipynb` Notebook, which can be downloaded [here](https://github.com/LinkedEarth/Pyleoclim_util/tree/master/Example).
 
-4. Help with functionalities can be found in the Documentation folder on our [GitHub repository](https://github.com/LinkedEarth/Pyleoclim_util) and on Pypi.     
+4. Help with functionalities can be found in the Documentation folder on our [GitHub repository](https://github.com/LinkedEarth/Pyleoclim_util/Pyleoclim_Documentation.pdf)
+and on [Pypi](https://pythonhosted.org/pyleoclim/). 
 
 ### <a name="req">Requirements</a>
 
