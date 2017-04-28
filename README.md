@@ -19,7 +19,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.1.4
+Current Version: 0.2.0
 
 ### <a name = "what">What is it?</a>
 
@@ -45,6 +45,7 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>
+0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.
 0.1.4: Rename function using camel case and consistency with LiPD utilities version 0.1.8.5  
 0.1.3: Compatible with LiPD utilities version 0.1.8.5.  
 Function openLiPD() renamed openLiPDs()  
@@ -77,16 +78,15 @@ pip install pyleoclim
 
 ### <a name="req">Requirements</a>
 
-- LiPD v0.1.8.5
+- LiPD v0.2.0.2
 - pandas v0.19+
 - numpy v1.12+
 - matplotlib v2.0+
 - Basemap v1.0.7+
-- scipy >=0.17.0
-- statsmodel>=0.6.1
+- scipy >=0.19.0
+- statsmodel>=0.8.0
 - seaborn>=0.7.0
 - scikit-learn>=0.17.1
-- nitime>=0.7
 - progressbar2>=3.12.0
 
 The installer will automatically check for the needed updates

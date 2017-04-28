@@ -4,35 +4,31 @@ Created on Wed May 11 10:42:34 2016
 
 @author: deborahkhider
 
-Initializes the Pyleoclim package
+License agreement - GNU GENERAL PUBLIC LICENSE v3
+https://github.com/LinkedEarth/Pyleoclim_util/blob/master/license
 
 """
 #Import all the needed packages
-
-
 import lipd as lpd
-import pandas as pd
 import numpy as np
+import sys
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
-import sys
-import os
 from matplotlib import gridspec
-from scipy.stats import pearsonr
-from scipy.stats.mstats import gmean
-from scipy.stats import t as stu
-from scipy.stats import gaussian_kde
-import statsmodels.api as sm
-from sklearn import preprocessing
 import seaborn as sns
-import progressbar
 
-#Import internal packages to pyleoclim
-from .pkg_resources.Map import *
-from .pkg_resources.TSPlot import *
-from .pkg_resources.LiPDutils import *
-from .pkg_resources.Basic import *
-from .pkg_resources.SummaryPlots import *
+#Import internal modules to pyleoclim
+from pyleoclim import Map
+from pyleoclim import LipdUtils
+from pyleoclim import SummaryPlots
+from pyleoclim import Plot
+#from pyleoclim import Spectral
+from pyleoclim import Stats
+from pyleoclim import Timeseries
+
+"""
+Get the LiPD files and set a few global variables
+"""
 
 # Load the LiPDs present in the directory
 def openLipds(path="",ts_list=""):
@@ -52,36 +48,6 @@ def openLipds(path="",ts_list=""):
 
     Warning: 
         if specifying a list, path should also be specified. 
-    
-    Examples:
-        >>> pyleoclim.openLipds(path = "/Users/deborahkhider/Documents/LiPD")
-        Found: 12 LiPD file(s)
-        processing: Crystal.McCabe-Glynn.2013.lpd
-        processing: MD01-2412.Harada.2006.lpd
-        processing: MD98-2170.Stott.2004.lpd
-        processing: MD982176.Stott.2004.lpd
-        processing: O2kLR-EmeraldBasin.Sachs.2007.lpd
-        processing: Ocean2kHR-AtlanticBahamasTOTORosenheim2005.lpd
-        processing: Ocean2kHR-AtlanticCapeVerdeMoses2006.lpd
-        processing: Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003.lpd
-        processing: Ocean2kHR-AtlanticPrincipeSwart1998.lpd
-        processing: Ocean2kHR-PacificClippertonClipp2bWu2014.lpd
-        processing: Ocean2kHR-PacificNauruGuilderson1999.lpd
-        processing: ODP1098B.lpd
-        extracting: ODP1098B.lpd
-        extracting: MD98-2170.Stott.2004.lpd
-        extracting: Ocean2kHR-PacificClippertonClipp2bWu2014.lpd
-        extracting: Ocean2kHR-AtlanticBahamasTOTORosenheim2005.lpd
-        extracting: Ocean2kHR-AtlanticPrincipeSwart1998.lpd
-        extracting: Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003.lpd
-        extracting: MD982176.Stott.2004.lpd
-        extracting: Ocean2kHR-PacificNauruGuilderson1999.lpd
-        extracting: O2kLR-EmeraldBasin.Sachs.2007.lpd
-        extracting: Crystal.McCabe-Glynn.2013.lpd
-        extracting: Ocean2kHR-AtlanticCapeVerdeMoses2006.lpd
-        extracting: MD01-2412.Harada.2006.lpd
-        Finished time series: 31 objects
-        Process Complete
 
     """
     global lipd_path
@@ -108,13 +74,16 @@ plot_default = {'ice/rock': ['#FFD600','h'],
                 'lake sediment': ['#4169E0','s'],
                 'marine sediment': ['#8A4513', 's'],
                 'sclerosponge' : ['r','o'],
-                'speleothem' : ['FF1492','d'], 
+                'speleothem' : ['#FF1492','d'], 
                 'wood' : ['#32CC32','^'],
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*']} 
 
-# Mapping
-def mapAll(markersize = 50, saveFig = False, dir="", format='eps'):
+""" 
+Mapping
+"""
+def mapAllArchive(markersize = 50, background = 'shadedrelief',\
+                  saveFig = False, dir="", format='eps'):
     """Map all the available records loaded into the workspace by archiveType.
     
     Map of all the records into the workspace by archiveType. 
@@ -122,6 +91,9 @@ def mapAll(markersize = 50, saveFig = False, dir="", format='eps'):
     
     Args:
         markersize (int): The size of the markers. Default is 50
+        background (str): Plots one of the following images on the map: 
+            bluemarble, etopo, shadedrelief, or none (filled continents). 
+            Default is shadedrelief.
         saveFig (bool): Default is to not save the figure
         dir (str): The absolute path of the directory in which to save the 
             figure. If not provided, creates a default folder called 'figures' 
@@ -131,34 +103,61 @@ def mapAll(markersize = 50, saveFig = False, dir="", format='eps'):
             and svg. 
     
     Returns:
-        The figure
-    
-    Examples:
-        >>> fig = pyleoclim.mapAll()
-        
+        The figure    
     """
     # Make sure there are LiPD files to plot
     if not 'timeseries_list' in globals():
         openLipds()
-        
-    map1 = Map(plot_default)
-    fig =  map1.map_all(markersize=markersize, saveFig = saveFig, dir=dir, format=format)
+    
+    #Get the lipd files
+    lipd_in_directory = lpd.getLipdNames()
+    
+    # Initialize the various lists
+    lat = []
+    lon = []
+    archiveType = []
+    
+    # Loop ang grab the metadata
+    for lipd in lipd_in_directory:
+        d = lpd.getMetadata(lipd)
+        lat.append(d['geo']['geometry']['coordinates'][1])
+        lon.append(d['geo']['geometry']['coordinates'][0])
+        archiveType.append(LipdUtils.LipdToOntology(d['archiveType']).lower())
 
+    # append the default palette for other category
+    plot_default.update({'other':['k','o']}) 
+    
+    # make sure criteria is in the plot_default list
+    for idx,val in enumerate(archiveType):
+        if val not in plot_default.keys():
+            archiveType[idx] = 'other'
+            
+    
+    # Make the map
+    fig = Map.mapAll(lat,lon,archiveType,lat_0=0,lon_0=0,palette=plot_default,\
+                     background = background, markersize = markersize)
+    
+    # Save the figure if asked
+    if saveFig == True:
+        LipdUtils.saveFigure('mapLipds_archive', format, dir)
+    else:
+        plt.show
+    
     return fig
 
-def mapLipd(name="", countries = True, counties = False, \
+def mapLipd(timeseries="", countries = True, counties = False, \
         rivers = False, states = False, background = "shadedrelief",\
-        scale = 0.5, markersize = 50, marker = "default", \
+        scale = 0.5, markersize = 50, marker = "ro", \
         saveFig = False, dir = "", format="eps"):
     """ Create a Map for a single record
     
     Orthographic projection map of a single record.
     
     Args:
-        name(str): the name of the LiPD file. **WITH THE .LPD EXTENSION!**. 
-            If not provided, will prompt the user for one
+        timeseries: a LiPD timeseries object. Will prompt for one if not given
         countries (bool): Draws the country borders. Default is on (True).
         counties (bool): Draws the USA counties. Default is off (False).
+        rivers (bool): Draws the rivers. Default is off (False).
         states (bool): Draws the American and Australian states borders. 
             Default is off (False)
         background (str): Plots one of the following images on the map: 
@@ -166,7 +165,7 @@ def mapLipd(name="", countries = True, counties = False, \
             Default is shadedrelief
         scale (float): useful to downgrade the original image resolution to 
             speed up the process. Default is 0.5.
-        markersize (int): default is 100
+        markersize (int): default is 50
         marker (str): a string (or list) containing the color and shape of the
             marker. Default is by archiveType. Type pyleo.plot_default to see
             the default palette. 
@@ -180,25 +179,45 @@ def mapLipd(name="", countries = True, counties = False, \
         
     Returns:
         The figure
-        
-    Examples:
-        >>> fig = pyleoclim.mapLipd(markersize=100)               
-        
+                      
     """
     # Make sure there are LiPD files to plot
-
     if not 'timeseries_list' in globals():
         openLipds()
         
-    map1 = Map(plot_default)
-    fig =  map1.map_Lipd(name=name,countries = countries, counties = counties, \
-        rivers = rivers, states = states, background = background,\
-        scale = scale, markersize = markersize, marker = marker, \
-        saveFig = saveFig, dir = dir, format=format)
+    if not timeseries:
+        timeseries = LipdUtils.getTs(timeseries_list)
+    
+    # Get latitude/longitude
 
+    lat = timeseries['geo_meanLat']    
+    lon = timeseries['geo_meanLon']
+    
+    # Get the marker color and shape
+    archiveType = LipdUtils.LipdToOntology(timeseries['archiveType']).lower()
+    
+    # Make sure it's in the palette
+    if marker == 'default':
+        archiveType = LipdUtils.LipdToOntology(timeseries["archiveType"])
+        marker = plot_default[archiveType]
+    else:
+        marker = 'ro'
+    
+    fig = Map.mapOne(lat,lon,marker=marker,markersize=markersize,\
+                     countries = countries, counties = counties,rivers = rivers, \
+                     states = states, background = background, scale =scale)
+
+    # Save the figure if asked
+    if saveFig == True:
+        LipdUtils.saveFigure(timeseries['dataSetName']+'_map', format, dir)
+    else:
+        plt.show
+    
     return fig
 
-# Plotting
+"""
+Plotting
+"""
 
 def plotTs(timeseries = "", x_axis = "", markersize = 50,\
             marker = "default", saveFig = False, dir = "",\
@@ -224,27 +243,76 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
     
     Returns:
         The figure. 
-    
-    Examples:
-        >>> fig = pyleoclim.plotTs(marker = 'rs')
         
     """
+    # Get the timeseries dictionary if not in global variables
     if not 'timeseries_list' in globals():
         openLipds()
-        
-    plot1 = Plot(plot_default, timeseries_list)
-    fig = plot1.plot_Ts(timeseries = timeseries, x_axis = x_axis,\
-                   markersize = markersize,\
-                   marker = marker, saveFig = saveFig, dir = dir,\
-                   format=format)
+    
+    # Get a timeseries if not already provided    
+    if not timeseries:
+        timeseries = LipdUtils.getTs(timeseries_list)
+    
+    y = np.array(timeseries['paleoData_values'], dtype = 'float64')   
+    x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
+    
+    # remove nans
+    index = np.where(~np.isnan(y))[0]
+    x = x[index]
+    y = y[index]
+    
+    # get the markers
+    if marker == "default":
+        archiveType = LipdUtils.LipdToOntology(timeseries["archiveType"])
+        marker = [plot_default[archiveType][0],plot_default[archiveType][1]]
+    
+    # Get the labels
+    # title
+    title = timeseries['dataSetName']
+    # x_label
+    if label+"Units" in timeseries.keys():
+        x_label = label[0].upper()+label[1:]+ " ("+timeseries[label+"Units"]+")"
+    else:
+        x_label = label[0].upper()+label[1:]   
+    # ylabel
+    if "paleoData_InferredVariableType" in timeseries.keys():
+        if "paleoData_units" in timeseries.keys():
+            y_label = timeseries["paleoData_InferredVariableType"] + \
+                      " (" + timeseries["paleoData_units"]+")" 
+        else:
+            y_label = timeseries["paleoData_InferredVariableType"]
+    elif "paleoData_ProxyObservationType" in timeseries.keys():
+        if "paleoData_units" in timeseries.keys():
+            y_label = timeseries["paleoData_ProxyObservationType"] + \
+                      " (" + timeseries["paleoData_units"]+")" 
+        else:
+            y_label = timeseries["paleoData_ProxyObservationType"]
+    else:
+        if "paleoData_units" in timeseries.keys():
+            y_label = timeseries["paleoData_variableName"] + \
+                      " (" + timeseries["paleoData_units"]+")" 
+        else:
+            y_label = timeseries["paleoData_variableName"]            
+                    
+    # make the plot
+    fig = Plot.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
+                    y_label=y_label, title=title)        
 
+    #Save the figure if asked
+    if saveFig == True:
+        name = 'plot_timeseries_'+timeseries["dataSetName"]+\
+            "_"+y_label
+        LipdUtils.saveFigure(name,format,dir)
+    else:
+        plt.show()        
+        
     return fig
 
 def histTs(timeseries = "", bins = None, hist = True, \
-             kde = True, rug = False, fit = None, hist_kws = {"label":"hist"},\
-             kde_kws = {"label":"kde"}, rug_kws = {"label":"rug"}, \
-             fit_kws = {"label":"fit"}, color = None, vertical = False, \
-             norm_hist = True, legend = True, saveFig = False, format ="eps",\
+             kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},\
+             kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"Rug"}, \
+             fit_kws = {"label":"Fit"}, color = "default", vertical = False, \
+             norm_hist = True, saveFig = False, format ="eps",\
              dir = ""):
     """ Plot a univariate distribution of the PaleoData values
     
@@ -267,12 +335,12 @@ def histTs(timeseries = "", bins = None, hist = True, \
             underlying plotting functions. If modifying the dictionary, make
             sure the labels "hist", "kde", "rug" and "fit" are still passed.
         color (str): matplotlib color. Color to plot everything but the
-            fitted curve in.
+            fitted curve in. Default is to use the default paletter for each
+            archive type. 
         vertical (bool): if True, oberved values are on y-axis.
         norm_hist (bool): If True (default), the histrogram height shows
             a density rather than a count. This is implied if a KDE or 
             fitted density is plotted
-        legend (bool): If true, plots a default legend
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
             If not provided, creates a default folder called 'figures' in the 
@@ -283,26 +351,203 @@ def histTs(timeseries = "", bins = None, hist = True, \
             
     Returns
         fig - The figure
-    
-    Examples:
-        >>> fig = pyleoclim.histTs(vertical = True)    
+  
     """    
     if not 'timeseries_list' in globals():
         openLipds()
-        
-    plot1 = Plot(plot_default, timeseries_list)
-    fig = plot1.plot_hist(timeseries = timeseries, bins = bins, hist = hist, \
-                 kde = kde, rug = rug, fit = fit, hist_kws = hist_kws,\
-                 kde_kws = kde_kws, rug_kws = rug_kws, \
-                 fit_kws = fit_kws, color = color, vertical = vertical, \
-                 norm_hist = norm_hist, legend = legend)
+
+    # Get the timeseries if not present
+    if not timeseries:
+        timeseries = LipdUtils.getTs(timeseries_list)
     
+    # Get the values    
+    y = np.array(timeseries['paleoData_values'], dtype = 'float64')                 
+
+    # Remove NaNs
+    index = np.where(~np.isnan(y))[0]
+    y = y[index]
+    
+    # Get the y_label
+    if "paleoData_InferredVariableType" in timeseries.keys():
+        if "paleoData_units" in timeseries.keys():
+            y_label = timeseries["paleoData_InferredVariableType"] + \
+                      " (" + timeseries["paleoData_units"]+")" 
+        else:
+            y_label = timeseries["paleoData_InferredVariableType"]
+    elif "paleoData_ProxyObservationType" in timeseries.keys():
+        if "paleoData_units" in timeseries.keys():
+            y_label = timeseries["paleoData_ProxyObservationType"] + \
+                      " (" + timeseries["paleoData_units"]+")" 
+        else:
+            y_label = timeseries["paleoData_ProxyObservationType"]
+    else:
+        if "paleoData_units" in timeseries.keys():
+            y_label = timeseries["paleoData_variableName"] + \
+                      " (" + timeseries["paleoData_units"]+")" 
+        else:
+            y_label = timeseries["paleoData_variableName"] 
+    
+    # Grab the color
+    if color == "default":
+       archiveType = LipdUtils.LipdToOntology(timeseries["archiveType"])
+       color = plot_default[archiveType][0] 
+    
+    # Make this histogram
+    fig = Plot.plot_hist(y, bins = bins, hist = hist, \
+             kde = kde, rug = rug, fit = fit, hist_kws = hist_kws,\
+             kde_kws = kde_kws, rug_kws = rug_kws, \
+             fit_kws = fit_kws, color = color, vertical = vertical, \
+             norm_hist = norm_hist, label = y_label)
+    
+    #Save the figure if asked
+    if saveFig == True:
+        name = 'plot_timeseries_'+timeseries["dataSetName"]+\
+            "_"+y_label
+        LipdUtils.saveFigure(name,format,dir)
+    else:
+        plt.show()        
+        
     return fig
 
-# Statistics
+"""
+SummaryPlots
+"""
+
+def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
+               format ="eps"):
+    """Basic summary plot
+    
+    Plots the following information: the time series, a histogram of
+    the PaleoData_values, location map, age-depth profile if both are
+    available from the paleodata, metadata about the record.
+
+    Args:
+        timeseries: a timeseries object. By default, will prompt for one
+        x_axis (str): The representation against which to plot the paleo-data.
+            Options are "age", "year", and "depth". Default is to let the
+            system choose if only one available or prompt the user.
+        saveFig (bool): default is to not save the figure
+        dir (str): the full path of the directory in which to save the figure.
+            If not provided, creates a default folder called 'figures' in the
+            LiPD working directory (lipd.path).
+        format (str): One of the file extensions supported by the active
+            backend. Default is "eps". Most backend support png, pdf, ps, eps,
+            and svg.
+
+    Returns:
+        The figure        
+    
+    """
+    
+    if not 'timeseries_list' in globals():
+        openLipds()
+    
+    # get a timeseries if none provided     
+    if not timeseries:
+        timeseries = LipdUtils.getTs(timeseries_list)
+    
+    # get the necessary metadata
+    metadata = SummaryPlots.getMetadata(timeseries)
+
+    # get the information about the timeseries
+    x,y,archiveType,x_label,y_label = SummaryPlots.TsData(timeseries,
+                                                          x_axis=x_axis)
+
+    # get the age model information if any
+    if "age" and "depth" in timeseries.keys() or "year" and "depth" in timeseries.keys():
+        depth, age , depth_label, age_label,archiveType = SummaryPlots.agemodelData(timeseries)
+        flag = ""
+    else:
+        flag = "no age or depth info"
+    
+    # Make the figure
+    fig = plt.figure(figsize=(11,8))
+    gs = gridspec.GridSpec(2, 5)
+    gs.update(left=0, right =1.1)
+    
+    # Plot the timeseries
+    ax1 = fig.add_subplot(gs[0,:-3])
+    marker = [plot_default[archiveType][0],plot_default[archiveType][1]]
+    markersize = 50
+    
+    ax1.scatter(x,y,s = markersize, facecolor = 'none', edgecolor = marker[0],
+                marker = marker[1], label = 'original')
+    ax1.plot(x,y, color = marker[0], linewidth = 1, label = 'interpolated')
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    axes = plt.gca()
+    ymin, ymax = axes.get_ylim()
+    plt.title(timeseries['dataSetName'], fontsize = 14, fontweight = 'bold')
+    plt.legend(loc=3,scatterpoints=1,fancybox=True,shadow=True,fontsize=10)
+    
+    # Plot the histogram and kernel density estimates
+    ax2 = fig.add_subplot(gs[0,2])
+    sns.distplot(y, vertical = True, color = marker[0], \
+                hist_kws = {"label":"Histogram"},
+                kde_kws = {"label":"KDE fit"})
+    
+    plt.xlabel('PDF')
+    ax2.set_ylim([ymin,ymax])
+    ax2.set_yticklabels([])
+    
+    # Plot the Map
+    lat = timeseries["geo_meanLat"]
+    lon = timeseries["geo_meanLon"]
+    
+    ax3 = fig.add_subplot(gs[1,0])
+    map = Basemap(projection='ortho', lon_0=lon, lat_0=lat)
+    map.drawcoastlines()
+    map.shadedrelief(scale=0.5)
+    map.drawcountries()
+    X,Y = map(lon,lat)
+    map.scatter(X,Y,
+               s = 150,
+               color = marker[0],
+               marker = marker[1])
+    
+    # Plot Age model if any
+    if not flag:
+        ax4 = fig.add_subplot(gs[1,2])
+        plt.style.use("ggplot")
+        ax4.plot(depth,age,color = marker[0],linewidth = 1.0)
+        plt.xlabel(depth_label)
+        plt.ylabel(age_label)
+    else:
+        print("No age or depth information available, skipping age model plot")
+    
+    #Add the metadata
+    textstr = "archiveType: " + metadata["archiveType"]+"\n"+"\n"+\
+              "Authors: " + metadata["authors"]+"\n"+"\n"+\
+              "Year: " + metadata["Year"]+"\n"+"\n"+\
+              "DOI: " + metadata["DOI"]+"\n"+"\n"+\
+              "Variable: " + metadata["Variable"]+"\n"+"\n"+\
+              "units: " + metadata["units"]+"\n"+"\n"+\
+              "Climate Interpretation: " +"\n"+\
+              "    Climate Variable: " + metadata["Climate_Variable"] +"\n"+\
+              "    Detail: " + metadata["Detail"]+"\n"+\
+              "    Seasonality: " + metadata["Seasonality"]+"\n"+\
+              "    Direction: " + metadata["Interpretation_Direction"]+"\n \n"+\
+              "Calibration: \n" + \
+              "    Equation: " + metadata["Calibration_equation"] + "\n" +\
+              "    Notes: " + metadata["Calibration_notes"]
+    plt.figtext(0.7, 0.4, textstr, fontsize = 12)        
+
+    #Save the figure if asked
+    if saveFig == True:
+        name = 'plot_timeseries_'+timeseries["dataSetName"]+\
+            "_"+y_label
+        LipdUtils.saveFigure(name,format,dir)
+    else:
+        plt.show()        
+        
+    return fig
+
+"""
+Statistics
+"""
 
 def statsTs(timeseries=""):
-    """ Calculate the mean and standard deviation of a timeseries
+    """ Calculate simple statistics of a timeseries
     
     Args:
         timeseries: sytem will prompt for one if not given
@@ -312,64 +557,21 @@ def statsTs(timeseries=""):
         inter-quartile range (IQR) of a timeseries.
         
     Examples:
-        >>> mean, median, min_, max_, std, IQR = pyleo.statsTs()
-        0 :  Ocean2kHR-AtlanticCapeVerdeMoses2006 :  d18O
-        1 :  ODP1098B :  SST
-        2 :  ODP1098B :  TEX86
-        3 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  d18O
-        4 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  Sr_Ca
-        5 :  Ocean2kHR-PacificClippertonClipp2bWu2014 :  Sr_Ca
-        6 :  Crystal.McCabe-Glynn.2013 :  sst.anom
-        7 :  Crystal.McCabe-Glynn.2013 :  s180carbVPDB
-        8 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O
-        9 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca
-        10 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d13C
-        11 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d18O
-        12 :  MD01-2412.Harada.2006 :  uk37
-        13 :  MD01-2412.Harada.2006 :  sst
-        14 :  MD01-2412.Harada.2006 :  calyrbp
-        15 :  MD98-2170.Stott.2004 :  mg
-        16 :  MD98-2170.Stott.2004 :  RMSE
-        17 :  MD98-2170.Stott.2004 :  d18ow
-        18 :  MD98-2170.Stott.2004 :  d18o
-        19 :  MD982176.Stott.2004 :  d18Ow-s
-        20 :  MD982176.Stott.2004 :  sst
-        21 :  MD982176.Stott.2004 :  d18Ob.rub
-        22 :  MD982176.Stott.2004 :  Mg/Ca-g.rub
-        23 :  Ocean2kHR-PacificNauruGuilderson1999 :  d13C
-        24 :  Ocean2kHR-PacificNauruGuilderson1999 :  d18O
-        25 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
-        26 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
-        27 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
-        28 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
-        29 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
-        30 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
-        Enter the number of the variable you wish to use: 13
-        
-        >>> print(mean)
-        10.6708933718
-        
-        >>> print(median)
-        11.0
-        
-        >>> print(min_)
-        5.0
-        
-        >>> print(max_)
-        16.2
-        
-        >>> print(std)
-        2.41519924361
-        
-        >>> print(IQR)
-        3.9
+        >>> mean, median, min_, max_, std, IQR = pyleo.statsTs(timeseries)
             
     """
     if not 'timeseries_list' in globals():
         openLipds()
+    
+    # Get the timeseries if not present
+    if not timeseries:
+        timeseries = LipdUtils.getTs(timeseries_list)
      
-    basic1 = Basic(timeseries_list)
-    mean, median, min_, max_, std, IQR = basic1.simpleStats(timeseries = timeseries)
+    # get the values
+    y = np.array(timeseries['paleoData_values'], dtype = 'float64')     
+    
+    mean, median, min_, max_, std, IQR = Stats.simpleStats(y)    
+     
     return mean, median, min_, max_, std, IQR
 
 def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
@@ -409,96 +611,63 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
             sig (bool) -  Returns True if significant, False otherwise \n
             p (real) - the p-value
             
-        Examples:
-            >>> r, sig, p = pyleoclim.corrSigTs()
-            0 :  Ocean2kHR-PacificClippertonClipp2bWu2014 :  Sr_Ca
-            1 :  Ocean2kHR-PacificNauruGuilderson1999 :  d18O
-            2 :  Ocean2kHR-PacificNauruGuilderson1999 :  d13C
-            3 :  MD982176.Stott.2004 :  sst
-            4 :  MD982176.Stott.2004 :  d18Ob.rub
-            5 :  MD982176.Stott.2004 :  d18Ow-s
-            6 :  MD982176.Stott.2004 :  Mg/Ca-g.rub
-            7 :  ODP1098B :  TEX86
-            8 :  ODP1098B :  SST
-            9 :  Ocean2kHR-AtlanticCapeVerdeMoses2006 :  d18O
-            10 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
-            11 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
-            12 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
-            13 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
-            14 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
-            15 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
-            16 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O
-            17 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca
-            18 :  MD98-2170.Stott.2004 :  d18o
-            19 :  MD98-2170.Stott.2004 :  RMSE
-            20 :  MD98-2170.Stott.2004 :  d18ow
-            21 :  MD98-2170.Stott.2004 :  mg
-            22 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d18O
-            23 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d13C
-            24 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  Sr_Ca
-            25 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  d18O
-            26 :  MD01-2412.Harada.2006 :  uk37
-            27 :  MD01-2412.Harada.2006 :  sst
-            28 :  MD01-2412.Harada.2006 :  calyrbp
-            29 :  Crystal.McCabe-Glynn.2013 :  sst.anom
-            30 :  Crystal.McCabe-Glynn.2013 :  s180carbVPDB
-            Enter the number of the variable you wish to use: 19
-            0 :  Ocean2kHR-PacificClippertonClipp2bWu2014 :  Sr_Ca
-            1 :  Ocean2kHR-PacificNauruGuilderson1999 :  d18O
-            2 :  Ocean2kHR-PacificNauruGuilderson1999 :  d13C
-            3 :  MD982176.Stott.2004 :  sst
-            4 :  MD982176.Stott.2004 :  d18Ob.rub
-            5 :  MD982176.Stott.2004 :  d18Ow-s
-            6 :  MD982176.Stott.2004 :  Mg/Ca-g.rub
-            7 :  ODP1098B :  TEX86
-            8 :  ODP1098B :  SST
-            9 :  Ocean2kHR-AtlanticCapeVerdeMoses2006 :  d18O
-            10 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
-            11 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
-            12 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
-            13 :  O2kLR-EmeraldBasin.Sachs.2007 :  temperature
-            14 :  O2kLR-EmeraldBasin.Sachs.2007 :  Uk37
-            15 :  O2kLR-EmeraldBasin.Sachs.2007 :  notes
-            16 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  d18O
-            17 :  Ocean2kHR-AtlanticMontegoBayHaaseSchramm2003 :  Sr_Ca
-            18 :  MD98-2170.Stott.2004 :  d18o
-            19 :  MD98-2170.Stott.2004 :  RMSE
-            20 :  MD98-2170.Stott.2004 :  d18ow
-            21 :  MD98-2170.Stott.2004 :  mg
-            22 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d18O
-            23 :  Ocean2kHR-AtlanticPrincipeSwart1998 :  d13C
-            24 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  Sr_Ca
-            25 :  Ocean2kHR-AtlanticBahamasTOTORosenheim2005 :  d18O
-            26 :  MD01-2412.Harada.2006 :  uk37
-            27 :  MD01-2412.Harada.2006 :  sst
-            28 :  MD01-2412.Harada.2006 :  calyrbp
-            29 :  Crystal.McCabe-Glynn.2013 :  sst.anom
-            30 :  Crystal.McCabe-Glynn.2013 :  s180carbVPDB
-            Enter the number of the variable you wish to use: 3
-            The two timeseries do not contain the same number of points. Interpolating...
-            Do you want to use time or depth?
-            Enter 0 for time and 1 for depth: 0
-        
-            >>> print(p)
-            0.004
-        
-            >>> print(r)
-            0.723075099334
-        
-            >>> print(sig)
-            True
     """    
     if not 'timeseries_list' in globals():
         openLipds()
-        
-    corr1 = Correlation(timeseries_list)
-    r, sig, p = corr1.corr_sig(timeseries1 = timeseries1, \
-                               timeseries2 = timeseries2, x_axis = x_axis, \
-                 interp_step = interp_step, start = start, end = end, \
-                 nsim = 1000, method = 'isospectral', alpha = 0.5)
+    
+    # Get the timeseries    
+    if not timeseries1:
+        timeseries1 = LipdUtils.getTs(timeseries_list)
+    
+    if not timeseries2:
+        timeseries2 = LipdUtils.getTs(timeseries_list)
+    
+    # Get the first time and paleoData values
+    y1 = np.array(timeseries1['paleoData_values'], dtype = 'float64')   
+    x1, label = LipdUtils.checkXaxis(timeseries1, x_axis=x_axis)
+    
+    # Get the second one
+    y2 = np.array(timeseries2['paleoData_values'], dtype = 'float64')  
+    x2, label = LipdUtils.checkXaxis(timeseries2, x_axis=label)
+    
+    # Remove NaNs 
+    index1 = np.where(~np.isnan(y1))[0]
+    x1 = x1[index1]
+    y1 = y1[index1]
+    
+    index2 = np.where(~np.isnan(y2))[0]
+    x2 = x2[index2]
+    y2 = y2[index2]
+    
+    #Check that the two timeseries have the same lenght and if not interpolate
+    if len(y1) != len(y2):
+        print("The two series don't have the same length. Interpolating ...")
+        xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+                                                                     interp_step = interp_step,
+                                                                     start =start,
+                                                                     end=end)
+    elif min(x1) != min(x2) and max(x1) != max(x2):
+        print("The two series don't have the same length. Interpolating ...")
+        xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+                                                                     interp_step = interp_step,
+                                                                     start =start,
+                                                                     end=end)
+    else:
+        #xi = x1
+        interp_values1 = y1
+        interp_values2 = y2
+    
+    
+    r, sig, p = Stats.corrsig(interp_values1,interp_values2,nsim=nsim,
+                                 method=method,alpha=alpha)    
 
     return r, sig, p    
-    
+ 
+
+"""
+Timeseries manipulation
+"""
+   
 def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
     """Bin the paleoData values of the timeseries
     
@@ -513,56 +682,33 @@ def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
         end (float): End time/age/depth. Default is the maximum
         
     Returns:
-        binned_data- the binned output,\n
+        binned_values- the binned output,\n
         bins-  the bins (centered on the median, i.e. the 100-200 bin is 150),\n
         n-  number of data points in each bin,\n
         error- the standard error on the mean in each bin\n
-    
-    Example:
-        >>> ts = pyleoclim.timeseries_list[28]
-        >>> bin_size = 200
-        >>> bins, binned_data, n, error = pyleoclim.binTs(timeseries = ts, bin_size = bin_size)
-        Do you want to plot vs time or depth?
-        Enter 0 for time and 1 for depth: 0
-        
-        >>> print(bins)
-        [   239.3    439.3    639.3 ...,  14439.3  14639.3  14839.3]
-        
-        >>> print(binned_data)
-        [28.440000000000005, 28.920000000000005, 28.657142857142862, 
-        28.939999999999998, 28.733333333333334, 28.949999999999999, 28.75, 
-        28.899999999999999, 28.75, 28.566666666666663, 28.800000000000001, 
-        29.049999999999997, 29.233333333333334, 29.274999999999999, 
-        29.057142857142857, 28.699999999999999, 29.433333333333334, 
-        28.575000000000003, 28.733333333333331, 28.48, 28.733333333333331,
-        28.766666666666666, 29.166666666666668, 29.18, 29.600000000000001, 
-        29.300000000000001, 28.949999999999999, 29.475000000000001,
-        29.333333333333332, 29.800000000000001, 29.016666666666666, 
-        29.349999999999998, 29.485714285714288, 28.850000000000001,
-        29.366666666666664, 28.699999999999999, 29.233333333333334, 
-        29.366666666666664, 29.5, 29.350000000000001, 29.699999999999999, 
-        29.300000000000001, 29.233333333333334, 29.300000000000001, 
-        29.300000000000001, 29.600000000000001, 28.950000000000003,
-        29.166666666666668, 28.799999999999997, 28.975000000000001,
-        29.033333333333331, 28.649999999999999, 28.450000000000003,
-        28.533333333333331, 28.599999999999998, 28.25, 28.0, 
-        28.550000000000001, 28.799999999999997, 28.350000000000001, 
-        27.699999999999999, 27.149999999999999, 27.666666666666668, 
-        26.800000000000001, 26.700000000000003, 26.800000000000001, 
-        26.5, 26.850000000000001, 26.5, 26.5, 26.0, 26.899999999999999,
-        26.5, 26.100000000000001]
         
     """
     if not 'timeseries_list' in globals():
         openLipds()
 
+    # get a timeseries if none provided     
     if not timeseries:
-        timeseries = getTs(timeseries_list)
-                
-    bins, binned_data, n, error = Basic.bin_Ts(timeseries = timeseries,\
-                x_axis = x_axis, bin_size = bin_size, start = start, end = end)
+        timeseries = LipdUtils.getTs(timeseries_list)
     
-    return bins, binned_data, n, error
+    # Get the values
+    y = np.array(timeseries['paleoData_values'], dtype = 'float64')   
+    x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
+
+    #remove nans
+    index = np.where(~np.isnan(y))[0]
+    x = x[index]
+    y = y[index]
+
+    #Bin the timeseries: 
+    bins, binned_values, n, error = Timeseries.bin(x,y, bin_size = bin_size,\
+                                                   start = start, end = end)
+    
+    return bins, binned_values, n, error
 
 def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = ""):
     """Simple linear interpolation
@@ -575,116 +721,33 @@ def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
             Options are "age", "year", and "depth". Default is to let the 
             system choose if only one available or prompt the user. 
         interp_step (float): the step size. By default, will prompt the user. 
-        start (float): Start time/age/depth. Default is the minimum 
-        end (float): End time/age/depth. Default is the maximum
+        start (float): Start year/age/depth. Default is the minimum 
+        end (float): End year/age/depth. Default is the maximum
         
     Returns:
         interp_age - the interpolated age/year/depth according to the end/start 
         and time step, \n
         interp_values - the interpolated values
-        
-    Examples:
-        >>> ts = pyleoclim.timeseries_list[28]
-        >>> interp_step = 200
-        >>> interp_age, interp_values = pyleoclim.interpTs(timeseries = ts, interp_step = interp_step)
-        Do you want to plot vs time or depth?
-        Enter 0 for time and 1 for depth: 0
-        
-        >>> print(interp_age)
-        [   139.3    339.3    539.3 ...,  14339.3  14539.3  14739.3]
-        
-        >>> print(interp_values)
-        [ 0.188       0.05981567 -0.04020261 ...,  1.20834663  1.47751854
-         1.16054494]
       
     """
     if not 'timeseries_list' in globals():
         openLipds()
-
+    
+    # get a timeseries if none provided     
     if not timeseries:
-        timeseries = getTs(timeseries_list)
+        timeseries = LipdUtils.getTs(timeseries_list)
         
-    interp_age, interp_values = Basic.interp_Ts(timeseries = timeseries,\
-                x_axis = x_axis, interp_step = interp_step, start= start, end=end)
+    # Get the values
+    y = np.array(timeseries['paleoData_values'], dtype = 'float64')   
+    x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
+
+    #remove nans
+    index = np.where(~np.isnan(y))[0]
+    x = x[index]
+    y = y[index]    
+
+    #Interpolate the timeseries    
+    interp_age, interp_values = Timeseries.interp(x,y,interp_step = interp_step,\
+                                                  start= start, end=end)
     
     return interp_age, interp_values
-    
-# SummaryPlots
-def basicSummary(timeseries = "", x_axis="", saveFig = False,
-                     format = "eps", dir = ""):
-    """ Makes a basic summary plot
-    
-    Plots the following information: the time series, location map, 
-    Age-Depth profile if both are available from the paleodata, Metadata
-
-    Notes: 
-        The plots use default settings from the MapLiPD and plotTS methods.
-    
-    Arguments:
-        timeseries: By default, will prompt for one.
-        x-axis (str): The representation against which to plot the paleo-data.
-            Options are "age", "year", and "depth". Default is to let the 
-            system choose if only one available or prompt the user.
-        saveFig (bool): default is to not save the figure
-        dir (str): the full path of the directory in which to save the figure.
-            If not provided, creates a default folder called 'figures' in the 
-            LiPD working directory (lipd.path). 
-        format (str): One of the file extensions supported by the active 
-            backend. Default is "eps". Most backend support png, pdf, ps, eps, 
-            and svg.
-        
-    Returns:
-        The figure.
-        
-    Examples:
-        >>> fig = pyleoclim.basicSummary()
-        
-    """
-    if not 'timeseries_list' in globals():
-        openLipds()
-        
-    plt1 = SummaryPlots(timeseries_list, plot_default)
-    fig = plt1.basic(x_axis=x_axis, timeseries = timeseries, saveFig=saveFig,\
-               format = format, dir = dir)
-
-    return fig
-
-def basicSummary2(timeseries = "", x_axis="", saveFig = False,
-                     format = "eps", dir = ""):
-    """ Second type of basic summary plot
-    
-    Plots the following information: the time series, a histogram of
-    the PaleoData_values, location map, age-depth profile if both are
-    available from the paleodata, metadata about the record.
-
-    Notes: 
-        The plots use default settings from the MapLiPD and plotTS methods.
-    
-    Arguments:
-        timeseries: By default, will prompt for one.
-        x-axis (str): The representation against which to plot the paleo-data.
-            Options are "age", "year", and "depth". Default is to let the 
-            system choose if only one available or prompt the user.
-        saveFig (bool): default is to not save the figure
-        dir (str): the full path of the directory in which to save the figure.
-            If not provided, creates a default folder called 'figures' in the 
-            LiPD working directory (lipd.path). 
-        format (str): One of the file extensions supported by the active 
-            backend. Default is "eps". Most backend support png, pdf, ps, eps, 
-            and svg.
-        
-    Returns:
-        The figure.
-        
-    Examples:
-        >>> fig = pyleoclim.basicSummary2()
-        
-    """
-    if not 'timeseries_list' in globals():
-        openLipds()
-        
-    plt1 = SummaryPlots(timeseries_list, plot_default)
-    fig = plt1.basic2(x_axis=x_axis, timeseries = timeseries, saveFig=saveFig,\
-               format = format, dir = dir)
-
-    return fig

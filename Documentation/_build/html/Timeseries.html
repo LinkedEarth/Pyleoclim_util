@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Timeseries Functions &#8212; Pyleoclim 0.2.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="LiPD Utilities" href="LipdUtils.html" />
+    <link rel="prev" title="Statistics Functions" href="Stats.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="LipdUtils.html" title="LiPD Utilities"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Stats.html" title="Statistics Functions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.2.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Stats.html"
+                        title="previous chapter">Statistics Functions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="LipdUtils.html"
+                        title="next chapter">LiPD Utilities</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Timeseries.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="timeseries-functions">
+<h1>Timeseries Functions<a class="headerlink" href="#timeseries-functions" title="Permalink to this headline">¶</a></h1>
+<p>This module allows the manipulation of timeseries.</p>
+<dl class="function">
+<dt id="pyleoclim.Timeseries.bin">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">bin</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.bin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bin the values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>array</em>) &#8211; the x-axis series.</li>
+<li><strong>y</strong> (<em>array</em>) &#8211; the y-axis series.</li>
+<li><strong>bin_size</strong> (<em>float</em>) &#8211; The size of the bins. Default is the average resolution</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; Where/when to start binning. Default is the minimum</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; When/where to stop binning. Defulat is the maximum</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>binned_values - the binned output</p>
+<p>bins - the bins (centered on the median, i.e., the 100-200 bin is 150)</p>
+<p>n - number of data points in each bin</p>
+<p>error -  the standard error on the mean in each bin</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Timeseries.interp">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">interp</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.interp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linear interpolation onto a new x-axis</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>array</em>) &#8211; the x-axis</li>
+<li><strong>y</strong> (<em>array</em>) &#8211; the y-axis</li>
+<li><strong>interp_step</strong> (<em>float</em>) &#8211; the interpolation step. Default is mean resolution.</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; where/when to start the interpolation. Default is min..</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; where/when to stop the interpolation. Defaul is max.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>xi - the interpolated x-axis</p>
+<p>interp_values - the interpolated values</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Timeseries.onCommonAxis">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">onCommonAxis</code><span class="sig-paren">(</span><em>x1</em>, <em>y1</em>, <em>x2</em>, <em>y2</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.onCommonAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Places two timeseries on a common axis</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x1</strong> (<em>array</em>) &#8211; x-axis values of the first timeseries</li>
+<li><strong>y1</strong> (<em>array</em>) &#8211; y-axis values of the first timeseries</li>
+<li><strong>x2</strong> (<em>array</em>) &#8211; x-axis values of the second timeseries</li>
+<li><strong>y2</strong> (<em>array</em>) &#8211; y-axis values of the second timeseries</li>
+<li><strong>interp_step</strong> (<em>float</em>) &#8211; The interpolation step. Default is mean resolution
+of lowest resolution series</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; where/when to start. Default is the maximum of the minima of
+the two timeseries</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; Where/when to end. Default is the minimum of the maxima of
+the two timeseries</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>xi -  the interpolated x-axis</p>
+<p>interp_values1 -  the interpolated y-values for the first timeseries
+interp_values2 - the intespolated y-values for the second timeseries</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="LipdUtils.html" title="LiPD Utilities"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Stats.html" title="Statistics Functions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.2.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>
