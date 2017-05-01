@@ -19,7 +19,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.2.0
+Current Version: 0.2.1
 
 ### <a name = "what">What is it?</a>
 
@@ -45,6 +45,7 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>
+0.2.1: Update package requirements
 0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.
 0.1.4: Rename function using camel case and consistency with LiPD utilities version 0.1.8.5  
 0.1.3: Compatible with LiPD utilities version 0.1.8.5.  
@@ -75,7 +76,7 @@ pip install pyleoclim
     3b. Use Jupyter Notebook to go through the tutorial contained in the `PyleoclimQuickstart.ipynb` Notebook, which can be downloaded [here](https://github.com/LinkedEarth/Pyleoclim_util/tree/master/Example).
 
 4. Help with functionalities can be found in the Documentation folder on our [GitHub repository](https://github.com/LinkedEarth/Pyleoclim_util/Pyleoclim_Documentation.pdf)
-and on [Pypi](https://pythonhosted.org/pyleoclim/). 
+and on [Pypi](https://pythonhosted.org/pyleoclim/).
 
 ### <a name="req">Requirements</a>
 
