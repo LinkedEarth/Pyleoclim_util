@@ -4,6 +4,7 @@ setup.py
 pyleoclim/LipdUtils.py
 pyleoclim/Map.py
 pyleoclim/Plot.py
+pyleoclim/Spectral.py
 pyleoclim/Stats.py
 pyleoclim/SummaryPlots.py
 pyleoclim/Timeseries.py

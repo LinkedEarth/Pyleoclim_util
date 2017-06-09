@@ -58,5 +58,6 @@ setup(
     "seaborn>=0.7.0",
     "scikit-learn>=0.17.1"
     "progressbar2>=3.12.0"
+    "pathos>=0.2.0"
     ]
 )
