@@ -3,11 +3,11 @@
 [![PyPI](https://img.shields.io/badge/python-3.5-yellow.svg)]()
 [![license](https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg)]()
 
-#Pyleoclim
+# Pyleoclim
 
 **Python Package for the Analysis of Paleoclimate Data**
 
-**Table of contents**  
+**Table of contents**
 
 * [What is it?](#what)
 * [Installation](#install)
@@ -45,13 +45,13 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>
-0.2.1: Update package requirements  
-0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.  
-0.1.4: Rename function using camel case and consistency with LiPD utilities version 0.1.8.5    
-0.1.3: Compatible with LiPD utilities version 0.1.8.5.  
-Function openLiPD() renamed openLiPDs()  
-0.1.2: Compatible with LiPD utilities version 0.1.8.3. Uses basemap instead of cartopy  
-0.1.1: Freezes the package prior to version 0.1.8.2 of LiPD utilities  
+0.2.1: Update package requirements
+0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.
+0.1.4: Rename function using camel case and consistency with LiPD utilities version 0.1.8.5
+0.1.3: Compatible with LiPD utilities version 0.1.8.5.
+Function openLiPD() renamed openLiPDs()
+0.1.2: Compatible with LiPD utilities version 0.1.8.3. Uses basemap instead of cartopy
+0.1.1: Freezes the package prior to version 0.1.8.2 of LiPD utilities
 0.1.0: First release
 
 ### <a name = "install"> Installation </a>
@@ -90,6 +90,8 @@ and on [Pypi](https://pythonhosted.org/pyleoclim/).
 - seaborn>=0.7.0
 - scikit-learn>=0.17.1
 - progressbar2>=3.12.0
+- pathos>=0.2.0
+- tqdm>=4.14.0
 
 The installer will automatically check for the needed updates
 

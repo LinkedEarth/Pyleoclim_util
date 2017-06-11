@@ -14,6 +14,7 @@ import statsmodels.api as sm
 import scipy.optimize as optimize
 import scipy.signal as signal
 from scipy.stats import mstats
+from scipy.signal import get_window
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -91,12 +92,12 @@ def ar1_sim(n, p, g, sig):
     return red
 
 
-def psd_ar(var_noise, fs, ar_params, f_sampling):
+def psd_ar(var_noise, freqs, ar_params, f_sampling):
     ''' Return the theoretical power spectral density (PSD) of an autoregressive model
 
     Args:
         var_noise (float): the variance of the noise of the AR process
-        fs (array): vector of frequency
+        freqs (array): vector of frequency
         ar_params (array): autoregressive coefficients, not including zero-lag
         f_sampling (float): sampling frequency
 
@@ -106,9 +107,9 @@ def psd_ar(var_noise, fs, ar_params, f_sampling):
     '''
     p = np.size(ar_params)
 
-    tmp = np.ndarray(shape=(p, np.size(fs)), dtype=complex)
+    tmp = np.ndarray(shape=(p, np.size(freqs)), dtype=complex)
     for k in range(p):
-        tmp[k, :] = np.exp(-1j*2*np.pi*(k+1)*fs/f_sampling)
+        tmp[k, :] = np.exp(-1j*2*np.pi*(k+1)*freqs/f_sampling)
 
     psd = var_noise / np.absolute(1-np.sum(ar_params*tmp, axis=0))**2
 
@@ -160,11 +161,11 @@ def fBMsim(N=128, H=0.25):
     return xfBm
 
 
-def psd_fBM(fs, ts, H):
+def psd_fBM(freqs, ts, H):
     ''' Return the theoretical psd of a fBM
 
     Args:
-        fs (array): the ordinary frequency (Hz)
+        freqs (array): vector of frequency
         ts (array): the time axis of the time series
         H (float): Hurst index, should be in (0, 1)
 
@@ -175,11 +176,11 @@ def psd_fBM(fs, ts, H):
         Flandrin, P. On the spectrum of fractional Brownian motions. IEEE Transactions on Information Theory 35, 197–199 (1989).
 
     '''
-    nf = np.size(fs)
+    nf = np.size(freqs)
     psd = np.ndarray(shape=(nf))
     T = np.max(ts) - np.min(ts)
 
-    omega = 2 * np.pi * fs
+    omega = 2 * np.pi * freqs
 
     for k in range(nf):
         tmp = 2 * omega[k] * T
@@ -319,13 +320,13 @@ class WaveletAnalysis(object):
 
         return r
 
-    def wwz_basic(self, ys, ts, fs, tau, c=1/(8*np.pi**2), Neff=6, nproc=1, a_thres=10, standardize=False, detrending=False):
+    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, a_thres=10, standardize=False, detrending=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
             ys (array): a time series
             ts (array): time axis of the time series
-            fs (array): the ordinary frequency (Hz)
+            freqs (array): vector of frequency
             tau (array): the evenly-spaced time points
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
@@ -346,11 +347,11 @@ class WaveletAnalysis(object):
         self.assertPositiveInt(Neff)
 
         nt = np.size(tau)
-        nf = np.size(fs)
+        nf = np.size(freqs)
 
         pd_ys = self.preprocess(ys, standardize=standardize, detrending=detrending)
 
-        omega = 2*np.pi*fs
+        omega = 2*np.pi*freqs
 
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
@@ -400,13 +401,13 @@ class WaveletAnalysis(object):
 
         return wwa, phase
 
-    def wwz_nproc(self, ys, ts, fs, tau, c=1/(8*np.pi**2), Neff=6, nproc=2, a_thres=10, standardize=False, detrending=False):
+    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=2, a_thres=10, standardize=False, detrending=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
             ys (array): a time series
             ts (array): time axis of the time series
-            fs (array): the ordinary frequency (Hz)
+            freqs (array): vector of frequency
             tau (array): the evenly-spaced time points
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
@@ -424,11 +425,11 @@ class WaveletAnalysis(object):
         self.assertPositiveInt(Neff)
 
         nt = np.size(tau)
-        nf = np.size(fs)
+        nf = np.size(freqs)
 
         pd_ys = self.preprocess(ys, standardize=standardize, detrending=detrending)
 
-        omega = 2*np.pi*fs
+        omega = 2*np.pi*freqs
 
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
@@ -487,7 +488,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase
 
-    def make_coi(self, tau, Neff=6):
+    def make_coi(self, tau, Neff=3):
         ''' Return the cone of influence.
 
         Args:
@@ -522,14 +523,14 @@ class WaveletAnalysis(object):
 
         return coi
 
-    def wavelet_analysis(self, ys, ts, fs, tau, c=1/(8*np.pi**2), nMC=0, nproc=2, a_thres=10,
+    def wavelet_analysis(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), nMC=0, nproc=2, a_thres=10,
                          standardize=False, detrending=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
             ys (array): a time series
             ts (array): time axis of the time series
-            fs (array): the ordinary frequency (Hz)
+            freqs (array): vector of frequency
             tau (array): the evenly-spaced time points
             c: the decay constant
             nMC (int): the number of Monte-Carlo simulations
@@ -548,14 +549,14 @@ class WaveletAnalysis(object):
         assert isinstance(nMC, int) and nMC >= 0
 
         nt = np.size(tau)
-        nf = np.size(fs)
+        nf = np.size(freqs)
 
         if nproc == 1:
             wwz_func = self.wwz_basic
         else:
             wwz_func = self.wwz_nproc
 
-        wwa, phase = wwz_func(ys, ts, fs, tau, c=c, nproc=nproc, a_thres=a_thres,
+        wwa, phase = wwz_func(ys, ts, freqs, tau, c=c, nproc=nproc, a_thres=a_thres,
                               standardize=standardize, detrending=detrending)
 
         wwa_red = np.ndarray(shape=(nMC, nt, nf))
@@ -566,7 +567,7 @@ class WaveletAnalysis(object):
         if nMC >= 1:
             for i in tqdm(range(nMC), desc='Monte-Carlo simulations...'):
                 r = self.ar1_model(ts, tauest)
-                wwa_red[i, :, :], _ = wwz_func(r, ts, fs, tau, c=c, nproc=nproc, standardize=standardize, detrending=detrending)
+                wwa_red[i, :, :], _ = wwz_func(r, ts, freqs, tau, c=c, nproc=nproc, standardize=standardize, detrending=detrending)
 
             for j in range(nt):
                 for k in range(nf):
@@ -579,64 +580,53 @@ class WaveletAnalysis(object):
 
         return wwa, phase, AR1_q, coi
 
-    def wwa2psd(self, wwa, ts, fs, tau, c=1/(8*np.pi**2), Neff=6, weighted=True):
+    def wwa2psd(self, wwa, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3):
         ''' Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
         Args:
             wwa (array): the weighted wavelet amplitude.
             ts (array): time axis of the time series
-            fs (array): the ordinary frequency (Hz)
+            freqs (array): vector of frequency
             c (float): the decay constant
             tau (array): the evenly-spaced time points
             Neff (int): the threshold of the number of effective samples
-            weighted (bool): whether to perform weighting based on number of effective dof or not
 
         Returns:
             psd (array): power spectral density
 
         References:
-            1. [TC98] Torrence, C. & Compo, G. P. A Practical Guide to Wavelet Analysis.
-                Bull. Amer. Meteor. Soc. 79, 61–78 (1998).
+            1. Kirchner's C code
 
         '''
         nt = np.size(tau)
-        nf = np.size(fs)
+        nf = np.size(freqs)
 
         sum_power = np.zeros(nf)
         sum_eff = np.zeros(nf)
 
-        df = np.mean(np.diff(fs))
+        dt = np.mean(np.diff(ts))
+        omega = 2*np.pi*freqs
 
-        if weighted:
-            omega = 2*np.pi*fs
+        for k in range(nf):
+            sum_power[k] = 0
+            sum_eff[k] = 0
+            for j in range(nt):
+                dz = omega[k] * (ts - tau[j])
+                weights = np.exp(-c*dz**2)
+                sum_w = np.sum(weights)
+                Neff_loc = sum_w**2 / np.sum(weights**2)
 
-            for k in range(nf):
-                sum_power[k] = 0
-                sum_eff[k] = 0
-                for j in range(nt):
-                    dz = omega[k] * (ts - tau[j])
-                    weights = np.exp(-c*dz**2)
-                    sum_w = np.sum(weights)
-                    Neff_loc = sum_w**2 / np.sum(weights**2)
+                if Neff_loc > Neff:
+                    power = wwa[j, k]**2 * 0.5 * dt * Neff_loc  # adopted from Kirchner's C code at line 2378
+                    sum_power[k] = sum_power[k] + power*(Neff_loc - Neff)
+                    sum_eff[k] = sum_eff[k] + (Neff_loc - Neff)
 
-                    if Neff_loc > Neff:
-                        power = wwa[j, k]**2
-                        sum_power[k] = sum_power[k] + power*(Neff_loc - Neff)
-                        sum_eff[k] = sum_eff[k] + (Neff_loc - Neff)
-
-            psd = sum_power / sum_eff / df
-
-        else:
-            '''
-            global wavelet spectrum is according to Eq.(22) in TC98,
-            and psd should be global wavelet spectrum over df
-            '''
-            psd = np.mean(wwa**2, axis=0) / df
+        psd = sum_power / sum_eff
 
         return psd
 
-    def freq_vector(self, ts, nf=None, ofac=4, hifac=1):
-        ''' Return the frequency vector.
+    def freq_vector_lomb_scargle(self, ts, nf=None, ofac=4, hifac=1):
+        ''' Return the frequency vector based on the Lomb-Scargle algorithm.
 
         Args:
             ts (array): time axis of the time series
@@ -648,13 +638,13 @@ class WaveletAnalysis(object):
                           can be analyzed by the Lomb-Scargle algorithm and fnyq is the Nyquist frequency.
 
         Returns:
-            fs (array): the frequency vector
+            freqs (array): the frequency vector
 
         References:
             Trauth, M. H. MATLAB® Recipes for Earth Sciences. (Springer, 2015). pp 181.
 
         '''
-        assert ofac >= 1 and hifac <= 1, "`ofac` and `hifac` should be both >= 1"
+        assert ofac >= 1 and hifac <= 1, "`ofac` should be >= 1, and `hifac` should be <= 1"
 
         dt = np.mean(np.diff(ts))
         flo = (1/(2*dt)) / (np.size(ts)*ofac)
@@ -664,9 +654,34 @@ class WaveletAnalysis(object):
             df = flo
             nf = (fhi - flo) / df + 1
 
-        fs = np.linspace(flo, fhi, nf)
+        freqs = np.linspace(flo, fhi, nf)
 
-        return fs
+        return freqs
+
+    def freq_vector_welch(self, ts):
+        ''' Return the frequency vector based on the Lomb-Scargle algorithm.
+
+        Args:
+            ts (array): time axis of the time series
+
+        Returns:
+            freqs (array): the frequency vector
+
+        References:
+            https://github.com/scipy/scipy/blob/v0.14.0/scipy/signal/spectral.py
+
+        '''
+        nt = np.size(ts)
+        dt = np.mean(np.diff(ts))
+        fs = 1 / dt
+        if nt % 2 == 0:
+            n_freqs = nt//2 + 1
+        else:
+            n_freqs = (nt+1) // 2
+
+        freqs = np.arange(n_freqs) * fs / nt
+
+        return freqs
 
 
 class AliasFilter(object):
@@ -777,14 +792,14 @@ Interface for users
 '''
 
 
-def wwz(ys, ts, tau, fs=None, nf=None, ofac=4, hifac=1, c=1/(8*np.pi**2),
+def wwz(ys, ts, tau, freqs=None, c=1/(8*np.pi**2),
         nMC=0, nproc=2, a_thres=10, standardize=False, detrending=False):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence
 
     Args:
         ys (array): a time series
         ts (array): the time points
-        fs (array): the ordinary frequency (Hz)
+        freqs (array): vector of frequency
         tau (array): the evenly-spaced time points
         c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
         nMC (int): the number of Monte-Carlo simulations
@@ -796,29 +811,31 @@ def wwz(ys, ts, tau, fs=None, nf=None, ofac=4, hifac=1, c=1/(8*np.pi**2),
         wwa (array): the weighted wavelet amplitude.
         AR1_q (array): AR1 simulations
         coi (array): cone of influence
+        freqs (array): vector of frequency
 
     '''
     wa = WaveletAnalysis()
 
-    if fs is None:
-        fs = wa.freq_vector(ts, nf=nf, ofac=ofac, hifac=hifac)
+    if freqs is None:
+        freqs_welch = wa.freq_vector_welch(ts)
+        nf = np.size(freqs_welch)
+        freqs = freqs_welch[1:round(0.95*nf)]  # discard the first element 0 and the last 1% (they can be too large for WWZ)
 
-    wwa, phase, AR1_q, coi = wa.wavelet_analysis(ys, ts, fs, tau, c=c, nMC=nMC, nproc=nproc, a_thres=a_thres,
+    wwa, phase, AR1_q, coi = wa.wavelet_analysis(ys, ts, freqs, tau, c=c, nMC=nMC, nproc=nproc, a_thres=a_thres,
                                                  standardize=standardize, detrending=detrending)
 
-    return wwa, phase, AR1_q, coi, fs
+    return wwa, phase, AR1_q, coi, freqs
 
 
-def wwa2psd(wwa, ts, fs, tau, c=1/(8*np.pi**2), weighted=True, anti_alias=True, avgs=2):
+def wwa2psd(wwa, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, anti_alias=True, avgs=2):
     """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
     Args:
         wwa (array): the weighted wavelet amplitude.
         ts (array): the time points
-        fs (array): the ordinary frequency (Hz)
+        freqs (array): vector of frequency
         c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
         tau (array): the evenly-spaced time points
-        weighted (bool): whether to perform weighting based on number of effective dof or not
         anti_alias (bool): whether to apply anti-alias filter
         avgs (int): flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
                     OR from measurements averaged over each sampling interval (avgs==1)
@@ -829,20 +846,20 @@ def wwa2psd(wwa, ts, fs, tau, c=1/(8*np.pi**2), weighted=True, anti_alias=True, 
     """
     wa = WaveletAnalysis()
     af = AliasFilter()
-    psd = wa.wwa2psd(wwa, ts, fs, tau, c=c, weighted=weighted)
+    psd = wa.wwa2psd(wwa, ts, freqs, tau, c=c, Neff=Neff)
 
     if anti_alias:
         dt = np.mean(np.diff(ts))
         f_sampling = 1/dt
         alpha, filtered_pwr, model_pwer, aliased_pwr = af.alias_filter(
-            fs, psd, f_sampling, f_sampling*1e3, np.min(fs), avgs)
+            freqs, psd, f_sampling, f_sampling*1e3, np.min(freqs), avgs)
 
         psd = np.copy(filtered_pwr)
 
     return psd
 
 
-def plot_wwa(wwa, fs, tau, Neff=6, AR1_q=None, coi=None, levels=None, tick_range=None,
+def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None,
              yticks=None, ylim=None, figsize=[20, 8], clr_map='OrRd',
              cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, plot_cone=False,
              ):
@@ -850,7 +867,7 @@ def plot_wwa(wwa, fs, tau, Neff=6, AR1_q=None, coi=None, levels=None, tick_range
 
     Args:
         wwa (array): the weighted wavelet amplitude.
-        fs (array): the ordinary frequency (Hz)
+        freqs (array): vector of frequency
         tau (array): the evenly-spaced time points
         AR1_q (array): AR1 simulations
         coi (array): cone of influence
@@ -897,9 +914,9 @@ def plot_wwa(wwa, fs, tau, Neff=6, AR1_q=None, coi=None, levels=None, tick_range
     origin = 'lower'
 
     if levels is not None:
-        plt.contourf(tau, 1/fs, wwa.T, levels, cmap=clr_map, origin=origin)
+        plt.contourf(tau, 1/freqs, wwa.T, levels, cmap=clr_map, origin=origin)
     else:
-        plt.contourf(tau, 1/fs, wwa.T, cmap=clr_map, origin=origin)
+        plt.contourf(tau, 1/freqs, wwa.T, cmap=clr_map, origin=origin)
 
     plt.colorbar(drawedges=cbar_drawedges, orientation='vertical', fraction=frac, pad=pad,
                  ticks=tick_range)
@@ -925,7 +942,7 @@ def plot_wwa(wwa, fs, tau, Neff=6, AR1_q=None, coi=None, levels=None, tick_range
     if plot_signif:
         assert AR1_q is not None, "Please set values for `AR1_q`!"
         signif = wwa / AR1_q
-        plt.contour(tau, 1/fs, signif.T, [-99, 1])
+        plt.contour(tau, 1/freqs, signif.T, [-99, 1])
 
     if plot_cone:
         assert coi is not None, "Please set values for `coi`!"
@@ -954,13 +971,13 @@ def plot_wwadist(wwa):
     return fig
 
 
-def plot_psd(psd, fs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None,
+def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None,
              figsize=[20, 8], label=None):
     """ Plot the wavelet amplitude
 
     Args:
         psd (array): power spectral density
-        fs (array): the ordinary frequency (Hz)
+        freqs (array): vector of frequency
         xticks (list): ticks on x-axis
         xlim (list): limitations for x-axis
         figsize (list): the size for the figure
@@ -973,9 +990,9 @@ def plot_psd(psd, fs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim
     fig, ax = plt.subplots(figsize=figsize)
 
     if lmstyle is not None:
-        plt.plot(1/fs, psd, lmstyle, linewidth=linewidth, label=label)
+        plt.plot(1/freqs, psd, lmstyle, linewidth=linewidth, label=label)
     else:
-        plt.plot(1/fs, psd, linewidth=linewidth,  label=label)
+        plt.plot(1/freqs, psd, linewidth=linewidth,  label=label)
 
     plt.ylabel('Spectral Density')
     plt.xlabel('Period (years)')
