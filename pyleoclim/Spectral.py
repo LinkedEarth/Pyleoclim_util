@@ -14,14 +14,12 @@ import statsmodels.api as sm
 import scipy.optimize as optimize
 import scipy.signal as signal
 from scipy.stats import mstats
-from scipy.signal import get_window
 
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.ticker import ScalarFormatter
 
 from pathos.multiprocessing import ProcessingPool as Pool
-
 from tqdm import tqdm
 
 import warnings
@@ -320,7 +318,7 @@ class WaveletAnalysis(object):
 
         return r
 
-    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, a_thres=10, standardize=False, detrending=False):
+    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, standardize=False, detrending=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -390,18 +388,11 @@ class WaveletAnalysis(object):
                     ywave_3 = S_inv[2, 0]*weighted_phi1 + S_inv[2, 1]*weighted_phi2 + S_inv[2, 2]*weighted_phi3
 
                     wwa[j, k] = np.sqrt(ywave_2**2 + ywave_3**2)
-
-                    if wwa[j, k] > a_thres:
-                        wwa[j, k] = np.nan
-                        phase[j, k] = np.nan
-                    else:
-                        phase[j, k] = np.arctan2(ywave_2, ywave_3)
-
                     phase[j, k] = np.arctan2(ywave_2, ywave_3)
 
         return wwa, phase
 
-    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=2, a_thres=10, standardize=False, detrending=False):
+    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=2, standardize=False, detrending=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -412,7 +403,6 @@ class WaveletAnalysis(object):
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
             nproc (int): the number of processes for multiprocessing
-            a_thres (float): the threshold for amplitude
             standardize (bool): whether to standardize the time series or not
             detrending (bool): whether to detrend the time series or not
 
@@ -421,7 +411,6 @@ class WaveletAnalysis(object):
 
         '''
         assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
-        assert a_thres > 0, "The threshold for amplitude should be positive."
         self.assertPositiveInt(Neff)
 
         nt = np.size(tau)
@@ -467,12 +456,7 @@ class WaveletAnalysis(object):
                 ywave_3 = S_inv[2, 0]*weighted_phi1 + S_inv[2, 1]*weighted_phi2 + S_inv[2, 2]*weighted_phi3
 
                 wwa_1g = np.sqrt(ywave_2**2 + ywave_3**2)
-
-                if wwa_1g > a_thres:
-                    wwa_1g = np.nan
-                    phase_1g = np.nan
-                else:
-                    phase_1g = np.arctan2(ywave_2, ywave_3)
+                phase_1g = np.arctan2(ywave_2, ywave_3)
 
             return wwa_1g, phase_1g
 
@@ -523,7 +507,7 @@ class WaveletAnalysis(object):
 
         return coi
 
-    def wavelet_analysis(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), nMC=0, nproc=2, a_thres=10,
+    def wavelet_analysis(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), nMC=0, nproc=2,
                          standardize=False, detrending=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
@@ -535,7 +519,6 @@ class WaveletAnalysis(object):
             c: the decay constant
             nMC (int): the number of Monte-Carlo simulations
             nproc (int): the number of processes for multiprocessing
-            a_thres (float): the threshold for amplitude
             standardize (bool): whether to standardize the time series or not
             detrending (bool): whether to detrend the time series or not
 
@@ -556,7 +539,7 @@ class WaveletAnalysis(object):
         else:
             wwz_func = self.wwz_nproc
 
-        wwa, phase = wwz_func(ys, ts, freqs, tau, c=c, nproc=nproc, a_thres=a_thres,
+        wwa, phase = wwz_func(ys, ts, freqs, tau, c=c, nproc=nproc,
                               standardize=standardize, detrending=detrending)
 
         wwa_red = np.ndarray(shape=(nMC, nt, nf))
@@ -567,7 +550,8 @@ class WaveletAnalysis(object):
         if nMC >= 1:
             for i in tqdm(range(nMC), desc='Monte-Carlo simulations...'):
                 r = self.ar1_model(ts, tauest)
-                wwa_red[i, :, :], _ = wwz_func(r, ts, freqs, tau, c=c, nproc=nproc, standardize=standardize, detrending=detrending)
+                wwa_red[i, :, :], _ = wwz_func(
+                    r, ts, freqs, tau, c=c, nproc=nproc, standardize=standardize, detrending=detrending)
 
             for j in range(nt):
                 for k in range(nf):
@@ -683,6 +667,96 @@ class WaveletAnalysis(object):
 
         return freqs
 
+    def make_freq_vector(self, ts, percent=0.95):
+        ''' Make frequency vector
+
+        Args:
+            ts (array): time axis of the time series
+
+        Returns:
+            freqs (array): the frequency vector
+
+        '''
+        freqs_welch = self.freq_vector_welch(ts)
+        nf = np.size(freqs_welch)
+        freqs = freqs_welch[1:round(percent*nf)]  # discard the first element 0 and the tail (they can be too large for WWZ)
+
+        return freqs
+
+    def beta_estimation(self, psd, freqs, fmin, fmax):
+        ''' Estimate the power slope of a 1/f^beta process.
+
+        Args:
+            psd (array): the power spectral density
+            freqs (array): the frequency vector
+            fmin, fmax (float): the frequency range for beta estimation
+
+        Returns:
+            beta (float): the estimated slope
+            f_binned (array): binned frequency vector
+            psd_binned (array): binned power spectral density
+            Y_reg (array): prediction based on linear regression
+
+        '''
+        # frequency binning start
+        fminindx = np.where(freqs >= fmin)[0][0]
+        fmaxindx = np.where(freqs <= fmax)[0][-1]
+
+        logf = np.log(freqs)
+        logf_step = logf[fminindx+1] - logf[fminindx]
+        logf_start = logf[fminindx]
+        logf_end = logf[fmaxindx]
+        logf_binedges = np.arange(logf_start, logf_end+logf_step, logf_step)
+
+        n_intervals = np.size(logf_binedges)-1
+        logpsd_binned = np.empty(n_intervals)
+        logf_binned = np.empty(n_intervals)
+
+        logpsd = np.log(psd)
+
+        for i in range(n_intervals):
+            lb = logf_binedges[i]
+            ub = logf_binedges[i+1]
+            q = np.where((logf > lb) & (logf <= ub))
+
+            logpsd_binned[i] = np.nanmean(logpsd[q])
+            logf_binned[i] = (ub + lb) / 2
+
+        f_binned = np.exp(logf_binned)
+        psd_binned = np.exp(logpsd_binned)
+        # frequency binning end
+
+        # linear regression below
+        Y = np.log10(psd_binned)
+        X = np.log10(f_binned)
+        X_ex = sm.add_constant(X)
+
+        model = sm.OLS(Y, X_ex)
+        results = model.fit()
+
+        beta = -results.params[1]  # the slope we want
+
+        Y_reg = 10**model.predict(results.params)  # prediction based on linear regression
+
+        return beta, f_binned, psd_binned, Y_reg
+
+    def beta2HurstIndex(self, beta):
+        ''' Translate psd slope to Hurst index
+
+        Args:
+            beta (float): the estimated slope of a power spectral density curve
+
+        Returns:
+            H (float): Hurst index, should be in (0, 1)
+
+        References:
+            Equation 2 in http://www.bearcave.com/misl/misl_tech/wavelets/hurst/
+
+        '''
+        H = (beta-1)/2
+
+        return H
+
 
 class AliasFilter(object):
     '''Performing anti-alias filter on a psd
@@ -792,8 +866,7 @@ Interface for users
 '''
 
 
-def wwz(ys, ts, tau, freqs=None, c=1/(8*np.pi**2),
-        nMC=0, nproc=2, a_thres=10, standardize=False, detrending=False):
+def wwz(ys, ts, tau, freqs=None, c=1/(8*np.pi**2), nMC=0, nproc=2, standardize=False, detrending=False):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence
 
     Args:
@@ -804,7 +877,6 @@ def wwz(ys, ts, tau, freqs=None, c=1/(8*np.pi**2),
         c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
         nMC (int): the number of Monte-Carlo simulations
         nproc (int): the number of processes for multiprocessing
-        a_thres (float): the threshold for amplitude
         detrending (bool): whether detrend the time series or not
 
     Returns:
@@ -817,17 +889,15 @@ def wwz(ys, ts, tau, freqs=None, c=1/(8*np.pi**2),
     wa = WaveletAnalysis()
 
     if freqs is None:
-        freqs_welch = wa.freq_vector_welch(ts)
-        nf = np.size(freqs_welch)
-        freqs = freqs_welch[1:round(0.95*nf)]  # discard the first element 0 and the last 1% (they can be too large for WWZ)
+        freqs = wa.make_freq_vector(ts)
 
-    wwa, phase, AR1_q, coi = wa.wavelet_analysis(ys, ts, freqs, tau, c=c, nMC=nMC, nproc=nproc, a_thres=a_thres,
+    wwa, phase, AR1_q, coi = wa.wavelet_analysis(ys, ts, freqs, tau, c=c, nMC=nMC, nproc=nproc,
                                                  standardize=standardize, detrending=detrending)
 
     return wwa, phase, AR1_q, coi, freqs
 
 
-def wwa2psd(wwa, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, anti_alias=True, avgs=2):
+def wwa2psd(wwa, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, anti_alias=False, avgs=2):
     """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
     Args:
