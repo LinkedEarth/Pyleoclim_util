@@ -29,12 +29,33 @@ Evenly-spaced methods
 '''
 
 
+def is_evenly_spaced(ts):
+    ''' Check if a time axis is evenly spaced.
+
+    Args:
+        ts (array): the time axis of a time series
+
+    Returns:
+        check (bool): True - evenly spaced; False - unevenly spaced.
+
+    '''
+    dts = np.diff(ts)
+    dt_mean = np.mean(dts)
+
+    if ts is None or any(dt == dt_mean for dt in dts):
+        check = True
+    else:
+        check = False
+
+    return check
+
+
 def ar1_fit(ys, ts=None, standardize=False, detrending=False):
     ''' Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
 
     Args:
-        ys (array): vector of (float) numbers as a time series
-        ts (array): time axis of the time series
+        ys (array): the time series
+        ts (array): the time axis of that series
         standardize (bool): whether to standardize the time series or not
         detrending (bool): whether to detrend the time series or not
 
@@ -45,47 +66,51 @@ def ar1_fit(ys, ts=None, standardize=False, detrending=False):
 
     wa = WaveletAnalysis()
 
-    if ts is None:
+    if is_evenly_spaced(ts):
         g = wa.ar1_fit_evenly(ys, standardize=standardize, detrending=detrending)
-
     else:
-        dts = np.diff(ts)
-        dt_mean = np.mean(np.diff(ts))
-
-        unevenly_spaced = True
-        if any(dt == dt_mean for dt in dts):
-            unevenly_spaced = False
-
-        if unevenly_spaced:
-            g = wa.tau_estimation(ys, ts, standardize=standardize, detrending=detrending)
-        else:
-            g = wa.ar1_fit_evenly(ys, standardize=standardize, detrending=detrending)
+        g = wa.tau_estimation(ys, ts, standardize=standardize, detrending=detrending)
 
     return g
 
 
-def ar1_sim(n, p, g, sig):
+def ar1_sim(ys, n, p, ts=None, standardize=False, detrending=False):
     ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g
 
     Args:
+        ys (array): a time series
         n, p (int): dimensions as n rows by p columns
-        g (float): lag-1 autocorrelation coefficient
-        sig (float): the standard deviation of the original time series
+        ts (array): the time axis of that series
+        standardize (bool): whether to standardize the time series or not
+        detrending (bool): whether to detrend the time series or not
 
     Returns:
         red (matrix): n rows by p columns matrix of an AR1 process
 
     '''
-    # specify model parameters (statsmodel wants lag0 coefficents as unity)
-    ar = np.r_[1, -g]  # AR model parameter
-    ma = np.r_[1, 0.0]  # MA model parameters
-    sig_n = sig*np.sqrt(1-g**2)  # theoretical noise variance for red to achieve the same variance as X
-
     red = np.empty(shape=(n, p))  # declare array
 
-    # simulate AR(1) model for each column
-    for i in np.arange(p):
-        red[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n)
+    if is_evenly_spaced(ts):
+        g = ar1_fit(ys, ts=ts, standardize=standardize, detrending=detrending)
+        sig = np.std(ys)
+
+        # specify model parameters (statsmodel wants lag0 coefficents as unity)
+        ar = np.r_[1, -g]  # AR model parameter
+        ma = np.r_[1, 0.0]  # MA model parameters
+        sig_n = sig*np.sqrt(1-g**2)  # theoretical noise variance for red to achieve the same variance as X
+
+        # simulate AR(1) model for each column
+        for i in np.arange(p):
+            red[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n)
+
+    else:
+        tau_est = ar1_fit(ys, ts=ts, standardize=standardize, detrending=detrending)
+        wa = WaveletAnalysis()
+        for i in np.arange(p):
+            red[:, i] = wa.ar1_model(ts, tau_est, n=n)
+
+    if p == 1:
+        red = red[:, 0]
 
     return red
 
@@ -291,12 +316,13 @@ class WaveletAnalysis(object):
         for arg in args:
             assert isinstance(arg, int) and arg >= 1
 
-    def ar1_model(self, ts, tau):
+    def ar1_model(self, ts, tau, n=None):
         ''' Return a time series with the AR1 process
 
         Args:
             ts (array): time axis of the time series
             tau (float): the averaged persistence
+            n (int): the length of the AR1 process
 
         Returns:
             r (array): the AR1 time series
@@ -306,11 +332,15 @@ class WaveletAnalysis(object):
                 paleoclimatic time series. Computers & Geosciences 28, 421–426 (2002).
 
         '''
-        nt = np.size(ts)
-        r = np.zeros(nt)
+        if n is None:
+            n = np.size(ts)
+        else:
+            self.assertPositiveInt(n)
+
+        r = np.zeros(n)
 
         r[0] = 1
-        for i in range(1, nt):
+        for i in range(1, n):
             scaled_dt = (ts[i] - ts[i-1]) / tau
             err = np.random.normal(0, np.sqrt(1 - np.exp(-2*scaled_dt)), 1)
             rho = np.exp(-scaled_dt)
@@ -667,7 +697,7 @@ class WaveletAnalysis(object):
 
         return freqs
 
-    def make_freq_vector(self, ts, percent=0.95):
+    def make_freq_vector(self, ts, percent=1):
         ''' Make frequency vector
 
         Args:
@@ -866,18 +896,20 @@ Interface for users
 '''
 
 
-def wwz(ys, ts, tau, freqs=None, c=1/(8*np.pi**2), nMC=0, nproc=2, standardize=False, detrending=False):
+def wwz(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), nMC=0, nproc=2, standardize=False, detrending=False):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence
 
     Args:
         ys (array): a time series
         ts (array): the time points
-        freqs (array): vector of frequency
         tau (array): the evenly-spaced time points
+        freqs (array): vector of frequency
+        freqs_num_percent (array): when `freqs` is None, `freqs_num_percent` should be used to generate `freqs`
         c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
         nMC (int): the number of Monte-Carlo simulations
         nproc (int): the number of processes for multiprocessing
-        detrending (bool): whether detrend the time series or not
+        standardize (bool): whether to standardize the time series or not
+        detrending (bool): whether to detrend the time series or not
 
     Returns:
         wwa (array): the weighted wavelet amplitude.
@@ -889,7 +921,7 @@ def wwz(ys, ts, tau, freqs=None, c=1/(8*np.pi**2), nMC=0, nproc=2, standardize=F
     wa = WaveletAnalysis()
 
     if freqs is None:
-        freqs = wa.make_freq_vector(ts)
+        freqs = wa.make_freq_vector(ts, percent=freqs_num_percent)
 
     wwa, phase, AR1_q, coi = wa.wavelet_analysis(ys, ts, freqs, tau, c=c, nMC=nMC, nproc=nproc,
                                                  standardize=standardize, detrending=detrending)
@@ -925,6 +957,32 @@ def wwa2psd(wwa, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, anti_alias=False, avg
             freqs, psd, f_sampling, f_sampling*1e3, np.min(freqs), avgs)
 
         psd = np.copy(filtered_pwr)
+
+    return psd
+
+
+def wwz_psd(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), nproc=2,
+            standardize=False, detrending=False, Neff=3, anti_alias=False, avgs=2):
+    ''' Return the psd of a timeseires directly using wwz method.
+
+    Args:
+        ys (array): a time series
+        ts (array): the time points
+        tau (array): the evenly-spaced time points
+        freqs (array): vector of frequency
+        freqs_num_percent (array): when `freqs` is None, `freqs_num_percent` should be used to generate `freqs`
+        c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+        nproc (int): the number of processes for multiprocessing
+        standardize (bool): whether to standardize the time series or not
+        detrending (bool): whether to detrend the time series or not
+
+    Returns:
+        psd (array): power spectral density
+
+    '''
+    wwa, phase, AR1_q, coi, freqs = wwz(ys, ts, tau, freqs=freqs, freqs_num_percent=freqs_num_percent, c=c, nproc=nproc,
+                                        standardize=standardize, detrending=detrending)
+    psd = wwa2psd(wwa, ts, freqs, tau, c=c, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
 
     return psd
 
