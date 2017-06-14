@@ -89,7 +89,6 @@ and on [Pypi](https://pythonhosted.org/pyleoclim/).
 - statsmodel>=0.8.0
 - seaborn>=0.7.0
 - scikit-learn>=0.17.1
-- progressbar2>=3.12.0
 - pathos>=0.2.0
 - tqdm>=4.14.0
 
