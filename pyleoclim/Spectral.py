@@ -21,6 +21,7 @@ from matplotlib.ticker import ScalarFormatter
 
 from pathos.multiprocessing import ProcessingPool as Pool
 from tqdm import tqdm
+from functools import partial
 
 import warnings
 
@@ -364,6 +365,7 @@ class WaveletAnalysis(object):
 
         Returns:
             wwa (array): the weighted wavelet amplitude
+            phase (array): the weighted wavelet phase
 
         References:
             Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
@@ -438,6 +440,7 @@ class WaveletAnalysis(object):
 
         Returns:
             wwa (array): the weighted wavelet amplitude
+            phase (array): the weighted wavelet phase
 
         '''
         assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -502,6 +505,215 @@ class WaveletAnalysis(object):
 
         return wwa, phase
 
+    def weighted_prod(self, xs, ys, ts, omega, tau, c=1/(8*np.pi**2)):
+        ''' Perform the weighted scalar product of two vectors `xs` and `ys`.
+
+        Args:
+            xs (array): a vector
+            ys (array): another vector with the same length as `xs`
+            ts (array): the time axis of `xs` and `ys`
+            omega (float): one particular angular frequency
+            tau (float): one particular evenly-spaced time point, also known as time shift
+            c (float): the decay constant
+
+        Returns:
+            prod (array): the weighted scalar product
+
+        References:
+            Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+            Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
+                Nonlinear Processes in Geophysics 12, 345–352 (2005).
+        '''
+
+        dz = omega * (ts - tau)
+        weights = np.exp(-c*dz**2)
+
+        prod = np.sum(weights*xs*ys) / np.sum(weights)
+
+        return prod
+
+    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, standardize=False, detrending=False):
+        ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
+
+        Args:
+            ys (array): a time series
+            ts (array): time axis of the time series
+            freqs (array): vector of frequency
+            tau (array): the evenly-spaced time points
+            c (float): the decay constant
+            Neff (int): the threshold of the number of effective degree of freedom
+            nproc (int): fake argument, just for convenience
+            standardize (bool): whether to standardize the time series or not
+            detrending (bool): whether to detrend the time series or not
+
+        Returns:
+            wwa (array): the weighted wavelet amplitude
+            phase (array): the weighted wavelet phase
+
+        References:
+            Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+            Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
+                Nonlinear Processes in Geophysics 12, 345–352 (2005).
+
+        '''
+        assert nproc == 1, "wwz_basic() only supports nproc=1"
+        self.assertPositiveInt(Neff)
+
+        nt = np.size(tau)
+        nts = np.size(ts)
+        nf = np.size(freqs)
+
+        pd_ys = self.preprocess(ys, standardize=standardize, detrending=detrending)
+
+        omega = 2*np.pi*freqs
+
+        wwa = np.ndarray(shape=(nt, nf))
+        phase = np.ndarray(shape=(nt, nf))
+
+        for k in range(nf):
+            for j in range(nt):
+                dz = omega[k] * (ts - tau[j])
+                weights = np.exp(-c*dz**2)
+
+                sum_w = np.sum(weights)
+                Neff_loc = sum_w**2 / np.sum(weights**2)  # local number of effective dof
+
+                if Neff_loc <= Neff:
+                    wwa[j, k] = np.nan  # the amplitude cannot be estimated reliably when Neff_loc <= Neff
+                    phase[j, k] = np.nan
+                else:
+                    sin_basis = np.sin(omega[k]*ts)
+                    cos_basis = np.cos(omega[k]*ts)
+
+                    one_v = np.ones(nts)
+
+                    w_prod = partial(self.weighted_prod, ts=ts, omega=omega[k], tau=tau[j], c=c)
+
+                    numerator = 2 * (w_prod(sin_basis, cos_basis) - w_prod(sin_basis, one_v) * w_prod(cos_basis, one_v))
+
+                    denominator = w_prod(cos_basis, cos_basis)
+                    - w_prod(cos_basis, one_v)**2 - (w_prod(sin_basis, sin_basis) - w_prod(sin_basis, one_v))**2
+
+                    time_shift = np.arctan2(numerator, denominator) / (2*omega[k])
+
+                    sin_phi = np.sin(omega[k]*(ts - time_shift))
+                    cos_phi = np.cos(omega[k]*(ts - time_shift))
+
+                    a1 = 2*(
+                        np.cos(omega[k]*time_shift) * (
+                            w_prod(pd_ys, cos_phi) - w_prod(pd_ys, one_v) * w_prod(cos_basis, one_v)
+                        ) - np.sin(omega[k]*time_shift) * (
+                            w_prod(pd_ys, sin_phi) - w_prod(pd_ys, one_v) * w_prod(sin_basis, one_v)
+                        )
+                    )
+
+                    a2 = 2*(
+                        np.sin(omega[k]*time_shift) * (
+                            w_prod(pd_ys, cos_phi) - w_prod(pd_ys, one_v) * w_prod(cos_basis, one_v)
+                        ) + np.cos(omega[k]*time_shift) * (
+                            w_prod(pd_ys, sin_phi) - w_prod(pd_ys, one_v) * w_prod(sin_basis, one_v)
+                        )
+                    )
+
+                    wwa[j, k] = np.sqrt(a1**2 + a2**2)
+                    phase[j, k] = np.arctan2(a1, a2)
+
+        return wwa, phase
+
+    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=2, standardize=False, detrending=False):
+        ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
+
+        Args:
+            ys (array): a time series
+            ts (array): time axis of the time series
+            freqs (array): vector of frequency
+            tau (array): the evenly-spaced time points
+            c (float): the decay constant
+            Neff (int): the threshold of the number of effective degree of freedom
+            nproc (int): the number of processes for multiprocessing
+            standardize (bool): whether to standardize the time series or not
+            detrending (bool): whether to detrend the time series or not
+
+        Returns:
+            wwa (array): the weighted wavelet amplitude
+            phase (array): the weighted wavelet phase
+
+        '''
+        assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
+        self.assertPositiveInt(Neff)
+
+        nt = np.size(tau)
+        nts = np.size(ts)
+        nf = np.size(freqs)
+
+        pd_ys = self.preprocess(ys, standardize=standardize, detrending=detrending)
+
+        omega = 2*np.pi*freqs
+
+        wwa = np.ndarray(shape=(nt, nf))
+        phase = np.ndarray(shape=(nt, nf))
+
+        def wwa_1g(tau, omega):
+            dz = omega * (ts - tau)
+            weights = np.exp(-c*dz**2)
+
+            sum_w = np.sum(weights)
+            Neff_loc = sum_w**2 / np.sum(weights**2)
+
+            if Neff_loc <= Neff:
+                wwa_1g = np.nan  # the amplitude cannot be estimated reliably when Neff_loc <= Neff
+                phase_1g = np.nan
+            else:
+                sin_basis = np.sin(omega*ts)
+                cos_basis = np.cos(omega*ts)
+
+                one_v = np.ones(nts)
+
+                w_prod = partial(self.weighted_prod, ts=ts, omega=omega, tau=tau, c=c)
+
+                numerator = 2 * (w_prod(sin_basis, cos_basis) - w_prod(sin_basis, one_v) * w_prod(cos_basis, one_v))
+
+                denominator = w_prod(cos_basis, cos_basis)
+                - w_prod(cos_basis, one_v)**2 - (w_prod(sin_basis, sin_basis) - w_prod(sin_basis, one_v))**2
+
+                time_shift = np.arctan2(numerator, denominator) / (2*omega)
+
+                sin_phi = np.sin(omega*(ts - time_shift))
+                cos_phi = np.cos(omega*(ts - time_shift))
+
+                a1 = 2*(
+                    np.cos(omega*time_shift) * (
+                        w_prod(pd_ys, cos_phi) - w_prod(pd_ys, one_v) * w_prod(cos_basis, one_v)
+                    ) - np.sin(omega*time_shift) * (
+                        w_prod(pd_ys, sin_phi) - w_prod(pd_ys, one_v) * w_prod(sin_basis, one_v)
+                    )
+                )
+
+                a2 = 2*(
+                    np.sin(omega*time_shift) * (
+                        w_prod(pd_ys, cos_phi) - w_prod(pd_ys, one_v) * w_prod(cos_basis, one_v)
+                    ) + np.cos(omega*time_shift) * (
+                        w_prod(pd_ys, sin_phi) - w_prod(pd_ys, one_v) * w_prod(sin_basis, one_v)
+                    )
+                )
+
+                wwa_1g = np.sqrt(a1**2 + a2**2)
+                phase_1g = np.arctan2(a1, a2)
+
+            return wwa_1g, phase_1g
+
+        tf_mesh = np.meshgrid(tau, omega)
+        list_of_grids = list(zip(*(grid.flat for grid in tf_mesh)))
+        tau_grids, omega_grids = zip(*list_of_grids)
+
+        with Pool(nproc) as pool:
+            res = pool.map(wwa_1g, tau_grids, omega_grids)
+            res_array = np.asarray(res)
+            wwa = res_array[:, 0].reshape((np.size(omega), np.size(tau))).T
+            phase = res_array[:, 1].reshape((np.size(omega), np.size(tau))).T
+
+        return wwa, phase
+
     def make_coi(self, tau, Neff=3):
         ''' Return the cone of influence.
 
@@ -537,8 +749,8 @@ class WaveletAnalysis(object):
 
         return coi
 
-    def wavelet_analysis(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), nMC=0, nproc=2,
-                         standardize=False, detrending=False):
+    def wavelet_analysis(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nMC=0, nproc=2,
+                         standardize=False, detrending=False, method='Kirchner'):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -551,6 +763,8 @@ class WaveletAnalysis(object):
             nproc (int): the number of processes for multiprocessing
             standardize (bool): whether to standardize the time series or not
             detrending (bool): whether to detrend the time series or not
+            method (str): 'Foster' - the original WWZ method;
+                          'Kirchner' - the method Kirchner adapted from Foster
 
         Returns:
             wwa (array): the weighted wavelet amplitude.
@@ -565,11 +779,17 @@ class WaveletAnalysis(object):
         nf = np.size(freqs)
 
         if nproc == 1:
-            wwz_func = self.wwz_basic
+            if method == 'Foster':
+                wwz_func = self.wwz_basic
+            else:
+                wwz_func = self.kirchner_basic
         else:
-            wwz_func = self.wwz_nproc
+            if method == 'Foster':
+                wwz_func = self.wwz_nproc
+            else:
+                wwz_func = self.kirchner_nproc
 
-        wwa, phase = wwz_func(ys, ts, freqs, tau, c=c, nproc=nproc,
+        wwa, phase = wwz_func(ys, ts, freqs, tau, Neff=Neff, c=c, nproc=nproc,
                               standardize=standardize, detrending=detrending)
 
         wwa_red = np.ndarray(shape=(nMC, nt, nf))
@@ -581,7 +801,7 @@ class WaveletAnalysis(object):
             for i in tqdm(range(nMC), desc='Monte-Carlo simulations...'):
                 r = self.ar1_model(ts, tauest)
                 wwa_red[i, :, :], _ = wwz_func(
-                    r, ts, freqs, tau, c=c, nproc=nproc, standardize=standardize, detrending=detrending)
+                    r, ts, freqs, tau, c=c, Neff=Neff, nproc=nproc, standardize=standardize, detrending=detrending)
 
             for j in range(nt):
                 for k in range(nf):
@@ -631,7 +851,7 @@ class WaveletAnalysis(object):
                 Neff_loc = sum_w**2 / np.sum(weights**2)
 
                 if Neff_loc > Neff:
-                    power = wwa[j, k]**2 * 0.5 * dt * Neff_loc  # adopted from Kirchner's C code at line 2378
+                    power = wwa[j, k]**2 * 0.5 * dt * Neff_loc  # adapted from Kirchner's C code at line 2378
                     sum_power[k] = sum_power[k] + power*(Neff_loc - Neff)
                     sum_eff[k] = sum_eff[k] + (Neff_loc - Neff)
 
@@ -896,7 +1116,8 @@ Interface for users
 '''
 
 
-def wwz(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), nMC=0, nproc=2, standardize=False, detrending=False):
+def wwz(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), Neff=3, nMC=0, nproc=2,
+        standardize=False, detrending=False, method='Kirchner'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence
 
     Args:
@@ -906,10 +1127,13 @@ def wwz(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), nMC=0, n
         freqs (array): vector of frequency
         freqs_num_percent (array): when `freqs` is None, `freqs_num_percent` should be used to generate `freqs`
         c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+        Neff (int): effective number of points
         nMC (int): the number of Monte-Carlo simulations
         nproc (int): the number of processes for multiprocessing
         standardize (bool): whether to standardize the time series or not
         detrending (bool): whether to detrend the time series or not
+        method (str): 'Foster' - the original WWZ method;
+                      'Kirchner' - the method Kirchner adapted from Foster
 
     Returns:
         wwa (array): the weighted wavelet amplitude.
@@ -923,8 +1147,8 @@ def wwz(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), nMC=0, n
     if freqs is None:
         freqs = wa.make_freq_vector(ts, percent=freqs_num_percent)
 
-    wwa, phase, AR1_q, coi = wa.wavelet_analysis(ys, ts, freqs, tau, c=c, nMC=nMC, nproc=nproc,
-                                                 standardize=standardize, detrending=detrending)
+    wwa, phase, AR1_q, coi = wa.wavelet_analysis(ys, ts, freqs, tau, c=c, Neff=Neff, nMC=nMC, nproc=nproc,
+                                                 standardize=standardize, detrending=detrending, method=method)
 
     return wwa, phase, AR1_q, coi, freqs
 
@@ -937,6 +1161,7 @@ def wwa2psd(wwa, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, anti_alias=False, avg
         ts (array): the time points
         freqs (array): vector of frequency
         c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+        Neff (int): effective number of points
         tau (array): the evenly-spaced time points
         anti_alias (bool): whether to apply anti-alias filter
         avgs (int): flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
@@ -988,7 +1213,7 @@ def wwz_psd(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), npro
 
 
 def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None,
-             yticks=None, ylim=None, figsize=[20, 8], clr_map='OrRd',
+             yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
              cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, plot_cone=False,
              ):
     """ Plot the wavelet amplitude
@@ -997,12 +1222,14 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
         wwa (array): the weighted wavelet amplitude.
         freqs (array): vector of frequency
         tau (array): the evenly-spaced time points
+        Neff (int): effective number of points
         AR1_q (array): AR1 simulations
         coi (array): cone of influence
         levels (array): levels of values to plot
         tick_range (array): levels of ticks to show on the colorbar
         yticks (list): ticks on y-axis
         ylim (list): limitations for y-axis
+        xticks (list): ticks on x-axis
         figsize (list): the size for the figure
         clr_map (str): the name of the colormap
         cbar_drawedges (bool): whether to draw edges on the colorbar or not
@@ -1021,10 +1248,7 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
 
     q95 = mstats.mquantiles(wwa, 0.95, alphap=0.5, betap=0.5)
 
-    if levels is not None:
-        levels = levels
-
-    else:
+    if levels is None:
         if np.nanmax(wwa) > 2*q95:
             warnings.warn("There are outliers in the input amplitudes, " +
                           "and the `levels` have been set so that the outpliers will be ignored! " +
@@ -1033,9 +1257,6 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
 
             max_level = np.round(2*q95, decimals=1)
             levels = np.linspace(0, max_level, 11)
-
-    if tick_range is not None:
-        tick_range = tick_range
 
     frac = 0.15
     pad = 0.05
@@ -1052,13 +1273,14 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
     plt.yscale('log', nonposy='clip')
 
     if yticks is not None:
-        yticks = yticks
         plt.yticks(yticks)
+
+    if xticks is not None:
+        plt.xticks(xticks, xlabels)
 
     ax.get_yaxis().set_major_formatter(ScalarFormatter())
 
     if ylim is not None:
-        ylim = ylim
         plt.ylim(ylim)
 
     else:
@@ -1070,7 +1292,8 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
     if plot_signif:
         assert AR1_q is not None, "Please set values for `AR1_q`!"
         signif = wwa / AR1_q
-        plt.contour(tau, 1/freqs, signif.T, [-99, 1])
+        #  plt.contour(tau, 1/freqs, signif.T, [-99, 1])
+        plt.contourf(tau, 1/freqs, signif.T, [-99, 1], colors='k', alpha=0.1)
 
     if plot_cone:
         assert coi is not None, "Please set values for `coi`!"
