@@ -41,7 +41,6 @@ setup(
     license='GNU Public',
     description='A Python package for paleoclimate data analysis',
     long_description=long_description,
-<<<<<<< Updated upstream
     author='Deborah Khider',
     author_email='dkhider@gmail.com',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
@@ -59,26 +58,5 @@ setup(
         "seaborn>=0.7.0",
         "scikit-learn>=0.17.1",
         "pathos>=0.2.0",
-        "tqdm>=4.14.0",
-=======
-    author = 'Deborah Khider',
-    author_email = 'dkhider@gmail.com',
-    url = 'https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
-    download_url = 'https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.2.1',
-    keywords = ['Paleoclimate, Data Analysis'],
-    classifiers = [],
-    install_requires = [
-    "LiPD>=0.2.0.2, <0.2.0.3",
-    "pandas>=0.19.2",
-    "numpy>=1.12.1",
-    "matplotlib>=2.0.0",
-    "basemap>=1.0.7",
-    "scipy>=0.19.0",
-    "statsmodels>=0.8.0",
-    "seaborn>=0.7.0",
-    "scikit-learn>=0.17.1"
-    "pathos>=0.2.0",
-    "tqmd>=4.14.0"
->>>>>>> Stashed changes
-    ]
+        "tqdm>=4.14.0"]
 )
