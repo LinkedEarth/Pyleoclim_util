@@ -631,6 +631,8 @@ class WaveletAnalysis(object):
 
         omega = 2*np.pi*freqs
 
+        from . import f2py_wwz as f2py
+        
         wwa, phase, Neffs = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
         undef = -99999.
         wwa[wwa == undef] = np.nan
