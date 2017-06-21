@@ -22,8 +22,6 @@ from matplotlib.ticker import ScalarFormatter
 from pathos.multiprocessing import ProcessingPool as Pool
 from tqdm import tqdm
 
-from . import f2py_wwz as f2py
-
 import warnings
 
 
