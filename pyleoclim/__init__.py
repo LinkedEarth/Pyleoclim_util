@@ -753,6 +753,49 @@ def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
     
     return interp_age, interp_values
 
+def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
+    """ Centers and normalizes the paleoData values of a  given time series. 
+    
+    Constant or nearly constant time series not rescaled.
+
+    Args:
+        x (array): vector of (real) numbers as a time series, NaNs allowed
+        scale (real): a scale factor used to scale a record to a match a given variance
+        axis (int or None): axis along which to operate, if None, compute over the whole array
+        ddof (int): degress of freedom correction in the calculation of the standard deviation
+        eps (real): a threshold to determine if the standard deviation is too close to zero
+
+    Returns:
+        - z (array): the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed \n
+        - mu (real): the mean of the original time series, E[X] \n
+        - sig (real): the standard deviation of the original time series, std[X] \n
+
+    References:
+        1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
+        2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
+
+    @author: fzhu
+    """
+    if not 'timeseries_list' in globals():
+        openLipds()
+    
+    # get a timeseries if none provided     
+    if not timeseries:
+        timeseries = LipdUtils.getTs(timeseries_list)
+        
+    # get the values
+    y = np.array(timeseries['paleoData_values'], dtype = 'float64') 
+    
+    # Remove NaNs
+    index = np.where(~np.isnan(y))[0]
+    y = y[index]
+    
+    #Standardize
+    z, mu, sig = Timeseries.standardize(y,scale=1,axis=None,ddof=0,eps=1e-3)
+    
+    return z, mu, sig
+    
+
 """
 Wavelet analysis
 """
