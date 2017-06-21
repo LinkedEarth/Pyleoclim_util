@@ -2,13 +2,22 @@ from setuptools import setup, find_packages
 import os
 import sys
 import io
-import path
 
 version = '0.2.1'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
     os.system('pandoc README.md -f markdown -t rst -s -o README.txt')
+
+# Check the version to make sure it's supported
+if sys.version_info.minor == 4:
+    f2py_wwz_filename = './pyleoclim/f2py_wwz.so'
+elif sys.version_info.minor == 5:
+    f2py_wwz_filename = './pyleoclim/f2py_wwz.cpython-35m-darwin.so'
+elif sys.version_info.minor == 6:
+    f2py_wwz_filename = './pyleoclim/f2py_wwz.cpython-36m-darwin.so'
+else:
+    sys.exit('Your python version is not supported!')    
 
 readme_file = io.open('README.txt', encoding='utf-8')
 
@@ -37,6 +46,7 @@ elif sys.argv[-1] == 'publishtest':
 setup(
     name='pyleoclim',
     packages=find_packages(),
+    package_data={'pyleoclim': [f2py_wwz_filename]},
     version=version,
     license='GNU Public',
     description='A Python package for paleoclimate data analysis',
@@ -48,7 +58,7 @@ setup(
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
     install_requires=[
-        "LiPD>=0.2.0.2, <0.2.0.3",
+        "LiPD>=0.2.0.2",
         "pandas>=0.19.2",
         "numpy>=1.12.1",
         "matplotlib>=2.0.0",

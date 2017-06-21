@@ -56,7 +56,7 @@ Function openLiPD() renamed openLiPDs()
 
 ### <a name = "install"> Installation </a>
 
-Python v3.5 is required. Not fully compatible with Python v3.6
+Python v3.4+ is required. Tested with Python v3.5
 
 Pyleoclim is published through PyPi and easily installed via `pip`
 ```

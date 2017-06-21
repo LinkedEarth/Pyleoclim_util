@@ -22,6 +22,8 @@ from matplotlib.ticker import ScalarFormatter
 from pathos.multiprocessing import ProcessingPool as Pool
 from tqdm import tqdm
 
+from . import f2py_wwz as f2py
+
 import warnings
 
 
@@ -242,6 +244,7 @@ class WaveletAnalysis(object):
         r[0] = 1
         for i in range(1, n):
             scaled_dt = (ts[i] - ts[i-1]) / tau
+            print(scaled_dt)
             err = np.random.normal(0, np.sqrt(1 - np.exp(-2*scaled_dt)), 1)
             rho = np.exp(-scaled_dt)
             r[i] = r[i-1]*rho + err
@@ -628,9 +631,7 @@ class WaveletAnalysis(object):
 
         omega = 2*np.pi*freqs
 
-        from f2py_wwz import f2py_wwz as f2py
-
-        wwa, phase, Neffs = f2py.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
+        wwa, phase, Neffs = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
         undef = -99999.
         wwa[wwa == undef] = np.nan
         phase[phase == undef] = np.nan
@@ -1167,9 +1168,10 @@ def wwa2psd(wwa, ts, freqs, tau, Neffs, c=1/(8*np.pi**2), Neff=3, anti_alias=Fal
     Args:
         wwa (array): the weighted wavelet amplitude.
         ts (array): the time points
-        freqs (array): vector of frequency
+        freqs (array): vector of frequency from wwz 
         c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
-        Neff (int): effective number of points
+        Neffs (array):  the matrix of effective number of points in the time-scale coordinates obtained from wwz from wwz
+        Neff (int): the threshold of the number of effective samples
         tau (array): the evenly-spaced time points
         anti_alias (bool): whether to apply anti-alias filter
         avgs (int): flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
@@ -1194,7 +1196,7 @@ def wwa2psd(wwa, ts, freqs, tau, Neffs, c=1/(8*np.pi**2), Neff=3, anti_alias=Fal
     return psd
 
 
-def wwz_psd(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), nproc=8,
+def wwz_psd(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1e-3, nproc=8,
             standardize=False, detrend=False, Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
     ''' Return the psd of a timeseires directly using wwz method.
 
@@ -1204,7 +1206,7 @@ def wwz_psd(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), npro
         tau (array): the evenly-spaced time points
         freqs (array): vector of frequency
         freqs_num_percent (array): when `freqs` is None, `freqs_num_percent` should be used to generate `freqs`
-        c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+        c (float): the decay constant, the default value 1e-3 is good for most of the cases
         nproc (int): the number of processes for multiprocessing
         standardize (bool): whether to standardize the time series or not
         detrend (bool): whether to detrend the time series or not

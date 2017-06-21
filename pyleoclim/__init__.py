@@ -26,6 +26,7 @@ from pyleoclim import Spectral
 from pyleoclim import Stats
 from pyleoclim import Timeseries
 
+
 """
 Get the LiPD files and set a few global variables
 """
@@ -53,10 +54,10 @@ def openLipds(path="",ts_list=""):
     global lipd_path
     global timeseries_list
     if not path and not ts_list:
-        lipd_path = lpd.readLipds()
+        lipd_path = lpd.readLipd()
         timeseries_list = lpd.extractTs()
     elif not ts_list:
-        lipd_path = lpd.readLipds(path)
+        lipd_path = lpd.readLipd(path)
         timeseries_list = lpd.extractTs()
     elif not path:
         sys.exit("If specifying a list of timeseries, also need to specify path")
@@ -601,9 +602,9 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
                     - 'isospectral' (default): phase randomization of original
                     inputs.
                 The T-test is parametric test, hence cheap but usually wrong 
-                    except in idyllic circumstances.
+                except in idyllic circumstances.
                 The others are non-parametric, but their computational 
-                    requirements scales with nsim.
+                requirements scales with nsim.
             alpha (float): significance level for critical value estimation. Default is 0.05
 
         Returns:
@@ -751,3 +752,8 @@ def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
                                                   start= start, end=end)
     
     return interp_age, interp_values
+
+"""
+Wavelet analysis
+"""
+
