@@ -13,11 +13,27 @@ readme_file = io.open('README.txt', encoding='utf-8')
 
 # Choose the right shared library to copy
 if sys.version_info.minor == 4:
-    f2py_wwz_filename = 'f2py_wwz.so'
+    if sys.platform.startswith('darwin'):
+        f2py_wwz_filename = 'f2py_wwz.so'
+    else:
+        f2py_wwz_filename = ''
+
 elif sys.version_info.minor == 5:
-    f2py_wwz_filename = 'f2py_wwz.cpython-35m-darwin.so'
+    if sys.platform.startswith('darwin'):
+        f2py_wwz_filename = 'f2py_wwz.cpython-35m-darwin.so'
+    elif sys.platform.startswith('linux'):
+        f2py_wwz_filename = 'f2py_wwz.cpython-35m-x86_64-linux-gnu.so'
+    else:
+        f2py_wwz_filename = ''
+
 elif sys.version_info.minor == 6:
-    f2py_wwz_filename = 'f2py_wwz.cpython-36m-darwin.so'
+    if sys.platform.startswith('darwin'):
+        f2py_wwz_filename = 'f2py_wwz.cpython-36m-darwin.so'
+    elif sys.platform.startswith('linux'):
+        f2py_wwz_filename = 'f2py_wwz.cpython-36m-x86_64-linux-gnu.so'
+    else:
+        f2py_wwz_filename = ''
+
 else:
     sys.exit('Your python version is not supported!')
 

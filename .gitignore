@@ -1,6 +1,5 @@
-./build
-./pyleoclim.egg-info
-./.ipynb_checkpoints
+build
+pyleoclim.egg-info
+.ipynb_checkpoints
 .ropeproject/
 .DS_Store
-
