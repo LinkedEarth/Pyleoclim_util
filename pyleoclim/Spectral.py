@@ -204,7 +204,7 @@ class WaveletAnalysis(object):
         def ar1_fun(a):
             return np.sum((pd_ys[1:] - pd_ys[:-1]*a**dt)**2)
 
-        a_est = optimize.minimize_scalar(ar1_fun, method='brent').x
+        a_est = optimize.minimize_scalar(ar1_fun, bounds=[0, 1], method='bounded').x
 
         tau_est = -1 / np.log(a_est)
 
@@ -242,7 +242,6 @@ class WaveletAnalysis(object):
         r[0] = 1
         for i in range(1, n):
             scaled_dt = (ts[i] - ts[i-1]) / tau
-            print(scaled_dt)
             err = np.random.normal(0, np.sqrt(1 - np.exp(-2*scaled_dt)), 1)
             rho = np.exp(-scaled_dt)
             r[i] = r[i-1]*rho + err
@@ -630,8 +629,8 @@ class WaveletAnalysis(object):
         omega = 2*np.pi*freqs
 
         from . import f2py_wwz as f2py
-        
         wwa, phase, Neffs = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
+
         undef = -99999.
         wwa[wwa == undef] = np.nan
         phase[phase == undef] = np.nan
@@ -729,7 +728,7 @@ class WaveletAnalysis(object):
         if nMC >= 1:
             for i in tqdm(range(nMC), desc='Monte-Carlo simulations...'):
                 r = self.ar1_model(ts, tauest)
-                wwa_red[i, :, :], _ = wwz_func(
+                wwa_red[i, :, :], _, _ = wwz_func(
                     r, ts, freqs, tau, c=c, Neff=Neff, nproc=nproc, standardize=standardize, detrend=detrend)
 
             for j in range(nt):
@@ -1128,8 +1127,8 @@ def wwz(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), Neff=3, 
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence
 
     Args:
-        ys (array): a time series
-        ts (array): the time points
+        ys (array): a time series, NaNs will be deleted automatically
+        ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
         tau (array): the evenly-spaced time points
         freqs (array): vector of frequency
         freqs_num_percent (array): when `freqs` is None, `freqs_num_percent` should be used to generate `freqs`
@@ -1153,6 +1152,10 @@ def wwz(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), Neff=3, 
     '''
     wa = WaveletAnalysis()
 
+    # delete NaNs if there is any
+    ys = ys[~np.isnan(ys)]
+    ts = ts[~np.isnan(ts)]
+
     if freqs is None:
         freqs = wa.make_freq_vector(ts, percent=freqs_num_percent)
 
@@ -1168,7 +1171,7 @@ def wwa2psd(wwa, ts, freqs, tau, Neffs, c=1/(8*np.pi**2), Neff=3, anti_alias=Fal
     Args:
         wwa (array): the weighted wavelet amplitude.
         ts (array): the time points
-        freqs (array): vector of frequency from wwz 
+        freqs (array): vector of frequency from wwz
         c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
         Neffs (array):  the matrix of effective number of points in the time-scale coordinates obtained from wwz from wwz
         Neff (int): the threshold of the number of effective samples
@@ -1201,8 +1204,8 @@ def wwz_psd(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1e-3, nproc=8,
     ''' Return the psd of a timeseires directly using wwz method.
 
     Args:
-        ys (array): a time series
-        ts (array): the time points
+        ys (array): a time series, NaNs will be deleted automatically
+        ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
         tau (array): the evenly-spaced time points
         freqs (array): vector of frequency
         freqs_num_percent (array): when `freqs` is None, `freqs_num_percent` should be used to generate `freqs`
@@ -1219,6 +1222,10 @@ def wwz_psd(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1e-3, nproc=8,
         freqs (array): vector of frequency
 
     '''
+    # delete NaNs if there is any
+    ys = ys[~np.isnan(ys)]
+    ts = ts[~np.isnan(ts)]
+
     wwa, phase, AR1_q, coi, freqs, Neffs = wwz(ys, ts, tau, freqs=freqs, freqs_num_percent=freqs_num_percent, c=c, nproc=nproc,
                                                standardize=standardize, detrend=detrend, method=method)
 
