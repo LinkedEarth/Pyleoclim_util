@@ -1,4 +1,4 @@
-LiPD>=0.2.0.2, <0.2.0.3
+LiPD>=0.2.0.2
 pandas>=0.19.2
 numpy>=1.12.1
 matplotlib>=2.0.0

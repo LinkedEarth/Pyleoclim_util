@@ -9,25 +9,15 @@ version = '0.2.1'
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
     os.system('pandoc README.md -f markdown -t rst -s -o README.txt')
 
-# Check the version to make sure it's supported
-if sys.version_info.minor == 4:
-    f2py_wwz_filename = './pyleoclim/f2py_wwz.so'
-elif sys.version_info.minor == 5:
-    f2py_wwz_filename = './pyleoclim/f2py_wwz.cpython-35m-darwin.so'
-elif sys.version_info.minor == 6:
-    f2py_wwz_filename = './pyleoclim/f2py_wwz.cpython-36m-darwin.so'
-else:
-    sys.exit('Your python version is not supported!')    
-
 readme_file = io.open('README.txt', encoding='utf-8')
 
 # Choose the right shared library to copy
 if sys.version_info.minor == 4:
-    f2py_wwz_filename = './pyleoclim/f2py_wwz.so'
+    f2py_wwz_filename = 'f2py_wwz.so'
 elif sys.version_info.minor == 5:
-    f2py_wwz_filename = './pyleoclim/f2py_wwz.cpython-35m-darwin.so'
+    f2py_wwz_filename = 'f2py_wwz.cpython-35m-darwin.so'
 elif sys.version_info.minor == 6:
-    f2py_wwz_filename = './pyleoclim/f2py_wwz.cpython-36m-darwin.so'
+    f2py_wwz_filename = 'f2py_wwz.cpython-36m-darwin.so'
 else:
     sys.exit('Your python version is not supported!')
 
@@ -56,7 +46,9 @@ elif sys.argv[-1] == 'publishtest':
 setup(
     name='pyleoclim',
     packages=find_packages(),
+    package_dir={'pyleoclim': './pyleoclim'},
     package_data={'pyleoclim': [f2py_wwz_filename]},
+    zip_safe=False,
     version=version,
     license='GNU Public',
     description='A Python package for paleoclimate data analysis',
