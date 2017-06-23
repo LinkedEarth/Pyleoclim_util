@@ -3,39 +3,13 @@ import os
 import sys
 import io
 
-version = '0.2.1'
+version = '0.2.2'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
     os.system('pandoc README.md -f markdown -t rst -s -o README.txt')
 
 readme_file = io.open('README.txt', encoding='utf-8')
-
-# Choose the right shared library to copy
-if sys.version_info.minor == 4:
-    if sys.platform.startswith('darwin'):
-        f2py_wwz_filename = 'f2py_wwz.so'
-    else:
-        f2py_wwz_filename = ''
-
-elif sys.version_info.minor == 5:
-    if sys.platform.startswith('darwin'):
-        f2py_wwz_filename = 'f2py_wwz.cpython-35m-darwin.so'
-    elif sys.platform.startswith('linux'):
-        f2py_wwz_filename = 'f2py_wwz.cpython-35m-x86_64-linux-gnu.so'
-    else:
-        f2py_wwz_filename = ''
-
-elif sys.version_info.minor == 6:
-    if sys.platform.startswith('darwin'):
-        f2py_wwz_filename = 'f2py_wwz.cpython-36m-darwin.so'
-    elif sys.platform.startswith('linux'):
-        f2py_wwz_filename = 'f2py_wwz.cpython-36m-x86_64-linux-gnu.so'
-    else:
-        f2py_wwz_filename = ''
-
-else:
-    sys.exit('Your python version is not supported!')
 
 # Fallback long_description in case errors with readme file.
 long_description = "Welcome to Pyleoclim. Please reference the README file in the package for information"
@@ -62,9 +36,6 @@ elif sys.argv[-1] == 'publishtest':
 setup(
     name='pyleoclim',
     packages=find_packages(),
-    package_dir={'pyleoclim': './pyleoclim'},
-    package_data={'pyleoclim': [f2py_wwz_filename]},
-    zip_safe=False,
     version=version,
     license='GNU Public',
     description='A Python package for paleoclimate data analysis',
@@ -72,12 +43,12 @@ setup(
     author='Deborah Khider',
     author_email='dkhider@gmail.com',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
-    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.2.1',
+    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.2.2',
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
     install_requires=[
         "LiPD>=0.2.0.2",
-        "pandas>=0.19.2",
+        "pandas<=0.19.2",
         "numpy>=1.12.1",
         "matplotlib>=2.0.0",
         "basemap>=1.0.7",
@@ -85,6 +56,5 @@ setup(
         "statsmodels>=0.8.0",
         "seaborn>=0.7.0",
         "scikit-learn>=0.17.1",
-        "pathos>=0.2.0",
         "tqdm>=4.14.0"]
 )

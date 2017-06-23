@@ -40,7 +40,7 @@
 
 
 \title{Pyleoclim Documentation}
-\date{Apr 27, 2017}
+\date{Jun 23, 2017}
 \release{0.2.0}
 \author{Deborah Khider, Julien Emile-Geay, Feng Zhu}
 \newcommand{\sphinxlogo}{}
@@ -58,7 +58,7 @@ Contents:
 
 
 \chapter{Pyleoclim}
-\label{\detokenize{Introduction:welcome-to-pyleoclim-s-documentation}}\label{\detokenize{Introduction:pyleoclim}}\label{\detokenize{Introduction::doc}}
+\label{\detokenize{Introduction:welcome-to-pyleoclim-s-documentation}}\label{\detokenize{Introduction::doc}}\label{\detokenize{Introduction:pyleoclim}}
 
 \section{What is it?}
 \label{\detokenize{Introduction:what-is-it}}
@@ -202,7 +202,7 @@ seaborn\textgreater{}=0.7.0
 scikit-learn\textgreater{}=0.17.1
 
 \item {} 
-progressbar2\textgreater{}=3.12.0
+tqdm\textgreater{}=4.14.0
 
 \end{itemize}
 
@@ -237,7 +237,7 @@ of the investigators and do not necessarily reflect the views of the National Sc
 
 
 \chapter{Main Functions}
-\label{\detokenize{Main:main-functions}}\label{\detokenize{Main::doc}}
+\label{\detokenize{Main::doc}}\label{\detokenize{Main:main-functions}}
 
 \section{Using Pyleoclim with a LiPD file}
 \label{\detokenize{Main:using-pyleoclim-with-a-lipd-file}}
@@ -760,6 +760,68 @@ interp\_values - the interpolated values
 
 \end{fulllineitems}
 
+\index{standardizeTs() (in module pyleoclim)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Main:pyleoclim.standardizeTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{standardizeTs}}{\emph{timeseries='`}, \emph{scale=1}, \emph{ddof=0}, \emph{eps=0.001}}{}
+Centers and normalizes the paleoData values of a  given time series.
+
+Constant or nearly constant time series not rescaled.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{x} (\sphinxstyleliteralemphasis{array}) -- vector of (real) numbers as a time series, NaNs allowed
+
+\item {} 
+\sphinxstyleliteralstrong{scale} (\sphinxstyleliteralemphasis{real}) -- a scale factor used to scale a record to a match a given variance
+
+\item {} 
+\sphinxstyleliteralstrong{axis} (\sphinxstyleliteralemphasis{int}\sphinxstyleliteralemphasis{ or }\sphinxstyleliteralemphasis{None}) -- axis along which to operate, if None, compute over the whole array
+
+\item {} 
+\sphinxstyleliteralstrong{ddof} (\sphinxstyleliteralemphasis{int}) -- degress of freedom correction in the calculation of the standard deviation
+
+\item {} 
+\sphinxstyleliteralstrong{eps} (\sphinxstyleliteralemphasis{real}) -- a threshold to determine if the standard deviation is too close to zero
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+
+the standardized time series (z-score), Z = (X - E{[}X{]})/std(X)*scale, NaNs allowed
+\begin{itemize}
+\item {} 
+mu (real): the mean of the original time series, E{[}X{]}
+
+\item {} 
+sig (real): the standard deviation of the original time series, std{[}X{]}
+
+\end{itemize}
+
+
+\item[{Return type}] \leavevmode
+\begin{itemize}
+\item {} 
+z (array)
+
+\end{itemize}
+
+
+\end{description}\end{quote}
+\paragraph{References}
+\begin{enumerate}
+\item {} 
+Tapio Schneider's MATLAB code: \url{http://www.clidyn.ethz.ch/imputation/standardize.m}
+
+\item {} 
+The zscore function in SciPy: \url{https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py}
+
+\end{enumerate}
+
+@author: fzhu
+
+\end{fulllineitems}
+
 
 
 \section{Using Pyleoclim without a LiPD file}
@@ -786,7 +848,7 @@ contains some functions to extract information about a timeseries object.
 
 
 \chapter{Mapping Functions}
-\label{\detokenize{Map:mapping-functions}}\label{\detokenize{Map::doc}}
+\label{\detokenize{Map::doc}}\label{\detokenize{Map:mapping-functions}}
 This module uses the Basemap package for mapping.
 \index{mapAll() (in module pyleoclim.Map)}
 
@@ -934,7 +996,7 @@ speed up the process. Default is 0.5.
 
 
 \chapter{Plotting Functions}
-\label{\detokenize{Plot:plotting-functions}}\label{\detokenize{Plot::doc}}\index{plot() (in module pyleoclim.Plot)}
+\label{\detokenize{Plot::doc}}\label{\detokenize{Plot:plotting-functions}}\index{plot() (in module pyleoclim.Plot)}
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{Plot:pyleoclim.Plot.plot}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Plot.}\sphinxbfcode{plot}}{\emph{x}, \emph{y}, \emph{markersize=50}, \emph{marker='ro'}, \emph{x\_label='`}, \emph{y\_label='`}, \emph{title='`}}{}
@@ -1038,7 +1100,7 @@ fig - The figure
 
 
 \chapter{Statistics Functions}
-\label{\detokenize{Stats:statistics-functions}}\label{\detokenize{Stats::doc}}\index{simpleStats() (in module pyleoclim.Stats)}
+\label{\detokenize{Stats::doc}}\label{\detokenize{Stats:statistics-functions}}\index{simpleStats() (in module pyleoclim.Stats)}
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{Stats:pyleoclim.Stats.simpleStats}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Stats.}\sphinxbfcode{simpleStats}}{\emph{y}, \emph{axis=None}}{}
@@ -1068,23 +1130,34 @@ The mean, median, min, max, standard deviation and IQR by columns
 \index{corrsig() (in module pyleoclim.Stats)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Stats:pyleoclim.Stats.corrsig}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Stats.}\sphinxbfcode{corrsig}}{\emph{y1}, \emph{y2}, \emph{nsim=1000}, \emph{method='isospectral'}, \emph{alpha=0.5}}{}
-Estimates the significance of correlations between non IID time series by 3 independent methods:
-t-test, AR(1) modeling and phase randomization of the original output.
+\phantomsection\label{\detokenize{Stats:pyleoclim.Stats.corrsig}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Stats.}\sphinxbfcode{corrsig}}{\emph{y1}, \emph{y2}, \emph{nsim=1000}, \emph{method='isospectral'}, \emph{alpha=0.5}}{}~\begin{description}
+\item[{Estimates the significance of correlations between non IID time series by 3 independent methods:}] \leavevmode\begin{enumerate}
+\item {} 
+`ttest': T-test where d.o.f are corrected for the effect of serial correlation
+
+\item {} 
+`isopersistent': AR(1) modeling of x and y.
+
+\end{enumerate}
+
+3) `isospectral': phase randomization of original inputs. (default)
+The T-test is parametric test, hence cheap but usually wrong except in idyllic circumstances.
+The others are non-parametric, but their computational requirements scales with nsim.
+
+\end{description}
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
-\sphinxstyleliteralstrong{y2} (\sphinxstyleliteralemphasis{y1}\sphinxstyleliteralemphasis{,}\sphinxstyleliteralemphasis{}) -- vector of (real) numbers of identical length, no NaNs allowed
+\sphinxstyleliteralstrong{y2} (\sphinxstyleliteralemphasis{y1}\sphinxstyleliteralemphasis{,}\sphinxstyleliteralemphasis{}) -- 
 
 \item {} 
-\sphinxstyleliteralstrong{nsim} (\sphinxstyleliteralemphasis{int}) -- the number of simulations {[}1000{]}
+\sphinxstyleliteralstrong{nsim} (\sphinxstyleliteralemphasis{int}) -- 
 
 \item {} 
-\sphinxstyleliteralstrong{method} (\sphinxstyleliteralemphasis{str}) -- methods 1-3 above {[}'isospectral'{]}. Other options include `ttest'
-and `isopersistant'
+\sphinxstyleliteralstrong{method} (\sphinxstyleliteralemphasis{str}) -- 
 
 \item {} 
-\sphinxstyleliteralstrong{alpha} (\sphinxstyleliteralemphasis{float}) -- significance level for critical value estimation {[}0.05{]}
+\sphinxstyleliteralstrong{alpha} (\sphinxstyleliteralemphasis{float}) -- 
 
 \end{itemize}
 
@@ -1111,7 +1184,7 @@ r (real)
 
 
 \chapter{Timeseries Functions}
-\label{\detokenize{Timeseries:timeseries-functions}}\label{\detokenize{Timeseries::doc}}
+\label{\detokenize{Timeseries::doc}}\label{\detokenize{Timeseries:timeseries-functions}}
 This module allows the manipulation of timeseries.
 \index{bin() (in module pyleoclim.Timeseries)}
 
@@ -1232,10 +1305,57 @@ interp\_values2 - the intespolated y-values for the second timeseries
 
 \end{fulllineitems}
 
+\index{standardize() (in module pyleoclim.Timeseries)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.standardize}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Timeseries.}\sphinxbfcode{standardize}}{\emph{x}, \emph{scale=1}, \emph{axis=0}, \emph{ddof=0}, \emph{eps=0.001}}{}
+Centers and normalizes a given time series. Constant or nearly constant time series not rescaled.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{x} (\sphinxstyleliteralemphasis{array}) -- vector of (real) numbers as a time series, NaNs allowed
+
+\item {} 
+\sphinxstyleliteralstrong{scale} (\sphinxstyleliteralemphasis{real}) -- a scale factor used to scale a record to a match a given variance
+
+\item {} 
+\sphinxstyleliteralstrong{axis} (\sphinxstyleliteralemphasis{int}\sphinxstyleliteralemphasis{ or }\sphinxstyleliteralemphasis{None}) -- axis along which to operate, if None, compute over the whole array
+
+\item {} 
+\sphinxstyleliteralstrong{ddof} (\sphinxstyleliteralemphasis{int}) -- degress of freedom correction in the calculation of the standard deviation
+
+\item {} 
+\sphinxstyleliteralstrong{eps} (\sphinxstyleliteralemphasis{real}) -- a threshold to determine if the standard deviation is too close to zero
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+the standardized time series (z-score), Z = (X - E{[}X{]})/std(X)*scale, NaNs allowed
+mu (real): the mean of the original time series, E{[}X{]}
+sig (real): the standard deviation of the original time series, std{[}X{]}
+
+\item[{Return type}] \leavevmode
+z (array)
+
+\end{description}\end{quote}
+\paragraph{References}
+\begin{enumerate}
+\item {} 
+Tapio Schneider's MATLAB code: \url{http://www.clidyn.ethz.ch/imputation/standardize.m}
+
+\item {} 
+The zscore function in SciPy: \url{https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py}
+
+\end{enumerate}
+
+@author: fzhu
+
+\end{fulllineitems}
+
 
 
 \chapter{LiPD Utilities}
-\label{\detokenize{LipdUtils:lipd-utilities}}\label{\detokenize{LipdUtils::doc}}
+\label{\detokenize{LipdUtils::doc}}\label{\detokenize{LipdUtils:lipd-utilities}}
 This modules allow basic manipulation of LiPD files
 
 
@@ -1444,7 +1564,7 @@ archiveType according to the ontology
 
 
 \chapter{Summary Plots}
-\label{\detokenize{SummaryPlots:summary-plots}}\label{\detokenize{SummaryPlots::doc}}
+\label{\detokenize{SummaryPlots::doc}}\label{\detokenize{SummaryPlots:summary-plots}}
 This module handles some basic return for the summary plots.
 
 \sphinxstylestrong{Requires} a LiPD file

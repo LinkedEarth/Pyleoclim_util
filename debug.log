@@ -1,0 +1,80 @@
+2017-06-23 14:15:02,772 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp_kxfi82a
+2017-06-23 14:15:02,772 [INFO] LiPD_Library: LiPD Library created
+2017-06-23 14:16:00,798 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpj6naxra2
+2017-06-23 14:16:00,798 [INFO] LiPD_Library: LiPD Library created
+2017-06-23 14:16:22,843 [INFO] directory: enter set_src_or_dst
+2017-06-23 14:16:22,843 [INFO] directory: enter browse_dialog
+2017-06-23 14:16:40,148 [INFO] directory: chosen path: /Users/deborahkhider/Documents/Documents/LinkedEarth/Holocene Project/Datasets/MD982170.Stott.2004, chosen file: ['/Users/deborahkhider/Documents/Documents/LinkedEarth/Holocene Project/Datasets/MD982170.Stott.2004/MD98-2170.Stott.2004.lpd']
+2017-06-23 14:16:40,149 [INFO] directory: exit browse_dialog_file
+2017-06-23 14:16:40,149 [INFO] LiPD: object created: MD98-2170.Stott.2004
+2017-06-23 14:16:40,150 [INFO] zips: enter unzip
+2017-06-23 14:16:40,152 [INFO] zips: exit unzip
+2017-06-23 14:16:40,152 [INFO] jsons: enter read_json_from_file
+2017-06-23 14:16:40,215 [INFO] jsons: successful read from json file
+2017-06-23 14:16:40,217 [INFO] jsons: exit read_json_from_file
+2017-06-23 14:16:40,217 [INFO] jsons: enter idx_num_to_name
+2017-06-23 14:16:40,217 [INFO] jsons: enter import_data: paleo
+2017-06-23 14:16:40,217 [INFO] misc: get_variable_name_table: KeyError: missing paleoDataTableName
+2017-06-23 14:16:40,217 [INFO] jsons: enter import_meas: paleo
+2017-06-23 14:16:40,217 [INFO] jsons: exit import_meas: paleo
+2017-06-23 14:16:40,217 [INFO] jsons: exit import_data: paleo
+2017-06-23 14:16:40,217 [INFO] jsons: enter import_data: chron
+2017-06-23 14:16:40,218 [INFO] misc: get_variable_name_table: KeyError: missing chronDataTableName
+2017-06-23 14:16:40,218 [INFO] jsons: enter import_meas: chron
+2017-06-23 14:16:40,218 [INFO] jsons: exit import_meas: chron
+2017-06-23 14:16:40,218 [INFO] jsons: exit import_data: chron
+2017-06-23 14:16:40,218 [INFO] jsons: exit idx_num_to_name
+2017-06-23 14:16:40,218 [INFO] misc: enter remove_empty_doi
+2017-06-23 14:16:40,218 [INFO] misc: exit remove_empty_doi
+2017-06-23 14:16:40,219 [INFO] csvs: enter merge_csv_metadata
+2017-06-23 14:16:40,219 [INFO] csvs: enter merge_csv_section: paleo
+2017-06-23 14:16:40,219 [INFO] csvs: enter read_csv_from_file
+2017-06-23 14:16:40,220 [INFO] csvs: exit read_csv_from_file
+2017-06-23 14:16:40,222 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-06-23 14:16:40,222 [INFO] csvs: exit merge_csv_section: paleo
+2017-06-23 14:16:40,222 [INFO] csvs: enter merge_csv_section: chron
+2017-06-23 14:16:40,222 [INFO] csvs: enter read_csv_from_file
+2017-06-23 14:16:40,222 [INFO] csvs: exit read_csv_from_file
+2017-06-23 14:16:40,222 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: labcode
+2017-06-23 14:16:40,223 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-06-23 14:16:40,223 [INFO] csvs: exit merge_csv_section: chron
+2017-06-23 14:16:40,223 [INFO] csvs: exit merge_csv_metadata
+2017-06-23 14:16:40,223 [INFO] csvs: enter get_csv_from_metadata
+2017-06-23 14:16:40,223 [INFO] csvs: enter get_csv_section: paleo
+2017-06-23 14:16:40,223 [INFO] csvs: exit get_csv_section: paleo
+2017-06-23 14:16:40,223 [INFO] csvs: enter get_csv_section: chron
+2017-06-23 14:16:40,223 [INFO] csvs: exit get_csv_section: chron
+2017-06-23 14:16:40,223 [INFO] csvs: exit get_csv_from_metadata
+2017-06-23 14:16:40,225 [INFO] jsons: enter idx_name_to_num
+2017-06-23 14:16:40,225 [INFO] jsons: enter export_data: paleo
+2017-06-23 14:16:40,225 [INFO] jsons: enter export_measurement: paleo
+2017-06-23 14:16:40,225 [INFO] jsons: exit export_measurement: paleo
+2017-06-23 14:16:40,225 [INFO] jsons: exit export_data: paleo
+2017-06-23 14:16:40,225 [INFO] jsons: enter export_data: chron
+2017-06-23 14:16:40,225 [INFO] jsons: enter export_measurement: chron
+2017-06-23 14:16:40,225 [INFO] jsons: exit export_measurement: chron
+2017-06-23 14:16:40,225 [INFO] jsons: exit export_data: chron
+2017-06-23 14:16:40,225 [INFO] jsons: exit idx_name_to_num
+2017-06-23 14:16:40,226 [INFO] PDSlib: enter lipd_to_df
+2017-06-23 14:16:40,226 [INFO] PDSlib: enter dot_notation
+2017-06-23 14:16:40,229 [INFO] PDSlib: enter get_lipd_cols
+2017-06-23 14:16:40,231 [INFO] PDSlib: exit get_lipd_cols
+2017-06-23 14:16:40,232 [INFO] LiPD: object loaded: MD98-2170.Stott.2004
+2017-06-23 14:16:40,232 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 2.9 seconds
+2017-06-23 14:16:40,232 [INFO] Convert: enter ts_extract_main
+2017-06-23 14:16:40,232 [INFO] Convert: enter ts_extract
+2017-06-23 14:16:40,232 [INFO] Convert: processing publication #: 0
+2017-06-23 14:16:40,232 [INFO] Convert: enter ts_extract_authors
+2017-06-23 14:16:40,232 [INFO] Convert: enter ts_extract_geo
+2017-06-23 14:16:40,232 [INFO] Convert: enter ts_extract_geo
+2017-06-23 14:16:40,233 [INFO] Convert: enter ts_extract_paleo
+2017-06-23 14:16:40,233 [INFO] Convert: enter ts_extract_paleo_table_root
+2017-06-23 14:16:40,233 [INFO] Convert: enter ts_extract_special
+2017-06-23 14:16:40,233 [INFO] Convert: enter ts_extract_paleo_columns
+2017-06-23 14:16:40,234 [INFO] Convert: enter ts_extract_paleo_columns
+2017-06-23 14:16:40,234 [INFO] Convert: enter ts_extract_paleo_columns
+2017-06-23 14:16:40,235 [INFO] Convert: enter ts_extract_paleo_columns
+2017-06-23 14:16:40,235 [INFO] Convert: enter ts_extract_paleo_columns
+2017-06-23 14:16:40,236 [INFO] Convert: enter ts_extract_paleo_columns
+2017-06-23 14:16:40,236 [INFO] Convert: exit ts_extract_main
+2017-06-23 14:16:40,236 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 0.0 seconds

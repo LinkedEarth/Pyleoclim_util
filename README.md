@@ -30,6 +30,7 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
 **Current capabilities**:
  - binning
  - interpolation
+ - standardization
  - plotting maps, timeseries, and basic age model information
  - paleo-aware correlation analysis (isopersistent, isospectral and classical t-test)
 
@@ -45,6 +46,7 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>
+0.2.2: Change progressbar to tqdm and add standardization function
 0.2.1: Update package requirements
 0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.
 0.1.4: Rename function using camel case and consistency with LiPD utilities version 0.1.8.5
@@ -89,7 +91,6 @@ and on [Pypi](https://pythonhosted.org/pyleoclim/).
 - statsmodel>=0.8.0
 - seaborn>=0.7.0
 - scikit-learn>=0.17.1
-- pathos>=0.2.0
 - tqdm>=4.14.0
 
 The installer will automatically check for the needed updates

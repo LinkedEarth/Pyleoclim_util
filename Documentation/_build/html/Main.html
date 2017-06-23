@@ -490,6 +490,48 @@ and time step,</p>
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="pyleoclim.standardizeTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">standardizeTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>scale=1</em>, <em>ddof=0</em>, <em>eps=0.001</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.standardizeTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Centers and normalizes the paleoData values of a  given time series.</p>
+<p>Constant or nearly constant time series not rescaled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>array</em>) &#8211; vector of (real) numbers as a time series, NaNs allowed</li>
+<li><strong>scale</strong> (<em>real</em>) &#8211; a scale factor used to scale a record to a match a given variance</li>
+<li><strong>axis</strong> (<em>int</em><em> or </em><em>None</em>) &#8211; axis along which to operate, if None, compute over the whole array</li>
+<li><strong>ddof</strong> (<em>int</em>) &#8211; degress of freedom correction in the calculation of the standard deviation</li>
+<li><strong>eps</strong> (<em>real</em>) &#8211; a threshold to determine if the standard deviation is too close to zero</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed</p>
+<ul class="simple">
+<li>mu (real): the mean of the original time series, E[X]</li>
+<li>sig (real): the standard deviation of the original time series, std[X]</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li>z (array)</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li>Tapio Schneider&#8217;s MATLAB code: <a class="reference external" href="http://www.clidyn.ethz.ch/imputation/standardize.m">http://www.clidyn.ethz.ch/imputation/standardize.m</a></li>
+<li>The zscore function in SciPy: <a class="reference external" href="https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py">https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py</a></li>
+</ol>
+<p>&#64;author: fzhu</p>
+</dd></dl>
+
 </div>
 </div>
 <div class="section" id="using-pyleoclim-without-a-lipd-file">

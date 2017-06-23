@@ -18,16 +18,18 @@
 \contentsline {subsection}{\numberline {2.1.4}Statistics}{10}{subsection.2.1.4}
 \contentsline {paragraph}{Examples}{10}{paragraph*.11}
 \contentsline {subsection}{\numberline {2.1.5}Timeseries}{11}{subsection.2.1.5}
-\contentsline {section}{\numberline {2.2}Using Pyleoclim without a LiPD file}{12}{section.2.2}
-\contentsline {chapter}{\numberline {3}Mapping Functions}{13}{chapter.3}
-\contentsline {chapter}{\numberline {4}Plotting Functions}{15}{chapter.4}
-\contentsline {chapter}{\numberline {5}Statistics Functions}{17}{chapter.5}
-\contentsline {chapter}{\numberline {6}Timeseries Functions}{19}{chapter.6}
-\contentsline {chapter}{\numberline {7}LiPD Utilities}{21}{chapter.7}
-\contentsline {section}{\numberline {7.1}Creating Directories and saving}{21}{section.7.1}
-\contentsline {section}{\numberline {7.2}LiPD files}{21}{section.7.2}
-\contentsline {section}{\numberline {7.3}Handling Variables}{22}{section.7.3}
-\contentsline {section}{\numberline {7.4}Handling timeseries objects}{22}{section.7.4}
-\contentsline {section}{\numberline {7.5}Linking LiPDs to the LinkedEarth Ontology}{22}{section.7.5}
-\contentsline {chapter}{\numberline {8}Summary Plots}{25}{chapter.8}
-\contentsline {chapter}{\numberline {9}Indices and tables}{27}{chapter.9}
+\contentsline {paragraph}{References}{12}{paragraph*.16}
+\contentsline {section}{\numberline {2.2}Using Pyleoclim without a LiPD file}{13}{section.2.2}
+\contentsline {chapter}{\numberline {3}Mapping Functions}{15}{chapter.3}
+\contentsline {chapter}{\numberline {4}Plotting Functions}{17}{chapter.4}
+\contentsline {chapter}{\numberline {5}Statistics Functions}{19}{chapter.5}
+\contentsline {chapter}{\numberline {6}Timeseries Functions}{21}{chapter.6}
+\contentsline {paragraph}{References}{22}{paragraph*.27}
+\contentsline {chapter}{\numberline {7}LiPD Utilities}{23}{chapter.7}
+\contentsline {section}{\numberline {7.1}Creating Directories and saving}{23}{section.7.1}
+\contentsline {section}{\numberline {7.2}LiPD files}{23}{section.7.2}
+\contentsline {section}{\numberline {7.3}Handling Variables}{24}{section.7.3}
+\contentsline {section}{\numberline {7.4}Handling timeseries objects}{24}{section.7.4}
+\contentsline {section}{\numberline {7.5}Linking LiPDs to the LinkedEarth Ontology}{24}{section.7.5}
+\contentsline {chapter}{\numberline {8}Summary Plots}{27}{chapter.8}
+\contentsline {chapter}{\numberline {9}Indices and tables}{29}{chapter.9}

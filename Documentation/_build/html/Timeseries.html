@@ -168,6 +168,41 @@ interp_values2 - the intespolated y-values for the second timeseries</p>
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="pyleoclim.Timeseries.standardize">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">standardize</code><span class="sig-paren">(</span><em>x</em>, <em>scale=1</em>, <em>axis=0</em>, <em>ddof=0</em>, <em>eps=0.001</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.standardize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Centers and normalizes a given time series. Constant or nearly constant time series not rescaled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>array</em>) &#8211; vector of (real) numbers as a time series, NaNs allowed</li>
+<li><strong>scale</strong> (<em>real</em>) &#8211; a scale factor used to scale a record to a match a given variance</li>
+<li><strong>axis</strong> (<em>int</em><em> or </em><em>None</em>) &#8211; axis along which to operate, if None, compute over the whole array</li>
+<li><strong>ddof</strong> (<em>int</em>) &#8211; degress of freedom correction in the calculation of the standard deviation</li>
+<li><strong>eps</strong> (<em>real</em>) &#8211; a threshold to determine if the standard deviation is too close to zero</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed
+mu (real): the mean of the original time series, E[X]
+sig (real): the standard deviation of the original time series, std[X]</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">z (array)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li>Tapio Schneider&#8217;s MATLAB code: <a class="reference external" href="http://www.clidyn.ethz.ch/imputation/standardize.m">http://www.clidyn.ethz.ch/imputation/standardize.m</a></li>
+<li>The zscore function in SciPy: <a class="reference external" href="https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py">https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py</a></li>
+</ol>
+<p>&#64;author: fzhu</p>
+</dd></dl>
+
 </div>
 
 

@@ -74,7 +74,7 @@ Requirements
 * statsmodel>=0.8.0
 * seaborn>=0.7.0
 * scikit-learn>=0.17.1
-* progressbar2>=3.12.0
+* tqdm>=4.14.0
 
 The installer will automatically check for the needed updates.
 

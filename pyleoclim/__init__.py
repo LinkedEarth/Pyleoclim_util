@@ -22,7 +22,6 @@ from pyleoclim import Map
 from pyleoclim import LipdUtils
 from pyleoclim import SummaryPlots
 from pyleoclim import Plot
-from pyleoclim import Spectral
 from pyleoclim import Stats
 from pyleoclim import Timeseries
 
@@ -793,9 +792,4 @@ def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
     z, mu, sig = Timeseries.standardize(y,scale=1,axis=None,ddof=0,eps=1e-3)
 
     return z, mu, sig
-
-
-"""
-Wavelet analysis
-"""
 

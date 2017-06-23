@@ -60,6 +60,8 @@ Basic manipulations of the timeseries objects.
 
 .. autofunction:: pyleoclim.interpTs
 
+.. autofunction:: pyleoclim.standardizeTs
+
 Using Pyleoclim without a LiPD file
 """""""""""""""""""""""""""""""""""
 
