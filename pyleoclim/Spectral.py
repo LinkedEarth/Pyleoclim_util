@@ -260,7 +260,7 @@ class WaveletAnalysis(object):
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
         Neffs = np.ndarray(shape=(nt, nf))
-        coeff = np.ndarray(shape=(nt, nf))
+        coeff = np.ndarray(shape=(nt, nf), dtype=complex)
 
         S = np.zeros(shape=(3, 3))
 
@@ -335,7 +335,7 @@ class WaveletAnalysis(object):
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
         Neffs = np.ndarray(shape=(nt, nf))
-        coeff = np.ndarray(shape=(nt, nf))
+        coeff = np.ndarray(shape=(nt, nf), dtype=complex)
 
         def wwa_1g(tau, omega):
             dz = omega * (ts - tau)
@@ -429,7 +429,7 @@ class WaveletAnalysis(object):
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
         Neffs = np.ndarray(shape=(nt, nf))
-        coeff = np.ndarray(shape=(nt, nf))
+        coeff = np.ndarray(shape=(nt, nf), dtype=complex)
 
         for k in range(nf):
             for j in range(nt):
@@ -518,7 +518,7 @@ class WaveletAnalysis(object):
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
         Neffs = np.ndarray(shape=(nt, nf))
-        coeff = np.ndarray(shape=(nt, nf))
+        coeff = np.ndarray(shape=(nt, nf), dtype=complex)
 
         def wwa_1g(tau, omega):
             dz = omega * (ts - tau)
@@ -733,7 +733,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, AR1_q, coi, Neffs, coeff
 
-    def wwa2psd(self, wwa, ts, Neffs, Neff=3):
+    def wwa2psd_weighted(self, wwa, ts, Neffs, Neff=3):
         ''' Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
         Args:
@@ -1180,7 +1180,7 @@ def wwa2psd(wwa, ts, freqs, tau, Neffs, Neff=3, anti_alias=False, avgs=2):
     """
     wa = WaveletAnalysis()
     af = AliasFilter()
-    psd = wa.wwa2psd(wwa, ts, Neffs=Neffs, Neff=Neff)
+    psd = wa.wwa2psd_weighted(wwa, ts, Neffs=Neffs, Neff=Neff)
 
     if anti_alias:
         dt = np.mean(np.diff(ts))
@@ -1193,7 +1193,7 @@ def wwa2psd(wwa, ts, freqs, tau, Neffs, Neff=3, anti_alias=False, avgs=2):
     return psd
 
 
-def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8,
+def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=0,
             detrend=False, Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
     ''' Return the psd of a timeseires directly using wwz method.
 
@@ -1204,6 +1204,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8,
         tau (array): the evenly-spaced time points
         c (float): the decay constant, the default value 1e-3 is good for most of the cases
         nproc (int): the number of processes for multiprocessing
+        nMC (int): the number of Monte-Carlo simulations
         detrend (bool): whether to detrend the time series or not
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
@@ -1211,7 +1212,6 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8,
 
     Returns:
         psd (array): power spectral density
-        tau (array): the evenly-spaced time points
         freqs (array): vector of frequency
 
     '''
@@ -1224,7 +1224,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8,
         med_res = np.size(ts) // np.median(np.diff(ts))
         tau = np.linspace(np.min(ts), np.max(ts), np.max([np.size(ts)//10, 50, med_res]))
 
-    wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = wwz(ys, ts, tau, freqs, c=c, nproc=nproc,
+    wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = wwz(ys, ts, tau, freqs, c=c, nproc=nproc, nMC=nMC,
                                                            detrend=detrend, method=method)
 
     psd = wwa2psd(wwa, ts, freqs, tau, Neffs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
@@ -1392,3 +1392,8 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, y
     plt.grid()
 
     return fig
+
+
+wa = WaveletAnalysis()
+beta_estimation = wa.beta_estimation
+tau_estimation = wa.tau_estimation
