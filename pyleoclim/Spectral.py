@@ -24,16 +24,16 @@ from tqdm import tqdm
 
 import warnings
 
+from pyleoclim import Timeseries
 
-def ar1_fit(ys, ts=None, standardize=False, detrend=False, trend='nc'):
+
+def ar1_fit(ys, ts=None, detrend=False):
     ''' Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
 
     Args:
         ys (array): the time series
         ts (array): the time axis of that series
-        standardize (bool): whether to standardize the time series or not
         detrend (bool): whether to detrend the time series or not
-        trend (str): whether to include a constant or not for `ar1_fit_evenly()`
 
     Returns:
         g (float): lag-1 autocorrelation coefficient (for evenly-spaced time series)
@@ -43,23 +43,21 @@ def ar1_fit(ys, ts=None, standardize=False, detrend=False, trend='nc'):
     wa = WaveletAnalysis()
 
     if wa.is_evenly_spaced(ts):
-        g = wa.ar1_fit_evenly(ys, standardize=standardize, detrend=detrend, trend=trend)
+        g = wa.ar1_fit_evenly(ys, detrend=detrend)
     else:
-        g = wa.tau_estimation(ys, ts, standardize=standardize, detrend=detrend)
+        g = wa.tau_estimation(ys, ts, detrend=detrend)
 
     return g
 
 
-def ar1_sim(ys, n, p, ts=None, standardize=False, detrend=False, trend='nc'):
+def ar1_sim(ys, n, p, ts=None, detrend=False):
     ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from `ys` and `ts`
 
     Args:
         ys (array): a time series
         n, p (int): dimensions as n rows by p columns
         ts (array): the time axis of that series
-        standardize (bool): whether to standardize the time series or not
         detrend (bool): whether to detrend the time series or not
-        trend (str): whether to include a constant or not for `ar1_fit()`
 
     Returns:
         red (matrix): n rows by p columns matrix of an AR1 process
@@ -69,7 +67,7 @@ def ar1_sim(ys, n, p, ts=None, standardize=False, detrend=False, trend='nc'):
 
     wa = WaveletAnalysis()
     if wa.is_evenly_spaced(ts):
-        g = ar1_fit(ys, ts=ts, standardize=standardize, detrend=detrend, trend=trend)
+        g = ar1_fit(ys, ts=ts, detrend=detrend)
         sig = np.std(ys)
 
         # specify model parameters (statsmodel wants lag0 coefficents as unity)
@@ -82,7 +80,7 @@ def ar1_sim(ys, n, p, ts=None, standardize=False, detrend=False, trend='nc'):
             red[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n)
 
     else:
-        tau_est = ar1_fit(ys, ts=ts, standardize=standardize, detrend=detrend)
+        tau_est = ar1_fit(ys, ts=ts, detrend=detrend)
         wa = WaveletAnalysis()
         for i in np.arange(p):
             red[:, i] = wa.ar1_model(ts, tau_est, n=n)
@@ -119,47 +117,28 @@ class WaveletAnalysis(object):
 
         return check
 
-    def ar1_fit_evenly(self, ys, standardize=False, detrend=False, trend='nc'):
+    def ar1_fit_evenly(self, ys, detrend=False):
         ''' Returns the lag-1 autocorrelation from ar1 fit.
 
         Args:
             ys (array): vector of (flaot) numbers as a time series
-            standardize (bool): whether to standardize the time series or not
             detrend (bool): whether to detrend the time series or not
-            trend (str): whether to include a constant or not for AR1 fit
 
         Returns:
             g (float): lag-1 autocorrelation coefficient
 
         '''
-        pd_ys = self.preprocess(ys, standardize=standardize, detrend=detrend)
-        ar1_mod = sm.tsa.AR(pd_ys, missing='drop').fit(maxlag=1, trend=trend)
+        pd_ys = self.preprocess(ys, detrend=detrend)
+        ar1_mod = sm.tsa.AR(pd_ys, missing='drop').fit(maxlag=1)
         g = ar1_mod.params[0]
 
         return g
 
-    def standardize(self, ys):
-        ''' Return the standardized version of a given time series.
-
-        Args:
-            ys (array): a time series
-
-        Returns:
-            array: the standardized time series.
-
-        '''
-        m = np.mean(ys)
-        std = np.std(ys, ddof=1)
-        res = (ys - m) / std
-
-        return res
-
-    def preprocess(self, ys, standardize=True, detrend=False):
+    def preprocess(self, ys, detrend=False):
         ''' Return the processed time series using (detrend and) standardization.
 
         Args:
             ys (array): a time series
-            standardize (bool): whether to standardize the time series or not
             detrend (bool): whether to detrend the time series or not
 
         Returns:
@@ -168,25 +147,20 @@ class WaveletAnalysis(object):
         '''
 
         if detrend:
-            res = signal.detrend(ys)
-            if standardize:
-                res = self.standardize(res)
-
-        elif standardize:
-            res = self.standardize(ys)
-
+            ys_d = signal.detrend(ys)
         else:
-            res = ys
+            ys_d = ys
+
+        res, _, _ = Timeseries.standardize(ys_d)
 
         return res
 
-    def tau_estimation(self, ys, ts, standardize=False, detrend=False):
+    def tau_estimation(self, ys, ts, detrend=False):
         ''' Return the estimated persistence of a givenevenly/unevenly spaced time series.
 
         Args:
             ys (array): a time series
             ts (array): time axis of the time series
-            standardize (bool): whether to standardize the time series or not
             detrend (bool): whether detrend the time series or not
 
         Returns:
@@ -197,7 +171,7 @@ class WaveletAnalysis(object):
                 Comput. Geosci. 28, 69–72 (2002).
 
         '''
-        pd_ys = self.preprocess(ys, standardize=standardize, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend)
         dt = np.diff(ts)
         #  assert dt > 0, "The time points should be increasing!"
 
@@ -242,13 +216,13 @@ class WaveletAnalysis(object):
         r[0] = 1
         for i in range(1, n):
             scaled_dt = (ts[i] - ts[i-1]) / tau
-            err = np.random.normal(0, np.sqrt(1 - np.exp(-2*scaled_dt)), 1)
             rho = np.exp(-scaled_dt)
+            err = np.random.normal(0, np.sqrt(1 - rho**2), 1)
             r[i] = r[i-1]*rho + err
 
         return r
 
-    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, standardize=False, detrend=False):
+    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -259,13 +233,13 @@ class WaveletAnalysis(object):
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
             nproc (int): fake argument, just for convenience
-            standardize (bool): whether to standardize the time series or not
             detrend (bool): whether to detrend the time series or not
 
         Returns:
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
+            coeff (array): the wavelet transform coefficients
 
         References:
             Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
@@ -279,13 +253,14 @@ class WaveletAnalysis(object):
         nt = np.size(tau)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, standardize=standardize, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend)
 
         omega = 2*np.pi*freqs
 
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
         Neffs = np.ndarray(shape=(nt, nf))
+        coeff = np.ndarray(shape=(nt, nf))
 
         S = np.zeros(shape=(3, 3))
 
@@ -300,6 +275,7 @@ class WaveletAnalysis(object):
                 if Neffs[j, k] <= Neff:
                     wwa[j, k] = np.nan  # the amplitude cannot be estimated reliably when Neff_loc <= Neff
                     phase[j, k] = np.nan
+                    coeff[j, k] = np.nan + np.nan*1j
                 else:
                     phi2 = np.cos(dz)
                     phi3 = np.sin(dz)
@@ -322,10 +298,11 @@ class WaveletAnalysis(object):
 
                     wwa[j, k] = np.sqrt(ywave_2**2 + ywave_3**2)
                     phase[j, k] = np.arctan2(ywave_2, ywave_3)
+                    coeff[j, k] = ywave_2 + ywave_3*1j
 
-        return wwa, phase, Neffs
+        return wwa, phase, Neffs, coeff
 
-    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, standardize=False, detrend=False):
+    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -336,13 +313,13 @@ class WaveletAnalysis(object):
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
             nproc (int): the number of processes for multiprocessing
-            standardize (bool): whether to standardize the time series or not
             detrend (bool): whether to detrend the time series or not
 
         Returns:
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
+            coeff (array): the wavelet transform coefficients
 
         '''
         assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -351,13 +328,14 @@ class WaveletAnalysis(object):
         nt = np.size(tau)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, standardize=standardize, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend)
 
         omega = 2*np.pi*freqs
 
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
         Neffs = np.ndarray(shape=(nt, nf))
+        coeff = np.ndarray(shape=(nt, nf))
 
         def wwa_1g(tau, omega):
             dz = omega * (ts - tau)
@@ -371,6 +349,7 @@ class WaveletAnalysis(object):
             if Neff_loc <= Neff:
                 amplitude_1g = np.nan  # the amplitude cannot be estimated reliably when Neff_loc <= Neff
                 phase_1g = np.nan
+                coeff_1g = np.nan + np.nan*1j
             else:
                 phi2 = np.cos(dz)
                 phi3 = np.sin(dz)
@@ -393,8 +372,9 @@ class WaveletAnalysis(object):
 
                 amplitude_1g = np.sqrt(ywave_2**2 + ywave_3**2)
                 phase_1g = np.arctan2(ywave_2, ywave_3)
+                coeff_1g = ywave_2 + ywave_3*1j
 
-            return amplitude_1g, phase_1g, Neff_loc
+            return amplitude_1g, phase_1g, Neff_loc, coeff_1g
 
         tf_mesh = np.meshgrid(tau, omega)
         list_of_grids = list(zip(*(grid.flat for grid in tf_mesh)))
@@ -406,10 +386,11 @@ class WaveletAnalysis(object):
             wwa = res_array[:, 0].reshape((np.size(omega), np.size(tau))).T
             phase = res_array[:, 1].reshape((np.size(omega), np.size(tau))).T
             Neffs = res_array[:, 2].reshape((np.size(omega), np.size(tau))).T
+            coeff = res_array[:, 3].reshape((np.size(omega), np.size(tau))).T
 
-        return wwa, phase, Neffs
+        return wwa, phase, Neffs, coeff
 
-    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, standardize=False, detrend=False):
+    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -420,13 +401,13 @@ class WaveletAnalysis(object):
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
             nproc (int): fake argument, just for convenience
-            standardize (bool): whether to standardize the time series or not
             detrend (bool): whether to detrend the time series or not
 
         Returns:
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
+            coeff (array): the wavelet transform coefficients
 
         References:
             Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
@@ -441,13 +422,14 @@ class WaveletAnalysis(object):
         nts = np.size(ts)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, standardize=standardize, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend)
 
         omega = 2*np.pi*freqs
 
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
         Neffs = np.ndarray(shape=(nt, nf))
+        coeff = np.ndarray(shape=(nt, nf))
 
         for k in range(nf):
             for j in range(nt):
@@ -460,6 +442,7 @@ class WaveletAnalysis(object):
                 if Neffs[j, k] <= Neff:
                     wwa[j, k] = np.nan  # the amplitude cannot be estimated reliably when Neff_loc <= Neff
                     phase[j, k] = np.nan
+                    coeff[j, k] = np.nan + np.nan*1j
                 else:
                     def w_prod(xs, ys):
                         return np.sum(weights*xs*ys) / sum_w
@@ -497,10 +480,11 @@ class WaveletAnalysis(object):
 
                     wwa[j, k] = np.sqrt(a1**2 + a2**2)
                     phase[j, k] = np.arctan2(a1, a2)
+                    coeff[j, k] = a1 + a2*1j
 
-        return wwa, phase, Neffs
+        return wwa, phase, Neffs, coeff
 
-    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, standardize=False, detrend=False):
+    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -511,13 +495,13 @@ class WaveletAnalysis(object):
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
             nproc (int): the number of processes for multiprocessing
-            standardize (bool): whether to standardize the time series or not
             detrend (bool): whether to detrend the time series or not
 
         Returns:
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
+            coeff (array): the wavelet transform coefficients
 
         '''
         assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -527,13 +511,14 @@ class WaveletAnalysis(object):
         nts = np.size(ts)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, standardize=standardize, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend)
 
         omega = 2*np.pi*freqs
 
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
         Neffs = np.ndarray(shape=(nt, nf))
+        coeff = np.ndarray(shape=(nt, nf))
 
         def wwa_1g(tau, omega):
             dz = omega * (ts - tau)
@@ -545,6 +530,7 @@ class WaveletAnalysis(object):
             if Neff_loc <= Neff:
                 amplitude_1g = np.nan  # the amplitude cannot be estimated reliably when Neff_loc <= Neff
                 phase_1g = np.nan
+                coeff_1g = np.nan + np.nan*1j
             else:
                 def w_prod(xs, ys):
                     return np.sum(weights*xs*ys) / sum_w
@@ -582,8 +568,9 @@ class WaveletAnalysis(object):
 
                 amplitude_1g = np.sqrt(a1**2 + a2**2)
                 phase_1g = np.arctan2(a1, a2)
+                coeff_1g = a1 + a2*1j
 
-            return amplitude_1g, phase_1g, Neff_loc
+            return amplitude_1g, phase_1g, Neff_loc, coeff_1g
 
         tf_mesh = np.meshgrid(tau, omega)
         list_of_grids = list(zip(*(grid.flat for grid in tf_mesh)))
@@ -595,10 +582,11 @@ class WaveletAnalysis(object):
             wwa = res_array[:, 0].reshape((np.size(omega), np.size(tau))).T
             phase = res_array[:, 1].reshape((np.size(omega), np.size(tau))).T
             Neffs = res_array[:, 2].reshape((np.size(omega), np.size(tau))).T
+            coeff = res_array[:, 3].reshape((np.size(omega), np.size(tau))).T
 
-        return wwa, phase, Neffs
+        return wwa, phase, Neffs, coeff
 
-    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, standardize=False, detrend=False):
+    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -609,13 +597,13 @@ class WaveletAnalysis(object):
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
             nproc (int): fake argument, just for convenience
-            standardize (bool): whether to standardize the time series or not
             detrend (bool): whether to detrend the time series or not
 
         Returns:
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
+            coeff (array): the wavelet transform coefficients
 
         '''
         self.assertPositiveInt(Neff, nproc)
@@ -624,19 +612,23 @@ class WaveletAnalysis(object):
         nts = np.size(ts)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, standardize=standardize, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend)
 
         omega = 2*np.pi*freqs
 
         from . import f2py_wwz as f2py
-        wwa, phase, Neffs = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
+        wwa, phase, Neffs, coeff_real, coeff_imag = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
 
         undef = -99999.
         wwa[wwa == undef] = np.nan
         phase[phase == undef] = np.nan
         Neffs[Neffs < Neff] = 0
 
-        return wwa, phase, Neffs
+        coeff_real[coeff_real == undef] = np.nan
+        coeff_imag[coeff_imag == undef] = np.nan
+        coeff = coeff_real + coeff_imag*1j
+
+        return wwa, phase, Neffs, coeff
     def make_coi(self, tau, Neff=3):
         ''' Return the cone of influence.
 
@@ -672,8 +664,8 @@ class WaveletAnalysis(object):
 
         return coi
 
-    def wavelet_analysis(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nMC=0, nproc=8,
-                         standardize=False, detrend=False, method='Kirchner_f2py'):
+    def wavelet_analysis(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8,
+                         detrend=False, method='Kirchner_f2py'):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -684,10 +676,9 @@ class WaveletAnalysis(object):
             c: the decay constant
             nMC (int): the number of Monte-Carlo simulations
             nproc (int): the number of processes for multiprocessing
-            standardize (bool): whether to standardize the time series or not
             detrend (bool): whether to detrend the time series or not
             method (str): 'Foster' - the original WWZ method;
-                          'Kirchner' - the method Kirchner adapted from Foster
+                          'Kirchner' - the method Kirchner adapted from Foster;
                           'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
 
         Returns:
@@ -695,10 +686,11 @@ class WaveletAnalysis(object):
             AR1_q (array): AR1 simulations
             coi (array): cone of influence
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
+            coeff (array): the wavelet transform coefficients
 
         '''
         self.assertPositiveInt(nproc)
-        assert isinstance(nMC, int) and nMC >= 0
+        assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
         nt = np.size(tau)
         nf = np.size(freqs)
@@ -718,18 +710,17 @@ class WaveletAnalysis(object):
         else:
             wwz_func = self.kirchner_f2py
 
-        wwa, phase, Neffs = wwz_func(ys, ts, freqs, tau, Neff=Neff, c=c, nproc=nproc, standardize=standardize, detrend=detrend)
+        wwa, phase, Neffs, coeff = wwz_func(ys, ts, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend)
 
         wwa_red = np.ndarray(shape=(nMC, nt, nf))
         AR1_q = np.ndarray(shape=(nt, nf))
 
-        tauest = self.tau_estimation(ys, ts, standardize=standardize, detrend=detrend)
+        tauest = self.tau_estimation(ys, ts, detrend=detrend)
 
         if nMC >= 1:
             for i in tqdm(range(nMC), desc='Monte-Carlo simulations...'):
                 r = self.ar1_model(ts, tauest)
-                wwa_red[i, :, :], _, _ = wwz_func(
-                    r, ts, freqs, tau, c=c, Neff=Neff, nproc=nproc, standardize=standardize, detrend=detrend)
+                wwa_red[i, :, :], _, _, _ = wwz_func(r, ts, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend)
 
             for j in range(nt):
                 for k in range(nf):
@@ -740,7 +731,7 @@ class WaveletAnalysis(object):
 
         coi = self.make_coi(tau)
 
-        return wwa, phase, AR1_q, coi, Neffs
+        return wwa, phase, AR1_q, coi, Neffs, coeff
 
     def wwa2psd(self, wwa, ts, Neffs, Neff=3):
         ''' Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
@@ -802,7 +793,7 @@ class WaveletAnalysis(object):
         return freqs
 
     def freq_vector_welch(self, ts):
-        ''' Return the frequency vector based on the Lomb-Scargle algorithm.
+        ''' Return the frequency vector based on the Weltch's method.
 
         Args:
             ts (array): time axis of the time series
@@ -826,7 +817,7 @@ class WaveletAnalysis(object):
 
         return freqs
 
-    def make_freq_vector(self, ts, percent=1):
+    def make_freq_vector(self, ts):
         ''' Make frequency vector
 
         Args:
@@ -837,8 +828,7 @@ class WaveletAnalysis(object):
 
         '''
         freqs_welch = self.freq_vector_welch(ts)
-        nf = np.size(freqs_welch)
-        freqs = freqs_welch[1:round(percent*nf)]  # discard the first element 0 and the tail (they can be too large for WWZ)
+        freqs = freqs_welch[1:]  # discard the first element 0
 
         return freqs
 
@@ -1122,8 +1112,8 @@ Interface for users
 '''
 
 
-def wwz(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), Neff=3, nMC=0, nproc=8,
-        standardize=False, detrend=False, method='Kirchner_f2py'):
+def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8,
+        detrend=False, method='Kirchner_f2py'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence
 
     Args:
@@ -1131,15 +1121,13 @@ def wwz(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), Neff=3, 
         ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
         tau (array): the evenly-spaced time points
         freqs (array): vector of frequency
-        freqs_num_percent (array): when `freqs` is None, `freqs_num_percent` should be used to generate `freqs`
         c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
         Neff (int): effective number of points
         nMC (int): the number of Monte-Carlo simulations
         nproc (int): the number of processes for multiprocessing
-        standardize (bool): whether to standardize the time series or not
         detrend (bool): whether to detrend the time series or not
         method (str): 'Foster' - the original WWZ method;
-                      'Kirchner' - the method Kirchner adapted from Foster
+                      'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
 
     Returns:
@@ -1147,32 +1135,38 @@ def wwz(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1/(8*np.pi**2), Neff=3, 
         AR1_q (array): AR1 simulations
         coi (array): cone of influence
         freqs (array): vector of frequency
-        Neffs (array): the effective number of points
+        tau (array): the evenly-spaced time points
+        Neffs (array): the matrix of effective number of points in the time-scale coordinates
+        coeff (array): the wavelet transform coefficents
 
     '''
     wa = WaveletAnalysis()
 
     # delete NaNs if there is any
-    ys = ys[~np.isnan(ys)]
-    ts = ts[~np.isnan(ts)]
+    ys_tmp = np.copy(ys)
+    ys = ys[~np.isnan(ys_tmp)]
+    ts = ts[~np.isnan(ys_tmp)]
+
+    if tau is None:
+        med_res = np.size(ts) // np.median(np.diff(ts))
+        tau = np.linspace(np.min(ts), np.max(ts), np.max([np.size(ts)//10, 50, med_res]))
 
     if freqs is None:
-        freqs = wa.make_freq_vector(ts, percent=freqs_num_percent)
+        freqs = wa.make_freq_vector(ts)
 
-    wwa, phase, AR1_q, coi, Neffs = wa.wavelet_analysis(ys, ts, freqs, tau, c=c, Neff=Neff, nMC=nMC, nproc=nproc,
-                                                        standardize=standardize, detrend=detrend, method=method)
+    wwa, phase, AR1_q, coi, Neffs, coeff = wa.wavelet_analysis(ys, ts, freqs, tau, c=c, Neff=Neff, nMC=nMC, nproc=nproc,
+                                                               detrend=detrend, method=method)
 
-    return wwa, phase, AR1_q, coi, freqs, Neffs
+    return wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff
 
 
-def wwa2psd(wwa, ts, freqs, tau, Neffs, c=1/(8*np.pi**2), Neff=3, anti_alias=False, avgs=2):
+def wwa2psd(wwa, ts, freqs, tau, Neffs, Neff=3, anti_alias=False, avgs=2):
     """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
     Args:
         wwa (array): the weighted wavelet amplitude.
         ts (array): the time points
         freqs (array): vector of frequency from wwz
-        c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
         Neffs (array):  the matrix of effective number of points in the time-scale coordinates obtained from wwz from wwz
         Neff (int): the threshold of the number of effective samples
         tau (array): the evenly-spaced time points
@@ -1199,37 +1193,41 @@ def wwa2psd(wwa, ts, freqs, tau, Neffs, c=1/(8*np.pi**2), Neff=3, anti_alias=Fal
     return psd
 
 
-def wwz_psd(ys, ts, tau, freqs=None, freqs_num_percent=1, c=1e-3, nproc=8,
-            standardize=False, detrend=False, Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
+def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8,
+            detrend=False, Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
     ''' Return the psd of a timeseires directly using wwz method.
 
     Args:
         ys (array): a time series, NaNs will be deleted automatically
         ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
-        tau (array): the evenly-spaced time points
         freqs (array): vector of frequency
-        freqs_num_percent (array): when `freqs` is None, `freqs_num_percent` should be used to generate `freqs`
+        tau (array): the evenly-spaced time points
         c (float): the decay constant, the default value 1e-3 is good for most of the cases
         nproc (int): the number of processes for multiprocessing
-        standardize (bool): whether to standardize the time series or not
         detrend (bool): whether to detrend the time series or not
         method (str): 'Foster' - the original WWZ method;
-                      'Kirchner' - the method Kirchner adapted from Foster
+                      'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
 
     Returns:
         psd (array): power spectral density
+        tau (array): the evenly-spaced time points
         freqs (array): vector of frequency
 
     '''
     # delete NaNs if there is any
-    ys = ys[~np.isnan(ys)]
-    ts = ts[~np.isnan(ts)]
+    ys_tmp = np.copy(ys)
+    ys = ys[~np.isnan(ys_tmp)]
+    ts = ts[~np.isnan(ys_tmp)]
 
-    wwa, phase, AR1_q, coi, freqs, Neffs = wwz(ys, ts, tau, freqs=freqs, freqs_num_percent=freqs_num_percent, c=c, nproc=nproc,
-                                               standardize=standardize, detrend=detrend, method=method)
+    if tau is None:
+        med_res = np.size(ts) // np.median(np.diff(ts))
+        tau = np.linspace(np.min(ts), np.max(ts), np.max([np.size(ts)//10, 50, med_res]))
 
-    psd = wwa2psd(wwa, ts, freqs, tau, Neffs, c=c, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+    wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = wwz(ys, ts, tau, freqs, c=c, nproc=nproc,
+                                                           detrend=detrend, method=method)
+
+    psd = wwa2psd(wwa, ts, freqs, tau, Neffs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
 
     return psd, freqs
 
@@ -1317,7 +1315,7 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
         assert AR1_q is not None, "Please set values for `AR1_q`!"
         signif = wwa / AR1_q
         if signif_style == 'countour':
-            plt.contour(tau, 1/freqs, signif.T, [-99, 1])
+            plt.contour(tau, 1/freqs, signif.T, [-99, 1], linewidth=3)
         elif signif_style == 'shade':
             plt.contourf(tau, 1/freqs, signif.T, [-99, 1], colors='k', alpha=0.1)
 
