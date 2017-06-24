@@ -629,6 +629,7 @@ class WaveletAnalysis(object):
         coeff = coeff_real + coeff_imag*1j
 
         return wwa, phase, Neffs, coeff
+
     def make_coi(self, tau, Neff=3):
         ''' Return the cone of influence.
 
@@ -710,17 +711,19 @@ class WaveletAnalysis(object):
         else:
             wwz_func = self.kirchner_f2py
 
-        wwa, phase, Neffs, coeff = wwz_func(ys, ts, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend)
+        ts_cut = ts[(np.min(tau) <= ts) & (ts <= np.max(tau))]
+        ys_cut = ys[(np.min(tau) <= ts) & (ts <= np.max(tau))]
+        tauest = self.tau_estimation(ys_cut, ts_cut, detrend=detrend)
+
+        wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend)
 
         wwa_red = np.ndarray(shape=(nMC, nt, nf))
         AR1_q = np.ndarray(shape=(nt, nf))
 
-        tauest = self.tau_estimation(ys, ts, detrend=detrend)
-
         if nMC >= 1:
             for i in tqdm(range(nMC), desc='Monte-Carlo simulations...'):
-                r = self.ar1_model(ts, tauest)
-                wwa_red[i, :, :], _, _, _ = wwz_func(r, ts, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend)
+                r = self.ar1_model(ts_cut, tauest)
+                wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend)
 
             for j in range(nt):
                 for k in range(nf):
