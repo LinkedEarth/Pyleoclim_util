@@ -13,7 +13,7 @@ import statsmodels.api as sm
 
 from scipy import optimize
 from scipy import signal
-from scipy.stats import mstats
+from scipy.stats.mstats import mquantiles
 
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -607,22 +607,29 @@ class WaveletAnalysis(object):
 
         return coi
 
-    def wwa2psd_weighted(self, wwa, ts, Neffs, Neff=3):
-        ''' Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
+    def wwa2psd(self, wwa, ts, Neffs, freqs=None, Neff=3, anti_alias=False, avgs=2):
+        """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
         Args:
             wwa (array): the weighted wavelet amplitude.
-            ts (array): time axis of the time series
-            Neffs (array): the matrix of effective number of points in the time-scale coordinates
+            ts (array): the time points, should be pre-truncated so that the span is exactly what is used for wwz
+            Neffs (array):  the matrix of effective number of points in the time-scale coordinates obtained from wwz from wwz
+            freqs (array): vector of frequency from wwz
             Neff (int): the threshold of the number of effective samples
+            anti_alias (bool): whether to apply anti-alias filter
+            avgs (int): flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
+                        OR from measurements averaged over each sampling interval (avgs==1)
 
         Returns:
             psd (array): power spectral density
 
         References:
-            Kirchner's C code
+            Kirchner's C code for weighted psd calculation
 
-        '''
+        """
+        af = AliasFilter()
+
+        # weighted psd calculation start
         dt = np.mean(np.diff(ts))
 
         power = wwa**2 * 0.5 * dt * Neffs
@@ -630,6 +637,16 @@ class WaveletAnalysis(object):
         sum_eff = np.sum(Neffs - Neff, axis=0)
 
         psd = sum_power / sum_eff
+        # weighted psd calculation end
+
+        if anti_alias:
+            assert freqs is not None, "freqs is required for alias filter!"
+            dt = np.mean(np.diff(ts))
+            f_sampling = 1/dt
+            alpha, filtered_pwr, model_pwer, aliased_pwr = af.alias_filter(
+                freqs, psd, f_sampling, f_sampling*1e3, np.min(freqs), avgs)
+
+            psd = np.copy(filtered_pwr)
 
         return psd
 
@@ -875,6 +892,74 @@ class WaveletAnalysis(object):
 
         return psd
 
+    def get_wwz_func(self, nproc, method):
+        ''' Return the wwz function to use.
+
+        Args:
+            nproc (int): the number of processes for multiprocessing
+            method (str): 'Foster' - the original WWZ method;
+                          'Kirchner' - the method Kirchner adapted from Foster;
+                          'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+        Returns:
+            wwz_func (function): the wwz function to use
+
+        '''
+        wa = WaveletAnalysis()
+        wa.assertPositiveInt(nproc)
+
+        if method == 'Foster':
+            if nproc == 1:
+                wwz_func = wa.wwz_basic
+            else:
+                wwz_func = wa.wwz_nproc
+
+        elif method == 'Kirchner':
+            if nproc == 1:
+                wwz_func = wa.kirchner_basic
+            else:
+                wwz_func = wa.kirchner_nproc
+
+        else:
+            wwz_func = wa.kirchner_f2py
+
+        return wwz_func
+
+    def prepare_wwz(self, ys, ts, freqs=None, tau=None):
+        ''' Return the truncated time series with NaNs deleted
+
+        Args:
+            ys (array): a time series, NaNs will be deleted automatically
+            ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
+            freqs (array): vector of frequency
+            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+
+        Returns:
+            ys_cut (array): the truncated time series with NaNs deleted
+            ts_cut (array): the truncated time axis of the original time series with NaNs deleted
+            freqs (array): vector of frequency
+            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+
+        '''
+        # delete NaNs if there is any
+        ys_tmp = np.copy(ys)
+        ys = ys[~np.isnan(ys_tmp)]
+        ts = ts[~np.isnan(ys_tmp)]
+
+        if tau is None:
+            med_res = np.size(ts) // np.median(np.diff(ts))
+            tau = np.linspace(np.min(ts), np.max(ts), np.max([np.size(ts)//10, 50, med_res]))
+        else:
+            assert np.min(tau) >= np.min(ts) and np.max(tau) <= np.max(ts), "tau should be within the time span of the time series."
+
+        # truncate the time series when the range of tau is smaller than that of the time series
+        ts_cut = ts[(np.min(tau) <= ts) & (ts <= np.max(tau))]
+        ys_cut = ys[(np.min(tau) <= ts) & (ts <= np.max(tau))]
+
+        if freqs is None:
+            freqs = self.make_freq_vector(ts_cut)
+
+        return ys_cut, ts_cut, freqs, tau
+
 
 class AliasFilter(object):
     '''Performing anti-alias filter on a psd
@@ -1040,7 +1125,6 @@ def ar1_sim(ys, n, p, ts=None, detrend=False):
 
     else:
         tau_est = ar1_fit(ys, ts=ts, detrend=detrend)
-        wa = WaveletAnalysis()
         for i in np.arange(p):
             red[:, i] = wa.ar1_model(ts, tau_est, n=n)
 
@@ -1050,8 +1134,7 @@ def ar1_sim(ys, n, p, ts=None, detrend=False):
     return red
 
 
-def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8,
-        detrend=False, method='Kirchner_f2py'):
+def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8, detrend=False, method='Kirchner_f2py'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients
 
     Args:
@@ -1079,42 +1162,11 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
 
     '''
     wa = WaveletAnalysis()
-    wa.assertPositiveInt(nproc)
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
-    if method == 'Foster':
-        if nproc == 1:
-            wwz_func = wa.wwz_basic
-        else:
-            wwz_func = wa.wwz_nproc
+    ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau)
 
-    elif method == 'Kirchner':
-        if nproc == 1:
-            wwz_func = wa.kirchner_basic
-        else:
-            wwz_func = wa.kirchner_nproc
-
-    else:
-        wwz_func = wa.kirchner_f2py
-
-    # delete NaNs if there is any
-    ys_tmp = np.copy(ys)
-    ys = ys[~np.isnan(ys_tmp)]
-    ts = ts[~np.isnan(ys_tmp)]
-
-    if tau is None:
-        med_res = np.size(ts) // np.median(np.diff(ts))
-        tau = np.linspace(np.min(ts), np.max(ts), np.max([np.size(ts)//10, 50, med_res]))
-    else:
-        assert np.min(tau) >= np.min(ts) and np.max(tau) <= np.max(ts), "tau should be within the time span of the time series."
-
-    if freqs is None:
-        freqs = wa.make_freq_vector(ts)
-
-    # truncate the time series when the range of tau is smaller than that of the time series
-    ts_cut = ts[(np.min(tau) <= ts) & (ts <= np.max(tau))]
-    ys_cut = ys[(np.min(tau) <= ts) & (ts <= np.max(tau))]
-
+    wwz_func = wa.get_wwz_func(nproc, method)
     wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend)
 
     # Monte-Carlo simulations of AR1 process
@@ -1133,7 +1185,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
 
         for j in range(nt):
             for k in range(nf):
-                AR1_q[j, k] = mstats.mquantiles(wwa_red[:, j, k], 0.95, alphap=0.5, betap=0.5)
+                AR1_q[j, k] = mquantiles(wwa_red[:, j, k], 0.95)
 
     else:
         AR1_q = None
@@ -1142,43 +1194,6 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
     coi = wa.make_coi(tau)
 
     return wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff
-
-
-def wwa2psd(wwa, ts, freqs, tau, Neffs, Neff=3, anti_alias=False, avgs=2):
-    """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
-
-    Args:
-        wwa (array): the weighted wavelet amplitude.
-        ts (array): the time points
-        freqs (array): vector of frequency from wwz
-        Neffs (array):  the matrix of effective number of points in the time-scale coordinates obtained from wwz from wwz
-        Neff (int): the threshold of the number of effective samples
-        tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-        anti_alias (bool): whether to apply anti-alias filter
-        avgs (int): flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
-                    OR from measurements averaged over each sampling interval (avgs==1)
-
-    Returns:
-        psd (array): power spectral density
-
-    """
-    wa = WaveletAnalysis()
-    af = AliasFilter()
-
-    # truncate the time series when the range of tau is smaller than that of the time series
-    ts_cut = ts[(np.min(tau) <= ts) & (ts <= np.max(tau))]
-
-    psd = wa.wwa2psd_weighted(wwa, ts_cut, Neffs=Neffs, Neff=Neff)
-
-    if anti_alias:
-        dt = np.mean(np.diff(ts_cut))
-        f_sampling = 1/dt
-        alpha, filtered_pwr, model_pwer, aliased_pwr = af.alias_filter(
-            freqs, psd, f_sampling, f_sampling*1e3, np.min(freqs), avgs)
-
-        psd = np.copy(filtered_pwr)
-
-    return psd
 
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
@@ -1201,23 +1216,38 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     Returns:
         psd (array): power spectral density
         freqs (array): vector of frequency
+        psd_red_q95 (array): the 95% quantile of the psds of AR1 processes
 
     '''
-    # delete NaNs if there is any
-    ys_tmp = np.copy(ys)
-    ys = ys[~np.isnan(ys_tmp)]
-    ts = ts[~np.isnan(ys_tmp)]
+    wa = WaveletAnalysis()
+    ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau)
 
-    if tau is None:
-        med_res = np.size(ts) // np.median(np.diff(ts))
-        tau = np.linspace(np.min(ts), np.max(ts), np.max([np.size(ts)//10, 50, med_res]))
+    # get wwa but AR1_q is not needed here so set nMC=0
+    wwa, _, _, _, freqs, _, Neffs, _ = wwz(ys_cut, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
+                                           detrend=detrend, method=method)
 
-    wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = wwz(ys, ts, tau, freqs, c=c, nproc=nproc, nMC=0,
-                                                           detrend=detrend, method=method)
+    psd = wa.wwa2psd(wwa, ts_cut, Neffs, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
 
-    psd = wwa2psd(wwa, ts, freqs, tau, Neffs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+    # Monte-Carlo simulations of AR1 process
+    nf = np.size(freqs)
 
-    return psd, freqs
+    psd_red = np.ndarray(shape=(nMC, nf))
+
+    if nMC >= 1:
+        tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
+
+        for i in tqdm(range(nMC), desc='Monte-Carlo simulations...'):
+            r = wa.ar1_model(ts_cut, tauest)
+            wwa_red, _, _, _, _, _, Neffs_red, _ = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
+                                                       detrend=detrend, method=method)
+            psd_red[i, :] = wa.wwa2psd(wwa_red, ts_cut, Neffs_red, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+
+        psd_red_q95 = mquantiles(psd_red, 0.95, axis=0)[0]
+
+    else:
+        psd_red_q95 = None
+
+    return psd, freqs, psd_red_q95
 
 
 def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None,
@@ -1256,7 +1286,7 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
     sns.set(style="ticks", font_scale=2)
     fig, ax = plt.subplots(figsize=figsize)
 
-    q95 = mstats.mquantiles(wwa, 0.95, alphap=0.5, betap=0.5)
+    q95 = mquantiles(wwa, 0.95)
 
     if levels is None:
         if np.nanmax(wwa) > 2*q95:
@@ -1328,14 +1358,14 @@ def plot_wwadist(wwa):
     sns.set(style="darkgrid", font_scale=2)
     plt.subplots(figsize=[20, 4])
 
-    q95 = mstats.mquantiles(wwa, 0.95, alphap=0.5, betap=0.5)
+    q95 = mquantiles(wwa, 0.95)
     fig = sns.distplot(np.nan_to_num(wwa.flat))
     fig.axvline(x=q95, ymin=0, ymax=0.5, linewidth=2, linestyle='-')
 
     return fig
 
 
-def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None,
+def plot_psd(psd, freqs, plot_red=True, psd_red_q95=None, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None,
              figsize=[20, 8], label=None):
     """ Plot the wavelet amplitude
 
@@ -1355,8 +1385,14 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, y
 
     if lmstyle is not None:
         plt.plot(1/freqs, psd, lmstyle, linewidth=linewidth, label=label)
+        if plot_red:
+            assert psd_red_q95 is not None, "psd_red_q95 is required!"
+            plt.plot(1/freqs, psd_red_q95, linewidth=linewidth,  label=label)
     else:
         plt.plot(1/freqs, psd, linewidth=linewidth,  label=label)
+        if plot_red:
+            assert psd_red_q95 is not None, "psd_red_q95 is required!"
+            plt.plot(1/freqs, psd_red_q95, linewidth=linewidth,  label=label)
 
     plt.ylabel('Spectral Density')
     plt.xlabel('Period (years)')
