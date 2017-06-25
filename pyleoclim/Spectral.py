@@ -240,7 +240,7 @@ class WaveletAnalysis(object):
 
                     wwa[j, k] = np.sqrt(ywave_2**2 + ywave_3**2)
                     phase[j, k] = np.arctan2(ywave_2, ywave_3)
-                    coeff[j, k] = ywave_2 + ywave_3*1j
+                    coeff[j, k] = ywave_3 + ywave_2*1j
 
         return wwa, phase, Neffs, coeff
 
@@ -277,7 +277,8 @@ class WaveletAnalysis(object):
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
         Neffs = np.ndarray(shape=(nt, nf))
-        coeff = np.ndarray(shape=(nt, nf), dtype=complex)
+        coeff_real = np.ndarray(shape=(nt, nf))
+        coeff_imag = np.ndarray(shape=(nt, nf))
 
         def wwa_1g(tau, omega):
             dz = omega * (ts - tau)
@@ -291,7 +292,8 @@ class WaveletAnalysis(object):
             if Neff_loc <= Neff:
                 amplitude_1g = np.nan  # the amplitude cannot be estimated reliably when Neff_loc <= Neff
                 phase_1g = np.nan
-                coeff_1g = np.nan + np.nan*1j
+                coeff_1g_real = np.nan
+                coeff_1g_imag = np.nan
             else:
                 phi2 = np.cos(dz)
                 phi3 = np.sin(dz)
@@ -314,9 +316,10 @@ class WaveletAnalysis(object):
 
                 amplitude_1g = np.sqrt(ywave_2**2 + ywave_3**2)
                 phase_1g = np.arctan2(ywave_2, ywave_3)
-                coeff_1g = ywave_2 + ywave_3*1j
+                coeff_1g_real = ywave_3
+                coeff_1g_imag = ywave_2
 
-            return amplitude_1g, phase_1g, Neff_loc, coeff_1g
+            return amplitude_1g, phase_1g, Neff_loc, coeff_1g_real, coeff_1g_imag
 
         tf_mesh = np.meshgrid(tau, omega)
         list_of_grids = list(zip(*(grid.flat for grid in tf_mesh)))
@@ -328,7 +331,10 @@ class WaveletAnalysis(object):
             wwa = res_array[:, 0].reshape((np.size(omega), np.size(tau))).T
             phase = res_array[:, 1].reshape((np.size(omega), np.size(tau))).T
             Neffs = res_array[:, 2].reshape((np.size(omega), np.size(tau))).T
-            coeff = res_array[:, 3].reshape((np.size(omega), np.size(tau))).T
+            coeff_real = res_array[:, 3].reshape((np.size(omega), np.size(tau))).T
+            coeff_imag = res_array[:, 4].reshape((np.size(omega), np.size(tau))).T
+
+        coeff = coeff_real + 1j*coeff_imag
 
         return wwa, phase, Neffs, coeff
 
@@ -421,7 +427,7 @@ class WaveletAnalysis(object):
                     a2 = 2*(sin_tau*A + cos_tau*B)  # Eq. (S7)
 
                     wwa[j, k] = np.sqrt(a1**2 + a2**2)
-                    phase[j, k] = np.arctan2(a1, a2)
+                    phase[j, k] = np.arctan2(a2, a1)
                     coeff[j, k] = a1 + a2*1j
 
         return wwa, phase, Neffs, coeff
@@ -460,7 +466,8 @@ class WaveletAnalysis(object):
         wwa = np.ndarray(shape=(nt, nf))
         phase = np.ndarray(shape=(nt, nf))
         Neffs = np.ndarray(shape=(nt, nf))
-        coeff = np.ndarray(shape=(nt, nf), dtype=complex)
+        coeff_real = np.ndarray(shape=(nt, nf))
+        coeff_imag = np.ndarray(shape=(nt, nf))
 
         def wwa_1g(tau, omega):
             dz = omega * (ts - tau)
@@ -472,7 +479,8 @@ class WaveletAnalysis(object):
             if Neff_loc <= Neff:
                 amplitude_1g = np.nan  # the amplitude cannot be estimated reliably when Neff_loc <= Neff
                 phase_1g = np.nan
-                coeff_1g = np.nan + np.nan*1j
+                coeff_1g_real = np.nan
+                coeff_1g_imag = np.nan
             else:
                 def w_prod(xs, ys):
                     return np.sum(weights*xs*ys) / sum_w
@@ -509,10 +517,11 @@ class WaveletAnalysis(object):
                 a2 = 2*(sin_tau*A + cos_tau*B)  # Eq. (S7)
 
                 amplitude_1g = np.sqrt(a1**2 + a2**2)
-                phase_1g = np.arctan2(a1, a2)
-                coeff_1g = a1 + a2*1j
+                phase_1g = np.arctan2(a2, a1)
+                coeff_1g_real = a1
+                coeff_1g_imag = a2
 
-            return amplitude_1g, phase_1g, Neff_loc, coeff_1g
+            return amplitude_1g, phase_1g, Neff_loc, coeff_1g_real, coeff_1g_imag
 
         tf_mesh = np.meshgrid(tau, omega)
         list_of_grids = list(zip(*(grid.flat for grid in tf_mesh)))
@@ -524,7 +533,10 @@ class WaveletAnalysis(object):
             wwa = res_array[:, 0].reshape((np.size(omega), np.size(tau))).T
             phase = res_array[:, 1].reshape((np.size(omega), np.size(tau))).T
             Neffs = res_array[:, 2].reshape((np.size(omega), np.size(tau))).T
-            coeff = res_array[:, 3].reshape((np.size(omega), np.size(tau))).T
+            coeff_real = res_array[:, 3].reshape((np.size(omega), np.size(tau))).T
+            coeff_imag = res_array[:, 4].reshape((np.size(omega), np.size(tau))).T
+
+        coeff = coeff_real + 1j*coeff_imag
 
         return wwa, phase, Neffs, coeff
 
@@ -559,16 +571,15 @@ class WaveletAnalysis(object):
         omega = 2*np.pi*freqs
 
         from . import f2py_wwz as f2py
-        wwa, phase, Neffs, coeff_real, coeff_imag = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
+        Neffs, a1, a2 = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
 
         undef = -99999.
-        wwa[wwa == undef] = np.nan
-        phase[phase == undef] = np.nan
-        Neffs[Neffs < Neff] = 0
+        a1[a1 == undef] = np.nan
+        a2[a2 == undef] = np.nan
+        wwa = np.sqrt(a1**2 + a2**2)
+        phase = np.arctan2(a2, a1)
 
-        coeff_real[coeff_real == undef] = np.nan
-        coeff_imag[coeff_imag == undef] = np.nan
-        coeff = coeff_real + coeff_imag*1j
+        coeff = a1 + a2*1j
 
         return wwa, phase, Neffs, coeff
 
@@ -633,8 +644,12 @@ class WaveletAnalysis(object):
         dt = np.mean(np.diff(ts))
 
         power = wwa**2 * 0.5 * dt * Neffs
-        sum_power = np.sum(power * (Neffs - Neff), axis=0)
-        sum_eff = np.sum(Neffs - Neff, axis=0)
+
+        Neff_diff = Neffs - Neff
+        Neff_diff[Neff_diff < 0] = 0
+
+        sum_power = np.sum(power * Neff_diff, axis=0)
+        sum_eff = np.sum(Neff_diff, axis=0)
 
         psd = sum_power / sum_eff
         # weighted psd calculation end
@@ -960,6 +975,29 @@ class WaveletAnalysis(object):
 
         return ys_cut, ts_cut, freqs, tau
 
+    def xwt(self, coeff1, coeff2, freqs, tau):
+        ''' Return the cross wavelet transform.
+
+        Args:
+            coeff1, coeff2 (array): the two sets of wavelet transform coefficients
+            freqs (array): vector of frequency
+            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+
+        Returns:
+            xw_power (array): the cross wavelet power
+            xw_argument (array): the cross wavelet argument
+
+        References:
+            1.Grinsted, A., Moore, J. C. & Jevrejeva, S. Application of the cross wavelet transform and
+                wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004).
+
+        '''
+        xwt = coeff1 * np.conj(coeff2)
+        xw_amplitude = np.sqrt(xwt.real**2 + xwt.imag**2)
+        xw_argument = np.atan2(xwt.imag, xwt.real)
+
+        return xw_amplitude, xw_argument
+
 
 class AliasFilter(object):
     '''Performing anti-alias filter on a psd
@@ -1216,7 +1254,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     Returns:
         psd (array): power spectral density
         freqs (array): vector of frequency
-        psd_red_q95 (array): the 95% quantile of the psds of AR1 processes
+        psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes
 
     '''
     wa = WaveletAnalysis()
@@ -1231,7 +1269,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     # Monte-Carlo simulations of AR1 process
     nf = np.size(freqs)
 
-    psd_red = np.ndarray(shape=(nMC, nf))
+    psd_ar1 = np.ndarray(shape=(nMC, nf))
 
     if nMC >= 1:
         tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
@@ -1240,14 +1278,14 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             r = wa.ar1_model(ts_cut, tauest)
             wwa_red, _, _, _, _, _, Neffs_red, _ = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
                                                        detrend=detrend, method=method)
-            psd_red[i, :] = wa.wwa2psd(wwa_red, ts_cut, Neffs_red, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+            psd_ar1[i, :] = wa.wwa2psd(wwa_red, ts_cut, Neffs_red, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
 
-        psd_red_q95 = mquantiles(psd_red, 0.95, axis=0)[0]
+        psd_ar1_q95 = mquantiles(psd_ar1, 0.95, axis=0)[0]
 
     else:
-        psd_red_q95 = None
+        psd_ar1_q95 = None
 
-    return psd, freqs, psd_red_q95
+    return psd, freqs, psd_ar1_q95
 
 
 def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None,
@@ -1286,9 +1324,8 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
     sns.set(style="ticks", font_scale=2)
     fig, ax = plt.subplots(figsize=figsize)
 
-    q95 = mquantiles(wwa, 0.95)
-
     if levels is None:
+        q95 = mquantiles(wwa, 0.95)
         if np.nanmax(wwa) > 2*q95:
             warnings.warn("There are outliers in the input amplitudes, " +
                           "and the `levels` have been set so that the outpliers will be ignored! " +
@@ -1296,6 +1333,8 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
                           "the amplitudes with the 95% quantile line to check if the levels are appropriate.", stacklevel=2)
 
             max_level = np.round(2*q95, decimals=1)
+            if max_level == 0:
+                max_level = 0.01
             levels = np.linspace(0, max_level, 11)
 
     frac = 0.15
@@ -1365,8 +1404,8 @@ def plot_wwadist(wwa):
     return fig
 
 
-def plot_psd(psd, freqs, plot_red=True, psd_red_q95=None, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None,
-             figsize=[20, 8], label=None):
+def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None,
+             figsize=[20, 8], label='PSD', plot_ar1=True, psd_ar1_q95=None, psd_ar1_color=sns.xkcd_rgb["pale red"]):
     """ Plot the wavelet amplitude
 
     Args:
@@ -1385,14 +1424,14 @@ def plot_psd(psd, freqs, plot_red=True, psd_red_q95=None, lmstyle=None, linewidt
 
     if lmstyle is not None:
         plt.plot(1/freqs, psd, lmstyle, linewidth=linewidth, label=label)
-        if plot_red:
-            assert psd_red_q95 is not None, "psd_red_q95 is required!"
-            plt.plot(1/freqs, psd_red_q95, linewidth=linewidth,  label=label)
+        if plot_ar1:
+            assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
+            plt.plot(1/freqs, psd_ar1_q95, linewidth=linewidth,  label='AR1 95%', color=psd_ar1_color)
     else:
         plt.plot(1/freqs, psd, linewidth=linewidth,  label=label)
-        if plot_red:
-            assert psd_red_q95 is not None, "psd_red_q95 is required!"
-            plt.plot(1/freqs, psd_red_q95, linewidth=linewidth,  label=label)
+        if plot_ar1:
+            assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
+            plt.plot(1/freqs, psd_ar1_q95, linewidth=linewidth,  label='AR1 95%', color=psd_ar1_color)
 
     plt.ylabel('Spectral Density')
     plt.xlabel('Period (years)')
@@ -1413,6 +1452,7 @@ def plot_psd(psd, freqs, plot_red=True, psd_red_q95=None, lmstyle=None, linewidt
         ax.set_aspect('equal')
 
     plt.gca().invert_xaxis()
+    plt.legend()
     plt.grid()
 
     return fig
