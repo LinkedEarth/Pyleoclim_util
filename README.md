@@ -19,7 +19,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.2.2
+Current Version: 0.2.3
 
 ### <a name = "what">What is it?</a>
 
@@ -46,6 +46,7 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>
+0.2.3: Freeze LiPD version to 1.2 to avoid conflicts with 1.3
 0.2.2: Change progressbar to tqdm and add standardization function
 0.2.1: Update package requirements
 0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.
@@ -82,7 +83,7 @@ and on [Pypi](https://pythonhosted.org/pyleoclim/).
 
 ### <a name="req">Requirements</a>
 
-- LiPD v0.2.0.2
+- LiPD >=0.2.0.2, <=0.2.1.9
 - pandas v0.19+
 - numpy v1.12+
 - matplotlib v2.0+
