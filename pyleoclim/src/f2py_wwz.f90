@@ -10,7 +10,7 @@ module f2py_wwz
 
     contains
 
-    subroutine wwa(taus, omegas, c, Neff, ts, pd_ys, nthread, nts, nt, nf, amplitude, phase, Neffs, coeff_real, coeff_imag)
+    subroutine wwa(taus, omegas, c, Neff, ts, pd_ys, nthread, nts, nt, nf, Neffs, a1, a2)
         implicit none
         !---------------------------------------------------------------------------------
         integer, intent(in) :: Neff, nts, nt, nf, nthread
@@ -18,7 +18,7 @@ module f2py_wwz
         double precision, dimension(nt), intent(in) :: taus
         double precision, dimension(nf), intent(in) :: omegas
         double precision, dimension(nts), intent(in) :: ts, pd_ys
-        double precision, dimension(nt, nf), intent(out) :: amplitude, phase, Neffs, coeff_real, coeff_imag
+        double precision, dimension(nt, nf), intent(out) :: Neffs, a1, a2
         ! double precision, intent(out) :: t_total
         !---------------------------------------------------------------------------------
         integer :: k, j
@@ -33,7 +33,7 @@ module f2py_wwz
         do k = 1, nf
             do j = 1, nt
                 ! call system_clock(t_start, rate)
-                call wwa_1g(taus(j), omegas(k), c, Neff, ts, pd_ys, amplitude(j, k), phase(j, k), Neffs(j, k), coeff_real(j, k), coeff_imag(j, k), nts)
+                call wwa_1g(taus(j), omegas(k), c, Neff, ts, pd_ys, Neffs(j, k), a1(j, k), a2(j, k), nts)
                 ! call system_clock(t_end)
                 ! t_lapse = real(t_end - t_start) / real(rate)
                 ! t_total = t_total + t_lapse
@@ -43,13 +43,13 @@ module f2py_wwz
 
     end subroutine wwa
 
-    subroutine wwa_1g(tau, omega, c, Neff, ts, pd_ys, amplitude_1g, phase_1g, Neff_loc, coeff_1g_real, coeff_1g_imag, nts)
+    subroutine wwa_1g(tau, omega, c, Neff, ts, pd_ys, Neff_loc, a1, a2, nts)
         implicit none
         !---------------------------------------------------------------------------------
         integer, intent(in) :: nts, Neff
         double precision, intent(in) :: tau, omega, c
         double precision, dimension(nts), intent(in) :: ts, pd_ys
-        double precision, intent(out) :: amplitude_1g, phase_1g, Neff_loc, coeff_1g_real, coeff_1g_imag
+        double precision, intent(out) :: Neff_loc, a1, a2
         !---------------------------------------------------------------------------------
         double precision, dimension(nts) :: dz, weights
         double precision :: sum_w
@@ -59,7 +59,7 @@ module f2py_wwz
         double precision, dimension(nts) :: sin_shift, cos_shift
         double precision :: sin_tau, cos_tau
         double precision :: ys_cos_shift, ys_sin_shift, ys_one, sin_shift_one, cos_shift_one
-        double precision :: A, B, a1, a2
+        double precision :: A, B
         !---------------------------------------------------------------------------------
 
         dz = omega * (ts - tau)
@@ -69,10 +69,8 @@ module f2py_wwz
         Neff_loc = sum_w**2 / sum(weights**2)
 
         if (Neff_loc <= Neff) then
-            amplitude_1g = -99999.
-            phase_1g = -99999.
-            coeff_1g_real = -99999.
-            coeff_1g_imag = -99999.
+            a1 = -99999.
+            a2 = -99999.
         else
             sin_basis = sin(omega*ts)
             cos_basis = cos(omega*ts)
@@ -104,11 +102,6 @@ module f2py_wwz
 
             a1 = 2*(cos_tau*A - sin_tau*B)
             a2 = 2*(sin_tau*A + cos_tau*B)
-
-            amplitude_1g = sqrt(a1**2 + a2**2)
-            phase_1g = atan2(a1, a2)
-            coeff_1g_real = a1
-            coeff_1g_imag = a2
         end if
 
     end subroutine wwa_1g
