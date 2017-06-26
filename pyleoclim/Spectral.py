@@ -57,12 +57,14 @@ class WaveletAnalysis(object):
 
         return check
 
-    def ar1_fit_evenly(self, ys, detrend=False):
+    def ar1_fit_evenly(self, ys, detrend='no'):
         ''' Returns the lag-1 autocorrelation from ar1 fit.
 
         Args:
             ys (array): vector of (flaot) numbers as a time series
-            detrend (bool): whether to detrend the time series or not
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
 
         Returns:
             g (float): lag-1 autocorrelation coefficient
@@ -74,20 +76,24 @@ class WaveletAnalysis(object):
 
         return g
 
-    def preprocess(self, ys, detrend=False):
+    def preprocess(self, ys, detrend='no'):
         ''' Return the processed time series using (detrend and) standardization.
 
         Args:
             ys (array): a time series
-            detrend (bool): whether to detrend the time series or not
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
 
         Returns:
             res (array): the processed time series
 
         '''
 
-        if detrend:
-            ys_d = signal.detrend(ys)
+        if detrend == 'linear':
+            ys_d = signal.detrend(ys, type='linear')
+        elif detrend == 'constant':
+            ys_d = signal.detrend(ys, type='constant')
         else:
             ys_d = ys
 
@@ -95,13 +101,15 @@ class WaveletAnalysis(object):
 
         return res
 
-    def tau_estimation(self, ys, ts, detrend=False):
+    def tau_estimation(self, ys, ts, detrend='no'):
         ''' Return the estimated persistence of a givenevenly/unevenly spaced time series.
 
         Args:
             ys (array): a time series
             ts (array): time axis of the time series
-            detrend (bool): whether detrend the time series or not
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
 
         Returns:
             tau_est (float): the estimated persistence
@@ -163,7 +171,7 @@ class WaveletAnalysis(object):
 
         return r
 
-    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False):
+    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no'):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -174,7 +182,9 @@ class WaveletAnalysis(object):
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
             nproc (int): fake argument, just for convenience
-            detrend (bool): whether to detrend the time series or not
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -241,7 +251,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=False):
+    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend='no'):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -252,7 +262,9 @@ class WaveletAnalysis(object):
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
             nproc (int): the number of processes for multiprocessing
-            detrend (bool): whether to detrend the time series or not
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -326,7 +338,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False):
+    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no'):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -337,7 +349,9 @@ class WaveletAnalysis(object):
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
             nproc (int): fake argument, just for convenience
-            detrend (bool): whether to detrend the time series or not
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -418,7 +432,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False):
+    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no'):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -429,7 +443,9 @@ class WaveletAnalysis(object):
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
             nproc (int): the number of processes for multiprocessing
-            detrend (bool): whether to detrend the time series or not
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -517,7 +533,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False):
+    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no'):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -528,7 +544,9 @@ class WaveletAnalysis(object):
             c (float): the decay constant
             Neff (int): the threshold of the number of effective degree of freedom
             nproc (int): fake argument, just for convenience
-            detrend (bool): whether to detrend the time series or not
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -975,13 +993,14 @@ class WaveletAnalysis(object):
 
         return xw_amplitude, xw_phase
 
-    def cross_coherence(self, coeff1, coeff2, freqs, tau):
+    def cross_coherence(self, coeff1, coeff2, freqs, tau, c1, c2):
         ''' Return the cross wavelet transform.
 
         Args:
             coeff1, coeff2 (array): the two sets of wavelet transform coefficients
             freqs (array): vector of frequency
             tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+            c1, c2 (float): normalization constants
 
         Returns:
             xw_coherence (array): the cross wavelet coherence
@@ -1002,12 +1021,19 @@ class WaveletAnalysis(object):
 
         xw_coherence = np.ndarray(shape=(nt, nf))
 
-        #  def Smoothing(coeff, c1, c2):
-        #      return None
+        def Smooth_time(coeff, c1):
+            return None
 
-        #  for j in range(nf):
-        #      xw_coherence[:, j] = np.abs(Smoothing(/omega[j]))**2 / Smoothing(/omega[j]) / Smoothing(/omega[j])
+        def Smooth_scale(coeff, c2):
+            return None
 
+        def Smoothing(coeff, c1, c2):
+            S = Smooth_scale(Smooth_time(coeff, c1), c2)
+            return S
+
+        for j in range(nf):
+            xw_coherence[:, j] = np.abs(Smoothing(xwt[:, j]/omega[j], c1, c2))**2 / \
+                Smoothing(power1[:, j]/omega[j], c1, c2) / Smoothing(power2[:, j]/omega[j], c1, c2)
 
         return xw_coherence
 
@@ -1121,13 +1147,15 @@ Interface for the users below, more checks about the input will be performed her
 '''
 
 
-def ar1_fit(ys, ts=None, detrend=False):
+def ar1_fit(ys, ts=None, detrend='no'):
     ''' Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
 
     Args:
         ys (array): the time series
         ts (array): the time axis of that series
-        detrend (bool): whether to detrend the time series or not
+        detrend (str): 'no' - the original time series is assumed to have no trend;
+                       'linear' - a linear least-squares fit to `ys` is subtracted;
+                       'constant' - the mean of `ys` is subtracted
 
     Returns:
         g (float): lag-1 autocorrelation coefficient (for evenly-spaced time series)
@@ -1144,14 +1172,16 @@ def ar1_fit(ys, ts=None, detrend=False):
     return g
 
 
-def ar1_sim(ys, n, p, ts=None, detrend=False):
+def ar1_sim(ys, n, p, ts=None, detrend='no'):
     ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from `ys` and `ts`
 
     Args:
         ys (array): a time series
         n, p (int): dimensions as n rows by p columns
         ts (array): the time axis of that series
-        detrend (bool): whether to detrend the time series or not
+        detrend (str): 'no' - the original time series is assumed to have no trend;
+                       'linear' - a linear least-squares fit to `ys` is subtracted;
+                       'constant' - the mean of `ys` is subtracted
 
     Returns:
         red (matrix): n rows by p columns matrix of an AR1 process
@@ -1184,7 +1214,7 @@ def ar1_sim(ys, n, p, ts=None, detrend=False):
     return red
 
 
-def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8, detrend=False, method='Kirchner_f2py'):
+def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8, detrend='no', method='Kirchner_f2py'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients
 
     Args:
@@ -1196,7 +1226,9 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
         Neff (int): effective number of points
         nMC (int): the number of Monte-Carlo simulations
         nproc (int): the number of processes for multiprocessing
-        detrend (bool): whether to detrend the time series or not
+        detrend (str): 'no' - the original time series is assumed to have no trend;
+                       'linear' - a linear least-squares fit to `ys` is subtracted;
+                       'constant' - the mean of `ys` is subtracted
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
@@ -1247,7 +1279,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
 
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
-            detrend=False, Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
+            detrend='no', Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
     ''' Return the psd of a timeseires directly using wwz method.
 
     Args:
@@ -1258,7 +1290,9 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         c (float): the decay constant, the default value 1e-3 is good for most of the cases
         nproc (int): the number of processes for multiprocessing
         nMC (int): the number of Monte-Carlo simulations
-        detrend (bool): whether to detrend the time series or not
+        detrend (str): 'no' - the original time series is assumed to have no trend;
+                       'linear' - a linear least-squares fit to `ys` is subtracted;
+                       'constant' - the mean of `ys` is subtracted
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
@@ -1301,7 +1335,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
 
 
 def xwt(ys1, ts1, ys2, ts2,
-        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8, detrend=False, method='Kirchner_f2py'):
+        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8, detrend='no', method='Kirchner_f2py'):
     ''' Return the crosse wavelet transform of two time series.
 
     Args:
@@ -1313,7 +1347,9 @@ def xwt(ys1, ts1, ys2, ts2,
         Neff (int): effective number of points
         nMC (int): the number of Monte-Carlo simulations
         nproc (int): the number of processes for multiprocessing
-        detrend (bool): whether to detrend the time series or not
+        detrend (str): 'no' - the original time series is assumed to have no trend;
+                       'linear' - a linear least-squares fit to `ys` is subtracted;
+                       'constant' - the mean of `ys` is subtracted
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
@@ -1429,10 +1465,10 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
     if plot_signif:
         assert AR1_q is not None, "Please set values for `AR1_q`!"
         signif = wwa / AR1_q
-        if signif_style == 'countour':
-            plt.contour(tau, 1/freqs, signif.T, [-99, 1])
+        if signif_style == 'contour':
+            plt.contour(tau, 1/freqs, signif.T, [-99, 1], colors='k')
         elif signif_style == 'shade':
-            plt.contourf(tau, 1/freqs, signif.T, [-99, 1], colors='k', alpha=0.1)
+            plt.contourf(tau, 1/freqs, signif.T, [-99, 1], colors='k', alpha=0.1)  # significant if not shaded
 
     if plot_cone:
         assert coi is not None, "Please set values for `coi`!"
