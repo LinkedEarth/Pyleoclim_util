@@ -700,7 +700,7 @@ def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
     x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
 
     #remove nans
-     y_temp = np.copy(y)
+    y_temp = np.copy(y)
     y = y[~np.isnan(y_temp)]
     x = x[~np.isnan(y_temp)]
     
