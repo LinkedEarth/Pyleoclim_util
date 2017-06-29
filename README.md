@@ -19,7 +19,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.2.4
+Current Version: 0.2.5
 
 ### <a name = "what">What is it?</a>
 
@@ -46,6 +46,7 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>
+0.2.5: Fix error on loading (Looking for Spectral Module)  
 0.2.4: Fix load error from init  
 0.2.3: Freeze LiPD version to 1.2 to avoid conflicts with 1.3  
 0.2.2: Change progressbar to tqdm and add standardization function  

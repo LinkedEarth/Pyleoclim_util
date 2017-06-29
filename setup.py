@@ -3,7 +3,7 @@ import os
 import sys
 import io
 
-version = '0.2.4'
+version = '0.2.5'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
@@ -43,7 +43,7 @@ setup(
     author='Deborah Khider',
     author_email='dkhider@gmail.com',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
-    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.2.4',
+    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.2.5',
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
     install_requires=[

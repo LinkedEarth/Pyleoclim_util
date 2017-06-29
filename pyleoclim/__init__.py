@@ -22,7 +22,7 @@ from pyleoclim import Map
 from pyleoclim import LipdUtils
 from pyleoclim import SummaryPlots
 from pyleoclim import Plot
-from pyleoclim import Spectral
+#from pyleoclim import Spectral
 from pyleoclim import Stats
 from pyleoclim import Timeseries
 
