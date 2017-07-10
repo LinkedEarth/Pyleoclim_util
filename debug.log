@@ -78,3 +78,5 @@
 2017-06-23 14:16:40,236 [INFO] Convert: enter ts_extract_paleo_columns
 2017-06-23 14:16:40,236 [INFO] Convert: exit ts_extract_main
 2017-06-23 14:16:40,236 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 0.0 seconds
+2017-06-28 22:47:21,517 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpt8y1vxce
+2017-06-28 22:47:21,517 [INFO] LiPD_Library: LiPD Library created

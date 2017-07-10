@@ -257,9 +257,9 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
     x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
 
     # remove nans
-    index = np.where(~np.isnan(y))[0]
-    x = x[index]
-    y = y[index]
+    y_temp = np.copy(y)
+    y = y[~np.isnan(y_temp)]
+    x = x[~np.isnan(y_temp)]
 
     # get the markers
     if marker == "default":
@@ -631,13 +631,13 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
     x2, label = LipdUtils.checkXaxis(timeseries2, x_axis=label)
 
     # Remove NaNs
-    index1 = np.where(~np.isnan(y1))[0]
-    x1 = x1[index1]
-    y1 = y1[index1]
+    y1_temp = np.copy(y1)
+    y1 = y1[~np.isnan(y1_temp)]
+    x1 = x1[~np.isnan(y1_temp)]
 
-    index2 = np.where(~np.isnan(y2))[0]
-    x2 = x2[index2]
-    y2 = y2[index2]
+    y2_temp = np.copy(y2)
+    y2 = y2[~np.isnan(y2_temp)]
+    x2 = x2[~np.isnan(y2_temp)]
 
     #Check that the two timeseries have the same lenght and if not interpolate
     if len(y1) != len(y2):
@@ -700,10 +700,10 @@ def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
     x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
 
     #remove nans
-    index = np.where(~np.isnan(y))[0]
-    x = x[index]
-    y = y[index]
-
+    y_temp = np.copy(y)
+    y = y[~np.isnan(y_temp)]
+    x = x[~np.isnan(y_temp)]
+    
     #Bin the timeseries:
     bins, binned_values, n, error = Timeseries.bin(x,y, bin_size = bin_size,\
                                                    start = start, end = end)
@@ -742,9 +742,9 @@ def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
     x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
 
     #remove nans
-    index = np.where(~np.isnan(y))[0]
-    x = x[index]
-    y = y[index]
+    y_temp = np.copy(y)
+    y = y[~np.isnan(y_temp)]
+    x = x[~np.isnan(y_temp)]
 
     #Interpolate the timeseries
     interp_age, interp_values = Timeseries.interp(x,y,interp_step = interp_step,\
@@ -786,11 +786,16 @@ def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
     y = np.array(timeseries['paleoData_values'], dtype = 'float64')
 
     # Remove NaNs
-    index = np.where(~np.isnan(y))[0]
-    y = y[index]
+    y_temp = np.copy(y)
+    y = y[~np.isnan(y_temp)]
 
     #Standardize
     z, mu, sig = Timeseries.standardize(y,scale=1,axis=None,ddof=0,eps=1e-3)
 
     return z, mu, sig
+
+
+"""
+Wavelet analysis
+"""
 
