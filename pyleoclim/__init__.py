@@ -11,11 +11,11 @@ https://github.com/LinkedEarth/Pyleoclim_util/blob/master/license
 #Import all the needed packages
 import lipd as lpd
 import numpy as np
-import sys
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from matplotlib import gridspec
 import seaborn as sns
+
 
 # Import internal modules to pyleoclim
 from pyleoclim import Map
@@ -26,45 +26,57 @@ from pyleoclim import Spectral
 from pyleoclim import Stats
 from pyleoclim import Timeseries
 
+
 """
-Get the LiPD files and set a few global variables
+Open Lipd files and extract timeseries (set them as global variable)
+ 
 """
 
-# Load the LiPDs present in the directory
-def openLipds(path="",ts_list=""):
-    """Load and extract timeseries objects from LiPD files.
-
-    Allows to load and extract timeseries objects into the workspace for use
-    with Pyleoclim. This can be done by the user previously, using the LiPD
-    utilities and passed into the function's argumenta. If no timeseries objects
-    are found by other functions, this function will be triggered automatically
-    without arguments.
-
+def readLipd(usr_path=""):
+    """Read Lipd files into a dictionary
+    
+    This function is based on the function of the same name in the LiPD utilities.
+    Sets the dictionary as global variable so that it doesn't have to be provided
+    as an argument for every function.
+    
     Args:
-        path (string): the path to the LiPD file. If not specified, will
-            trigger the LiPD utilities GUI.
-        ts_list (list): the list of available timeseries objects
-            obtained from lipd.extractTs().
-
-    Warning:
-        if specifying a list, path should also be specified.
-
+        usr_path (str): The path to a directory or a single file. (Optional argument)
+        
+    Returns:
+        lipd_dict - a dictionary containing the LiPD library
+    
     """
-    global lipd_path
-    global timeseries_list
-    if not path and not ts_list:
-        lipd_path = lpd.readLipd()
-        timeseries_list = lpd.extractTs()
-    elif not ts_list:
-        lipd_path = lpd.readLipd(path)
-        timeseries_list = lpd.extractTs()
-    elif not path:
-        sys.exit("If specifying a list of timeseries, also need to specify path")
-    else:
-        lipd_path = path
-        timeseries_list = ts_list
+    global lipd_dict
+    lipd_dict = lpd.readLipd(usr_path=usr_path)
+    return lipd_dict
 
-# Set the default palette for plots
+def extractTs(lipd_dict=""):
+    """Extract timeseries dictionary
+    
+    This function is based on the function of the same name in the LiPD utilities.
+    Set the dictionary as a global variable so that it doesn't have to be
+    provided as an argument for every function. 
+    
+    Args:
+        lipd_dict (dict): A dictionary of LiPD files obtained through the 
+        readLipd function
+    
+    Returns:
+        ts_list - A list of timeseries object
+    
+    """
+    global ts_list
+    if not lipd_dict and 'lipd_dict' not in globals():
+        lipd_dict = readLipd()
+    ts_list = lpd.extractTs(lipd_dict)
+    return ts_list
+        
+
+"""
+Set a few global variables
+"""
+      
+#Set the default palette for plots
 
 plot_default = {'ice/rock': ['#FFD600','h'],
                 'coral': ['#FF8B00','o'],
@@ -82,7 +94,7 @@ plot_default = {'ice/rock': ['#FFD600','h'],
 """
 Mapping
 """
-def mapAllArchive(markersize = 50, background = 'shadedrelief',\
+def mapAllArchive(lipd_dict = "", markersize = 50, background = 'shadedrelief',\
                   saveFig = False, dir="", format='eps'):
     """Map all the available records loaded into the workspace by archiveType.
 
@@ -90,6 +102,7 @@ def mapAllArchive(markersize = 50, background = 'shadedrelief',\
         Uses the default color palette. Enter pyleoclim.plot_default for detail.
 
     Args:
+        lipd_dict (dict): A dictionary of LiPD files. (Optional)
         markersize (int): The size of the markers. Default is 50
         background (str): Plots one of the following images on the map:
             bluemarble, etopo, shadedrelief, or none (filled continents).
@@ -105,21 +118,19 @@ def mapAllArchive(markersize = 50, background = 'shadedrelief',\
     Returns:
         The figure
     """
-    # Make sure there are LiPD files to plot
-    if not 'timeseries_list' in globals():
-        openLipds()
-
-    #Get the lipd files
-    lipd_in_directory = lpd.getLipdNames()
-
+    
+    # Get the dictionary of LiPD files
+    if not lipd_dict and 'lipd_dict' not in globals():
+        lipd_dict = readLipd()
+        
     # Initialize the various lists
     lat = []
     lon = []
     archiveType = []
 
     # Loop ang grab the metadata
-    for lipd in lipd_in_directory:
-        d = lpd.getMetadata(lipd)
+    for idx, key in enumerate(lipd_dict):
+        d = lipd_dict[key]
         lat.append(d['geo']['geometry']['coordinates'][1])
         lon.append(d['geo']['geometry']['coordinates'][0])
         archiveType.append(LipdUtils.LipdToOntology(d['archiveType']).lower())
@@ -182,11 +193,10 @@ def mapLipd(timeseries="", countries = True, counties = False, \
 
     """
     # Make sure there are LiPD files to plot
-    if not 'timeseries_list' in globals():
-        openLipds()
-
     if not timeseries:
-        timeseries = LipdUtils.getTs(timeseries_list)
+        if not 'ts_list' in globals():
+            ts_list = extractTs()
+        timeseries = LipdUtils.getTs(ts_list)    
 
     # Get latitude/longitude
 
@@ -245,13 +255,10 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
         The figure.
 
     """
-    # Get the timeseries dictionary if not in global variables
-    if not 'timeseries_list' in globals():
-        openLipds()
-
-    # Get a timeseries if not already provided
     if not timeseries:
-        timeseries = LipdUtils.getTs(timeseries_list)
+        if not 'ts_list' in globals():
+            ts_list = extractTs()
+        timeseries = LipdUtils.getTs(ts_list) 
 
     y = np.array(timeseries['paleoData_values'], dtype = 'float64')
     x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
@@ -353,12 +360,10 @@ def histTs(timeseries = "", bins = None, hist = True, \
         fig - The figure
 
     """
-    if not 'timeseries_list' in globals():
-        openLipds()
-
-    # Get the timeseries if not present
     if not timeseries:
-        timeseries = LipdUtils.getTs(timeseries_list)
+        if not 'ts_list' in globals():
+            ts_list = extractTs()
+        timeseries = LipdUtils.getTs(ts_list) 
 
     # Get the values
     y = np.array(timeseries['paleoData_values'], dtype = 'float64')
@@ -439,12 +444,10 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
 
     """
 
-    if not 'timeseries_list' in globals():
-        openLipds()
-
-    # get a timeseries if none provided
     if not timeseries:
-        timeseries = LipdUtils.getTs(timeseries_list)
+        if not 'ts_list' in globals():
+            ts_list = extractTs()
+        timeseries = LipdUtils.getTs(ts_list) 
 
     # get the necessary metadata
     metadata = SummaryPlots.getMetadata(timeseries)
@@ -560,12 +563,10 @@ def statsTs(timeseries=""):
         >>> mean, median, min_, max_, std, IQR = pyleo.statsTs(timeseries)
 
     """
-    if not 'timeseries_list' in globals():
-        openLipds()
-
-    # Get the timeseries if not present
     if not timeseries:
-        timeseries = LipdUtils.getTs(timeseries_list)
+        if not 'ts_list' in globals():
+            ts_list = extractTs()
+        timeseries = LipdUtils.getTs(ts_list) 
 
     # get the values
     y = np.array(timeseries['paleoData_values'], dtype = 'float64')
@@ -612,15 +613,15 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
             p (real) - the p-value
 
     """
-    if not 'timeseries_list' in globals():
-        openLipds()
-
-    # Get the timeseries
     if not timeseries1:
-        timeseries1 = LipdUtils.getTs(timeseries_list)
-
+        if not 'ts_list' in globals():
+            ts_list = extractTs()
+        timeseries1 = LipdUtils.getTs(ts_list)
+        
     if not timeseries2:
-        timeseries2 = LipdUtils.getTs(timeseries_list)
+        if not 'ts_list' in globals():
+            ts_list = extractTs()
+        timeseries2 = LipdUtils.getTs(ts_list)    
 
     # Get the first time and paleoData values
     y1 = np.array(timeseries1['paleoData_values'], dtype = 'float64')
@@ -688,12 +689,10 @@ def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
         error- the standard error on the mean in each bin\n
 
     """
-    if not 'timeseries_list' in globals():
-        openLipds()
-
-    # get a timeseries if none provided
     if not timeseries:
-        timeseries = LipdUtils.getTs(timeseries_list)
+        if not 'ts_list' in globals():
+            ts_list = extractTs()
+        timeseries = LipdUtils.getTs(ts_list)
 
     # Get the values
     y = np.array(timeseries['paleoData_values'], dtype = 'float64')
@@ -730,12 +729,10 @@ def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
         interp_values - the interpolated values
 
     """
-    if not 'timeseries_list' in globals():
-        openLipds()
-
-    # get a timeseries if none provided
     if not timeseries:
-        timeseries = LipdUtils.getTs(timeseries_list)
+        if not 'ts_list' in globals():
+            ts_list = extractTs()
+        timeseries = LipdUtils.getTs(ts_list)
 
     # Get the values
     y = np.array(timeseries['paleoData_values'], dtype = 'float64')
@@ -775,12 +772,10 @@ def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
 
     @author: fzhu
     """
-    if not 'timeseries_list' in globals():
-        openLipds()
-
-    # get a timeseries if none provided
     if not timeseries:
-        timeseries = LipdUtils.getTs(timeseries_list)
+        if not 'ts_list' in globals():
+            ts_list = extractTs()
+        timeseries = LipdUtils.getTs(ts_list)
 
     # get the values
     y = np.array(timeseries['paleoData_values'], dtype = 'float64')
@@ -795,7 +790,7 @@ def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
     return z, mu, sig
 
 
-"""
-Wavelet analysis
-"""
+#"""
+#Wavelet analysis
+#"""
 
