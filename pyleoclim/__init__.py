@@ -803,7 +803,104 @@ def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
 def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
           psd_default = True, wwaplot_default = True, psdplot_default = True,
           fig = True, saveFig = False, dir = "", format = "eps"):
-    """Weigthed Z-transform wavelet analysis
+    """Weigthed wavelet Z-transform analysis
+    
+    Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)
+    
+    Args:
+        timeseries (dict): A LiPD timeseries object (Optional, will prompt for one.)
+        wwz (bool): If True, will perform wavelet analysis
+        psd (bool): If True, will inform the power spectral density of the timeseries
+        wwz_default: If True, will use the following default parameters:
+            wwz_default = {'tau':None,
+                           'freqs':None,
+                           'c':1/(8*np.pi**2),
+                           'Neff':3,
+                           'nMC':200,
+                           'nproc':8,
+                           'detrend':'no',
+                           'method':'Kirchner_f2py'}
+            Modify the values for specific keys to change the default behavior.
+        psd_default: If True, will use the following default parameters:
+            psd_default = {'tau':None,
+                          'freqs': None,
+                          'c':1e-3,
+                          'nproc':8,
+                          'nMC':200,
+                          'detrend':'no',
+                          'Neff':3,
+                          'anti_alias':False,
+                          'avgs':2,
+                          'method':'Kirchner_f2py'}
+            Modify the values for specific keys to change the default behavior.
+        wwaplot_default: If True, will use the following default parameters:
+            wwaplot_default={'Neff':3,
+                                 'AR1_q':AR1_q,
+                                 'coi':coi,
+                                 'levels':None,
+                                 'tick_range':None,
+                                 'yticks':None,
+                                 'ylim':None,
+                                 'xticks':None,
+                                 'xlabels':None,
+                                 'figsize':[20,8],
+                                 'clr_map':'OrRd',
+                                 'cbar_drawedges':False,
+                                 'cone_alpha':0.5,
+                                 'plot_signif':True,
+                                 'signif_style':'contour',
+                                 'plot_cone':True}
+            Modify the values for specific keys to change the default behavior.
+        psdplot_default: If True, will use the following default parameters:
+            psdplot_default={'lmstyle':None,
+                             'linewidth':None,
+                             'xticks':None,
+                             'xlim':None,
+                             'ylim':None,
+                             'figsize':[20,8],
+                             'label':'PSD',
+                             'plot_ar1':True,
+                             'psd_ar1_q95':psd_ar1_q95,
+                             'psd_ar1_color':sns.xkcd_rgb["pale red"]}
+            Modify the values for specific keys to change the default behavior.
+        fig (bool): If True, plots the figure
+        saveFig (bool): default is to not save the figure
+        dir (str): the full path of the directory in which to save the figure.
+            If not provided, creates a default folder called 'figures' in the
+            LiPD working directory (lipd.path).
+        format (str): One of the file extensions supported by the active
+            backend. Default is "eps". Most backend support png, pdf, ps, eps,
+            and svg.
+        
+        Returns:
+            dict_out - A dictionary of outputs. \n
+            For wwz: \n
+            - wwa (array): The weights wavelet amplitude \n
+            - AR1_q (array): AR1 simulations \n
+            - coi (array): cone of influence \n
+            - freqs (array): vector for frequencies \n
+            - tau (array): the evenly-spaced time points, namely the time 
+            shift for wavelet analysis. \n
+            - Neffs (array): The matrix of effective number of points in the
+            time-scale coordinates.
+            - coeff (array): The wavelet transform coefficients\n
+            For psd: \n
+            - psd (array): power spectral density \n
+            - freqs (array): vector of frequency \n
+            - psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes \n
+            fig - The figure
+         
+        References:
+            Foster, G. (1996). Wavelets for period analysis of unevenly 
+            sampled time series. The Astronomical Journal, 112(4), 1709-1729.
+        
+        Examples:
+            To run both wwz and psd:
+            >>> dict_out, fig = pyleoclim.wwzTs(wwz=True)
+            Note: This will return a single figure with wwa and psd
+            To change a default behavior:
+            >>> dict_out, fig = pyleoclim.wwzTs(psd_default = {'nMC':1000}) 
+           
     """
     
     # Make sure there is something to compute
