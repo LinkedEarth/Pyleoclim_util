@@ -1,4 +1,1533 @@
-2017-06-20 13:14:40,533 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpcwfl8kd2
-2017-06-20 13:14:40,534 [INFO] LiPD_Library: LiPD Library created
-2017-06-20 14:50:51,033 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpeef62myp
-2017-06-20 14:50:51,033 [INFO] LiPD_Library: LiPD Library created
+2017-07-12 10:44:46,808 [INFO] directory: enter list_files
+2017-07-12 10:44:46,810 [INFO] directory: exit list_files
+2017-07-12 10:44:46,820 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpv8s4guxq
+2017-07-12 10:44:46,820 [INFO] zips: enter unzip
+2017-07-12 10:44:46,878 [INFO] zips: exit unzip
+2017-07-12 10:44:46,924 [INFO] jsons: Read JSONLD successful: Ant-JamesRossIsland.Mulvaney.2013.jsonld
+2017-07-12 10:44:46,924 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:46,924 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:46,924 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:46,924 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:46,924 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:46,925 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:46,925 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:46,925 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:46,925 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:46,925 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:46,925 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:46,925 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:46,925 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:46,925 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:46,925 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:46,925 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:46,929 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:46,932 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:46,933 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:46,933 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:46,934 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ant-JamesRossIsland.Mulvaney.2013.lpd
+2017-07-12 10:44:46,934 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp04moyj_s
+2017-07-12 10:44:46,934 [INFO] zips: enter unzip
+2017-07-12 10:44:47,100 [INFO] zips: exit unzip
+2017-07-12 10:44:47,547 [INFO] jsons: Read JSONLD successful: Arc-LakeNatauj├ñrvi.Ojala.2005.jsonld
+2017-07-12 10:44:47,547 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:47,549 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:47,549 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:47,549 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:47,549 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:47,552 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:47,553 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:47,553 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:47,553 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:47,553 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:47,553 [INFO] jsons: enter import_data: chron
+2017-07-12 10:44:47,553 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:44:47,553 [INFO] jsons: idx_table_by_name: Exception: 'columns'
+2017-07-12 10:44:47,553 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:44:47,553 [INFO] jsons: exit import_data: chron
+2017-07-12 10:44:47,553 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:47,554 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:47,554 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:47,555 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:47,556 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:47,556 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:47,560 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:47,562 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:47,562 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:47,562 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:44:47,562 [INFO] csvs: get_filename: KeyError: missing filename key for chron.chron0.measurement.chron0measurement0
+2017-07-12 10:44:47,562 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:44:47,562 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:47,565 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Arc-LakeNataujärvi.Ojala.2005.lpd
+2017-07-12 10:44:47,565 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpgdxb6o4y
+2017-07-12 10:44:47,565 [INFO] zips: enter unzip
+2017-07-12 10:44:47,601 [INFO] zips: exit unzip
+2017-07-12 10:44:47,641 [INFO] jsons: Read JSONLD successful: Arc-Yukon.DArrigo.2006.jsonld
+2017-07-12 10:44:47,641 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:47,641 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:47,641 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:47,641 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:47,641 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:47,641 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:47,641 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:47,641 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:47,641 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:47,642 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:47,642 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:47,642 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:47,642 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:47,642 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:47,642 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:47,642 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:47,644 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:47,645 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:47,645 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:47,645 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:47,646 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Arc-Yukon.D'Arrigo.2006.lpd
+2017-07-12 10:44:47,646 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpxi0lsk03
+2017-07-12 10:44:47,647 [INFO] zips: enter unzip
+2017-07-12 10:44:47,683 [INFO] zips: exit unzip
+2017-07-12 10:44:47,739 [INFO] jsons: Read JSONLD successful: Asi-Dasuopu.Thompson.2000.jsonld
+2017-07-12 10:44:47,740 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:47,740 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:47,740 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:47,740 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:47,740 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:47,741 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:47,741 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:47,741 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:47,741 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:47,741 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:47,741 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:47,741 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:47,741 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:47,742 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:47,742 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:47,742 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:47,744 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:47,747 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:47,747 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:47,747 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:47,748 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Asi-Dasuopu.Thompson.2000.lpd
+2017-07-12 10:44:47,748 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpby7j6maj
+2017-07-12 10:44:47,748 [INFO] zips: enter unzip
+2017-07-12 10:44:47,790 [INFO] zips: exit unzip
+2017-07-12 10:44:47,833 [INFO] jsons: Read JSONLD successful: Asi-TH001.Buckley.2010.jsonld
+2017-07-12 10:44:47,833 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:47,833 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:47,833 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:47,833 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:47,833 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:47,833 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:47,833 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:47,833 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:47,833 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:47,834 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:47,834 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:47,834 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:47,834 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:47,834 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:47,834 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:47,834 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:47,835 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:47,836 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:47,836 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:47,836 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:47,837 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Asi-TH001.Buckley.2010.lpd
+2017-07-12 10:44:47,837 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpvkqjzs94
+2017-07-12 10:44:47,837 [INFO] zips: enter unzip
+2017-07-12 10:44:47,872 [INFO] zips: exit unzip
+2017-07-12 10:44:47,969 [INFO] jsons: Read JSONLD successful: Eur-NorthernSpain.Mart├¡n-Chivelet.2011.jsonld
+2017-07-12 10:44:47,969 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:47,969 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:47,970 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:47,970 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:47,970 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:47,970 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:47,970 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:47,970 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:47,970 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:47,970 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:47,970 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:47,970 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:47,970 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:47,971 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:47,971 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:47,971 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:47,974 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:47,975 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:47,975 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:47,975 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:47,976 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Eur-NorthernSpain.Martín-Chivelet.2011.lpd
+2017-07-12 10:44:47,976 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp262y8j__
+2017-07-12 10:44:47,977 [INFO] zips: enter unzip
+2017-07-12 10:44:48,022 [INFO] zips: exit unzip
+2017-07-12 10:44:48,189 [INFO] jsons: Read JSONLD successful: Juxtlahuaca.Lachniet.2012.jsonld
+2017-07-12 10:44:48,189 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:48,190 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:48,191 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:48,191 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:48,191 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:48,192 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:48,192 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:48,192 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:48,192 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:48,192 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:48,192 [INFO] jsons: enter import_data: chron
+2017-07-12 10:44:48,193 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:44:48,193 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:44:48,193 [INFO] jsons: exit import_data: chron
+2017-07-12 10:44:48,193 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:48,193 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:48,193 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:48,195 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:48,196 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:48,196 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:48,205 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:48,215 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:48,216 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:48,216 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:44:48,216 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:48,218 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:48,220 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: is_date_used_original_model
+2017-07-12 10:44:48,222 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: decay_constants_used
+2017-07-12 10:44:48,223 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: modern_reference
+2017-07-12 10:44:48,223 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:48,223 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:44:48,224 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:48,225 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Juxtlahuaca.Lachniet.2012.lpd
+2017-07-12 10:44:48,225 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpaatgc9tj
+2017-07-12 10:44:48,225 [INFO] zips: enter unzip
+2017-07-12 10:44:48,308 [INFO] zips: exit unzip
+2017-07-12 10:44:48,490 [INFO] jsons: Read JSONLD successful: MD01-2378.Xu.2008.jsonld
+2017-07-12 10:44:48,491 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:48,491 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:48,491 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:48,491 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:48,491 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:48,492 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:48,492 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:48,492 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:48,493 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:48,493 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:48,493 [INFO] jsons: enter import_data: chron
+2017-07-12 10:44:48,493 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:44:48,493 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:44:48,493 [INFO] jsons: exit import_data: chron
+2017-07-12 10:44:48,493 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:48,493 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:48,493 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:48,494 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:48,494 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:48,494 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:48,495 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:48,499 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:48,499 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:48,499 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:44:48,499 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:48,499 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:48,499 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: lab label
+2017-07-12 10:44:48,500 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:48,500 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:44:48,500 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:48,501 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/MD01-2378.Xu.2008.lpd
+2017-07-12 10:44:48,501 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpfbmjp87d
+2017-07-12 10:44:48,501 [INFO] zips: enter unzip
+2017-07-12 10:44:48,562 [INFO] zips: exit unzip
+2017-07-12 10:44:49,275 [INFO] jsons: Read JSONLD successful: MD97-2121.Marr.2013.jsonld
+2017-07-12 10:44:49,276 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:49,278 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:49,278 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:49,279 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:49,279 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:49,282 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:49,282 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:49,282 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:49,282 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:49,283 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:49,283 [INFO] jsons: enter import_data: chron
+2017-07-12 10:44:49,283 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:44:49,283 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:44:49,283 [INFO] jsons: exit import_data: chron
+2017-07-12 10:44:49,283 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:49,283 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:49,283 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:49,286 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:49,286 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:49,286 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,286 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,290 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,291 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,292 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,295 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,296 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,297 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,300 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,300 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:49,300 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:44:49,300 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,300 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,301 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: tephra/ams
+2017-07-12 10:44:49,301 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,302 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:44:49,302 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:49,303 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/MD97-2121.Marr.2013.lpd
+2017-07-12 10:44:49,303 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpw0dgnph_
+2017-07-12 10:44:49,303 [INFO] zips: enter unzip
+2017-07-12 10:44:49,343 [INFO] zips: exit unzip
+2017-07-12 10:44:49,474 [INFO] jsons: Read JSONLD successful: MD98-2170.Stott.2004.jsonld
+2017-07-12 10:44:49,474 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:49,475 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:49,475 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:49,475 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:49,475 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:49,476 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:49,476 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:49,476 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:49,476 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:49,476 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:49,476 [INFO] jsons: enter import_data: chron
+2017-07-12 10:44:49,476 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:44:49,476 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:44:49,476 [INFO] jsons: exit import_data: chron
+2017-07-12 10:44:49,476 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:49,476 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:49,476 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:49,477 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:49,477 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:49,477 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,477 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,479 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,479 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:49,479 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:44:49,479 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,479 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,479 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: labcode
+2017-07-12 10:44:49,480 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,480 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:44:49,480 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:49,481 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/MD98-2170.Stott.2004.lpd
+2017-07-12 10:44:49,481 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmps9cwb35_
+2017-07-12 10:44:49,481 [INFO] zips: enter unzip
+2017-07-12 10:44:49,516 [INFO] zips: exit unzip
+2017-07-12 10:44:49,563 [INFO] jsons: Read JSONLD successful: Ocn-MadangLagoonPapuaNewGuinea.Kuhnert.2001.jsonld
+2017-07-12 10:44:49,563 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:49,563 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:49,563 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:49,563 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:49,564 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:49,564 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:49,564 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:49,564 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:49,564 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:49,564 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:49,564 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:49,564 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:49,564 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:49,565 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:49,565 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:49,565 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,566 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,568 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,568 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:49,568 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:49,569 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-MadangLagoonPapuaNewGuinea.Kuhnert.2001.lpd
+2017-07-12 10:44:49,569 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpsmwxoim6
+2017-07-12 10:44:49,569 [INFO] zips: enter unzip
+2017-07-12 10:44:49,617 [INFO] zips: exit unzip
+2017-07-12 10:44:49,727 [INFO] jsons: Read JSONLD successful: Ocn-MontegoBayJamaica.Haase-Schramm.2003.jsonld
+2017-07-12 10:44:49,727 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:49,728 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:49,728 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:49,728 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:49,728 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:49,728 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:49,728 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:49,729 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:49,729 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:49,729 [INFO] jsons: enter import_meas: paleo1
+2017-07-12 10:44:49,729 [INFO] jsons: exit import_meas: paleo1measurement
+2017-07-12 10:44:49,729 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:49,729 [INFO] jsons: enter import_data: chron
+2017-07-12 10:44:49,729 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:44:49,729 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:44:49,729 [INFO] jsons: exit import_data: chron
+2017-07-12 10:44:49,729 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:49,729 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:49,729 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:49,730 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:49,730 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:49,730 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,731 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,731 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,731 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,732 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,733 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,733 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:49,733 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:44:49,733 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,733 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,733 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:44:49,734 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:49,735 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-MontegoBayJamaica.Haase-Schramm.2003.lpd
+2017-07-12 10:44:49,735 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpa88te33p
+2017-07-12 10:44:49,735 [INFO] zips: enter unzip
+2017-07-12 10:44:49,780 [INFO] zips: exit unzip
+2017-07-12 10:44:49,853 [INFO] jsons: Read JSONLD successful: Ocn-SantaBarbaraBasin.Zhao.2000.jsonld
+2017-07-12 10:44:49,853 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:49,854 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:49,854 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:49,854 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:49,854 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:49,854 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:49,854 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:49,854 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:49,854 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:49,854 [INFO] jsons: enter import_meas: paleo1
+2017-07-12 10:44:49,854 [INFO] jsons: exit import_meas: paleo1measurement
+2017-07-12 10:44:49,855 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:49,855 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:49,855 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:49,855 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:49,856 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:49,856 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:49,856 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,858 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,861 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: core
+2017-07-12 10:44:49,861 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,861 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,862 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,863 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,863 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:49,863 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:49,864 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-SantaBarbaraBasin.Zhao.2000.lpd
+2017-07-12 10:44:49,864 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpo8w6k0_a
+2017-07-12 10:44:49,864 [INFO] zips: enter unzip
+2017-07-12 10:44:49,897 [INFO] zips: exit unzip
+2017-07-12 10:44:49,945 [INFO] jsons: Read JSONLD successful: Ocn-TongueoftheOcean.Rosenheim.2005.jsonld
+2017-07-12 10:44:49,945 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:44:49,945 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:44:49,945 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:44:49,945 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:44:49,945 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:44:49,945 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:44:49,945 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:44:49,946 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:44:49,946 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:44:49,946 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:44:49,946 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:44:49,946 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:44:49,946 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:44:49,946 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:44:49,946 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:44:49,946 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:44:49,947 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:44:49,947 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:44:49,947 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:44:49,948 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:44:49,949 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-TongueoftheOcean.Rosenheim.2005.lpd
+2017-07-12 10:44:49,960 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 2.45 seconds
+2017-07-12 10:45:13,625 [INFO] directory: enter list_files
+2017-07-12 10:45:13,642 [INFO] directory: exit list_files
+2017-07-12 10:45:13,666 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp7rdjm28z
+2017-07-12 10:45:13,679 [INFO] zips: enter unzip
+2017-07-12 10:45:13,739 [INFO] zips: exit unzip
+2017-07-12 10:45:13,815 [INFO] jsons: Read JSONLD successful: Ant-JamesRossIsland.Mulvaney.2013.jsonld
+2017-07-12 10:45:13,828 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:13,850 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:13,863 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:13,876 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:13,887 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:13,907 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:13,919 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:13,932 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:13,946 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:13,957 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:13,969 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:13,980 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:14,000 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:14,015 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:14,028 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:14,039 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:14,056 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:14,070 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:14,084 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:14,100 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:14,116 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ant-JamesRossIsland.Mulvaney.2013.lpd
+2017-07-12 10:45:14,134 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpvyoyk2f7
+2017-07-12 10:45:14,163 [INFO] zips: enter unzip
+2017-07-12 10:45:14,482 [INFO] zips: exit unzip
+2017-07-12 10:45:15,189 [INFO] jsons: Read JSONLD successful: Arc-LakeNatauj├ñrvi.Ojala.2005.jsonld
+2017-07-12 10:45:15,206 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:15,232 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:15,268 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:15,299 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:15,330 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:15,367 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:15,394 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:15,410 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:15,424 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:15,439 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:15,455 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:15,469 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:15,487 [INFO] jsons: idx_table_by_name: Exception: 'columns'
+2017-07-12 10:45:15,505 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:15,523 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:15,542 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:15,571 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:15,585 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:15,598 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:15,613 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:15,631 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:15,673 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:15,707 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:15,728 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:15,742 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:15,760 [INFO] csvs: get_filename: KeyError: missing filename key for chron.chron0.measurement.chron0measurement0
+2017-07-12 10:45:15,772 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:15,786 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:15,801 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Arc-LakeNataujärvi.Ojala.2005.lpd
+2017-07-12 10:45:15,813 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpxyq98rfz
+2017-07-12 10:45:15,825 [INFO] zips: enter unzip
+2017-07-12 10:45:15,913 [INFO] zips: exit unzip
+2017-07-12 10:45:15,979 [INFO] jsons: Read JSONLD successful: Arc-Yukon.DArrigo.2006.jsonld
+2017-07-12 10:45:16,013 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:16,029 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:16,045 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:16,068 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:16,093 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:16,108 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:16,125 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:16,141 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:16,157 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:16,176 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:16,194 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:16,210 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:16,228 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:16,249 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:16,281 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:16,306 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:16,325 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:16,342 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:16,374 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:16,407 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:16,440 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Arc-Yukon.D'Arrigo.2006.lpd
+2017-07-12 10:45:16,456 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpj5c6c9ak
+2017-07-12 10:45:16,479 [INFO] zips: enter unzip
+2017-07-12 10:45:16,569 [INFO] zips: exit unzip
+2017-07-12 10:45:16,672 [INFO] jsons: Read JSONLD successful: Asi-Dasuopu.Thompson.2000.jsonld
+2017-07-12 10:45:16,697 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:16,715 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:16,731 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:16,747 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:16,762 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:16,783 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:16,797 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:16,812 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:16,823 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:16,835 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:16,850 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:16,866 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:16,895 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:16,911 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:16,928 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:16,942 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:16,959 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:16,976 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:16,994 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:17,008 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:17,023 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Asi-Dasuopu.Thompson.2000.lpd
+2017-07-12 10:45:17,036 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp_7ck21hb
+2017-07-12 10:45:17,049 [INFO] zips: enter unzip
+2017-07-12 10:45:17,110 [INFO] zips: exit unzip
+2017-07-12 10:45:17,165 [INFO] jsons: Read JSONLD successful: Asi-TH001.Buckley.2010.jsonld
+2017-07-12 10:45:17,183 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:17,203 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:17,219 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:17,234 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:17,247 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:17,261 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:17,274 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:17,292 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:17,308 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:17,319 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:17,333 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:17,347 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:17,369 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:17,404 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:17,420 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:17,449 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:17,485 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:17,515 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:17,534 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:17,552 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:17,574 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Asi-TH001.Buckley.2010.lpd
+2017-07-12 10:45:17,598 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp57qsmi9e
+2017-07-12 10:45:17,614 [INFO] zips: enter unzip
+2017-07-12 10:45:17,691 [INFO] zips: exit unzip
+2017-07-12 10:45:17,818 [INFO] jsons: Read JSONLD successful: Eur-NorthernSpain.Mart├¡n-Chivelet.2011.jsonld
+2017-07-12 10:45:17,835 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:17,853 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:17,868 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:17,884 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:17,907 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:17,919 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:17,940 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:17,957 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:17,970 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:17,985 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:18,014 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:18,030 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:18,056 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:18,070 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:18,083 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:18,104 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:18,129 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:18,154 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:18,173 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:18,188 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:18,213 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Eur-NorthernSpain.Martín-Chivelet.2011.lpd
+2017-07-12 10:45:18,236 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpd0umrzs4
+2017-07-12 10:45:18,254 [INFO] zips: enter unzip
+2017-07-12 10:45:18,366 [INFO] zips: exit unzip
+2017-07-12 10:45:18,568 [INFO] jsons: Read JSONLD successful: Juxtlahuaca.Lachniet.2012.jsonld
+2017-07-12 10:45:18,586 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:18,601 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:18,630 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:18,647 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:18,663 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:18,680 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:18,703 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:18,742 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:18,765 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:18,791 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:18,806 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:18,827 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:18,842 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:18,861 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:18,876 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:18,889 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:18,900 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:18,924 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:18,942 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:18,961 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:18,981 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:19,004 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:19,027 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:19,041 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:19,063 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:19,080 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:19,102 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: is_date_used_original_model
+2017-07-12 10:45:19,129 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: decay_constants_used
+2017-07-12 10:45:19,144 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: modern_reference
+2017-07-12 10:45:19,161 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:19,176 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:19,192 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:19,211 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Juxtlahuaca.Lachniet.2012.lpd
+2017-07-12 10:45:19,241 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpippm08ot
+2017-07-12 10:45:19,266 [INFO] zips: enter unzip
+2017-07-12 10:45:19,366 [INFO] zips: exit unzip
+2017-07-12 10:45:19,637 [INFO] jsons: Read JSONLD successful: MD01-2378.Xu.2008.jsonld
+2017-07-12 10:45:19,652 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:19,674 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:19,695 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:19,710 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:19,724 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:19,737 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:19,749 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:19,762 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:19,774 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:19,791 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:19,802 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:19,815 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:19,827 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:19,838 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:19,851 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:19,863 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:19,877 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:19,895 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:19,906 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:19,921 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:19,944 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:19,968 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:19,996 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:20,008 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:20,021 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:20,032 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:20,045 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: lab label
+2017-07-12 10:45:20,057 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:20,069 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:20,100 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:20,114 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/MD01-2378.Xu.2008.lpd
+2017-07-12 10:45:20,132 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpcnwk8kgd
+2017-07-12 10:45:20,147 [INFO] zips: enter unzip
+2017-07-12 10:45:20,249 [INFO] zips: exit unzip
+2017-07-12 10:45:20,973 [INFO] jsons: Read JSONLD successful: MD97-2121.Marr.2013.jsonld
+2017-07-12 10:45:20,984 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:20,998 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:21,010 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:21,024 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:21,042 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:21,069 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:21,098 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:21,112 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:21,130 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:21,151 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:21,165 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:21,182 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:21,227 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:21,243 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:21,257 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:21,269 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:21,282 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:21,299 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:21,312 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:21,327 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:21,346 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:21,364 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:21,378 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:21,391 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:21,416 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:21,441 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:21,456 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:21,476 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:21,489 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:21,502 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:21,515 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:21,528 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:21,547 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: tephra/ams
+2017-07-12 10:45:21,561 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:21,576 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:21,595 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:21,615 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/MD97-2121.Marr.2013.lpd
+2017-07-12 10:45:21,635 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp9kwzjyaw
+2017-07-12 10:45:21,663 [INFO] zips: enter unzip
+2017-07-12 10:45:21,743 [INFO] zips: exit unzip
+2017-07-12 10:45:21,950 [INFO] jsons: Read JSONLD successful: MD98-2170.Stott.2004.jsonld
+2017-07-12 10:45:21,968 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:21,987 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:22,002 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:22,020 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:22,037 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:22,051 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:22,064 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:22,076 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:22,086 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:22,101 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:22,120 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:22,137 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:22,158 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:22,177 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:22,196 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:22,214 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:22,233 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:22,252 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:22,266 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:22,279 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:22,293 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:22,314 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:22,338 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:22,358 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:22,374 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:22,392 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:22,413 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: labcode
+2017-07-12 10:45:22,436 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:22,464 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:22,480 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:22,503 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/MD98-2170.Stott.2004.lpd
+2017-07-12 10:45:22,531 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmptbb1tahx
+2017-07-12 10:45:22,546 [INFO] zips: enter unzip
+2017-07-12 10:45:22,628 [INFO] zips: exit unzip
+2017-07-12 10:45:22,750 [INFO] jsons: Read JSONLD successful: Ocn-MadangLagoonPapuaNewGuinea.Kuhnert.2001.jsonld
+2017-07-12 10:45:22,768 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:22,785 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:22,802 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:22,826 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:22,843 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:22,861 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:22,874 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:22,889 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:22,905 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:22,930 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:22,950 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:22,969 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:22,985 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:23,001 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:23,027 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:23,046 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:23,082 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:23,110 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:23,133 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:23,149 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:23,165 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-MadangLagoonPapuaNewGuinea.Kuhnert.2001.lpd
+2017-07-12 10:45:23,178 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpj6p89t3p
+2017-07-12 10:45:23,195 [INFO] zips: enter unzip
+2017-07-12 10:45:23,311 [INFO] zips: exit unzip
+2017-07-12 10:45:23,478 [INFO] jsons: Read JSONLD successful: Ocn-MontegoBayJamaica.Haase-Schramm.2003.jsonld
+2017-07-12 10:45:23,491 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:23,503 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:23,519 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:23,535 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:23,552 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:23,567 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:23,579 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:23,592 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:23,605 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:23,624 [INFO] jsons: enter import_meas: paleo1
+2017-07-12 10:45:23,658 [INFO] jsons: exit import_meas: paleo1measurement
+2017-07-12 10:45:23,670 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:23,685 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:23,700 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:23,714 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:23,729 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:23,746 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:23,760 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:23,776 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:23,790 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:23,803 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:23,816 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:23,832 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:23,851 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:23,869 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:23,892 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:23,912 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:23,931 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:23,949 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:23,978 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:24,009 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:24,042 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:24,069 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:24,084 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-MontegoBayJamaica.Haase-Schramm.2003.lpd
+2017-07-12 10:45:24,099 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpr1fdm42d
+2017-07-12 10:45:24,113 [INFO] zips: enter unzip
+2017-07-12 10:45:24,194 [INFO] zips: exit unzip
+2017-07-12 10:45:24,301 [INFO] jsons: Read JSONLD successful: Ocn-SantaBarbaraBasin.Zhao.2000.jsonld
+2017-07-12 10:45:24,320 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:24,335 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:24,354 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:24,368 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:24,383 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:24,396 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:24,410 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:24,430 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:24,461 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:24,479 [INFO] jsons: enter import_meas: paleo1
+2017-07-12 10:45:24,494 [INFO] jsons: exit import_meas: paleo1measurement
+2017-07-12 10:45:24,505 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:24,521 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:24,541 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:24,560 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:24,574 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:24,589 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:24,602 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:24,617 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:24,632 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: core
+2017-07-12 10:45:24,651 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:24,668 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:24,684 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:24,699 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:24,720 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:24,736 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:24,752 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-SantaBarbaraBasin.Zhao.2000.lpd
+2017-07-12 10:45:24,771 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp7tsnb_w7
+2017-07-12 10:45:24,786 [INFO] zips: enter unzip
+2017-07-12 10:45:24,867 [INFO] zips: exit unzip
+2017-07-12 10:45:24,930 [INFO] jsons: Read JSONLD successful: Ocn-TongueoftheOcean.Rosenheim.2005.jsonld
+2017-07-12 10:45:24,951 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:24,973 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:24,984 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:25,002 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:25,028 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:25,047 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:25,065 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:25,088 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:25,103 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:25,117 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:25,130 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:25,144 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:25,157 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:25,188 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:25,217 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:25,233 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:25,268 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:25,294 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:25,310 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:25,321 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:25,334 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-TongueoftheOcean.Rosenheim.2005.lpd
+2017-07-12 10:45:25,352 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpg986zotp
+2017-07-12 10:45:25,370 [INFO] zips: enter unzip
+2017-07-12 10:45:25,449 [INFO] zips: exit unzip
+2017-07-12 10:45:25,574 [INFO] jsons: Read JSONLD successful: Ant-JamesRossIsland.Mulvaney.2013.jsonld
+2017-07-12 10:45:25,595 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:25,616 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:25,633 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:25,648 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:25,666 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:25,692 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:25,710 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:25,730 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:25,746 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:25,762 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:25,786 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:25,813 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:25,834 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:25,850 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:25,866 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:25,886 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:25,907 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:25,926 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:25,942 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:25,957 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:25,974 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ant-JamesRossIsland.Mulvaney.2013.lpd
+2017-07-12 10:45:25,993 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpgwxsla0v
+2017-07-12 10:45:26,010 [INFO] zips: enter unzip
+2017-07-12 10:45:26,243 [INFO] zips: exit unzip
+2017-07-12 10:45:26,717 [INFO] jsons: Read JSONLD successful: Arc-LakeNatauj├ñrvi.Ojala.2005.jsonld
+2017-07-12 10:45:26,733 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:26,749 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:26,761 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:26,772 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:26,784 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:26,799 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:26,814 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:26,828 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:26,840 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:26,854 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:26,867 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:26,883 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:26,901 [INFO] jsons: idx_table_by_name: Exception: 'columns'
+2017-07-12 10:45:26,919 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:26,940 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:26,955 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:26,969 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:26,983 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:26,999 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:27,020 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:27,032 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:27,052 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:27,066 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:27,081 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:27,094 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:27,116 [INFO] csvs: get_filename: KeyError: missing filename key for chron.chron0.measurement.chron0measurement0
+2017-07-12 10:45:27,139 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:27,155 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:27,170 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Arc-LakeNataujärvi.Ojala.2005.lpd
+2017-07-12 10:45:27,185 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpv5yuuzl1
+2017-07-12 10:45:27,200 [INFO] zips: enter unzip
+2017-07-12 10:45:27,289 [INFO] zips: exit unzip
+2017-07-12 10:45:27,348 [INFO] jsons: Read JSONLD successful: Arc-Yukon.DArrigo.2006.jsonld
+2017-07-12 10:45:27,367 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:27,382 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:27,398 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:27,423 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:27,437 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:27,453 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:27,468 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:27,485 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:27,498 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:27,513 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:27,531 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:27,544 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:27,558 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:27,572 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:27,586 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:27,600 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:27,616 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:27,636 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:27,650 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:27,665 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:27,679 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Arc-Yukon.D'Arrigo.2006.lpd
+2017-07-12 10:45:27,694 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpeuhjpp50
+2017-07-12 10:45:27,706 [INFO] zips: enter unzip
+2017-07-12 10:45:27,819 [INFO] zips: exit unzip
+2017-07-12 10:45:27,909 [INFO] jsons: Read JSONLD successful: Asi-Dasuopu.Thompson.2000.jsonld
+2017-07-12 10:45:27,924 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:27,944 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:27,961 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:27,974 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:27,996 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:28,010 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:28,028 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:28,046 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:28,063 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:28,076 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:28,088 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:28,100 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:28,132 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:28,148 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:28,164 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:28,177 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:28,196 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:28,212 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:28,224 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:28,251 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:28,266 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Asi-Dasuopu.Thompson.2000.lpd
+2017-07-12 10:45:28,282 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmplaiaf4bf
+2017-07-12 10:45:28,296 [INFO] zips: enter unzip
+2017-07-12 10:45:28,367 [INFO] zips: exit unzip
+2017-07-12 10:45:28,440 [INFO] jsons: Read JSONLD successful: Asi-TH001.Buckley.2010.jsonld
+2017-07-12 10:45:28,457 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:28,475 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:28,487 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:28,502 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:28,515 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:28,529 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:28,549 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:28,563 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:28,577 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:28,590 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:28,602 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:28,615 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:28,629 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:28,648 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:28,663 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:28,678 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:28,693 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:28,718 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:28,732 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:28,762 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:28,777 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Asi-TH001.Buckley.2010.lpd
+2017-07-12 10:45:28,791 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpg3n52rv8
+2017-07-12 10:45:28,805 [INFO] zips: enter unzip
+2017-07-12 10:45:28,868 [INFO] zips: exit unzip
+2017-07-12 10:45:28,938 [INFO] jsons: Read JSONLD successful: Eur-NorthernSpain.Mart├¡n-Chivelet.2011.jsonld
+2017-07-12 10:45:28,967 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:28,980 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:28,997 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:29,011 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:29,026 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:29,039 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:29,057 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:29,071 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:29,087 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:29,099 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:29,124 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:29,139 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:29,154 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:29,174 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:29,192 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:29,207 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:29,223 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:29,238 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:29,254 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:29,271 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:29,288 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Eur-NorthernSpain.Martín-Chivelet.2011.lpd
+2017-07-12 10:45:29,301 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpfdwmmkg6
+2017-07-12 10:45:29,316 [INFO] zips: enter unzip
+2017-07-12 10:45:29,394 [INFO] zips: exit unzip
+2017-07-12 10:45:29,579 [INFO] jsons: Read JSONLD successful: Juxtlahuaca.Lachniet.2012.jsonld
+2017-07-12 10:45:29,592 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:29,607 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:29,626 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:29,642 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:29,658 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:29,674 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:29,687 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:29,702 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:29,720 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:29,736 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:29,752 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:29,767 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:29,780 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:29,792 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:29,806 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:29,825 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:29,845 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:29,863 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:29,877 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:29,889 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:29,906 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:29,929 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:29,945 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:29,959 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:29,974 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:29,998 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:30,013 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: is_date_used_original_model
+2017-07-12 10:45:30,032 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: decay_constants_used
+2017-07-12 10:45:30,062 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: modern_reference
+2017-07-12 10:45:30,080 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:30,099 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:30,118 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:30,141 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Juxtlahuaca.Lachniet.2012.lpd
+2017-07-12 10:45:30,154 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpbkxe9ev4
+2017-07-12 10:45:30,170 [INFO] zips: enter unzip
+2017-07-12 10:45:30,249 [INFO] zips: exit unzip
+2017-07-12 10:45:30,457 [INFO] jsons: Read JSONLD successful: MD01-2378.Xu.2008.jsonld
+2017-07-12 10:45:30,471 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:30,486 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:30,513 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:30,531 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:30,555 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:30,587 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:30,619 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:30,659 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:30,678 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:30,707 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:30,724 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:30,749 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:30,774 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:30,801 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:30,825 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:30,842 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:30,864 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:30,883 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:30,899 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:30,916 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:30,932 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:30,958 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:30,972 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:30,992 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:31,010 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:31,027 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:31,054 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: lab label
+2017-07-12 10:45:31,073 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:31,095 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:31,116 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:31,140 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/MD01-2378.Xu.2008.lpd
+2017-07-12 10:45:31,160 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpcu89fkg8
+2017-07-12 10:45:31,175 [INFO] zips: enter unzip
+2017-07-12 10:45:31,333 [INFO] zips: exit unzip
+2017-07-12 10:45:32,083 [INFO] jsons: Read JSONLD successful: MD97-2121.Marr.2013.jsonld
+2017-07-12 10:45:32,103 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:32,117 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:32,129 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:32,146 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:32,159 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:32,181 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:32,199 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:32,216 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:32,231 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:32,250 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:32,264 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:32,279 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:32,298 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:32,317 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:32,331 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:32,354 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:32,369 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:32,392 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:32,413 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:32,428 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:32,452 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:32,475 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:32,493 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:32,519 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:32,551 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:32,569 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:32,586 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:32,609 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:32,624 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:32,640 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:32,660 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:32,683 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:32,702 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: tephra/ams
+2017-07-12 10:45:32,717 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:32,732 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:32,757 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:32,782 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/MD97-2121.Marr.2013.lpd
+2017-07-12 10:45:32,813 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpvhq2bgvo
+2017-07-12 10:45:32,830 [INFO] zips: enter unzip
+2017-07-12 10:45:32,926 [INFO] zips: exit unzip
+2017-07-12 10:45:33,152 [INFO] jsons: Read JSONLD successful: MD98-2170.Stott.2004.jsonld
+2017-07-12 10:45:33,235 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:33,303 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:33,350 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:33,376 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:33,396 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:33,421 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:33,444 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:33,466 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:33,486 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:33,509 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:33,529 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:33,543 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:33,561 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:33,581 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:33,594 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:33,610 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:33,624 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:33,640 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:33,655 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:33,673 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:33,690 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:33,706 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:33,721 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:33,736 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:33,765 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:33,794 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:33,809 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: labcode
+2017-07-12 10:45:33,824 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:33,839 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:33,853 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:33,869 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/MD98-2170.Stott.2004.lpd
+2017-07-12 10:45:33,891 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmphi3_rdv3
+2017-07-12 10:45:33,911 [INFO] zips: enter unzip
+2017-07-12 10:45:33,971 [INFO] zips: exit unzip
+2017-07-12 10:45:34,044 [INFO] jsons: Read JSONLD successful: Ocn-MadangLagoonPapuaNewGuinea.Kuhnert.2001.jsonld
+2017-07-12 10:45:34,060 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:34,076 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:34,098 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:34,115 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:34,131 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:34,146 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:34,161 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:34,194 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:34,210 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:34,226 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:34,240 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:34,260 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:34,278 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:34,306 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:34,328 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:34,347 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:34,362 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:34,378 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:34,397 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:34,410 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:34,428 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-MadangLagoonPapuaNewGuinea.Kuhnert.2001.lpd
+2017-07-12 10:45:34,443 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpattletnm
+2017-07-12 10:45:34,459 [INFO] zips: enter unzip
+2017-07-12 10:45:34,542 [INFO] zips: exit unzip
+2017-07-12 10:45:34,677 [INFO] jsons: Read JSONLD successful: Ocn-MontegoBayJamaica.Haase-Schramm.2003.jsonld
+2017-07-12 10:45:34,692 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:34,705 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:34,721 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:34,735 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:34,759 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:34,775 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:34,789 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:34,802 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:34,817 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:34,830 [INFO] jsons: enter import_meas: paleo1
+2017-07-12 10:45:34,852 [INFO] jsons: exit import_meas: paleo1measurement
+2017-07-12 10:45:34,875 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:34,902 [INFO] jsons: enter import_data: chron
+2017-07-12 10:45:34,917 [INFO] jsons: enter import_meas: chron0
+2017-07-12 10:45:34,934 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 10:45:34,951 [INFO] jsons: exit import_data: chron
+2017-07-12 10:45:34,968 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:34,984 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:35,000 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:35,018 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:35,033 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:35,048 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:35,068 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:35,084 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:35,099 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:35,114 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:35,137 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:35,170 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:35,201 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 10:45:35,228 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:35,260 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:35,290 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 10:45:35,312 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:35,340 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-MontegoBayJamaica.Haase-Schramm.2003.lpd
+2017-07-12 10:45:35,377 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmp6cr511xd
+2017-07-12 10:45:35,400 [INFO] zips: enter unzip
+2017-07-12 10:45:35,544 [INFO] zips: exit unzip
+2017-07-12 10:45:35,656 [INFO] jsons: Read JSONLD successful: Ocn-SantaBarbaraBasin.Zhao.2000.jsonld
+2017-07-12 10:45:35,676 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:35,692 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:35,709 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:35,724 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:35,738 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:35,756 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:35,780 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:35,795 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:35,817 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:35,834 [INFO] jsons: enter import_meas: paleo1
+2017-07-12 10:45:35,852 [INFO] jsons: exit import_meas: paleo1measurement
+2017-07-12 10:45:35,875 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:35,902 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:35,928 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:35,971 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:36,044 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:36,067 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:36,107 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:36,125 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:36,150 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: core
+2017-07-12 10:45:36,204 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:36,245 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:36,269 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:36,295 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:36,320 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:36,341 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:36,367 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-SantaBarbaraBasin.Zhao.2000.lpd
+2017-07-12 10:45:36,394 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpradff7yh
+2017-07-12 10:45:36,415 [INFO] zips: enter unzip
+2017-07-12 10:45:36,492 [INFO] zips: exit unzip
+2017-07-12 10:45:36,564 [INFO] jsons: Read JSONLD successful: Ocn-TongueoftheOcean.Rosenheim.2005.jsonld
+2017-07-12 10:45:36,580 [INFO] jsons: exit read_json_from_file
+2017-07-12 10:45:36,601 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 10:45:36,617 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 10:45:36,633 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 10:45:36,647 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 10:45:36,664 [INFO] jsons: enter idx_num_to_name
+2017-07-12 10:45:36,679 [INFO] jsons: enter import_data: paleo
+2017-07-12 10:45:36,700 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 10:45:36,718 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 10:45:36,733 [INFO] jsons: exit import_data: paleo
+2017-07-12 10:45:36,749 [INFO] jsons: exit idx_num_to_name
+2017-07-12 10:45:36,764 [INFO] misc: enter remove_empty_doi
+2017-07-12 10:45:36,778 [INFO] misc: exit remove_empty_doi
+2017-07-12 10:45:36,798 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 10:45:36,816 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 10:45:36,832 [INFO] csvs: enter read_csv_from_file
+2017-07-12 10:45:36,848 [INFO] csvs: exit read_csv_from_file
+2017-07-12 10:45:36,861 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 10:45:36,876 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 10:45:36,892 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 10:45:36,912 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Documents/Python/Pyleoclim_util/Example/Ocn-TongueoftheOcean.Rosenheim.2005.lpd
+2017-07-12 10:45:36,932 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 5.88 seconds
+2017-07-12 10:45:36,961 [INFO] time_series: enter extract_main
+2017-07-12 10:45:36,985 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:37,011 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:37,034 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:37,070 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:37,099 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:37,130 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:37,166 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:37,184 [INFO] time_series: processing publication #: 1
+2017-07-12 10:45:37,203 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:37,229 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:37,247 [INFO] time_series: processing publication #: 2
+2017-07-12 10:45:37,267 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:37,284 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:37,307 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:37,334 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:37,353 [INFO] time_series: enter extract_special
+2017-07-12 10:45:37,379 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:37,401 [INFO] time_series: enter extract_calibration
+2017-07-12 10:45:37,437 [ERROR] time_series: extract_table: 'list' object has no attribute 'items'
+2017-07-12 10:45:37,459 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:37,484 [INFO] time_series: enter extract_special
+2017-07-12 10:45:37,507 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:37,534 [INFO] time_series: enter extract_calibration
+2017-07-12 10:45:37,552 [ERROR] time_series: extract_table: 'list' object has no attribute 'items'
+2017-07-12 10:45:37,571 [INFO] time_series: exit extract_main
+2017-07-12 10:45:37,588 [INFO] time_series: enter extract_main
+2017-07-12 10:45:37,606 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:37,623 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:37,649 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:37,716 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:37,862 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:37,904 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:37,958 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:38,043 [INFO] time_series: enter extract_special
+2017-07-12 10:45:38,105 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:38,159 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:38,188 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:38,219 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:38,282 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:38,339 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:38,451 [INFO] time_series: exit extract_main
+2017-07-12 10:45:38,481 [INFO] time_series: enter extract_main
+2017-07-12 10:45:38,567 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:38,596 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:38,775 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:38,820 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:38,899 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:38,953 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:39,019 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:39,052 [INFO] time_series: processing publication #: 1
+2017-07-12 10:45:39,125 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:39,161 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:39,188 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:39,343 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:39,487 [INFO] time_series: enter extract_special
+2017-07-12 10:45:39,805 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:39,862 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:39,904 [INFO] time_series: exit extract_main
+2017-07-12 10:45:39,939 [INFO] time_series: enter extract_main
+2017-07-12 10:45:39,960 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:39,982 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:40,005 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:40,025 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:40,065 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:40,094 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:40,123 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:40,153 [INFO] time_series: enter extract_special
+2017-07-12 10:45:40,175 [WARNING] time_series: extract_special: KeyError: 'units' not found, 'units'
+2017-07-12 10:45:40,219 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:40,262 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:40,286 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:40,313 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:40,417 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:40,450 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:40,492 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:40,530 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:40,581 [INFO] time_series: exit extract_main
+2017-07-12 10:45:40,603 [INFO] time_series: enter extract_main
+2017-07-12 10:45:40,625 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:40,642 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:40,680 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:40,701 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:40,725 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:40,776 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:40,797 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:40,831 [INFO] time_series: processing publication #: 1
+2017-07-12 10:45:40,849 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:40,881 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:40,902 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:40,927 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:40,945 [INFO] time_series: enter extract_special
+2017-07-12 10:45:40,965 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:40,985 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,004 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:41,024 [INFO] time_series: enter extract_special
+2017-07-12 10:45:41,039 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,057 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,077 [INFO] time_series: exit extract_main
+2017-07-12 10:45:41,097 [INFO] time_series: enter extract_main
+2017-07-12 10:45:41,119 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:41,137 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:41,162 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:41,192 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:41,208 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:41,226 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:41,242 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:41,261 [INFO] time_series: processing publication #: 1
+2017-07-12 10:45:41,279 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:41,296 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:41,324 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:41,342 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:41,357 [INFO] time_series: enter extract_special
+2017-07-12 10:45:41,391 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,415 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,435 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,455 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,486 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,509 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,527 [INFO] time_series: exit extract_main
+2017-07-12 10:45:41,546 [INFO] time_series: enter extract_main
+2017-07-12 10:45:41,565 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:41,584 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:41,602 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:41,624 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:41,640 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:41,666 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:41,694 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:41,711 [INFO] time_series: enter extract_special
+2017-07-12 10:45:41,747 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,787 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,817 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,842 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:41,856 [INFO] time_series: exit extract_main
+2017-07-12 10:45:41,877 [INFO] time_series: enter extract_main
+2017-07-12 10:45:41,896 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:41,912 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:41,928 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:41,945 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:41,960 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:41,977 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:41,993 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:42,012 [INFO] time_series: processing publication #: 1
+2017-07-12 10:45:42,029 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:42,045 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:42,061 [INFO] time_series: processing publication #: 2
+2017-07-12 10:45:42,077 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:42,100 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:42,122 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:42,142 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:42,157 [INFO] time_series: enter extract_special
+2017-07-12 10:45:42,177 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:42,198 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:42,222 [INFO] time_series: exit extract_main
+2017-07-12 10:45:42,241 [INFO] time_series: enter extract_main
+2017-07-12 10:45:42,269 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:42,287 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:42,307 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:42,326 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:42,342 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:42,357 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:42,374 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:42,389 [INFO] time_series: processing publication #: 1
+2017-07-12 10:45:42,404 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:42,427 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:42,449 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:42,471 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:42,485 [INFO] time_series: enter extract_special
+2017-07-12 10:45:42,501 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:42,527 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:42,541 [INFO] time_series: exit extract_main
+2017-07-12 10:45:42,570 [INFO] time_series: enter extract_main
+2017-07-12 10:45:42,584 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:42,599 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:42,617 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:42,636 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:42,649 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:42,670 [ERROR] time_series: extract: Exception: can only concatenate list (not "str") to list
+2017-07-12 10:45:42,684 [INFO] time_series: exit extract_main
+2017-07-12 10:45:42,701 [INFO] time_series: enter extract_main
+2017-07-12 10:45:42,720 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:42,740 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:42,760 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:42,784 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:42,803 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:42,828 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:42,858 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:42,876 [INFO] time_series: processing publication #: 1
+2017-07-12 10:45:42,892 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:42,904 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:42,922 [INFO] time_series: processing publication #: 2
+2017-07-12 10:45:42,944 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:42,959 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:42,978 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:42,994 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:43,009 [INFO] time_series: enter extract_special
+2017-07-12 10:45:43,028 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:43,048 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:43,069 [INFO] time_series: exit extract_main
+2017-07-12 10:45:43,086 [INFO] time_series: enter extract_main
+2017-07-12 10:45:43,102 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:43,120 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:43,138 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:43,157 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:43,176 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:43,193 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:43,211 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:43,231 [INFO] time_series: processing publication #: 1
+2017-07-12 10:45:43,252 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:43,270 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:43,286 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:43,308 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:43,325 [INFO] time_series: enter extract_special
+2017-07-12 10:45:43,344 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:43,366 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:43,392 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:43,424 [INFO] time_series: exit extract_main
+2017-07-12 10:45:43,448 [INFO] time_series: enter extract_main
+2017-07-12 10:45:43,466 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:43,484 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:43,498 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:43,514 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:43,530 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:43,548 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:43,568 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:43,584 [INFO] time_series: processing publication #: 1
+2017-07-12 10:45:43,599 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:43,618 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:43,637 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:43,671 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:43,689 [INFO] time_series: enter extract_special
+2017-07-12 10:45:43,713 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:43,740 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:43,765 [INFO] time_series: exit extract_main
+2017-07-12 10:45:43,785 [INFO] time_series: enter extract_main
+2017-07-12 10:45:43,800 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:43,820 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:43,833 [INFO] time_series: enter ts_extract_geo
+2017-07-12 10:45:43,850 [INFO] time_series: enter _extract_pub
+2017-07-12 10:45:43,869 [INFO] time_series: processing publication #: 0
+2017-07-12 10:45:43,882 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:43,898 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:43,916 [INFO] time_series: processing publication #: 1
+2017-07-12 10:45:43,942 [INFO] time_series: enter extract_authors
+2017-07-12 10:45:43,971 [INFO] time_series: extract_authors: KeyError: author data not provided, 'authors'
+2017-07-12 10:45:43,991 [INFO] time_series: enter extract_pc
+2017-07-12 10:45:44,012 [INFO] time_series: enter extract_table_root
+2017-07-12 10:45:44,027 [INFO] time_series: enter extract_special
+2017-07-12 10:45:44,042 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:44,067 [INFO] time_series: enter extract_columns
+2017-07-12 10:45:44,082 [INFO] time_series: exit extract_main
+2017-07-12 10:45:44,097 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 0.54 seconds
