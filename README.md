@@ -33,11 +33,11 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  - standardization
  - plotting maps, timeseries, and basic age model information
  - paleo-aware correlation analysis (isopersistent, isospectral and classical t-test)
+ - weighted wavelet Z transform (WWZ)
 
 **Future capabilities**:
  - paleo-aware singular spectrum analysis (AR(1) null eigenvalue identification, missing data)
  - spectral analysis (Multi-Taper Method, Lomb-Scargle)
- - weighted wavelet Z transform (WWZ)
  - cross-wavelet analysis
  - index reconstruction
  - climate reconstruction
@@ -85,16 +85,17 @@ and on [Pypi](https://pythonhosted.org/pyleoclim/).
 
 ### <a name="req">Requirements</a>
 
-- LiPD >=0.2.0.2, <=0.2.1.9
+- LiPD >=0.2.2+
 - pandas v0.19+
 - numpy v1.12+
 - matplotlib v2.0+
 - Basemap v1.0.7+
-- scipy >=0.19.0
-- statsmodel>=0.8.0
-- seaborn>=0.7.0
-- scikit-learn>=0.17.1
-- tqdm>=4.14.0
+- scipy v0.19.0+
+- statsmodel v0.8.0+
+- seaborn 0.7.0+
+- scikit-learn 0.17.1+
+- tqdm 4.14.0+
+- pathos 0.2.0+
 
 The installer will automatically check for the needed updates
 
