@@ -1475,6 +1475,8 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
         plt.plot(tau, coi, 'k--')
         ax.fill_between(tau, coi, ylim[1], color='white', alpha=cone_alpha)
 
+    ax.set_ylim(ylim)
+    
     return ax
 
 
