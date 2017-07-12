@@ -40,8 +40,8 @@
 
 
 \title{Pyleoclim Documentation}
-\date{Jun 23, 2017}
-\release{0.2.0}
+\date{Jul 12, 2017}
+\release{0.3.0}
 \author{Deborah Khider, Julien Emile-Geay, Feng Zhu}
 \newcommand{\sphinxlogo}{}
 \renewcommand{\releasename}{Release}
@@ -85,6 +85,9 @@ plotting maps, timeseries, and basic age model information
 \item {} 
 paleo-aware correlation analysis (isopersistent, isospectral, and classical t-test)
 
+\item {} 
+weighted wavelet Z transform (WWZ)
+
 \end{itemize}
 
 \sphinxstylestrong{Future capabilities:}
@@ -94,9 +97,6 @@ paleo-aware singular spectrum analysis (AR(1) null eigenvalue identification, mi
 
 \item {} 
 spectral analysis (Multi-Taper Method, Lomb-Scargle)
-
-\item {} 
-weighted wavelet Z transform (WWZ)
 
 \item {} 
 cross-wavelet analysis
@@ -116,6 +116,12 @@ ensemble methods for most of the above
 \section{Version Information}
 \label{\detokenize{Introduction:version-information}}
 \begin{DUlineblock}{0em}
+\item[] 0.3.0: Compatibility with LiPD 1.3 and Spectral module added
+\item[] 0.2.5: Fix error on loading (Looking for Spectral Module)
+\item[] 0.2.4: Fix load error from init
+\item[] 0.2.3: Freeze LiPD version to 1.2 to avoid conflicts with 1.3
+\item[] 0.2.2: Change progressbar to tqdm and add standardization function
+\item[] 0.2.1: Update package requirements
 \item[] 0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.
 \item[] 0.1.4: Rename functions using camel case convention and consistency with LiPD utilities version 0.1.8.5
 \item[] 0.1.3: Compatible with LiPD utilities version 0.1.8.5
@@ -135,7 +141,7 @@ ensemble methods for most of the above
 
 \section{Installation}
 \label{\detokenize{Introduction:installation}}
-Python v3.5+ is required
+Python v3.4+ is required. Tested with Python v3.5
 Pyleoclim is published through Pypi and easily installed via pip:
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
@@ -175,7 +181,7 @@ Use Jupyter Notebook to go through the tutorial contained in the \href{https://g
 \section{Requirements}
 \label{\detokenize{Introduction:requirements}}\begin{itemize}
 \item {} 
-LiPD v0.2.0.2
+LiPD v0.2.2+
 
 \item {} 
 pandas v0.19+
@@ -190,19 +196,22 @@ matplotlib v2.0+
 Basemap v1.0.7+
 
 \item {} 
-scipy \textgreater{}=0.19.0
+scipy v0.19.0+
 
 \item {} 
-statsmodel\textgreater{}=0.8.0
+statsmodel v0.8.0+
 
 \item {} 
-seaborn\textgreater{}=0.7.0
+seaborn v0.7.0+
 
 \item {} 
-scikit-learn\textgreater{}=0.17.1
+scikit-learn v0.17.1+
 
 \item {} 
-tqdm\textgreater{}=4.14.0
+tqdm v4.14.0+
+
+\item {} 
+pathos v0.2.0+
 
 \end{itemize}
 
@@ -237,7 +246,7 @@ of the investigators and do not necessarily reflect the views of the National Sc
 
 
 \chapter{Main Functions}
-\label{\detokenize{Main::doc}}\label{\detokenize{Main:main-functions}}
+\label{\detokenize{Main:main-functions}}\label{\detokenize{Main::doc}}
 
 \section{Using Pyleoclim with a LiPD file}
 \label{\detokenize{Main:using-pyleoclim-with-a-lipd-file}}
@@ -256,36 +265,54 @@ objects, one for each of the observations.
 The LiPD utilities function lipd.extractTs() returns a list of dictionaries for
 the selected LiPD files, which need to be passed to Pyleoclim along with the path
 to the directory containing the LiPD files.
+\begin{description}
+\item[{This is done through the functions pyleoclim.readLiPD() and pyleoclim.extracTs(),}] \leavevmode
+which are lightweight versions of their counterparts in the LiPD utilities:
 
-This is done through the function pyleoclim.openLiPDs:
-\index{openLipds() (in module pyleoclim)}
+\end{description}
+\index{readLipd() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.openLipds}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{openLipds}}{\emph{path='`}, \emph{ts\_list='`}}{}
-Load and extract timeseries objects from LiPD files.
+\phantomsection\label{\detokenize{Main:pyleoclim.readLipd}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{readLipd}}{\emph{usr\_path='`}}{}
+Read Lipd files into a dictionary
 
-Allows to load and extract timeseries objects into the workspace for use
-with Pyleoclim. This can be done by the user previously, using the LiPD
-utilities and passed into the function's argumenta. If no timeseries objects
-are found by other functions, this function will be triggered automatically
-without arguments.
+This function is based on the function of the same name in the LiPD utilities.
+Sets the dictionary as global variable so that it doesn't have to be provided
+as an argument for every function.
 \begin{quote}\begin{description}
-\item[{Parameters}] \leavevmode\begin{itemize}
-\item {} 
-\sphinxstyleliteralstrong{path} (\sphinxstyleliteralemphasis{string}) -- the path to the LiPD file. If not specified, will
-trigger the LiPD utilities GUI.
+\item[{Parameters}] \leavevmode
+\sphinxstyleliteralstrong{usr\_path} (\sphinxstyleliteralemphasis{str}) -- The path to a directory or a single file. (Optional argument)
 
-\item {} 
-\sphinxstyleliteralstrong{ts\_list} (\sphinxstyleliteralemphasis{list}) -- the list of available timeseries objects
-obtained from lipd.extractTs().
-
-\end{itemize}
+\item[{Returns}] \leavevmode
+lipd\_dict - a dictionary containing the LiPD library
 
 \end{description}\end{quote}
 
-\begin{sphinxadmonition}{warning}{Warning:}
-if specifying a list, path should also be specified.
-\end{sphinxadmonition}
+\end{fulllineitems}
+
+\index{extractTs() (in module pyleoclim)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Main:pyleoclim.extractTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{extractTs}}{\emph{lipds=None}}{}
+Extract timeseries dictionary
+
+This function is based on the function of the same name in the LiPD utilities.
+Set the dictionary as a global variable so that it doesn't have to be
+provided as an argument for every function.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{lipds} (\sphinxstyleliteralemphasis{dict}) -- A dictionary of LiPD files obtained through the
+
+\item {} 
+\sphinxstyleliteralstrong{function} ({\hyperref[\detokenize{Main:pyleoclim.readLipd}]{\sphinxcrossref{\sphinxstyleliteralemphasis{readLipd}}}}) -- 
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+ts\_list - A list of timeseries object
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -295,7 +322,7 @@ if specifying a list, path should also be specified.
 \label{\detokenize{Main:mapping}}\index{mapAllArchive() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.mapAllArchive}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{mapAllArchive}}{\emph{markersize=50}, \emph{background='shadedrelief'}, \emph{saveFig=False}, \emph{dir='`}, \emph{format='eps'}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.mapAllArchive}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{mapAllArchive}}{\emph{lipd\_dict='`}, \emph{markersize=50}, \emph{background='shadedrelief'}, \emph{saveFig=False}, \emph{dir='`}, \emph{format='eps'}}{}
 Map all the available records loaded into the workspace by archiveType.
 \begin{description}
 \item[{Map of all the records into the workspace by archiveType.}] \leavevmode
@@ -304,6 +331,9 @@ Uses the default color palette. Enter pyleoclim.plot\_default for detail.
 \end{description}
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{lipd\_dict} (\sphinxstyleliteralemphasis{dict}) -- A dictionary of LiPD files. (Optional)
+
 \item {} 
 \sphinxstyleliteralstrong{markersize} (\sphinxstyleliteralemphasis{int}) -- The size of the markers. Default is 50
 
@@ -824,6 +854,204 @@ The zscore function in SciPy: \url{https://github.com/scipy/scipy/blob/master/sc
 
 
 
+\subsection{Analysis in the frequency domain}
+\label{\detokenize{Main:analysis-in-the-frequency-domain}}\index{wwzTs() (in module pyleoclim)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Main:pyleoclim.wwzTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{wwzTs}}{\emph{timeseries='`}, \emph{wwz=False}, \emph{psd=True}, \emph{wwz\_default=True}, \emph{psd\_default=True}, \emph{wwaplot\_default=True}, \emph{psdplot\_default=True}, \emph{fig=True}, \emph{saveFig=False}, \emph{dir='`}, \emph{format='eps'}}{}
+Weigthed wavelet Z-transform analysis
+
+Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{timeseries} (\sphinxstyleliteralemphasis{dict}) -- A LiPD timeseries object (Optional, will prompt for one.)
+
+\item {} 
+\sphinxstyleliteralstrong{wwz} (\sphinxstyleliteralemphasis{bool}) -- If True, will perform wavelet analysis
+
+\item {} 
+\sphinxstyleliteralstrong{psd} (\sphinxstyleliteralemphasis{bool}) -- If True, will inform the power spectral density of the timeseries
+
+\item {} 
+\sphinxstyleliteralstrong{wwz\_default} -- 
+If True, will use the following default parameters:
+\begin{description}
+\item[{wwz\_default = \{`tau':None,'freqs':None,'c':1/(8*np.pi**2),'Neff':3,'nMC':200,}] \leavevmode
+`nproc':8,'detrend':'no','method':'Kirchner\_f2py'\}.
+
+\end{description}
+
+Modify the values for specific keys to change the default behavior.
+
+
+\item {} 
+\sphinxstyleliteralstrong{psd\_default} -- 
+If True, will use the following default parameters:
+\begin{description}
+\item[{psd\_default = \{`tau':None,}] \leavevmode
+`freqs': None,
+`c':1e-3,
+`nproc':8,
+`nMC':200,
+`detrend':'no',
+`Neff':3,
+`anti\_alias':False,
+`avgs':2,
+`method':'Kirchner\_f2py'\}
+
+\end{description}
+
+Modify the values for specific keys to change the default behavior.
+
+
+\item {} 
+\sphinxstyleliteralstrong{wwaplot\_default} -- 
+If True, will use the following default parameters:
+\begin{description}
+\item[{wwaplot\_default=\{`Neff':3,}] \leavevmode
+`AR1\_q':AR1\_q,
+`coi':coi,
+`levels':None,
+`tick\_range':None,
+`yticks':None,
+`ylim':None,
+`xticks':None,
+`xlabels':None,
+`figsize':{[}20,8{]},
+`clr\_map':'OrRd',
+`cbar\_drawedges':False,
+`cone\_alpha':0.5,
+`plot\_signif':True,
+`signif\_style':'contour',
+`plot\_cone':True\}
+
+\end{description}
+
+Modify the values for specific keys to change the default behavior.
+
+
+\item {} 
+\sphinxstyleliteralstrong{psdplot\_default} -- 
+If True, will use the following default parameters:
+\begin{description}
+\item[{psdplot\_default=\{`lmstyle':None,}] \leavevmode
+`linewidth':None,
+`xticks':None,
+`xlim':None,
+`ylim':None,
+`figsize':{[}20,8{]},
+`label':'PSD',
+`plot\_ar1':True,
+`psd\_ar1\_q95':psd\_ar1\_q95,
+`psd\_ar1\_color':sns.xkcd\_rgb{[}''pale red''{]}\}
+
+\end{description}
+
+Modify the values for specific keys to change the default behavior.
+
+
+\item {} 
+\sphinxstyleliteralstrong{fig} (\sphinxstyleliteralemphasis{bool}) -- If True, plots the figure
+
+\item {} 
+\sphinxstyleliteralstrong{saveFig} (\sphinxstyleliteralemphasis{bool}) -- default is to not save the figure
+
+\item {} 
+\sphinxstyleliteralstrong{dir} (\sphinxstyleliteralemphasis{str}) -- the full path of the directory in which to save the figure.
+If not provided, creates a default folder called `figures' in the
+LiPD working directory (lipd.path).
+
+\item {} 
+\sphinxstyleliteralstrong{format} (\sphinxstyleliteralemphasis{str}) -- One of the file extensions supported by the active
+backend. Default is ``eps''. Most backend support png, pdf, ps, eps,
+and svg.
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+
+A dictionary of outputs.
+\begin{quote}
+
+For wwz:
+\begin{itemize}
+\item {} 
+wwa (array): The weights wavelet amplitude
+
+\item {} 
+AR1\_q (array): AR1 simulations
+
+\item {} 
+coi (array): cone of influence
+
+\item {} 
+freqs (array): vector for frequencies
+
+\item {} 
+tau (array): the evenly-spaced time points, namely the time
+
+\end{itemize}
+
+shift for wavelet analysis.
+\begin{itemize}
+\item {} 
+Neffs (array): The matrix of effective number of points in the
+
+\end{itemize}
+
+time-scale coordinates.
+\begin{itemize}
+\item {} 
+coeff (array): The wavelet transform coefficients
+
+\end{itemize}
+
+For psd:
+\begin{itemize}
+\item {} 
+psd (array): power spectral density
+
+\item {} 
+freqs (array): vector of frequency
+
+\item {} 
+psd\_ar1\_q95 (array): the 95\% quantile of the psds of AR1 processes
+
+\end{itemize}
+\end{quote}
+
+fig: The figure
+\paragraph{References}
+
+Foster, G. (1996). Wavelets for period analysis of unevenly
+sampled time series. The Astronomical Journal, 112(4), 1709-1729.
+\paragraph{Examples}
+
+To run both wwz and psd:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{dict\PYGZus{}out}\PYG{p}{,} \PYG{n}{fig} \PYG{o}{=} \PYG{n}{pyleoclim}\PYG{o}{.}\PYG{n}{wwzTs}\PYG{p}{(}\PYG{n}{wwz}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+Note: This will return a single figure with wwa and psd
+
+To change a default behavior:
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{dict\PYGZus{}out}\PYG{p}{,} \PYG{n}{fig} \PYG{o}{=} \PYG{n}{pyleoclim}\PYG{o}{.}\PYG{n}{wwzTs}\PYG{p}{(}\PYG{n}{psd\PYGZus{}default} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{nMC}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+m+mi}{1000}\PYG{p}{\PYGZcb{}}\PYG{p}{)}
+\end{sphinxVerbatim}
+
+
+\item[{Return type}] \leavevmode
+dict\_out (dict)
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+
+
 \section{Using Pyleoclim without a LiPD file}
 \label{\detokenize{Main:using-pyleoclim-without-a-lipd-file}}
 The Pyleoclim modules can be called separately so the main functions can be used without a timeseries objects.
@@ -841,6 +1069,9 @@ pyleoclim.Stats: statistics (including correlation)
 \item {} 
 pyleoclim.Timeseries: binning, interpolating
 
+\item {} 
+pyleoclim.Spectral: analysis in the frequency domain
+
 \end{itemize}
 
 In addition, the pyleoclim.LipdUtils module allows the basic manipulation of LiPD files and the pyleoclim.SummaryPlots module
@@ -848,7 +1079,7 @@ contains some functions to extract information about a timeseries object.
 
 
 \chapter{Mapping Functions}
-\label{\detokenize{Map::doc}}\label{\detokenize{Map:mapping-functions}}
+\label{\detokenize{Map:mapping-functions}}\label{\detokenize{Map::doc}}
 This module uses the Basemap package for mapping.
 \index{mapAll() (in module pyleoclim.Map)}
 
@@ -996,7 +1227,7 @@ speed up the process. Default is 0.5.
 
 
 \chapter{Plotting Functions}
-\label{\detokenize{Plot::doc}}\label{\detokenize{Plot:plotting-functions}}\index{plot() (in module pyleoclim.Plot)}
+\label{\detokenize{Plot:plotting-functions}}\label{\detokenize{Plot::doc}}\index{plot() (in module pyleoclim.Plot)}
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{Plot:pyleoclim.Plot.plot}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Plot.}\sphinxbfcode{plot}}{\emph{x}, \emph{y}, \emph{markersize=50}, \emph{marker='ro'}, \emph{x\_label='`}, \emph{y\_label='`}, \emph{title='`}}{}
@@ -1355,7 +1586,7 @@ The zscore function in SciPy: \url{https://github.com/scipy/scipy/blob/master/sc
 
 
 \chapter{LiPD Utilities}
-\label{\detokenize{LipdUtils::doc}}\label{\detokenize{LipdUtils:lipd-utilities}}
+\label{\detokenize{LipdUtils:lipd-utilities}}\label{\detokenize{LipdUtils::doc}}
 This modules allow basic manipulation of LiPD files
 
 
@@ -1391,7 +1622,7 @@ newdir - the full path to the new directory
 Save a figure
 
 Save the figure in the directory. If not given, creates a folder in the
-lipd.path directory.
+current working directory.
 \begin{quote}\begin{description}
 \item[{Parameters}] \leavevmode\begin{itemize}
 \item {} 
@@ -1564,7 +1795,7 @@ archiveType according to the ontology
 
 
 \chapter{Summary Plots}
-\label{\detokenize{SummaryPlots::doc}}\label{\detokenize{SummaryPlots:summary-plots}}
+\label{\detokenize{SummaryPlots:summary-plots}}\label{\detokenize{SummaryPlots::doc}}
 This module handles some basic return for the summary plots.
 
 \sphinxstylestrong{Requires} a LiPD file
@@ -1670,6 +1901,312 @@ y\_label - the label for the y-axis
 
 archiveType - the archiveType (for default plot settings)
 
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+
+
+\chapter{Spectral Functions}
+\label{\detokenize{Spectral::doc}}\label{\detokenize{Spectral:spectral-functions}}
+This module allows analysis in the frequency domain
+\index{ar1\_fit() (in module pyleoclim.Spectral)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.ar1_fit}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{ar1\_fit}}{\emph{ys}, \emph{ts=None}, \emph{detrend='no'}}{}
+Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{ys} (\sphinxstyleliteralemphasis{array}) -- the time series
+
+\item {} 
+\sphinxstyleliteralstrong{ts} (\sphinxstyleliteralemphasis{array}) -- the time axis of that series
+
+\item {} 
+\sphinxstyleliteralstrong{detrend} (\sphinxstyleliteralemphasis{str}) -- `no' - the original time series is assumed to have no trend;
+`linear' - a linear least-squares fit to \sphinxtitleref{ys} is subtracted;
+`constant' - the mean of \sphinxtitleref{ys} is subtracted
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+lag-1 autocorrelation coefficient (for evenly-spaced time series)
+OR estimated persistence (for unevenly-spaced time series)
+
+\item[{Return type}] \leavevmode
+g (float)
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{ar1\_sim() (in module pyleoclim.Spectral)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.ar1_sim}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{ar1\_sim}}{\emph{ys}, \emph{n}, \emph{p}, \emph{ts=None}, \emph{detrend='no'}}{}
+Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from \sphinxtitleref{ys} and \sphinxtitleref{ts}
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{ys} (\sphinxstyleliteralemphasis{array}) -- a time series
+
+\item {} 
+\sphinxstyleliteralstrong{p} (\sphinxstyleliteralemphasis{n}\sphinxstyleliteralemphasis{,}\sphinxstyleliteralemphasis{}) -- dimensions as n rows by p columns
+
+\item {} 
+\sphinxstyleliteralstrong{ts} (\sphinxstyleliteralemphasis{array}) -- the time axis of that series
+
+\item {} 
+\sphinxstyleliteralstrong{detrend} (\sphinxstyleliteralemphasis{str}) -- `no' - the original time series is assumed to have no trend;
+`linear' - a linear least-squares fit to \sphinxtitleref{ys} is subtracted;
+`constant' - the mean of \sphinxtitleref{ys} is subtracted
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+n rows by p columns matrix of an AR1 process
+
+\item[{Return type}] \leavevmode
+red (matrix)
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{wwz() (in module pyleoclim.Spectral)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.wwz}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{wwz}}{\emph{ys}, \emph{ts}, \emph{tau=None}, \emph{freqs=None}, \emph{c=0.012665147955292222}, \emph{Neff=3}, \emph{nMC=200}, \emph{nproc=8}, \emph{detrend='no'}, \emph{method='Kirchner\_f2py'}}{}
+Return the weighted wavelet amplitude (WWA) with phase, AR1\_q, and cone of influence, as well as WT coeeficients
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{ys} (\sphinxstyleliteralemphasis{array}) -- a time series, NaNs will be deleted automatically
+
+\item {} 
+\sphinxstyleliteralstrong{ts} (\sphinxstyleliteralemphasis{array}) -- the time points, if \sphinxtitleref{ys} contains any NaNs, some of the time points will be deleted accordingly
+
+\item {} 
+\sphinxstyleliteralstrong{tau} (\sphinxstyleliteralemphasis{array}) -- the evenly-spaced time points
+
+\item {} 
+\sphinxstyleliteralstrong{freqs} (\sphinxstyleliteralemphasis{array}) -- vector of frequency
+
+\item {} 
+\sphinxstyleliteralstrong{c} (\sphinxstyleliteralemphasis{float}) -- the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+
+\item {} 
+\sphinxstyleliteralstrong{Neff} (\sphinxstyleliteralemphasis{int}) -- effective number of points
+
+\item {} 
+\sphinxstyleliteralstrong{nMC} (\sphinxstyleliteralemphasis{int}) -- the number of Monte-Carlo simulations
+
+\item {} 
+\sphinxstyleliteralstrong{nproc} (\sphinxstyleliteralemphasis{int}) -- the number of processes for multiprocessing
+
+\item {} 
+\sphinxstyleliteralstrong{detrend} (\sphinxstyleliteralemphasis{str}) -- `no' - the original time series is assumed to have no trend;
+`linear' - a linear least-squares fit to \sphinxtitleref{ys} is subtracted;
+`constant' - the mean of \sphinxtitleref{ys} is subtracted
+
+\item {} 
+\sphinxstyleliteralstrong{method} (\sphinxstyleliteralemphasis{str}) -- `Foster' - the original WWZ method;
+`Kirchner' - the method Kirchner adapted from Foster;
+`Kirchner\_f2py' - the method Kirchner adapted from Foster with f2py
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+the weighted wavelet amplitude.
+AR1\_q (array): AR1 simulations
+coi (array): cone of influence
+freqs (array): vector of frequency
+tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+Neffs (array): the matrix of effective number of points in the time-scale coordinates
+coeff (array): the wavelet transform coefficents
+
+\item[{Return type}] \leavevmode
+wwa (array)
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{wwz\_psd() (in module pyleoclim.Spectral)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.wwz_psd}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{wwz\_psd}}{\emph{ys}, \emph{ts}, \emph{freqs=None}, \emph{tau=None}, \emph{c=0.001}, \emph{nproc=8}, \emph{nMC=200}, \emph{detrend='no'}, \emph{Neff=3}, \emph{anti\_alias=False}, \emph{avgs=2}, \emph{method='Kirchner\_f2py'}}{}
+Return the psd of a timeseries directly using wwz method.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{ys} (\sphinxstyleliteralemphasis{array}) -- a time series, NaNs will be deleted automatically
+
+\item {} 
+\sphinxstyleliteralstrong{ts} (\sphinxstyleliteralemphasis{array}) -- the time points, if \sphinxtitleref{ys} contains any NaNs, some of the time points will be deleted accordingly
+
+\item {} 
+\sphinxstyleliteralstrong{freqs} (\sphinxstyleliteralemphasis{array}) -- vector of frequency
+
+\item {} 
+\sphinxstyleliteralstrong{tau} (\sphinxstyleliteralemphasis{array}) -- the evenly-spaced time points, namely the time shift for wavelet analysis
+
+\item {} 
+\sphinxstyleliteralstrong{c} (\sphinxstyleliteralemphasis{float}) -- the decay constant, the default value 1e-3 is good for most of the cases
+
+\item {} 
+\sphinxstyleliteralstrong{nproc} (\sphinxstyleliteralemphasis{int}) -- the number of processes for multiprocessing
+
+\item {} 
+\sphinxstyleliteralstrong{nMC} (\sphinxstyleliteralemphasis{int}) -- the number of Monte-Carlo simulations
+
+\item {} 
+\sphinxstyleliteralstrong{detrend} (\sphinxstyleliteralemphasis{str}) -- `no' - the original time series is assumed to have no trend;
+`linear' - a linear least-squares fit to \sphinxtitleref{ys} is subtracted;
+`constant' - the mean of \sphinxtitleref{ys} is subtracted
+
+\item {} 
+\sphinxstyleliteralstrong{method} (\sphinxstyleliteralemphasis{str}) -- `Foster' - the original WWZ method;
+`Kirchner' - the method Kirchner adapted from Foster;
+`Kirchner\_f2py' - the method Kirchner adapted from Foster with f2py
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+power spectral density
+freqs (array): vector of frequency
+psd\_ar1\_q95 (array): the 95\% quantile of the psds of AR1 processes
+
+\item[{Return type}] \leavevmode
+psd (array)
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{plot\_wwa() (in module pyleoclim.Spectral)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_wwa}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{plot\_wwa}}{\emph{wwa, freqs, tau, Neff=3, AR1\_q=None, coi=None, levels=None, tick\_range=None, yticks=None, ylim=None, xticks=None, xlabels=None, figsize={[}20, 8{]}, clr\_map='OrRd', cbar\_drawedges=False, cone\_alpha=0.5, plot\_signif=False, signif\_style='contour', plot\_cone=False, ax=None}}{}
+Plot the wavelet amplitude
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{wwa} (\sphinxstyleliteralemphasis{array}) -- the weighted wavelet amplitude.
+
+\item {} 
+\sphinxstyleliteralstrong{freqs} (\sphinxstyleliteralemphasis{array}) -- vector of frequency
+
+\item {} 
+\sphinxstyleliteralstrong{tau} (\sphinxstyleliteralemphasis{array}) -- the evenly-spaced time points, namely the time shift for wavelet analysis
+
+\item {} 
+\sphinxstyleliteralstrong{Neff} (\sphinxstyleliteralemphasis{int}) -- effective number of points
+
+\item {} 
+\sphinxstyleliteralstrong{AR1\_q} (\sphinxstyleliteralemphasis{array}) -- AR1 simulations
+
+\item {} 
+\sphinxstyleliteralstrong{coi} (\sphinxstyleliteralemphasis{array}) -- cone of influence
+
+\item {} 
+\sphinxstyleliteralstrong{levels} (\sphinxstyleliteralemphasis{array}) -- levels of values to plot
+
+\item {} 
+\sphinxstyleliteralstrong{tick\_range} (\sphinxstyleliteralemphasis{array}) -- levels of ticks to show on the colorbar
+
+\item {} 
+\sphinxstyleliteralstrong{yticks} (\sphinxstyleliteralemphasis{list}) -- ticks on y-axis
+
+\item {} 
+\sphinxstyleliteralstrong{ylim} (\sphinxstyleliteralemphasis{list}) -- limitations for y-axis
+
+\item {} 
+\sphinxstyleliteralstrong{xticks} (\sphinxstyleliteralemphasis{list}) -- ticks on x-axis
+
+\item {} 
+\sphinxstyleliteralstrong{figsize} (\sphinxstyleliteralemphasis{list}) -- the size for the figure
+
+\item {} 
+\sphinxstyleliteralstrong{clr\_map} (\sphinxstyleliteralemphasis{str}) -- the name of the colormap
+
+\item {} 
+\sphinxstyleliteralstrong{cbar\_drawedges} (\sphinxstyleliteralemphasis{bool}) -- whether to draw edges on the colorbar or not
+
+\item {} 
+\sphinxstyleliteralstrong{cone\_alpha} (\sphinxstyleliteralemphasis{float}) -- the alpha value for the area covered by cone of influence
+
+\item {} 
+\sphinxstyleliteralstrong{plot\_signif} (\sphinxstyleliteralemphasis{bool}) -- plot 95\% significant area or not
+
+\item {} 
+\sphinxstyleliteralstrong{signif\_style} (\sphinxstyleliteralemphasis{str}) -- plot 95\% significant area with \sphinxtitleref{contour} or \sphinxtitleref{shade}
+
+\item {} 
+\sphinxstyleliteralstrong{plot\_cone} (\sphinxstyleliteralemphasis{bool}) -- plot cone of influence or not
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+the 2-D plot of wavelet analysis
+
+\item[{Return type}] \leavevmode
+fig (figure)
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{plot\_wwadist() (in module pyleoclim.Spectral)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_wwadist}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{plot\_wwadist}}{\emph{wwa}}{}
+Plot the distribution of wwa with the 95\% quantile line.
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode
+\sphinxstyleliteralstrong{wwa} (\sphinxstyleliteralemphasis{array}) -- the weighted wavelet amplitude.
+
+\item[{Returns}] \leavevmode
+the 2-D plot of wavelet analysis
+
+\item[{Return type}] \leavevmode
+fig (figure)
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{plot\_psd() (in module pyleoclim.Spectral)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_psd}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{plot\_psd}}{\emph{psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None, figsize={[}20, 8{]}, label='PSD', plot\_ar1=True, psd\_ar1\_q95=None, psd\_ar1\_color='\#d9544d', ax=None}}{}
+Plot the wavelet amplitude
+\begin{quote}\begin{description}
+\item[{Parameters}] \leavevmode\begin{itemize}
+\item {} 
+\sphinxstyleliteralstrong{psd} (\sphinxstyleliteralemphasis{array}) -- power spectral density
+
+\item {} 
+\sphinxstyleliteralstrong{freqs} (\sphinxstyleliteralemphasis{array}) -- vector of frequency
+
+\item {} 
+\sphinxstyleliteralstrong{xticks} (\sphinxstyleliteralemphasis{list}) -- ticks on x-axis
+
+\item {} 
+\sphinxstyleliteralstrong{xlim} (\sphinxstyleliteralemphasis{list}) -- limitations for x-axis
+
+\item {} 
+\sphinxstyleliteralstrong{figsize} (\sphinxstyleliteralemphasis{list}) -- the size for the figure
+
+\end{itemize}
+
+\item[{Returns}] \leavevmode
+the 2-D plot of wavelet analysis
+
+\item[{Return type}] \leavevmode
+fig (figure)
 
 \end{description}\end{quote}
 

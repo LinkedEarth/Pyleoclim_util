@@ -21,9 +21,11 @@ The LiPD utilities function lipd.extractTs() returns a list of dictionaries for
 the selected LiPD files, which need to be passed to Pyleoclim along with the path
 to the directory containing the LiPD files.
 
-This is done through the function pyleoclim.openLiPDs:
+This is done through the functions pyleoclim.readLiPD() and pyleoclim.extracTs(),
+ which are lightweight versions of their counterparts in the LiPD utilities:
 
-.. autofunction:: pyleoclim.openLipds
+.. autofunction:: pyleoclim.readLipd
+.. autofunction:: pyleoclim.extractTs
 
 Mapping
 ```````
@@ -62,6 +64,10 @@ Basic manipulations of the timeseries objects.
 
 .. autofunction:: pyleoclim.standardizeTs
 
+Analysis in the frequency domain
+````````````````````````````````
+.. autofunction:: pyleoclim.wwzTs
+
 Using Pyleoclim without a LiPD file
 """""""""""""""""""""""""""""""""""
 
@@ -72,6 +78,7 @@ The following modules are available:
 * pyleoclim.Plot: plotting functions
 * pyleoclim.Stats: statistics (including correlation)
 * pyleoclim.Timeseries: binning, interpolating
+* pyleoclim.Spectral: analysis in the frequency domain
 
 In addition, the pyleoclim.LipdUtils module allows the basic manipulation of LiPD files and the pyleoclim.SummaryPlots module
 contains some functions to extract information about a timeseries object.

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  23 JUN 2017 14:12
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  12 JUL 2017 10:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1060,7 +1060,7 @@ LaTeX Font Info:    Try loading font information for TS1+ptm on input line 76.
 (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/ts1ptm.fd
 File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 ) [3]
-LaTeX Font Info:    Try loading font information for T1+pcr on input line 141.
+LaTeX Font Info:    Try loading font information for T1+pcr on input line 147.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
@@ -1073,7 +1073,7 @@ LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
 LaTeX Font Info:    Font shape `T1/pcr/m/it' in size <10> not available
 (Font)              Font shape `T1/pcr/m/sl' tried instead on input line 1.
 [7] [8]
-Underfull \hbox (badness 10000) in paragraph at lines 452--452
+Underfull \hbox (badness 10000) in paragraph at lines 482--482
 []\T1/ptm/m/it/10 timeseries='`\T1/ptm/m/n/10 , \T1/ptm/m/it/10 bins=None\T1/pt
 m/m/n/10 , \T1/ptm/m/it/10 hist=True\T1/ptm/m/n/10 , \T1/ptm/m/it/10 kde=True\T
 1/ptm/m/n/10 , \T1/ptm/m/it/10 rug=False\T1/ptm/m/n/10 , \T1/ptm/m/it/10 fit=No
@@ -1082,62 +1082,149 @@ ne\T1/ptm/m/n/10 ,
 
 [9]
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <9> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 591.
- [10] [11] [12] [13] [14
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 621.
+ [10] [11] [12]
+Underfull \hbox (badness 10000) in paragraph at lines 861--861
+[]\T1/ptm/m/it/10 timeseries='`\T1/ptm/m/n/10 , \T1/ptm/m/it/10 wwz=False\T1/pt
+m/m/n/10 , \T1/ptm/m/it/10 psd=True\T1/ptm/m/n/10 , \T1/ptm/m/it/10 wwz_default
+=True\T1/ptm/m/n/10 , \T1/ptm/m/it/10 psd_default=True\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 880--882
+[]
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 912--928
+[]\T1/ptm/m/n/10 `AR1_q':AR1_q, `coi':coi, `lev-els':None,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 912--928
+\T1/ptm/m/n/10 `tick_range':None, `yt-icks':None, `ylim':None, `xticks':None, `
+xla-bels':None,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 912--928
+\T1/ptm/m/n/10 `fig-size':[20,8], `clr_map':'OrRd', `cbar_drawedges':False, `co
+ne_alpha':0.5,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 938--948
+[]\T1/ptm/m/n/10 `linewidth':None, `xticks':None,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 938--948
+\T1/ptm/m/n/10 `xlim':None, `ylim':None, `fig-size':[20,8], `la-bel':'PSD', `pl
+ot_ar1':True,
+ []
+
+[13]
+LaTeX Font Info:    Try loading font information for TS1+pcr on input line 1042
+.
+ (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/ts1pcr.fd
+File: ts1pcr.fd 2001/06/04 font definitions for TS1/pcr.
+) [14]
+[15] [16
 
 ]
 Chapter 3.
-[15] [16]
+[17] [18]
 Chapter 4.
 
-Underfull \hbox (badness 6204) in paragraph at lines 1039--1039
+Underfull \hbox (badness 6204) in paragraph at lines 1270--1270
 \T1/ptm/m/it/10 hist_kws={`label': `His-togram'}\T1/ptm/m/n/10 , \T1/ptm/m/it/1
 0 kde_kws={`label': `KDE fit'}\T1/ptm/m/n/10 ,
  []
 
-[17
-
-] [18]
-Chapter 5.
 [19
 
-] [20
+] [20]
+Chapter 5.
+[21
+
+] [22
 
 ]
 Chapter 6.
-[21] [22]
+[23] [24]
 Chapter 7.
-[23
+[25
 
-] [24] [25] [26
+] [26] [27] [28
 
 ]
 Chapter 8.
-[27] [28]
+[29] [30]
 Chapter 9.
-(./Pyleoclim.ind [29
 
-] [30
+Underfull \hbox (badness 7291) in paragraph at lines 1981--1981
+[]\T1/ptm/m/it/10 ys\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ts\T1/ptm/m/n/10 , \T1/ptm
+/m/it/10 tau=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 freqs=None\T1/ptm/m/n/10 , \T
+1/ptm/m/it/10 c=0.012665147955292222\T1/ptm/m/n/10 , \T1/ptm/m/it/10 Neff=3\T1/
+ptm/m/n/10 ,
+ []
+
+[31
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 2040--2040
+[]\T1/ptm/m/it/10 ys\T1/ptm/m/n/10 , \T1/ptm/m/it/10 ts\T1/ptm/m/n/10 , \T1/ptm
+/m/it/10 freqs=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 tau=None\T1/ptm/m/n/10 , \T
+1/ptm/m/it/10 c=0.001\T1/ptm/m/n/10 , \T1/ptm/m/it/10 nproc=8\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2040--2040
+\T1/ptm/m/it/10 nMC=200\T1/ptm/m/n/10 , \T1/ptm/m/it/10 de-trend='no'\T1/ptm/m/
+n/10 , \T1/ptm/m/it/10 Neff=3\T1/ptm/m/n/10 , \T1/ptm/m/it/10 anti_alias=False\
+T1/ptm/m/n/10 , \T1/ptm/m/it/10 avgs=2\T1/ptm/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2092--2092
+[]\T1/ptm/m/it/10 wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, lev-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 2092--2092
+\T1/ptm/m/it/10 els=None, tick_range=None, yt-icks=None, ylim=None,
+ []
+
+[32]
+Underfull \hbox (badness 10000) in paragraph at lines 2184--2184
+\T1/ptm/m/it/10 ylim=None, fig-size=[20, 8], la-bel='PSD', plot_ar1=True,
+ []
+
+[33] [34
+
+]
+Chapter 10.
+(./Pyleoclim.ind [35] [36
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1697.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1697.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2234.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2234.
  (./Pyleoclim.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1697.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1697.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2234.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2234.
 
 Package rerunfilecheck Info: File `Pyleoclim.out' has not changed.
-(rerunfilecheck)             Checksum: 15BE36D9DC89192F0DB89F359BE3E793;4188.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1697.
+(rerunfilecheck)             Checksum: 11128DC2E26E23105966E0D5B727FE83;4560.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2234.
  ) 
 Here is how much of TeX's memory you used:
- 13752 strings out of 493089
- 191020 string characters out of 6134842
- 283581 words of memory out of 5000000
- 16805 multiletter control sequences out of 15000+600000
- 50919 words of font info for 73 fonts, out of 8000000 for 9000
+ 13805 strings out of 493089
+ 191921 string characters out of 6134842
+ 284148 words of memory out of 5000000
+ 16835 multiletter control sequences out of 15000+600000
+ 51212 words of font info for 74 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 37i,12n,45p,577b,585s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 37i,12n,45p,577b,672s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2015/texmf-dist/fonts/type1/urw/courier/ucrb8a.pfb></usr/local/texlive/2
 015/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/local/texlive/2015/texm
@@ -1147,10 +1234,10 @@ ype1/urw/helvetic/uhvbo8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/u
 rw/helvetic/uhvr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/time
 s/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr8a.p
 fb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Pyleoclim.pdf (34 pages, 163189 bytes).
+Output written on Pyleoclim.pdf (40 pages, 181537 bytes).
 PDF statistics:
- 470 PDF objects out of 1000 (max. 8388607)
- 415 compressed objects within 5 object streams
- 114 named destinations out of 1000 (max. 500000)
- 261 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 532 PDF objects out of 1000 (max. 8388607)
+ 471 compressed objects within 5 object streams
+ 133 named destinations out of 1000 (max. 500000)
+ 277 words of extra memory for PDF output out of 10000 (max. 10000000)
 

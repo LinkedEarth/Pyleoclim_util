@@ -19,6 +19,7 @@ Contents:
    Timeseries
    LipdUtils
    SummaryPlots
+   Spectral
 
 
 Indices and tables

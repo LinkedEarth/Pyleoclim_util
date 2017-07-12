@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Main Functions &#8212; Pyleoclim 0.2.0 documentation</title>
+    <title>Main Functions &#8212; Pyleoclim 0.3.0 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.2.0',
+        VERSION:     '0.3.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -43,7 +43,7 @@
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -60,6 +60,7 @@
 </li>
 <li><a class="reference internal" href="#statistics">Statistics</a></li>
 <li><a class="reference internal" href="#timeseries">Timeseries</a></li>
+<li><a class="reference internal" href="#analysis-in-the-frequency-domain">Analysis in the frequency domain</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#using-pyleoclim-without-a-lipd-file">Using Pyleoclim without a LiPD file</a></li>
@@ -114,34 +115,51 @@ objects, one for each of the observations.</p>
 <p>The LiPD utilities function lipd.extractTs() returns a list of dictionaries for
 the selected LiPD files, which need to be passed to Pyleoclim along with the path
 to the directory containing the LiPD files.</p>
-<p>This is done through the function pyleoclim.openLiPDs:</p>
+<dl class="docutils">
+<dt>This is done through the functions pyleoclim.readLiPD() and pyleoclim.extracTs(),</dt>
+<dd>which are lightweight versions of their counterparts in the LiPD utilities:</dd>
+</dl>
 <dl class="function">
-<dt id="pyleoclim.openLipds">
-<code class="descclassname">pyleoclim.</code><code class="descname">openLipds</code><span class="sig-paren">(</span><em>path=''</em>, <em>ts_list=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.openLipds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load and extract timeseries objects from LiPD files.</p>
-<p>Allows to load and extract timeseries objects into the workspace for use
-with Pyleoclim. This can be done by the user previously, using the LiPD
-utilities and passed into the function&#8217;s argumenta. If no timeseries objects
-are found by other functions, this function will be triggered automatically
-without arguments.</p>
+<dt id="pyleoclim.readLipd">
+<code class="descclassname">pyleoclim.</code><code class="descname">readLipd</code><span class="sig-paren">(</span><em>usr_path=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.readLipd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read Lipd files into a dictionary</p>
+<p>This function is based on the function of the same name in the LiPD utilities.
+Sets the dictionary as global variable so that it doesn&#8217;t have to be provided
+as an argument for every function.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>path</strong> (<em>string</em>) &#8211; the path to the LiPD file. If not specified, will
-trigger the LiPD utilities GUI.</li>
-<li><strong>ts_list</strong> (<em>list</em>) &#8211; the list of available timeseries objects
-obtained from lipd.extractTs().</li>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>usr_path</strong> (<em>str</em>) &#8211; The path to a directory or a single file. (Optional argument)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">lipd_dict - a dictionary containing the LiPD library</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.extractTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">extractTs</code><span class="sig-paren">(</span><em>lipds=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.extractTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract timeseries dictionary</p>
+<p>This function is based on the function of the same name in the LiPD utilities.
+Set the dictionary as a global variable so that it doesn&#8217;t have to be
+provided as an argument for every function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lipds</strong> (<em>dict</em>) &#8211; A dictionary of LiPD files obtained through the</li>
+<li><strong>function</strong> (<a class="reference internal" href="#pyleoclim.readLipd" title="pyleoclim.readLipd"><em>readLipd</em></a>) &#8211; </li>
 </ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">ts_list - A list of timeseries object</p>
 </td>
 </tr>
 </tbody>
 </table>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">if specifying a list, path should also be specified.</p>
-</div>
 </dd></dl>
 
 </div>
@@ -149,7 +167,7 @@ obtained from lipd.extractTs().</li>
 <h3>Mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="pyleoclim.mapAllArchive">
-<code class="descclassname">pyleoclim.</code><code class="descname">mapAllArchive</code><span class="sig-paren">(</span><em>markersize=50</em>, <em>background='shadedrelief'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.mapAllArchive" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">mapAllArchive</code><span class="sig-paren">(</span><em>lipd_dict=''</em>, <em>markersize=50</em>, <em>background='shadedrelief'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.mapAllArchive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Map all the available records loaded into the workspace by archiveType.</p>
 <dl class="docutils">
 <dt>Map of all the records into the workspace by archiveType.</dt>
@@ -160,6 +178,7 @@ obtained from lipd.extractTs().</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lipd_dict</strong> (<em>dict</em>) &#8211; A dictionary of LiPD files. (Optional)</li>
 <li><strong>markersize</strong> (<em>int</em>) &#8211; The size of the markers. Default is 50</li>
 <li><strong>background</strong> (<em>str</em>) &#8211; Plots one of the following images on the map:
 bluemarble, etopo, shadedrelief, or none (filled continents).
@@ -533,6 +552,140 @@ and time step,</p>
 </dd></dl>
 
 </div>
+<div class="section" id="analysis-in-the-frequency-domain">
+<h3>Analysis in the frequency domain<a class="headerlink" href="#analysis-in-the-frequency-domain" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="pyleoclim.wwzTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">wwzTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>wwz=False</em>, <em>psd=True</em>, <em>wwz_default=True</em>, <em>psd_default=True</em>, <em>wwaplot_default=True</em>, <em>psdplot_default=True</em>, <em>fig=True</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.wwzTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weigthed wavelet Z-transform analysis</p>
+<p>Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries</strong> (<em>dict</em>) &#8211; A LiPD timeseries object (Optional, will prompt for one.)</li>
+<li><strong>wwz</strong> (<em>bool</em>) &#8211; If True, will perform wavelet analysis</li>
+<li><strong>psd</strong> (<em>bool</em>) &#8211; If True, will inform the power spectral density of the timeseries</li>
+<li><strong>wwz_default</strong> &#8211; <p>If True, will use the following default parameters:</p>
+<dl class="docutils">
+<dt>wwz_default = {&#8216;tau&#8217;:None,&#8217;freqs&#8217;:None,&#8217;c&#8217;:1/(8*np.pi**2),&#8217;Neff&#8217;:3,&#8217;nMC&#8217;:200,</dt>
+<dd>&#8216;nproc&#8217;:8,&#8217;detrend&#8217;:&#8217;no&#8217;,&#8217;method&#8217;:&#8217;Kirchner_f2py&#8217;}.</dd>
+</dl>
+<p>Modify the values for specific keys to change the default behavior.</p>
+</li>
+<li><strong>psd_default</strong> &#8211; <p>If True, will use the following default parameters:</p>
+<dl class="docutils">
+<dt>psd_default = {&#8216;tau&#8217;:None,</dt>
+<dd>&#8216;freqs&#8217;: None,
+&#8216;c&#8217;:1e-3,
+&#8216;nproc&#8217;:8,
+&#8216;nMC&#8217;:200,
+&#8216;detrend&#8217;:&#8217;no&#8217;,
+&#8216;Neff&#8217;:3,
+&#8216;anti_alias&#8217;:False,
+&#8216;avgs&#8217;:2,
+&#8216;method&#8217;:&#8217;Kirchner_f2py&#8217;}</dd>
+</dl>
+<p>Modify the values for specific keys to change the default behavior.</p>
+</li>
+<li><strong>wwaplot_default</strong> &#8211; <p>If True, will use the following default parameters:</p>
+<dl class="docutils">
+<dt>wwaplot_default={&#8216;Neff&#8217;:3,</dt>
+<dd>&#8216;AR1_q&#8217;:AR1_q,
+&#8216;coi&#8217;:coi,
+&#8216;levels&#8217;:None,
+&#8216;tick_range&#8217;:None,
+&#8216;yticks&#8217;:None,
+&#8216;ylim&#8217;:None,
+&#8216;xticks&#8217;:None,
+&#8216;xlabels&#8217;:None,
+&#8216;figsize&#8217;:[20,8],
+&#8216;clr_map&#8217;:&#8217;OrRd&#8217;,
+&#8216;cbar_drawedges&#8217;:False,
+&#8216;cone_alpha&#8217;:0.5,
+&#8216;plot_signif&#8217;:True,
+&#8216;signif_style&#8217;:&#8217;contour&#8217;,
+&#8216;plot_cone&#8217;:True}</dd>
+</dl>
+<p>Modify the values for specific keys to change the default behavior.</p>
+</li>
+<li><strong>psdplot_default</strong> &#8211; <p>If True, will use the following default parameters:</p>
+<dl class="docutils">
+<dt>psdplot_default={&#8216;lmstyle&#8217;:None,</dt>
+<dd>&#8216;linewidth&#8217;:None,
+&#8216;xticks&#8217;:None,
+&#8216;xlim&#8217;:None,
+&#8216;ylim&#8217;:None,
+&#8216;figsize&#8217;:[20,8],
+&#8216;label&#8217;:&#8217;PSD&#8217;,
+&#8216;plot_ar1&#8217;:True,
+&#8216;psd_ar1_q95&#8217;:psd_ar1_q95,
+&#8216;psd_ar1_color&#8217;:sns.xkcd_rgb[&#8220;pale red&#8221;]}</dd>
+</dl>
+<p>Modify the values for specific keys to change the default behavior.</p>
+</li>
+<li><strong>fig</strong> (<em>bool</em>) &#8211; If True, plots the figure</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the figure.
+If not provided, creates a default folder called &#8216;figures&#8217; in the
+LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A dictionary of outputs.</p>
+<blockquote>
+<div><p>For wwz:</p>
+<ul class="simple">
+<li>wwa (array): The weights wavelet amplitude</li>
+<li>AR1_q (array): AR1 simulations</li>
+<li>coi (array): cone of influence</li>
+<li>freqs (array): vector for frequencies</li>
+<li>tau (array): the evenly-spaced time points, namely the time</li>
+</ul>
+<p>shift for wavelet analysis.</p>
+<ul class="simple">
+<li>Neffs (array): The matrix of effective number of points in the</li>
+</ul>
+<p>time-scale coordinates.</p>
+<ul class="simple">
+<li>coeff (array): The wavelet transform coefficients</li>
+</ul>
+<p>For psd:</p>
+<ul class="simple">
+<li>psd (array): power spectral density</li>
+<li>freqs (array): vector of frequency</li>
+<li>psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes</li>
+</ul>
+</div></blockquote>
+<p>fig: The figure</p>
+<p class="rubric">References</p>
+<p>Foster, G. (1996). Wavelets for period analysis of unevenly
+sampled time series. The Astronomical Journal, 112(4), 1709-1729.</p>
+<p class="rubric">Examples</p>
+<p>To run both wwz and psd:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">wwz</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note: This will return a single figure with wwa and psd</p>
+<p>To change a default behavior:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">psd_default</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nMC&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">})</span>
+</pre></div>
+</div>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict_out (dict)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="using-pyleoclim-without-a-lipd-file">
 <h2>Using Pyleoclim without a LiPD file<a class="headerlink" href="#using-pyleoclim-without-a-lipd-file" title="Permalink to this headline">¶</a></h2>
@@ -543,6 +696,7 @@ The following modules are available:</p>
 <li>pyleoclim.Plot: plotting functions</li>
 <li>pyleoclim.Stats: statistics (including correlation)</li>
 <li>pyleoclim.Timeseries: binning, interpolating</li>
+<li>pyleoclim.Spectral: analysis in the frequency domain</li>
 </ul>
 <p>In addition, the pyleoclim.LipdUtils module allows the basic manipulation of LiPD files and the pyleoclim.SummaryPlots module
 contains some functions to extract information about a timeseries object.</p>
@@ -567,11 +721,11 @@ contains some functions to extract information about a timeseries object.</p>
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.2.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay.
+        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>

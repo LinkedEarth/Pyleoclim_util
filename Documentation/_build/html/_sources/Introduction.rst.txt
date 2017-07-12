@@ -19,12 +19,12 @@ is aware of age ensembles stored via LiPD and uses them for time-uncertain analy
 * interpolation
 * plotting maps, timeseries, and basic age model information
 * paleo-aware correlation analysis (isopersistent, isospectral, and classical t-test)
+* weighted wavelet Z transform (WWZ)
 
 **Future capabilities:**
 
 * paleo-aware singular spectrum analysis (AR(1) null eigenvalue identification, missing data)
 * spectral analysis (Multi-Taper Method, Lomb-Scargle)
-* weighted wavelet Z transform (WWZ)
 * cross-wavelet analysis
 * index reconstruction
 * climate reconstruction
@@ -33,6 +33,12 @@ is aware of age ensembles stored via LiPD and uses them for time-uncertain analy
 
 Version Information
 ```````````````````
+| 0.3.0: Compatibility with LiPD 1.3 and Spectral module added
+| 0.2.5: Fix error on loading (Looking for Spectral Module)
+| 0.2.4: Fix load error from init
+| 0.2.3: Freeze LiPD version to 1.2 to avoid conflicts with 1.3
+| 0.2.2: Change progressbar to tqdm and add standardization function
+| 0.2.1: Update package requirements
 | 0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.
 | 0.1.4: Rename functions using camel case convention and consistency with LiPD utilities version 0.1.8.5
 | 0.1.3: Compatible with LiPD utilities version 0.1.8.5
@@ -44,7 +50,7 @@ Version Information
 
 Installation
 ````````````
-Python v3.5+ is required
+Python v3.4+ is required. Tested with Python v3.5
 Pyleoclim is published through Pypi and easily installed via pip::
 
   pip install pyleoclim
@@ -65,16 +71,17 @@ Quickstart guide
 Requirements
 ````````````
 
-* LiPD v0.2.0.2
+* LiPD v0.2.2+
 * pandas v0.19+
 * numpy v1.12+
 * matplotlib v2.0+
 * Basemap v1.0.7+
-* scipy >=0.19.0
-* statsmodel>=0.8.0
-* seaborn>=0.7.0
-* scikit-learn>=0.17.1
-* tqdm>=4.14.0
+* scipy v0.19.0+
+* statsmodel v0.8.0+
+* seaborn v0.7.0+
+* scikit-learn v0.17.1+
+* tqdm v4.14.0+
+* pathos v0.2.0+
 
 The installer will automatically check for the needed updates.
 
