@@ -80,3 +80,56 @@
 2017-06-23 14:16:40,236 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 0.0 seconds
 2017-06-28 22:47:21,517 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpt8y1vxce
 2017-06-28 22:47:21,517 [INFO] LiPD_Library: LiPD Library created
+2017-07-12 14:19:30,017 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmpt8y5kmc4
+2017-07-12 14:19:30,018 [INFO] zips: enter unzip
+2017-07-12 14:19:30,058 [INFO] zips: exit unzip
+2017-07-12 14:19:30,176 [INFO] jsons: Read JSONLD successful: MD98-2170.Stott.2004.jsonld
+2017-07-12 14:19:30,176 [INFO] jsons: exit read_json_from_file
+2017-07-12 14:19:30,177 [INFO] misc: enter update_lipd_v1_1
+2017-07-12 14:19:30,177 [INFO] misc: exit update_lipd_v1_1
+2017-07-12 14:19:30,177 [INFO] misc: enter update_lipd_v1_2
+2017-07-12 14:19:30,177 [INFO] misc: exit update_lipd_v1_2
+2017-07-12 14:19:30,178 [INFO] jsons: enter idx_num_to_name
+2017-07-12 14:19:30,179 [INFO] jsons: enter import_data: paleo
+2017-07-12 14:19:30,179 [INFO] jsons: enter import_meas: paleo0
+2017-07-12 14:19:30,179 [INFO] jsons: exit import_meas: paleo0measurement
+2017-07-12 14:19:30,179 [INFO] jsons: exit import_data: paleo
+2017-07-12 14:19:30,179 [INFO] jsons: enter import_data: chron
+2017-07-12 14:19:30,179 [INFO] jsons: enter import_meas: chron0
+2017-07-12 14:19:30,179 [INFO] jsons: exit import_meas: chron0measurement
+2017-07-12 14:19:30,179 [INFO] jsons: exit import_data: chron
+2017-07-12 14:19:30,179 [INFO] jsons: exit idx_num_to_name
+2017-07-12 14:19:30,179 [INFO] misc: enter remove_empty_doi
+2017-07-12 14:19:30,179 [INFO] misc: exit remove_empty_doi
+2017-07-12 14:19:30,180 [INFO] csvs: enter merge_csv_metadata
+2017-07-12 14:19:30,180 [INFO] csvs: enter merge_csv_section: paleo
+2017-07-12 14:19:30,181 [INFO] csvs: enter read_csv_from_file
+2017-07-12 14:19:30,181 [INFO] csvs: exit read_csv_from_file
+2017-07-12 14:19:30,183 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 14:19:30,183 [INFO] csvs: exit merge_csv_section: paleo
+2017-07-12 14:19:30,183 [INFO] csvs: enter merge_csv_section: chron
+2017-07-12 14:19:30,183 [INFO] csvs: enter read_csv_from_file
+2017-07-12 14:19:30,183 [INFO] csvs: exit read_csv_from_file
+2017-07-12 14:19:30,183 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: labcode
+2017-07-12 14:19:30,184 [ERROR] inferred_data: fix_numeric_types: a float is required
+2017-07-12 14:19:30,184 [INFO] csvs: exit merge_csv_section: chron
+2017-07-12 14:19:30,184 [INFO] csvs: exit merge_csv_metadata
+2017-07-12 14:19:30,185 [INFO] LiPD: lipd_read: record loaded: /Users/deborahkhider/Desktop/testLiPD/MD98-2170.Stott.2004.lpd
+2017-07-12 14:19:30,185 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 0.13 seconds
+2017-07-12 14:19:52,559 [INFO] time_series: enter extract_main
+2017-07-12 14:19:52,560 [INFO] time_series: enter ts_extract_geo
+2017-07-12 14:19:52,560 [INFO] time_series: enter ts_extract_geo
+2017-07-12 14:19:52,561 [INFO] time_series: enter _extract_pub
+2017-07-12 14:19:52,561 [INFO] time_series: processing publication #: 0
+2017-07-12 14:19:52,561 [INFO] time_series: enter extract_authors
+2017-07-12 14:19:52,562 [INFO] time_series: enter extract_pc
+2017-07-12 14:19:52,563 [INFO] time_series: enter extract_table_root
+2017-07-12 14:19:52,563 [INFO] time_series: enter extract_special
+2017-07-12 14:19:52,565 [INFO] time_series: enter extract_columns
+2017-07-12 14:19:52,567 [INFO] time_series: enter extract_columns
+2017-07-12 14:19:52,569 [INFO] time_series: enter extract_columns
+2017-07-12 14:19:52,570 [INFO] time_series: enter extract_columns
+2017-07-12 14:19:52,571 [INFO] time_series: enter extract_columns
+2017-07-12 14:19:52,573 [INFO] time_series: enter extract_columns
+2017-07-12 14:19:52,573 [INFO] time_series: exit extract_main
+2017-07-12 14:19:52,573 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 0.02 seconds

@@ -100,7 +100,8 @@ plot_default = {'ice/rock': ['#FFD600','h'],
 """
 Mapping
 """
-def mapAllArchive(lipd_dict = "", markersize = 50, background = 'shadedrelief',\
+def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
+                  figsize = [10,4], ax = None,\
                   saveFig = False, dir="", format='eps'):
     """Map all the available records loaded into the workspace by archiveType.
 
@@ -113,6 +114,8 @@ def mapAllArchive(lipd_dict = "", markersize = 50, background = 'shadedrelief',\
         background (str): Plots one of the following images on the map:
             bluemarble, etopo, shadedrelief, or none (filled continents).
             Default is shadedrelief.
+        figsize (list): the size for the figure
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
         saveFig (bool): Default is to not save the figure
         dir (str): The absolute path of the directory in which to save the
             figure. If not provided, creates a default folder called 'figures'
@@ -126,7 +129,7 @@ def mapAllArchive(lipd_dict = "", markersize = 50, background = 'shadedrelief',\
     """
     
     # Get the dictionary of LiPD files
-    if not lipd_dict and 'lipd_dict' not in globals():
+    if not lipds and 'lipd_dict' not in globals():
         readLipd()
         
     # Initialize the various lists
@@ -151,8 +154,9 @@ def mapAllArchive(lipd_dict = "", markersize = 50, background = 'shadedrelief',\
 
 
     # Make the map
-    fig = Map.mapAll(lat,lon,archiveType,lat_0=0,lon_0=0,palette=plot_default,\
-                     background = background, markersize = markersize)
+    ax = Map.mapAll(lat,lon,archiveType,lat_0=0,lon_0=0,palette=plot_default,\
+                     background = background, markersize = markersize,\
+                     figsize=figsize, ax=ax)
 
     # Save the figure if asked
     if saveFig == True:
@@ -160,11 +164,12 @@ def mapAllArchive(lipd_dict = "", markersize = 50, background = 'shadedrelief',\
     else:
         plt.show
 
-    return fig
+    return ax
 
 def mapLipd(timeseries="", countries = True, counties = False, \
         rivers = False, states = False, background = "shadedrelief",\
         scale = 0.5, markersize = 50, marker = "ro", \
+        figsize = [4,4], ax = None, \
         saveFig = False, dir = "", format="eps"):
     """ Create a Map for a single record
 
@@ -186,6 +191,8 @@ def mapLipd(timeseries="", countries = True, counties = False, \
         marker (str): a string (or list) containing the color and shape of the
             marker. Default is by archiveType. Type pyleo.plot_default to see
             the default palette.
+        figsize (list): the size for the figure
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
             If not provided, creates a default folder called 'figures' in the
@@ -219,9 +226,10 @@ def mapLipd(timeseries="", countries = True, counties = False, \
     else:
         marker = 'ro'
 
-    fig = Map.mapOne(lat,lon,marker=marker,markersize=markersize,\
+    ax = Map.mapOne(lat,lon,marker=marker,markersize=markersize,\
                      countries = countries, counties = counties,rivers = rivers, \
-                     states = states, background = background, scale =scale)
+                     states = states, background = background, scale =scale,
+                     ax=ax, figsize = figsize)
 
     # Save the figure if asked
     if saveFig == True:
@@ -229,14 +237,15 @@ def mapLipd(timeseries="", countries = True, counties = False, \
     else:
         plt.show
 
-    return fig
+    return ax
 
 """
 Plotting
 """
 
 def plotTs(timeseries = "", x_axis = "", markersize = 50,\
-            marker = "default", saveFig = False, dir = "",\
+            marker = "default", figsize =[10,4], ax = None,\
+            saveFig = False, dir = "",\
             format="eps"):
     """Plot a single time series.
 
@@ -249,6 +258,8 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
         marker (str): a string (or list) containing the color and shape of the
             marker. Default is by archiveType. Type pyleo.plot_default to see
             the default palette.
+        figsize (list): the size for the figure
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
             If not provided, creates a default folder called 'figures' in the
@@ -308,8 +319,8 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
             y_label = timeseries["paleoData_variableName"]
 
     # make the plot
-    fig = Plot.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
-                    y_label=y_label, title=title)
+    ax = Plot.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
+                    y_label=y_label, title=title, figsize = figsize, ax=ax)
 
     #Save the figure if asked
     if saveFig == True:
@@ -319,13 +330,14 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
     else:
         plt.show()
 
-    return fig
+    return ax
 
 def histTs(timeseries = "", bins = None, hist = True, \
              kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},\
              kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"Rug"}, \
              fit_kws = {"label":"Fit"}, color = "default", vertical = False, \
-             norm_hist = True, saveFig = False, format ="eps",\
+             norm_hist = True, figsize = [5,5], ax = None,\
+             saveFig = False, format ="eps",\
              dir = ""):
     """ Plot a univariate distribution of the PaleoData values
 
@@ -354,6 +366,8 @@ def histTs(timeseries = "", bins = None, hist = True, \
         norm_hist (bool): If True (default), the histrogram height shows
             a density rather than a count. This is implied if a KDE or
             fitted density is plotted
+        figsize (list): the size for the figure
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
             If not provided, creates a default folder called 'figures' in the
@@ -404,11 +418,11 @@ def histTs(timeseries = "", bins = None, hist = True, \
        color = plot_default[archiveType][0]
 
     # Make this histogram
-    fig = Plot.plot_hist(y, bins = bins, hist = hist, \
+    ax = Plot.plot_hist(y, bins = bins, hist = hist, \
              kde = kde, rug = rug, fit = fit, hist_kws = hist_kws,\
              kde_kws = kde_kws, rug_kws = rug_kws, \
              fit_kws = fit_kws, color = color, vertical = vertical, \
-             norm_hist = norm_hist, label = y_label)
+             norm_hist = norm_hist, label = y_label, figsize = figsize, ax=ax)
 
     #Save the figure if asked
     if saveFig == True:
@@ -418,7 +432,7 @@ def histTs(timeseries = "", bins = None, hist = True, \
     else:
         plt.show()
 
-    return fig
+    return ax
 
 """
 SummaryPlots

@@ -13,7 +13,7 @@ import sys
 import seaborn as sns
 
 def plot(x,y,markersize=50,marker='ro',x_label="",y_label="",\
-         title =""):
+         title ="", figsize =[10,4], ax = None):
     """ Make a 2-D plot
     
     Args:
@@ -24,7 +24,9 @@ def plot(x,y,markersize=50,marker='ro',x_label="",y_label="",\
         x_axis_label (str): the label for the x-axis
         y_axis_label (str): the label for the y-axis
         title (str): the title for the plot
-        
+        figsize (list): the size of the figure
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot)
+            
     Return:
         The figure       
     
@@ -37,7 +39,9 @@ def plot(x,y,markersize=50,marker='ro',x_label="",y_label="",\
     if len(np.shape(x)) >2 or len(np.shape(y))>2:
         sys.exit("x and y should be vectors and not matrices") 
 
-    fig = plt.figure()
+    if not ax:
+        fig, ax = plt.subplots(figsize=figsize)
+        
     plt.style.use("ggplot") # set the style
     # do a scatter plot of the original data
     plt.scatter(x,y,s=markersize,facecolor='none',edgecolor=marker[0],
@@ -52,13 +56,13 @@ def plot(x,y,markersize=50,marker='ro',x_label="",y_label="",\
     plt.title(title)
     plt.legend(loc=3,scatterpoints=1,fancybox=True,shadow=True,fontsize=10)
     
-    return fig
+    return ax
     
 def plot_hist(y, bins = None, hist = True, label = "", \
               kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},\
               kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"rug"}, \
               fit_kws = {"label":"fit"}, color ='0.7' , vertical = False, \
-              norm_hist = True):
+              norm_hist = True, figsize = [5,5], ax = None):
     """ Plot a univariate distribution of the PaleoData values
             
     This function is based on the seaborn displot function, which is
@@ -86,6 +90,8 @@ def plot_hist(y, bins = None, hist = True, label = "", \
         norm_hist (bool): If True (default), the histrogram height shows
             a density rather than a count. This is implied if a KDE or 
             fitted density is plotted
+        figsize (list): the size of the figure
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
  
     Returns
        fig - The figure
@@ -99,7 +105,8 @@ def plot_hist(y, bins = None, hist = True, label = "", \
     if len(np.shape(y))>2:
         sys.exit("x and y should be vectors and not matrices") 
      
-    fig = plt.figure()
+    if not ax:
+        fig, ax = plt.subplots(figsize=figsize)
 
     sns.distplot(y,bins=bins, hist=hist, kde=kde, rug=rug,\
                   fit=fit, hist_kws = hist_kws,\
@@ -117,7 +124,7 @@ def plot_hist(y, bins = None, hist = True, label = "", \
         plt.ylabel('PDF')
         plt.xlabel(label)
             
-    return fig 
+    return ax 
                 
                            
                        

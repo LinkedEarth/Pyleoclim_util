@@ -19,6 +19,7 @@ import sys
 def mapAll(lat, lon, criteria, projection = 'robin', lat_0 = "", lon_0 = "",\
            llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, \
            countries = False, counties = False, rivers = False, states = False,\
+           figsize = [10,4], ax = None,\
            background = 'none', scale = 0.5, palette="", markersize = 50):
     """ Map the location of all lat/lon according to some criteria 
     
@@ -58,6 +59,8 @@ def mapAll(lat, lon, criteria, projection = 'robin', lat_0 = "", lon_0 = "",\
             associated values. The list should be in the format 
             ['color', 'marker'].
         markersize (int): The size of the marker.
+        figsize (list): the size for the figure
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot) 
         
     Returns:
         The figure       
@@ -90,7 +93,9 @@ def mapAll(lat, lon, criteria, projection = 'robin', lat_0 = "", lon_0 = "",\
             palette.update(d1)
             
     #Make the figure
-    fig = plt.figure()
+    if not ax:
+        fig, ax = plt.subplots(figsize=figsize)
+        
     map = Basemap(projection = projection, lat_0 = lat_0, lon_0 = lon_0,\
                   llcrnrlat=llcrnrlat, urcrnrlat=urcrnrlat,\
                   llcrnrlon=llcrnrlon, urcrnrlon=urcrnrlon)
@@ -132,13 +137,14 @@ def mapAll(lat, lon, criteria, projection = 'robin', lat_0 = "", lon_0 = "",\
     plt.legend(loc = 'center', bbox_to_anchor=(1.25,0.5),scatterpoints = 1,
                frameon = False, fontsize = 8, markerscale = 0.7)
     
-    return fig    
+    return ax    
         
 def mapOne(lat, lon, projection = 'ortho', lat_0 = "", lon_0 = "",\
            llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180,\
            countries = True, counties = False, \
            rivers = False, states = False, background = "shadedrelief",\
-           scale = 0.5, markersize = 50, marker = "ro"):
+           scale = 0.5, markersize = 50, marker = "ro", figsize = [4,4], \
+           ax = None,):
     """ Map one location on the globe
     
     Args:
@@ -167,6 +173,8 @@ def mapOne(lat, lon, projection = 'ortho', lat_0 = "", lon_0 = "",\
             speed up the process. Default is 0.5.
         markersize (int): The size of the marker.
         marker (str or list): color and type of marker. 
+        figsize (list): the size for the figure
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot) 
     
     """
     if not lon_0:
@@ -174,7 +182,9 @@ def mapOne(lat, lon, projection = 'ortho', lat_0 = "", lon_0 = "",\
     if not lat_0:
         lat_0 = lat
     
-    fig = plt.figure()
+    if not ax:
+        fig, ax = plt.subplots(figsize=figsize)
+        
     map = Basemap(projection=projection, lat_0=lat_0, lon_0=lon_0,
                   llcrnrlat=llcrnrlat, urcrnrlat=urcrnrlat,\
                   llcrnrlon=llcrnrlon, urcrnrlon=urcrnrlon)
@@ -207,4 +217,4 @@ def mapOne(lat, lon, projection = 'ortho', lat_0 = "", lon_0 = "",\
     X,Y = map(lon,lat)
     map.scatter(X,Y,s=markersize,facecolor=marker[0],marker=marker[1],zorder=10) 
     
-    return fig
+    return ax
