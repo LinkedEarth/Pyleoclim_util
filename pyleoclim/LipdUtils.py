@@ -16,8 +16,6 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
-#Import internal modules to pyleoclim
-import pyleoclim 
 
 """
 The following functions handle creating new directories and saving figures and logs
@@ -48,7 +46,7 @@ def saveFigure(name, format="eps",dir=""):
     """Save a figure
     
     Save the figure in the directory. If not given, creates a folder in the 
-    lipd.path directory. 
+    current working directory. 
     
     Args:
         name (str): name of the file
@@ -60,7 +58,7 @@ def saveFigure(name, format="eps",dir=""):
             
     """
     if not dir:
-        newdir = createDir(pyleoclim.lipd_path,"figures")            
+        newdir = createDir(os.getcwd(),"figures")            
         plt.savefig(newdir+'/'+name+'.'+format,\
                     bbox_inches='tight',pad_inches = 0.25)
     else:

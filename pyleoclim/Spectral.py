@@ -1280,7 +1280,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             detrend='no', Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
-    ''' Return the psd of a timeseires directly using wwz method.
+    ''' Return the psd of a timeseries directly using wwz method.
 
     Args:
         ys (array): a time series, NaNs will be deleted automatically
@@ -1385,8 +1385,7 @@ def xwt(ys1, ts1, ys2, ts2,
 def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None,
              yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
              cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour',
-             plot_cone=False,
-             ):
+             plot_cone=False,ax=None):
     """ Plot the wavelet amplitude
 
     Args:
@@ -1416,7 +1415,8 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
     assert isinstance(Neff, int) and Neff >= 1
 
     sns.set(style="ticks", font_scale=2)
-    fig, ax = plt.subplots(figsize=figsize)
+    if not ax:
+        fig, ax = plt.subplots(figsize=figsize)
 
     if levels is None:
         q95 = mquantiles(wwa, 0.95)
@@ -1475,7 +1475,9 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
         plt.plot(tau, coi, 'k--')
         ax.fill_between(tau, coi, ylim[1], color='white', alpha=cone_alpha)
 
-    return fig
+    ax.set_ylim(ylim)
+    
+    return ax
 
 
 def plot_wwadist(wwa):
@@ -1499,7 +1501,8 @@ def plot_wwadist(wwa):
 
 
 def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None,
-             figsize=[20, 8], label='PSD', plot_ar1=True, psd_ar1_q95=None, psd_ar1_color=sns.xkcd_rgb["pale red"]):
+             figsize=[20, 8], label='PSD', plot_ar1=True, psd_ar1_q95=None, 
+             psd_ar1_color=sns.xkcd_rgb["pale red"], ax = None):
     """ Plot the wavelet amplitude
 
     Args:
@@ -1514,7 +1517,9 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, y
 
     """
     sns.set(style="ticks", font_scale=2)
-    fig, ax = plt.subplots(figsize=figsize)
+    
+    if not ax:
+        fig, ax = plt.subplots(figsize=figsize)
 
     if lmstyle is not None:
         plt.plot(1/freqs, psd, lmstyle, linewidth=linewidth, label=label)
@@ -1549,7 +1554,7 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, y
     plt.legend()
     plt.grid()
 
-    return fig
+    return ax
 
 
 # some alias
