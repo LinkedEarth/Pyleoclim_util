@@ -22,7 +22,7 @@ elif sys.version_info.minor == 5:
     if sys.platform.startswith('darwin'):
         f2py_wwz_filename = 'f2py_wwz.cpython-35m-darwin.so'
     elif sys.platform.startswith('linux'):
-        f2py_wwz_filename = 'f2py_wwz.cpython-35m-x86_64-linux-gnu.so'
+        f2py_wwz_filename = ''
     else:
         f2py_wwz_filename = ''
 
@@ -30,7 +30,7 @@ elif sys.version_info.minor == 6:
     if sys.platform.startswith('darwin'):
         f2py_wwz_filename = 'f2py_wwz.cpython-36m-darwin.so'
     elif sys.platform.startswith('linux'):
-        f2py_wwz_filename = 'f2py_wwz.cpython-36m-x86_64-linux-gnu.so'
+        f2py_wwz_filename = ''
     else:
         f2py_wwz_filename = ''
 

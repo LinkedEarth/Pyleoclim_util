@@ -25,6 +25,7 @@ from tqdm import tqdm
 import warnings
 
 from pyleoclim import Timeseries
+import sys
 
 
 '''
@@ -171,6 +172,145 @@ class WaveletAnalysis(object):
 
         return r
 
+    def wwz_opt2(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no'):
+        ''' Return the weighted wavelet amplitude (WWA).
+
+        Args:
+            ys (array): a time series
+            ts (array): time axis of the time series
+            freqs (array): vector of frequency
+            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+            c (float): the decay constant
+            Neff (int): the threshold of the number of effective degree of freedom
+            nproc (int): fake argument, just for convenience
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
+
+        Returns:
+            wwa (array): the weighted wavelet amplitude
+            phase (array): the weighted wavelet phase
+            Neffs (array): the matrix of effective number of points in the time-scale coordinates
+            coeff (array): the wavelet transform coefficients
+
+        References:
+            Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+            Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
+                Nonlinear Processes in Geophysics 12, 345–352 (2005).
+
+        '''
+        assert nproc == 1, "wwz_basic() only supports nproc=1"
+        self.assertPositiveInt(Neff)
+
+        nt = np.size(tau)
+        nf = np.size(freqs)
+
+        pd_ys = self.preprocess(ys, detrend=detrend)
+
+        omega = 2*np.pi*freqs
+
+        Neffs = np.ndarray(shape=(nt, nf))
+        ywave_2 = np.ndarray(shape=(nt, nf))
+        ywave_3 = np.ndarray(shape=(nt, nf))
+
+        for k in range(nf):
+            for j in range(nt):
+                dz = omega[k] * (ts - tau[j])
+                weights = np.exp(-c*dz**2)
+
+                sum_w = np.sum(weights)
+                Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
+
+                if Neffs[j, k] <= Neff:
+                    ywave_2[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                    ywave_3[j, k] = np.nan
+                else:
+                    phi2 = np.cos(dz)
+                    phi3 = np.sin(dz)
+
+                    weighted_phi2 = np.sum(weights*phi2*pd_ys) / sum_w
+                    weighted_phi3 = np.sum(weights*phi3*pd_ys) / sum_w
+
+                    ywave_2[j, k] = 2*weighted_phi2
+                    ywave_3[j, k] = 2*weighted_phi3
+
+        wwa = np.sqrt(ywave_2**2 + ywave_3**2)
+        phase = np.arctan2(ywave_3, ywave_2)
+        coeff = ywave_2 + ywave_3*1j
+
+        return wwa, phase, Neffs, coeff
+
+    def wwz_opt1(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no'):
+        ''' Return the weighted wavelet amplitude (WWA).
+
+        Args:
+            ys (array): a time series
+            ts (array): time axis of the time series
+            freqs (array): vector of frequency
+            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+            c (float): the decay constant
+            Neff (int): the threshold of the number of effective degree of freedom
+            nproc (int): fake argument, just for convenience
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
+
+        Returns:
+            wwa (array): the weighted wavelet amplitude
+            phase (array): the weighted wavelet phase
+            Neffs (array): the matrix of effective number of points in the time-scale coordinates
+            coeff (array): the wavelet transform coefficients
+
+        References:
+            Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+            Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
+                Nonlinear Processes in Geophysics 12, 345–352 (2005).
+
+        '''
+        assert nproc == 1, "wwz_basic() only supports nproc=1"
+        self.assertPositiveInt(Neff)
+
+        nt = np.size(tau)
+        nf = np.size(freqs)
+
+        pd_ys = self.preprocess(ys, detrend=detrend)
+
+        omega = 2*np.pi*freqs
+
+        Neffs = np.ndarray(shape=(nt, nf))
+        ywave_2 = np.ndarray(shape=(nt, nf))
+        ywave_3 = np.ndarray(shape=(nt, nf))
+
+        for k in range(nf):
+            for j in range(nt):
+                dz = omega[k] * (ts - tau[j])
+                weights = np.exp(-c*dz**2)
+
+                sum_w = np.sum(weights)
+                Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
+
+                if Neffs[j, k] <= Neff:
+                    ywave_2[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                    ywave_3[j, k] = np.nan
+                else:
+                    phi2 = np.cos(dz)
+                    phi3 = np.sin(dz)
+
+                    weighted_phi2 = np.sum(weights*phi2*pd_ys) / sum_w
+                    weighted_phi3 = np.sum(weights*phi3*pd_ys) / sum_w
+                    weighted_one = np.sum(weights*pd_ys) / sum_w
+                    cos_shift_one = np.sum(weights*phi2) / sum_w
+                    sin_shift_one = np.sum(weights*phi3) / sum_w
+
+                    ywave_2[j, k] = 2*(weighted_phi2-weighted_one*cos_shift_one)
+                    ywave_3[j, k] = 2*(weighted_phi3-weighted_one*sin_shift_one)
+
+        wwa = np.sqrt(ywave_2**2 + ywave_3**2)
+        phase = np.arctan2(ywave_3, ywave_2)
+        coeff = ywave_2 + ywave_3*1j
+
+        return wwa, phase, Neffs, coeff
+
     def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no'):
         ''' Return the weighted wavelet amplitude (WWA).
 
@@ -246,8 +386,8 @@ class WaveletAnalysis(object):
                     ywave_3[j, k] = S_inv[2, 0]*weighted_phi1 + S_inv[2, 1]*weighted_phi2 + S_inv[2, 2]*weighted_phi3
 
         wwa = np.sqrt(ywave_2**2 + ywave_3**2)
-        phase = np.arctan2(ywave_2, ywave_3)
-        coeff = ywave_3 + ywave_2*1j
+        phase = np.arctan2(ywave_3, ywave_2)
+        coeff = ywave_2 + ywave_3*1j
 
         return wwa, phase, Neffs, coeff
 
@@ -333,8 +473,8 @@ class WaveletAnalysis(object):
             ywave_3 = res_array[:, 2].reshape((np.size(omega), np.size(tau))).T
 
         wwa = np.sqrt(ywave_2**2 + ywave_3**2)
-        phase = np.arctan2(ywave_2, ywave_3)
-        coeff = ywave_3 + ywave_2*1j
+        phase = np.arctan2(ywave_3, ywave_2)
+        coeff = ywave_2 + ywave_3*1j
 
         return wwa, phase, Neffs, coeff
 
@@ -406,13 +546,13 @@ class WaveletAnalysis(object):
                     cos_cos = w_prod(cos_basis, cos_basis)
 
                     numerator = 2 * (sin_cos - sin_one * cos_one)
-                    denominator = cos_cos - cos_one**2 - (sin_sin - sin_one)**2
+                    denominator = (cos_cos - cos_one**2) - (sin_sin - sin_one**2)
                     time_shift = np.arctan2(numerator, denominator) / (2*omega[k])  # Eq. (S5)
 
                     sin_shift = np.sin(omega[k]*(ts - time_shift))
                     cos_shift = np.cos(omega[k]*(ts - time_shift))
-                    sin_tau = np.sin(omega[k]*time_shift)
-                    cos_tau = np.cos(omega[k]*time_shift)
+                    sin_tau_center = np.sin(omega[k]*(time_shift - tau[j]))
+                    cos_tau_center = np.cos(omega[k]*(time_shift - tau[j]))
 
                     ys_cos_shift = w_prod(pd_ys, cos_shift)
                     ys_sin_shift = w_prod(pd_ys, sin_shift)
@@ -420,11 +560,102 @@ class WaveletAnalysis(object):
                     cos_shift_one = w_prod(cos_shift, one_v)
                     sin_shift_one = w_prod(sin_shift, one_v)
 
-                    A = ys_cos_shift-ys_one*cos_shift_one
-                    B = ys_sin_shift-ys_one*sin_shift_one
+                    A = 2*(ys_cos_shift-ys_one*cos_shift_one)
+                    B = 2*(ys_sin_shift-ys_one*sin_shift_one)
 
-                    a1[j, k] = 2*(cos_tau*A - sin_tau*B)  # Eq. (S6)
-                    a2[j, k] = 2*(sin_tau*A + cos_tau*B)  # Eq. (S7)
+                    a1[j, k] = cos_tau_center*A - sin_tau_center*B  # Eq. (S6)
+                    a2[j, k] = sin_tau_center*A + cos_tau_center*B  # Eq. (S7)
+
+        wwa = np.sqrt(a1**2 + a2**2)
+        phase = np.arctan2(a2, a1)
+        coeff = a1 + a2*1j
+
+        return wwa, phase, Neffs, coeff
+
+    def kirchner_opt(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no'):
+        ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
+
+        Args:
+            ys (array): a time series
+            ts (array): time axis of the time series
+            freqs (array): vector of frequency
+            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+            c (float): the decay constant
+            Neff (int): the threshold of the number of effective degree of freedom
+            nproc (int): fake argument, just for convenience
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
+
+        Returns:
+            wwa (array): the weighted wavelet amplitude
+            phase (array): the weighted wavelet phase
+            Neffs (array): the matrix of effective number of points in the time-scale coordinates
+            coeff (array): the wavelet transform coefficients
+
+        References:
+            Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+            Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
+                Nonlinear Processes in Geophysics 12, 345–352 (2005).
+
+        '''
+        assert nproc == 1, "wwz_basic() only supports nproc=1"
+        self.assertPositiveInt(Neff)
+
+        nt = np.size(tau)
+        nts = np.size(ts)
+        nf = np.size(freqs)
+
+        pd_ys = self.preprocess(ys, detrend=detrend)
+
+        omega = 2*np.pi*freqs
+
+        Neffs = np.ndarray(shape=(nt, nf))
+        a1 = np.ndarray(shape=(nt, nf))
+        a2 = np.ndarray(shape=(nt, nf))
+
+        for k in range(nf):
+            for j in range(nt):
+                dz = omega[k] * (ts - tau[j])
+                weights = np.exp(-c*dz**2)
+
+                sum_w = np.sum(weights)
+                Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
+
+                if Neffs[j, k] <= Neff:
+                    a1[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                    a2[j, k] = np.nan
+                else:
+                    def w_prod(xs, ys):
+                        return np.sum(weights*xs*ys) / sum_w
+
+                    sin_basis = np.sin(omega[k]*ts)
+                    cos_basis = np.cos(omega[k]*ts)
+                    one_v = np.ones(nts)
+
+                    sin_one = w_prod(sin_basis, one_v)
+                    cos_one = w_prod(cos_basis, one_v)
+                    sin_cos = w_prod(sin_basis, cos_basis)
+                    sin_sin = w_prod(sin_basis, sin_basis)
+                    cos_cos = w_prod(cos_basis, cos_basis)
+
+                    numerator = 2 * (sin_cos - sin_one * cos_one)
+                    denominator = (cos_cos - cos_one**2) - (sin_sin - sin_one**2)
+                    time_shift = np.arctan2(numerator, denominator) / (2*omega[k])  # Eq. (S5)
+
+                    sin_shift = np.sin(omega[k]*(ts - time_shift))
+                    cos_shift = np.cos(omega[k]*(ts - time_shift))
+                    sin_tau_center = np.sin(omega[k]*(time_shift - tau[j]))
+                    cos_tau_center = np.cos(omega[k]*(time_shift - tau[j]))
+
+                    ys_cos_shift = w_prod(pd_ys, cos_shift)
+                    ys_sin_shift = w_prod(pd_ys, sin_shift)
+
+                    A = 2*ys_cos_shift
+                    B = 2*ys_sin_shift
+
+                    a1[j, k] = cos_tau_center*A - sin_tau_center*B  # Eq. (S6)
+                    a2[j, k] = sin_tau_center*A + cos_tau_center*B  # Eq. (S7)
 
         wwa = np.sqrt(a1**2 + a2**2)
         phase = np.arctan2(a2, a1)
@@ -499,8 +730,8 @@ class WaveletAnalysis(object):
 
                 sin_shift = np.sin(omega*(ts - time_shift))
                 cos_shift = np.cos(omega*(ts - time_shift))
-                sin_tau = np.sin(omega*time_shift)
-                cos_tau = np.cos(omega*time_shift)
+                sin_tau_center = np.sin(omega*(time_shift - tau))
+                cos_tau_center = np.cos(omega*(time_shift - tau))
 
                 ys_cos_shift = w_prod(pd_ys, cos_shift)
                 ys_sin_shift = w_prod(pd_ys, sin_shift)
@@ -508,11 +739,11 @@ class WaveletAnalysis(object):
                 cos_shift_one = w_prod(cos_shift, one_v)
                 sin_shift_one = w_prod(sin_shift, one_v)
 
-                A = ys_cos_shift - ys_one*cos_shift_one
-                B = ys_sin_shift - ys_one*sin_shift_one
+                A = 2*(ys_cos_shift - ys_one*cos_shift_one)
+                B = 2*(ys_sin_shift - ys_one*sin_shift_one)
 
-                a1_1g = 2*(cos_tau*A - sin_tau*B)  # Eq. (S6)
-                a2_1g = 2*(sin_tau*A + cos_tau*B)  # Eq. (S7)
+                a1_1g = cos_tau_center*A - sin_tau_center*B  # Eq. (S6)
+                a2_1g = sin_tau_center*A + cos_tau_center*B  # Eq. (S7)
 
             return Neff_loc, a1_1g, a2_1g
 
@@ -929,6 +1160,15 @@ class WaveletAnalysis(object):
             else:
                 wwz_func = wa.kirchner_nproc
 
+        elif method == 'Kirchner_opt':
+            wwz_func = wa.kirchner_opt
+
+        elif method == 'Foster_opt1':
+            wwz_func = wa.wwz_opt1
+
+        elif method == 'Foster_opt2':
+            wwz_func = wa.wwz_opt2
+
         else:
             wwz_func = wa.kirchner_f2py
 
@@ -1243,6 +1483,10 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
         coeff (array): the wavelet transform coefficents
 
     '''
+    if sys.platform.startswith('linux') and method == 'Kirchner_f2py':
+        warnings.warn("The f2py version is not supported for Linux right now; will use python version instead.")
+        method = 'Kirchner'
+
     wa = WaveletAnalysis()
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
@@ -1280,7 +1524,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             detrend='no', Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
-    ''' Return the psd of a timeseries directly using wwz method.
+    ''' Return the psd of a timeseires directly using wwz method.
 
     Args:
         ys (array): a time series, NaNs will be deleted automatically
@@ -1385,7 +1629,7 @@ def xwt(ys1, ts1, ys2, ts2,
 def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None,
              yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
              cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour',
-             plot_cone=False,ax=None, xlabel = 'Year', ylabel = 'Period'):
+             plot_cone=False, ax=None, xlabel='Year', ylabel='Period'):
     """ Plot the wavelet amplitude
 
     Args:
@@ -1410,7 +1654,7 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
         ax: Return as axis instead of figure (useful to integrate plot into a subplot)
         xlabel (str): The x-axis label
         ylabel (str): The y-axis label
-            
+
     Returns:
         fig (figure): the 2-D plot of wavelet analysis
 
@@ -1479,15 +1723,16 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
         ax.fill_between(tau, coi, ylim[1], color='white', alpha=cone_alpha)
 
     ax.set_ylim(ylim)
-    
+
     return ax
 
 
-def plot_wwadist(wwa):
+def plot_wwadist(wwa, ylim=None):
     ''' Plot the distribution of wwa with the 95% quantile line.
 
     Args:
         wwa (array): the weighted wavelet amplitude.
+        ylim (list): limitations for y-axis
 
     Returns:
         fig (figure): the 2-D plot of wavelet analysis
@@ -1495,18 +1740,20 @@ def plot_wwadist(wwa):
     '''
     sns.set(style="darkgrid", font_scale=2)
     plt.subplots(figsize=[20, 4])
-
     q95 = mquantiles(wwa, 0.95)
     fig = sns.distplot(np.nan_to_num(wwa.flat))
     fig.axvline(x=q95, ymin=0, ymax=0.5, linewidth=2, linestyle='-')
+
+    if ylim is not None:
+        plt.ylim(ylim)
 
     return fig
 
 
 def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None,
-             figsize=[20, 8], label='PSD', plot_ar1=True, psd_ar1_q95=None, 
-             psd_ar1_color=sns.xkcd_rgb["pale red"], ax = None,\
-             xlabel = 'Period', ylabel = 'Spectral Density'):
+             figsize=[20, 8], label='PSD', plot_ar1=True, psd_ar1_q95=None,
+             psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None,
+             xlabel='Period', ylabel='Spectral Density'):
     """ Plot the wavelet amplitude
 
     Args:
@@ -1515,7 +1762,7 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, y
         xticks (list): ticks on x-axis
         xlim (list): limits for x-axis
         figsize (list): the size for the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot) 
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot)
         xlabel (str): The x-axis label
         ylabel (str): The y-axis label
 
@@ -1524,7 +1771,7 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, y
 
     """
     sns.set(style="ticks", font_scale=2)
-    
+
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
 
@@ -1562,7 +1809,6 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, y
     plt.grid()
 
     return ax
-
 
 # some alias
 wa = WaveletAnalysis()
