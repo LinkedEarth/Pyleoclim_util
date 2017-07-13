@@ -95,13 +95,14 @@ plot_default = {'ice/rock': ['#FFD600','h'],
                 'speleothem' : ['#FF1492','d'],
                 'wood' : ['#32CC32','^'],
                 'molluskshells' : ['#FFD600','h'],
-                'peat' : ['#2F4F4F','*']}
+                'peat' : ['#2F4F4F','*'],
+                'other':['k','o']}
 
 """
 Mapping
 """
 def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
-                  figsize = [10,4], ax = None,\
+                  figsize = [10,4],\
                   saveFig = False, dir="", format='eps'):
     """Map all the available records loaded into the workspace by archiveType.
 
@@ -109,7 +110,7 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
         Uses the default color palette. Enter pyleoclim.plot_default for detail.
 
     Args:
-        lipd_dict (dict): A dictionary of LiPD files. (Optional)
+        lipds (dict): A dictionary of LiPD files. (Optional)
         markersize (int): The size of the markers. Default is 50
         background (str): Plots one of the following images on the map:
             bluemarble, etopo, shadedrelief, or none (filled continents).
@@ -144,8 +145,6 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
         lon.append(d['geo']['geometry']['coordinates'][0])
         archiveType.append(LipdUtils.LipdToOntology(d['archiveType']).lower())
 
-    # append the default palette for other category
-    plot_default.update({'other':['k','o']})
 
     # make sure criteria is in the plot_default list
     for idx,val in enumerate(archiveType):
@@ -154,9 +153,9 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
 
 
     # Make the map
-    ax = Map.mapAll(lat,lon,archiveType,lat_0=0,lon_0=0,palette=plot_default,\
+    fig = Map.mapAll(lat,lon,archiveType,lat_0=0,lon_0=0,palette=plot_default,\
                      background = background, markersize = markersize,\
-                     figsize=figsize, ax=ax)
+                     figsize=figsize, ax=None)
 
     # Save the figure if asked
     if saveFig == True:
@@ -164,12 +163,12 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
     else:
         plt.show
 
-    return ax
+    return fig
 
 def mapLipd(timeseries="", countries = True, counties = False, \
         rivers = False, states = False, background = "shadedrelief",\
-        scale = 0.5, markersize = 50, marker = "ro", \
-        figsize = [4,4], ax = None, \
+        scale = 0.5, markersize = 50, marker = "default", \
+        figsize = [4,4], \
         saveFig = False, dir = "", format="eps"):
     """ Create a Map for a single record
 
@@ -192,7 +191,6 @@ def mapLipd(timeseries="", countries = True, counties = False, \
             marker. Default is by archiveType. Type pyleo.plot_default to see
             the default palette.
         figsize (list): the size for the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
             If not provided, creates a default folder called 'figures' in the
@@ -216,20 +214,18 @@ def mapLipd(timeseries="", countries = True, counties = False, \
     lat = timeseries['geo_meanLat']
     lon = timeseries['geo_meanLon']
 
-    # Get the marker color and shape
-    archiveType = LipdUtils.LipdToOntology(timeseries['archiveType']).lower()
-
     # Make sure it's in the palette
     if marker == 'default':
-        archiveType = LipdUtils.LipdToOntology(timeseries["archiveType"])
+        archiveType = LipdUtils.LipdToOntology(timeseries['archiveType']).lower()
+        if archiveType not in plot_default.keys():
+            archiveType = 'other'
         marker = plot_default[archiveType]
-    else:
-        marker = 'ro'
+    
 
-    ax = Map.mapOne(lat,lon,marker=marker,markersize=markersize,\
+    fig = Map.mapOne(lat,lon,marker=marker,markersize=markersize,\
                      countries = countries, counties = counties,rivers = rivers, \
                      states = states, background = background, scale =scale,
-                     ax=ax, figsize = figsize)
+                     ax=None, figsize = figsize)
 
     # Save the figure if asked
     if saveFig == True:
@@ -237,14 +233,14 @@ def mapLipd(timeseries="", countries = True, counties = False, \
     else:
         plt.show
 
-    return ax
+    return fig
 
 """
 Plotting
 """
 
 def plotTs(timeseries = "", x_axis = "", markersize = 50,\
-            marker = "default", figsize =[10,4], ax = None,\
+            marker = "default", figsize =[10,4],\
             saveFig = False, dir = "",\
             format="eps"):
     """Plot a single time series.
@@ -259,7 +255,6 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
             marker. Default is by archiveType. Type pyleo.plot_default to see
             the default palette.
         figsize (list): the size for the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
             If not provided, creates a default folder called 'figures' in the
@@ -286,9 +281,11 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
     x = x[~np.isnan(y_temp)]
 
     # get the markers
-    if marker == "default":
-        archiveType = LipdUtils.LipdToOntology(timeseries["archiveType"])
-        marker = [plot_default[archiveType][0],plot_default[archiveType][1]]
+    if marker == 'default':
+        archiveType = LipdUtils.LipdToOntology(timeseries['archiveType']).lower()
+        if archiveType not in plot_default.keys():
+            archiveType = 'other'
+        marker = plot_default[archiveType]
 
     # Get the labels
     # title
@@ -318,12 +315,11 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
         else:
             y_label = timeseries["paleoData_variableName"]
 
-    if not ax: 
-        fig, ax = plt.subplots(figsize=figsize)
+
     
     # make the plot
-    Plot.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
-              y_label=y_label, title=title, figsize = figsize, ax=ax)
+    fig = Plot.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
+              y_label=y_label, title=title, figsize = figsize, ax=None)
 
     #Save the figure if asked
     if saveFig == True:
@@ -333,13 +329,13 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
     else:
         plt.show()
 
-    return ax
+    return fig
 
 def histTs(timeseries = "", bins = None, hist = True, \
              kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},\
              kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"Rug"}, \
              fit_kws = {"label":"Fit"}, color = "default", vertical = False, \
-             norm_hist = True, figsize = [5,5], ax = None,\
+             norm_hist = True, figsize = [5,5],\
              saveFig = False, format ="eps",\
              dir = ""):
     """ Plot a univariate distribution of the PaleoData values
@@ -370,7 +366,6 @@ def histTs(timeseries = "", bins = None, hist = True, \
             a density rather than a count. This is implied if a KDE or
             fitted density is plotted
         figsize (list): the size for the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
             If not provided, creates a default folder called 'figures' in the
@@ -416,19 +411,18 @@ def histTs(timeseries = "", bins = None, hist = True, \
             y_label = timeseries["paleoData_variableName"]
 
     # Grab the color
-    if color == "default":
-       archiveType = LipdUtils.LipdToOntology(timeseries["archiveType"])
-       color = plot_default[archiveType][0]
+    if color == 'default':
+        archiveType = LipdUtils.LipdToOntology(timeseries['archiveType']).lower()
+        if archiveType not in plot_default.keys():
+            archiveType = 'other'
+        color = plot_default[archiveType][0]
     
-    if not ax:
-        fig, ax = plt.subplots(figsize=figsize)
-
     # Make this histogram
-    Plot.plot_hist(y, bins = bins, hist = hist, \
+    fig = Plot.plot_hist(y, bins = bins, hist = hist, \
         kde = kde, rug = rug, fit = fit, hist_kws = hist_kws,\
         kde_kws = kde_kws, rug_kws = rug_kws, \
         fit_kws = fit_kws, color = color, vertical = vertical, \
-        norm_hist = norm_hist, label = y_label, figsize = figsize, ax=ax)
+        norm_hist = norm_hist, label = y_label, figsize = figsize, ax=None)
 
     #Save the figure if asked
     if saveFig == True:
@@ -438,7 +432,7 @@ def histTs(timeseries = "", bins = None, hist = True, \
     else:
         plt.show()
 
-    return ax
+    return fig
 
 """
 SummaryPlots
@@ -449,8 +443,8 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
     """Basic summary plot
 
     Plots the following information: the time series, a histogram of
-    the PaleoData_values, location map, age-depth profile if both are
-    available from the paleodata, metadata about the record.
+    the PaleoData_values, location map, spectral density using the wwz 
+    method, and metadata about the record.
 
     Args:
         timeseries: a timeseries object. By default, will prompt for one
@@ -477,52 +471,43 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
 
     # get the necessary metadata
     metadata = SummaryPlots.getMetadata(timeseries)
-
+    
     # get the information about the timeseries
     x,y,archiveType,x_label,y_label = SummaryPlots.TsData(timeseries,
                                                           x_axis=x_axis)
-
-    # get the age model information if any
-    if "age" and "depth" in timeseries.keys() or "year" and "depth" in timeseries.keys():
-        depth, age , depth_label, age_label,archiveType = SummaryPlots.agemodelData(timeseries)
-        flag = ""
-    else:
-        flag = "no age or depth info"
-
+        
     # Make the figure
     fig = plt.figure(figsize=(11,8))
+    plt.style.use("ggplot")
     gs = gridspec.GridSpec(2, 5)
     gs.update(left=0, right =1.1)
-
+    
     # Plot the timeseries
     ax1 = fig.add_subplot(gs[0,:-3])
-    marker = [plot_default[archiveType][0],plot_default[archiveType][1]]
+    archiveType = LipdUtils.LipdToOntology(timeseries['archiveType']).lower()
+    if archiveType not in plot_default.keys():
+        archiveType = 'other'
+    marker = plot_default[archiveType]
     markersize = 50
     
-    ax1.scatter(x,y,s = markersize, facecolor = 'none', edgecolor = marker[0],
-                marker = marker[1], label = 'original')
-    ax1.plot(x,y, color = marker[0], linewidth = 1, label = 'interpolated')
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
+    Plot.plot(x,y,markersize=markersize, marker = marker, x_label=x_label,\
+              y_label=y_label, title = timeseries['dataSetName'], ax=ax1)
     axes = plt.gca()
     ymin, ymax = axes.get_ylim()
-    plt.title(timeseries['dataSetName'], fontsize = 14, fontweight = 'bold')
-    plt.legend(loc=3,scatterpoints=1,fancybox=True,shadow=True,fontsize=10)
-
+    
     # Plot the histogram and kernel density estimates
     ax2 = fig.add_subplot(gs[0,2])
     sns.distplot(y, vertical = True, color = marker[0], \
                 hist_kws = {"label":"Histogram"},
                 kde_kws = {"label":"KDE fit"})
-
     plt.xlabel('PDF')
     ax2.set_ylim([ymin,ymax])
     ax2.set_yticklabels([])
-
+    
     # Plot the Map
     lat = timeseries["geo_meanLat"]
     lon = timeseries["geo_meanLon"]
-
+    
     ax3 = fig.add_subplot(gs[1,0])
     map = Basemap(projection='ortho', lon_0=lon, lat_0=lat)
     map.drawcoastlines()
@@ -533,17 +518,58 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
                s = 150,
                color = marker[0],
                marker = marker[1])
-
+    
     # Plot Age model if any
-    if not flag:
-        ax4 = fig.add_subplot(gs[1,2])
-        plt.style.use("ggplot")
-        ax4.plot(depth,age,color = marker[0],linewidth = 1.0)
-        plt.xlabel(depth_label)
-        plt.ylabel(age_label)
+    
+    if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
+        print("No age or year information available, skipping spectral analysis")
     else:
-        print("No age or depth information available, skipping age model plot")
-
+        ax4 = fig.add_subplot(gs[1,2])    
+        if 'depth' in x_label.lower():
+            if 'age' in timeseries.keys() and 'year' in timeseries.keys():
+                print("Both age and year information are available.")
+                x_axis = input("Which one would you like to use? ")
+                while x_axis != "year" and x_axis != "age":
+                    x_axis = input("Only enter year or age: ")
+            elif 'age' in timeseries.keys():
+                x_axis = 'age'
+            elif 'year' in timeseries.keys():
+                x_axis = 'year'
+            y = np.array(timeseries['paleoData_values'], dtype = 'float64')
+            x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
+            y_temp = np.copy(y)
+            y = y[~np.isnan(y_temp)]
+            x = x[~np.isnan(y_temp)]
+                   
+    # Perform the analysis
+    default = {'tau':None,
+               'freqs':None,
+               'c':1e-3,
+               'nproc':8,
+               'nMC':200,
+               'detrend':'no',
+               'Neff':3,
+               'anti_alias':False,
+               'avgs':2,
+               'method':'Kirchner_f2py'}
+    psd, freqs, psd_ar1_q95 = Spectral.wwz_psd(y,x,**default)
+    
+    # Make the plot
+    ax4.plot(1/freqs, psd, linewidth=1,  label='PSD', color = marker[0])
+    ax4.plot(1/freqs, psd_ar1_q95, linewidth=1,  label='AR1 95%', color=sns.xkcd_rgb["pale red"])
+    plt.ylabel('Spectral Density')
+    plt.xlabel('Period ('+\
+                x_label[x_label.find("(")+1:x_label.find(")")][0:x_label.find(" ")-1]+')')
+    
+    plt.xscale('log', nonposy='clip')
+    plt.yscale('log', nonposy='clip')
+    
+    ax4.set_aspect('equal')
+    
+    plt.gca().invert_xaxis()
+    plt.legend()    
+        
+    
     #Add the metadata
     textstr = "archiveType: " + metadata["archiveType"]+"\n"+"\n"+\
               "Authors: " + metadata["authors"]+"\n"+"\n"+\
