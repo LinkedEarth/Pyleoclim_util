@@ -50,7 +50,7 @@ def plot(x,y,markersize=50,marker='ro',x_label="",y_label="",\
     plt.plot(x,y,color=marker[0],linewidth=1,label='interpolated')
     
     #Stylistic issues
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.title(title)

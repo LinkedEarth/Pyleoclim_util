@@ -1385,7 +1385,7 @@ def xwt(ys1, ts1, ys2, ts2,
 def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None,
              yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
              cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour',
-             plot_cone=False,ax=None):
+             plot_cone=False,ax=None, xlabel = 'Year', ylabel = 'Period'):
     """ Plot the wavelet amplitude
 
     Args:
@@ -1407,7 +1407,10 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
         plot_signif (bool): plot 95% significant area or not
         signif_style (str): plot 95% significant area with `contour` or `shade`
         plot_cone (bool): plot cone of influence or not
-
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot)
+        xlabel (str): The x-axis label
+        ylabel (str): The y-axis label
+            
     Returns:
         fig (figure): the 2-D plot of wavelet analysis
 
@@ -1459,8 +1462,8 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
     else:
         ylim = ax.get_ylim()
 
-    plt.xlabel('Year (CE)')
-    plt.ylabel('Period (years)')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
 
     if plot_signif:
         assert AR1_q is not None, "Please set values for `AR1_q`!"
@@ -1502,15 +1505,19 @@ def plot_wwadist(wwa):
 
 def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None,
              figsize=[20, 8], label='PSD', plot_ar1=True, psd_ar1_q95=None, 
-             psd_ar1_color=sns.xkcd_rgb["pale red"], ax = None):
+             psd_ar1_color=sns.xkcd_rgb["pale red"], ax = None,\
+             xlabel = 'Period', ylabel = 'Spectral Density'):
     """ Plot the wavelet amplitude
 
     Args:
         psd (array): power spectral density
         freqs (array): vector of frequency
         xticks (list): ticks on x-axis
-        xlim (list): limitations for x-axis
+        xlim (list): limits for x-axis
         figsize (list): the size for the figure
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot) 
+        xlabel (str): The x-axis label
+        ylabel (str): The y-axis label
 
     Returns:
         fig (figure): the 2-D plot of wavelet analysis
@@ -1532,8 +1539,8 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, y
             assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
             plt.plot(1/freqs, psd_ar1_q95, linewidth=linewidth,  label='AR1 95%', color=psd_ar1_color)
 
-    plt.ylabel('Spectral Density')
-    plt.xlabel('Period (years)')
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
 
     plt.xscale('log', nonposy='clip')
     plt.yscale('log', nonposy='clip')

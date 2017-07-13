@@ -318,9 +318,12 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
         else:
             y_label = timeseries["paleoData_variableName"]
 
+    if not ax: 
+        fig, ax = plt.subplots(figsize=figsize)
+    
     # make the plot
-    ax = Plot.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
-                    y_label=y_label, title=title, figsize = figsize, ax=ax)
+    Plot.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
+              y_label=y_label, title=title, figsize = figsize, ax=ax)
 
     #Save the figure if asked
     if saveFig == True:
@@ -416,13 +419,16 @@ def histTs(timeseries = "", bins = None, hist = True, \
     if color == "default":
        archiveType = LipdUtils.LipdToOntology(timeseries["archiveType"])
        color = plot_default[archiveType][0]
+    
+    if not ax:
+        fig, ax = plt.subplots(figsize=figsize)
 
     # Make this histogram
-    ax = Plot.plot_hist(y, bins = bins, hist = hist, \
-             kde = kde, rug = rug, fit = fit, hist_kws = hist_kws,\
-             kde_kws = kde_kws, rug_kws = rug_kws, \
-             fit_kws = fit_kws, color = color, vertical = vertical, \
-             norm_hist = norm_hist, label = y_label, figsize = figsize, ax=ax)
+    Plot.plot_hist(y, bins = bins, hist = hist, \
+        kde = kde, rug = rug, fit = fit, hist_kws = hist_kws,\
+        kde_kws = kde_kws, rug_kws = rug_kws, \
+        fit_kws = fit_kws, color = color, vertical = vertical, \
+        norm_hist = norm_hist, label = y_label, figsize = figsize, ax=ax)
 
     #Save the figure if asked
     if saveFig == True:
@@ -492,7 +498,7 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
     ax1 = fig.add_subplot(gs[0,:-3])
     marker = [plot_default[archiveType][0],plot_default[archiveType][1]]
     markersize = 50
-
+    
     ax1.scatter(x,y,s = markersize, facecolor = 'none', edgecolor = marker[0],
                 marker = marker[1], label = 'original')
     ax1.plot(x,y, color = marker[0], linewidth = 1, label = 'interpolated')
@@ -816,7 +822,7 @@ def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
 
 def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
           psd_default = True, wwaplot_default = True, psdplot_default = True,
-          fig = True, saveFig = False, dir = "", format = "eps"):
+          fig = True, ax = None, saveFig = False, dir = "", format = "eps"):
     """Weigthed wavelet Z-transform analysis
     
     Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)
@@ -883,6 +889,7 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
             Modify the values for specific keys to change the default behavior.
             
         fig (bool): If True, plots the figure
+        ax: Useful for subplots
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
             If not provided, creates a default folder called 'figures' in the
@@ -971,6 +978,10 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
     ys = ys[~np.isnan(ys_temp)]
     ts = ts[~np.isnan(ys_temp)]   
     
+    #Get the time units
+    s = timeseries[label+"Units"]
+    ageunits = s[0:s.find(" ")]  
+    
     # Perform the calculations
     if psd is True and wwz is False: # PSD only
             
@@ -985,7 +996,8 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                           'Neff':3,
                           'anti_alias':False,
                           'avgs':2,
-                          'method':'Kirchner_f2py'}
+                          'method':'Kirchner_f2py',
+                          }
          
         # Perform calculation
         psd, freqs, psd_ar1_q95 = Spectral.wwz_psd(ys, ts, **psd_default)
@@ -1009,7 +1021,9 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None}
+                                 'ax':None,
+                                 'xlabel':'Period ('+ageunits+')',
+                                 'ylabel':'Spectral Density'}
                 
             fig = Spectral.plot_psd(psd,freqs,**psdplot_default)
             
@@ -1066,7 +1080,9 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'plot_signif':True,
                                  'signif_style':'contour',
                                  'plot_cone':True,
-                                 'ax':None}
+                                 'ax':None,
+                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
+                                 'ylabel': 'Period ('+ageunits+')'}
             
             fig = Spectral.plot_wwa(wwa, freqs, tau, **wwaplot_default)
             
@@ -1139,7 +1155,9 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'cone_alpha':0.5,
                                  'plot_signif':True,
                                  'signif_style':'contour',
-                                 'plot_cone':True}
+                                 'plot_cone':True,
+                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
+                                 'ylabel': 'Period ('+ageunits+')'}
                 
             if psdplot_default is True:
                 psdplot_default={'lmstyle':None,
@@ -1151,7 +1169,9 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                              'label':'PSD',
                              'plot_ar1':True,
                              'psd_ar1_q95':psd_ar1_q95,
-                             'psd_ar1_color':sns.xkcd_rgb["pale red"]}
+                             'psd_ar1_color':sns.xkcd_rgb["pale red"],
+                             'xlabel':'Period ('+ageunits+')',
+                             'ylabel':'Spectral Density'}
             
             if 'figsize' in wwaplot_default.keys():
                 figsize = wwaplot_default['figsize']
@@ -1160,7 +1180,7 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
             else:
                 figsize = [20.8]
                 
-                
+               
             fig = plt.figure(figsize = figsize)
             
             ax1 = plt.subplot2grid((1,3),(0,0), colspan =2)
