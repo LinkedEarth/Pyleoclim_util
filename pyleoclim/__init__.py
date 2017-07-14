@@ -677,11 +677,11 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
 
     # Get the first time and paleoData values
     y1 = np.array(timeseries1['paleoData_values'], dtype = 'float64')
-    x1, label = LipdUtils.checkXaxis(timeseries1, x_axis=x_axis)
+    x1, label1 = LipdUtils.checkXaxis(timeseries1, x_axis=x_axis)
 
     # Get the second one
     y2 = np.array(timeseries2['paleoData_values'], dtype = 'float64')
-    x2, label = LipdUtils.checkXaxis(timeseries2, x_axis=label)
+    x2, label2 = LipdUtils.checkXaxis(timeseries2, x_axis=x_axis)
 
     # Remove NaNs
     y1_temp = np.copy(y1)
@@ -691,6 +691,37 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
     y2_temp = np.copy(y2)
     y2 = y2[~np.isnan(y2_temp)]
     x2 = x2[~np.isnan(y2_temp)]
+    
+    
+    # Make sure that the series have the same units:
+    units1 = timeseries1[label1+'Units']
+    units2 = timeseries2[label2+'Units'] 
+    
+    if units2!=units1:
+        print('Warning: The two timeseries are on different time units!')
+        print('The units of timeseries1 are '+units1)
+        print('The units of timeseries2 are '+units2)
+        answer = input('Enter an equation to convert the units of x2 onto x1.'+
+                       " The equation should be written in Python format"+
+                       " (e.g., a*x2+b or 1950-a*x2) or press enter to abort: ")
+        
+        if not answer:
+            sys.exit("Aborted by User")
+        elif "x2" not in answer: 
+            answer = input("The form must be a valid python expression and contain x2!"+
+                           "Enter a valid expression: ")
+            while "x2" not in answer:
+                answer = input("The form must be a valid python expression and contain x2!"+
+                           "Enter a valid expression: ")        
+        else: x2 = eval(answer)  
+        
+    # Make sure these things are actually ordered
+    x1_idx = np.argsort(x1)
+    x2_idx = np.argsort(x2)
+    x1 = x1[x1_idx]
+    y1 = y1[x1_idx]
+    x2 = x2[x2_idx]
+    y2 = y2[x2_idx]    
 
     #Check that the two timeseries have the same lenght and if not interpolate
     if len(y1) != len(y2):
@@ -710,6 +741,9 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
         interp_values1 = y1
         interp_values2 = y2
 
+    #Make sure that these vectors are not empty, otherwise return an error
+    if np.size(interp_values1) == 0 or np.size(interp_values2) == 0:
+        sys.exit("No common time period between the two time series.")
 
     r, sig, p = Stats.corrsig(interp_values1,interp_values2,nsim=nsim,
                                  method=method,alpha=alpha)
