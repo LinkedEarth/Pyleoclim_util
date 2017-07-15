@@ -224,18 +224,18 @@ def ts2segments(ys, ts, factor):
 
     nt = np.size(ts)
 
-    dt_mean = np.mean(np.diff(ts))
+    dt_med = np.median(np.abs(np.diff(ts)))
     dts = np.diff(ts)
 
-    threshold = factor * dt_mean
-    n_breaks = np.size(dts[dts > threshold])  # the number of breaks
+    threshold = factor * dt_med
+    n_breaks = np.size(dts[np.abs(dts) > threshold])  # the number of breaks
     n_segs = n_breaks + 1
 
     seg_ys, seg_ts = [], []  # store the segments with lists
 
     i_start = 0
     for i in range(nt-1):
-        if dts[i] > threshold:
+        if np.abs(dts[i]) > threshold:
             i_end = i + 1
             seg_ys.append(ys[i_start:i_end])
             seg_ts.append(ts[i_start:i_end])

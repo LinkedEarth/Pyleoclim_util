@@ -1208,8 +1208,9 @@ class WaveletAnalysis(object):
         if freqs is None:
             freqs = self.make_freq_vector(ts_cut)
 
-        warnings.warn("tau will be adjusted since the boundary of tau is not on any time point.")
-        tau = np.linspace(np.min(ts_cut), np.max(ts_cut), np.size(tau))
+        if np.min(tau) != np.min(ts) or np.max(tau) != np.max(ts):
+            warnings.warn("tau will be adjusted since the boundary of tau is not on any time point.")
+            tau = np.linspace(np.min(ts_cut), np.max(ts_cut), np.size(tau))
 
         return ys_cut, ts_cut, freqs, tau
 
