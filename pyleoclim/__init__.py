@@ -875,6 +875,58 @@ def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
 
     return z, mu, sig
 
+def segmentTs(timeseries = "", factor = 2):
+    """Divides a time series into several segments using a gap detection algorithm
+    
+    Gap detection rule: If the time interval between some two data points is
+    larger than some factor times the mean resolution of the timeseries, then
+    a brak point is applied and the timseries is divided. 
+    
+    Args:
+        timeseries: a LiPD timeseries object
+        factor (float): factor to adjust the threshold. threshold = factor*dt_mean.
+            Default is 2.
+    
+    Returns:
+        seg_y (list) - a list of several segments with potentially different length
+        seg_t (list) - A list of the time values for each y segment. 
+        n_segs (int) - the number of segments
+        
+    
+    """
+    
+    if not timeseries:
+        if not 'ts_list' in globals():
+            extractTs()
+        timeseries = LipdUtils.getTs(ts_list)
+        
+    # Get the values
+    # Raise an error if age or year not in the keys
+    if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
+        sys.exit("No time information available")
+    elif 'age' in timeseries.keys() and 'year' in timeseries.keys():
+        print("Both age and year information are available.")
+        x_axis = input("Which one would you like to use? ")
+        while x_axis != "year" and x_axis != "age":
+            x_axis = input("Only enter year or age: ")
+    elif 'age' in timeseries.keys():
+        x_axis = 'age'
+    elif 'year' in timeseries.keys():
+        x_axis = 'year'        
+    
+    # Get the values
+    ys = np.array(timeseries['paleoData_values'], dtype = 'float64') 
+    ts, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
+    
+    # remove NaNs
+    ys_temp = np.copy(ys)
+    ys = ys[~np.isnan(ys_temp)]
+    ts = ts[~np.isnan(ys_temp)]   
+
+    #segment the timeseries
+    seg_y, seg_t, n_segs = Timeseries.ts2segments(ys, ts, factor)
+
+    return seg_y, seg_t, n_segs        
 
 #"""
 # Spectral Analysis
@@ -882,7 +934,7 @@ def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
 
 def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
           psd_default = True, wwaplot_default = True, psdplot_default = True,
-          fig = True, ax = None, saveFig = False, dir = "", format = "eps"):
+          fig = True, saveFig = False, dir = "", format = "eps"):
     """Weigthed wavelet Z-transform analysis
     
     Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)
@@ -949,7 +1001,6 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
             Modify the values for specific keys to change the default behavior.
             
         fig (bool): If True, plots the figure
-        ax: Useful for subplots
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
             If not provided, creates a default folder called 'figures' in the
@@ -1016,7 +1067,7 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
             extractTs()
         timeseries = LipdUtils.getTs(ts_list)
     
-     # Raise an error if age or year not in the keys
+    # Raise an error if age or year not in the keys
     if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
         sys.exit("No time information available")
     elif 'age' in timeseries.keys() and 'year' in timeseries.keys():
@@ -1027,8 +1078,23 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
     elif 'age' in timeseries.keys():
         x_axis = 'age'
     elif 'year' in timeseries.keys():
-        x_axis = 'year'        
-    
+        x_axis = 'year'
+
+    # Set the defaults
+    #Make sure the default have the proper type 
+    if psd_default is not True and type(psd_default) is not dict:
+        sys.exit('The default for the psd calculation should either be provided'+
+                 ' as a dictionary are set to True')
+    if psdplot_default is not True and type(psdplot_default) is not dict:
+        sys.exit('The default for the psd figure should either be provided'+
+                 ' as a dictionary are set to True')  
+    if wwz_default is not True and type(wwz_default) is not dict:
+        sys.exit('The default for the wwz calculation should either be provided'+
+                 ' as a dictionary are set to True')
+    if wwaplot_default is not True and type(wwaplot_default) is not dict:
+        sys.exit('The default for the wwa figure should either be provided'+
+                 ' as a dictionary are set to True')
+
     # Get the values
     ys = np.array(timeseries['paleoData_values'], dtype = 'float64') 
     ts, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
@@ -1044,21 +1110,39 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
     
     # Perform the calculations
     if psd is True and wwz is False: # PSD only
+        
+        if type(psd_default) is dict:
+            dict_in = psd_default
             
-        #Set default
-        if psd_default is True:
-           psd_default = {'tau':None,
-                          'freqs': None,
-                          'c':1e-3,
-                          'nproc':8,
-                          'nMC':200,
-                          'detrend':'no',
-                          'Neff':3,
-                          'anti_alias':False,
-                          'avgs':2,
-                          'method':'Kirchner_f2py',
-                          }
-         
+            psd_default = {'tau':None,
+                       'freqs': None,
+                       'c':1e-3,
+                       'nproc':8,
+                       'nMC':200,
+                       'detrend':'no',
+                       'Neff':3,
+                       'anti_alias':False,
+                       'avgs':2,
+                       'method':'Kirchner_f2py',
+                       }
+            
+            for key, value in dict_in.items():
+                if key in psd_default.keys():
+                    psd_default[key] = value
+        
+        else:
+          psd_default = {'tau':None,
+                       'freqs': None,
+                       'c':1e-3,
+                       'nproc':8,
+                       'nMC':200,
+                       'detrend':'no',
+                       'Neff':3,
+                       'anti_alias':False,
+                       'avgs':2,
+                       'method':'Kirchner_f2py',
+                       }
+            
         # Perform calculation
         psd, freqs, psd_ar1_q95 = Spectral.wwz_psd(ys, ts, **psd_default)
         
@@ -1069,8 +1153,10 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
         
         # Plot if asked
         if fig is True:
-            #Set the plot default
-            if psdplot_default is True:
+
+            if type(psdplot_default) is dict:
+                dict_in = psdplot_default
+                
                 psdplot_default={'lmstyle':None,
                                  'linewidth':None,
                                  'xticks':None,
@@ -1083,7 +1169,27 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
                                  'ax':None,
                                  'xlabel':'Period ('+ageunits+')',
-                                 'ylabel':'Spectral Density'}
+                                 'ylabel':'Spectral Density'}        
+                                
+                for key, value in dict_in.items():
+                    if key in psdplot_default.keys():
+                        psdplot_default[key] = value
+                        
+            else:
+                   
+               psdplot_default={'lmstyle':None,
+                                 'linewidth':None,
+                                 'xticks':None,
+                                 'xlim':None,
+                                 'ylim':None,
+                                 'figsize':[20,8],
+                                 'label':'PSD',
+                                 'plot_ar1':True,
+                                 'psd_ar1_q95':psd_ar1_q95,
+                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
+                                 'ax':None,
+                                 'xlabel':'Period ('+ageunits+')',
+                                 'ylabel':'Spectral Density'}                 
                 
             fig = Spectral.plot_psd(psd,freqs,**psdplot_default)
             
@@ -1097,7 +1203,24 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
              
     elif psd is False and wwz is True: #WWZ only   
         # Set default 
-        if wwz_default is True:
+        if type(wwz_default) is dict:
+            dict_in = wwz_default
+            
+            wwz_default = {'tau':None,
+                           'freqs':None,
+                           'c':1/(8*np.pi**2),
+                           'Neff':3,
+                           'nMC':200,
+                           'nproc':8,
+                           'detrend':'no',
+                           'method':'Kirchner_f2py'}
+            
+            for key,value in dict_in.items():
+                if key in wwz_default.keys():
+                    wwz_default[key]=value
+        
+        else:  
+            
             wwz_default = {'tau':None,
                            'freqs':None,
                            'c':1/(8*np.pi**2),
@@ -1123,7 +1246,32 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
         #PLot if asked
         if fig is True:
             # Set the plot default
-            if wwaplot_default is True:
+            if type(wwaplot_default) is dict:
+                dict_in = wwaplot_default
+                wwaplot_default={'Neff':3,
+                                 'AR1_q':AR1_q,
+                                 'coi':coi,
+                                 'levels':None,
+                                 'tick_range':None,
+                                 'yticks':None,
+                                 'ylim':None,
+                                 'xticks':None,
+                                 'xlabels':None,
+                                 'figsize':[20,8],
+                                 'clr_map':'OrRd',
+                                 'cbar_drawedges':False,
+                                 'cone_alpha':0.5,
+                                 'plot_signif':True,
+                                 'signif_style':'contour',
+                                 'plot_cone':True,
+                                 'ax':None,
+                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
+                                 'ylabel': 'Period ('+ageunits+')'}
+                for key, value in dict_in.items():
+                    if key in wwaplot_default.keys():
+                        wwaplot_default[key] = value
+            
+            else:
                 wwaplot_default={'Neff':3,
                                  'AR1_q':AR1_q,
                                  'coi':coi,
@@ -1158,19 +1306,56 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
     
         # Set the defaults
         
-        if psd_default is True:
-           psd_default = {'tau':None,
-                          'freqs': None,
-                          'c':1e-3,
-                          'nproc':8,
-                          'nMC':200,
-                          'detrend':'no',
-                          'Neff':3,
-                          'anti_alias':False,
-                          'avgs':2,
-                          'method':'Kirchner_f2py'}
+        if type(psd_default) is dict:
+            dict_in = psd_default
+            
+            psd_default = {'tau':None,
+                       'freqs': None,
+                       'c':1e-3,
+                       'nproc':8,
+                       'nMC':200,
+                       'detrend':'no',
+                       'Neff':3,
+                       'anti_alias':False,
+                       'avgs':2,
+                       'method':'Kirchner_f2py',
+                       }
+            
+            for key, value in dict_in.items():
+                if key in psd_default.keys():
+                    psd_default[key] = value
+        
+        else:
+          psd_default = {'tau':None,
+                       'freqs': None,
+                       'c':1e-3,
+                       'nproc':8,
+                       'nMC':200,
+                       'detrend':'no',
+                       'Neff':3,
+                       'anti_alias':False,
+                       'avgs':2,
+                       'method':'Kirchner_f2py',
+                       }
            
-        if wwz_default is True:
+        if type(wwz_default) is dict:
+            dict_in = wwz_default
+            
+            wwz_default = {'tau':None,
+                           'freqs':None,
+                           'c':1/(8*np.pi**2),
+                           'Neff':3,
+                           'nMC':200,
+                           'nproc':8,
+                           'detrend':'no',
+                           'method':'Kirchner_f2py'}
+            
+            for key,value in dict_in.items():
+                if key in wwz_default.keys():
+                    wwz_default[key]=value
+        
+        else:  
+            
             wwz_default = {'tau':None,
                            'freqs':None,
                            'c':1/(8*np.pi**2),
@@ -1199,7 +1384,8 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
         # Make the plot if asked
         if fig is True:
             # Set the plot default
-            if wwaplot_default is True:
+            if type(wwaplot_default) is dict:
+                dict_in = wwaplot_default
                 wwaplot_default={'Neff':3,
                                  'AR1_q':AR1_q,
                                  'coi':coi,
@@ -1216,29 +1402,79 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'plot_signif':True,
                                  'signif_style':'contour',
                                  'plot_cone':True,
+                                 'ax':None,
                                  'xlabel': label.upper()[0]+label[1:]+'('+s+')',
                                  'ylabel': 'Period ('+ageunits+')'}
+                for key, value in dict_in.items():
+                    if key in wwaplot_default.keys():
+                        wwaplot_default[key] = value
+            
+            else:
+                wwaplot_default={'Neff':3,
+                                 'AR1_q':AR1_q,
+                                 'coi':coi,
+                                 'levels':None,
+                                 'tick_range':None,
+                                 'yticks':None,
+                                 'ylim':None,
+                                 'xticks':None,
+                                 'xlabels':None,
+                                 'figsize':[20,8],
+                                 'clr_map':'OrRd',
+                                 'cbar_drawedges':False,
+                                 'cone_alpha':0.5,
+                                 'plot_signif':True,
+                                 'signif_style':'contour',
+                                 'plot_cone':True,
+                                 'ax':None,
+                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
+                                 'ylabel': 'Period ('+ageunits+')'}
+            
                 
-            if psdplot_default is True:
+            if type(psdplot_default) is dict:
+                dict_in = psdplot_default
+                
                 psdplot_default={'lmstyle':None,
-                             'linewidth':None,
-                             'xticks':None,
-                             'xlim':None,
-                             'ylim':None,
-                             'figsize':[20,8],
-                             'label':'PSD',
-                             'plot_ar1':True,
-                             'psd_ar1_q95':psd_ar1_q95,
-                             'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                             'xlabel':'Period ('+ageunits+')',
-                             'ylabel':'Spectral Density'}
+                                 'linewidth':None,
+                                 'xticks':None,
+                                 'xlim':None,
+                                 'ylim':None,
+                                 'figsize':[20,8],
+                                 'label':'PSD',
+                                 'plot_ar1':True,
+                                 'psd_ar1_q95':psd_ar1_q95,
+                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
+                                 'ax':None,
+                                 'xlabel':'Period ('+ageunits+')',
+                                 'ylabel':'Spectral Density'}        
+                                
+                for key, value in dict_in.items():
+                    if key in psdplot_default.keys():
+                        psdplot_default[key] = value
+                        
+            else:
+                   
+               psdplot_default={'lmstyle':None,
+                                 'linewidth':None,
+                                 'xticks':None,
+                                 'xlim':None,
+                                 'ylim':None,
+                                 'figsize':[20,8],
+                                 'label':'PSD',
+                                 'plot_ar1':True,
+                                 'psd_ar1_q95':psd_ar1_q95,
+                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
+                                 'ax':None,
+                                 'xlabel':'Period ('+ageunits+')',
+                                 'ylabel':'Spectral Density'} 
+               
             
             if 'figsize' in wwaplot_default.keys():
                 figsize = wwaplot_default['figsize']
             elif 'figsize' in psdplot_default.keys():
                 figsize = psdplot_default['figsize']
             else:
-                figsize = [20.8]
+                figsize = [20,8]
                 
                
             fig = plt.figure(figsize = figsize)
