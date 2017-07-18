@@ -15,7 +15,6 @@
 
 import sys
 import os
-import sphinx_rtd_theme
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -363,6 +362,6 @@ epub_exclude_files = ['search.html']
 #---- Read the Docs output
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
-    html_theme = 'sphinx_rtd_theme'
+    html_theme = 'default'
 else:
     html_theme = 'nature'
