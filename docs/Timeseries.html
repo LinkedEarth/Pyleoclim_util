@@ -1,0 +1,207 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Timeseries Functions &#8212; Pyleoclim 0.3.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="LiPD Utilities" href="LipdUtils.html" />
+    <link rel="prev" title="Statistics Functions" href="Stats.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="timeseries-functions">
+<h1>Timeseries Functions<a class="headerlink" href="#timeseries-functions" title="Permalink to this headline">¶</a></h1>
+<p>This module allows the manipulation of timeseries.</p>
+<dl class="function">
+<dt id="pyleoclim.Timeseries.bin">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">bin</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Timeseries.html#bin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Timeseries.bin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bin the values</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>x (array): the x-axis series.
+y (array): the y-axis series.
+bin_size (float): The size of the bins. Default is the average resolution
+start (float): Where/when to start binning. Default is the minimum
+end (float): When/where to stop binning. Defulat is the maximum</dd>
+<dt>Returns:</dt>
+<dd><p class="first">binned_values - the binned output</p>
+<p>bins - the bins (centered on the median, i.e., the 100-200 bin is 150)</p>
+<p>n - number of data points in each bin</p>
+<p class="last">error -  the standard error on the mean in each bin</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Timeseries.interp">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">interp</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Timeseries.html#interp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Timeseries.interp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linear interpolation onto a new x-axis</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>x (array): the x-axis
+y (array): the y-axis
+interp_step (float): the interpolation step. Default is mean resolution.
+start (float): where/when to start the interpolation. Default is min..
+end (float): where/when to stop the interpolation. Defaul is max.</dd>
+<dt>Returns:</dt>
+<dd><p class="first">xi - the interpolated x-axis</p>
+<p class="last">interp_values - the interpolated values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Timeseries.onCommonAxis">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">onCommonAxis</code><span class="sig-paren">(</span><em>x1</em>, <em>y1</em>, <em>x2</em>, <em>y2</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Timeseries.html#onCommonAxis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Timeseries.onCommonAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Places two timeseries on a common axis</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">x1 (array): x-axis values of the first timeseries
+y1 (array): y-axis values of the first timeseries
+x2 (array): x-axis values of the second timeseries
+y2 (array): y-axis values of the second timeseries
+interp_step (float): The interpolation step. Default is mean resolution</p>
+<blockquote>
+<div>of lowest resolution series</div></blockquote>
+<dl class="last docutils">
+<dt>start (float): where/when to start. Default is the maximum of the minima of</dt>
+<dd>the two timeseries</dd>
+<dt>end (float): Where/when to end. Default is the minimum of the maxima of</dt>
+<dd>the two timeseries</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd><p class="first">xi -  the interpolated x-axis</p>
+<p class="last">interp_values1 -  the interpolated y-values for the first timeseries
+interp_values2 - the intespolated y-values for the second timeseries</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Timeseries.standardize">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">standardize</code><span class="sig-paren">(</span><em>x</em>, <em>scale=1</em>, <em>axis=0</em>, <em>ddof=0</em>, <em>eps=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Timeseries.html#standardize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Timeseries.standardize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Centers and normalizes a given time series. Constant or nearly constant time series not rescaled.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>x (array): vector of (real) numbers as a time series, NaNs allowed
+scale (real): a scale factor used to scale a record to a match a given variance
+axis (int or None): axis along which to operate, if None, compute over the whole array
+ddof (int): degress of freedom correction in the calculation of the standard deviation
+eps (real): a threshold to determine if the standard deviation is too close to zero</dd>
+<dt>Returns:</dt>
+<dd>z (array): the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed
+mu (real): the mean of the original time series, E[X]
+sig (real): the standard deviation of the original time series, std[X]</dd>
+<dt>References:</dt>
+<dd><ol class="first last arabic simple">
+<li>Tapio Schneider’s MATLAB code: <a class="reference external" href="http://www.clidyn.ethz.ch/imputation/standardize.m">http://www.clidyn.ethz.ch/imputation/standardize.m</a></li>
+<li>The zscore function in SciPy: <a class="reference external" href="https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py">https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py</a></li>
+</ol>
+</dd>
+</dl>
+<p>&#64;author: fzhu</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Pyleoclim</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Main.html">Main Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Map.html">Mapping Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Plot.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Stats.html">Statistics Functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Timeseries Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LipdUtils.html">LiPD Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SummaryPlots.html">Summary Plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Spectral.html">Spectral Functions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="Stats.html" title="previous chapter">Statistics Functions</a></li>
+      <li>Next: <a href="LipdUtils.html" title="next chapter">LiPD Utilities</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/Timeseries.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

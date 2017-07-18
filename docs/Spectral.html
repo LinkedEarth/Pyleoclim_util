@@ -1,0 +1,281 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Spectral Functions &#8212; Pyleoclim 0.3.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Summary Plots" href="SummaryPlots.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spectral-functions">
+<h1>Spectral Functions<a class="headerlink" href="#spectral-functions" title="Permalink to this headline">¶</a></h1>
+<p>This module allows analysis in the frequency domain</p>
+<dl class="function">
+<dt id="pyleoclim.Spectral.ar1_fit">
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">ar1_fit</code><span class="sig-paren">(</span><em>ys</em>, <em>ts=None</em>, <em>detrend='no'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#ar1_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.ar1_fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">ys (array): the time series
+ts (array): the time axis of that series
+detrend (str): ‘no’ - the original time series is assumed to have no trend;</p>
+<blockquote class="last">
+<div>‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;
+‘constant’ - the mean of <cite>ys</cite> is subtracted</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>g (float): lag-1 autocorrelation coefficient (for evenly-spaced time series)
+OR estimated persistence (for unevenly-spaced time series)</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Spectral.ar1_sim">
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">ar1_sim</code><span class="sig-paren">(</span><em>ys</em>, <em>n</em>, <em>p</em>, <em>ts=None</em>, <em>detrend='no'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#ar1_sim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.ar1_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from <cite>ys</cite> and <cite>ts</cite></p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">ys (array): a time series
+n, p (int): dimensions as n rows by p columns
+ts (array): the time axis of that series
+detrend (str): ‘no’ - the original time series is assumed to have no trend;</p>
+<blockquote class="last">
+<div>‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;
+‘constant’ - the mean of <cite>ys</cite> is subtracted</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>red (matrix): n rows by p columns matrix of an AR1 process</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Spectral.wwz">
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">wwz</code><span class="sig-paren">(</span><em>ys</em>, <em>ts</em>, <em>tau=None</em>, <em>freqs=None</em>, <em>c=0.012665147955292222</em>, <em>Neff=3</em>, <em>nMC=200</em>, <em>nproc=8</em>, <em>detrend='no'</em>, <em>method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#wwz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.wwz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">ys (array): a time series, NaNs will be deleted automatically
+ts (array): the time points, if <cite>ys</cite> contains any NaNs, some of the time points will be deleted accordingly
+tau (array): the evenly-spaced time points
+freqs (array): vector of frequency
+c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+Neff (int): effective number of points
+nMC (int): the number of Monte-Carlo simulations
+nproc (int): the number of processes for multiprocessing
+detrend (str): ‘no’ - the original time series is assumed to have no trend;</p>
+<blockquote>
+<div>‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;
+‘constant’ - the mean of <cite>ys</cite> is subtracted</div></blockquote>
+<dl class="last docutils">
+<dt>method (str): ‘Foster’ - the original WWZ method;</dt>
+<dd>‘Kirchner’ - the method Kirchner adapted from Foster;
+‘Kirchner_f2py’ - the method Kirchner adapted from Foster with f2py</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>wwa (array): the weighted wavelet amplitude.
+AR1_q (array): AR1 simulations
+coi (array): cone of influence
+freqs (array): vector of frequency
+tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+Neffs (array): the matrix of effective number of points in the time-scale coordinates
+coeff (array): the wavelet transform coefficents</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Spectral.wwz_psd">
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">wwz_psd</code><span class="sig-paren">(</span><em>ys</em>, <em>ts</em>, <em>freqs=None</em>, <em>tau=None</em>, <em>c=0.001</em>, <em>nproc=8</em>, <em>nMC=200</em>, <em>detrend='no'</em>, <em>Neff=3</em>, <em>anti_alias=False</em>, <em>avgs=2</em>, <em>method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#wwz_psd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.wwz_psd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the psd of a timeseires directly using wwz method.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">ys (array): a time series, NaNs will be deleted automatically
+ts (array): the time points, if <cite>ys</cite> contains any NaNs, some of the time points will be deleted accordingly
+freqs (array): vector of frequency
+tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+c (float): the decay constant, the default value 1e-3 is good for most of the cases
+nproc (int): the number of processes for multiprocessing
+nMC (int): the number of Monte-Carlo simulations
+detrend (str): ‘no’ - the original time series is assumed to have no trend;</p>
+<blockquote>
+<div>‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;
+‘constant’ - the mean of <cite>ys</cite> is subtracted</div></blockquote>
+<dl class="last docutils">
+<dt>method (str): ‘Foster’ - the original WWZ method;</dt>
+<dd>‘Kirchner’ - the method Kirchner adapted from Foster;
+‘Kirchner_f2py’ - the method Kirchner adapted from Foster with f2py</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>psd (array): power spectral density
+freqs (array): vector of frequency
+psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Spectral.plot_wwa">
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_wwa</code><span class="sig-paren">(</span><em>wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None, yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', plot_cone=False, ax=None, xlabel='Year', ylabel='Period'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#plot_wwa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.plot_wwa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the wavelet amplitude</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>wwa (array): the weighted wavelet amplitude.
+freqs (array): vector of frequency
+tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+Neff (int): effective number of points
+AR1_q (array): AR1 simulations
+coi (array): cone of influence
+levels (array): levels of values to plot
+tick_range (array): levels of ticks to show on the colorbar
+yticks (list): ticks on y-axis
+ylim (list): limitations for y-axis
+xticks (list): ticks on x-axis
+figsize (list): the size for the figure
+clr_map (str): the name of the colormap
+cbar_drawedges (bool): whether to draw edges on the colorbar or not
+cone_alpha (float): the alpha value for the area covered by cone of influence
+plot_signif (bool): plot 95% significant area or not
+signif_style (str): plot 95% significant area with <cite>contour</cite> or <cite>shade</cite>
+plot_cone (bool): plot cone of influence or not
+ax: Return as axis instead of figure (useful to integrate plot into a subplot)
+xlabel (str): The x-axis label
+ylabel (str): The y-axis label</dd>
+<dt>Returns:</dt>
+<dd>fig (figure): the 2-D plot of wavelet analysis</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Spectral.plot_wwadist">
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_wwadist</code><span class="sig-paren">(</span><em>wwa</em>, <em>ylim=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#plot_wwadist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.plot_wwadist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the distribution of wwa with the 95% quantile line.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>wwa (array): the weighted wavelet amplitude.
+ylim (list): limitations for y-axis</dd>
+<dt>Returns:</dt>
+<dd>fig (figure): the 2-D plot of wavelet analysis</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Spectral.plot_psd">
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_psd</code><span class="sig-paren">(</span><em>psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None, figsize=[20, 8], label='PSD', plot_ar1=True, psd_ar1_q95=None, psd_ar1_color='#d9544d', ax=None, xlabel='Period', ylabel='Spectral Density'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#plot_psd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.plot_psd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the wavelet amplitude</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>psd (array): power spectral density
+freqs (array): vector of frequency
+xticks (list): ticks on x-axis
+xlim (list): limits for x-axis
+figsize (list): the size for the figure
+ax: Return as axis instead of figure (useful to integrate plot into a subplot)
+xlabel (str): The x-axis label
+ylabel (str): The y-axis label</dd>
+<dt>Returns:</dt>
+<dd>fig (figure): the 2-D plot of wavelet analysis</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Pyleoclim</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Main.html">Main Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Map.html">Mapping Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Plot.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Stats.html">Statistics Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Timeseries.html">Timeseries Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LipdUtils.html">LiPD Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SummaryPlots.html">Summary Plots</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Spectral Functions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="SummaryPlots.html" title="previous chapter">Summary Plots</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/Spectral.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
