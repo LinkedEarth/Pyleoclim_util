@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Summary Plots &#8212; Pyleoclim 0.3.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Spectral Functions" href="Spectral.html" />
+    <link rel="prev" title="LiPD Utilities" href="LipdUtils.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Spectral.html" title="Spectral Functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="LipdUtils.html" title="LiPD Utilities"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="LipdUtils.html"
+                        title="previous chapter">LiPD Utilities</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Spectral.html"
+                        title="next chapter">Spectral Functions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/SummaryPlots.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="summary-plots">
+<h1>Summary Plots<a class="headerlink" href="#summary-plots" title="Permalink to this headline">¶</a></h1>
+<p>This module handles some basic return for the summary plots.</p>
+<p><strong>Requires</strong> a LiPD file</p>
+<dl class="function">
+<dt id="pyleoclim.SummaryPlots.getMetadata">
+<code class="descclassname">pyleoclim.SummaryPlots.</code><code class="descname">getMetadata</code><span class="sig-paren">(</span><em>timeseries</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.SummaryPlots.getMetadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the necessary metadata to be printed out automatically</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeseries</strong> &#8211; a specific timeseries object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">archiveType<p>Authors (if more than 2, replace by et al.</p>
+<p>PublicationYear</p>
+<p>Publication DOI</p>
+<p>Variable Name</p>
+<p>Units</p>
+<p>Climate Interpretation</p>
+<p>Calibration Equation</p>
+<p>Calibration References</p>
+<p>Calibration Notes</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">A dictionary containing the following metadata</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.SummaryPlots.TsData">
+<code class="descclassname">pyleoclim.SummaryPlots.</code><code class="descname">TsData</code><span class="sig-paren">(</span><em>timeseries</em>, <em>x_axis=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.SummaryPlots.TsData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the PaleoData with age/depth information</p>
+<p>Get the necessary information for the TS plots/necessary to allow for
+axes specification</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries</strong> &#8211; a single timeseries object.
+By default, will prompt the user</li>
+<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to plot the
+paleo-data. Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;.
+Default is to let the system choose if only one available
+or prompt the user.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>x - the x-valus</p>
+<p>y - the y-values</p>
+<p>archiveType - the archiveType (for plot settings)</p>
+<p>x_label - the label for the x-axis</p>
+<p>y_label - the label for the y-axis</p>
+<p>label - the results of the x-axis query. Either depth, year, or age</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.SummaryPlots.agemodelData">
+<code class="descclassname">pyleoclim.SummaryPlots.</code><code class="descname">agemodelData</code><span class="sig-paren">(</span><em>timeseries</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.SummaryPlots.agemodelData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the necessary information for the agemodel plot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeseries</strong> &#8211; a single timeseries object. By default, will
+prompt the user</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">depth - the depth values<p>age - the age values</p>
+<p>x_label - the label for the x-axis</p>
+<p>y_label - the label for the y-axis</p>
+<p>archiveType - the archiveType (for default plot settings)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Spectral.html" title="Spectral Functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="LipdUtils.html" title="LiPD Utilities"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

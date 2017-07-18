@@ -1,0 +1,732 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Main Functions &#8212; Pyleoclim 0.3.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Mapping Functions" href="Map.html" />
+    <link rel="prev" title="Pyleoclim" href="Introduction.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Map.html" title="Mapping Functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Introduction.html" title="Pyleoclim"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Main Functions</a><ul>
+<li><a class="reference internal" href="#using-pyleoclim-with-a-lipd-file">Using Pyleoclim with a LiPD file</a><ul>
+<li><a class="reference internal" href="#getting-started">Getting started</a></li>
+<li><a class="reference internal" href="#mapping">Mapping</a></li>
+<li><a class="reference internal" href="#plotting">Plotting</a><ul>
+<li><a class="reference internal" href="#summary-plots">Summary Plots</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#statistics">Statistics</a></li>
+<li><a class="reference internal" href="#timeseries">Timeseries</a></li>
+<li><a class="reference internal" href="#analysis-in-the-frequency-domain">Analysis in the frequency domain</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-pyleoclim-without-a-lipd-file">Using Pyleoclim without a LiPD file</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Introduction.html"
+                        title="previous chapter">Pyleoclim</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Map.html"
+                        title="next chapter">Mapping Functions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Main.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="main-functions">
+<h1>Main Functions<a class="headerlink" href="#main-functions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="using-pyleoclim-with-a-lipd-file">
+<h2>Using Pyleoclim with a LiPD file<a class="headerlink" href="#using-pyleoclim-with-a-lipd-file" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="getting-started">
+<h3>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h3>
+<p>Pyleoclim relies heavily on the concept of timeseries objects introduced in
+<a class="reference external" href="http://www.clim-past.net/12/1093/2016/">LiPD</a> and implemented in the
+<a class="reference external" href="http://nickmckay.github.io/LiPD-utilities/">LiPD utilities</a>.</p>
+<p>Briefly, timeseries objects are dictionaries containing the ChronData values and
+PaleoData values as well as the metadata associated with the record. If one record
+has three ProxyObservations (e.g., Mg/Ca, d18O, d13C) then it will have three timeseries
+objects, one for each of the observations.</p>
+<p>The LiPD utilities function lipd.extractTs() returns a list of dictionaries for
+the selected LiPD files, which need to be passed to Pyleoclim along with the path
+to the directory containing the LiPD files.</p>
+<dl class="docutils">
+<dt>This is done through the functions pyleoclim.readLiPD() and pyleoclim.extracTs(),</dt>
+<dd>which are lightweight versions of their counterparts in the LiPD utilities:</dd>
+</dl>
+<dl class="function">
+<dt id="pyleoclim.readLipd">
+<code class="descclassname">pyleoclim.</code><code class="descname">readLipd</code><span class="sig-paren">(</span><em>usr_path=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.readLipd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read Lipd files into a dictionary</p>
+<p>This function is based on the function of the same name in the LiPD utilities.
+Sets the dictionary as global variable so that it doesn&#8217;t have to be provided
+as an argument for every function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>usr_path</strong> (<em>str</em>) &#8211; The path to a directory or a single file. (Optional argument)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">lipd_dict - a dictionary containing the LiPD library</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.extractTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">extractTs</code><span class="sig-paren">(</span><em>lipds=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.extractTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract timeseries dictionary</p>
+<p>This function is based on the function of the same name in the LiPD utilities.
+Set the dictionary as a global variable so that it doesn&#8217;t have to be
+provided as an argument for every function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lipds</strong> (<em>dict</em>) &#8211; A dictionary of LiPD files obtained through the</li>
+<li><strong>function</strong> (<a class="reference internal" href="#pyleoclim.readLipd" title="pyleoclim.readLipd"><em>readLipd</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">ts_list - A list of timeseries object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="mapping">
+<h3>Mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="pyleoclim.mapAllArchive">
+<code class="descclassname">pyleoclim.</code><code class="descname">mapAllArchive</code><span class="sig-paren">(</span><em>lipd_dict=''</em>, <em>markersize=50</em>, <em>background='shadedrelief'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.mapAllArchive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map all the available records loaded into the workspace by archiveType.</p>
+<dl class="docutils">
+<dt>Map of all the records into the workspace by archiveType.</dt>
+<dd>Uses the default color palette. Enter pyleoclim.plot_default for detail.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lipd_dict</strong> (<em>dict</em>) &#8211; A dictionary of LiPD files. (Optional)</li>
+<li><strong>markersize</strong> (<em>int</em>) &#8211; The size of the markers. Default is 50</li>
+<li><strong>background</strong> (<em>str</em>) &#8211; Plots one of the following images on the map:
+bluemarble, etopo, shadedrelief, or none (filled continents).
+Default is shadedrelief.</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; Default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; The absolute path of the directory in which to save the
+figure. If not provided, creates a default folder called &#8216;figures&#8217;
+in the LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.mapLipd">
+<code class="descclassname">pyleoclim.</code><code class="descname">mapLipd</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>countries=True</em>, <em>counties=False</em>, <em>rivers=False</em>, <em>states=False</em>, <em>background='shadedrelief'</em>, <em>scale=0.5</em>, <em>markersize=50</em>, <em>marker='ro'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.mapLipd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Map for a single record</p>
+<p>Orthographic projection map of a single record.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries</strong> &#8211; a LiPD timeseries object. Will prompt for one if not given</li>
+<li><strong>countries</strong> (<em>bool</em>) &#8211; Draws the country borders. Default is on (True).</li>
+<li><strong>counties</strong> (<em>bool</em>) &#8211; Draws the USA counties. Default is off (False).</li>
+<li><strong>rivers</strong> (<em>bool</em>) &#8211; Draws the rivers. Default is off (False).</li>
+<li><strong>states</strong> (<em>bool</em>) &#8211; Draws the American and Australian states borders.
+Default is off (False)</li>
+<li><strong>background</strong> (<em>str</em>) &#8211; Plots one of the following images on the map:
+bluemarble, etopo, shadedrelief, or none (filled continents).
+Default is shadedrelief</li>
+<li><strong>scale</strong> (<em>float</em>) &#8211; useful to downgrade the original image resolution to
+speed up the process. Default is 0.5.</li>
+<li><strong>markersize</strong> (<em>int</em>) &#8211; default is 50</li>
+<li><strong>marker</strong> (<em>str</em>) &#8211; a string (or list) containing the color and shape of the
+marker. Default is by archiveType. Type pyleo.plot_default to see
+the default palette.</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the figure.
+If not provided, creates a default folder called &#8216;figures&#8217; in the
+LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="plotting">
+<h3>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="pyleoclim.plotTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">plotTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>markersize=50</em>, <em>marker='default'</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.plotTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a single time series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries</strong> (<em>A</em>) &#8211; By default, will prompt the user for one.</li>
+<li><strong>x_axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
+Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default is to let the
+system choose if only one available or prompt the user.</li>
+<li><strong>markersize</strong> (<em>int</em>) &#8211; default is 50.</li>
+<li><strong>marker</strong> (<em>str</em>) &#8211; a string (or list) containing the color and shape of the
+marker. Default is by archiveType. Type pyleo.plot_default to see
+the default palette.</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the figure.
+If not provided, creates a default folder called &#8216;figures&#8217; in the
+LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.histTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">histTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>bins=None</em>, <em>hist=True</em>, <em>kde=True</em>, <em>rug=False</em>, <em>fit=None</em>, <em>hist_kws={'label': 'Histogram'}</em>, <em>kde_kws={'label': 'KDE fit'}</em>, <em>rug_kws={'label': 'Rug'}</em>, <em>fit_kws={'label': 'Fit'}</em>, <em>color='default'</em>, <em>vertical=False</em>, <em>norm_hist=True</em>, <em>saveFig=False</em>, <em>format='eps'</em>, <em>dir=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.histTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a univariate distribution of the PaleoData values</p>
+<p>This function is based on the seaborn displot function, which is
+itself a combination of the matplotlib hist function with the
+seaborn kdeplot() and rugplot() functions. It can also fit
+scipy.stats distributions and plot the estimated PDF over the data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>timeseries</strong> &#8211; A timeseries. By default, will prompt the user for one.</li>
+<li><strong>bins</strong> (<em>int</em>) &#8211; Specification of hist bins following matplotlib(hist),
+or None to use Freedman-Diaconis rule</li>
+<li><strong>hist</strong> (<em>bool</em>) &#8211; Whether to plot a (normed) histogram</li>
+<li><strong>kde</strong> (<em>bool</em>) &#8211; Whether to plot a gaussian kernel density estimate</li>
+<li><strong>rug</strong> (<em>bool</em>) &#8211; Whether to draw a rugplot on the support axis</li>
+<li><strong>fit</strong> &#8211; Random variable object. An object with fit method, returning
+a tuple that can be passed to a pdf method of positional
+arguments following a grid of values to evaluate the pdf on.</li>
+<li><strong>kde</strong><strong>, </strong><strong>rug</strong><strong>, </strong><strong>fit}_kws</strong> (<em>{hist</em><em>,</em><em></em>) &#8211; Dictionaries. Keyword arguments for
+underlying plotting functions. If modifying the dictionary, make
+sure the labels &#8220;hist&#8221;, &#8220;kde&#8221;, &#8220;rug&#8221; and &#8220;fit&#8221; are still passed.</li>
+<li><strong>color</strong> (<em>str</em>) &#8211; matplotlib color. Color to plot everything but the
+fitted curve in. Default is to use the default paletter for each
+archive type.</li>
+<li><strong>vertical</strong> (<em>bool</em>) &#8211; if True, oberved values are on y-axis.</li>
+<li><strong>norm_hist</strong> (<em>bool</em>) &#8211; If True (default), the histrogram height shows
+a density rather than a count. This is implied if a KDE or
+fitted density is plotted</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the figure.
+If not provided, creates a default folder called &#8216;figures&#8217; in the
+LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Returns</dt>
+<dd>fig - The figure</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="summary-plots">
+<h4>Summary Plots<a class="headerlink" href="#summary-plots" title="Permalink to this headline">¶</a></h4>
+<p>Summary plots are a special categories of plots enabled by Pyleoclim.
+They allow to plot specific information about a timeseries but are not customizable.</p>
+<dl class="function">
+<dt id="pyleoclim.summaryTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">summaryTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.summaryTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic summary plot</p>
+<p>Plots the following information: the time series, a histogram of
+the PaleoData_values, location map, age-depth profile if both are
+available from the paleodata, metadata about the record.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries</strong> &#8211; a timeseries object. By default, will prompt for one</li>
+<li><strong>x_axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
+Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default is to let the
+system choose if only one available or prompt the user.</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the figure.
+If not provided, creates a default folder called &#8216;figures&#8217; in the
+LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="statistics">
+<h3>Statistics<a class="headerlink" href="#statistics" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="pyleoclim.statsTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">statsTs</code><span class="sig-paren">(</span><em>timeseries=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.statsTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate simple statistics of a timeseries</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeseries</strong> &#8211; sytem will prompt for one if not given</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the mean, median, min, max, standard deviation and the
+inter-quartile range (IQR) of a timeseries.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mean</span><span class="p">,</span> <span class="n">median</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">IQR</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">statsTs</span><span class="p">(</span><span class="n">timeseries</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.corrSigTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">corrSigTs</code><span class="sig-paren">(</span><em>timeseries1=''</em>, <em>timeseries2=''</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em>, <em>nsim=1000</em>, <em>method='isospectral'</em>, <em>alpha=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.corrSigTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimates the significance of correlations between non IID timeseries.</p>
+<p>Function written by. F. Zhu.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries2</strong> (<em>timeseries1</em><em>,</em><em></em>) &#8211; timeseries object. Default is blank.</li>
+<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to express the
+paleo-data. Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;.
+Default is to let the system choose if only one available
+or prompt the user.</li>
+<li><strong>interp_step</strong> (<em>float</em>) &#8211; the step size. By default, will prompt the user.</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; Start time/age/depth. Default is the maximum of
+the minima of the two timeseries</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; End time/age/depth. Default is the minimum of the
+maxima of the two timeseries</li>
+<li><strong>nsim</strong> (<em>int</em>) &#8211; the number of simulations. Default is 1000</li>
+<li><strong>method</strong> (<em>str</em>) &#8211; <p>method use to estimate the correlation and significance.
+Available methods include:</p>
+<blockquote>
+<div><ul>
+<li>&#8216;ttest&#8217;: T-test where the degrees of freedom are corrected for</li>
+</ul>
+<p>the effect of serial correlation</p>
+<ul>
+<li>&#8216;isopersistant&#8217;: AR(1) modeling of the two timeseries</li>
+<li>&#8216;isospectral&#8217; (default): phase randomization of original</li>
+</ul>
+<p>inputs.</p>
+</div></blockquote>
+<p>The T-test is parametric test, hence cheap but usually wrong
+except in idyllic circumstances.
+The others are non-parametric, but their computational
+requirements scales with nsim.</p>
+</li>
+<li><strong>alpha</strong> (<em>float</em>) &#8211; significance level for critical value estimation. Default is 0.05</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>r (float) - correlation between the two timeseries</p>
+<p>sig (bool) -  Returns True if significant, False otherwise</p>
+<p>p (real) - the p-value</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="timeseries">
+<h3>Timeseries<a class="headerlink" href="#timeseries" title="Permalink to this headline">¶</a></h3>
+<p>Basic manipulations of the timeseries objects.</p>
+<dl class="function">
+<dt id="pyleoclim.binTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">binTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.binTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bin the paleoData values of the timeseries</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>By default</strong><strong>, </strong><strong>will prompt the user for one.</strong> (<em>timeseries.</em>) &#8211; </li>
+<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
+Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default is to let the
+system  choose if only one available or prompt the user.</li>
+<li><strong>bin_size</strong> (<em>float</em>) &#8211; the size of the bins to be used. By default,
+will prompt for one</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; Start time/age/depth. Default is the minimum</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; End time/age/depth. Default is the maximum</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>binned_values- the binned output,</p>
+<p>bins-  the bins (centered on the median, i.e. the 100-200 bin is 150),</p>
+<p>n-  number of data points in each bin,</p>
+<p>error- the standard error on the mean in each bin</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.interpTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">interpTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.interpTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple linear interpolation</p>
+<p>Simple linear interpolation of the data using the numpy.interp method</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>Default is blank</strong><strong>, </strong><strong>will prompt for it</strong> (<em>timeseries.</em>) &#8211; </li>
+<li><strong>x-axis</strong> (<em>str</em>) &#8211; The representation against which to plot the paleo-data.
+Options are &#8220;age&#8221;, &#8220;year&#8221;, and &#8220;depth&#8221;. Default is to let the
+system choose if only one available or prompt the user.</li>
+<li><strong>interp_step</strong> (<em>float</em>) &#8211; the step size. By default, will prompt the user.</li>
+<li><strong>start</strong> (<em>float</em>) &#8211; Start year/age/depth. Default is the minimum</li>
+<li><strong>end</strong> (<em>float</em>) &#8211; End year/age/depth. Default is the maximum</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p>interp_age - the interpolated age/year/depth according to the end/start
+and time step,</p>
+<p>interp_values - the interpolated values</p>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.standardizeTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">standardizeTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>scale=1</em>, <em>ddof=0</em>, <em>eps=0.001</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.standardizeTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Centers and normalizes the paleoData values of a  given time series.</p>
+<p>Constant or nearly constant time series not rescaled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>array</em>) &#8211; vector of (real) numbers as a time series, NaNs allowed</li>
+<li><strong>scale</strong> (<em>real</em>) &#8211; a scale factor used to scale a record to a match a given variance</li>
+<li><strong>axis</strong> (<em>int</em><em> or </em><em>None</em>) &#8211; axis along which to operate, if None, compute over the whole array</li>
+<li><strong>ddof</strong> (<em>int</em>) &#8211; degress of freedom correction in the calculation of the standard deviation</li>
+<li><strong>eps</strong> (<em>real</em>) &#8211; a threshold to determine if the standard deviation is too close to zero</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed</p>
+<ul class="simple">
+<li>mu (real): the mean of the original time series, E[X]</li>
+<li>sig (real): the standard deviation of the original time series, std[X]</li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li>z (array)</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<ol class="arabic simple">
+<li>Tapio Schneider&#8217;s MATLAB code: <a class="reference external" href="http://www.clidyn.ethz.ch/imputation/standardize.m">http://www.clidyn.ethz.ch/imputation/standardize.m</a></li>
+<li>The zscore function in SciPy: <a class="reference external" href="https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py">https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py</a></li>
+</ol>
+<p>&#64;author: fzhu</p>
+</dd></dl>
+
+</div>
+<div class="section" id="analysis-in-the-frequency-domain">
+<h3>Analysis in the frequency domain<a class="headerlink" href="#analysis-in-the-frequency-domain" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="pyleoclim.wwzTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">wwzTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>wwz=False</em>, <em>psd=True</em>, <em>wwz_default=True</em>, <em>psd_default=True</em>, <em>wwaplot_default=True</em>, <em>psdplot_default=True</em>, <em>fig=True</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.wwzTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Weigthed wavelet Z-transform analysis</p>
+<p>Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>timeseries</strong> (<em>dict</em>) &#8211; A LiPD timeseries object (Optional, will prompt for one.)</li>
+<li><strong>wwz</strong> (<em>bool</em>) &#8211; If True, will perform wavelet analysis</li>
+<li><strong>psd</strong> (<em>bool</em>) &#8211; If True, will inform the power spectral density of the timeseries</li>
+<li><strong>wwz_default</strong> &#8211; <p>If True, will use the following default parameters:</p>
+<dl class="docutils">
+<dt>wwz_default = {&#8216;tau&#8217;:None,&#8217;freqs&#8217;:None,&#8217;c&#8217;:1/(8*np.pi**2),&#8217;Neff&#8217;:3,&#8217;nMC&#8217;:200,</dt>
+<dd>&#8216;nproc&#8217;:8,&#8217;detrend&#8217;:&#8217;no&#8217;,&#8217;method&#8217;:&#8217;Kirchner_f2py&#8217;}.</dd>
+</dl>
+<p>Modify the values for specific keys to change the default behavior.</p>
+</li>
+<li><strong>psd_default</strong> &#8211; <p>If True, will use the following default parameters:</p>
+<dl class="docutils">
+<dt>psd_default = {&#8216;tau&#8217;:None,</dt>
+<dd>&#8216;freqs&#8217;: None,
+&#8216;c&#8217;:1e-3,
+&#8216;nproc&#8217;:8,
+&#8216;nMC&#8217;:200,
+&#8216;detrend&#8217;:&#8217;no&#8217;,
+&#8216;Neff&#8217;:3,
+&#8216;anti_alias&#8217;:False,
+&#8216;avgs&#8217;:2,
+&#8216;method&#8217;:&#8217;Kirchner_f2py&#8217;}</dd>
+</dl>
+<p>Modify the values for specific keys to change the default behavior.</p>
+</li>
+<li><strong>wwaplot_default</strong> &#8211; <p>If True, will use the following default parameters:</p>
+<dl class="docutils">
+<dt>wwaplot_default={&#8216;Neff&#8217;:3,</dt>
+<dd>&#8216;AR1_q&#8217;:AR1_q,
+&#8216;coi&#8217;:coi,
+&#8216;levels&#8217;:None,
+&#8216;tick_range&#8217;:None,
+&#8216;yticks&#8217;:None,
+&#8216;ylim&#8217;:None,
+&#8216;xticks&#8217;:None,
+&#8216;xlabels&#8217;:None,
+&#8216;figsize&#8217;:[20,8],
+&#8216;clr_map&#8217;:&#8217;OrRd&#8217;,
+&#8216;cbar_drawedges&#8217;:False,
+&#8216;cone_alpha&#8217;:0.5,
+&#8216;plot_signif&#8217;:True,
+&#8216;signif_style&#8217;:&#8217;contour&#8217;,
+&#8216;plot_cone&#8217;:True}</dd>
+</dl>
+<p>Modify the values for specific keys to change the default behavior.</p>
+</li>
+<li><strong>psdplot_default</strong> &#8211; <p>If True, will use the following default parameters:</p>
+<dl class="docutils">
+<dt>psdplot_default={&#8216;lmstyle&#8217;:None,</dt>
+<dd>&#8216;linewidth&#8217;:None,
+&#8216;xticks&#8217;:None,
+&#8216;xlim&#8217;:None,
+&#8216;ylim&#8217;:None,
+&#8216;figsize&#8217;:[20,8],
+&#8216;label&#8217;:&#8217;PSD&#8217;,
+&#8216;plot_ar1&#8217;:True,
+&#8216;psd_ar1_q95&#8217;:psd_ar1_q95,
+&#8216;psd_ar1_color&#8217;:sns.xkcd_rgb[&#8220;pale red&#8221;]}</dd>
+</dl>
+<p>Modify the values for specific keys to change the default behavior.</p>
+</li>
+<li><strong>fig</strong> (<em>bool</em>) &#8211; If True, plots the figure</li>
+<li><strong>saveFig</strong> (<em>bool</em>) &#8211; default is to not save the figure</li>
+<li><strong>dir</strong> (<em>str</em>) &#8211; the full path of the directory in which to save the figure.
+If not provided, creates a default folder called &#8216;figures&#8217; in the
+LiPD working directory (lipd.path).</li>
+<li><strong>format</strong> (<em>str</em>) &#8211; One of the file extensions supported by the active
+backend. Default is &#8220;eps&#8221;. Most backend support png, pdf, ps, eps,
+and svg.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>A dictionary of outputs.</p>
+<blockquote>
+<div><p>For wwz:</p>
+<ul class="simple">
+<li>wwa (array): The weights wavelet amplitude</li>
+<li>AR1_q (array): AR1 simulations</li>
+<li>coi (array): cone of influence</li>
+<li>freqs (array): vector for frequencies</li>
+<li>tau (array): the evenly-spaced time points, namely the time</li>
+</ul>
+<p>shift for wavelet analysis.</p>
+<ul class="simple">
+<li>Neffs (array): The matrix of effective number of points in the</li>
+</ul>
+<p>time-scale coordinates.</p>
+<ul class="simple">
+<li>coeff (array): The wavelet transform coefficients</li>
+</ul>
+<p>For psd:</p>
+<ul class="simple">
+<li>psd (array): power spectral density</li>
+<li>freqs (array): vector of frequency</li>
+<li>psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes</li>
+</ul>
+</div></blockquote>
+<p>fig: The figure</p>
+<p class="rubric">References</p>
+<p>Foster, G. (1996). Wavelets for period analysis of unevenly
+sampled time series. The Astronomical Journal, 112(4), 1709-1729.</p>
+<p class="rubric">Examples</p>
+<p>To run both wwz and psd:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">wwz</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note: This will return a single figure with wwa and psd</p>
+<p>To change a default behavior:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">psd_default</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nMC&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">})</span>
+</pre></div>
+</div>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dict_out (dict)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="using-pyleoclim-without-a-lipd-file">
+<h2>Using Pyleoclim without a LiPD file<a class="headerlink" href="#using-pyleoclim-without-a-lipd-file" title="Permalink to this headline">¶</a></h2>
+<p>The Pyleoclim modules can be called separately so the main functions can be used without a timeseries objects.
+The following modules are available:</p>
+<ul class="simple">
+<li>pyleoclim.Map: mapping functions</li>
+<li>pyleoclim.Plot: plotting functions</li>
+<li>pyleoclim.Stats: statistics (including correlation)</li>
+<li>pyleoclim.Timeseries: binning, interpolating</li>
+<li>pyleoclim.Spectral: analysis in the frequency domain</li>
+</ul>
+<p>In addition, the pyleoclim.LipdUtils module allows the basic manipulation of LiPD files and the pyleoclim.SummaryPlots module
+contains some functions to extract information about a timeseries object.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Map.html" title="Mapping Functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Introduction.html" title="Pyleoclim"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

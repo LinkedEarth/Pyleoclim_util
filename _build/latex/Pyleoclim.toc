@@ -1,0 +1,39 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Pyleoclim}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}What is it?}{3}{section.1.1}
+\contentsline {section}{\numberline {1.2}Version Information}{3}{section.1.2}
+\contentsline {section}{\numberline {1.3}Installation}{4}{section.1.3}
+\contentsline {section}{\numberline {1.4}Quickstart guide}{4}{section.1.4}
+\contentsline {section}{\numberline {1.5}Requirements}{4}{section.1.5}
+\contentsline {section}{\numberline {1.6}Further information}{5}{section.1.6}
+\contentsline {section}{\numberline {1.7}Contact}{5}{section.1.7}
+\contentsline {section}{\numberline {1.8}License}{5}{section.1.8}
+\contentsline {section}{\numberline {1.9}Disclaimer}{5}{section.1.9}
+\contentsline {chapter}{\numberline {2}Main Functions}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}Using Pyleoclim with a LiPD file}{7}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Getting started}{7}{subsection.2.1.1}
+\contentsline {subsection}{\numberline {2.1.2}Mapping}{7}{subsection.2.1.2}
+\contentsline {subsection}{\numberline {2.1.3}Plotting}{9}{subsection.2.1.3}
+\contentsline {subsubsection}{Summary Plots}{10}{subsubsection*.9}
+\contentsline {subsection}{\numberline {2.1.4}Statistics}{10}{subsection.2.1.4}
+\contentsline {paragraph}{Examples}{10}{paragraph*.12}
+\contentsline {subsection}{\numberline {2.1.5}Timeseries}{11}{subsection.2.1.5}
+\contentsline {paragraph}{References}{13}{paragraph*.17}
+\contentsline {subsection}{\numberline {2.1.6}Analysis in the frequency domain}{13}{subsection.2.1.6}
+\contentsline {paragraph}{References}{14}{paragraph*.19}
+\contentsline {paragraph}{Examples}{14}{paragraph*.20}
+\contentsline {section}{\numberline {2.2}Using Pyleoclim without a LiPD file}{14}{section.2.2}
+\contentsline {chapter}{\numberline {3}Mapping Functions}{17}{chapter.3}
+\contentsline {chapter}{\numberline {4}Plotting Functions}{19}{chapter.4}
+\contentsline {chapter}{\numberline {5}Statistics Functions}{21}{chapter.5}
+\contentsline {chapter}{\numberline {6}Timeseries Functions}{23}{chapter.6}
+\contentsline {paragraph}{References}{24}{paragraph*.31}
+\contentsline {chapter}{\numberline {7}LiPD Utilities}{25}{chapter.7}
+\contentsline {section}{\numberline {7.1}Creating Directories and saving}{25}{section.7.1}
+\contentsline {section}{\numberline {7.2}LiPD files}{25}{section.7.2}
+\contentsline {section}{\numberline {7.3}Handling Variables}{26}{section.7.3}
+\contentsline {section}{\numberline {7.4}Handling timeseries objects}{26}{section.7.4}
+\contentsline {section}{\numberline {7.5}Linking LiPDs to the LinkedEarth Ontology}{26}{section.7.5}
+\contentsline {chapter}{\numberline {8}Summary Plots}{29}{chapter.8}
+\contentsline {chapter}{\numberline {9}Spectral Functions}{31}{chapter.9}
+\contentsline {chapter}{\numberline {10}Indices and tables}{35}{chapter.10}
