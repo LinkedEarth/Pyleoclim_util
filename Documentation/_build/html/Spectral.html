@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Spectral Functions &#8212; Pyleoclim 0.3.0 documentation</title>
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -24,45 +24,16 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Summary Plots" href="SummaryPlots.html" /> 
+    <link rel="prev" title="Summary Plots" href="SummaryPlots.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
   </head>
   <body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="SummaryPlots.html" title="Summary Plots"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
-      </ul>
-    </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="SummaryPlots.html"
-                        title="previous chapter">Summary Plots</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/Spectral.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+  
 
     <div class="document">
       <div class="documentwrapper">
@@ -74,7 +45,7 @@
 <p>This module allows analysis in the frequency domain</p>
 <dl class="function">
 <dt id="pyleoclim.Spectral.ar1_fit">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">ar1_fit</code><span class="sig-paren">(</span><em>ys</em>, <em>ts=None</em>, <em>detrend='no'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.ar1_fit" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">ar1_fit</code><span class="sig-paren">(</span><em>ys</em>, <em>ts=None</em>, <em>detrend='no'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#ar1_fit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.ar1_fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -93,7 +64,7 @@ OR estimated persistence (for unevenly-spaced time series)</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.ar1_sim">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">ar1_sim</code><span class="sig-paren">(</span><em>ys</em>, <em>n</em>, <em>p</em>, <em>ts=None</em>, <em>detrend='no'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.ar1_sim" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">ar1_sim</code><span class="sig-paren">(</span><em>ys</em>, <em>n</em>, <em>p</em>, <em>ts=None</em>, <em>detrend='no'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#ar1_sim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.ar1_sim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from <cite>ys</cite> and <cite>ts</cite></p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -112,7 +83,7 @@ detrend (str): ‘no’ - the original time series is assumed to have no trend;<
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.wwz">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">wwz</code><span class="sig-paren">(</span><em>ys</em>, <em>ts</em>, <em>tau=None</em>, <em>freqs=None</em>, <em>c=0.012665147955292222</em>, <em>Neff=3</em>, <em>nMC=200</em>, <em>nproc=8</em>, <em>detrend='no'</em>, <em>method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.wwz" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">wwz</code><span class="sig-paren">(</span><em>ys</em>, <em>ts</em>, <em>tau=None</em>, <em>freqs=None</em>, <em>c=0.012665147955292222</em>, <em>Neff=3</em>, <em>nMC=200</em>, <em>nproc=8</em>, <em>detrend='no'</em>, <em>method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#wwz"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.wwz" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -147,7 +118,7 @@ coeff (array): the wavelet transform coefficents</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.wwz_psd">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">wwz_psd</code><span class="sig-paren">(</span><em>ys</em>, <em>ts</em>, <em>freqs=None</em>, <em>tau=None</em>, <em>c=0.001</em>, <em>nproc=8</em>, <em>nMC=200</em>, <em>detrend='no'</em>, <em>Neff=3</em>, <em>anti_alias=False</em>, <em>avgs=2</em>, <em>method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.wwz_psd" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">wwz_psd</code><span class="sig-paren">(</span><em>ys</em>, <em>ts</em>, <em>freqs=None</em>, <em>tau=None</em>, <em>c=0.001</em>, <em>nproc=8</em>, <em>nMC=200</em>, <em>detrend='no'</em>, <em>Neff=3</em>, <em>anti_alias=False</em>, <em>avgs=2</em>, <em>method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#wwz_psd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.wwz_psd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the psd of a timeseires directly using wwz method.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -177,7 +148,7 @@ psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_wwa">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_wwa</code><span class="sig-paren">(</span><em>wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None, yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', plot_cone=False, ax=None, xlabel='Year', ylabel='Period'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwa" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_wwa</code><span class="sig-paren">(</span><em>wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None, yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', plot_cone=False, ax=None, xlabel='Year', ylabel='Period'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#plot_wwa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.plot_wwa" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the wavelet amplitude</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -209,7 +180,7 @@ ylabel (str): The y-axis label</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_wwadist">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_wwadist</code><span class="sig-paren">(</span><em>wwa</em>, <em>ylim=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwadist" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_wwadist</code><span class="sig-paren">(</span><em>wwa</em>, <em>ylim=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#plot_wwadist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.plot_wwadist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the distribution of wwa with the 95% quantile line.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -222,7 +193,7 @@ ylim (list): limitations for y-axis</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_psd">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_psd</code><span class="sig-paren">(</span><em>psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None, figsize=[20, 8], label='PSD', plot_ar1=True, psd_ar1_q95=None, psd_ar1_color='#d9544d', ax=None, xlabel='Period', ylabel='Spectral Density'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_psd" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_psd</code><span class="sig-paren">(</span><em>psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None, figsize=[20, 8], label='PSD', plot_ar1=True, psd_ar1_q95=None, psd_ar1_color='#d9544d', ax=None, xlabel='Period', ylabel='Spectral Density'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Spectral.html#plot_psd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Spectral.plot_psd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the wavelet amplitude</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -245,23 +216,66 @@ ylabel (str): The y-axis label</dd>
           </div>
         </div>
       </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Pyleoclim</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Main.html">Main Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Map.html">Mapping Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Plot.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Stats.html">Statistics Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Timeseries.html">Timeseries Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LipdUtils.html">LiPD Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SummaryPlots.html">Summary Plots</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Spectral Functions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="SummaryPlots.html" title="previous chapter">Summary Plots</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="SummaryPlots.html" title="Summary Plots"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
-      </ul>
+    <div class="footer">
+      &copy;2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/Spectral.rst.txt"
+          rel="nofollow">Page source</a>
     </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
-    </div>
+
+    
+
+    
   </body>
 </html>
