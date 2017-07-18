@@ -17,7 +17,7 @@ from scipy.stats.mstats import mquantiles
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-from matplotlib.ticker import ScalarFormatter
+from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 
 from pathos.multiprocessing import ProcessingPool as Pool
 from tqdm import tqdm
@@ -1194,23 +1194,35 @@ class WaveletAnalysis(object):
         ys_tmp = np.copy(ys)
         ys = ys[~np.isnan(ys_tmp)]
         ts = ts[~np.isnan(ys_tmp)]
+        ts_tmp = np.copy(ts)
+        ys = ys[~np.isnan(ts_tmp)]
+        ts = ts[~np.isnan(ts_tmp)]
+
+        if np.mean(np.diff(ts)) < 0:
+            warnings.warn("The original time axis is decreasing, and it has been reversed.")
+            ys = ys[::-1]
+            ts = ts[::-1]
 
         if tau is None:
             med_res = np.size(ts) // np.median(np.diff(ts))
             tau = np.linspace(np.min(ts), np.max(ts), np.max([np.size(ts)//10, 50, med_res]))
         else:
-            assert np.min(tau) >= np.min(ts) and np.max(tau) <= np.max(ts), "tau should be within the time span of the time series."
+            if np.min(tau) < np.min(ts) or np.max(tau) > np.max(ts):
+                warnings.warn("The time span of tau is outside of that of the time series and will be truncated.")
+                tau = tau[(tau >= np.min(ts)) & (tau <= np.max(ts))]
+
+            #assert np.min(tau) >= np.min(ts) and np.max(tau) <= np.max(ts), "tau should be within the time span of the time series."
 
         # truncate the time series when the range of tau is smaller than that of the time series
         ts_cut = ts[(np.min(tau) <= ts) & (ts <= np.max(tau))]
         ys_cut = ys[(np.min(tau) <= ts) & (ts <= np.max(tau))]
 
-        if freqs is None:
-            freqs = self.make_freq_vector(ts_cut)
-
-        if np.min(tau) != np.min(ts) or np.max(tau) != np.max(ts):
+        if np.min(tau) != np.min(ts_cut) or np.max(tau) != np.max(ts_cut):
             warnings.warn("tau will be adjusted since the boundary of tau is not on any time point.")
             tau = np.linspace(np.min(ts_cut), np.max(ts_cut), np.size(tau))
+
+        if freqs is None:
+            freqs = self.make_freq_vector(ts_cut)
 
         return ys_cut, ts_cut, freqs, tau
 
@@ -1808,11 +1820,13 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, y
     else:
         ax.set_aspect('equal')
 
+    ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
     plt.gca().invert_xaxis()
     plt.legend()
     plt.grid()
 
     return ax
+
 
 # some alias
 wa = WaveletAnalysis()
