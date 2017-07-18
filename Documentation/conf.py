@@ -33,9 +33,9 @@ sys.path.insert(0,'/Users/deborahkhider/Documents/Python/Pyleoclim_util/pyleocli
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
-    'sphinx.ext.mathjax',
-    'sphinxcontrib.napoleon',
-    ]
+    'sphinx.ext.mathjax']
+    #'sphinxcontrib.napoleon',
+    #]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

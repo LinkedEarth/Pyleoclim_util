@@ -36,3 +36,1806 @@
 2017-06-23 14:11:53,441 [INFO] LiPD_Library: LiPD Library created
 2017-06-23 14:12:06,098 [INFO] directory: temp directory: /var/folders/j5/h401grn92_q265mg4925_51h0000gn/T/tmprlhw7p4f
 2017-06-23 14:12:06,099 [INFO] LiPD_Library: LiPD Library created
+2017-07-18 14:46:25,322 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.LipdUtils' from '//anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py'>
+2017-07-18 14:46:25,323 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'createDir')
+2017-07-18 14:46:25,324 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function createDir at 0x1173c80d0>
+2017-07-18 14:46:25,352 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.LipdUtils.createDir', <function createDir at 0x1173c80d0>, {}, ['Create a ne
+2017-07-18 14:46:25,352 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: createDir(path, foldername)
+   :module: pyleoclim.LipdUtils
+
+   Create a new folder in a working directory
+   
+   Create a new folder in a working directory to save outputs from Pyleoclim.
+   
+   Args:
+       path(str): the path to the new folder.
+       foldername(str): the name of the folder to be created
+       
+   Returns:
+       newdir - the full path to the new directory
+       
+   
+2017-07-18 14:46:25,357 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/LipdUtils.rst:11: input:
+.. autofunction:: pyleoclim.LipdUtils.saveFigure
+
+2017-07-18 14:46:25,357 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.LipdUtils import saveFigure
+2017-07-18 14:46:25,357 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.LipdUtils
+2017-07-18 14:46:25,357 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.LipdUtils' from '//anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py'>
+2017-07-18 14:46:25,358 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'saveFigure')
+2017-07-18 14:46:25,358 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function saveFigure at 0x1173c8158>
+2017-07-18 14:46:25,358 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.LipdUtils.saveFigure', <function saveFigure at 0x1173c8158>, {}, ['Save a fi
+2017-07-18 14:46:25,358 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: saveFigure(name, format='eps', dir='')
+   :module: pyleoclim.LipdUtils
+
+   Save a figure
+   
+   Save the figure in the directory. If not given, creates a folder in the 
+   current working directory. 
+   
+   Args:
+       name (str): name of the file
+       format (str): One of the file extensions supported by the active 
+           backend. Default is "eps". Most backend support png, pdf, ps, eps,
+           and svg.
+       dir (str): the name of the folder in the LiPD working directory.
+           If not provided, creates a default folder called 'figures'.
+           
+   
+2017-07-18 14:46:25,360 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:25,361 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:25,363 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/LipdUtils.rst:16: input:
+.. autofunction:: pyleoclim.LipdUtils.enumerateLipds
+
+2017-07-18 14:46:25,363 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.LipdUtils import enumerateLipds
+2017-07-18 14:46:25,363 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.LipdUtils
+2017-07-18 14:46:25,363 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.LipdUtils' from '//anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py'>
+2017-07-18 14:46:25,363 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'enumerateLipds')
+2017-07-18 14:46:25,363 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function enumerateLipds at 0x1173c81e0>
+2017-07-18 14:46:25,364 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.LipdUtils.enumerateLipds', <function enumerateLipds at 0x1173c81e0>, {}, ['E
+2017-07-18 14:46:25,364 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: enumerateLipds(lipds)
+   :module: pyleoclim.LipdUtils
+
+   Enumerate the LiPD files loaded in the workspace
+   
+   Args:
+       lipds (dict): A dictionary of LiPD files. Can be obtained from
+           pyleoclim.readLipd()
+   
+   
+2017-07-18 14:46:25,368 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/LipdUtils.rst:18: input:
+.. autofunction:: pyleoclim.LipdUtils.promptForLipd
+
+2017-07-18 14:46:25,368 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.LipdUtils import promptForLipd
+2017-07-18 14:46:25,368 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.LipdUtils
+2017-07-18 14:46:25,368 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.LipdUtils' from '//anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py'>
+2017-07-18 14:46:25,368 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'promptForLipd')
+2017-07-18 14:46:25,368 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function promptForLipd at 0x1173c8268>
+2017-07-18 14:46:25,368 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.LipdUtils.promptForLipd', <function promptForLipd at 0x1173c8268>, {}, ['Pro
+2017-07-18 14:46:25,368 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: promptForLipd(lipds)
+   :module: pyleoclim.LipdUtils
+
+   Prompt for a LiPD file
+   
+   Ask the user to select a LiPD file from a list
+   Use this function in conjunction with enumerateLipds()
+   
+   Args:
+       lipds (dict): A dictionary of LiPD files. Can be obtained from
+           pyleoclim.readLipd()
+   
+   Returns:
+       The index of the LiPD file
+       
+   
+2017-07-18 14:46:25,373 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/LipdUtils.rst:23: input:
+.. autofunction:: pyleoclim.LipdUtils.promptForVariable
+
+2017-07-18 14:46:25,373 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.LipdUtils import promptForVariable
+2017-07-18 14:46:25,373 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.LipdUtils
+2017-07-18 14:46:25,373 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.LipdUtils' from '//anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py'>
+2017-07-18 14:46:25,373 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'promptForVariable')
+2017-07-18 14:46:25,373 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function promptForVariable at 0x1173c82f0>
+2017-07-18 14:46:25,373 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.LipdUtils.promptForVariable', <function promptForVariable at 0x1173c82f0>, {
+2017-07-18 14:46:25,373 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: promptForVariable()
+   :module: pyleoclim.LipdUtils
+
+   Prompt for a specific variable
+   
+   Ask the user to select the variable they are interested in.
+   Use this function in conjunction with readHeaders() or getTSO()
+   
+   Returns:
+       The index of the variable
+       
+   
+2017-07-18 14:46:25,377 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/LipdUtils.rst:25: input:
+.. autofunction:: pyleoclim.LipdUtils.xAxisTs
+
+2017-07-18 14:46:25,377 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.LipdUtils import xAxisTs
+2017-07-18 14:46:25,377 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.LipdUtils
+2017-07-18 14:46:25,377 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.LipdUtils' from '//anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py'>
+2017-07-18 14:46:25,377 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'xAxisTs')
+2017-07-18 14:46:25,377 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function xAxisTs at 0x1173c8378>
+2017-07-18 14:46:25,377 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.LipdUtils.xAxisTs', <function xAxisTs at 0x1173c8378>, {}, ['Prompt the user
+2017-07-18 14:46:25,378 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: xAxisTs(timeseries)
+   :module: pyleoclim.LipdUtils
+
+   Prompt the user to choose a x-axis representation for the timeseries.
+   
+   Args:
+       timeseries: a timeseries object
+       
+   Returns:
+       x_axis - the values for the x-axis representation, 
+   
+       label - returns either "age", "year", or "depth"
+       
+   
+2017-07-18 14:46:25,381 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/LipdUtils.rst:27: input:
+.. autofunction:: pyleoclim.LipdUtils.checkXaxis
+
+2017-07-18 14:46:25,381 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.LipdUtils import checkXaxis
+2017-07-18 14:46:25,382 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.LipdUtils
+2017-07-18 14:46:25,382 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.LipdUtils' from '//anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py'>
+2017-07-18 14:46:25,382 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'checkXaxis')
+2017-07-18 14:46:25,382 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function checkXaxis at 0x1173c8400>
+2017-07-18 14:46:25,382 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.LipdUtils.checkXaxis', <function checkXaxis at 0x1173c8400>, {}, ['Check tha
+2017-07-18 14:46:25,382 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: checkXaxis(timeseries, x_axis='')
+   :module: pyleoclim.LipdUtils
+
+   Check that a x-axis is present for the timeseries
+   
+   Args:
+       timeseries : a timeseries
+       x_axis (str) : the x-axis representation, either depth, age or year
+       
+   Returns:
+       x - the values for the x-axis representation, 
+   
+       label - returns either "age", "year", or "depth"    
+   
+   
+2017-07-18 14:46:25,385 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/LipdUtils.rst:32: input:
+.. autofunction:: pyleoclim.LipdUtils.enumerateTs
+
+2017-07-18 14:46:25,386 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.LipdUtils import enumerateTs
+2017-07-18 14:46:25,386 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.LipdUtils
+2017-07-18 14:46:25,386 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.LipdUtils' from '//anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py'>
+2017-07-18 14:46:25,386 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'enumerateTs')
+2017-07-18 14:46:25,386 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function enumerateTs at 0x1173c8488>
+2017-07-18 14:46:25,386 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.LipdUtils.enumerateTs', <function enumerateTs at 0x1173c8488>, {}, ['Enumera
+2017-07-18 14:46:25,386 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: enumerateTs(timeseries_list)
+   :module: pyleoclim.LipdUtils
+
+   Enumerate the available time series objects
+   
+   Args:
+       timeseries_list: a  list of available timeseries objects. 
+           To use the timeseries loaded upon initiation of the 
+           pyleoclim package, use pyleo.time_series.
+           
+   
+2017-07-18 14:46:25,390 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/LipdUtils.rst:34: input:
+.. autofunction:: pyleoclim.LipdUtils.getTs
+
+2017-07-18 14:46:25,390 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.LipdUtils import getTs
+2017-07-18 14:46:25,390 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.LipdUtils
+2017-07-18 14:46:25,391 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.LipdUtils' from '//anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py'>
+2017-07-18 14:46:25,391 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'getTs')
+2017-07-18 14:46:25,391 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function getTs at 0x1173c8510>
+2017-07-18 14:46:25,391 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.LipdUtils.getTs', <function getTs at 0x1173c8510>, {}, ['Get a specific time
+2017-07-18 14:46:25,391 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: getTs(timeseries_list)
+   :module: pyleoclim.LipdUtils
+
+   Get a specific timeseries object from a dictionary of timeseries
+   
+   Args:
+       timeseries_list: a  list of available timeseries objects. 
+           To use the timeseries loaded upon initiation of the 
+           pyleoclim package, use pyleo.time_series.
+           
+   Returns:
+       A single timeseries object 
+       
+   
+2017-07-18 14:46:25,395 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/LipdUtils.rst:39: input:
+.. autofunction:: pyleoclim.LipdUtils.LipdToOntology
+2017-07-18 14:46:25,395 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.LipdUtils import LipdToOntology
+2017-07-18 14:46:25,395 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.LipdUtils
+2017-07-18 14:46:25,395 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.LipdUtils' from '//anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py'>
+2017-07-18 14:46:25,395 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'LipdToOntology')
+2017-07-18 14:46:25,396 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function LipdToOntology at 0x1173c8598>
+2017-07-18 14:46:25,396 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.LipdUtils.LipdToOntology', <function LipdToOntology at 0x1173c8598>, {}, ['s
+2017-07-18 14:46:25,396 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: LipdToOntology(archiveType)
+   :module: pyleoclim.LipdUtils
+
+   standardize archiveType
+   
+   Transform the archiveType from their LiPD name to their ontology counterpart
+   
+   Args:
+       archiveType (STR): name of the archiveType from the LiPD file
+       
+   Returns:
+       archiveType according to the ontology
+       
+   
+2017-07-18 14:46:25,410 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py:docstring of pyleoclim.LipdUtils.saveFigure:9: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:25,410 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/LipdUtils.py:docstring of pyleoclim.LipdUtils.saveFigure:11: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:25,411 [DEBUG] sphinx.application: [app] emitting event: 'doctree-read'(<document: <section "lipd utilities"...>>,)
+2017-07-18 14:46:25,416 [INFO] sphinx.util: [01mreading sources... [39;49;00m[ 30%] [35mMain[39;49;00m                                                                                                               
+2017-07-18 14:46:25,416 [DEBUG] sphinx.application: [app] emitting event: 'env-purge-doc'(<sphinx.environment.BuildEnvironment object at 0x1050fa438>, 'Main')
+2017-07-18 14:46:25,419 [DEBUG] sphinx.application: [app] emitting event: 'source-read'('Main', ['Main Functions\n==============\n\n\nUsing Pyleoclim with a LiPD file\n"""""""""""""""""""
+2017-07-18 14:46:25,422 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:27: input:
+.. autofunction:: pyleoclim.readLipd
+2017-07-18 14:46:25,422 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import readLipd
+2017-07-18 14:46:25,423 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:25,423 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:25,423 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'readLipd')
+2017-07-18 14:46:25,423 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function readLipd at 0x1173c8620>
+2017-07-18 14:46:25,715 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.readLipd', <function readLipd at 0x1173c8620>, {}, ['Read Lipd files into a 
+2017-07-18 14:46:25,715 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: readLipd(usr_path='')
+   :module: pyleoclim
+
+   Read Lipd files into a dictionary
+   
+   This function is based on the function of the same name in the LiPD utilities.
+   Sets the dictionary as global variable so that it doesn't have to be provided
+   as an argument for every function.
+   
+   Args:
+       usr_path (str): The path to a directory or a single file. (Optional argument)
+       
+   Returns:
+       lipd_dict - a dictionary containing the LiPD library
+   
+   
+2017-07-18 14:46:25,719 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:28: input:
+.. autofunction:: pyleoclim.extractTs
+
+2017-07-18 14:46:25,720 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import extractTs
+2017-07-18 14:46:25,720 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:25,720 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:25,720 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'extractTs')
+2017-07-18 14:46:25,720 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function extractTs at 0x11839f620>
+2017-07-18 14:46:25,720 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.extractTs', <function extractTs at 0x11839f620>, {}, ['Extract timeseries di
+2017-07-18 14:46:25,720 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: extractTs(lipds=None)
+   :module: pyleoclim
+
+   Extract timeseries dictionary
+   
+   This function is based on the function of the same name in the LiPD utilities.
+   Set the dictionary as a global variable so that it doesn't have to be
+   provided as an argument for every function. 
+   
+   Args:
+       lipds (dict): A dictionary of LiPD files obtained through the 
+       readLipd function
+   
+   Returns:
+       ts_list - A list of timeseries object
+   
+   
+2017-07-18 14:46:25,725 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:32: input:
+.. autofunction:: pyleoclim.mapAllArchive
+
+2017-07-18 14:46:25,725 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import mapAllArchive
+2017-07-18 14:46:25,725 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:25,725 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:25,725 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'mapAllArchive')
+2017-07-18 14:46:25,725 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function mapAllArchive at 0x11839f6a8>
+2017-07-18 14:46:25,725 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.mapAllArchive', <function mapAllArchive at 0x11839f6a8>, {}, ['Map all the a
+2017-07-18 14:46:25,726 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: mapAllArchive(lipds='', markersize=50, background='shadedrelief', figsize=[10, 4], saveFig=False, dir='', format='eps')
+   :module: pyleoclim
+
+   Map all the available records loaded into the workspace by archiveType.
+   
+   Map of all the records into the workspace by archiveType.
+       Uses the default color palette. Enter pyleoclim.plot_default for detail.
+   
+   Args:
+       lipds (dict): A dictionary of LiPD files. (Optional)
+       markersize (int): The size of the markers. Default is 50
+       background (str): Plots one of the following images on the map:
+           bluemarble, etopo, shadedrelief, or none (filled continents).
+           Default is shadedrelief.
+       figsize (list): the size for the figure
+       ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
+       saveFig (bool): Default is to not save the figure
+       dir (str): The absolute path of the directory in which to save the
+           figure. If not provided, creates a default folder called 'figures'
+           in the LiPD working directory (lipd.path).
+       format (str): One of the file extensions supported by the active
+           backend. Default is "eps". Most backend support png, pdf, ps, eps,
+           and svg.
+   
+   Returns:
+       The figure
+   
+2017-07-18 14:46:25,729 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:25,731 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:25,731 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:25,731 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:25,734 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:34: input:
+.. autofunction:: pyleoclim.mapLipd
+
+2017-07-18 14:46:25,735 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import mapLipd
+2017-07-18 14:46:25,735 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:25,735 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:25,735 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'mapLipd')
+2017-07-18 14:46:25,735 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function mapLipd at 0x11839f730>
+2017-07-18 14:46:25,736 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.mapLipd', <function mapLipd at 0x11839f730>, {}, ['Create a Map for a single
+2017-07-18 14:46:25,736 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: mapLipd(timeseries='', countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=50, marker='default', figsize=[4, 4], saveFig=False, dir='', format='eps')
+   :module: pyleoclim
+
+   Create a Map for a single record
+   
+   Orthographic projection map of a single record.
+   
+   Args:
+       timeseries: a LiPD timeseries object. Will prompt for one if not given
+       countries (bool): Draws the country borders. Default is on (True).
+       counties (bool): Draws the USA counties. Default is off (False).
+       rivers (bool): Draws the rivers. Default is off (False).
+       states (bool): Draws the American and Australian states borders.
+           Default is off (False)
+       background (str): Plots one of the following images on the map:
+           bluemarble, etopo, shadedrelief, or none (filled continents).
+           Default is shadedrelief
+       scale (float): useful to downgrade the original image resolution to
+           speed up the process. Default is 0.5.
+       markersize (int): default is 50
+       marker (str): a string (or list) containing the color and shape of the
+           marker. Default is by archiveType. Type pyleo.plot_default to see
+           the default palette.
+       figsize (list): the size for the figure
+       saveFig (bool): default is to not save the figure
+       dir (str): the full path of the directory in which to save the figure.
+           If not provided, creates a default folder called 'figures' in the
+           LiPD working directory (lipd.path).
+       format (str): One of the file extensions supported by the active
+           backend. Default is "eps". Most backend support png, pdf, ps, eps,
+           and svg.
+   
+   Returns:
+       The figure
+   
+   
+2017-07-18 14:46:25,739 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:25,740 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:25,742 [WARNING] sphinx.util.docutils: Definition list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:25,743 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:25,743 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:25,743 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:25,744 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:25,748 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:38: input:
+.. autofunction:: pyleoclim.plotTs
+
+2017-07-18 14:46:25,749 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import plotTs
+2017-07-18 14:46:25,749 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:25,749 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:25,749 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'plotTs')
+2017-07-18 14:46:25,749 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function plotTs at 0x11839f7b8>
+2017-07-18 14:46:25,749 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.plotTs', <function plotTs at 0x11839f7b8>, {}, ['Plot a single time series.'
+2017-07-18 14:46:25,750 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: plotTs(timeseries='', x_axis='', markersize=50, marker='default', figsize=[10, 4], saveFig=False, dir='', format='eps')
+   :module: pyleoclim
+
+   Plot a single time series.
+   
+   Args:
+       A timeseries: By default, will prompt the user for one.
+       x_axis (str): The representation against which to plot the paleo-data.
+           Options are "age", "year", and "depth". Default is to let the
+           system choose if only one available or prompt the user.
+       markersize (int): default is 50.
+       marker (str): a string (or list) containing the color and shape of the
+           marker. Default is by archiveType. Type pyleo.plot_default to see
+           the default palette.
+       figsize (list): the size for the figure
+       saveFig (bool): default is to not save the figure
+       dir (str): the full path of the directory in which to save the figure.
+           If not provided, creates a default folder called 'figures' in the
+           LiPD working directory (lipd.path).
+       format (str): One of the file extensions supported by the active
+           backend. Default is "eps". Most backend support png, pdf, ps, eps,
+           and svg.
+   
+   Returns:
+       The figure.
+   
+   
+2017-07-18 14:46:25,752 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:25,752 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:25,765 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:25,776 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:25,786 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:25,798 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:25,815 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:40: input:
+.. autofunction:: pyleoclim.histTs
+
+2017-07-18 14:46:25,827 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import histTs
+2017-07-18 14:46:25,852 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:25,865 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:25,876 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'histTs')
+2017-07-18 14:46:25,887 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function histTs at 0x11839f840>
+2017-07-18 14:46:25,899 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.histTs', <function histTs at 0x11839f840>, {}, ['Plot a univariate distribut
+2017-07-18 14:46:25,917 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: histTs(timeseries='', bins=None, hist=True, kde=True, rug=False, fit=None, hist_kws={'label': 'Histogram'}, kde_kws={'label': 'KDE fit'}, rug_kws={'label': 'Rug'}, fit_kws={'label': 'Fit'}, color='default', vertical=False, norm_hist=True, figsize=[5, 5], saveFig=False, format='eps', dir='')
+   :module: pyleoclim
+
+   Plot a univariate distribution of the PaleoData values
+   
+   This function is based on the seaborn displot function, which is
+   itself a combination of the matplotlib hist function with the
+   seaborn kdeplot() and rugplot() functions. It can also fit
+   scipy.stats distributions and plot the estimated PDF over the data.
+   
+   Args:
+       timeseries: A timeseries. By default, will prompt the user for one.
+       bins (int): Specification of hist bins following matplotlib(hist),
+           or None to use Freedman-Diaconis rule
+       hist (bool): Whether to plot a (normed) histogram
+       kde (bool): Whether to plot a gaussian kernel density estimate
+       rug (bool): Whether to draw a rugplot on the support axis
+       fit: Random variable object. An object with fit method, returning
+           a tuple that can be passed to a pdf method of positional
+           arguments following a grid of values to evaluate the pdf on.
+       {hist, kde, rug, fit}_kws: Dictionaries. Keyword arguments for
+           underlying plotting functions. If modifying the dictionary, make
+           sure the labels "hist", "kde", "rug" and "fit" are still passed.
+       color (str): matplotlib color. Color to plot everything but the
+           fitted curve in. Default is to use the default paletter for each
+           archive type.
+       vertical (bool): if True, oberved values are on y-axis.
+       norm_hist (bool): If True (default), the histrogram height shows
+           a density rather than a count. This is implied if a KDE or
+           fitted density is plotted
+       figsize (list): the size for the figure
+       saveFig (bool): default is to not save the figure
+       dir (str): the full path of the directory in which to save the figure.
+           If not provided, creates a default folder called 'figures' in the
+           LiPD working directory (lipd.path).
+       format (str): One of the file extensions supported by the active
+           backend. Default is "eps". Most backend support png, pdf, ps, eps,
+           and svg.
+   
+   Returns
+       fig - The figure
+   
+   
+2017-07-18 14:46:25,936 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:25,957 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:25,977 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:25,992 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,010 [WARNING] sphinx.util.docutils: Definition list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,026 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:26,040 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,055 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:26,068 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,085 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:48: input:
+.. autofunction:: pyleoclim.summaryTs
+
+2017-07-18 14:46:26,099 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import summaryTs
+2017-07-18 14:46:26,118 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:26,136 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:26,153 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'summaryTs')
+2017-07-18 14:46:26,165 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function summaryTs at 0x11839f8c8>
+2017-07-18 14:46:26,177 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.summaryTs', <function summaryTs at 0x11839f8c8>, {}, ['Basic summary plot', 
+2017-07-18 14:46:26,188 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: summaryTs(timeseries='', x_axis='', saveFig=False, dir='', format='eps')
+   :module: pyleoclim
+
+   Basic summary plot
+   
+   Plots the following information: the time series, a histogram of
+   the PaleoData_values, location map, spectral density using the wwz 
+   method, and metadata about the record.
+   
+   Args:
+       timeseries: a timeseries object. By default, will prompt for one
+       x_axis (str): The representation against which to plot the paleo-data.
+           Options are "age", "year", and "depth". Default is to let the
+           system choose if only one available or prompt the user.
+       saveFig (bool): default is to not save the figure
+       dir (str): the full path of the directory in which to save the figure.
+           If not provided, creates a default folder called 'figures' in the
+           LiPD working directory (lipd.path).
+       format (str): One of the file extensions supported by the active
+           backend. Default is "eps". Most backend support png, pdf, ps, eps,
+           and svg.
+   
+   Returns:
+       The figure
+   
+   
+2017-07-18 14:46:26,201 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:26,221 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,235 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:26,249 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,272 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:53: input:
+.. autofunction:: pyleoclim.statsTs
+
+2017-07-18 14:46:26,287 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import statsTs
+2017-07-18 14:46:26,303 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:26,324 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:26,337 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'statsTs')
+2017-07-18 14:46:26,350 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function statsTs at 0x11839f950>
+2017-07-18 14:46:26,360 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.statsTs', <function statsTs at 0x11839f950>, {}, ['Calculate simple statisti
+2017-07-18 14:46:26,372 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: statsTs(timeseries='')
+   :module: pyleoclim
+
+   Calculate simple statistics of a timeseries
+   
+   Args:
+       timeseries: sytem will prompt for one if not given
+   
+   Returns:
+       the mean, median, min, max, standard deviation and the
+       inter-quartile range (IQR) of a timeseries.
+   
+   Examples:
+       >>> mean, median, min_, max_, std, IQR = pyleo.statsTs(timeseries)
+   
+   
+2017-07-18 14:46:26,387 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:55: input:
+.. autofunction:: pyleoclim.corrSigTs
+
+2017-07-18 14:46:26,400 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import corrSigTs
+2017-07-18 14:46:26,417 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:26,439 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:26,462 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'corrSigTs')
+2017-07-18 14:46:26,483 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function corrSigTs at 0x11839f9d8>
+2017-07-18 14:46:26,502 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.corrSigTs', <function corrSigTs at 0x11839f9d8>, {}, ['Estimates the signifi
+2017-07-18 14:46:26,521 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: corrSigTs(timeseries1='', timeseries2='', x_axis='', interp_step='', start='', end='', nsim=1000, method='isospectral', alpha=0.5)
+   :module: pyleoclim
+
+   Estimates the significance of correlations between non IID timeseries.
+   
+   Function written by. F. Zhu.
+   
+   Args:
+       timeseries1, timeseries2: timeseries object. Default is blank.
+       x-axis (str): The representation against which to express the
+           paleo-data. Options are "age", "year", and "depth".
+           Default is to let the system choose if only one available
+           or prompt the user.
+       interp_step (float): the step size. By default, will prompt the user.
+       start (float): Start time/age/depth. Default is the maximum of
+           the minima of the two timeseries
+       end (float): End time/age/depth. Default is the minimum of the
+           maxima of the two timeseries
+       nsim (int): the number of simulations. Default is 1000
+       method (str): method use to estimate the correlation and significance.
+           Available methods include:
+               - 'ttest': T-test where the degrees of freedom are corrected for
+               the effect of serial correlation 
+   
+               - 'isopersistant': AR(1) modeling of the two timeseries 
+   
+               - 'isospectral' (default): phase randomization of original
+               inputs.
+           The T-test is parametric test, hence cheap but usually wrong
+           except in idyllic circumstances.
+           The others are non-parametric, but their computational
+           requirements scales with nsim.
+       alpha (float): significance level for critical value estimation. Default is 0.05
+   
+   Returns:
+       r (float) - correlation between the two timeseries 
+   
+       sig (bool) -  Returns True if significant, False otherwise 
+   
+       p (real) - the p-value
+   
+   
+2017-07-18 14:46:26,545 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:26,561 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,577 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:26,595 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,628 [WARNING] sphinx.util.docutils: Definition list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,654 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:26,677 [WARNING] sphinx.util.docutils: Bullet list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,695 [WARNING] sphinx.util.docutils: Bullet list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,713 [WARNING] sphinx.util.docutils: Definition list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,728 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,751 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:61: input:
+.. autofunction:: pyleoclim.binTs
+
+2017-07-18 14:46:26,772 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import binTs
+2017-07-18 14:46:26,788 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:26,807 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:26,826 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'binTs')
+2017-07-18 14:46:26,837 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function binTs at 0x11839fa60>
+2017-07-18 14:46:26,862 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.binTs', <function binTs at 0x11839fa60>, {}, ['Bin the paleoData values of t
+2017-07-18 14:46:26,880 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: binTs(timeseries='', x_axis='', bin_size='', start='', end='')
+   :module: pyleoclim
+
+   Bin the paleoData values of the timeseries
+   
+   Args:
+       timeseries. By default, will prompt the user for one.
+       x-axis (str): The representation against which to plot the paleo-data.
+           Options are "age", "year", and "depth". Default is to let the
+           system  choose if only one available or prompt the user.
+       bin_size (float): the size of the bins to be used. By default,
+           will prompt for one
+       start (float): Start time/age/depth. Default is the minimum
+       end (float): End time/age/depth. Default is the maximum
+   
+   Returns:
+       binned_values- the binned output,
+   
+       bins-  the bins (centered on the median, i.e. the 100-200 bin is 150),
+   
+       n-  number of data points in each bin,
+   
+       error- the standard error on the mean in each bin
+   
+   
+   
+2017-07-18 14:46:26,892 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:26,909 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,940 [WARNING] sphinx.util.docutils: Definition list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:26,981 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:63: input:
+.. autofunction:: pyleoclim.interpTs
+
+2017-07-18 14:46:27,009 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import interpTs
+2017-07-18 14:46:27,031 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:27,048 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:27,063 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'interpTs')
+2017-07-18 14:46:27,081 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function interpTs at 0x11839fae8>
+2017-07-18 14:46:27,094 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.interpTs', <function interpTs at 0x11839fae8>, {}, ['Simple linear interpola
+2017-07-18 14:46:27,110 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: interpTs(timeseries='', x_axis='', interp_step='', start='', end='')
+   :module: pyleoclim
+
+   Simple linear interpolation
+   
+   Simple linear interpolation of the data using the numpy.interp method
+   
+   Args:
+       timeseries. Default is blank, will prompt for it
+       x-axis (str): The representation against which to plot the paleo-data.
+           Options are "age", "year", and "depth". Default is to let the
+           system choose if only one available or prompt the user.
+       interp_step (float): the step size. By default, will prompt the user.
+       start (float): Start year/age/depth. Default is the minimum
+       end (float): End year/age/depth. Default is the maximum
+   
+   Returns:
+       interp_age - the interpolated age/year/depth according to the end/start
+       and time step, 
+   
+       interp_values - the interpolated values
+   
+   
+2017-07-18 14:46:27,132 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:27,145 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:27,173 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:65: input:
+.. autofunction:: pyleoclim.standardizeTs
+
+2017-07-18 14:46:27,192 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import standardizeTs
+2017-07-18 14:46:27,206 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:27,220 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:27,236 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'standardizeTs')
+2017-07-18 14:46:27,255 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function standardizeTs at 0x11839fb70>
+2017-07-18 14:46:27,278 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.standardizeTs', <function standardizeTs at 0x11839fb70>, {}, ['Centers and n
+2017-07-18 14:46:27,292 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: standardizeTs(timeseries='', scale=1, ddof=0, eps=0.001)
+   :module: pyleoclim
+
+   Centers and normalizes the paleoData values of a  given time series.
+   
+   Constant or nearly constant time series not rescaled.
+   
+   Args:
+       x (array): vector of (real) numbers as a time series, NaNs allowed
+       scale (real): a scale factor used to scale a record to a match a given variance
+       axis (int or None): axis along which to operate, if None, compute over the whole array
+       ddof (int): degress of freedom correction in the calculation of the standard deviation
+       eps (real): a threshold to determine if the standard deviation is too close to zero
+   
+   Returns:
+       - z (array): the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed 
+   
+       - mu (real): the mean of the original time series, E[X] 
+   
+       - sig (real): the standard deviation of the original time series, std[X] 
+   
+   
+   References:
+       1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
+       2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
+   
+   @author: fzhu
+   
+2017-07-18 14:46:27,312 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Main.rst:69: input:
+.. autofunction:: pyleoclim.wwzTs
+
+2017-07-18 14:46:27,332 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim import wwzTs
+2017-07-18 14:46:27,342 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim
+2017-07-18 14:46:27,357 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim' from '//anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py'>
+2017-07-18 14:46:27,370 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'wwzTs')
+2017-07-18 14:46:27,381 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function wwzTs at 0x11839fc80>
+2017-07-18 14:46:27,394 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.wwzTs', <function wwzTs at 0x11839fc80>, {}, ['Weigthed wavelet Z-transform 
+2017-07-18 14:46:27,424 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: wwzTs(timeseries='', wwz=False, psd=True, wwz_default=True, psd_default=True, wwaplot_default=True, psdplot_default=True, fig=True, saveFig=False, dir='', format='eps')
+   :module: pyleoclim
+
+   Weigthed wavelet Z-transform analysis
+   
+   Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)
+   
+   Args:
+       timeseries (dict): A LiPD timeseries object (Optional, will prompt for one.)
+       wwz (bool): If True, will perform wavelet analysis
+       psd (bool): If True, will inform the power spectral density of the timeseries
+       wwz_default: If True, will use the following default parameters:
+           
+           wwz_default = {'tau':None,'freqs':None,'c':1/(8*np.pi**2),'Neff':3,'nMC':200,
+                              'nproc':8,'detrend':'no','method':'Kirchner_f2py'}.
+               
+           Modify the values for specific keys to change the default behavior.
+               
+       psd_default: If True, will use the following default parameters:
+           
+           psd_default = {'tau':None,
+                         'freqs': None,
+                         'c':1e-3,
+                         'nproc':8,
+                         'nMC':200,
+                         'detrend':'no',
+                         'Neff':3,
+                         'anti_alias':False,
+                         'avgs':2,
+                         'method':'Kirchner_f2py'}
+           
+           Modify the values for specific keys to change the default behavior.
+           
+       wwaplot_default: If True, will use the following default parameters:
+           
+           wwaplot_default={'Neff':3,
+                                'AR1_q':AR1_q,
+                                'coi':coi,
+                                'levels':None,
+                                'tick_range':None,
+                                'yticks':None,
+                                'ylim':None,
+                                'xticks':None,
+                                'xlabels':None,
+                                'figsize':[20,8],
+                                'clr_map':'OrRd',
+                                'cbar_drawedges':False,
+                                'cone_alpha':0.5,
+                                'plot_signif':True,
+                                'signif_style':'contour',
+                                'plot_cone':True}
+           
+           Modify the values for specific keys to change the default behavior.
+       psdplot_default: If True, will use the following default parameters:
+           
+           psdplot_default={'lmstyle':None,
+                            'linewidth':None,
+                            'xticks':None,
+                            'xlim':None,
+                            'ylim':None,
+                            'figsize':[20,8],
+                            'label':'PSD',
+                            'plot_ar1':True,
+                            'psd_ar1_q95':psd_ar1_q95,
+                            'psd_ar1_color':sns.xkcd_rgb["pale red"]}
+           
+           Modify the values for specific keys to change the default behavior.
+           
+       fig (bool): If True, plots the figure
+       saveFig (bool): default is to not save the figure
+       dir (str): the full path of the directory in which to save the figure.
+           If not provided, creates a default folder called 'figures' in the
+           LiPD working directory (lipd.path).
+       format (str): One of the file extensions supported by the active
+           backend. Default is "eps". Most backend support png, pdf, ps, eps,
+           and svg.
+       
+   Returns:
+       dict_out (dict): A dictionary of outputs. 
+           
+           For wwz: 
+           
+           - wwa (array): The weights wavelet amplitude 
+       
+           - AR1_q (array): AR1 simulations 
+       
+           - coi (array): cone of influence 
+       
+           - freqs (array): vector for frequencies 
+       
+           - tau (array): the evenly-spaced time points, namely the time 
+           shift for wavelet analysis. 
+       
+           - Neffs (array): The matrix of effective number of points in the
+           time-scale coordinates.
+       
+           - coeff (array): The wavelet transform coefficients
+       
+           For psd: 
+           
+           - psd (array): power spectral density 
+       
+           - freqs (array): vector of frequency 
+       
+           - psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes 
+       
+       fig: The figure
+        
+       References:
+           Foster, G. (1996). Wavelets for period analysis of unevenly 
+           sampled time series. The Astronomical Journal, 112(4), 1709-1729.
+       
+       Examples:
+           To run both wwz and psd: 
+   
+           
+           >>> dict_out, fig = pyleoclim.wwzTs(wwz=True)
+           
+           Note: This will return a single figure with wwa and psd 
+   
+           
+           To change a default behavior:
+   
+           
+           >>> dict_out, fig = pyleoclim.wwzTs(psd_default = {'nMC':1000}) 
+          
+   
+2017-07-18 14:46:27,489 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:27,506 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:27,521 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:27,560 [WARNING] sphinx.util.docutils: Bullet list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:27,576 [WARNING] sphinx.util.docutils: Bullet list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:27,672 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.mapAllArchive:10: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:27,690 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.mapAllArchive:12: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:27,701 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.mapAllArchive:16: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:27,722 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.mapAllArchive:18: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:27,749 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.mapLipd:11: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:27,768 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.mapLipd:12: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:27,786 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.mapLipd:17: (WARNING/2) Definition list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:27,798 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.mapLipd:19: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:27,809 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.mapLipd:21: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:27,824 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.mapLipd:24: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:27,842 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.mapLipd:26: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:27,858 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.plotTs:6: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:27,872 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.plotTs:8: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:27,885 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.plotTs:10: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:27,897 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.plotTs:12: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:27,909 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.plotTs:15: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:27,920 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.plotTs:17: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:27,943 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.histTs:11: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:27,960 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.histTs:12: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:27,975 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.histTs:16: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:27,988 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.histTs:18: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:27,999 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.histTs:24: (WARNING/2) Definition list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,011 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.histTs:26: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:28,024 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.histTs:28: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,038 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.histTs:31: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:28,054 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.histTs:33: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,067 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.summaryTs:10: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:28,080 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.summaryTs:12: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,091 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.summaryTs:14: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:28,107 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.summaryTs:16: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,121 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.corrSigTs:8: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:28,133 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.corrSigTs:11: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,154 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.corrSigTs:13: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:28,169 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.corrSigTs:14: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,181 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.corrSigTs:16: (WARNING/2) Definition list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,192 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.corrSigTs:18: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:28,203 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.corrSigTs:20: (WARNING/2) Bullet list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,216 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.corrSigTs:25: (WARNING/2) Bullet list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,230 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.corrSigTs:26: (WARNING/2) Definition list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,246 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.corrSigTs:30: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,263 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.binTs:6: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:28,277 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.binTs:8: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,289 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.binTs:10: (WARNING/2) Definition list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,301 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.interpTs:8: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:28,312 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.interpTs:10: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,323 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.wwzTs:51: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,335 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.wwzTs:69: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:28,353 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.wwzTs:71: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,370 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.wwzTs:89: (WARNING/2) Bullet list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,387 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/__init__.py:docstring of pyleoclim.wwzTs:92: (WARNING/2) Bullet list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:28,402 [DEBUG] sphinx.application: [app] emitting event: 'doctree-read'(<document: <section "main functions"...>>,)
+2017-07-18 14:46:28,437 [INFO] sphinx.util: [01mreading sources... [39;49;00m[ 40%] [35mMap[39;49;00m                                                                                                                
+2017-07-18 14:46:28,460 [DEBUG] sphinx.application: [app] emitting event: 'env-purge-doc'(<sphinx.environment.BuildEnvironment object at 0x1050fa438>, 'Map')
+2017-07-18 14:46:28,481 [DEBUG] sphinx.application: [app] emitting event: 'source-read'('Map', ['Mapping Functions\n=================\n\nThis module uses the Basemap package for mapping. 
+2017-07-18 14:46:28,496 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Map.rst:6: input:
+.. autofunction:: pyleoclim.Map.mapAll
+
+2017-07-18 14:46:28,513 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Map import mapAll
+2017-07-18 14:46:28,526 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Map
+2017-07-18 14:46:28,539 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Map' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Map.py'>
+2017-07-18 14:46:28,557 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'mapAll')
+2017-07-18 14:46:28,568 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function mapAll at 0x10485cc80>
+2017-07-18 14:46:28,615 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Map.mapAll', <function mapAll at 0x10485cc80>, {}, ['Map the location of all
+2017-07-18 14:46:28,630 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: mapAll(lat, lon, criteria, projection='robin', lat_0='', lon_0='', llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, countries=False, counties=False, rivers=False, states=False, figsize=[10, 4], ax=None, background='none', scale=0.5, palette='', markersize=50)
+   :module: pyleoclim.Map
+
+   Map the location of all lat/lon according to some criteria 
+   
+   Map the location of all lat/lon according to some criteria. The choice of 
+   plotting color/marker is passed through palette according to unique 
+   criteria (e.g., record name, archive type, proxy observation type).
+   
+   Args:
+       lat (list): a list of latitude.
+       lon (list): a list of longitude.
+       criteria (list): a list of criteria for plotting purposes. For instance,
+           a map by the types of archive present in the dataset or proxy
+           observations.
+       projection (string): the map projection. Refers to the Basemap
+           documentation for a list of available projections. Only projections
+           supporting setting the map center with a single lat/lon or with
+           the coordinates of the rectangle are currently supported. 
+           Default is to use a Robinson projection.
+       lat_0, lon_0 (float): the center coordinates for the map. Default is
+           mean latitude/longitude in the list. 
+           If the chosen projection doesn't support it, Basemap will
+           ignore the given values.
+       llcrnrlat, urcrnrlat, llcrnrlon, urcrnrlon (float): The coordinates
+           of the two opposite corners of the rectangle.
+       countries (bool): Draws the countries border. Defaults is off (False). 
+       counties (bool): Draws the USA counties. Default is off (False).
+       rivers (bool): Draws the rivers. Default is off (False).
+       states (bool): Draws the American and Australian states borders. 
+           Default is off (False).
+       background (string): Plots one of the following images on the map: 
+           bluemarble, etopo, shadedrelief, or none (filled continents). 
+           Default is none.
+       scale (float): Useful to downgrade the original image resolution to
+           speed up the process. Default is 0.5.
+       palette (dict): A dictionary of plotting color/marker by criteria. The
+           keys should correspond to ***unique*** criteria with a list of 
+           associated values. The list should be in the format 
+           ['color', 'marker'].
+       markersize (int): The size of the marker.
+       figsize (list): the size for the figure
+       ax: Return as axis instead of figure (useful to integrate plot into a subplot) 
+       
+   Returns:
+       The figure       
+   
+2017-07-18 14:46:28,646 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:28,664 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:28,682 [WARNING] sphinx.util.docutils: Definition list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:28,695 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:28,707 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:28,720 [WARNING] sphinx.util.docutils: Definition list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:28,736 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Map.rst:8: input:
+.. autofunction:: pyleoclim.Map.mapOne
+2017-07-18 14:46:28,756 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Map import mapOne
+2017-07-18 14:46:28,771 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Map
+2017-07-18 14:46:28,785 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Map' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Map.py'>
+2017-07-18 14:46:28,798 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'mapOne')
+2017-07-18 14:46:28,809 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function mapOne at 0x1173c8048>
+2017-07-18 14:46:28,823 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Map.mapOne', <function mapOne at 0x1173c8048>, {}, ['Map one location on the
+2017-07-18 14:46:28,836 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: mapOne(lat, lon, projection='ortho', lat_0='', lon_0='', llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=50, marker='ro', figsize=[4, 4], ax=None)
+   :module: pyleoclim.Map
+
+   Map one location on the globe
+   
+   Args:
+       lat (float): a float number representing latitude
+       lon (float): a float number representing longitude
+       projection (string): the map projection. Refers to the Basemap
+           documentation for a list of available projections. Only projections
+           supporting setting the map center with a single lat/lon or with
+           the coordinates of the rectangle are currently supported. 
+           Default is to use a Robinson projection.
+       lat_0, lon_0 (float): the center coordinates for the map. Default is
+           mean latitude/longitude in the list. 
+           If the chosen projection doesn't support it, Basemap will
+           ignore the given values.
+       llcrnrlat, urcrnrlat, llcrnrlon, urcrnrlon (float): The coordinates
+           of the two opposite corners of the rectangle.
+       countries (bool): Draws the countries border. Defaults is off (False). 
+       counties (bool): Draws the USA counties. Default is off (False).
+       rivers (bool): Draws the rivers. Default is off (False).
+       states (bool): Draws the American and Australian states borders. 
+           Default is off (False).
+       background (string): Plots one of the following images on the map: 
+           bluemarble, etopo, shadedrelief, or none (filled continents). 
+           Default is none.
+       scale (float): Useful to downgrade the original image resolution to
+           speed up the process. Default is 0.5.
+       markersize (int): The size of the marker.
+       marker (str or list): color and type of marker. 
+       figsize (list): the size for the figure
+       ax: Return as axis instead of figure (useful to integrate plot into a subplot) 
+   
+   
+2017-07-18 14:46:28,856 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:28,877 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:28,893 [WARNING] sphinx.util.docutils: Definition list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:28,905 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:28,924 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:28,957 [WARNING] sphinx.util.docutils: Definition list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:28,988 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapAll:11: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:29,000 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapAll:13: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,011 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapAll:24: (WARNING/2) Definition list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,025 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapAll:28: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:29,039 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapAll:29: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,062 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapAll:38: (WARNING/2) Definition list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,080 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapOne:7: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:29,100 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapOne:11: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,118 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapOne:17: (WARNING/2) Definition list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,133 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapOne:21: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:29,150 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapOne:22: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,166 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Map.py:docstring of pyleoclim.Map.mapOne:27: (WARNING/2) Definition list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,185 [DEBUG] sphinx.application: [app] emitting event: 'doctree-read'(<document: <section "mapping functions"...>>,)
+2017-07-18 14:46:29,203 [INFO] sphinx.util: [01mreading sources... [39;49;00m[ 50%] [35mPlot[39;49;00m                                                                                                               
+2017-07-18 14:46:29,217 [DEBUG] sphinx.application: [app] emitting event: 'env-purge-doc'(<sphinx.environment.BuildEnvironment object at 0x1050fa438>, 'Plot')
+2017-07-18 14:46:29,232 [DEBUG] sphinx.application: [app] emitting event: 'source-read'('Plot', ['Plotting Functions\n==================\n\n.. autofunction:: pyleoclim.Plot.plot\n\n.. aut
+2017-07-18 14:46:29,246 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Plot.rst:4: input:
+.. autofunction:: pyleoclim.Plot.plot
+
+2017-07-18 14:46:29,266 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Plot import plot
+2017-07-18 14:46:29,280 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Plot
+2017-07-18 14:46:29,294 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Plot' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Plot.py'>
+2017-07-18 14:46:29,305 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'plot')
+2017-07-18 14:46:29,317 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function plot at 0x1173c88c8>
+2017-07-18 14:46:29,348 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Plot.plot', <function plot at 0x1173c88c8>, {}, ['Make a 2-D plot', '', 'Arg
+2017-07-18 14:46:29,368 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: plot(x, y, markersize=50, marker='ro', x_label='', y_label='', title='', figsize=[10, 4], ax=None)
+   :module: pyleoclim.Plot
+
+   Make a 2-D plot
+   
+   Args:
+       x (numpy array): a 1xn numpy array of values for the x-axis
+       y (numpy array): a 1xn numpy array for the y-axis
+       markersize (int): the size of the marker
+       marker (string or list): color and shape of the marker
+       x_axis_label (str): the label for the x-axis
+       y_axis_label (str): the label for the y-axis
+       title (str): the title for the plot
+       figsize (list): the size of the figure
+       ax: Return as axis instead of figure (useful to integrate plot into a subplot)
+           
+   Return:
+       The figure       
+   
+   
+2017-07-18 14:46:29,387 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Plot.rst:6: input:
+.. autofunction:: pyleoclim.Plot.plot_hist
+2017-07-18 14:46:29,399 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Plot import plot_hist
+2017-07-18 14:46:29,411 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Plot
+2017-07-18 14:46:29,423 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Plot' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Plot.py'>
+2017-07-18 14:46:29,438 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'plot_hist')
+2017-07-18 14:46:29,474 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function plot_hist at 0x1173c8950>
+2017-07-18 14:46:29,500 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Plot.plot_hist', <function plot_hist at 0x1173c8950>, {}, ['Plot a univariat
+2017-07-18 14:46:29,516 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: plot_hist(y, bins=None, hist=True, label='', kde=True, rug=False, fit=None, hist_kws={'label': 'Histogram'}, kde_kws={'label': 'KDE fit'}, rug_kws={'label': 'rug'}, fit_kws={'label': 'fit'}, color='0.7', vertical=False, norm_hist=True, figsize=[5, 5], ax=None)
+   :module: pyleoclim.Plot
+
+   Plot a univariate distribution of the PaleoData values
+           
+   This function is based on the seaborn displot function, which is
+   itself a combination of the matplotlib hist function with the 
+   seaborn kdeplot() and rugplot() functions. It can also fit 
+   scipy.stats distributions and plot the estimated PDF over the data.
+       
+   Args:
+       y (array): nx1 numpy array. No missing values allowed 
+       bins (int): Specification of hist bins following matplotlib(hist), 
+           or None to use Freedman-Diaconis rule
+       hist (bool): Whether to plot a (normed) histogram 
+       label (str): The label for the axis
+       kde (bool): Whether to plot a gaussian kernel density estimate
+       rug (bool): Whether to draw a rugplot on the support axis
+       fit: Random variable object. An object with fit method, returning 
+           a tuple that can be passed to a pdf method of positional 
+           arguments following a grid of values to evaluate the pdf on.
+       {hist, kde, rug, fit}_kws: Dictionaries. Keyword arguments for 
+           underlying plotting functions. If modifying the dictionary, make
+           sure the labels "hist", "kde", "rug" and "fit" are still passed.
+       color (str): matplotlib color. Color to plot everything but the
+           fitted curve in.
+       vertical (bool): if True, oberved values are on y-axis.
+       norm_hist (bool): If True (default), the histrogram height shows
+           a density rather than a count. This is implied if a KDE or 
+           fitted density is plotted
+       figsize (list): the size of the figure
+       ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
+   
+   Returns
+      fig - The figure
+   
+2017-07-18 14:46:29,533 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:29,548 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:29,563 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:29,578 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:29,595 [WARNING] sphinx.util.docutils: Definition list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:29,609 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:29,630 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:29,649 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Plot.py:docstring of pyleoclim.Plot.plot_hist:11: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:29,670 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Plot.py:docstring of pyleoclim.Plot.plot_hist:12: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,686 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Plot.py:docstring of pyleoclim.Plot.plot_hist:17: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:29,700 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Plot.py:docstring of pyleoclim.Plot.plot_hist:19: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,714 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Plot.py:docstring of pyleoclim.Plot.plot_hist:24: (WARNING/2) Definition list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,727 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Plot.py:docstring of pyleoclim.Plot.plot_hist:26: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:29,739 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Plot.py:docstring of pyleoclim.Plot.plot_hist:28: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:29,759 [DEBUG] sphinx.application: [app] emitting event: 'doctree-read'(<document: <section "plotting functions"...>>,)
+2017-07-18 14:46:29,790 [INFO] sphinx.util: [01mreading sources... [39;49;00m[ 60%] [35mSpectral[39;49;00m                                                                                                           
+2017-07-18 14:46:29,810 [DEBUG] sphinx.application: [app] emitting event: 'env-purge-doc'(<sphinx.environment.BuildEnvironment object at 0x1050fa438>, 'Spectral')
+2017-07-18 14:46:29,826 [DEBUG] sphinx.application: [app] emitting event: 'source-read'('Spectral', ['Spectral Functions\n==================\n\nThis module allows analysis in the frequenc
+2017-07-18 14:46:29,841 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Spectral.rst:6: input:
+.. autofunction:: pyleoclim.Spectral.ar1_fit
+
+2017-07-18 14:46:29,853 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Spectral import ar1_fit
+2017-07-18 14:46:29,871 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Spectral
+2017-07-18 14:46:29,882 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Spectral' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py'>
+2017-07-18 14:46:29,897 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'ar1_fit')
+2017-07-18 14:46:29,911 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function ar1_fit at 0x1173c8a60>
+2017-07-18 14:46:30,474 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Spectral.ar1_fit', <function ar1_fit at 0x1173c8a60>, {}, ['Returns the lag-
+2017-07-18 14:46:30,499 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: ar1_fit(ys, ts=None, detrend='no')
+   :module: pyleoclim.Spectral
+
+   Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
+   
+   Args:
+       ys (array): the time series
+       ts (array): the time axis of that series
+       detrend (str): 'no' - the original time series is assumed to have no trend;
+                      'linear' - a linear least-squares fit to `ys` is subtracted;
+                      'constant' - the mean of `ys` is subtracted
+   
+   Returns:
+       g (float): lag-1 autocorrelation coefficient (for evenly-spaced time series)
+       OR estimated persistence (for unevenly-spaced time series)
+   
+2017-07-18 14:46:30,524 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:30,547 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Spectral.rst:8: input:
+.. autofunction:: pyleoclim.Spectral.ar1_sim
+
+2017-07-18 14:46:30,561 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Spectral import ar1_sim
+2017-07-18 14:46:30,583 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Spectral
+2017-07-18 14:46:30,608 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Spectral' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py'>
+2017-07-18 14:46:30,631 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'ar1_sim')
+2017-07-18 14:46:30,650 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function ar1_sim at 0x1182d17b8>
+2017-07-18 14:46:30,670 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Spectral.ar1_sim', <function ar1_sim at 0x1182d17b8>, {}, ['Produce p realiz
+2017-07-18 14:46:30,684 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: ar1_sim(ys, n, p, ts=None, detrend='no')
+   :module: pyleoclim.Spectral
+
+   Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from `ys` and `ts`
+   
+   Args:
+       ys (array): a time series
+       n, p (int): dimensions as n rows by p columns
+       ts (array): the time axis of that series
+       detrend (str): 'no' - the original time series is assumed to have no trend;
+                      'linear' - a linear least-squares fit to `ys` is subtracted;
+                      'constant' - the mean of `ys` is subtracted
+   
+   Returns:
+       red (matrix): n rows by p columns matrix of an AR1 process
+   
+   
+2017-07-18 14:46:30,701 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:30,726 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Spectral.rst:10: input:
+.. autofunction:: pyleoclim.Spectral.wwz
+
+2017-07-18 14:46:30,756 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Spectral import wwz
+2017-07-18 14:46:30,776 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Spectral
+2017-07-18 14:46:30,797 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Spectral' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py'>
+2017-07-18 14:46:30,819 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'wwz')
+2017-07-18 14:46:30,837 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function wwz at 0x1182d1840>
+2017-07-18 14:46:30,857 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Spectral.wwz', <function wwz at 0x1182d1840>, {}, ['Return the weighted wave
+2017-07-18 14:46:30,872 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: wwz(ys, ts, tau=None, freqs=None, c=0.012665147955292222, Neff=3, nMC=200, nproc=8, detrend='no', method='Kirchner_f2py')
+   :module: pyleoclim.Spectral
+
+   Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients
+   
+   Args:
+       ys (array): a time series, NaNs will be deleted automatically
+       ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
+       tau (array): the evenly-spaced time points
+       freqs (array): vector of frequency
+       c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+       Neff (int): effective number of points
+       nMC (int): the number of Monte-Carlo simulations
+       nproc (int): the number of processes for multiprocessing
+       detrend (str): 'no' - the original time series is assumed to have no trend;
+                      'linear' - a linear least-squares fit to `ys` is subtracted;
+                      'constant' - the mean of `ys` is subtracted
+       method (str): 'Foster' - the original WWZ method;
+                     'Kirchner' - the method Kirchner adapted from Foster;
+                     'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+   
+   Returns:
+       wwa (array): the weighted wavelet amplitude.
+       AR1_q (array): AR1 simulations
+       coi (array): cone of influence
+       freqs (array): vector of frequency
+       tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+       Neffs (array): the matrix of effective number of points in the time-scale coordinates
+       coeff (array): the wavelet transform coefficents
+   
+   
+2017-07-18 14:46:30,887 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:30,900 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:30,916 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Spectral.rst:12: input:
+.. autofunction:: pyleoclim.Spectral.wwz_psd
+
+2017-07-18 14:46:30,930 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Spectral import wwz_psd
+2017-07-18 14:46:30,955 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Spectral
+2017-07-18 14:46:30,984 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Spectral' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py'>
+2017-07-18 14:46:31,009 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'wwz_psd')
+2017-07-18 14:46:31,083 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function wwz_psd at 0x1182d18c8>
+2017-07-18 14:46:31,108 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Spectral.wwz_psd', <function wwz_psd at 0x1182d18c8>, {}, ['Return the psd o
+2017-07-18 14:46:31,126 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: wwz_psd(ys, ts, freqs=None, tau=None, c=0.001, nproc=8, nMC=200, detrend='no', Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py')
+   :module: pyleoclim.Spectral
+
+   Return the psd of a timeseires directly using wwz method.
+   
+   Args:
+       ys (array): a time series, NaNs will be deleted automatically
+       ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
+       freqs (array): vector of frequency
+       tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+       c (float): the decay constant, the default value 1e-3 is good for most of the cases
+       nproc (int): the number of processes for multiprocessing
+       nMC (int): the number of Monte-Carlo simulations
+       detrend (str): 'no' - the original time series is assumed to have no trend;
+                      'linear' - a linear least-squares fit to `ys` is subtracted;
+                      'constant' - the mean of `ys` is subtracted
+       method (str): 'Foster' - the original WWZ method;
+                     'Kirchner' - the method Kirchner adapted from Foster;
+                     'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+   
+   Returns:
+       psd (array): power spectral density
+       freqs (array): vector of frequency
+       psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes
+   
+   
+2017-07-18 14:46:31,158 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:31,184 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:31,223 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Spectral.rst:14: input:
+.. autofunction:: pyleoclim.Spectral.plot_wwa
+
+2017-07-18 14:46:31,249 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Spectral import plot_wwa
+2017-07-18 14:46:31,264 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Spectral
+2017-07-18 14:46:31,283 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Spectral' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py'>
+2017-07-18 14:46:31,298 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'plot_wwa')
+2017-07-18 14:46:31,310 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function plot_wwa at 0x1182d19d8>
+2017-07-18 14:46:31,324 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Spectral.plot_wwa', <function plot_wwa at 0x1182d19d8>, {}, ['Plot the wavel
+2017-07-18 14:46:31,337 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None, yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', plot_cone=False, ax=None, xlabel='Year', ylabel='Period')
+   :module: pyleoclim.Spectral
+
+   Plot the wavelet amplitude
+   
+   Args:
+       wwa (array): the weighted wavelet amplitude.
+       freqs (array): vector of frequency
+       tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+       Neff (int): effective number of points
+       AR1_q (array): AR1 simulations
+       coi (array): cone of influence
+       levels (array): levels of values to plot
+       tick_range (array): levels of ticks to show on the colorbar
+       yticks (list): ticks on y-axis
+       ylim (list): limitations for y-axis
+       xticks (list): ticks on x-axis
+       figsize (list): the size for the figure
+       clr_map (str): the name of the colormap
+       cbar_drawedges (bool): whether to draw edges on the colorbar or not
+       cone_alpha (float): the alpha value for the area covered by cone of influence
+       plot_signif (bool): plot 95% significant area or not
+       signif_style (str): plot 95% significant area with `contour` or `shade`
+       plot_cone (bool): plot cone of influence or not
+       ax: Return as axis instead of figure (useful to integrate plot into a subplot)
+       xlabel (str): The x-axis label
+       ylabel (str): The y-axis label
+   
+   Returns:
+       fig (figure): the 2-D plot of wavelet analysis
+   
+   
+2017-07-18 14:46:31,359 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Spectral.rst:16: input:
+.. autofunction:: pyleoclim.Spectral.plot_wwadist
+
+2017-07-18 14:46:31,374 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Spectral import plot_wwadist
+2017-07-18 14:46:31,387 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Spectral
+2017-07-18 14:46:31,399 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Spectral' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py'>
+2017-07-18 14:46:31,411 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'plot_wwadist')
+2017-07-18 14:46:31,424 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function plot_wwadist at 0x1182d1a60>
+2017-07-18 14:46:31,436 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Spectral.plot_wwadist', <function plot_wwadist at 0x1182d1a60>, {}, ['Plot t
+2017-07-18 14:46:31,460 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: plot_wwadist(wwa, ylim=None)
+   :module: pyleoclim.Spectral
+
+   Plot the distribution of wwa with the 95% quantile line.
+   
+   Args:
+       wwa (array): the weighted wavelet amplitude.
+       ylim (list): limitations for y-axis
+   
+   Returns:
+       fig (figure): the 2-D plot of wavelet analysis
+   
+   
+2017-07-18 14:46:31,481 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Spectral.rst:18: input:
+.. autofunction:: pyleoclim.Spectral.plot_psd
+2017-07-18 14:46:31,494 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Spectral import plot_psd
+2017-07-18 14:46:31,509 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Spectral
+2017-07-18 14:46:31,523 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Spectral' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py'>
+2017-07-18 14:46:31,537 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'plot_psd')
+2017-07-18 14:46:31,554 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function plot_psd at 0x1182d1ae8>
+2017-07-18 14:46:31,572 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Spectral.plot_psd', <function plot_psd at 0x1182d1ae8>, {}, ['Plot the wavel
+2017-07-18 14:46:31,587 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None, figsize=[20, 8], label='PSD', plot_ar1=True, psd_ar1_q95=None, psd_ar1_color='#d9544d', ax=None, xlabel='Period', ylabel='Spectral Density')
+   :module: pyleoclim.Spectral
+
+   Plot the wavelet amplitude
+   
+   Args:
+       psd (array): power spectral density
+       freqs (array): vector of frequency
+       xticks (list): ticks on x-axis
+       xlim (list): limits for x-axis
+       figsize (list): the size for the figure
+       ax: Return as axis instead of figure (useful to integrate plot into a subplot)
+       xlabel (str): The x-axis label
+       ylabel (str): The y-axis label
+   
+   Returns:
+       fig (figure): the 2-D plot of wavelet analysis
+   
+   
+2017-07-18 14:46:31,630 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py:docstring of pyleoclim.Spectral.ar1_fit:7: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:31,654 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py:docstring of pyleoclim.Spectral.ar1_sim:8: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:31,672 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py:docstring of pyleoclim.Spectral.wwz:13: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:31,687 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py:docstring of pyleoclim.Spectral.wwz:15: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:31,699 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py:docstring of pyleoclim.Spectral.wwz_psd:12: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:31,715 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Spectral.py:docstring of pyleoclim.Spectral.wwz_psd:14: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:31,737 [DEBUG] sphinx.application: [app] emitting event: 'doctree-read'(<document: <section "spectral functions"...>>,)
+2017-07-18 14:46:31,769 [INFO] sphinx.util: [01mreading sources... [39;49;00m[ 70%] [35mStats[39;49;00m                                                                                                              
+2017-07-18 14:46:31,786 [DEBUG] sphinx.application: [app] emitting event: 'env-purge-doc'(<sphinx.environment.BuildEnvironment object at 0x1050fa438>, 'Stats')
+2017-07-18 14:46:31,803 [DEBUG] sphinx.application: [app] emitting event: 'source-read'('Stats', ['Statistics Functions\n====================\n\n.. autofunction:: pyleoclim.Stats.simpleSt
+2017-07-18 14:46:31,816 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Stats.rst:4: input:
+.. autofunction:: pyleoclim.Stats.simpleStats
+
+2017-07-18 14:46:31,828 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Stats import simpleStats
+2017-07-18 14:46:31,840 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Stats
+2017-07-18 14:46:31,858 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Stats' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Stats.py'>
+2017-07-18 14:46:31,876 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'simpleStats')
+2017-07-18 14:46:31,898 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function simpleStats at 0x1182d1bf8>
+2017-07-18 14:46:32,007 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Stats.simpleStats', <function simpleStats at 0x1182d1bf8>, {}, ['Computes si
+2017-07-18 14:46:32,020 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: simpleStats(y, axis=None)
+   :module: pyleoclim.Stats
+
+   Computes simple statistics
+   
+   Computes the mean, median, min, max, standard deviation, and interquartile
+   range of a numpy array y.
+   
+   Args:
+       y (array): A Numpy array
+       axis (int, typle of ints): Optional. Axis or Axes along which the means
+           are computed, the default is to compute the mean of the flattened
+           array. If a tuple of ints, performed over multiple axes
+   
+   Returns:
+       The mean, median, min, max, standard deviation and IQR by columns
+   
+   
+2017-07-18 14:46:32,036 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:32,053 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Stats.rst:6: input:
+.. autofunction:: pyleoclim.Stats.corrsig
+2017-07-18 14:46:32,071 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Stats import corrsig
+2017-07-18 14:46:32,088 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Stats
+2017-07-18 14:46:32,108 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Stats' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Stats.py'>
+2017-07-18 14:46:32,130 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'corrsig')
+2017-07-18 14:46:32,145 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function corrsig at 0x118369d08>
+2017-07-18 14:46:32,162 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Stats.corrsig', <function corrsig at 0x118369d08>, {}, ['Estimates the signi
+2017-07-18 14:46:32,181 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: corrsig(y1, y2, nsim=1000, method='isospectral', alpha=0.5)
+   :module: pyleoclim.Stats
+
+   Estimates the significance of correlations between non IID time series by 3 independent methods:
+       1) 'ttest': T-test where d.o.f are corrected for the effect of serial correlation
+       2) 'isopersistent': AR(1) modeling of x and y.
+       3) 'isospectral': phase randomization of original inputs. (default)
+       The T-test is parametric test, hence cheap but usually wrong except in idyllic circumstances.
+       The others are non-parametric, but their computational requirements scales with nsim.
+   
+   Args:
+       y1, y2 (array)- vector of (real) numbers of identical length, no NaNs allowed
+       nsim (int)- the number of simulations [1000]
+       method (str)- methods 1-3 above ['isospectral']
+       alpha (float)- significance level for critical value estimation [0.05]
+   
+   Returns:
+        r (real): correlation between x and y 
+   
+        signif (int): true  if significant; false otherwise 
+   
+        p (real): Fraction of time series with higher correlation coefficents than observed (approximates the p-value). 
+   
+           Note that signif = True if and only if p <= alpha.
+   
+2017-07-18 14:46:32,205 [WARNING] sphinx.util.docutils: Enumerated list ends without a blank line; unexpected unindent.
+2017-07-18 14:46:32,238 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Stats.py:docstring of pyleoclim.Stats.simpleStats:9: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:32,254 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Stats.py:docstring of pyleoclim.Stats.corrsig:4: (WARNING/2) Enumerated list ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:32,274 [DEBUG] sphinx.application: [app] emitting event: 'doctree-read'(<document: <section "statistics functions"...>>,)
+2017-07-18 14:46:32,292 [INFO] sphinx.util: [01mreading sources... [39;49;00m[ 80%] [35mSummaryPlots[39;49;00m                                                                                                       
+2017-07-18 14:46:32,305 [DEBUG] sphinx.application: [app] emitting event: 'env-purge-doc'(<sphinx.environment.BuildEnvironment object at 0x1050fa438>, 'SummaryPlots')
+2017-07-18 14:46:32,321 [DEBUG] sphinx.application: [app] emitting event: 'source-read'('SummaryPlots', ['Summary Plots\n==============\n\nThis module handles some basic return for the su
+2017-07-18 14:46:32,338 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/SummaryPlots.rst:8: input:
+.. autofunction:: pyleoclim.SummaryPlots.getMetadata
+
+2017-07-18 14:46:32,350 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.SummaryPlots import getMetadata
+2017-07-18 14:46:32,365 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.SummaryPlots
+2017-07-18 14:46:32,381 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.SummaryPlots' from '//anaconda/lib/python3.5/site-packages/pyleoclim/SummaryPlots.py'>
+2017-07-18 14:46:32,394 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'getMetadata')
+2017-07-18 14:46:32,406 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function getMetadata at 0x1173c86a8>
+2017-07-18 14:46:32,476 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.SummaryPlots.getMetadata', <function getMetadata at 0x1173c86a8>, {}, ['Get 
+2017-07-18 14:46:32,489 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: getMetadata(timeseries)
+   :module: pyleoclim.SummaryPlots
+
+   Get the necessary metadata to be printed out automatically
+   
+   Args:
+       timeseries: a specific timeseries object. 
+       
+   Returns:
+       A dictionary containing the following metadata:
+   
+       archiveType 
+   
+       Authors (if more than 2, replace by et al. 
+   
+       PublicationYear 
+   
+       Publication DOI 
+   
+       Variable Name 
+   
+       Units 
+   
+       Climate Interpretation 
+   
+       Calibration Equation 
+   
+       Calibration References 
+   
+       Calibration Notes 
+   
+       
+   
+2017-07-18 14:46:32,511 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/SummaryPlots.rst:10: input:
+.. autofunction:: pyleoclim.SummaryPlots.TsData
+
+2017-07-18 14:46:32,531 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.SummaryPlots import TsData
+2017-07-18 14:46:32,565 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.SummaryPlots
+2017-07-18 14:46:32,635 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.SummaryPlots' from '//anaconda/lib/python3.5/site-packages/pyleoclim/SummaryPlots.py'>
+2017-07-18 14:46:32,668 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'TsData')
+2017-07-18 14:46:32,683 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function TsData at 0x1173c8730>
+2017-07-18 14:46:32,697 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.SummaryPlots.TsData', <function TsData at 0x1173c8730>, {}, ['Get the PaleoD
+2017-07-18 14:46:32,711 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: TsData(timeseries, x_axis='')
+   :module: pyleoclim.SummaryPlots
+
+   Get the PaleoData with age/depth information
+       
+   Get the necessary information for the TS plots/necessary to allow for
+   axes specification
+   
+   Args:
+       timeseries: a single timeseries object. 
+           By default, will prompt the user
+       x-axis (str): The representation against which to plot the 
+           paleo-data. Options are "age", "year", and "depth". 
+           Default is to let the system choose if only one available 
+           or prompt the user.
+   Returns:
+       x - the x-valus 
+   
+       y - the y-values 
+   
+       archiveType - the archiveType (for plot settings) 
+   
+       x_label - the label for the x-axis 
+   
+       y_label - the label for the y-axis 
+   
+       label - the results of the x-axis query. Either depth, year, or age
+       
+   
+2017-07-18 14:46:32,732 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/SummaryPlots.rst:12: input:
+.. autofunction:: pyleoclim.SummaryPlots.agemodelData
+2017-07-18 14:46:32,755 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.SummaryPlots import agemodelData
+2017-07-18 14:46:32,786 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.SummaryPlots
+2017-07-18 14:46:32,805 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.SummaryPlots' from '//anaconda/lib/python3.5/site-packages/pyleoclim/SummaryPlots.py'>
+2017-07-18 14:46:32,819 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'agemodelData')
+2017-07-18 14:46:32,831 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function agemodelData at 0x1173c87b8>
+2017-07-18 14:46:32,844 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.SummaryPlots.agemodelData', <function agemodelData at 0x1173c87b8>, {}, ['Ge
+2017-07-18 14:46:32,857 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: agemodelData(timeseries)
+   :module: pyleoclim.SummaryPlots
+
+   Get the necessary information for the agemodel plot
+   
+   Args:
+       timeseries: a single timeseries object. By default, will
+           prompt the user
+   
+   Returns:
+       depth - the depth values 
+   
+       age - the age values 
+   
+       x_label - the label for the x-axis 
+   
+       y_label - the label for the y-axis 
+   
+       archiveType - the archiveType (for default plot settings)
+   
+   
+2017-07-18 14:46:32,906 [DEBUG] sphinx.application: [app] emitting event: 'doctree-read'(<document: <section "summary plots"...>>,)
+2017-07-18 14:46:32,928 [INFO] sphinx.util: [01mreading sources... [39;49;00m[ 90%] [35mTimeseries[39;49;00m                                                                                                         
+2017-07-18 14:46:32,946 [DEBUG] sphinx.application: [app] emitting event: 'env-purge-doc'(<sphinx.environment.BuildEnvironment object at 0x1050fa438>, 'Timeseries')
+2017-07-18 14:46:32,961 [DEBUG] sphinx.application: [app] emitting event: 'source-read'('Timeseries', ['Timeseries Functions\n====================\n\nThis module allows the manipulation o
+2017-07-18 14:46:32,988 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Timeseries.rst:6: input:
+.. autofunction:: pyleoclim.Timeseries.bin
+
+2017-07-18 14:46:33,019 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Timeseries import bin
+2017-07-18 14:46:33,054 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Timeseries
+2017-07-18 14:46:33,083 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Timeseries' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Timeseries.py'>
+2017-07-18 14:46:33,101 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'bin')
+2017-07-18 14:46:33,125 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function bin at 0x1182cf2f0>
+2017-07-18 14:46:33,230 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Timeseries.bin', <function bin at 0x1182cf2f0>, {}, ['Bin the values', '', '
+2017-07-18 14:46:33,250 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: bin(x, y, bin_size='', start='', end='')
+   :module: pyleoclim.Timeseries
+
+   Bin the values
+   
+   Args:
+       x (array): the x-axis series.
+       y (array): the y-axis series.
+       bin_size (float): The size of the bins. Default is the average resolution
+       start (float): Where/when to start binning. Default is the minimum
+       end (float): When/where to stop binning. Defulat is the maximum
+   
+   Returns:
+       binned_values - the binned output 
+   
+       bins - the bins (centered on the median, i.e., the 100-200 bin is 150) 
+   
+       n - number of data points in each bin 
+   
+       error -  the standard error on the mean in each bin
+   
+   
+2017-07-18 14:46:33,276 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Timeseries.rst:8: input:
+.. autofunction:: pyleoclim.Timeseries.interp
+
+2017-07-18 14:46:33,304 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Timeseries import interp
+2017-07-18 14:46:33,330 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Timeseries
+2017-07-18 14:46:33,347 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Timeseries' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Timeseries.py'>
+2017-07-18 14:46:33,399 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'interp')
+2017-07-18 14:46:33,436 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function interp at 0x1182cf400>
+2017-07-18 14:46:33,464 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Timeseries.interp', <function interp at 0x1182cf400>, {}, ['Linear interpola
+2017-07-18 14:46:33,492 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: interp(x, y, interp_step='', start='', end='')
+   :module: pyleoclim.Timeseries
+
+   Linear interpolation onto a new x-axis
+   
+   Args:
+       x (array): the x-axis
+       y (array): the y-axis
+       interp_step (float): the interpolation step. Default is mean resolution.
+       start (float): where/when to start the interpolation. Default is min..
+       end (float): where/when to stop the interpolation. Defaul is max.
+   
+   Returns:
+       xi - the interpolated x-axis 
+   
+       interp_values - the interpolated values
+    
+   
+2017-07-18 14:46:33,541 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Timeseries.rst:10: input:
+.. autofunction:: pyleoclim.Timeseries.onCommonAxis
+
+2017-07-18 14:46:33,563 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Timeseries import onCommonAxis
+2017-07-18 14:46:33,586 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Timeseries
+2017-07-18 14:46:33,601 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Timeseries' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Timeseries.py'>
+2017-07-18 14:46:33,619 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'onCommonAxis')
+2017-07-18 14:46:33,640 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function onCommonAxis at 0x1182cf488>
+2017-07-18 14:46:33,661 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Timeseries.onCommonAxis', <function onCommonAxis at 0x1182cf488>, {}, ['Plac
+2017-07-18 14:46:33,677 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: onCommonAxis(x1, y1, x2, y2, interp_step='', start='', end='')
+   :module: pyleoclim.Timeseries
+
+   Places two timeseries on a common axis
+   
+   Args:
+       x1 (array): x-axis values of the first timeseries
+       y1 (array): y-axis values of the first timeseries
+       x2 (array): x-axis values of the second timeseries
+       y2 (array): y-axis values of the second timeseries
+       interp_step (float): The interpolation step. Default is mean resolution
+           of lowest resolution series
+       start (float): where/when to start. Default is the maximum of the minima of
+           the two timeseries
+       end (float): Where/when to end. Default is the minimum of the maxima of
+           the two timeseries
+   
+   Returns:
+       xi -  the interpolated x-axis 
+   
+       interp_values1 -  the interpolated y-values for the first timeseries
+       interp_values2 - the intespolated y-values for the second timeseries
+   
+2017-07-18 14:46:33,699 [ERROR] sphinx.util.docutils: Unexpected indentation.
+2017-07-18 14:46:33,715 [WARNING] sphinx.util.docutils: Block quote ends without a blank line; unexpected unindent.
+2017-07-18 14:46:33,733 [DEBUG] sphinx.ext.autodoc: [autodoc] /Users/deborahkhider/Documents/Python/Pyleoclim_util/Documentation/Timeseries.rst:12: input:
+.. autofunction:: pyleoclim.Timeseries.standardize
+2017-07-18 14:46:33,755 [DEBUG] sphinx.ext.autodoc: [autodoc] from pyleoclim.Timeseries import standardize
+2017-07-18 14:46:33,783 [DEBUG] sphinx.ext.autodoc: [autodoc] import pyleoclim.Timeseries
+2017-07-18 14:46:33,808 [DEBUG] sphinx.ext.autodoc: [autodoc] => <module 'pyleoclim.Timeseries' from '//anaconda/lib/python3.5/site-packages/pyleoclim/Timeseries.py'>
+2017-07-18 14:46:33,825 [DEBUG] sphinx.ext.autodoc: [autodoc] getattr(_, 'standardize')
+2017-07-18 14:46:33,840 [DEBUG] sphinx.ext.autodoc: [autodoc] => <function standardize at 0x1182cf510>
+2017-07-18 14:46:33,855 [DEBUG] sphinx.application: [app] emitting event: 'autodoc-process-docstring'('function', 'pyleoclim.Timeseries.standardize', <function standardize at 0x1182cf510>, {}, ['Center
+2017-07-18 14:46:33,869 [DEBUG] sphinx.ext.autodoc: [autodoc] output:
+
+.. py:function:: standardize(x, scale=1, axis=0, ddof=0, eps=0.001)
+   :module: pyleoclim.Timeseries
+
+   Centers and normalizes a given time series. Constant or nearly constant time series not rescaled.
+   
+   Args:
+       x (array): vector of (real) numbers as a time series, NaNs allowed
+       scale (real): a scale factor used to scale a record to a match a given variance
+       axis (int or None): axis along which to operate, if None, compute over the whole array
+       ddof (int): degress of freedom correction in the calculation of the standard deviation
+       eps (real): a threshold to determine if the standard deviation is too close to zero
+   
+   Returns:
+       z (array): the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed
+       mu (real): the mean of the original time series, E[X]
+       sig (real): the standard deviation of the original time series, std[X]
+   
+   References:
+       1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
+       2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
+   
+   @author: fzhu
+   
+2017-07-18 14:46:33,904 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Timeseries.py:docstring of pyleoclim.Timeseries.onCommonAxis:9: (ERROR/3) Unexpected indentation. [filtered system message]
+2017-07-18 14:46:33,918 [DEBUG] sphinx.transforms: //anaconda/lib/python3.5/site-packages/pyleoclim/Timeseries.py:docstring of pyleoclim.Timeseries.onCommonAxis:10: (WARNING/2) Block quote ends without a blank line; unexpected unindent. [filtered system message]
+2017-07-18 14:46:33,933 [DEBUG] sphinx.application: [app] emitting event: 'doctree-read'(<document: <section "timeseries functions"...>>,)
+2017-07-18 14:46:33,957 [INFO] sphinx.util: [01mreading sources... [39;49;00m[100%] [35mindex[39;49;00m                                                                                                              
+2017-07-18 14:46:33,978 [DEBUG] sphinx.application: [app] emitting event: 'env-purge-doc'(<sphinx.environment.BuildEnvironment object at 0x1050fa438>, 'index')
+2017-07-18 14:46:34,008 [DEBUG] sphinx.application: [app] emitting event: 'source-read'('index', [".. Pyleoclim documentation master file, created by\n   sphinx-quickstart on Fri Feb 10 1
+2017-07-18 14:46:34,039 [DEBUG] sphinx.application: [app] emitting event: 'doctree-read'(<document: <comment...><section "welcome to pyleoclim's documentati ...>,)
+2017-07-18 14:46:34,057 [INFO] sphinx.util: 
+2017-07-18 14:46:34,070 [DEBUG] sphinx.application: [app] emitting event: 'env-updated'(<sphinx.environment.BuildEnvironment object at 0x1050fa438>,)
+2017-07-18 14:46:22,696 [WARNING] sphinx.util.docutils: Literal block expected; none found.
+2017-07-18 14:46:34,110 [INFO] sphinx.builders: [01mlooking for now-outdated files... [39;49;00m
+2017-07-18 14:46:34,177 [DEBUG] sphinx.application: [app] emitting event: 'env-get-updated'(<sphinx.environment.BuildEnvironment object at 0x1050fa438>,)
+2017-07-18 14:46:34,206 [INFO] sphinx.builders: none found
+2017-07-18 14:46:34,232 [INFO] sphinx.builders: [01mpickling environment... [39;49;00m
+2017-07-18 14:46:34,372 [INFO] sphinx.builders: done
+2017-07-18 14:46:34,399 [INFO] sphinx.builders: [01mchecking consistency... [39;49;00m
+2017-07-18 14:46:34,422 [DEBUG] sphinx.application: [app] emitting event: 'env-check-consistency'(<sphinx.environment.BuildEnvironment object at 0x1050fa438>,)
+2017-07-18 14:46:34,443 [INFO] sphinx.builders: done
+2017-07-18 14:46:34,488 [DEBUG] sphinx.builders: docnames to write: Introduction, LipdUtils, Main, Map, Plot, Spectral, Stats, SummaryPlots, Timeseries, index
+2017-07-18 14:46:34,528 [INFO] sphinx.builders: [01mpreparing documents... [39;49;00m
+2017-07-18 14:46:34,568 [INFO] sphinx.builders: done
+2017-07-18 14:46:34,612 [INFO] sphinx.util: [01mwriting output... [39;49;00m[ 10%] [32mIntroduction[39;49;00m                                                                                                        
+2017-07-18 14:46:34,640 [DEBUG] sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "pyleoclim"...>>, 'Introduction')
+2017-07-18 14:46:34,865 [INFO] sphinx.util: [01mwriting output... [39;49;00m[ 20%] [32mLipdUtils[39;49;00m                                                                                                           
+2017-07-18 14:46:34,886 [DEBUG] sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "lipd utilities"...>>, 'LipdUtils')
+2017-07-18 14:46:34,991 [INFO] sphinx.util: [01mwriting output... [39;49;00m[ 30%] [32mMain[39;49;00m                                                                                                                
+2017-07-18 14:46:35,032 [DEBUG] sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "main functions"...>>, 'Main')
+2017-07-18 14:46:35,147 [INFO] sphinx.util: [01mwriting output... [39;49;00m[ 40%] [32mMap[39;49;00m                                                                                                                 
+2017-07-18 14:46:35,164 [DEBUG] sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "mapping functions"...>>, 'Map')
+2017-07-18 14:46:35,211 [INFO] sphinx.util: [01mwriting output... [39;49;00m[ 50%] [32mPlot[39;49;00m                                                                                                                
+2017-07-18 14:46:35,239 [DEBUG] sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "plotting functions"...>>, 'Plot')
+2017-07-18 14:46:35,326 [INFO] sphinx.util: [01mwriting output... [39;49;00m[ 60%] [32mSpectral[39;49;00m                                                                                                            
+2017-07-18 14:46:35,348 [DEBUG] sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "spectral functions"...>>, 'Spectral')
+2017-07-18 14:46:35,394 [INFO] sphinx.util: [01mwriting output... [39;49;00m[ 70%] [32mStats[39;49;00m                                                                                                               
+2017-07-18 14:46:35,408 [DEBUG] sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "statistics functions"...>>, 'Stats')
+2017-07-18 14:46:35,478 [INFO] sphinx.util: [01mwriting output... [39;49;00m[ 80%] [32mSummaryPlots[39;49;00m                                                                                                        
+2017-07-18 14:46:35,508 [DEBUG] sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "summary plots"...>>, 'SummaryPlots')
+2017-07-18 14:46:35,602 [INFO] sphinx.util: [01mwriting output... [39;49;00m[ 90%] [32mTimeseries[39;49;00m                                                                                                          
+2017-07-18 14:46:35,620 [DEBUG] sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <section "timeseries functions"...>>, 'Timeseries')
+2017-07-18 14:46:35,721 [INFO] sphinx.util: [01mwriting output... [39;49;00m[100%] [32mindex[39;49;00m                                                                                                               
+2017-07-18 14:46:35,745 [DEBUG] sphinx.application: [app] emitting event: 'doctree-resolved'(<document: <comment...><section "welcome to pyleoclim's documentati ...>, 'index')
+2017-07-18 14:46:36,071 [INFO] sphinx.util: 
+2017-07-18 14:46:36,168 [INFO] sphinx.builders.html: [01mgenerating indices...[39;49;00m
+2017-07-18 14:46:36,230 [INFO] sphinx.builders.html:  genindex
+2017-07-18 14:46:36,322 [INFO] sphinx.builders.html: 
+2017-07-18 14:46:36,350 [DEBUG] sphinx.application: [app] emitting event: 'html-collect-pages'()
+2017-07-18 14:46:36,486 [INFO] sphinx.builders.html: [01mwriting additional pages...[39;49;00m
+2017-07-18 14:46:36,518 [INFO] sphinx.builders.html:  search
+2017-07-18 14:46:36,581 [INFO] sphinx.builders.html: 
+2017-07-18 14:46:36,608 [INFO] sphinx.builders.html: [01mcopying static files... [39;49;00m
+2017-07-18 14:46:36,854 [INFO] sphinx.builders.html: done
+2017-07-18 14:46:36,878 [INFO] sphinx.builders.html: [01mcopying extra files... [39;49;00m
+2017-07-18 14:46:36,915 [INFO] sphinx.builders.html: done
+2017-07-18 14:46:36,987 [INFO] sphinx.builders.html: [01mdumping search index in English (code: en) ... [39;49;00m
+2017-07-18 14:46:37,132 [INFO] sphinx.builders.html: done
+2017-07-18 14:46:37,182 [INFO] sphinx.builders.html: [01mdumping object inventory... [39;49;00m
+2017-07-18 14:46:37,241 [INFO] sphinx.builders.html: done
+2017-07-18 14:46:37,338 [INFO] sphinx.application: [01mbuild succeeded, 1 warning.[39;49;00m
+2017-07-18 14:46:37,442 [DEBUG] sphinx.application: [app] emitting event: 'build-finished'(None,)

@@ -1,16 +1,13 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>Plotting Functions &#8212; Pyleoclim 0.3.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -24,13 +21,13 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Statistics Functions" href="Stats.html" />
     <link rel="prev" title="Mapping Functions" href="Map.html" /> 
   </head>
-  <body role="document">
+  <body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -45,7 +42,83 @@
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
       </ul>
-    </div>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="plotting-functions">
+<h1>Plotting Functions<a class="headerlink" href="#plotting-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pyleoclim.Plot.plot">
+<code class="descclassname">pyleoclim.Plot.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>x, y, markersize=50, marker='ro', x_label='', y_label='', title='', figsize=[10, 4], ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Plot.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a 2-D plot</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>x (numpy array): a 1xn numpy array of values for the x-axis
+y (numpy array): a 1xn numpy array for the y-axis
+markersize (int): the size of the marker
+marker (string or list): color and shape of the marker
+x_axis_label (str): the label for the x-axis
+y_axis_label (str): the label for the y-axis
+title (str): the title for the plot
+figsize (list): the size of the figure
+ax: Return as axis instead of figure (useful to integrate plot into a subplot)</dd>
+<dt>Return:</dt>
+<dd>The figure</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Plot.plot_hist">
+<code class="descclassname">pyleoclim.Plot.</code><code class="descname">plot_hist</code><span class="sig-paren">(</span><em>y, bins=None, hist=True, label='', kde=True, rug=False, fit=None, hist_kws={'label': 'Histogram'}, kde_kws={'label': 'KDE fit'}, rug_kws={'label': 'rug'}, fit_kws={'label': 'fit'}, color='0.7', vertical=False, norm_hist=True, figsize=[5, 5], ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Plot.plot_hist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a univariate distribution of the PaleoData values</p>
+<p>This function is based on the seaborn displot function, which is
+itself a combination of the matplotlib hist function with the 
+seaborn kdeplot() and rugplot() functions. It can also fit 
+scipy.stats distributions and plot the estimated PDF over the data.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">y (array): nx1 numpy array. No missing values allowed 
+bins (int): Specification of hist bins following matplotlib(hist),</p>
+<blockquote>
+<div>or None to use Freedman-Diaconis rule</div></blockquote>
+<p>hist (bool): Whether to plot a (normed) histogram 
+label (str): The label for the axis
+kde (bool): Whether to plot a gaussian kernel density estimate
+rug (bool): Whether to draw a rugplot on the support axis
+fit: Random variable object. An object with fit method, returning</p>
+<blockquote>
+<div>a tuple that can be passed to a pdf method of positional 
+arguments following a grid of values to evaluate the pdf on.</div></blockquote>
+<dl class="docutils">
+<dt>{hist, kde, rug, fit}_kws: Dictionaries. Keyword arguments for </dt>
+<dd>underlying plotting functions. If modifying the dictionary, make
+sure the labels “hist”, “kde”, “rug” and “fit” are still passed.</dd>
+<dt>color (str): matplotlib color. Color to plot everything but the</dt>
+<dd>fitted curve in.</dd>
+</dl>
+<p>vertical (bool): if True, oberved values are on y-axis.
+norm_hist (bool): If True (default), the histrogram height shows</p>
+<blockquote>
+<div>a density rather than a count. This is implied if a KDE or 
+fitted density is plotted</div></blockquote>
+<p class="last">figsize (list): the size of the figure
+ax: Return as axis instead of figure (useful to integrate plot into a subplot)</p>
+</dd>
+<dt>Returns</dt>
+<dd>fig - The figure</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
@@ -73,89 +146,6 @@
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
-
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="plotting-functions">
-<h1>Plotting Functions<a class="headerlink" href="#plotting-functions" title="Permalink to this headline">¶</a></h1>
-<dl class="function">
-<dt id="pyleoclim.Plot.plot">
-<code class="descclassname">pyleoclim.Plot.</code><code class="descname">plot</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>markersize=50</em>, <em>marker='ro'</em>, <em>x_label=''</em>, <em>y_label=''</em>, <em>title=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Plot.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Make a 2-D plot</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>x</strong> (<em>numpy array</em>) &#8211; a 1xn numpy array of values for the x-axis</li>
-<li><strong>y</strong> (<em>numpy array</em>) &#8211; a 1xn numpy array for the y-axis</li>
-<li><strong>markersize</strong> (<em>int</em>) &#8211; the size of the marker</li>
-<li><strong>marker</strong> (<em>string</em><em> or </em><em>list</em>) &#8211; color and shape of the marker</li>
-<li><strong>x_axis_label</strong> (<em>str</em>) &#8211; the label for the x-axis</li>
-<li><strong>y_axis_label</strong> (<em>str</em>) &#8211; the label for the y-axis</li>
-<li><strong>title</strong> (<em>str</em>) &#8211; the title for the plot</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The figure</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyleoclim.Plot.plot_hist">
-<code class="descclassname">pyleoclim.Plot.</code><code class="descname">plot_hist</code><span class="sig-paren">(</span><em>y</em>, <em>bins=None</em>, <em>hist=True</em>, <em>label=''</em>, <em>kde=True</em>, <em>rug=False</em>, <em>fit=None</em>, <em>hist_kws={'label': 'Histogram'}</em>, <em>kde_kws={'label': 'KDE fit'}</em>, <em>rug_kws={'label': 'rug'}</em>, <em>fit_kws={'label': 'fit'}</em>, <em>color='0.7'</em>, <em>vertical=False</em>, <em>norm_hist=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Plot.plot_hist" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot a univariate distribution of the PaleoData values</p>
-<p>This function is based on the seaborn displot function, which is
-itself a combination of the matplotlib hist function with the
-seaborn kdeplot() and rugplot() functions. It can also fit
-scipy.stats distributions and plot the estimated PDF over the data.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>y</strong> (<em>array</em>) &#8211; nx1 numpy array. No missing values allowed</li>
-<li><strong>bins</strong> (<em>int</em>) &#8211; Specification of hist bins following matplotlib(hist),
-or None to use Freedman-Diaconis rule</li>
-<li><strong>hist</strong> (<em>bool</em>) &#8211; Whether to plot a (normed) histogram</li>
-<li><strong>label</strong> (<em>str</em>) &#8211; The label for the axis</li>
-<li><strong>kde</strong> (<em>bool</em>) &#8211; Whether to plot a gaussian kernel density estimate</li>
-<li><strong>rug</strong> (<em>bool</em>) &#8211; Whether to draw a rugplot on the support axis</li>
-<li><strong>fit</strong> &#8211; Random variable object. An object with fit method, returning
-a tuple that can be passed to a pdf method of positional
-arguments following a grid of values to evaluate the pdf on.</li>
-<li><strong>kde</strong><strong>, </strong><strong>rug</strong><strong>, </strong><strong>fit}_kws</strong> (<em>{hist</em><em>,</em><em></em>) &#8211; Dictionaries. Keyword arguments for
-underlying plotting functions. If modifying the dictionary, make
-sure the labels &#8220;hist&#8221;, &#8220;kde&#8221;, &#8220;rug&#8221; and &#8220;fit&#8221; are still passed.</li>
-<li><strong>color</strong> (<em>str</em>) &#8211; matplotlib color. Color to plot everything but the
-fitted curve in.</li>
-<li><strong>vertical</strong> (<em>bool</em>) &#8211; if True, oberved values are on y-axis.</li>
-<li><strong>norm_hist</strong> (<em>bool</em>) &#8211; If True (default), the histrogram height shows
-a density rather than a count. This is implied if a KDE or
-fitted density is plotted</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="docutils">
-<dt>Returns</dt>
-<dd>fig - The figure</dd>
-</dl>
-</dd></dl>
-
-</div>
-
-
-          </div>
-        </div>
-      </div>
       <div class="clearer"></div>
     </div>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -175,7 +165,7 @@ fitted density is plotted</li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>
