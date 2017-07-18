@@ -362,6 +362,6 @@ epub_exclude_files = ['search.html']
 #---- Read the Docs output
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 if on_rtd:
-    html_theme = 'default'
+    html_theme = 'sphinxdoc'
 else:
-    html_theme = 'nature'
+    html_theme = 'sphinxdoc'
