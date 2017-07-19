@@ -874,8 +874,8 @@ class WaveletAnalysis(object):
         Neff_diff = Neffs - Neff
         Neff_diff[Neff_diff < 0] = 0
 
-        sum_power = np.sum(power * Neff_diff, axis=0)
-        sum_eff = np.sum(Neff_diff, axis=0)
+        sum_power = np.nansum(power * Neff_diff, axis=0)
+        sum_eff = np.nansum(Neff_diff, axis=0)
 
         psd = sum_power / sum_eff
         # weighted psd calculation end
@@ -1182,6 +1182,7 @@ class WaveletAnalysis(object):
             ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
             freqs (array): vector of frequency
             tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+                if the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so
 
         Returns:
             ys_cut (array): the truncated time series with NaNs deleted
@@ -1206,20 +1207,24 @@ class WaveletAnalysis(object):
         if tau is None:
             med_res = np.size(ts) // np.median(np.diff(ts))
             tau = np.linspace(np.min(ts), np.max(ts), np.max([np.size(ts)//10, 50, med_res]))
-        else:
-            if np.min(tau) < np.min(ts) or np.max(tau) > np.max(ts):
-                warnings.warn("The time span of tau is outside of that of the time series and will be truncated.")
-                tau = tau[(tau >= np.min(ts)) & (tau <= np.max(ts))]
 
-            #assert np.min(tau) >= np.min(ts) and np.max(tau) <= np.max(ts), "tau should be within the time span of the time series."
+        elif np.min(tau) < np.min(ts) and np.max(tau) > np.max(ts):
+            warnings.warn("tau should be within the time span of the time series. \
+                          Note that sometimes if the leading points of the time series are NaNs, \
+                          they will be deleted and cause np.min(tau) < np.min(ts). \
+                          A new tau with the same size of the input tau will be generated.")
+            tau = np.linspace(np.min(ts), np.max(ts), np.size(tau))
+
+        elif np.min(tau) not in ts or np.max(tau) not in ts:
+            warnings.warn("The boundaries of tau are not exactly on two of the time axis points, \
+                          and it will be adjusted to be so.")
+            tau_lb = np.min(ts[ts > np.min(tau)])
+            tau_ub = np.max(ts[ts < np.max(tau)])
+            tau = np.linspace(tau_lb, tau_ub, np.size(tau))
 
         # truncate the time series when the range of tau is smaller than that of the time series
         ts_cut = ts[(np.min(tau) <= ts) & (ts <= np.max(tau))]
         ys_cut = ys[(np.min(tau) <= ts) & (ts <= np.max(tau))]
-
-        if np.min(tau) != np.min(ts_cut) or np.max(tau) != np.max(ts_cut):
-            warnings.warn("tau will be adjusted since the boundary of tau is not on any time point.")
-            tau = np.linspace(np.min(ts_cut), np.max(ts_cut), np.size(tau))
 
         if freqs is None:
             freqs = self.make_freq_vector(ts_cut)
@@ -1767,7 +1772,7 @@ def plot_wwadist(wwa, ylim=None):
 
 
 def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None,
-             figsize=[20, 8], label='PSD', plot_ar1=True, psd_ar1_q95=None,
+             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None,
              psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None,
              xlabel='Period', ylabel='Spectral Density'):
     """ Plot the wavelet amplitude
@@ -1795,7 +1800,7 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, y
         plt.plot(1/freqs, psd, lmstyle, linewidth=linewidth, label=label)
         if plot_ar1:
             assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
-            plt.plot(1/freqs, psd_ar1_q95, linewidth=linewidth,  label='AR1 95%', color=psd_ar1_color)
+            plt.plot(1/freqs, psd_ar1_q95, lmstyle, linewidth=linewidth,  label='AR1 95%', color=psd_ar1_color)
     else:
         plt.plot(1/freqs, psd, linewidth=linewidth,  label=label)
         if plot_ar1:

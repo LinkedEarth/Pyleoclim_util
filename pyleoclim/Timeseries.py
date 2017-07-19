@@ -197,7 +197,7 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     return z, mu, sig
 
 
-def ts2segments(ys, ts, factor=3):
+def ts2segments(ys, ts, factor=10):
     ''' Chop a time series into several segments based on gap detection.
 
     The rule of gap detection is very simple:
