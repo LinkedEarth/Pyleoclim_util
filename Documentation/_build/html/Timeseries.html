@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Timeseries Functions &#8212; Pyleoclim 0.3.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -25,16 +25,51 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="LiPD Utilities" href="LipdUtils.html" />
-    <link rel="prev" title="Statistics Functions" href="Stats.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="Statistics Functions" href="Stats.html" /> 
   </head>
   <body>
-  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="LipdUtils.html" title="LiPD Utilities"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Stats.html" title="Statistics Functions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Stats.html"
+                        title="previous chapter">Statistics Functions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="LipdUtils.html"
+                        title="next chapter">LiPD Utilities</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Timeseries.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
@@ -46,7 +81,7 @@
 <p>This module allows the manipulation of timeseries.</p>
 <dl class="function">
 <dt id="pyleoclim.Timeseries.bin">
-<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">bin</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Timeseries.html#bin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Timeseries.bin" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">bin</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.bin" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bin the values</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -66,7 +101,7 @@ end (float): When/where to stop binning. Defulat is the maximum</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Timeseries.interp">
-<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">interp</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Timeseries.html#interp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Timeseries.interp" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">interp</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.interp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Linear interpolation onto a new x-axis</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -84,7 +119,7 @@ end (float): where/when to stop the interpolation. Defaul is max.</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Timeseries.onCommonAxis">
-<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">onCommonAxis</code><span class="sig-paren">(</span><em>x1</em>, <em>y1</em>, <em>x2</em>, <em>y2</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Timeseries.html#onCommonAxis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Timeseries.onCommonAxis" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">onCommonAxis</code><span class="sig-paren">(</span><em>x1</em>, <em>y1</em>, <em>x2</em>, <em>y2</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.onCommonAxis" title="Permalink to this definition">¶</a></dt>
 <dd><p>Places two timeseries on a common axis</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -112,7 +147,7 @@ interp_values2 - the intespolated y-values for the second timeseries</p>
 
 <dl class="function">
 <dt id="pyleoclim.Timeseries.standardize">
-<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">standardize</code><span class="sig-paren">(</span><em>x</em>, <em>scale=1</em>, <em>axis=0</em>, <em>ddof=0</em>, <em>eps=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Timeseries.html#standardize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Timeseries.standardize" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">standardize</code><span class="sig-paren">(</span><em>x</em>, <em>scale=1</em>, <em>axis=0</em>, <em>ddof=0</em>, <em>eps=0.001</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.standardize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Centers and normalizes a given time series. Constant or nearly constant time series not rescaled.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -141,67 +176,26 @@ sig (real): the standard deviation of the original time series, std[X]</dd>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">Pyleoclim</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Pyleoclim</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Main.html">Main Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Map.html">Mapping Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Plot.html">Plotting Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Stats.html">Statistics Functions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Timeseries Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="LipdUtils.html">LiPD Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="SummaryPlots.html">Summary Plots</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Spectral.html">Spectral Functions</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="Stats.html" title="previous chapter">Statistics Functions</a></li>
-      <li>Next: <a href="LipdUtils.html" title="next chapter">LiPD Utilities</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/Timeseries.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="LipdUtils.html" title="LiPD Utilities"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Stats.html" title="Statistics Functions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
   </body>
 </html>

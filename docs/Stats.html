@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Statistics Functions &#8212; Pyleoclim 0.3.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -25,16 +25,51 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Timeseries Functions" href="Timeseries.html" />
-    <link rel="prev" title="Plotting Functions" href="Plot.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="Plotting Functions" href="Plot.html" /> 
   </head>
   <body>
-  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Timeseries.html" title="Timeseries Functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Plot.html" title="Plotting Functions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Plot.html"
+                        title="previous chapter">Plotting Functions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Timeseries.html"
+                        title="next chapter">Timeseries Functions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Stats.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
@@ -45,7 +80,7 @@
 <h1>Statistics Functions<a class="headerlink" href="#statistics-functions" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="pyleoclim.Stats.simpleStats">
-<code class="descclassname">pyleoclim.Stats.</code><code class="descname">simpleStats</code><span class="sig-paren">(</span><em>y</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Stats.html#simpleStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Stats.simpleStats" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Stats.</code><code class="descname">simpleStats</code><span class="sig-paren">(</span><em>y</em>, <em>axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Stats.simpleStats" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes simple statistics</p>
 <p>Computes the mean, median, min, max, standard deviation, and interquartile
 range of a numpy array y.</p>
@@ -64,7 +99,7 @@ array. If a tuple of ints, performed over multiple axes</div></blockquote>
 
 <dl class="function">
 <dt id="pyleoclim.Stats.corrsig">
-<code class="descclassname">pyleoclim.Stats.</code><code class="descname">corrsig</code><span class="sig-paren">(</span><em>y1</em>, <em>y2</em>, <em>nsim=1000</em>, <em>method='isospectral'</em>, <em>alpha=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim/Stats.html#corrsig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.Stats.corrsig" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Stats.</code><code class="descname">corrsig</code><span class="sig-paren">(</span><em>y1</em>, <em>y2</em>, <em>nsim=1000</em>, <em>method='isospectral'</em>, <em>alpha=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Stats.corrsig" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
 <dt>Estimates the significance of correlations between non IID time series by 3 independent methods:</dt>
 <dd><ol class="first arabic simple">
@@ -96,67 +131,26 @@ alpha (float)- significance level for critical value estimation [0.05]</dd>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">Pyleoclim</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Pyleoclim</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Main.html">Main Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Map.html">Mapping Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Plot.html">Plotting Functions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Statistics Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Timeseries.html">Timeseries Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="LipdUtils.html">LiPD Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="SummaryPlots.html">Summary Plots</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Spectral.html">Spectral Functions</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="Plot.html" title="previous chapter">Plotting Functions</a></li>
-      <li>Next: <a href="Timeseries.html" title="next chapter">Timeseries Functions</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/Stats.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Timeseries.html" title="Timeseries Functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Plot.html" title="Plotting Functions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
   </body>
 </html>

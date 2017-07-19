@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Main Functions &#8212; Pyleoclim 0.3.0 documentation</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -25,16 +25,71 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Mapping Functions" href="Map.html" />
-    <link rel="prev" title="Pyleoclim" href="Introduction.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="prev" title="Pyleoclim" href="Introduction.html" /> 
   </head>
   <body>
-  
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Map.html" title="Mapping Functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Introduction.html" title="Pyleoclim"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Main Functions</a><ul>
+<li><a class="reference internal" href="#using-pyleoclim-with-a-lipd-file">Using Pyleoclim with a LiPD file</a><ul>
+<li><a class="reference internal" href="#getting-started">Getting started</a></li>
+<li><a class="reference internal" href="#mapping">Mapping</a></li>
+<li><a class="reference internal" href="#plotting">Plotting</a><ul>
+<li><a class="reference internal" href="#summary-plots">Summary Plots</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#statistics">Statistics</a></li>
+<li><a class="reference internal" href="#timeseries">Timeseries</a></li>
+<li><a class="reference internal" href="#analysis-in-the-frequency-domain">Analysis in the frequency domain</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-pyleoclim-without-a-lipd-file">Using Pyleoclim without a LiPD file</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Introduction.html"
+                        title="previous chapter">Pyleoclim</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Map.html"
+                        title="next chapter">Mapping Functions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Main.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
 
     <div class="document">
       <div class="documentwrapper">
@@ -63,7 +118,7 @@ to the directory containing the LiPD files.</p>
 </dl>
 <dl class="function">
 <dt id="pyleoclim.readLipd">
-<code class="descclassname">pyleoclim.</code><code class="descname">readLipd</code><span class="sig-paren">(</span><em>usr_path=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#readLipd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.readLipd" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">readLipd</code><span class="sig-paren">(</span><em>usr_path=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.readLipd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read Lipd files into a dictionary</p>
 <p>This function is based on the function of the same name in the LiPD utilities.
 Sets the dictionary as global variable so that it doesn’t have to be provided
@@ -78,7 +133,7 @@ as an argument for every function.</p>
 
 <dl class="function">
 <dt id="pyleoclim.extractTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">extractTs</code><span class="sig-paren">(</span><em>lipds=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#extractTs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.extractTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">extractTs</code><span class="sig-paren">(</span><em>lipds=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.extractTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract timeseries dictionary</p>
 <p>This function is based on the function of the same name in the LiPD utilities.
 Set the dictionary as a global variable so that it doesn’t have to be
@@ -97,7 +152,7 @@ readLipd function</dd>
 <h3>Mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="pyleoclim.mapAllArchive">
-<code class="descclassname">pyleoclim.</code><code class="descname">mapAllArchive</code><span class="sig-paren">(</span><em>lipds='', markersize=50, background='shadedrelief', figsize=[10, 4], saveFig=False, dir='', format='eps'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#mapAllArchive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.mapAllArchive" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">mapAllArchive</code><span class="sig-paren">(</span><em>lipds='', markersize=50, background='shadedrelief', figsize=[10, 4], saveFig=False, dir='', format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.mapAllArchive" title="Permalink to this definition">¶</a></dt>
 <dd><p>Map all the available records loaded into the workspace by archiveType.</p>
 <dl class="docutils">
 <dt>Map of all the records into the workspace by archiveType.</dt>
@@ -129,7 +184,7 @@ and svg.</dd>
 
 <dl class="function">
 <dt id="pyleoclim.mapLipd">
-<code class="descclassname">pyleoclim.</code><code class="descname">mapLipd</code><span class="sig-paren">(</span><em>timeseries='', countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=50, marker='default', figsize=[4, 4], saveFig=False, dir='', format='eps'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#mapLipd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.mapLipd" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">mapLipd</code><span class="sig-paren">(</span><em>timeseries='', countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=50, marker='default', figsize=[4, 4], saveFig=False, dir='', format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.mapLipd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a Map for a single record</p>
 <p>Orthographic projection map of a single record.</p>
 <dl class="docutils">
@@ -175,7 +230,7 @@ and svg.</dd>
 <h3>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="pyleoclim.plotTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">plotTs</code><span class="sig-paren">(</span><em>timeseries='', x_axis='', markersize=50, marker='default', figsize=[10, 4], saveFig=False, dir='', format='eps'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#plotTs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.plotTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">plotTs</code><span class="sig-paren">(</span><em>timeseries='', x_axis='', markersize=50, marker='default', figsize=[10, 4], saveFig=False, dir='', format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.plotTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot a single time series.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -208,7 +263,7 @@ and svg.</dd>
 
 <dl class="function">
 <dt id="pyleoclim.histTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">histTs</code><span class="sig-paren">(</span><em>timeseries='', bins=None, hist=True, kde=True, rug=False, fit=None, hist_kws={'label': 'Histogram'}, kde_kws={'label': 'KDE fit'}, rug_kws={'label': 'Rug'}, fit_kws={'label': 'Fit'}, color='default', vertical=False, norm_hist=True, figsize=[5, 5], saveFig=False, format='eps', dir=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#histTs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.histTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">histTs</code><span class="sig-paren">(</span><em>timeseries='', bins=None, hist=True, kde=True, rug=False, fit=None, hist_kws={'label': 'Histogram'}, kde_kws={'label': 'KDE fit'}, rug_kws={'label': 'Rug'}, fit_kws={'label': 'Fit'}, color='default', vertical=False, norm_hist=True, figsize=[5, 5], saveFig=False, format='eps', dir=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.histTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot a univariate distribution of the PaleoData values</p>
 <p>This function is based on the seaborn displot function, which is
 itself a combination of the matplotlib hist function with the
@@ -263,7 +318,7 @@ and svg.</dd>
 They allow to plot specific information about a timeseries but are not customizable.</p>
 <dl class="function">
 <dt id="pyleoclim.summaryTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">summaryTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#summaryTs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.summaryTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">summaryTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.summaryTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Basic summary plot</p>
 <p>Plots the following information: the time series, a histogram of
 the PaleoData_values, location map, spectral density using the wwz 
@@ -297,7 +352,7 @@ and svg.</dd>
 <h3>Statistics<a class="headerlink" href="#statistics" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="pyleoclim.statsTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">statsTs</code><span class="sig-paren">(</span><em>timeseries=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#statsTs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.statsTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">statsTs</code><span class="sig-paren">(</span><em>timeseries=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.statsTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate simple statistics of a timeseries</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -315,7 +370,7 @@ inter-quartile range (IQR) of a timeseries.</dd>
 
 <dl class="function">
 <dt id="pyleoclim.corrSigTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">corrSigTs</code><span class="sig-paren">(</span><em>timeseries1=''</em>, <em>timeseries2=''</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em>, <em>nsim=1000</em>, <em>method='isospectral'</em>, <em>alpha=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#corrSigTs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.corrSigTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">corrSigTs</code><span class="sig-paren">(</span><em>timeseries1=''</em>, <em>timeseries2=''</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em>, <em>nsim=1000</em>, <em>method='isospectral'</em>, <em>alpha=0.5</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.corrSigTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimates the significance of correlations between non IID timeseries.</p>
 <p>Function written by. F. Zhu.</p>
 <dl class="docutils">
@@ -371,7 +426,7 @@ requirements scales with nsim.</p>
 <p>Basic manipulations of the timeseries objects.</p>
 <dl class="function">
 <dt id="pyleoclim.binTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">binTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#binTs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.binTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">binTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>bin_size=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.binTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bin the paleoData values of the timeseries</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -398,7 +453,7 @@ end (float): End time/age/depth. Default is the maximum</p>
 
 <dl class="function">
 <dt id="pyleoclim.interpTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">interpTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#interpTs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.interpTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">interpTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>interp_step=''</em>, <em>start=''</em>, <em>end=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.interpTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Simple linear interpolation</p>
 <p>Simple linear interpolation of the data using the numpy.interp method</p>
 <dl class="docutils">
@@ -422,7 +477,7 @@ and time step,</p>
 
 <dl class="function">
 <dt id="pyleoclim.standardizeTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">standardizeTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>scale=1</em>, <em>ddof=0</em>, <em>eps=0.001</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#standardizeTs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.standardizeTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">standardizeTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>scale=1</em>, <em>ddof=0</em>, <em>eps=0.001</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.standardizeTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Centers and normalizes the paleoData values of a  given time series.</p>
 <p>Constant or nearly constant time series not rescaled.</p>
 <dl class="docutils">
@@ -454,7 +509,7 @@ eps (real): a threshold to determine if the standard deviation is too close to z
 <h3>Analysis in the frequency domain<a class="headerlink" href="#analysis-in-the-frequency-domain" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="pyleoclim.wwzTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">wwzTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>wwz=False</em>, <em>psd=True</em>, <em>wwz_default=True</em>, <em>psd_default=True</em>, <em>wwaplot_default=True</em>, <em>psdplot_default=True</em>, <em>fig=True</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyleoclim.html#wwzTs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.wwzTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">wwzTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>wwz=False</em>, <em>psd=True</em>, <em>wwz_default=True</em>, <em>psd_default=True</em>, <em>wwaplot_default=True</em>, <em>psdplot_default=True</em>, <em>fig=True</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.wwzTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weigthed wavelet Z-transform analysis</p>
 <p>Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)</p>
 <dl class="docutils">
@@ -605,79 +660,26 @@ contains some functions to extract information about a timeseries object.</p>
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">Pyleoclim</a></h1>
-
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="Introduction.html">Pyleoclim</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Main Functions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#using-pyleoclim-with-a-lipd-file">Using Pyleoclim with a LiPD file</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#getting-started">Getting started</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#mapping">Mapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#plotting">Plotting</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#statistics">Statistics</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#timeseries">Timeseries</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#analysis-in-the-frequency-domain">Analysis in the frequency domain</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#using-pyleoclim-without-a-lipd-file">Using Pyleoclim without a LiPD file</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="Map.html">Mapping Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Plot.html">Plotting Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Stats.html">Statistics Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Timeseries.html">Timeseries Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="LipdUtils.html">LiPD Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="SummaryPlots.html">Summary Plots</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Spectral.html">Spectral Functions</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="Introduction.html" title="previous chapter">Pyleoclim</a></li>
-      <li>Next: <a href="Map.html" title="next chapter">Mapping Functions</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
       <div class="clearer"></div>
     </div>
-    <div class="footer">
-      &copy;2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/Main.rst.txt"
-          rel="nofollow">Page source</a>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Map.html" title="Mapping Functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Introduction.html" title="Pyleoclim"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+      </ul>
     </div>
-
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
   </body>
 </html>
