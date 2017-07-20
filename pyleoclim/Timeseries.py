@@ -197,18 +197,18 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     return z, mu, sig
 
 
-def ts2segments(ys, ts, factor):
+def ts2segments(ys, ts, factor=10):
     ''' Chop a time series into several segments based on gap detection.
 
-    The rule of gap detection is very simple now:
-        if the time interval between some two data points are larger than some factor
-        times the mean time interval between each two neighbouring data points, then
-        we think there is a breaking point between them and chop them into two pieces
+    The rule of gap detection is very simple:
+        we define the intervals between time points as dts, then if dts[i] is larger than factor * dts[i-1],
+        we think that the change of dts (or the gradient) is too large, and we regard it as a breaking point
+        and chop the time series into two segments here
 
     Args:
         ys (array): a time series, NaNs allowed
         ts (array): the time points
-        factor (float): factor to adjust the threshold, threshold = factor * dt_mean
+        factor (float): the factor that adjusts the threshold for gap detection
 
     Returns:
         seg_ys (list): a list of several segments with potentially different lengths
@@ -221,25 +221,24 @@ def ts2segments(ys, ts, factor):
     ys_tmp = np.copy(ys)
     ys = ys[~np.isnan(ys_tmp)]
     ts = ts[~np.isnan(ys_tmp)]
+    ts_tmp = np.copy(ts)
+    ys = ys[~np.isnan(ts_tmp)]
+    ts = ts[~np.isnan(ts_tmp)]
 
     nt = np.size(ts)
-
-    dt_mean = np.mean(np.diff(ts))
     dts = np.diff(ts)
-
-    threshold = factor * dt_mean
-    n_breaks = np.size(dts[dts > threshold])  # the number of breaks
-    n_segs = n_breaks + 1
 
     seg_ys, seg_ts = [], []  # store the segments with lists
 
+    n_segs = 1
     i_start = 0
-    for i in range(nt-1):
-        if dts[i] > threshold:
+    for i in range(1, nt-1):
+        if np.abs(dts[i]) > factor*np.abs(dts[i-1]):
             i_end = i + 1
             seg_ys.append(ys[i_start:i_end])
             seg_ts.append(ts[i_start:i_end])
             i_start = np.copy(i_end)
+            n_segs += 1
 
     seg_ys.append(ys[i_start:nt])
     seg_ts.append(ts[i_start:nt])
