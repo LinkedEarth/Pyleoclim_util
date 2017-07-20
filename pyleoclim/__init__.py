@@ -33,10 +33,9 @@ Open Lipd files and extract timeseries (set them as global variable)
  
 """
 
-def readLipd(usr_path=""):
+def openLipd(usr_path=""):
     """Read Lipd files into a dictionary
     
-    This function is based on the function of the same name in the LiPD utilities.
     Sets the dictionary as global variable so that it doesn't have to be provided
     as an argument for every function.
     
@@ -51,7 +50,7 @@ def readLipd(usr_path=""):
     lipd_dict = lpd.readLipd(usr_path=usr_path)
     return lipd_dict
 
-def extractTs(lipds=None):
+def fetchTs(lipds=None):
     """Extract timeseries dictionary
     
     This function is based on the function of the same name in the LiPD utilities.
@@ -69,7 +68,7 @@ def extractTs(lipds=None):
     global ts_list
     if not lipds:
         if 'lipd_dict' not in globals():
-            readLipd()
+            openLipd()
             
         ts_list = lpd.extractTs(lipd_dict)
         
@@ -131,7 +130,7 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
     
     # Get the dictionary of LiPD files
     if not lipds and 'lipd_dict' not in globals():
-        readLipd()
+        openLipd()
         
     # Initialize the various lists
     lat = []
@@ -206,7 +205,7 @@ def mapLipd(timeseries="", countries = True, counties = False, \
     # Make sure there are LiPD files to plot
     if not timeseries:
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries = LipdUtils.getTs(ts_list)    
 
     # Get latitude/longitude
@@ -269,7 +268,7 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
     """
     if not timeseries:
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries = LipdUtils.getTs(ts_list) 
 
     y = np.array(timeseries['paleoData_values'], dtype = 'float64')
@@ -380,7 +379,7 @@ def histTs(timeseries = "", bins = None, hist = True, \
     """
     if not timeseries:
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries = LipdUtils.getTs(ts_list) 
 
     # Get the values
@@ -466,7 +465,7 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
 
     if not timeseries:
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries = LipdUtils.getTs(ts_list) 
 
     # get the necessary metadata
@@ -617,7 +616,7 @@ def statsTs(timeseries=""):
     """
     if not timeseries:
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries = LipdUtils.getTs(ts_list) 
 
     # get the values
@@ -667,12 +666,12 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
     """
     if not timeseries1:
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries1 = LipdUtils.getTs(ts_list)
         
     if not timeseries2:
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries2 = LipdUtils.getTs(ts_list)    
 
     # Get the first time and paleoData values
@@ -777,7 +776,7 @@ def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
     """
     if not timeseries:
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
 
     # Get the values
@@ -817,7 +816,7 @@ def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
     """
     if not timeseries:
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
 
     # Get the values
@@ -860,7 +859,7 @@ def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
     """
     if not timeseries:
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
 
     # get the values
@@ -897,7 +896,7 @@ def segmentTs(timeseries = "", factor = 2):
     
     if not timeseries:
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
         
     # Get the values
@@ -1064,7 +1063,7 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
     # Get a timeseries
     if not timeseries: 
         if not 'ts_list' in globals():
-            extractTs()
+            fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
     
     # Raise an error if age or year not in the keys
@@ -1383,6 +1382,29 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
         
         # Make the plot if asked
         if fig is True:
+            
+            if type(wwaplot_default) is dict and type(psdplot_default)is dict:
+                if 'figsize' in wwaplot_default.keys():
+                    figsize = wwaplot_default['figsize']
+                elif 'figsize' in psdplot_default.keys():
+                    figsize = psdplot_default['figsize']
+                else: figsize = [20,8]    
+            elif type(wwaplot_default) is dict:
+                if 'figsize' in wwaplot_default.keys():
+                    figsize = wwaplot_default['figsize']
+                else:
+                    figsize = [20,8]
+            elif type(psdplot_default) is dict:
+                if 'figsize' in psdplot_default.keys():
+                    figsize = psdplot_default['figsize']
+                else:
+                    figsize = [20,8]
+            else: figsize = [20,8]    
+                    
+            
+            fig = plt.figure(figsize = figsize)
+            ax1 = plt.subplot2grid((1,3),(0,0), colspan =2)
+        
             # Set the plot default
             if type(wwaplot_default) is dict:
                 dict_in = wwaplot_default
@@ -1395,14 +1417,14 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'ylim':None,
                                  'xticks':None,
                                  'xlabels':None,
-                                 'figsize':[20,8],
+                                 'figsize':figsize,
                                  'clr_map':'OrRd',
                                  'cbar_drawedges':False,
                                  'cone_alpha':0.5,
                                  'plot_signif':True,
                                  'signif_style':'contour',
                                  'plot_cone':True,
-                                 'ax':None,
+                                 'ax':ax1,
                                  'xlabel': label.upper()[0]+label[1:]+'('+s+')',
                                  'ylabel': 'Period ('+ageunits+')'}
                 for key, value in dict_in.items():
@@ -1419,18 +1441,21 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'ylim':None,
                                  'xticks':None,
                                  'xlabels':None,
-                                 'figsize':[20,8],
+                                 'figsize':figsize,
                                  'clr_map':'OrRd',
                                  'cbar_drawedges':False,
                                  'cone_alpha':0.5,
                                  'plot_signif':True,
                                  'signif_style':'contour',
                                  'plot_cone':True,
-                                 'ax':None,
+                                 'ax':ax1,
                                  'xlabel': label.upper()[0]+label[1:]+'('+s+')',
                                  'ylabel': 'Period ('+ageunits+')'}
-            
                 
+            Spectral.plot_wwa(wwa, freqs, tau, **wwaplot_default)    
+            
+            ax2 = plt.subplot2grid((1,3),(0,2))
+            
             if type(psdplot_default) is dict:
                 dict_in = psdplot_default
                 
@@ -1439,12 +1464,12 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'xticks':None,
                                  'xlim':None,
                                  'ylim':None,
-                                 'figsize':[20,8],
+                                 'figsize':figsize,
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None,
+                                 'ax':ax2,
                                  'xlabel':'Period ('+ageunits+')',
                                  'ylabel':'Spectral Density'}        
                                 
@@ -1459,31 +1484,16 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'xticks':None,
                                  'xlim':None,
                                  'ylim':None,
-                                 'figsize':[20,8],
+                                 'figsize':figsize,
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None,
+                                 'ax':ax2,
                                  'xlabel':'Period ('+ageunits+')',
                                  'ylabel':'Spectral Density'} 
-               
             
-            if 'figsize' in wwaplot_default.keys():
-                figsize = wwaplot_default['figsize']
-            elif 'figsize' in psdplot_default.keys():
-                figsize = psdplot_default['figsize']
-            else:
-                figsize = [20,8]
-                
-               
-            fig = plt.figure(figsize = figsize)
-            
-            ax1 = plt.subplot2grid((1,3),(0,0), colspan =2)
-            Spectral.plot_wwa(wwa, freqs, tau, **wwaplot_default,ax=ax1)
-            
-            ax2 = plt.subplot2grid((1,3),(0,2))
-            Spectral.plot_psd(psd,freqs,**psdplot_default,ax=ax2)
+            Spectral.plot_psd(psd,freqs,**psdplot_default)
             
             if saveFig is True:
                 LipdUtils.saveFigure(timeseries['dataSetName']+'_PSDplot',format,dir)
