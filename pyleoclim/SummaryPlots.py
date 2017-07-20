@@ -185,9 +185,9 @@ def TsData(timeseries, x_axis=""):
     x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
 
     # Remove NaNs
-    index = np.where(~np.isnan(y))[0]
-    x = x[index]
-    y = y[index]
+    y_temp = np.copy(y)
+    y = y[~np.isnan(y_temp)]
+    x = x[~np.isnan(y_temp)]
 
     # Grab the archiveType
     archiveType = LipdUtils.LipdToOntology(timeseries["archiveType"])
