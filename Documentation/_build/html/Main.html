@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Main Functions &#8212; Pyleoclim 0.3.0 documentation</title>
+    <title>Main Functions &#8212; Pyleoclim 0.3.1 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0',
+        VERSION:     '0.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.1 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -113,15 +113,14 @@ objects, one for each of the observations.</p>
 the selected LiPD files, which need to be passed to Pyleoclim along with the path
 to the directory containing the LiPD files.</p>
 <dl class="docutils">
-<dt>This is done through the functions pyleoclim.readLiPD() and pyleoclim.extracTs(),</dt>
+<dt>This is done through the functions pyleoclim.openLiPD() and pyleoclim.fetchTs(),</dt>
 <dd>which are lightweight versions of their counterparts in the LiPD utilities:</dd>
 </dl>
 <dl class="function">
-<dt id="pyleoclim.readLipd">
-<code class="descclassname">pyleoclim.</code><code class="descname">readLipd</code><span class="sig-paren">(</span><em>usr_path=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.readLipd" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.openLipd">
+<code class="descclassname">pyleoclim.</code><code class="descname">openLipd</code><span class="sig-paren">(</span><em>usr_path=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.openLipd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read Lipd files into a dictionary</p>
-<p>This function is based on the function of the same name in the LiPD utilities.
-Sets the dictionary as global variable so that it doesn’t have to be provided
+<p>Sets the dictionary as global variable so that it doesn’t have to be provided
 as an argument for every function.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -132,8 +131,8 @@ as an argument for every function.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyleoclim.extractTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">extractTs</code><span class="sig-paren">(</span><em>lipds=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.extractTs" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.fetchTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">fetchTs</code><span class="sig-paren">(</span><em>lipds=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.fetchTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract timeseries dictionary</p>
 <p>This function is based on the function of the same name in the LiPD utilities.
 Set the dictionary as a global variable so that it doesn’t have to be
@@ -504,6 +503,27 @@ eps (real): a threshold to determine if the standard deviation is too close to z
 <p>&#64;author: fzhu</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="pyleoclim.segmentTs">
+<code class="descclassname">pyleoclim.</code><code class="descname">segmentTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>factor=2</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.segmentTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Divides a time series into several segments using a gap detection algorithm</p>
+<p>Gap detection rule: If the time interval between some two data points is
+larger than some factor times the mean resolution of the timeseries, then
+a brak point is applied and the timseries is divided.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">timeseries: a LiPD timeseries object
+factor (float): factor to adjust the threshold. threshold = factor*dt_mean.</p>
+<blockquote class="last">
+<div>Default is 2.</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>seg_y (list) - a list of several segments with potentially different length
+seg_t (list) - A list of the time values for each y segment. 
+n_segs (int) - the number of segments</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="analysis-in-the-frequency-domain">
 <h3>Analysis in the frequency domain<a class="headerlink" href="#analysis-in-the-frequency-domain" title="Permalink to this headline">¶</a></h3>
@@ -674,7 +694,7 @@ contains some functions to extract information about a timeseries object.</p>
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
