@@ -1,0 +1,330 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pyleoclim.Map &#8212; Pyleoclim 0.3.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.3.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyleoclim.Map</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Thu Apr 21 11:00:07 2016</span>
+
+<span class="sd">@author: deborahkhider</span>
+
+<span class="sd">Mapping functions.</span>
+
+<span class="sd">Uses the LiPD files directly rather than timeseries objects</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.basemap</span> <span class="k">import</span> <span class="n">Basemap</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+
+<div class="viewcode-block" id="mapAll"><a class="viewcode-back" href="../../Map.html#pyleoclim.Map.mapAll">[docs]</a><span class="k">def</span> <span class="nf">mapAll</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">criteria</span><span class="p">,</span> <span class="n">projection</span> <span class="o">=</span> <span class="s1">&#39;robin&#39;</span><span class="p">,</span> <span class="n">lat_0</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">lon_0</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>\
+           <span class="n">llcrnrlat</span><span class="o">=-</span><span class="mi">90</span><span class="p">,</span> <span class="n">urcrnrlat</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">llcrnrlon</span><span class="o">=-</span><span class="mi">180</span><span class="p">,</span> <span class="n">urcrnrlon</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> \
+           <span class="n">countries</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">counties</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">rivers</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>\
+           <span class="n">figsize</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">ax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>\
+           <span class="n">background</span> <span class="o">=</span> <span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">markersize</span> <span class="o">=</span> <span class="mi">50</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Map the location of all lat/lon according to some criteria </span>
+<span class="sd">    </span>
+<span class="sd">    Map the location of all lat/lon according to some criteria. The choice of </span>
+<span class="sd">    plotting color/marker is passed through palette according to unique </span>
+<span class="sd">    criteria (e.g., record name, archive type, proxy observation type).</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        lat (list): a list of latitude.</span>
+<span class="sd">        lon (list): a list of longitude.</span>
+<span class="sd">        criteria (list): a list of criteria for plotting purposes. For instance,</span>
+<span class="sd">            a map by the types of archive present in the dataset or proxy</span>
+<span class="sd">            observations.</span>
+<span class="sd">        projection (string): the map projection. Refers to the Basemap</span>
+<span class="sd">            documentation for a list of available projections. Only projections</span>
+<span class="sd">            supporting setting the map center with a single lat/lon or with</span>
+<span class="sd">            the coordinates of the rectangle are currently supported. </span>
+<span class="sd">            Default is to use a Robinson projection.</span>
+<span class="sd">        lat_0, lon_0 (float): the center coordinates for the map. Default is</span>
+<span class="sd">            mean latitude/longitude in the list. </span>
+<span class="sd">            If the chosen projection doesn&#39;t support it, Basemap will</span>
+<span class="sd">            ignore the given values.</span>
+<span class="sd">        llcrnrlat, urcrnrlat, llcrnrlon, urcrnrlon (float): The coordinates</span>
+<span class="sd">            of the two opposite corners of the rectangle.</span>
+<span class="sd">        countries (bool): Draws the countries border. Defaults is off (False). </span>
+<span class="sd">        counties (bool): Draws the USA counties. Default is off (False).</span>
+<span class="sd">        rivers (bool): Draws the rivers. Default is off (False).</span>
+<span class="sd">        states (bool): Draws the American and Australian states borders. </span>
+<span class="sd">            Default is off (False).</span>
+<span class="sd">        background (string): Plots one of the following images on the map: </span>
+<span class="sd">            bluemarble, etopo, shadedrelief, or none (filled continents). </span>
+<span class="sd">            Default is none.</span>
+<span class="sd">        scale (float): Useful to downgrade the original image resolution to</span>
+<span class="sd">            speed up the process. Default is 0.5.</span>
+<span class="sd">        palette (dict): A dictionary of plotting color/marker by criteria. The</span>
+<span class="sd">            keys should correspond to ***unique*** criteria with a list of </span>
+<span class="sd">            associated values. The list should be in the format </span>
+<span class="sd">            [&#39;color&#39;, &#39;marker&#39;].</span>
+<span class="sd">        markersize (int): The size of the marker.</span>
+<span class="sd">        figsize (list): the size for the figure</span>
+<span class="sd">        ax: Return as axis instead of figure (useful to integrate plot into a subplot) </span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The figure       </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Check that the lists have the same length and convert to numpy arrays</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">criteria</span><span class="p">):</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Latitude, Longitude, and criteria list must be the same&quot;</span> <span class="o">+</span>\
+                 <span class="s2">&quot;length&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Grab the center latitude/longitude </span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lat_0</span><span class="p">:</span>
+        <span class="n">lat_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lon_0</span><span class="p">:</span>
+        <span class="n">lon_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lon</span><span class="p">))</span>
+        
+    <span class="c1"># If palette is not given, then make a random one.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">palette</span><span class="p">:</span>
+        <span class="n">marker_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="s1">&#39;v&#39;</span><span class="p">,</span><span class="s1">&#39;^&#39;</span><span class="p">,</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span><span class="s1">&#39;8&#39;</span><span class="p">,</span><span class="s1">&#39;s&#39;</span><span class="p">,</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;*&#39;</span><span class="p">,</span><span class="s1">&#39;h&#39;</span><span class="p">,</span><span class="s1">&#39;D&#39;</span><span class="p">]</span>
+        <span class="n">color_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;#FFD600&#39;</span><span class="p">,</span><span class="s1">&#39;#FF8B00&#39;</span><span class="p">,</span><span class="s1">&#39;k&#39;</span><span class="p">,</span><span class="s1">&#39;#86CDFA&#39;</span><span class="p">,</span><span class="s1">&#39;#00BEFF&#39;</span><span class="p">,</span><span class="s1">&#39;#4169E0&#39;</span><span class="p">,</span>\
+                 <span class="s1">&#39;#8A4513&#39;</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="s1">&#39;#FF1492&#39;</span><span class="p">,</span><span class="s1">&#39;#32CC32&#39;</span><span class="p">,</span><span class="s1">&#39;#FFD600&#39;</span><span class="p">,</span><span class="s1">&#39;#2F4F4F&#39;</span><span class="p">]</span>
+        <span class="c1"># select at random for unique entries in criteria</span>
+        <span class="n">marker</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">marker_list</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">criteria</span><span class="p">)))]</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">color_list</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">criteria</span><span class="p">)))]</span>
+        <span class="n">crit_unique</span> <span class="o">=</span> <span class="p">[</span><span class="n">crit</span> <span class="k">for</span> <span class="n">crit</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">criteria</span><span class="p">)]</span>
+        <span class="c1">#initialize the palette</span>
+        <span class="n">palette</span> <span class="o">=</span> <span class="p">{</span><span class="n">crit_unique</span><span class="p">[</span><span class="mi">0</span><span class="p">]:[</span><span class="n">color</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">marker</span><span class="p">[</span><span class="mi">0</span><span class="p">]]}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">crit_unique</span><span class="p">)):</span>
+            <span class="n">d1</span> <span class="o">=</span> <span class="p">{</span><span class="n">crit_unique</span><span class="p">[</span><span class="n">i</span><span class="p">]:[</span><span class="n">color</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">marker</span><span class="p">[</span><span class="n">i</span><span class="p">]]}</span>
+            <span class="n">palette</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">d1</span><span class="p">)</span>
+            
+    <span class="c1">#Make the figure</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ax</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">Basemap</span><span class="p">(</span><span class="n">projection</span> <span class="o">=</span> <span class="n">projection</span><span class="p">,</span> <span class="n">lat_0</span> <span class="o">=</span> <span class="n">lat_0</span><span class="p">,</span> <span class="n">lon_0</span> <span class="o">=</span> <span class="n">lon_0</span><span class="p">,</span>\
+                  <span class="n">llcrnrlat</span><span class="o">=</span><span class="n">llcrnrlat</span><span class="p">,</span> <span class="n">urcrnrlat</span><span class="o">=</span><span class="n">urcrnrlat</span><span class="p">,</span>\
+                  <span class="n">llcrnrlon</span><span class="o">=</span><span class="n">llcrnrlon</span><span class="p">,</span> <span class="n">urcrnrlon</span><span class="o">=</span><span class="n">urcrnrlon</span><span class="p">)</span>
+    <span class="nb">map</span><span class="o">.</span><span class="n">drawcoastlines</span><span class="p">()</span>
+    
+    <span class="c1"># Background</span>
+    <span class="k">if</span> <span class="n">background</span> <span class="o">==</span> <span class="s2">&quot;shadedrelief&quot;</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">shadedrelief</span><span class="p">(</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">background</span> <span class="o">==</span> <span class="s2">&quot;bluemarble&quot;</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">bluemarble</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">background</span> <span class="o">==</span> <span class="s2">&quot;etopo&quot;</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">etopo</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">background</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">fillcontinents</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;0.9&#39;</span><span class="p">,</span> <span class="n">lake_color</span> <span class="o">=</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Enter either &#39;shadedrelief&#39;,&#39;bluemarble&#39;,&#39;etopo&#39;,or&#39;None&#39;&quot;</span><span class="p">)</span>
+            
+    <span class="c1">#Other extra information</span>
+    <span class="k">if</span> <span class="n">countries</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">drawcountries</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">counties</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">drawcounties</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">rivers</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">drawrivers</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">states</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">drawrivers</span><span class="p">()</span>
+    
+    <span class="c1"># Get the indexes by criteria</span>
+    <span class="k">for</span> <span class="n">crit</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">criteria</span><span class="p">):</span>
+        <span class="c1"># Grab the indices with same criteria</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">crit</span><span class="p">]</span>
+        <span class="n">X</span><span class="p">,</span><span class="n">Y</span> <span class="o">=</span><span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lon</span><span class="p">)[</span><span class="n">index</span><span class="p">],</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lat</span><span class="p">)[</span><span class="n">index</span><span class="p">])</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span>
+                    <span class="n">s</span><span class="o">=</span> <span class="n">markersize</span><span class="p">,</span>
+                    <span class="n">facecolor</span> <span class="o">=</span> <span class="n">palette</span><span class="p">[</span><span class="n">crit</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">marker</span> <span class="o">=</span> <span class="n">palette</span><span class="p">[</span><span class="n">crit</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">zorder</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+                    <span class="n">label</span> <span class="o">=</span> <span class="n">crit</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.25</span><span class="p">,</span><span class="mf">0.5</span><span class="p">),</span><span class="n">scatterpoints</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+               <span class="n">frameon</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">fontsize</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">markerscale</span> <span class="o">=</span> <span class="mf">0.7</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">ax</span>    </div>
+        
+<div class="viewcode-block" id="mapOne"><a class="viewcode-back" href="../../Map.html#pyleoclim.Map.mapOne">[docs]</a><span class="k">def</span> <span class="nf">mapOne</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">projection</span> <span class="o">=</span> <span class="s1">&#39;ortho&#39;</span><span class="p">,</span> <span class="n">lat_0</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">lon_0</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>\
+           <span class="n">llcrnrlat</span><span class="o">=-</span><span class="mi">90</span><span class="p">,</span> <span class="n">urcrnrlat</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">llcrnrlon</span><span class="o">=-</span><span class="mi">180</span><span class="p">,</span> <span class="n">urcrnrlon</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span>\
+           <span class="n">countries</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">counties</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> \
+           <span class="n">rivers</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">background</span> <span class="o">=</span> <span class="s2">&quot;shadedrelief&quot;</span><span class="p">,</span>\
+           <span class="n">scale</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">markersize</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s2">&quot;ro&quot;</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> \
+           <span class="n">ax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,):</span>
+    <span class="sd">&quot;&quot;&quot; Map one location on the globe</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        lat (float): a float number representing latitude</span>
+<span class="sd">        lon (float): a float number representing longitude</span>
+<span class="sd">        projection (string): the map projection. Refers to the Basemap</span>
+<span class="sd">            documentation for a list of available projections. Only projections</span>
+<span class="sd">            supporting setting the map center with a single lat/lon or with</span>
+<span class="sd">            the coordinates of the rectangle are currently supported. </span>
+<span class="sd">            Default is to use a Robinson projection.</span>
+<span class="sd">        lat_0, lon_0 (float): the center coordinates for the map. Default is</span>
+<span class="sd">            mean latitude/longitude in the list. </span>
+<span class="sd">            If the chosen projection doesn&#39;t support it, Basemap will</span>
+<span class="sd">            ignore the given values.</span>
+<span class="sd">        llcrnrlat, urcrnrlat, llcrnrlon, urcrnrlon (float): The coordinates</span>
+<span class="sd">            of the two opposite corners of the rectangle.</span>
+<span class="sd">        countries (bool): Draws the countries border. Defaults is off (False). </span>
+<span class="sd">        counties (bool): Draws the USA counties. Default is off (False).</span>
+<span class="sd">        rivers (bool): Draws the rivers. Default is off (False).</span>
+<span class="sd">        states (bool): Draws the American and Australian states borders. </span>
+<span class="sd">            Default is off (False).</span>
+<span class="sd">        background (string): Plots one of the following images on the map: </span>
+<span class="sd">            bluemarble, etopo, shadedrelief, or none (filled continents). </span>
+<span class="sd">            Default is none.</span>
+<span class="sd">        scale (float): Useful to downgrade the original image resolution to</span>
+<span class="sd">            speed up the process. Default is 0.5.</span>
+<span class="sd">        markersize (int): The size of the marker.</span>
+<span class="sd">        marker (str or list): color and type of marker. </span>
+<span class="sd">        figsize (list): the size for the figure</span>
+<span class="sd">        ax: Return as axis instead of figure (useful to integrate plot into a subplot) </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lon_0</span><span class="p">:</span>
+        <span class="n">lon_0</span> <span class="o">=</span> <span class="n">lon</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">lat_0</span><span class="p">:</span>
+        <span class="n">lat_0</span> <span class="o">=</span> <span class="n">lat</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ax</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">Basemap</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="n">projection</span><span class="p">,</span> <span class="n">lat_0</span><span class="o">=</span><span class="n">lat_0</span><span class="p">,</span> <span class="n">lon_0</span><span class="o">=</span><span class="n">lon_0</span><span class="p">,</span>
+                  <span class="n">llcrnrlat</span><span class="o">=</span><span class="n">llcrnrlat</span><span class="p">,</span> <span class="n">urcrnrlat</span><span class="o">=</span><span class="n">urcrnrlat</span><span class="p">,</span>\
+                  <span class="n">llcrnrlon</span><span class="o">=</span><span class="n">llcrnrlon</span><span class="p">,</span> <span class="n">urcrnrlon</span><span class="o">=</span><span class="n">urcrnrlon</span><span class="p">)</span>
+    
+    <span class="nb">map</span><span class="o">.</span><span class="n">drawcoastlines</span><span class="p">()</span>
+    
+    <span class="c1"># Background</span>
+    <span class="k">if</span> <span class="n">background</span> <span class="o">==</span> <span class="s2">&quot;shadedrelief&quot;</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">shadedrelief</span><span class="p">(</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">background</span> <span class="o">==</span> <span class="s2">&quot;bluemarble&quot;</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">bluemarble</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">background</span> <span class="o">==</span> <span class="s2">&quot;etopo&quot;</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">etopo</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">background</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">fillcontinents</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;0.9&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Enter either &#39;shadedrelief&#39;,&#39;bluemarble&#39;,&#39;etopo&#39;,or&#39;None&#39;&quot;</span><span class="p">)</span>
+            
+    <span class="c1">#Other extra information</span>
+    <span class="k">if</span> <span class="n">countries</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">drawcountries</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">counties</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">drawcounties</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">rivers</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">drawrivers</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">states</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">map</span><span class="o">.</span><span class="n">drawrivers</span><span class="p">()</span>
+    
+    <span class="c1">#Plot the point</span>
+    <span class="n">X</span><span class="p">,</span><span class="n">Y</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span><span class="n">lat</span><span class="p">)</span>
+    <span class="nb">map</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">s</span><span class="o">=</span><span class="n">markersize</span><span class="p">,</span><span class="n">facecolor</span><span class="o">=</span><span class="n">marker</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> 
+    
+    <span class="k">return</span> <span class="n">ax</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Pyleoclim</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Introduction.html">Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Main.html">Main Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Map.html">Mapping Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Plot.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Stats.html">Statistics Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Timeseries.html">Timeseries Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LipdUtils.html">LiPD Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SummaryPlots.html">Summary Plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Spectral.html">Spectral Functions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  <li><a href="../pyleoclim.html">pyleoclim</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

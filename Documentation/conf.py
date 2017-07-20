@@ -34,8 +34,9 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.mathjax',
-    'sphinxcontrib.napoleon',
-]
+    'sphinx.ext.githubpages']
+    #'sphinxcontrib.napoleon',
+    #]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -358,3 +359,10 @@ epub_exclude_files = ['search.html']
 
 # If false, no index is generated.
 #epub_use_index = True
+
+#---- Read the Docs output
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
+if on_rtd:
+    html_theme = 'sphinxdoc'
+else:
+    html_theme = 'sphinxdoc'
