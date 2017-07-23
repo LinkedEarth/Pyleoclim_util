@@ -1192,33 +1192,28 @@ class WaveletAnalysis(object):
             tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
 
         '''
-        # delete NaNs if there is any
-        ys_tmp = np.copy(ys)
-        ys = ys[~np.isnan(ys_tmp)]
-        ts = ts[~np.isnan(ys_tmp)]
-        ts_tmp = np.copy(ts)
-        ys = ys[~np.isnan(ts_tmp)]
-        ts = ts[~np.isnan(ts_tmp)]
-
-        if np.mean(np.diff(ts)) < 0:
-            warnings.warn("The original time axis is decreasing, and it has been reversed.")
-            ys = ys[::-1]
-            ts = ts[::-1]
+        ys, ts = Timeseries.clean_ts(ys, ts)
 
         if tau is None:
             med_res = np.size(ts) // np.median(np.diff(ts))
             tau = np.linspace(np.min(ts), np.max(ts), np.max([np.size(ts)//10, 50, med_res]))
 
+        elif np.isnan(tau).any():
+            warnings.warn("The input tau contains some NaNs." +
+                          "It will be regenerated using the boundarys of the time axis of the time series with NaNs deleted," +
+                          "with the length of the size of the input tau.")
+            tau = np.linspace(np.min(ts), np.max(ts), np.size(tau))
+
         elif np.min(tau) < np.min(ts) and np.max(tau) > np.max(ts):
-            warnings.warn("tau should be within the time span of the time series. \
-                          Note that sometimes if the leading points of the time series are NaNs, \
-                          they will be deleted and cause np.min(tau) < np.min(ts). \
-                          A new tau with the same size of the input tau will be generated.")
+            warnings.warn("tau should be within the time span of the time series." +
+                          "Note that sometimes if the leading points of the time series are NaNs," +
+                          "they will be deleted and cause np.min(tau) < np.min(ts)." +
+                          "A new tau with the same size of the input tau will be generated.")
             tau = np.linspace(np.min(ts), np.max(ts), np.size(tau))
 
         elif np.min(tau) not in ts or np.max(tau) not in ts:
-            warnings.warn("The boundaries of tau are not exactly on two of the time axis points, \
-                          and it will be adjusted to be so.")
+            warnings.warn("The boundaries of tau are not exactly on two of the time axis points," +
+                          "and it will be adjusted to be so.")
             tau_lb = np.min(ts[ts > np.min(tau)])
             tau_ub = np.max(ts[ts < np.max(tau)])
             tau = np.linspace(tau_lb, tau_ub, np.size(tau))
@@ -1527,7 +1522,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
     if nMC >= 1:
         tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
 
-        for i in tqdm(range(nMC), desc='Monte-Carlo simulations...'):
+        for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             r = wa.ar1_model(ts_cut, tauest)
             wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend)
 
@@ -1586,7 +1581,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     if nMC >= 1:
         tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
 
-        for i in tqdm(range(nMC), desc='Monte-Carlo simulations...'):
+        for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             r = wa.ar1_model(ts_cut, tauest)
             wwa_red, _, _, _, _, _, Neffs_red, _ = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
                                                        detrend=detrend, method=method)
@@ -1868,7 +1863,7 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, period_ticks=None, psd_li
 
 def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=200, nproc=8, detrend=False, anti_alias=False,
                  period_ticks=None, ts_color=None, title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
-                 psd_lmstyle='-', psd_lim=None):
+                 psd_lmstyle='-', psd_lim=None, period_I=[1/8, 1/2], period_D=[1/200, 1/20]):
     """ Plot the time series with the wavelet analysis and psd
 
     Args:
@@ -1889,6 +1884,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
         wwa_ylabel (str): label for y-axis in the wwa plot
         psd_lmstyle (str): the line style in the psd plot
         psd_lim (list): the limits for psd
+        period_I, period_D (list): the ranges for beta estimation
 
     Returns:
         fig (figure): the summary plot
@@ -1907,12 +1903,10 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     # plot the time series
     sns.set(style="ticks", font_scale=1.5)
     ax1 = plt.subplot(gs[0:1, :-3])
-    plt.plot(ts, ys, '-', label='interpolation', color=ts_color)
-    plt.plot(ts, ys, 'o', label='original', color=ts_color)
+    plt.plot(ts, ys, '-o', color=ts_color)
     plt.title(title, **title_font)
     plt.xlim([np.min(ts), np.max(ts)])
     plt.ylabel(ts_ylabel)
-    plt.legend(fontsize=16)
     plt.grid()
     plt.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
 
@@ -1932,16 +1926,17 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     sns.set(style="ticks", font_scale=1.5)
     ax3 = plt.subplot(gs[1:4, 9:])
     psd, freqs, psd_ar1_q95 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC, anti_alias=anti_alias)
-    plot_psd(psd, freqs, plot_ar1=True, psd_ar1_q95=psd_ar1_q95, period_ticks=period_ticks[period_ticks<np.max(coi)],
+    plot_psd(psd, freqs, plot_ar1=True, psd_ar1_q95=psd_ar1_q95, period_ticks=period_ticks[period_ticks < np.max(coi)],
              period_lim=[np.min(period_ticks), np.max(coi)], psd_lim=psd_lim,
              lmstyle=psd_lmstyle, ax=ax3, period_label='', label='Estimated spectrum', vertical=True)
 
-    beta_1, f_binned_1, psd_binned_1, Y_reg_1 = beta_estimation(psd, freqs, 1/8, 1/2)
-    beta_2, f_binned_2, psd_binned_2, Y_reg_2 = beta_estimation(psd, freqs, 1/200, 1/20)
-    ax3.plot(Y_reg_1, 1/f_binned_1, color='k', label=r'$\beta_I$ = {:.2f}, '.format(beta_1) + r'$\beta_D$ = {:.2f}'.format(beta_2))
+    beta_1, f_binned_1, psd_binned_1, Y_reg_1 = beta_estimation(psd, freqs, period_I[0], period_I[1])
+    beta_2, f_binned_2, psd_binned_2, Y_reg_2 = beta_estimation(psd, freqs, period_D[0], period_D[1])
+    ax3.plot(Y_reg_1, 1/f_binned_1, color='k',
+             label=r'$\beta_I$ = {:.2f}'.format(beta_1) + ', ' + r'$\beta_D$ = {:.2f}'.format(beta_2))
     ax3.plot(Y_reg_2, 1/f_binned_2, color='k')
     plt.tick_params(axis='y', which='both', labelleft='off')
-    plt.legend(fontsize=15)
+    plt.legend(fontsize=15, bbox_to_anchor=(0, 1.2), loc='upper left', ncol=1)
 
     return fig
 
