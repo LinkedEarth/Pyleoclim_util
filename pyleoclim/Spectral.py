@@ -1279,18 +1279,41 @@ class WaveletAnalysis(object):
         xw_coherence = np.ndarray(shape=(nt, nf))
 
         def Smooth_time(coeff, c1):
-            return None
+            if type(coeff) is complex:
+                S_time = np.ndarray(shape=(nt, nf), dtype='complex')
+            else:
+                S_time = np.ndarray(shape=(nt, nf))
+
+            for i, s in enumerate(omega):
+                S_time[:, i] = signal.convolve(coeff[:, i], c1**(-.5*(tau/s)**2), mode='same')
+
+            return S_time
 
         def Smooth_scale(coeff, c2):
-            return None
+            def rect(x):
+                ''' Rectangle function
+
+                Reference:
+                    http://mathworld.wolfram.com/RectangleFunction.html
+                '''
+                return np.where(np.abs(x) <= 0.5, 1, 0)
+
+            if type(coeff) is complex:
+                S_scale = np.ndarray(shape=(nt, nf), dtype='complex')
+            else:
+                S_scale = np.ndarray(shape=(nt, nf))
+
+            for i, n in enumerate(tau):
+                S_scale[i, :] = signal.convolve(coeff[i, :], c2*rect(0.6*freqs), mode='same')
+
+            return S_scale
 
         def Smoothing(coeff, c1, c2):
             S = Smooth_scale(Smooth_time(coeff, c1), c2)
             return S
 
-        for j in range(nf):
-            xw_coherence[:, j] = np.abs(Smoothing(xwt[:, j]/omega[j], c1, c2))**2 / \
-                Smoothing(power1[:, j]/omega[j], c1, c2) / Smoothing(power2[:, j]/omega[j], c1, c2)
+        xw_coherence = np.abs(Smoothing(xwt/omega, c1, c2))**2 / \
+            Smoothing(power1/omega, c1, c2) / Smoothing(power2/omega, c1, c2)
 
         return xw_coherence
 
@@ -1945,3 +1968,4 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
 wa = WaveletAnalysis()
 beta_estimation = wa.beta_estimation
 tau_estimation = wa.tau_estimation
+cross_coherence = wa.cross_coherence
