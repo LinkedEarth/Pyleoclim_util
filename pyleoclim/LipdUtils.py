@@ -69,20 +69,27 @@ def saveFigure(name, format="eps",dir=""):
 The following functions handle the LiPD files
 """
     
-def enumerateLipds():
+def enumerateLipds(lipds):
     """Enumerate the LiPD files loaded in the workspace
     
+    Args:
+        lipds (dict): A dictionary of LiPD files. Can be obtained from
+            pyleoclim.readLipd()
+    
     """
-    lipd_in_directory = lpd.getLipdNames()
     print("Below are the available records")
-    for idx, val in enumerate(lipd_in_directory):
+    for idx, val in enumerate(lipds):
         print(idx,': ',val)   
 
-def promptForLipd():
+def promptForLipd(lipds):
     """Prompt for a LiPD file
     
     Ask the user to select a LiPD file from a list
     Use this function in conjunction with enumerateLipds()
+    
+    Args:
+        lipds (dict): A dictionary of LiPD files. Can be obtained from
+            pyleoclim.readLipd()
     
     Returns:
         The index of the LiPD file
@@ -222,21 +229,26 @@ def enumerateTs(timeseries_list):
     for idx,val in enumerate(available_y):
         print(idx,': ',dataSetName[idx], ': ', val)     
 
-def getTs(timeseries_list):
+def getTs(timeseries_list, option = ""):
     """Get a specific timeseries object from a dictionary of timeseries
     
     Args:
         timeseries_list: a  list of available timeseries objects. 
             To use the timeseries loaded upon initiation of the 
             pyleoclim package, use pyleo.time_series.
+        option: An expression to filter the datasets. Uses lipd.filterTs()    
             
     Returns:
-        A single timeseries object 
+        A single timeseries object if not optional filter selected or a filtered
+        list if optional arguments given
         
-    """        
-    enumerateTs(timeseries_list)
-    select_TSO = promptForVariable()
-    timeseries = timeseries_list[select_TSO]
+    """     
+    if not option:
+        enumerateTs(timeseries_list)
+        select_TSO = promptForVariable()
+        timeseries = timeseries_list[select_TSO]
+    else:
+        timeseries = lpd.filterTs(timeseries_list, option)
 
     return timeseries   
 

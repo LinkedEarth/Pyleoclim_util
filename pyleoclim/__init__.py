@@ -274,10 +274,8 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
     y = np.array(timeseries['paleoData_values'], dtype = 'float64')
     x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
 
-    # remove nans
-    y_temp = np.copy(y)
-    y = y[~np.isnan(y_temp)]
-    x = x[~np.isnan(y_temp)]
+    # remove nans and sort time axis
+    y,x = Timeseries.clean_ts(y,x)
 
     # get the markers
     if marker == 'default':
@@ -474,6 +472,9 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
     # get the information about the timeseries
     x,y,archiveType,x_label,y_label = SummaryPlots.TsData(timeseries,
                                                           x_axis=x_axis)
+    
+    # Clean up
+    y,x = Timeseries.clean_ts(y,x)
         
     # Make the figure
     fig = plt.figure(figsize=(11,8))
@@ -518,7 +519,7 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
                color = marker[0],
                marker = marker[1])
     
-    # Plot Age model if any
+    # Spectral analysis
     
     if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
         print("No age or year information available, skipping spectral analysis")
@@ -536,9 +537,7 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
                 x_axis = 'year'
             y = np.array(timeseries['paleoData_values'], dtype = 'float64')
             x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
-            y_temp = np.copy(y)
-            y = y[~np.isnan(y_temp)]
-            x = x[~np.isnan(y_temp)]
+            y,x = Timeseries.clean_ts(y,x)
                    
     # Perform the analysis
     default = {'tau':None,
@@ -682,15 +681,9 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
     y2 = np.array(timeseries2['paleoData_values'], dtype = 'float64')
     x2, label2 = LipdUtils.checkXaxis(timeseries2, x_axis=x_axis)
 
-    # Remove NaNs
-    y1_temp = np.copy(y1)
-    y1 = y1[~np.isnan(y1_temp)]
-    x1 = x1[~np.isnan(y1_temp)]
-
-    y2_temp = np.copy(y2)
-    y2 = y2[~np.isnan(y2_temp)]
-    x2 = x2[~np.isnan(y2_temp)]
-    
+    # Remove NaNs and ordered
+    y1,x1 = Timeseries.clean_ts(y1,x1)
+    y2,x2 = Timeseries.clean_ts(y2,x2)
     
     # Make sure that the series have the same units:
     units1 = timeseries1[label1+'Units']
@@ -713,14 +706,7 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
                 answer = input("The form must be a valid python expression and contain x2!"+
                            "Enter a valid expression: ")        
         else: x2 = eval(answer)  
-        
-    # Make sure these things are actually ordered
-    x1_idx = np.argsort(x1)
-    x2_idx = np.argsort(x2)
-    x1 = x1[x1_idx]
-    y1 = y1[x1_idx]
-    x2 = x2[x2_idx]
-    y2 = y2[x2_idx]    
+          
 
     #Check that the two timeseries have the same lenght and if not interpolate
     if len(y1) != len(y2):
@@ -784,9 +770,7 @@ def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
     x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
 
     #remove nans
-    y_temp = np.copy(y)
-    y = y[~np.isnan(y_temp)]
-    x = x[~np.isnan(y_temp)]
+    y,x = Timeseries.clean_ts(y,x)
     
     #Bin the timeseries:
     bins, binned_values, n, error = Timeseries.bin(x,y, bin_size = bin_size,\
@@ -824,9 +808,7 @@ def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
     x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
 
     #remove nans
-    y_temp = np.copy(y)
-    y = y[~np.isnan(y_temp)]
-    x = x[~np.isnan(y_temp)]
+    y,x = Timeseries.clean_ts(y,x)
 
     #Interpolate the timeseries
     interp_age, interp_values = Timeseries.interp(x,y,interp_step = interp_step,\
@@ -918,9 +900,7 @@ def segmentTs(timeseries = "", factor = 2):
     ts, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
     
     # remove NaNs
-    ys_temp = np.copy(ys)
-    ys = ys[~np.isnan(ys_temp)]
-    ts = ts[~np.isnan(ys_temp)]   
+    ys,ts = Timeseries.clean_ts(ys,ts)   
 
     #segment the timeseries
     seg_y, seg_t, n_segs = Timeseries.ts2segments(ys, ts, factor)
@@ -1099,9 +1079,7 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
     ts, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
     
     # remove NaNs
-    ys_temp = np.copy(ys)
-    ys = ys[~np.isnan(ys_temp)]
-    ts = ts[~np.isnan(ys_temp)]   
+    ys,ts = Timeseries.clean_ts(ys,ts)  
     
     #Get the time units
     s = timeseries[label+"Units"]
