@@ -18,6 +18,7 @@ from scipy.stats.mstats import mquantiles
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
+from matplotlib import gridspec
 
 from pathos.multiprocessing import ProcessingPool as Pool
 from tqdm import tqdm
@@ -1191,33 +1192,28 @@ class WaveletAnalysis(object):
             tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
 
         '''
-        # delete NaNs if there is any
-        ys_tmp = np.copy(ys)
-        ys = ys[~np.isnan(ys_tmp)]
-        ts = ts[~np.isnan(ys_tmp)]
-        ts_tmp = np.copy(ts)
-        ys = ys[~np.isnan(ts_tmp)]
-        ts = ts[~np.isnan(ts_tmp)]
-
-        if np.mean(np.diff(ts)) < 0:
-            warnings.warn("The original time axis is decreasing, and it has been reversed.")
-            ys = ys[::-1]
-            ts = ts[::-1]
+        ys, ts = Timeseries.clean_ts(ys, ts)
 
         if tau is None:
             med_res = np.size(ts) // np.median(np.diff(ts))
             tau = np.linspace(np.min(ts), np.max(ts), np.max([np.size(ts)//10, 50, med_res]))
 
+        elif np.isnan(tau).any():
+            warnings.warn("The input tau contains some NaNs." +
+                          "It will be regenerated using the boundarys of the time axis of the time series with NaNs deleted," +
+                          "with the length of the size of the input tau.")
+            tau = np.linspace(np.min(ts), np.max(ts), np.size(tau))
+
         elif np.min(tau) < np.min(ts) and np.max(tau) > np.max(ts):
-            warnings.warn("tau should be within the time span of the time series. \
-                          Note that sometimes if the leading points of the time series are NaNs, \
-                          they will be deleted and cause np.min(tau) < np.min(ts). \
-                          A new tau with the same size of the input tau will be generated.")
+            warnings.warn("tau should be within the time span of the time series." +
+                          "Note that sometimes if the leading points of the time series are NaNs," +
+                          "they will be deleted and cause np.min(tau) < np.min(ts)." +
+                          "A new tau with the same size of the input tau will be generated.")
             tau = np.linspace(np.min(ts), np.max(ts), np.size(tau))
 
         elif np.min(tau) not in ts or np.max(tau) not in ts:
-            warnings.warn("The boundaries of tau are not exactly on two of the time axis points, \
-                          and it will be adjusted to be so.")
+            warnings.warn("The boundaries of tau are not exactly on two of the time axis points," +
+                          "and it will be adjusted to be so.")
             tau_lb = np.min(ts[ts > np.min(tau)])
             tau_ub = np.max(ts[ts < np.max(tau)])
             tau = np.linspace(tau_lb, tau_ub, np.size(tau))
@@ -1252,7 +1248,7 @@ class WaveletAnalysis(object):
         xw_amplitude = np.sqrt(xwt.real**2 + xwt.imag**2)
         xw_phase = np.arctan2(xwt.imag, xwt.real)
 
-        return xw_amplitude, xw_phase
+        return xwt, xw_amplitude, xw_phase
 
     def cross_coherence(self, coeff1, coeff2, freqs, tau, c1, c2):
         ''' Return the cross wavelet transform.
@@ -1283,18 +1279,41 @@ class WaveletAnalysis(object):
         xw_coherence = np.ndarray(shape=(nt, nf))
 
         def Smooth_time(coeff, c1):
-            return None
+            if type(coeff) is complex:
+                S_time = np.ndarray(shape=(nt, nf), dtype='complex')
+            else:
+                S_time = np.ndarray(shape=(nt, nf))
+
+            for i, s in enumerate(omega):
+                S_time[:, i] = signal.convolve(coeff[:, i], c1**(-.5*(tau/s)**2), mode='same')
+
+            return S_time
 
         def Smooth_scale(coeff, c2):
-            return None
+            def rect(x):
+                ''' Rectangle function
+
+                Reference:
+                    http://mathworld.wolfram.com/RectangleFunction.html
+                '''
+                return np.where(np.abs(x) <= 0.5, 1, 0)
+
+            if type(coeff) is complex:
+                S_scale = np.ndarray(shape=(nt, nf), dtype='complex')
+            else:
+                S_scale = np.ndarray(shape=(nt, nf))
+
+            for i, n in enumerate(tau):
+                S_scale[i, :] = signal.convolve(coeff[i, :], c2*rect(0.6*freqs), mode='same')
+
+            return S_scale
 
         def Smoothing(coeff, c1, c2):
             S = Smooth_scale(Smooth_time(coeff, c1), c2)
             return S
 
-        for j in range(nf):
-            xw_coherence[:, j] = np.abs(Smoothing(xwt[:, j]/omega[j], c1, c2))**2 / \
-                Smoothing(power1[:, j]/omega[j], c1, c2) / Smoothing(power2[:, j]/omega[j], c1, c2)
+        xw_coherence = np.abs(Smoothing(xwt/omega, c1, c2))**2 / \
+            Smoothing(power1/omega, c1, c2) / Smoothing(power2/omega, c1, c2)
 
         return xw_coherence
 
@@ -1526,7 +1545,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
     if nMC >= 1:
         tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
 
-        for i in tqdm(range(nMC), desc='Monte-Carlo simulations...'):
+        for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             r = wa.ar1_model(ts_cut, tauest)
             wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend)
 
@@ -1585,7 +1604,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     if nMC >= 1:
         tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
 
-        for i in tqdm(range(nMC), desc='Monte-Carlo simulations...'):
+        for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             r = wa.ar1_model(ts_cut, tauest)
             wwa_red, _, _, _, _, _, Neffs_red, _ = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
                                                        detrend=detrend, method=method)
@@ -1639,25 +1658,25 @@ def xwt(ys1, ts1, ys2, ts2,
     wwa, phase, Neffs, coeff1 = wwz_func(ys1_cut, ts1_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend)
     wwa, phase, Neffs, coeff2 = wwz_func(ys2_cut, ts2_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend)
 
-    xw_amplitude, xw_phase = wa.cross_wt(coeff1, coeff2, freqs, tau)
+    xwt, xw_amplitude, xw_phase = wa.cross_wt(coeff1, coeff2, freqs, tau)
 
     AR1_q = None
     coi = wa.make_coi(tau)
 
-    return xw_amplitude, xw_phase, freqs, tau, AR1_q, coi
+    return xwt, xw_amplitude, xw_phase, freqs, tau, AR1_q, coi
 
 
-def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_range=None,
+def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
              yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
              cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour',
-             plot_cone=False, ax=None, xlabel='Year', ylabel='Period'):
+             plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical',
+             cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
     """ Plot the wavelet amplitude
 
     Args:
         wwa (array): the weighted wavelet amplitude.
         freqs (array): vector of frequency
         tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-        Neff (int): effective number of points
         AR1_q (array): AR1 simulations
         coi (array): cone of influence
         levels (array): levels of values to plot
@@ -1675,13 +1694,14 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
         ax: Return as axis instead of figure (useful to integrate plot into a subplot)
         xlabel (str): The x-axis label
         ylabel (str): The y-axis label
+        cbar_pad (float): the pad for the colorbar
+        cbar_frac (float): the frac for the colorbar
+        cbar_labelsize (float): the font size of the colorbar label
 
     Returns:
         fig (figure): the 2-D plot of wavelet analysis
 
     """
-    assert isinstance(Neff, int) and Neff >= 1
-
     sns.set(style="ticks", font_scale=2)
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
@@ -1699,8 +1719,6 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
                 max_level = 0.01
             levels = np.linspace(0, max_level, 11)
 
-    frac = 0.15
-    pad = 0.05
     origin = 'lower'
 
     if levels is not None:
@@ -1708,8 +1726,11 @@ def plot_wwa(wwa, freqs, tau, Neff=3, AR1_q=None, coi=None, levels=None, tick_ra
     else:
         plt.contourf(tau, 1/freqs, wwa.T, cmap=clr_map, origin=origin)
 
-    plt.colorbar(drawedges=cbar_drawedges, orientation='vertical', fraction=frac, pad=pad,
-                 ticks=tick_range)
+    cb = plt.colorbar(drawedges=cbar_drawedges, orientation=cbar_orientation, fraction=cbar_frac, pad=cbar_pad,
+                      ticks=tick_range)
+
+    if cbar_labelsize is not None:
+        cb.ax.tick_params(labelsize=cbar_labelsize)
 
     plt.yscale('log', nonposy='clip')
 
@@ -1771,24 +1792,26 @@ def plot_wwadist(wwa, ylim=None):
     return fig
 
 
-def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, ylim=None,
+def plot_psd(psd, freqs, lmstyle=None, linewidth=None, period_ticks=None, psd_lim=None, period_lim=None,
              figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None,
-             psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None,
-             xlabel='Period', ylabel='Spectral Density'):
+             psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False,
+             period_label='Period', psd_label='Spectral Density'):
     """ Plot the wavelet amplitude
 
     Args:
         psd (array): power spectral density
         freqs (array): vector of frequency
-        xticks (list): ticks on x-axis
-        xlim (list): limits for x-axis
+        period_ticks (list): ticks for period
+        psd_lim (list): limits for spectral density axis
+        period_lim (list): limits for period axis
         figsize (list): the size for the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot)
-        xlabel (str): The x-axis label
-        ylabel (str): The y-axis label
+        ax (axis): Return as axis instead of figure (useful to integrate plot into a subplot)
+        vertical (bool): plot in vertical layout or not
+        period_label (str): the label for period
+        psd_label (str): the label for psd
 
     Returns:
-        fig (figure): the 2-D plot of wavelet analysis
+        ax (figure): the 2-D plot of wavelet analysis
 
     """
     sns.set(style="ticks", font_scale=2)
@@ -1796,44 +1819,153 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, xticks=None, xlim=None, y
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
 
-    if lmstyle is not None:
-        plt.plot(1/freqs, psd, lmstyle, linewidth=linewidth, label=label)
-        if plot_ar1:
-            assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
-            plt.plot(1/freqs, psd_ar1_q95, lmstyle, linewidth=linewidth,  label='AR1 95%', color=psd_ar1_color)
+    if vertical:
+        x_data = psd
+        y_data = 1 / freqs
+        x_data_ar1 = psd_ar1_q95
+        y_data_ar1 = 1 / freqs
     else:
-        plt.plot(1/freqs, psd, linewidth=linewidth,  label=label)
+        x_data = 1 / freqs
+        y_data = psd
+        x_data_ar1 = 1 / freqs
+        y_data_ar1 = psd_ar1_q95
+
+    if lmstyle is not None:
+        plt.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label)
         if plot_ar1:
             assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
-            plt.plot(1/freqs, psd_ar1_q95, linewidth=linewidth,  label='AR1 95%', color=psd_ar1_color)
-
-    plt.ylabel(ylabel)
-    plt.xlabel(xlabel)
+            plt.plot(x_data_ar1, y_data_ar1, lmstyle, linewidth=linewidth,  label='AR1 95%', color=psd_ar1_color)
+    else:
+        plt.plot(x_data, y_data, linewidth=linewidth,  label=label)
+        if plot_ar1:
+            assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
+            plt.plot(x_data_ar1, y_data_ar1, linewidth=linewidth,  label='AR1 95%', color=psd_ar1_color)
 
     plt.xscale('log', nonposy='clip')
     plt.yscale('log', nonposy='clip')
 
-    if xlim is not None:
-        plt.xlim(xlim)
+    if vertical:
+        plt.ylabel(period_label)
+        plt.xlabel(psd_label)
 
-    if ylim is not None:
-        plt.ylim(ylim)
+        if period_lim is not None:
+            ax.set_ylim(period_lim)
 
-    if xticks is not None:
-        plt.xticks(xticks)
-        ax.get_xaxis().set_major_formatter(ScalarFormatter())
+        if psd_lim is not None:
+            ax.set_xlim(psd_lim)
+
+        if period_ticks is not None:
+            plt.yticks(period_ticks)
+            ax.get_yaxis().set_major_formatter(ScalarFormatter())
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
+        else:
+            ax.set_aspect('equal')
     else:
-        ax.set_aspect('equal')
+        plt.xlabel(period_label)
+        plt.ylabel(psd_label)
 
-    ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
-    plt.gca().invert_xaxis()
+        if period_lim is not None:
+            ax.set_xlim(period_lim)
+
+        if psd_lim is not None:
+            ax.set_ylim(psd_lim)
+
+        if period_ticks is not None:
+            plt.xticks(period_ticks)
+            ax.get_xaxis().set_major_formatter(ScalarFormatter())
+            ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
+            plt.gca().invert_xaxis()
+        else:
+            ax.set_aspect('equal')
+
     plt.legend()
     plt.grid()
 
     return ax
 
 
+def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=200, nproc=8, detrend=False, anti_alias=False,
+                 period_ticks=None, ts_color=None, title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
+                 psd_lmstyle='-', psd_lim=None, period_I=[1/8, 1/2], period_D=[1/200, 1/20]):
+    """ Plot the time series with the wavelet analysis and psd
+
+    Args:
+        ys (array): a time series
+        ts (array): time axis of the time series
+        freqs (array): vector of frequency
+        tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+        c (float): the decay constant
+        Neff (int): the threshold of the number of effective degree of freedom
+        nproc (int): fake argument, just for convenience
+        detrend (str): 'no' - the original time series is assumed to have no trend;
+                       'linear' - a linear least-squares fit to `ys` is subtracted;
+                       'constant' - the mean of `ys` is subtracted
+        ts_color (str): the color for the time series curve
+        title (str): the title for the time series plot
+        ts_ylabel (str): label for y-axis in the time series plot
+        wwa_xlabel (str): label for x-axis in the wwa plot
+        wwa_ylabel (str): label for y-axis in the wwa plot
+        psd_lmstyle (str): the line style in the psd plot
+        psd_lim (list): the limits for psd
+        period_I, period_D (list): the ranges for beta estimation
+
+    Returns:
+        fig (figure): the summary plot
+
+    """
+    title_font = {'fontname': 'Arial', 'size': '24', 'color': 'black', 'weight': 'normal', 'verticalalignment': 'bottom'}
+
+    if period_ticks is not None:
+        period_ticks = np.asarray(period_ticks)
+
+    gs = gridspec.GridSpec(6, 12)
+    gs.update(wspace=0, hspace=0)
+
+    fig = plt.figure(figsize=(15, 15))
+
+    # plot the time series
+    sns.set(style="ticks", font_scale=1.5)
+    ax1 = plt.subplot(gs[0:1, :-3])
+    plt.plot(ts, ys, '-o', color=ts_color)
+    plt.title(title, **title_font)
+    plt.xlim([np.min(ts), np.max(ts)])
+    plt.ylabel(ts_ylabel)
+    plt.grid()
+    plt.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
+
+    # plot wwa
+    sns.set(style="ticks", font_scale=1.5)
+    ax2 = plt.subplot(gs[1:5, :-3])
+
+    wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = \
+        wwz(ys, ts, freqs=freqs, tau=tau, c=c1, nMC=nMC, nproc=nproc, detrend=detrend)
+
+    plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[np.min(period_ticks), np.max(coi)],
+             plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2,
+             cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
+             )
+
+    # plot psd
+    sns.set(style="ticks", font_scale=1.5)
+    ax3 = plt.subplot(gs[1:4, 9:])
+    psd, freqs, psd_ar1_q95 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC, anti_alias=anti_alias)
+    plot_psd(psd, freqs, plot_ar1=True, psd_ar1_q95=psd_ar1_q95, period_ticks=period_ticks[period_ticks < np.max(coi)],
+             period_lim=[np.min(period_ticks), np.max(coi)], psd_lim=psd_lim,
+             lmstyle=psd_lmstyle, ax=ax3, period_label='', label='Estimated spectrum', vertical=True)
+
+    beta_1, f_binned_1, psd_binned_1, Y_reg_1 = beta_estimation(psd, freqs, period_I[0], period_I[1])
+    beta_2, f_binned_2, psd_binned_2, Y_reg_2 = beta_estimation(psd, freqs, period_D[0], period_D[1])
+    ax3.plot(Y_reg_1, 1/f_binned_1, color='k',
+             label=r'$\beta_I$ = {:.2f}'.format(beta_1) + ', ' + r'$\beta_D$ = {:.2f}'.format(beta_2))
+    ax3.plot(Y_reg_2, 1/f_binned_2, color='k')
+    plt.tick_params(axis='y', which='both', labelleft='off')
+    plt.legend(fontsize=15, bbox_to_anchor=(0, 1.2), loc='upper left', ncol=1)
+
+    return fig
+
+
 # some alias
 wa = WaveletAnalysis()
 beta_estimation = wa.beta_estimation
 tau_estimation = wa.tau_estimation
+cross_coherence = wa.cross_coherence

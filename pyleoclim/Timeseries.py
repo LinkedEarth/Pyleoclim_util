@@ -217,13 +217,8 @@ def ts2segments(ys, ts, factor=10):
 
     @author: fzhu
     '''
-    # delete the NaNs if there is any
-    ys_tmp = np.copy(ys)
-    ys = ys[~np.isnan(ys_tmp)]
-    ts = ts[~np.isnan(ys_tmp)]
-    ts_tmp = np.copy(ts)
-    ys = ys[~np.isnan(ts_tmp)]
-    ts = ts[~np.isnan(ts_tmp)]
+
+    ys, ts = clean_ts(ys, ts)
 
     nt = np.size(ts)
     dts = np.diff(ts)
@@ -244,3 +239,31 @@ def ts2segments(ys, ts, factor=10):
     seg_ts.append(ts[i_start:nt])
 
     return seg_ys, seg_ts, n_segs
+
+
+def clean_ts(ys, ts):
+    ''' Delete the NaNs in the time series and sort it with time axis ascending
+
+    Args:
+        ys (array): a time series, NaNs allowed
+        ts (array): the time axis of the time seires, NaNs allowed
+
+    Returns:
+        ys (array): the time series without nans
+        ts (array): the time axis of the time series without nans
+
+    '''
+    # delete NaNs if there is any
+    ys_tmp = np.copy(ys)
+    ys = ys[~np.isnan(ys_tmp)]
+    ts = ts[~np.isnan(ys_tmp)]
+    ts_tmp = np.copy(ts)
+    ys = ys[~np.isnan(ts_tmp)]
+    ts = ts[~np.isnan(ts_tmp)]
+
+    # sort the time series so that the time axis will be ascending
+    sort_ind = np.argsort(ts)
+    ys = ys[sort_ind]
+    ts = ts[sort_ind]
+
+    return ys, ts
