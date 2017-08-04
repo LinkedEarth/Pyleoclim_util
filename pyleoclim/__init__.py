@@ -109,7 +109,7 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
         Uses the default color palette. Enter pyleoclim.plot_default for detail.
 
     Args:
-        lipds (dict): A dictionary of LiPD files. (Optional)
+        lipds (dict): A list of LiPD files. (Optional)
         markersize (int): The size of the markers. Default is 50
         background (str): Plots one of the following images on the map:
             bluemarble, etopo, shadedrelief, or none (filled continents).
@@ -233,6 +233,373 @@ def mapLipd(timeseries="", countries = True, counties = False, \
         plt.show
 
     return fig
+
+class MapFilters():
+    """Create the various filters for mapping purposes
+    """
+    
+    def getData(self, lipd_dict):
+        """Initializes the object and store the information into lists        
+        """
+        lat = []
+        lon = []
+        archiveType = []
+        dataSetName =[]
+    
+        for idx, key in enumerate(lipd_dict):
+            d = lipd_dict[key]
+            lat.append(d['geo']['geometry']['coordinates'][1])
+            lon.append(d['geo']['geometry']['coordinates'][0])
+            archiveType.append(LipdUtils.LipdToOntology(d['archiveType']))  
+            dataSetName.append(d['dataSetName'])
+        
+        # make sure criteria is in the plot_default list
+        for idx,val in enumerate(archiveType):
+            if val not in plot_default.keys():
+                archiveType[idx] = 'other'
+        
+        return lat, lon, archiveType, dataSetName          
+
+    def distSphere(self, lat1,lon1,lat2,lon2):
+        """Uses the harversine formula to calculate distance on a sphere
+        
+        Args:
+            lat1: Latitude of the first point, in radians
+            lon1: Longitude of the first point, in radians
+            lat2: Latitude of the second point, in radians
+            lon2: Longitude of the second point, in radians
+            
+        Returns:
+            The distance between the two point in km
+        
+        """
+        R = 6371  #km. Earth's radius
+        dlat = lat2-lat1
+        dlon = lon2-lon1
+        
+        a = np.sin(dlat/2)**2+np.cos(lat1)*np.cos(lat2)*np.sin(dlon/2)**2
+        c = 2*np.arctan2(np.sqrt(a),np.sqrt(1-a))   
+        dist =R*c
+        
+        return dist
+    
+    def computeDist(self, lat_r, lon_r, lat_c, lon_c):
+        """ Computes the distance in (km) between a reference point and an array
+        of other coordinates.
+        
+        Args:
+            lat_r (float): The reference latitude, in deg
+            lon_r (float): The reference longitude, in deg
+            lat_c (list): An list of latitudes for the comparison points, in deg
+            lon_c (list): An list of longitudes for the comparison points, in deg
+            
+        Returns:
+            dist - a list of distances in km. 
+        """
+        dist = []
+        
+        for idx, val in enumerate (lat_c):
+            lat1 = np.radians(lat_r)
+            lon1 = np.radians(lon_r)
+            lat2 = np.radians(val)
+            lon2 = np.radians(lon_c[idx])
+            dist.append(self.distSphere(lat1,lon1,lat2,lon2))
+        
+        return dist
+    
+    def filterByArchive(self,archiveType,option):
+        """Returns the indexes of the records with the matching archiveType
+        
+        Args:
+            archiveType (list): A list of ArchiveType
+            option: the matching string
+            
+        Returns:
+            idx (list): The indices matching the query
+        """        
+        idx = [idx for idx,val in enumerate(archiveType) if val==option]
+        if not idx:
+            print("Warning: Your search criteria doesn't match any record in the database")
+        
+        return idx 
+
+    def withinDistance(self, distance, radius):
+        """ Returns the index of the records that are within a certain distance
+        
+        Args:
+            distance (list): A list containing the distance
+            radius (float): the radius to be considered
+            
+        Returns:
+            idx (list): a list of index
+        """ 
+        idx = [idx for idx,val in enumerate(distance) if val <= radius]
+
+        return idx
+
+    def filterList(self, lat, lon, archiveType, dist, dataSetName, idx):
+        """Filters the list by the given indexes
+        
+        Args:
+            lat (array): Array of latitudes
+            lon (array): Array of longitudes
+            archiveType (array): Array of ArchiveTypes
+            dist (array): Array of distances
+            dataSetName (array): Array of dataset names
+            idx (array): An array of indices used for the filtering
+            
+        Returns:
+            The previous arrays filtered by indexes
+            
+        """
+        
+        lat =  np.array(lat)[idx]
+        lon = np.array(lon)[idx]
+        archiveType = np.array(archiveType)[idx]
+        dataSetName = np.array(dataSetName)[idx]
+        dist =np.array(dist)[idx]
+        
+        return lat, lon, archiveType, dataSetName, dist
+        
+
+def MapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
+                   sameArchive = False, projection = 'ortho', lat_0 = "", \
+                   lon_0="", llcrnrlat = -90, urcrnrlat=90, llcrnrlon=-180, 
+                   urcrnrlon=180, countries = True, counties = False, \
+                   rivers = False, states = False, \
+                   background = "shadedrelief", scale = 0.5, markersize = 200,\
+                   markersize_adjust = True, marker_r = "ko", \
+                   marker_c = "default", cmap = "Reds", colorbar = True,\
+                   location = "right", label = "Distance in km",
+                   figsize = [4,4],ax = None, saveFig = False, dir = "", \
+                   format = "eps"):
+    
+    """ Map the nearest records from the record of interest
+    
+    Args:
+        timeseries (dict): A timeseries object. If none given, will prompt for one
+        lipds (list): A list of LiPD files. (Optional)
+        n (int): the number of records to match
+        radius (float): The distance (in km) to search for nearby records.
+            Default is to search the entire globe
+        sameArchive (bool): Returns only records with the same archiveType.
+            Default is not to do so.
+        projection (string): the map projection. Refers to the Basemap
+            documentation for a list of available projections. Only projections
+            supporting setting the map center with a single lat/lon or with
+            the coordinates of the rectangle are currently supported. 
+            Default is to use a Robinson projection.
+        lat_0, lon_0 (float): the center coordinates for the map. Default is
+            mean latitude/longitude in the list. 
+            If the chosen projection doesn't support it, Basemap will
+            ignore the given values.
+        llcrnrlat, urcrnrlat, llcrnrlon, urcrnrlon (float): The coordinates
+            of the two opposite corners of the rectangle.
+        countries (bool): Draws the countries border. Defaults is off (False). 
+        counties (bool): Draws the USA counties. Default is off (False).
+        rivers (bool): Draws the rivers. Default is off (False).
+        states (bool): Draws the American and Australian states borders. 
+            Default is off (False).
+        background (string): Plots one of the following images on the map: 
+            bluemarble, etopo, shadedrelief, or none (filled continents). 
+            Default is none.
+        scale (float): Useful to downgrade the original image resolution to
+            speed up the process. Default is 0.5.
+        markersize (int): the size of the marker
+        markersize_adjust (bool): If True, will proportionaly adjust the size of
+            the marker according to distance.
+        marker_r (list or str): The color and shape of the marker for the
+            reference record.
+        marker_c (list or str): The color and shape of the marker for the other
+            records. Default is to use the color palette by archiveType. If set
+            to None then the color of the marker will represent the distance from
+            the reference records.
+        cmap (str): The colormap to use to represent the distance from the 
+            reference record if no marker is selected.
+        colorbar (bool): Create a colorbar. Default is True
+        location (str): Location of the colorbar
+        label (str): Label for the colorbar.
+        figsize (list): the size for the figure
+        ax: Return as axis instead of figure (useful to integrate plot into a subplot)
+        saveFig (bool): default is to not save the figure
+        dir (str): the full path of the directory in which to save the figure.
+            If not provided, creates a default folder called 'figures' in the
+            LiPD working directory (lipd.path).
+        format (str): One of the file extensions supported by the active
+            backend. Default is "eps". Most backend support png, pdf, ps, eps,
+            and svg.
+
+        
+    Returns:
+        ax - The figure       
+    
+    """
+    
+    # Get the dictionary of LiPD files
+    if not lipds and 'lipd_dict' not in globals():
+        lipd_dict = openLipd()
+    elif lipds:
+        lipd_dict = lipds
+    
+    # Get a timeseries if not given
+    if not timeseries:
+        if not 'ts_list' in globals():
+            fetchTs()
+        timeseries = LipdUtils.getTs(ts_list)
+    
+    # Get the data
+    newfilter = MapFilters()
+    lat, lon, archiveType, dataSetName = newfilter.getData(lipd_dict)
+    # Calculate the distance
+    dist = newfilter.computeDist(timeseries["geo_meanLat"],
+                                 timeseries["geo_meanLon"],
+                                 lat,
+                                 lon)
+    
+    # Filter to remove the reference record from the list
+    idx_zero = np.flatnonzero(np.array(dist))
+    if len(idx_zero)==0:
+        sys.exit("No matching records found. Change your search criteria!")
+    lat, lon, archiveType, dataSetName, dist = newfilter.filterList(lat,lon,
+                                                                    archiveType,
+                                                                    dist,
+                                                                    dataSetName,
+                                                                    idx_zero)
+    
+    #Filter to be within the radius
+    if radius:
+       idx_radius = newfilter.withinDistance(dist, radius)
+       if len(idx_radius)==0:
+           sys.exit("No matching records found. Change your search criteria!")
+       lat, lon, archiveType, dataSetName, dist = newfilter.filterList(lat,lon,
+                                                                    archiveType,
+                                                                    dist,
+                                                                    dataSetName,
+                                                                    idx_radius)
+    
+    # Same archive if asked
+    if sameArchive == True:
+        idx_archive = newfilter.filterByArchive(archiveType,timeseries["archiveType"])
+        if len(idx_archive)==0:
+            sys.exit("No matching records found. Change your search criteria!")
+        lat, lon, archiveType, dataSetName, dist = newfilter.filterList(lat,lon,
+                                                                    archiveType,
+                                                                    dist,
+                                                                    dataSetName,
+                                                                    idx_archive)
+    
+    #Print a warning if plotting less than asked because of the filters
+    if n>len(dist):    
+        print("Warning: Number of matching records is less"+\
+              " than the number of neighbors chosen. Including all records "+\
+              " in the analysis.")
+        n = len(dist)
+    
+    # Sort the distance array
+    sort_idx = np.argsort(dist)
+    lat, lon, archiveType, dataSetName, dist = newfilter.filterList(lat,lon,
+                                                                    archiveType,
+                                                                    dist,
+                                                                    dataSetName,
+                                                                    sort_idx)
+    
+    # Grab the right number of records
+    dist = dist[0:n]
+    lat = lat[0:n]
+    lon = lon[0:n]
+    archiveType = archiveType[0:n]
+    dataSetName = dataSetName[0:n]  
+    
+    # Make the map
+    if not lon_0:
+        lon_0 = timeseries["geo_meanLon"]
+        
+    if not lat_0:
+        lat_0 = timeseries["geo_meanLat"]
+    
+    if not ax:
+        fig,ax =  plt.subplots(figsize=figsize)
+        
+    map = Basemap(projection=projection, lat_0 = lat_0, lon_0 = lon_0,\
+                  llcrnrlat=llcrnrlat, urcrnrlat=urcrnrlat,\
+                  llcrnrlon=llcrnrlon, urcrnrlon=urcrnrlon)
+    
+    map.drawcoastlines()
+    
+    # Background
+    if background == "shadedrelief":
+        map.shadedrelief(scale = scale)
+    elif background == "bluemarble":
+        map.bluemarble(scale=scale)
+    elif background == "etopo":
+        map.etopo(scale=scale)
+    elif not background:
+        map.fillcontinents(color='0.5')
+    else:
+        sys.exit("Enter either 'shadedrelief','bluemarble','etopo',or None")
+         
+    # Other extra information
+    
+    if countries == True:
+        map.drawcountries()
+    if counties == True:
+        map.drawcounties()
+    if rivers == True:
+        map.drawrivers()
+    if states == True:
+        map.drawrivers()
+    
+        
+    X_r,Y_r = map(timeseries["geo_meanLon"],timeseries["geo_meanLat"]) 
+    map.scatter(X_r, Y_r, s=markersize, facecolor = marker_r[0], \
+                marker = marker_r[1], zorder =10)
+    
+    #Either plot single color or gradient
+    
+    if not marker_c:
+        X_c, Y_c = map(lon,lat)
+        CS = map.scatter(X_c, Y_c, s=markersize, c = dist, zorder =10, cmap = cmap,\
+                         marker = '^')
+        if colorbar == True:
+           cb = map.colorbar(CS,location)
+           if not not label:
+               cb.set_label(label)          
+    elif marker_c == "default":
+        dist_max = np.max(dist)
+        dist_adj = np.ceil(dist*markersize/dist_max)
+        #Use the archive specific markers
+        for archive in archiveType:
+           index = [i for i,x, in enumerate(archiveType) if x == archive]
+           X_c, Y_c = map(lon[index],lat[index])
+           if markersize_adjust == True:
+               map.scatter(X_c, Y_c, s = dist_adj[index],
+                       facecolor = plot_default[archive][0],
+                       marker = plot_default[archive][1],
+                       zorder = 10)
+           else:
+               map.scatter(X_c, Y_c, s = markersize,
+                       facecolor = plot_default[archive][0],
+                       marker = plot_default[archive][1],
+                       zorder = 10)
+    else:
+        X_c, Y_c = map(lon,lat)
+        dist_max = np.max(dist)
+        dist_adj = np.ceil(dist*markersize/dist_max)
+        if markersize_adjust == True:
+            map.scatter(X_c, Y_c, s=dist_adj, zorder =10, marker = marker_c[1],\
+                    facecolor = marker_c[0])
+        else:
+            map.scatter(X_c, Y_c, s=markersize, zorder =10, marker = marker_c[1],\
+                    facecolor = marker_c[0])
+            
+    # Save the figure if asked
+    if saveFig == True:
+        LipdUtils.saveFigure(timeseries['dataSetName']+'_map', format, dir)
+    else:
+        plt.show     
+            
+    return ax
+
 
 """
 Plotting
