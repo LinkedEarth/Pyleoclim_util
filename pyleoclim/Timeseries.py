@@ -11,6 +11,8 @@ Basic manipulation of timeseries for the pyleoclim module
 import numpy as np
 import pandas as pd
 import warnings
+import copy
+from scipy import special
 
 
 def bin(x, y, bin_size="", start="", end=""):
@@ -42,8 +44,8 @@ def bin(x, y, bin_size="", start="", end=""):
     # Get the start/end if not given
     if type(start) is str:
         start = np.nanmin(x)
-    if type(end) is str:
-        end = np.nanmax(x)
+        if type(end) is str:
+            end = np.nanmax(x)
 
     # Set the bin medians
     bins = np.arange(start+bin_size/2, end + bin_size/2, bin_size)
@@ -78,7 +80,7 @@ def interp(x,y,interp_step="",start="",end=""):
     Returns:
         xi - the interpolated x-axis \n
         interp_values - the interpolated values
-     """
+        """
 
     #Make sure x and y are numpy arrays
     x = np.array(x,dtype='float64')
@@ -91,8 +93,8 @@ def interp(x,y,interp_step="",start="",end=""):
     # Get the start and end point if not given
     if type(start) is str:
         start = np.nanmin(np.asarray(x))
-    if type(end) is str:
-        end = np.nanmax(np.asarray(x))
+        if type(end) is str:
+            end = np.nanmax(np.asarray(x))
 
     # Get the interpolated x-axis.
     xi = np.arange(start,end,interp_step)
@@ -114,17 +116,17 @@ def onCommonAxis(x1, y1, x2, y2, interp_step="", start="", end=""):
         x2 (array): x-axis values of the second timeseries
         y2 (array): y-axis values of the second timeseries
         interp_step (float): The interpolation step. Default is mean resolution
-            of lowest resolution series
+        of lowest resolution series
         start (float): where/when to start. Default is the maximum of the minima of
-            the two timeseries
+        the two timeseries
         end (float): Where/when to end. Default is the minimum of the maxima of
-            the two timeseries
+        the two timeseries
 
     Returns:
         xi -  the interpolated x-axis \n
         interp_values1 -  the interpolated y-values for the first timeseries
         interp_values2 - the intespolated y-values for the second timeseries
-    """
+        """
 
     # make sure that x1, y1, x2, y2 are numpy arrays
     x1 = np.array(x1, dtype='float64')
@@ -135,8 +137,8 @@ def onCommonAxis(x1, y1, x2, y2, interp_step="", start="", end=""):
     # Find the mean/max x-axis is not provided
     if type(start) is str:
         start = np.nanmax([np.nanmin(x1), np.nanmin(x2)])
-    if type(end) is str:
-        end = np.nanmin([np.nanmax(x1), np.nanmax(x2)])
+        if type(end) is str:
+            end = np.nanmin([np.nanmax(x1), np.nanmax(x2)])
 
     # Get the interp_step
     if not interp_step:
@@ -267,3 +269,47 @@ def clean_ts(ys, ts):
     ts = ts[sort_ind]
 
     return ys, ts
+
+
+def gaussianize(X):
+    """ Transforms a (proxy) timeseries to Gaussian distribution.
+
+    Originator: Michael Erb, Univ. of Southern California - April 2017
+    """
+
+    # Give every record at least one dimensions, or else the code will crash.
+    X = np.atleast_1d(X)
+
+    # Make a blank copy of the array, retaining the data type of the original data variable.
+    Xn = copy.deepcopy(X)
+    Xn[:] = np.NAN
+
+    if len(X.shape) == 1:
+        Xn = gaussianize_single(X)
+    else:
+        for i in range(X.shape[1]):
+            Xn[:, i] = gaussianize_single(X[:, i])
+
+    return Xn
+
+
+def gaussianize_single(X_single):
+    """ Transforms a single (proxy) timeseries to Gaussian distribution.
+
+    Originator: Michael Erb, Univ. of Southern California - April 2017
+    """
+    # Count only elements with data.
+
+    n = X_single[~np.isnan(X_single)].shape[0]
+
+    # Create a blank copy of the array.
+    Xn_single = copy.deepcopy(X_single)
+    Xn_single[:] = np.NAN
+
+    nz = np.logical_not(np.isnan(X_single))
+    index = np.argsort(X_single[nz])
+    rank = np.argsort(index)
+    CDF = 1.*(rank+1)/(1.*n) - 1./(2*n)
+    Xn_single[nz] = np.sqrt(2)*special.erfinv(2*CDF - 1)
+
+    return Xn_single

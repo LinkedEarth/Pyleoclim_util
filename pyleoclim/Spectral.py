@@ -28,6 +28,8 @@ import warnings
 from pyleoclim import Timeseries
 import sys
 
+if sys.platform.startswith('darwin'):
+    from . import f2py_wwz as f2py
 
 '''
 Core functions below, focusing on algorithms
@@ -59,7 +61,7 @@ class WaveletAnalysis(object):
 
         return check
 
-    def ar1_fit_evenly(self, ys, detrend='no'):
+    def ar1_fit_evenly(self, ys, detrend='no', gaussianize=False):
         ''' Returns the lag-1 autocorrelation from ar1 fit.
 
         Args:
@@ -72,13 +74,13 @@ class WaveletAnalysis(object):
             g (float): lag-1 autocorrelation coefficient
 
         '''
-        pd_ys = self.preprocess(ys, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize)
         ar1_mod = sm.tsa.AR(pd_ys, missing='drop').fit(maxlag=1)
         g = ar1_mod.params[0]
 
         return g
 
-    def preprocess(self, ys, detrend='no'):
+    def preprocess(self, ys, detrend='no', gaussianize=False):
         ''' Return the processed time series using (detrend and) standardization.
 
         Args:
@@ -101,9 +103,12 @@ class WaveletAnalysis(object):
 
         res, _, _ = Timeseries.standardize(ys_d)
 
+        if gaussianize:
+            res = Timeseries.gaussianize(res)
+
         return res
 
-    def tau_estimation(self, ys, ts, detrend='no'):
+    def tau_estimation(self, ys, ts, detrend='no', gaussianize=False):
         ''' Return the estimated persistence of a givenevenly/unevenly spaced time series.
 
         Args:
@@ -121,7 +126,7 @@ class WaveletAnalysis(object):
                 Comput. Geosci. 28, 69–72 (2002).
 
         '''
-        pd_ys = self.preprocess(ys, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize)
         dt = np.diff(ts)
         #  assert dt > 0, "The time points should be increasing!"
 
@@ -173,7 +178,7 @@ class WaveletAnalysis(object):
 
         return r
 
-    def wwz_opt2(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no'):
+    def wwz_opt2(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', gaussianize=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -206,9 +211,9 @@ class WaveletAnalysis(object):
         nt = np.size(tau)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize)
 
-        omega = 2*np.pi*freqs
+        omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
         ywave_2 = np.ndarray(shape=(nt, nf))
@@ -241,7 +246,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_opt1(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no'):
+    def wwz_opt1(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', gaussianize=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -274,9 +279,9 @@ class WaveletAnalysis(object):
         nt = np.size(tau)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize)
 
-        omega = 2*np.pi*freqs
+        omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
         ywave_2 = np.ndarray(shape=(nt, nf))
@@ -312,7 +317,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no'):
+    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', gaussianize=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -345,9 +350,9 @@ class WaveletAnalysis(object):
         nt = np.size(tau)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize)
 
-        omega = 2*np.pi*freqs
+        omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
         ywave_2 = np.ndarray(shape=(nt, nf))
@@ -392,7 +397,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend='no'):
+    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend='no', gaussianize=False):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -420,9 +425,9 @@ class WaveletAnalysis(object):
         nt = np.size(tau)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize)
 
-        omega = 2*np.pi*freqs
+        omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
         ywave_2 = np.ndarray(shape=(nt, nf))
@@ -479,7 +484,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no'):
+    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', gaussianize=False):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -513,9 +518,9 @@ class WaveletAnalysis(object):
         nts = np.size(ts)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize)
 
-        omega = 2*np.pi*freqs
+        omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
         a1 = np.ndarray(shape=(nt, nf))
@@ -573,7 +578,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_opt(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no'):
+    def kirchner_opt(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', gaussianize=False):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -607,9 +612,9 @@ class WaveletAnalysis(object):
         nts = np.size(ts)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize)
 
-        omega = 2*np.pi*freqs
+        omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
         a1 = np.ndarray(shape=(nt, nf))
@@ -664,7 +669,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no'):
+    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no', gaussianize=False):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -693,9 +698,9 @@ class WaveletAnalysis(object):
         nts = np.size(ts)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize)
 
-        omega = 2*np.pi*freqs
+        omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
         a1 = np.ndarray(shape=(nt, nf))
@@ -765,7 +770,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no'):
+    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no', gaussianize=False):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -793,11 +798,10 @@ class WaveletAnalysis(object):
         nts = np.size(ts)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend)
+        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize)
 
-        omega = 2*np.pi*freqs
+        omega = self.make_omega(ts, freqs)
 
-        from . import f2py_wwz as f2py
         Neffs, a1, a2 = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
 
         undef = -99999.
@@ -845,6 +849,24 @@ class WaveletAnalysis(object):
 
         return coi
 
+    def make_omega(self, ts, freqs):
+        ''' Return the angular frequency based on the time axis and given frequency vector
+
+        Args:
+            ys (array): a time series
+            ts (array): time axis of the time series
+            freqs (array): vector of frequency
+
+        Returns:
+            omega (array): the angular frequency vector
+
+        '''
+        f_Nyquist = 0.5 / np.mean(np.diff(ts))  # for the frequency band larger than f_Nyquist, the wwa will be marked as NaNs
+        freqs_with_nan = np.copy(freqs)
+        freqs_with_nan[freqs > f_Nyquist] = np.nan
+        omega = 2*np.pi*freqs_with_nan
+
+        return omega
     def wwa2psd(self, wwa, ts, Neffs, freqs=None, Neff=3, anti_alias=False, avgs=2):
         """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
@@ -1069,12 +1091,14 @@ class WaveletAnalysis(object):
             N (int): the length of the simulated time series
             H (float): Hurst index, should be in (0, 1)
 
+        Returns:
+            xfBm (array): the simulated fractional Brownian Motion time series
+
         References:
             1. http://cours-physique.lps.ens.fr/index.php/TD11_Correlated_Noise_2011
             2. https://www.wikiwand.com/en/Fractional_Brownian_motion
 
-        @authors: jeg
-
+        @authors: jeg, fzhu
         '''
         assert isinstance(N, int) and N >= 1
         assert H > 0 and H < 1, "H should be in (0, 1)!"
@@ -1276,8 +1300,6 @@ class WaveletAnalysis(object):
 
         omega = 2*np.pi*freqs
 
-        xw_coherence = np.ndarray(shape=(nt, nf))
-
         def Smooth_time(coeff, c1):
             if type(coeff) is complex:
                 S_time = np.ndarray(shape=(nt, nf), dtype='complex')
@@ -1312,8 +1334,10 @@ class WaveletAnalysis(object):
             S = Smooth_scale(Smooth_time(coeff, c1), c2)
             return S
 
-        xw_coherence = np.abs(Smoothing(xwt/omega, c1, c2))**2 / \
-            Smoothing(power1/omega, c1, c2) / Smoothing(power2/omega, c1, c2)
+        #  xw_coherence = np.abs(Smoothing(xwt/omega, c1, c2))**2 / \
+            #  Smoothing(power1/omega, c1, c2) / Smoothing(power2/omega, c1, c2)
+
+        xw_coherence = np.abs(xwt)**2 / np.sqrt(power1 * power2)
 
         return xw_coherence
 
@@ -1494,7 +1518,8 @@ def ar1_sim(ys, n, p, ts=None, detrend='no'):
     return red
 
 
-def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8, detrend='no', method='Kirchner_f2py'):
+def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8,
+        detrend='no', gaussianize=False, method='Kirchner_f2py'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients
 
     Args:
@@ -1533,7 +1558,8 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
     ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau)
 
     wwz_func = wa.get_wwz_func(nproc, method)
-    wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend)
+    wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc,
+                                        detrend=detrend, gaussianize=gaussianize)
 
     # Monte-Carlo simulations of AR1 process
     nt = np.size(tau)
@@ -1543,11 +1569,12 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
     AR1_q = np.ndarray(shape=(nt, nf))
 
     if nMC >= 1:
-        tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
+        tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend, gaussianize=gaussianize)
 
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             r = wa.ar1_model(ts_cut, tauest)
-            wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend)
+            wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc,
+                                                 detrend=detrend, gaussianize=gaussianize)
 
         for j in range(nt):
             for k in range(nf):
@@ -1563,7 +1590,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
 
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
-            detrend='no', Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
+            detrend='no', gaussianize=False, Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
     ''' Return the psd of a timeseires directly using wwz method.
 
     Args:
@@ -1577,6 +1604,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         detrend (str): 'no' - the original time series is assumed to have no trend;
                        'linear' - a linear least-squares fit to `ys` is subtracted;
                        'constant' - the mean of `ys` is subtracted
+        gaussianize (bool): gaussianize the time series or not
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
@@ -1592,7 +1620,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
 
     # get wwa but AR1_q is not needed here so set nMC=0
     wwa, _, _, _, freqs, _, Neffs, _ = wwz(ys_cut, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
-                                           detrend=detrend, method=method)
+                                           detrend=detrend, gaussianize=gaussianize, method=method)
 
     psd = wa.wwa2psd(wwa, ts_cut, Neffs, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
 
@@ -1607,7 +1635,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             r = wa.ar1_model(ts_cut, tauest)
             wwa_red, _, _, _, _, _, Neffs_red, _ = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
-                                                       detrend=detrend, method=method)
+                                                       detrend=detrend, gaussianize=gaussianize, method=method)
             psd_ar1[i, :] = wa.wwa2psd(wwa_red, ts_cut, Neffs_red, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
 
         psd_ar1_q95 = mquantiles(psd_ar1, 0.95, axis=0)[0]
@@ -1619,7 +1647,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
 
 
 def xwt(ys1, ts1, ys2, ts2,
-        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8, detrend='no', method='Kirchner_f2py'):
+        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no', method='Kirchner_f2py'):
     ''' Return the crosse wavelet transform of two time series.
 
     Args:
@@ -1629,7 +1657,6 @@ def xwt(ys1, ts1, ys2, ts2,
         freqs (array): vector of frequency
         c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
         Neff (int): effective number of points
-        nMC (int): the number of Monte-Carlo simulations
         nproc (int): the number of processes for multiprocessing
         detrend (str): 'no' - the original time series is assumed to have no trend;
                        'linear' - a linear least-squares fit to `ys` is subtracted;
@@ -1648,7 +1675,6 @@ def xwt(ys1, ts1, ys2, ts2,
 
     '''
     wa = WaveletAnalysis()
-    assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
     wwz_func = wa.get_wwz_func(nproc, method)
 
@@ -1658,9 +1684,25 @@ def xwt(ys1, ts1, ys2, ts2,
     wwa, phase, Neffs, coeff1 = wwz_func(ys1_cut, ts1_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend)
     wwa, phase, Neffs, coeff2 = wwz_func(ys2_cut, ts2_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend)
 
+    tauest1 = wa.tau_estimation(ys1_cut, ts1_cut, detrend=detrend)
+    tauest2 = wa.tau_estimation(ys2_cut, ts2_cut, detrend=detrend)
+    r1 = wa.ar1_model(ts1_cut, tauest1)
+    r2 = wa.ar1_model(ts2_cut, tauest2)
+
+    wwa_red1, _, Neffs_red1, _ = wwz_func(r1, ts1_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend)
+    wwa_red2, _, Neffs_red2, _ = wwz_func(r2, ts2_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend)
+    psd1_ar1 = wa.wwa2psd(wwa_red1, ts1_cut, Neffs_red1, freqs=freqs, Neff=Neff, anti_alias=False, avgs=2)
+    psd2_ar1 = wa.wwa2psd(wwa_red2, ts2_cut, Neffs_red2, freqs=freqs, Neff=Neff, anti_alias=False, avgs=2)
+
     xwt, xw_amplitude, xw_phase = wa.cross_wt(coeff1, coeff2, freqs, tau)
 
-    AR1_q = None
+    sigma_1 = np.std(ys1)
+    sigma_2 = np.std(ys2)
+    nu, Znu = 2, 3.9999  # according to `xwt.m` from Grinsted's MATLAB code
+
+    signif = sigma_1*sigma_2 * np.sqrt(psd1_ar1*psd2_ar1) * Znu/nu  # Eq. (5) of Grinsted et al 2004
+    AR1_q = np.tile(signif, (np.size(tau), 1))
+
     coi = wa.make_coi(tau)
 
     return xwt, xw_amplitude, xw_phase, freqs, tau, AR1_q, coi
@@ -1668,7 +1710,7 @@ def xwt(ys1, ts1, ys2, ts2,
 
 def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
              yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
-             cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour',
+             cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
              plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical',
              cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
     """ Plot the wavelet amplitude
@@ -1764,6 +1806,9 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
         plt.plot(tau, coi, 'k--')
         ax.fill_between(tau, coi, ylim[1], color='white', alpha=cone_alpha)
 
+    if title is not None:
+        plt.title(title)
+
     ax.set_ylim(ylim)
 
     return ax
@@ -1792,10 +1837,11 @@ def plot_wwadist(wwa, ylim=None):
     return fig
 
 
-def plot_psd(psd, freqs, lmstyle=None, linewidth=None, period_ticks=None, psd_lim=None, period_lim=None,
-             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None,
+def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-', ar1_linewidth=None,
+             period_ticks=None, psd_lim=None, period_lim=None,
+             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None,
              psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False,
-             period_label='Period', psd_label='Spectral Density'):
+             period_label='Period', psd_label='Spectral Density', zorder=None):
     """ Plot the wavelet amplitude
 
     Args:
@@ -1819,6 +1865,9 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, period_ticks=None, psd_li
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
 
+    if title is not None:
+        plt.title(title)
+
     if vertical:
         x_data = psd
         y_data = 1 / freqs
@@ -1830,16 +1879,18 @@ def plot_psd(psd, freqs, lmstyle=None, linewidth=None, period_ticks=None, psd_li
         x_data_ar1 = 1 / freqs
         y_data_ar1 = psd_ar1_q95
 
-    if lmstyle is not None:
-        plt.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label)
+    if zorder is not None:
+        plt.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, zorder=zorder, color=color)
         if plot_ar1:
             assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
-            plt.plot(x_data_ar1, y_data_ar1, lmstyle, linewidth=linewidth,  label='AR1 95%', color=psd_ar1_color)
+            plt.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
+                     label='AR1 95%', color=psd_ar1_color, zorder=zorder-1)
     else:
-        plt.plot(x_data, y_data, linewidth=linewidth,  label=label)
+        plt.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, color=color)
         if plot_ar1:
             assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
-            plt.plot(x_data_ar1, y_data_ar1, linewidth=linewidth,  label='AR1 95%', color=psd_ar1_color)
+            plt.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
+                     label='AR1 95%', color=psd_ar1_color)
 
     plt.xscale('log', nonposy='clip')
     plt.yscale('log', nonposy='clip')
