@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
-
 """
 The following functions handle creating new directories and saving figures and logs
 """
@@ -278,3 +277,81 @@ def LipdToOntology(archiveType):
         archiveType = 'molluskshells'
     
     return archiveType
+
+"""
+Deal with ensembles
+"""
+
+def isEnsemble(csv_dict):
+    """ Check whether ensembles are available
+    
+    Args:
+        csv_dict (dict): Dictionary of available csv
+        option (str): check for a chron, paleo, or both
+    
+    Returns:
+        paleoEnsembleTables: List of available paleoEnsembleTables \n
+        chronEnsembleTables: List of availale chronEnsemble Tables
+        
+    """     
+    chronEnsembleTables =[]
+    paleoEnsembleTables =[]
+    for val in csv_dict.keys():
+        if "ensemble" in val and "chron" in val:
+            chronEnsembleTables.append(val)
+        elif "ensemble" in val and "paleo" in val:
+            paleoEnsembleTables.append(val)
+            
+    return chronEnsembleTables, paleoEnsembleTables
+
+def getEnsembleValues(ensemble_dict):
+    """ Grabs the ensemble values and depth vector from the dictionary and
+    return them into two numpy arrays.
+    
+    Args:
+        ensemble_dict (dict): dictionary containing the ensemble information    
+    
+    Returns:
+        depth (array): Vector of depth \n
+        ensembleValues (array): The matrix of Ensemble values
+    """
+
+    for val in ensemble_dict.keys():
+        number = ensemble_dict[val]["number"]
+        if type(number) is int:
+            depth = ensemble_dict[val]["values"]
+        else:
+            ensembleValues = ensemble_dict[val]["values"]
+            ensembleValues= np.transpose(np.array(ensembleValues))
+            
+    return depth, ensembleValues       
+
+def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo):
+    """ Map the depth for the ensemble age values to the paleo depth
+    
+    Args:
+        ensembleValues (array): A matrix of possible age models. Realizations
+            should be stored in columns
+        depthEnsemble (array): A vector of depth. The vector should have the same
+            length as the number of rows in the ensembleValues
+        depthPaleo (array): A vector corresponding to the depth at which there
+            are paleodata information
+            
+    Returns:
+        ensembleValuesToPaleo - A matrix of age ensemble on the PaleoData scale \n        
+    
+    """
+    if len(depthEnsemble)!=np.shape(ensembleValues)[0]:
+        sys.exit("Depth and age need to have the same length")
+    
+    #Make sure that numpy arrays were given
+    ensembleValues=np.array(ensembleValues)
+    depthEnsemble=np.array(depthEnsemble)
+    depthPaleo = np.array(depthPaleo)
+
+    #Interpolate
+    ensembleValuesToPaleo = np.zeros((len(depthPaleo),np.shape(ensembleValues)[1])) #placeholder
+    for i in np.arange(0,np.shape(ensembleValues)[1]):
+        ensembleValuesToPaleo[:,i]=np.interp(depthPaleo,depthEnsemble,ensembleValues[:,i])
+        
+    return ensembleValuesToPaleo    

@@ -144,7 +144,7 @@ def mapOne(lat, lon, projection = 'ortho', lat_0 = "", lon_0 = "",\
            countries = True, counties = False, \
            rivers = False, states = False, background = "shadedrelief",\
            scale = 0.5, markersize = 50, marker = "ro", figsize = [4,4], \
-           ax = None,):
+           ax = None):
     """ Map one location on the globe
     
     Args:
