@@ -1341,6 +1341,34 @@ class WaveletAnalysis(object):
 
         return xw_coherence
 
+    def reconstruct_ts(self, coeff, freqs, tau, t, a0=0):
+        ''' Reconstruct the time series from the wavelet coefficients.
+        Args:
+            coeff (array): the coefficients of the corresponding basis functions a_1 and a_2
+            freqs (array): vector of frequency of the basis functions
+            tau (array): the evenly-spaced time points of the basis functions
+            t (array): the evenly-spaced time points of the reconstructed time series
+            a0 (array): the constant basis function (can be ignored if only care about the anomaly series)
+
+        Returns:
+            rec_ts (array): the reconstructed time series (not normalized yet)
+        '''
+        omega = 2*np.pi*freqs
+        nf = np.size(freqs)
+        ntau = np.size(tau)
+        a_1 = coeff.real
+        a_2 = coeff.imag
+
+        rec_ts = np.zeros(np.size(t))
+        for k in range(nf):
+            for j in range(ntau):
+                dz = omega[k] * (t - tau[j])
+                phi_1 = np.cos(dz)
+                phi_2 = np.sin(dz)
+
+                rec_ts += (a0 + a_1[j, k]*phi_1 + a_2[j, k]*phi_2)
+
+        return rec_ts
 
 class AliasFilter(object):
     '''Performing anti-alias filter on a psd @author: fzhu
@@ -1569,10 +1597,11 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nMC=200, nproc=8
     AR1_q = np.ndarray(shape=(nt, nf))
 
     if nMC >= 1:
-        tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend, gaussianize=gaussianize)
+        #  tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend, gaussianize=gaussianize)
 
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
-            r = wa.ar1_model(ts_cut, tauest)
+            #  r = wa.ar1_model(ts_cut, tauest)
+            r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
             wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc,
                                                  detrend=detrend, gaussianize=gaussianize)
 
@@ -1630,10 +1659,11 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     psd_ar1 = np.ndarray(shape=(nMC, nf))
 
     if nMC >= 1:
-        tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
+        #  tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
 
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
-            r = wa.ar1_model(ts_cut, tauest)
+            #  r = wa.ar1_model(ts_cut, tauest)
+            r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
             wwa_red, _, _, _, _, _, Neffs_red, _ = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
                                                        detrend=detrend, gaussianize=gaussianize, method=method)
             psd_ar1[i, :] = wa.wwa2psd(wwa_red, ts_cut, Neffs_red, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
@@ -1643,7 +1673,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     else:
         psd_ar1_q95 = None
 
-    return psd, freqs, psd_ar1_q95
+    return psd, freqs, psd_ar1_q95, psd_ar1
 
 
 def xwt(ys1, ts1, ys2, ts2,
@@ -1839,7 +1869,7 @@ def plot_wwadist(wwa, ylim=None):
 
 def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-', ar1_linewidth=None,
              period_ticks=None, psd_lim=None, period_lim=None,
-             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None,
+             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, plot_ar1_ensembel=False, psd_ar1=None, title=None,
              psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False,
              period_label='Period', psd_label='Spectral Density', zorder=None):
     """ Plot the wavelet amplitude
@@ -1935,8 +1965,9 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
     return ax
 
 
-def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=200, nproc=8, detrend=False, anti_alias=False,
-                 period_ticks=None, ts_color=None, title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
+def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=200, nproc=8, detrend='no', gaussianize=False,
+                 anti_alias=False, period_ticks=None, ts_color=None,
+                 title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
                  psd_lmstyle='-', psd_lim=None, period_I=[1/8, 1/2], period_D=[1/200, 1/20]):
     """ Plot the time series with the wavelet analysis and psd
 
@@ -1978,9 +2009,15 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     sns.set(style="ticks", font_scale=1.5)
     ax1 = plt.subplot(gs[0:1, :-3])
     plt.plot(ts, ys, '-o', color=ts_color)
-    plt.title(title, **title_font)
+
+    if title is not None:
+        plt.title(title, **title_font)
+
     plt.xlim([np.min(ts), np.max(ts)])
-    plt.ylabel(ts_ylabel)
+
+    if ts_ylabel is not None:
+        plt.ylabel(ts_ylabel)
+
     plt.grid()
     plt.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
 
@@ -1989,17 +2026,25 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     ax2 = plt.subplot(gs[1:5, :-3])
 
     wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = \
-        wwz(ys, ts, freqs=freqs, tau=tau, c=c1, nMC=nMC, nproc=nproc, detrend=detrend)
+        wwz(ys, ts, freqs=freqs, tau=tau, c=c1, nMC=nMC, nproc=nproc, detrend=detrend, gaussianize=gaussianize)
 
-    plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[np.min(period_ticks), np.max(coi)],
-             plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2,
-             cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
-             )
+    if wwa_xlabel is not None and wwa_ylabel is not None:
+        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[np.min(period_ticks), np.max(coi)],
+                 plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2,
+                 cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
+                 )
+    else:
+        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[np.min(period_ticks), np.max(coi)],
+                 plot_cone=True, plot_signif=True, ax=ax2,
+                 cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
+                 )
 
     # plot psd
     sns.set(style="ticks", font_scale=1.5)
     ax3 = plt.subplot(gs[1:4, 9:])
-    psd, freqs, psd_ar1_q95 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC, anti_alias=anti_alias)
+    psd, freqs, psd_ar1_q95 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC,
+                                      detrend=detrend, gaussianize=gaussianize, anti_alias=anti_alias)
+
     plot_psd(psd, freqs, plot_ar1=True, psd_ar1_q95=psd_ar1_q95, period_ticks=period_ticks[period_ticks < np.max(coi)],
              period_lim=[np.min(period_ticks), np.max(coi)], psd_lim=psd_lim,
              lmstyle=psd_lmstyle, ax=ax3, period_label='', label='Estimated spectrum', vertical=True)
