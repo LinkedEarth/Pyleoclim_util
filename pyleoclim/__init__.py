@@ -695,6 +695,140 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
 
     return fig
 
+def plotEnsTs(timeseries = "", ensTableName = None, ens = None, \
+              color = "default", \
+              alpha = 0.005, figsize = [10,4], \
+              saveFig = False, dir = "",\
+              format="eps"):
+    """ Plot timeseries on various ensemble ages
+    
+    Args:
+        timeseries (dict): LiPD timeseries object. By default, will prompt for one
+        ensTableName (str): The name of the ensemble table, if known.
+        ens (int): Number of ensembles to plot. By default, will plot either the 
+            number of ensembles stored in the chronensembleTable or 500 of them,
+            whichever is lower
+        color (str): The line color. If None, uses the default color palette
+        alpha (float): Transparency setting for each line. Default is 0.005.
+        figsize (list): the size for the figure
+        saveFig (bool): default is to not save the figure
+        dir (str): the full path of the directory in which to save the figure.
+            If not provided, creates a default folder called 'figures' in the
+            LiPD working directory (lipd.path).
+        format (str): One of the file extensions supported by the active
+            backend. Default is "eps". Most backend support png, pdf, ps, eps,
+            and svg.
+
+    Returns:
+        The figure
+        
+    """
+    
+    if not timeseries:
+        if not 'ts_list' in globals():
+            fetchTs()
+        timeseries = LipdUtils.getTs(ts_list)    
+    
+    # Get the csv files
+    if timeseries["dataSetName"] not in lipd_dict.keys():
+        # Print out warnings
+        print("Dataset name and LiPD file name don't match!")
+        print("Select your LiPD file from the list")
+        # Get the name of the LiPD files stored in memory
+        keylist = []
+        for val in lipd_dict.keys():
+            keylist.append(val)
+        #Print them out for the users
+        for idx, val in enumerate(keylist):
+            print(idx,": ",val)
+        # Ask the user to pick one    
+        sel = int(input("Enter the number of the LiPD file: "))
+        lipd_name = keylist[sel]
+        # Grab the csv list
+        csv_dict = lpd.getCsv(lipd_dict[lipd_name])
+        
+    else: #Just grab the csv directly
+        csv_dict = lpd.getCsv(lipd_dict[timeseries["dataSetName"]])
+        
+    # Get the ensemble tables
+    if not ensTableName:
+        chronEnsembleTables, paleoEnsembleTables = LipdUtils.isEnsemble(csv_dict)
+    elif ensTableName not in csv_dict.keys():
+        print("The name of the table you entered doesn't exist, selecting...")
+    else:
+        chronEnsembleTables = ensTableName
+
+    # Check the number of Chron Tables 
+    if len(chronEnsembleTables) == 0:
+        sys.exit("No chronEnsembleTable available")
+    elif len(chronEnsembleTables) > 1: 
+        print("More than one ensemble table available.")
+        for idx, val in enumerate(chronEnsembleTables):
+            print(idx,": ",val)
+        sel = int(input("Enter the number of the table you'd like to use: "))
+        ensemble_dict = csv_dict[chronEnsembleTables[sel]]
+    else:
+        ensemble_dict = csv_dict[chronEnsembleTables[0]]
+    
+    # Get depth and values    
+    depth, ensembleValues = LipdUtils.getEnsembleValues(ensemble_dict)
+    
+    # Get the paleoData values
+    ys = np.array(timeseries["paleoData_values"])
+    ds = np.array(timeseries["depth"])
+    # Remove NaNs
+    ys_tmp = np.copy(ys)
+    ys = ys[~np.isnan(ys_tmp)]
+    ds = ds[~np.isnan(ys_tmp)]
+    
+    # Bring the ensemble values to common depth
+    ensembleValuestoPaleo = LipdUtils.mapAgeEnsembleToPaleoData(ensembleValues, depth, ds)
+
+    # Get plot information
+    title = timeseries['dataSetName']
+    x_label = "Age"
+    # y_label
+    if "paleoData_InferredVariableType" in timeseries.keys():
+        if "paleoData_units" in timeseries.keys():
+            y_label = timeseries["paleoData_InferredVariableType"] + \
+                      " (" + timeseries["paleoData_units"]+")"
+        else:
+            y_label = timeseries["paleoData_InferredVariableType"]
+    elif "paleoData_ProxyObservationType" in timeseries.keys():
+        if "paleoData_units" in timeseries.keys():
+            y_label = timeseries["paleoData_ProxyObservationType"] + \
+                      " (" + timeseries["paleoData_units"]+")"
+        else:
+            y_label = timeseries["paleoData_ProxyObservationType"]
+    else:
+        if "paleoData_units" in timeseries.keys():
+            y_label = timeseries["paleoData_variableName"] + \
+                      " (" + timeseries["paleoData_units"]+")"
+        else:
+            y_label = timeseries["paleoData_variableName"]
+     
+    # Get the color
+    if color == "default":
+        archiveType = LipdUtils.LipdToOntology(timeseries['archiveType']).lower()
+        if archiveType not in plot_default.keys():
+            archiveType = 'other'
+        color = plot_default[archiveType][0]
+    
+    # Make the plot
+    fig = Plot.plotEns(ensembleValuestoPaleo, ys, ens = ens, color = color,\
+                       alpha = alpha, x_label = x_label, y_label = y_label,\
+                       title = title, figsize = figsize, ax = None)
+
+    # Save the figure if asked
+    if saveFig == True:
+        name = 'plot_ens_timeseries_'+timeseries["dataSetName"]+\
+            "_"+y_label
+        LipdUtils.saveFigure(name,format,dir)
+    else:
+        plt.show()
+
+    return fig
+
 def histTs(timeseries = "", bins = None, hist = True, \
              kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},\
              kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"Rug"}, \

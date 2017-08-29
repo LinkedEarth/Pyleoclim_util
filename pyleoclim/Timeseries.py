@@ -73,7 +73,7 @@ def interp(x,y,interp_step="",start="",end=""):
         y (array): the y-axis
         interp_step (float): the interpolation step. Default is mean resolution.
         start (float): where/when to start the interpolation. Default is min..
-        end (float): where/when to stop the interpolation. Defaul is max.
+        end (float): where/when to stop the interpolation. Default is max.
 
     Returns:
         xi - the interpolated x-axis \n
@@ -246,7 +246,7 @@ def clean_ts(ys, ts):
 
     Args:
         ys (array): a time series, NaNs allowed
-        ts (array): the time axis of the time seires, NaNs allowed
+        ts (array): the time axis of the time series, NaNs allowed
 
     Returns:
         ys (array): the time series without nans

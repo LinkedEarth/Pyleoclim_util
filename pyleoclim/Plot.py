@@ -58,6 +58,67 @@ def plot(x,y,markersize=50,marker='ro',x_label="",y_label="",\
     
     return ax
     
+def plotEns(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = "",\
+            y_label = "", title = "", figsize = [10,4], ax = None):
+    """Plot Ensemble Values
+    
+    This function allows to plot all or a subset of ensemble members of a 
+    timeseries
+    
+    Args:
+        ageEns (numpy array): Age ensemble data. Iterations should be stored in columns
+        y (numpy array): Ordinate values
+        ens (int): Number of ensemble to plots. If None, will choose either the number
+            of ensembles stored in the ensemble matrix or 500, whichever is lower
+        color (str): Linecolor (default is red)
+        alpha (float): Transparency setting for each line (default is 0.005)
+        x_label (str): Label for the x-axis
+        y_label (str): Label for the y-axis
+        title (str): Title for the figure
+        figsize (list): Size of the figure. Default is [10,4]
+        ax: Return as axis instead of figure
+    
+    Return:
+        The figure
+    
+    TODO:
+        Enable paleoEnsemble       
+    
+    """
+
+    #Make sure that the ensemble and paleo values are numpy arrays
+    ageEns = np.array(ageEns)
+    y = np.array(y)
+    
+    # Make sure that the length of y is the same as the number of rows in ensemble array
+    if len(y) != np.shape(ageEns)[0]:
+        sys.exit("The length of the paleoData is different than number of rows in ensemble table!")
+
+    # Figure out the number of ensembles to plot
+    if not ens:
+        if np.shape(ageEns)[1]<500:
+            ens = np.shape(ageEns)[1]
+        else:
+            ens = 500
+            print("Plotting 500 ensemble members")
+    elif ens > np.shape(ageEns)[1]:
+        ens = np.shape(ageEns)[1]
+        print("Plotting all available ensemble members") 
+        
+    # Figure setting
+    if not ax:
+        fig, ax = plt.subplots(figsize = figsize)
+        
+    # Finally make the plot
+    plt.style.use("ggplot")
+    for i in np.arange(0,ens,1):
+        plt.plot(ageEns[:,i],y,alpha=alpha,color=color)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.title(title)
+
+    return ax    
+
 def plot_hist(y, bins = None, hist = True, label = "", \
               kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},\
               kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"rug"}, \
