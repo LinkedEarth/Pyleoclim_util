@@ -182,7 +182,8 @@ class WaveletAnalysis(object):
 
         return r
 
-    def wwz_opt2(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', gaussianize=False, standardize=True):
+    def wwz_opt2(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no',
+                 gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -220,6 +221,7 @@ class WaveletAnalysis(object):
         omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
+        ywave_1 = np.ndarray(shape=(nt, nf))
         ywave_2 = np.ndarray(shape=(nt, nf))
         ywave_3 = np.ndarray(shape=(nt, nf))
 
@@ -238,19 +240,23 @@ class WaveletAnalysis(object):
                     phi2 = np.cos(dz)
                     phi3 = np.sin(dz)
 
+                    weighted_one = np.sum(weights*pd_ys) / sum_w
                     weighted_phi2 = np.sum(weights*phi2*pd_ys) / sum_w
                     weighted_phi3 = np.sum(weights*phi3*pd_ys) / sum_w
 
+                    ywave_1[j, k] = weighted_one
                     ywave_2[j, k] = 2*weighted_phi2
                     ywave_3[j, k] = 2*weighted_phi3
 
         wwa = np.sqrt(ywave_2**2 + ywave_3**2)
         phase = np.arctan2(ywave_3, ywave_2)
-        coeff = ywave_2 + ywave_3*1j
+        #  coeff = ywave_2 + ywave_3*1j
+        coeff = (ywave_1, ywave_2, ywave_3)
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_opt1(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', gaussianize=False, standardize=True):
+    def wwz_opt1(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no',
+                 gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -288,6 +294,7 @@ class WaveletAnalysis(object):
         omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
+        ywave_1 = np.ndarray(shape=(nt, nf))
         ywave_2 = np.ndarray(shape=(nt, nf))
         ywave_3 = np.ndarray(shape=(nt, nf))
 
@@ -300,7 +307,8 @@ class WaveletAnalysis(object):
                 Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
 
                 if Neffs[j, k] <= Neff:
-                    ywave_2[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                    ywave_1[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                    ywave_2[j, k] = np.nan
                     ywave_3[j, k] = np.nan
                 else:
                     phi2 = np.cos(dz)
@@ -312,16 +320,19 @@ class WaveletAnalysis(object):
                     cos_shift_one = np.sum(weights*phi2) / sum_w
                     sin_shift_one = np.sum(weights*phi3) / sum_w
 
+                    ywave_1[j, k] = weighted_one
                     ywave_2[j, k] = 2*(weighted_phi2-weighted_one*cos_shift_one)
                     ywave_3[j, k] = 2*(weighted_phi3-weighted_one*sin_shift_one)
 
         wwa = np.sqrt(ywave_2**2 + ywave_3**2)
         phase = np.arctan2(ywave_3, ywave_2)
-        coeff = ywave_2 + ywave_3*1j
+        #  coeff = ywave_2 + ywave_3*1j
+        coeff = (ywave_1, ywave_2, ywave_3)
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', gaussianize=False, standardize=True):
+    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no',
+                  gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -359,6 +370,7 @@ class WaveletAnalysis(object):
         omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
+        ywave_1 = np.ndarray(shape=(nt, nf))
         ywave_2 = np.ndarray(shape=(nt, nf))
         ywave_3 = np.ndarray(shape=(nt, nf))
 
@@ -373,7 +385,8 @@ class WaveletAnalysis(object):
                 Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
 
                 if Neffs[j, k] <= Neff:
-                    ywave_2[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                    ywave_1[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                    ywave_2[j, k] = np.nan
                     ywave_3[j, k] = np.nan
                 else:
                     phi2 = np.cos(dz)
@@ -392,16 +405,19 @@ class WaveletAnalysis(object):
                     weighted_phi2 = np.sum(weights*phi2*pd_ys) / sum_w
                     weighted_phi3 = np.sum(weights*phi3*pd_ys) / sum_w
 
+                    ywave_1[j, k] = S_inv[0, 0]*weighted_phi1 + S_inv[0, 1]*weighted_phi2 + S_inv[0, 2]*weighted_phi3
                     ywave_2[j, k] = S_inv[1, 0]*weighted_phi1 + S_inv[1, 1]*weighted_phi2 + S_inv[1, 2]*weighted_phi3
                     ywave_3[j, k] = S_inv[2, 0]*weighted_phi1 + S_inv[2, 1]*weighted_phi2 + S_inv[2, 2]*weighted_phi3
 
         wwa = np.sqrt(ywave_2**2 + ywave_3**2)
         phase = np.arctan2(ywave_3, ywave_2)
-        coeff = ywave_2 + ywave_3*1j
+        #  coeff = ywave_2 + ywave_3*1j
+        coeff = (ywave_1, ywave_2, ywave_3)
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend='no', gaussianize=False, standardize=True):
+    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend='no',
+                  gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
 
         Args:
@@ -434,6 +450,7 @@ class WaveletAnalysis(object):
         omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
+        ywave_1 = np.ndarray(shape=(nt, nf))
         ywave_2 = np.ndarray(shape=(nt, nf))
         ywave_3 = np.ndarray(shape=(nt, nf))
 
@@ -466,10 +483,11 @@ class WaveletAnalysis(object):
                 weighted_phi2 = np.sum(weights*phi2*pd_ys) / sum_w
                 weighted_phi3 = np.sum(weights*phi3*pd_ys) / sum_w
 
+                ywave_1_1g = S_inv[0, 0]*weighted_phi1 + S_inv[0, 1]*weighted_phi2 + S_inv[0, 2]*weighted_phi3
                 ywave_2_1g = S_inv[1, 0]*weighted_phi1 + S_inv[1, 1]*weighted_phi2 + S_inv[1, 2]*weighted_phi3
                 ywave_3_1g = S_inv[2, 0]*weighted_phi1 + S_inv[2, 1]*weighted_phi2 + S_inv[2, 2]*weighted_phi3
 
-            return Neff_loc, ywave_2_1g, ywave_3_1g
+            return Neff_loc, ywave_1_1g, ywave_2_1g, ywave_3_1g
 
         tf_mesh = np.meshgrid(tau, omega)
         list_of_grids = list(zip(*(grid.flat for grid in tf_mesh)))
@@ -479,16 +497,19 @@ class WaveletAnalysis(object):
             res = pool.map(wwa_1g, tau_grids, omega_grids)
             res_array = np.asarray(res)
             Neffs = res_array[:, 0].reshape((np.size(omega), np.size(tau))).T
-            ywave_2 = res_array[:, 1].reshape((np.size(omega), np.size(tau))).T
-            ywave_3 = res_array[:, 2].reshape((np.size(omega), np.size(tau))).T
+            ywave_1 = res_array[:, 1].reshape((np.size(omega), np.size(tau))).T
+            ywave_2 = res_array[:, 2].reshape((np.size(omega), np.size(tau))).T
+            ywave_3 = res_array[:, 3].reshape((np.size(omega), np.size(tau))).T
 
         wwa = np.sqrt(ywave_2**2 + ywave_3**2)
         phase = np.arctan2(ywave_3, ywave_2)
-        coeff = ywave_2 + ywave_3*1j
+        #  coeff = ywave_2 + ywave_3*1j
+        coeff = (ywave_1, ywave_2, ywave_3)
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', gaussianize=False, standardize=True):
+    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no',
+                       gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -527,6 +548,7 @@ class WaveletAnalysis(object):
         omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
+        a0 = np.ndarray(shape=(nt, nf))
         a1 = np.ndarray(shape=(nt, nf))
         a2 = np.ndarray(shape=(nt, nf))
 
@@ -539,7 +561,8 @@ class WaveletAnalysis(object):
                 Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
 
                 if Neffs[j, k] <= Neff:
-                    a1[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                    a0[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                    a1[j, k] = np.nan
                     a2[j, k] = np.nan
                 else:
                     def w_prod(xs, ys):
@@ -573,16 +596,19 @@ class WaveletAnalysis(object):
                     A = 2*(ys_cos_shift-ys_one*cos_shift_one)
                     B = 2*(ys_sin_shift-ys_one*sin_shift_one)
 
+                    a0[j, k] = ys_one
                     a1[j, k] = cos_tau_center*A - sin_tau_center*B  # Eq. (S6)
                     a2[j, k] = sin_tau_center*A + cos_tau_center*B  # Eq. (S7)
 
         wwa = np.sqrt(a1**2 + a2**2)
         phase = np.arctan2(a2, a1)
-        coeff = a1 + a2*1j
+        #  coeff = a1 + a2*1j
+        coeff = (a0, a1, a2)
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_opt(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', gaussianize=False, standardize=True):
+    def kirchner_opt(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no',
+                     gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -609,7 +635,7 @@ class WaveletAnalysis(object):
                 Nonlinear Processes in Geophysics 12, 345–352 (2005).
 
         '''
-        assert nproc == 1, "wwz_basic() only supports nproc=1"
+        assert nproc == 1, "kirchner_opt() only supports nproc=1"
         self.assertPositiveInt(Neff)
 
         nt = np.size(tau)
@@ -621,6 +647,7 @@ class WaveletAnalysis(object):
         omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
+        a0 = np.ndarray(shape=(nt, nf))
         a1 = np.ndarray(shape=(nt, nf))
         a2 = np.ndarray(shape=(nt, nf))
 
@@ -633,7 +660,8 @@ class WaveletAnalysis(object):
                 Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
 
                 if Neffs[j, k] <= Neff:
-                    a1[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                    a0[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                    a1[j, k] = np.nan
                     a2[j, k] = np.nan
                 else:
                     def w_prod(xs, ys):
@@ -655,6 +683,7 @@ class WaveletAnalysis(object):
 
                     sin_shift = np.sin(omega[k]*(ts - time_shift))
                     cos_shift = np.cos(omega[k]*(ts - time_shift))
+                    ys_one = w_prod(pd_ys, one_v)
                     sin_tau_center = np.sin(omega[k]*(time_shift - tau[j]))
                     cos_tau_center = np.cos(omega[k]*(time_shift - tau[j]))
 
@@ -664,16 +693,19 @@ class WaveletAnalysis(object):
                     A = 2*ys_cos_shift
                     B = 2*ys_sin_shift
 
+                    a0[j, k] = ys_one
                     a1[j, k] = cos_tau_center*A - sin_tau_center*B  # Eq. (S6)
                     a2[j, k] = sin_tau_center*A + cos_tau_center*B  # Eq. (S7)
 
         wwa = np.sqrt(a1**2 + a2**2)
         phase = np.arctan2(a2, a1)
-        coeff = a1 + a2*1j
+        #  coeff = a1 + a2*1j
+        coeff = (a0, a1, a2)
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no', gaussianize=False, standardize=True):
+    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no',
+                       gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -707,6 +739,7 @@ class WaveletAnalysis(object):
         omega = self.make_omega(ts, freqs)
 
         Neffs = np.ndarray(shape=(nt, nf))
+        a0 = np.ndarray(shape=(nt, nf))
         a1 = np.ndarray(shape=(nt, nf))
         a2 = np.ndarray(shape=(nt, nf))
 
@@ -718,6 +751,7 @@ class WaveletAnalysis(object):
             Neff_loc = sum_w**2 / np.sum(weights**2)
 
             if Neff_loc <= Neff:
+                a0_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
                 a1_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
                 a2_1g = np.nan
             else:
@@ -752,10 +786,11 @@ class WaveletAnalysis(object):
                 A = 2*(ys_cos_shift - ys_one*cos_shift_one)
                 B = 2*(ys_sin_shift - ys_one*sin_shift_one)
 
+                a0_1g = ys_one
                 a1_1g = cos_tau_center*A - sin_tau_center*B  # Eq. (S6)
                 a2_1g = sin_tau_center*A + cos_tau_center*B  # Eq. (S7)
 
-            return Neff_loc, a1_1g, a2_1g
+            return Neff_loc, a0_1g, a1_1g, a2_1g
 
         tf_mesh = np.meshgrid(tau, omega)
         list_of_grids = list(zip(*(grid.flat for grid in tf_mesh)))
@@ -765,16 +800,19 @@ class WaveletAnalysis(object):
             res = pool.map(wwa_1g, tau_grids, omega_grids)
             res_array = np.asarray(res)
             Neffs = res_array[:, 0].reshape((np.size(omega), np.size(tau))).T
-            a1 = res_array[:, 1].reshape((np.size(omega), np.size(tau))).T
-            a2 = res_array[:, 2].reshape((np.size(omega), np.size(tau))).T
+            a0 = res_array[:, 1].reshape((np.size(omega), np.size(tau))).T
+            a1 = res_array[:, 2].reshape((np.size(omega), np.size(tau))).T
+            a2 = res_array[:, 3].reshape((np.size(omega), np.size(tau))).T
 
         wwa = np.sqrt(a1**2 + a2**2)
         phase = np.arctan2(a2, a1)
-        coeff = a1 + a2*1j
+        #  coeff = a1 + a2*1j
+        coeff = (a0, a1, a2)
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no', gaussianize=False, standardize=True):
+    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no',
+                      gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Args:
@@ -806,15 +844,17 @@ class WaveletAnalysis(object):
 
         omega = self.make_omega(ts, freqs)
 
-        Neffs, a1, a2 = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
+        Neffs, a0, a1, a2 = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
 
         undef = -99999.
+        a0[a0 == undef] = np.nan
         a1[a1 == undef] = np.nan
         a2[a2 == undef] = np.nan
         wwa = np.sqrt(a1**2 + a2**2)
         phase = np.arctan2(a2, a1)
 
-        coeff = a1 + a2*1j
+        #  coeff = a1 + a2*1j
+        coeff = (a0, a1, a2)
 
         return wwa, phase, Neffs, coeff
 
@@ -1203,7 +1243,7 @@ class WaveletAnalysis(object):
 
         return wwz_func
 
-    def prepare_wwz(self, ys, ts, freqs=None, tau=None):
+    def prepare_wwz(self, ys, ts, freqs=None, tau=None, bc='no', len_bd=10):
         ''' Return the truncated time series with NaNs deleted
 
         Args:
@@ -1212,6 +1252,9 @@ class WaveletAnalysis(object):
             freqs (array): vector of frequency
             tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
                 if the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so
+            bc (str): 'no' - no boundary conditions are applied;
+                      'odd' - creat ghost grids by making odd time series with respect to the boundary points
+            len_bd (int): the number of the ghost grids want to creat on each boundary
 
         Returns:
             ys_cut (array): the truncated time series with NaNs deleted
@@ -1246,6 +1289,27 @@ class WaveletAnalysis(object):
             tau_ub = np.max(ts[ts < np.max(tau)])
             tau = np.linspace(tau_lb, tau_ub, np.size(tau))
 
+        # boundary condition
+        dt = np.mean(np.diff(ts))
+        dtau = np.mean(np.diff(tau))
+        len_bd_tau = len_bd*dt//dtau
+
+        if bc == 'odd':
+            ys_left_bd = ys[1:len_bd+1]
+            ys_left_bd = -(ys_left_bd[::-1] - ys[0]) + ys[0]
+            ys_right_bd = ys[-len_bd-1:-1]
+            ys_right_bd = -(ys_right_bd[::-1] - ys[-1]) + ys[-1]
+            ys = np.concatenate((ys_left_bd, ys, ys_right_bd))
+
+            ts_left_bd = np.linspace(ts[0]-dt*len_bd, ts[0]-dt, len_bd)
+            ts_right_bd = np.linspace(ts[-1]+dt, ts[-1]+dt*len_bd, len_bd)
+            ts = np.concatenate((ts_left_bd, ts, ts_right_bd))
+
+            warnings.warn("The tau will be regenerated to fit the boundary condition.")
+            tau_left_bd = np.linspace(tau[0]-dtau*len_bd_tau, tau[0]-dtau, len_bd_tau)
+            tau_right_bd = np.linspace(tau[-1]+dtau, tau[-1]+dtau*len_bd_tau, len_bd_tau)
+            tau = np.concatenate((tau_left_bd, tau, tau_right_bd))
+
         # truncate the time series when the range of tau is smaller than that of the time series
         ts_cut = ts[(np.min(tau) <= ts) & (ts <= np.max(tau))]
         ys_cut = ys[(np.min(tau) <= ts) & (ts <= np.max(tau))]
@@ -1259,7 +1323,7 @@ class WaveletAnalysis(object):
         ''' Return the cross wavelet transform.
 
         Args:
-            coeff1, coeff2 (array): the two sets of wavelet transform coefficients
+            coeff1, coeff2 (array): the two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
             freqs (array): vector of frequency
             tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
 
@@ -1282,7 +1346,7 @@ class WaveletAnalysis(object):
         ''' Return the cross wavelet transform.
 
         Args:
-            coeff1, coeff2 (array): the two sets of wavelet transform coefficients
+            coeff1, coeff2 (array): the two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
             freqs (array): vector of frequency
             tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
 
@@ -1320,7 +1384,7 @@ class WaveletAnalysis(object):
             """ Soothing function adapted from https://github.com/regeirk/pycwt/blob/master/pycwt/helpers.py
 
             Args:
-                coeff (array): the wavelet coefficients get from wavlet transform
+                coeff (array): the wavelet coefficients get from wavlet transform **in the form of a1 + a2*1j**
                 snorm (array): normalized scales
                 dj (float): it satisfies the equation [ Sj = S0 * 2**(j*dj) ]
 
@@ -1378,22 +1442,31 @@ class WaveletAnalysis(object):
 
         return xw_coherence
 
-    def reconstruct_ts(self, coeff, freqs, tau, t):
+    def reconstruct_ts(self, coeff, freqs, tau, t, bc='no', len_bd=10):
         ''' Reconstruct the normalized time series from the wavelet coefficients.
         Args:
             coeff (array): the coefficients of the corresponding basis functions a_1 and a_2
             freqs (array): vector of frequency of the basis functions
             tau (array): the evenly-spaced time points of the basis functions
             t (array): the evenly-spaced time points of the reconstructed time series
+            bc (str): 'no' - no boundary conditions are applied;
+                      'odd' - creat ghost grids by making odd time series with respect to the boundary points
+            len_bd (int): the number of the ghost grids want to creat on each boundary
 
         Returns:
             rec_ts (array): the reconstructed normalized time series
         '''
         omega = 2*np.pi*freqs
         nf = np.size(freqs)
+
+        dt = np.mean(np.diff(t))
+        if bc == 'odd':
+            t_left_bd = np.linspace(t[0]-dt*len_bd, t[0]-dt, len_bd)
+            t_right_bd = np.linspace(t[-1]+dt, t[-1]+dt*len_bd, len_bd)
+            t = np.concatenate((t_left_bd, t, t_right_bd))
+
         ntau = np.size(tau)
-        a_1 = coeff.real
-        a_2 = coeff.imag
+        a_0, a_1, a_2 = coeff
 
         rec_ts = np.zeros(np.size(t))
         for k in range(nf):
@@ -1402,7 +1475,10 @@ class WaveletAnalysis(object):
                 phi_1 = np.cos(dz)
                 phi_2 = np.sin(dz)
 
-                rec_ts += a_1[j, k]*phi_1 + a_2[j, k]*phi_2
+                rec_ts += (a_0[j, k] + a_1[j, k]*phi_1 + a_2[j, k]*phi_2)
+
+        if bc == 'odd':
+            rec_ts = rec_ts[len_bd:-len_bd]
 
         rec_ts = self.preprocess(rec_ts, detrend='no', gaussianize=False, standardize=True)
 
@@ -1585,7 +1661,7 @@ def ar1_sim(ys, n, p, ts=None, detrend='no'):
 
 
 def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=200, nproc=8,
-        detrend='no', gaussianize=False, standardize=True, method='Kirchner_f2py'):
+        detrend='no', gaussianize=False, standardize=True, method='Kirchner_f2py', bc='no', len_bd=10):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients
 
     Args:
@@ -1603,6 +1679,9 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+        bc (str): 'no' - no boundary conditions are applied;
+                  'odd' - creat ghost grids by making odd time series with respect to the boundary points
+        len_bd (int): the number of the ghost grids want to creat on each boundary
 
     Returns:
         wwa (array): the weighted wavelet amplitude.
@@ -1621,7 +1700,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=
     wa = WaveletAnalysis()
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
-    ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau)
+    ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau, bc=bc, len_bd=len_bd)
 
     wwz_func = wa.get_wwz_func(nproc, method)
     wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc,
@@ -1778,7 +1857,9 @@ def xwt(ys1, ts1, ys2, ts2,
     psd1_ar1 = wa.psd_ar(np.var(r1), freqs, tauest1, f_sampling_1)
     psd2_ar1 = wa.psd_ar(np.var(r2), freqs, tauest2, f_sampling_2)
 
-    xwt, xw_amplitude, xw_phase = wa.cross_wt(coeff1, coeff2, freqs, tau)
+    wt_coeff1 = coeff1[1] + coeff1[2]*1j
+    wt_coeff2 = coeff2[1] + coeff2[2]*1j
+    xwt, xw_amplitude, xw_phase = wa.cross_wt(wt_coeff1, wt_coeff2, freqs, tau)
 
     sigma_1 = np.std(ys1_cut)
     sigma_2 = np.std(ys2_cut)
@@ -1857,8 +1938,10 @@ def xwc(ys1, ts1, ys2, ts2,
                                                               nproc=nproc, detrend=detrend, gaussianize=gaussianize,
                                                               standardize=standardize, method=method)
 
-    xw_coherence = wa.wavelet_coherence(coeff1, coeff2, freqs, tau)
-    xwt, xw_amplitude, xw_phase = wa.cross_wt(coeff1, coeff2, freqs, tau)
+    wt_coeff1 = coeff1[1] + coeff1[2]*1j
+    wt_coeff2 = coeff2[1] + coeff2[2]*1j
+    xw_coherence = wa.wavelet_coherence(wt_coeff1, wt_coeff2, freqs, tau)
+    xwt, xw_amplitude, xw_phase = wa.cross_wt(wt_coeff1, wt_coeff2, freqs, tau)
 
     # Monte-Carlo simulations of AR1 process
     nt = np.size(tau)
@@ -1877,7 +1960,9 @@ def xwc(ys1, ts1, ys2, ts2,
             _, _, _, _, freqs, tau, _, coeffr2 = wwz(r2, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
                                                      detrend=detrend, gaussianize=gaussianize, standardize=standardize)
 
-            coherence_red[i, :, :] = wa.wavelet_coherence(coeffr1, coeffr2, freqs, tau)
+            wt_coeffr1 = coeffr1[1] + coeffr1[2]*1j
+            wt_coeffr2 = coeffr2[1] + coeffr2[2]*1j
+            coherence_red[i, :, :] = wa.wavelet_coherence(wt_coeffr1, wt_coeffr2, freqs, tau)
 
         for j in range(nt):
             for k in range(nf):
@@ -1997,7 +2082,7 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
 
 def plot_coherence(xw_coherence, xw_phase, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None, basey=2,
                    yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
-                   exg=3, scale=50, width=0.0015,
+                   exg=5, scale=30, width=0.004,
                    cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
                    plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical',
                    cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
