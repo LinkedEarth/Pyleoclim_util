@@ -16,6 +16,11 @@ from mpl_toolkits.basemap import Basemap
 from matplotlib import gridspec
 import seaborn as sns
 import sys
+from itertools import chain
+from scipy.stats.mstats import mquantiles
+import datetime
+import os
+from collections import OrderedDict
 
 
 # Import internal modules to pyleoclim
@@ -26,6 +31,7 @@ from pyleoclim import Plot
 from pyleoclim import Spectral
 from pyleoclim import Stats
 from pyleoclim import Timeseries
+from pyleoclim import RBchron
 
 
 """
@@ -1982,4 +1988,486 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
         else:
             fig = None
                          
-    return dict_out, fig   
+    return dict_out, fig  
+
+"""
+Age model
+"""
+
+def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
+           calCurves = None, reservoirAgeCorr = None, predictPositions = "paleo",\
+           positionsThickness = None, outlierProbs =None, iterations =1000,\
+           burn = 2000, thin = 8, extractDate = 1950-datetime.datetime.now().year,\
+           maxExtrap = 500, thetaMhSd = 0.5, muMhSd = 0.1, psiMhSd = 0.1,\
+           ageScaleVal = 1000, positionScaleVal = 100, saveLipd = True,\
+           plot = True, figsize = [4,8], flipCoor = False,xlabel = None, ylabel = None,
+           xlim = None, ylim = None, violinColor = '#8B008B',\
+           medianLineColor = "black", medianLineWidth = 2.0,\
+           CIFillColor = "Silver", samplePaths = True, samplePathNumber =10,\
+           alpha = 0.5, saveFig = False, dir = "", format = "eps"):
+    """ Runs Bchron and plot if asked 
+    
+    Fits a non-parametric chronology model to age/position data according to
+    the Compound Poisson-Gamma model defined by Haslett and Parnell (2008). 
+    This version used a slightly modified Markov chain Monte-Carlo fitting
+    algorithm which aims to converge quicker and requires fewer iterations.
+    It also a slightly modified procedure for identifying outliers.
+    
+    The Bchronology functions fits a compounf Poisson-Gamma distribution to the
+    incrememnts between the dated levels. This involves a stochastic linear
+    interpolation step where the age gaps are Gamma distributed, and the position
+    gaps are Exponential. Radiocarbon and non-radiocarbon dates (including outliers)
+    are updated within the fucntion also by MCMC.
+    
+    This function also allows to save the ensemble, distributions, and probability
+    tables as well as the parameters with which the model was run into the LiPD file.
+    
+    Finally allows to make a plot.
+    
+    Args:
+        lipd (dict): A dictionary containing the entry of a LiPD file. Can be
+            obtained from lipd.readLipd() or pyleoclim.openLipd(). Please note
+            that the Bchron function currently only allows for a single LiPD file
+            (i.e., not the entire directory).
+        modelNum (int): The model number in which to place the Bchron output. 
+            If unknown, the function will try to make a guess and/or prompt
+            based on the number of already available models.
+        objectName (str): The name of the chron object in which to store the new
+            model (e.g. "chron0")
+        rejectAges (vector): A vector of 1/0 where 1 include the dates to be rejected. 
+            Default it None.
+        calCurves (list): (Optional) A vector of values containing either 'intcal13',
+            'marine13', 'shcal13', or 'normal'. If none is provided, will
+            prompt the user. Should be either of length =1 if using the same
+            calibration for each age or the same length as the vector of ages.
+        reservoirAgeCorr (array): (Optional) A list (matrix) of two floats that correspond to the
+            DeltaR and DeltaR uncertainty. If already added to the ages and
+            ages standard deviation, then enter [0,0] to bypass the prompt.
+            Will only be applied if CalCurves is set to 'marine13'. Otherwise,
+            leave to none.
+        predictPositions (array): (Optional) a vector of positions 
+            (e.g. depths) at which predicted age values are required. 
+            Defaults to a sequence of length 100 from the top position to the
+            bottom position.
+        positionsThickness (array): (Optional) Thickness values for each of the positions.
+            The thickness values should be the full thickness value of the
+            slice. By default set to zero.
+        outlierProbs (array): (Optional) A vector of prior outlier probabilities,
+            one for each age. Defaults to 0.01
+        iterations (int): (Optional) The number of iterations to start the procedure. 
+            Default and minimum should be 10000.
+        burn (int): (Optional) The number of starting iterations to discard.
+            Default is 200
+        thin (int): (Optional) The step size for every iteration to keep beyond
+            the burnin. Default is 8.
+        extractDate (float): (Optional) The top age of the core. Used for
+            extrapolation purposes so that no extrapolated ages go beyond the
+            top age of the core. Defaults to the current year.
+        maxExtrap (int): (Optional) The maximum number of extrapolations to
+            perform before giving up and setting the predicted ages to NA. 
+            Useful for when large amounts of extrapolation are required, i.e.
+            some of the predictPositions are a long way from the dated
+            positions. Defaults to 500.
+        thetaMhSd (float):  (Optional)  The Metropolis-Hastings standard
+            deviation for the age parameters. Defaults to 0.5.
+        muMhSd (float): (Optional)  The Metropolis-Hastings standard deviation
+            for the compound Poisson-Gamma Scale. Defaults to 0.1
+        psiMhSd (float): (Optional) The Metropolis-Hastings standard deviation 
+            for the Compound Poisson-Gamma Scale.
+        ageScaleVal (int): (Optional) A scale value for the ages. 
+            Bchronology works best when the ages are scaled to be 
+            approximately between 0 and 100.
+            The default value is thus 1000 for ages given in years.
+        positionScaleVal (int):  (Optional) A scale value for the positions. 
+            Bchronology works best when the positions are scaled to be 
+            approximately between 0 and 100. The default value is thus
+            100 for positions given in cm.
+        saveLipd (bool): If True, saves the ensemble, distribution, and probability
+            tables along with the parameters used to run the model in the LiPD
+            file.
+        plot (bool): If True, makes a plot for the chronology
+        figsize (list): The figure size. Default is [4,8]
+        flipCoor (bool): If True, plots depth on the y-axis.
+        xlabel (str): The label for the x-axis
+        ylabel (str): The label for the y-axis
+        xlim (list): Limits for the x-axis. Default corresponds to the min/max
+            of the depth vector.
+        ylim (list): Limits for the y-axis. Default set by matplotlib
+        violinColor (str): The color for the violins. Default is purple
+        medianLineColor (str): The color for the median line. Default is black.
+        medianLineWidth (float): The width for the median line
+        CIFillColor (str): Fill color in between the 95% confidence interval.
+            Default is silver.
+        samplePaths (bool): If True, draws sample paths from the distribution.
+            Use the same color as the violins. 
+        samplePathNumber (int): The number of sample paths to draw. Default is 10.
+            Note: samplePaths need to be set to True. 
+        alpha (float): The violins' transparency. Number between 0 and 1
+        saveFig (bool): default is to not save the figure
+        dir (str): the full path of the directory in which to save the figure.
+            If not provided, creates a default folder called 'figures' in the
+            LiPD working directory (lipd.path).
+        format (str): One of the file extensions supported by the active
+            backend. Default is "eps". Most backend support png, pdf, ps, eps,
+            and svg.
+    """
+    
+    # Get the csv_list
+    csv_dict = lpd.getCsv(lipd)
+    # Get the list of possible measurement tables
+    chronMeasurementTables, paleoMeasurementTables = LipdUtils.isMeasurement(csv_dict)
+    #Check that there is a measurement table or exit
+    if not chronMeasurementTables:
+        sys.exit("No ChronMeasurementTables available to run BChron!")
+    # Selct measurement table
+    csvName = LipdUtils.whichMeasurement(chronMeasurementTables, csv_dict)
+    # Get the ts-like object from selected measurement table
+    ts_list = LipdUtils.getMeasurement(csvName, lipd)
+    # Make sure there is no model associated with the choice
+    if not modelNum and not objectName:
+        model, objectName = LipdUtils.isModel(csvName, lipd)
+        modelNum = LipdUtils.modelNumber(model)
+    elif modelNum and not objectName:
+        sys.exit("You must provide a dataObject when specifying a model.")        
+    ## look for the inputs for Bchron
+    # Find an age column
+    print("Looking for age data...")
+    match = LipdUtils.searchVar(ts_list,["radiocarbon","age14C"])
+    if not match:
+        sys.exit("No age data available")
+    ages = ts_list[match[0]]['values']
+    if "units" in ts_list[match[0]].keys():
+        agesUnit = ts_list[match[0]]['units']
+    else:
+        agesUnit =[]    
+    print("Age data found.")
+    
+    # Find a depth column
+    print("Looking for a depth/position column...")
+    match = LipdUtils.searchVar(ts_list,["depth"]) 
+    if not match:
+        sys.exit("No age data available")
+    positions = ts_list[match[0]]['values']
+    if "units" in ts_list[match[0]].keys():
+        positionsUnits = ts_list[match[0]]['units']
+    else:
+        positionsUnits = []
+    print("Depth information found.")
+    
+    # Find the uncertainty
+    print("Looking for age uncertainty...")
+    match = LipdUtils.searchVar(ts_list,["uncertainty"],exact=False)
+    if not match:
+        sys.exit("No uncertainty data available")
+    agesStd = ts_list[match[0]]['values']
+    print("Uncertainty data found.")
+    
+    # See if there is a column of reject ages
+    if rejectAges == True:
+        print("Looking for a column of rejected ages...")
+        match = LipdUtils.searchVar(ts_list,["rejectAges"], exact=False)
+        if not match:
+            print("No column of rejected ages found.")
+            rejectAges = None
+            print("No ages rejected.")
+        else:
+            rejectAges = ts_list[match[0]]['values']
+            print("Rejected ages found.")
+    
+    # Check if there are calibration curves
+    if not calCurves:
+        print("Looking for calibration curves...")
+        match = LipdUtils.searchVar(ts_list,["calCurves"], exact=False)
+        if not match:
+            calCurves = RBchron.chooseCalCurves()
+            calCurves = RBchron.verifyCalCurves(calCurves)
+            if len(calCurves) == 1 and len(positions)!=1:
+                calCurves = list(chain(*[[i]*len(positions) for i in calCurves]))
+        else:
+            calCurves = ts_list[match[0]]['values']
+            calCurves = RBchron.verifyCalCurves(calCurves)
+    elif len(calCurves)==1 and len(positions)!=1:
+        calCurves = RBchron.verifyCalCurves(calCurves)
+        calCurves = list(chain(*[[i]*len(positions) for i in calCurves]))
+    else:
+        assert len(calCurves) == len(positions)
+        calCurves = RBchron.verifyCalCurves(calCurves)
+    print("Calibration curves found.")
+                
+    #Check for a reservoir age 
+    
+    if reservoirAgeCorr == None:
+        print("Looking for a reservoir age correction.")
+        match = LipdUtils.searchVar(ts_list,\
+                                    ["reservoir","reservoirAge","correction"],\
+                                    exact=True)
+        if len(match)==1:
+            ageCorr = ts_list[match[0]]['values']
+            print("Reservoir Age correction found.")
+            print("Looking for correction uncertainty...")
+            match = LipdUtils.searchVar(ts_list,["reservoirUncertainty"],\
+                                                 exact=True)
+            if not match:
+                print("No match found.")
+                corrU = float(input("Enter a value for the correction uncertainty: "))
+                ageCorrStd = corrU*np.ones((len(ageCorr),1))
+            else:
+                ageCorrStd = ts_list[match[0]]['values']
+                    
+        else:
+            print("No match found.")
+            ageCorr, ageCorrStd = RBchron.reservoirAgeCorrection()
+        reservoirAgeCorr = np.column_stack((ageCorr,ageCorrStd))
+        reservoirAgeCorr = reservoirAgeCorr.flatten()
+        
+    elif reservoirAgeCorr == True:
+        ageCorr, ageCorrStd = RBchron.reservoirAgeCorrection()
+        reservoirAgeCorr = np.column_stack((ageCorr,ageCorrStd))
+        reservoirAgeCorr = reservoirAgeCorr.flatten()       
+    else:
+        if type(reservoirAgeCorr)!=np.ndarray:
+            if type(reservoirAgeCorr) == list:
+                reservoirAgeCorr = np.array(reservoirAgeCorr)
+            else:
+                sys.exit("The reservoir age correction should be either None, True or an array.")
+         
+    #Predict positions
+    if predictPositions == "paleo":
+        # Grab the paleomeasurementTables
+        paleoCsvName = LipdUtils.whichMeasurement(paleoMeasurementTables, csv_dict)
+        # Get the various timeseries
+        paleots_list = LipdUtils.getMeasurement(paleoCsvName, lipd)
+        #Look for a depth column
+        match = LipdUtils.searchVar(paleots_list,["depth"], exact=True)
+        if not match:
+            print("No paleoDepth information available, using Bchron default")
+            predictPositions = None
+        else:
+            predictPositions = paleots_list[match[0]]['values']
+            if "units" in paleots_list[match[0]].keys():
+                predictPositionsUnits = paleots_list[match[0]]['units']
+            else:
+                predictPositionsUnits = []
+     
+    # Raise an error if the depth units don't correspond
+    if predictPositionsUnits and positionsUnits:
+        if predictPositionsUnits != positionsUnits:
+            print("Depth units in the paleoData table and the chronData table don't match!")
+            print("PaleoDepth are expressed in "+predictPositionsUnits+\
+                  " while ChronDepth is expressed in "+positionsUnits)
+            factor = float(input("Enter a correction value to bring Chron to Paleo scale"+\
+                                 " or press Enter to exit."+\
+                                 " Enter 1 if the units are in fact the same but"+\
+                                 " written differently (e.g., m vs meter): "))  
+            if not factor:
+                sys.exit("No correction factor entered.")
+            else:
+                positions = positions*factor
+      
+    # Run Bchron
+    print("Running Bchron. This could take a few minutes...")
+    depth, chron, ageDist, run = RBchron.runBchron(ages, agesStd,positions,\
+                                                    rejectAges = rejectAges,\
+                                                    calCurves = calCurves,\
+                                                    reservoirAgeCorr = reservoirAgeCorr,\
+                                                    predictPositions = predictPositions,
+                                                    positionsThickness= positionsThickness,\
+                                                    outlierProbs=outlierProbs,\
+                                                    iterations=iterations,\
+                                                    burn=burn, thin=thin,\
+                                                    extractDate=extractDate,\
+                                                    maxExtrap=maxExtrap,\
+                                                    thetaMhSd = thetaMhSd,\
+                                                    muMhSd=muMhSd,psiMhSd = psiMhSd,\
+                                                    ageScaleVal=ageScaleVal,\
+                                                    positionScaleVal =positionScaleVal)
+    
+    ## Write into the LiPD file is asked
+    if saveLipd is True:
+        print("Placing all the tables in the LiPD object and saving...")
+        if "model" in lipd["chronData"][objectName].keys():
+            T = lipd["chronData"][objectName]["model"]
+        else:
+            T = lipd["chronData"][objectName].update({"model":{}})
+        #Grab the part of the LiPD dictionary with the chronObject/model
+        T = lipd["chronData"][objectName]["model"]
+        
+        ## methods
+        inputs={"calCurves":calCurves,
+                "iterations":iterations,
+                "burn":burn,
+                "thin":thin,
+                "extractDate":extractDate,
+                "maxExtrap": maxExtrap,
+                "thetaMhSd": thetaMhSd,
+                "muMhSd":muMhSd,
+                "psiMhSd":psiMhSd,
+                "ageScaleVal":ageScaleVal,
+                "positionScaleVal":positionScaleVal}
+        
+        # Other None objects 
+        if type(reservoirAgeCorr) is np.ndarray:
+            reservoirAgeCorr = reservoirAgeCorr.tolist()
+            inputs.update({"reservoirAgeCorr":reservoirAgeCorr})
+        else:
+            inputs.update({"reservoirAgeCorr":"Not provided"})    
+        if type(rejectAges) is np.ndarray:
+            rejectAges = rejectAges.tolist()
+            inputs.update({"rejectAges":rejectAges})
+        else:
+            inputs.update({"rejectAges":"Not provided"})    
+        if type(positionsThickness) is np.ndarray:
+            positionsThickness = positionsThickness.tolist()
+            inputs.update({"positionsThickness":positionsThickness})
+        else:
+            inputs.update({"positionsThickness":"Not provided"})
+        if type(outlierProbs) is np.ndarray:
+            outlierProbs = outlierProbs.tolist()
+            inputs.update({"outlierProbs":outlierProbs})    
+        else:
+            inputs.update({"outlierProbs":"Not provided"}) 
+            
+        methods = {"algorithm":"Bchron", "inputs":inputs,"runEnv":"python"}
+        
+        #create the key for the new model
+        key = str(objectName)+"model"+str(modelNum)
+        # Add the method to object
+        T.update({key:{}})
+        T[key].update({"method":methods})
+        
+        ##EnsembleTable
+        d = OrderedDict()
+        T[key].update({"ensembleTable": d})
+        key_ens = key+"ensemble0" # Key for the ensemble table
+        T[key]["ensembleTable"].update({key_ens:{}})
+        d = OrderedDict() #RESET VERY IMPORTANT
+        T[key]["ensembleTable"][key_ens].update({"columns": d})
+        
+        #store age and depth info 
+        number_age = np.arange(2,np.shape(chron)[1]+2,1)
+        number_age = number_age.tolist()
+        chron_list = np.transpose(chron).tolist()
+        age_dict = {"number": number_age,
+                    "units":agesUnit,
+                    "variableName":"age",
+                    "values":chron_list}
+        depth_dict = {"number":1,
+                      "units":predictPositionsUnits,
+                      "variableName":"depth",
+                      "values":depth}
+        T[key]["ensembleTable"][key_ens]["columns"].update({"depth":depth_dict})
+        T[key]["ensembleTable"][key_ens]["columns"].update({"age":age_dict}) 
+        
+        ## Summary Table
+        # First calculate some summary stats
+        quant = mquantiles(chron,[0.025,0.5,0.975],axis=1)
+        # Save as list for JSON
+        lower95 = quant[:,0].tolist()
+        medianAge = quant[:,1].tolist()
+        upper95 = quant[:,2].tolist()
+        meanVal = np.mean(chron, axis=1)
+        meanVal = meanVal.tolist()
+        # Put everything where it belongs
+        d = OrderedDict()
+        T[key].update({"summaryTable": d})
+        key_sum = key+"summary0"
+        T[key]["summaryTable"].update({key_sum:{}})
+        d = OrderedDict()
+        T[key]["summaryTable"][key_sum].update({"columns": d})
+        # Place each column as separate dictionary
+        T[key]["summaryTable"][key_sum]["columns"].update({"depth":{"variableName":"depth",
+                                                                    "units":predictPositionsUnits,
+                                                                    "values":depth,
+                                                                    "number":1}})
+        T[key]["summaryTable"][key_sum]["columns"].update({"meanAge":{"variableName":"meanAge",
+                                                                    "units":agesUnit,
+                                                                    "values":meanVal,
+                                                                    "number":2}})
+        T[key]["summaryTable"][key_sum]["columns"].update({"medianAge":{"variableName":"medianAge",
+                                                                    "units":agesUnit,
+                                                                    "values":medianAge,
+                                                                    "number":3}})
+        T[key]["summaryTable"][key_sum]["columns"].update({"95Lower":{"variableName":"95Lower",
+                                                                    "units":agesUnit,
+                                                                    "values":lower95,
+                                                                    "number":4}})
+        T[key]["summaryTable"][key_sum]["columns"].update({"95Higher":{"variableName":"95Higher",
+                                                                    "units":agesUnit,
+                                                                    "values":upper95,
+                                                                    "number":5}})
+        
+        ## DistributionTables
+        d = OrderedDict()
+        T[key].update({"distributionTable": d})
+        
+        for i in np.arange(0,np.shape(ageDist)[1],1):
+            #Get the output in list form
+             
+            key_dist = key+"distribution"+str(i)
+            T[key]["distributionTable"].update({key_dist:{}})
+            d = OrderedDict()
+            T[key]["distributionTable"][key_dist].update({"age14C":list(run[6][i][0])[0],
+                                                         "calibrationCurve":calCurves[i],
+                                                         "columns":d,
+                                                         "depth":list(run[6][i][2])[0],
+                                                         "depthUnits":predictPositionsUnits,
+                                                         "sd14C":list(run[6][i][1])[0]})
+            age_dict = {"number":1,
+                        "variableName":"age",
+                        "units":agesUnit,
+                        "values":list(run[6][i][4])}
+            density_dict = {"number":2,
+                        "variableName":"probabilityDensity",
+                        "values":list(run[6][i][5])}
+            
+            T[key]["distributionTable"][key_dist]["columns"].update({"age":age_dict,
+                                                                     "probabilityDensity":density_dict})
+        ## Finally write it out
+        print("Writing LiPD file...")
+        lpd.writeLipd(lipd,path=os.getcwd()) 
+        
+    #Plot if asked
+    if plot is True:
+        print("Plotting...")
+        if flipCoor is True:
+            if ylabel == None:
+                if len(predictPositionsUnits)!=0:
+                    ylabel = "Depth ("+str(predictPositionsUnits)+")"
+                else:
+                    ylabel = "Depth"
+            if xlabel == None:
+                if len(agesUnit)!=0:
+                    xlabel = "Age ("+str(agesUnit)+")"
+                else:
+                    xlabel = "Age"
+        else:    
+            if xlabel == None:
+                if len(predictPositionsUnits)!=0:
+                    xlabel = "Depth ("+str(predictPositionsUnits)+")"
+                else:
+                    xlabel = "Depth"
+            if ylabel == None:
+                if len(agesUnit)!=0:
+                    ylabel = "Age ("+str(agesUnit)+")"
+                else:
+                    ylabel = "Age"
+        fig = RBchron.plotBchron(depth,chron,positions,ageDist, flipCoor=flipCoor,\
+                                 xlabel =xlabel, ylabel=ylabel,\
+                                 xlim = xlim, ylim = ylim,\
+                                 violinColor = violinColor,\
+                                 medianLineColor = medianLineColor,\
+                                 medianLineWidth = medianLineWidth,\
+                                 CIFillColor = CIFillColor,\
+                                 samplePaths = samplePaths,\
+                                 samplePathNumber = samplePathNumber,
+                                 alpha = alpha, figsize = figsize)
+        if saveFig is True:
+            LipdUtils.saveFigure(lipd['dataSetName']+'_Bchron',format,dir)
+        else:
+            plt.show                   
+    else:
+        fig = None
+        
+    return depth, chron, positions, ageDist, fig               
+        
+    

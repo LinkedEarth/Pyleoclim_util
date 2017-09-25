@@ -77,10 +77,11 @@ def enumerateLipds(lipds):
     
     """
     print("Below are the available records")
-    for idx, val in enumerate(lipds):
+    lipds_list = [val for val in lipds.keys()]
+    for idx, val in enumerate(lipds_list):
         print(idx,': ',val)   
 
-def promptForLipd(lipds):
+def getLipd(lipds):
     """Prompt for a LiPD file
     
     Ask the user to select a LiPD file from a list
@@ -94,8 +95,14 @@ def promptForLipd(lipds):
         The index of the LiPD file
         
     """
-    select_lipd = int(input("Enter the number of the file you wish to analyze: "))
+    enumerateLipds(lipds)
+    lipds_list = [val for val in lipds.keys()]
+    choice = int(input("Enter the number of the file: "))
+    lipd_name = lipds_list[choice]
+    select_lipd = lipds[lipd_name]
+    
     return select_lipd 
+   
                                    
 """
 The following functions work at the variables level
@@ -203,6 +210,180 @@ def checkXaxis(timeseries, x_axis=""):
         sys.exit("enter either 'depth','age',or 'year'") 
   
     return x, label
+
+def searchVar(timeseries_list, key, exact = True, override = True):
+    """ This function search for key words (exact match) for a variable
+    
+    Args:
+        timeseries_list (list): A list of available series
+        key (list): A list of keys to search
+        exact (bool): if True, looks for an exact match.
+        override (bool): if True, override the exact match if no match is found
+    
+    Returns:
+        match (list)- A list of keys for the timeseries that match the selection
+            criteria.
+    """
+    
+    # Make sure thaat the keys are contained in a list
+    if type(key) is not list:
+       if type(key) is str:
+           key = [key]
+       else:
+           sys.exit("Key terms should be entered as a list")
+    
+    match = []
+    
+    if exact == True:
+    #Search for exact match with the key    
+        for keyVal in key:
+            for val in timeseries_list.keys():
+                ts_temp = timeseries_list[val]
+                if "variableName" in ts_temp.keys():
+                    name = ts_temp["variableName"]
+                    if keyVal.lower() == name.lower():
+                        match.append(val)
+                elif "paleoData_variableName" in ts_temp.keys():
+                    name = ts_temp["paleoData_variableName"]
+                    if keyVal.lower() == name.lower():
+                        match.append(val)
+                elif "chronData_variableName" in ts_temp.keys():
+                    name = ts_temp["chronData_variableName"]
+                    if keyVal.lower() == name.lower():
+                        match.append(val)        
+                elif "proxyObservationType" in ts_temp.keys():
+                    name = ts_temp["proxyObservationType"]
+                    if keyVal.lower() == name.lower():
+                        match.append(val)
+                elif "paleoData_proxyObservationType" in ts_temp.keys():
+                    name = ts_temp["paleoData_proxyObservationType"]
+                    if keyVal.lower() == name.lower():
+                        match.append(val) 
+                elif "chronData_proxyObservationType" in ts_temp.keys():
+                    name = ts_temp["chronData_proxyObservationType"]
+                    if keyVal.lower() == name.lower():
+                        match.append(val)
+                elif "inferredVariableType" in ts_temp.keys():
+                    name = ts_temp["inferredVariableType"]
+                    if keyVal.lower() == name.lower():
+                        match.append(val)
+                elif "paleoData_inferredVariableType" in ts_temp.keys():
+                    name = ts_temp["paleoData_inferredVariableType"]
+                    if keyVal.lower() == name.lower():
+                        match.append(val) 
+                elif "chronData_inferredVariableType" in ts_temp.keys():
+                    name = ts_temp["chronData_inferredVariableType"]
+                    if keyVal.lower() == name.lower():
+                        match.append(val)          
+    else:    
+    # Search for the word in the ley
+        for keyVal in key:
+            for val in timeseries_list.keys():
+                ts_temp = timeseries_list[val]
+                if "variableName" in ts_temp.keys():
+                    name = ts_temp["variableName"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)
+                elif "paleoData_variableName" in ts_temp.keys():
+                    name = ts_temp["paleoData_variableName"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)
+                elif "chronData_variableName" in ts_temp.keys():
+                    name = ts_temp["chronData_variableName"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)        
+                elif "proxyObservationType" in ts_temp.keys():
+                    name = ts_temp["proxyObservationType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)
+                elif "paleoData_proxyObservationType" in ts_temp.keys():
+                    name = ts_temp["paleoData_proxyObservationType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val) 
+                elif "chronData_proxyObservationType" in ts_temp.keys():
+                    name = ts_temp["chronData_proxyObservationType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)
+                elif "inferredVariableType" in ts_temp.keys():
+                    name = ts_temp["inferredVariableType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)
+                elif "paleoData_inferredVariableType" in ts_temp.keys():
+                    name = ts_temp["paleoData_inferredVariableType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val) 
+                elif "chronData_inferredVariableType" in ts_temp.keys():
+                    name = ts_temp["chronData_inferredVariableType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)
+    
+    # Expand the search if asked                    
+    if not match and exact == True and override == True:
+        print("No match found on exact search, running partial match")
+        for keyVal in key:
+            for val in timeseries_list.keys():
+                ts_temp = timeseries_list[val]
+                if "variableName" in ts_temp.keys():
+                    name = ts_temp["variableName"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)
+                elif "paleoData_variableName" in ts_temp.keys():
+                    name = ts_temp["paleoData_variableName"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)
+                elif "chronData_variableName" in ts_temp.keys():
+                    name = ts_temp["chronData_variableName"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)        
+                elif "proxyObservationType" in ts_temp.keys():
+                    name = ts_temp["proxyObservationType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)
+                elif "paleoData_proxyObservationType" in ts_temp.keys():
+                    name = ts_temp["paleoData_proxyObservationType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val) 
+                elif "chronData_proxyObservationType" in ts_temp.keys():
+                    name = ts_temp["chronData_proxyObservationType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)
+                elif "inferredVariableType" in ts_temp.keys():
+                    name = ts_temp["inferredVariableType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)
+                elif "paleoData_inferredVariableType" in ts_temp.keys():
+                    name = ts_temp["paleoData_inferredVariableType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val) 
+                elif "chronData_inferredVariableType" in ts_temp.keys():
+                    name = ts_temp["chronData_inferredVariableType"]
+                    if keyVal.lower() in name.lower():
+                        match.append(val)  
+    
+    # Get the unique entries
+    match = list(set(match))
+    
+    # Narrow down if more than one match is found by asking the user
+    if len(match) > 1:
+        print("More than one series match your search criteria")
+        for idx, val in enumerate(match):
+            print(idx,": ", val)
+        choice = int(input("Enter the number for the variable: "))
+        match = match[choice]
+    elif not match:
+        print("No match found.")
+        print("Here are the available variables: ")
+        v = list(timeseries_list.keys())
+        for idx, val in enumerate(v):
+            print(idx,": ",val)
+        choice = input("Please select the variable you'd like to use or enter to continue: ")
+        if not choice:
+            match =[]
+        else:
+            choice = int(choice)
+            match = v[choice]    
+        
+    return match
     
 """
 The following functions handle the time series objects
@@ -279,6 +460,148 @@ def LipdToOntology(archiveType):
     return archiveType
 
 """
+Deal with models
+"""
+def isModel(csvName, lipd):
+    """Check for the presence of a model in the same object than the measurement table
+    
+    Args:
+        csvName (str): The name of the csv file corresponding to the measurement table
+        lipd (dict): A LiPD object
+    
+    Returns:
+        model (list): List of models already available\n
+        dataObject (str): The name of the paleoData or ChronData
+            object in which the model(s) are stored
+    """
+    csvNameSplit = csvName.split('.')
+    for val in csvNameSplit:
+        if "chron" in val or "paleo" in val:
+            tableName = val
+    
+    if tableName[0] == 'c':
+        objectName = 'chron'+tableName.split('chron')[1][0]
+        dataObject = lipd["chronData"][objectName]
+    elif tableName[0] == 'p':
+        objectName = 'paleo'+tableName.split('paleo')[1][0]
+        dataObject = lipd["paleoData"][objectName]
+    else:
+        sys.exit("Key name should only include 'chron' or 'paleo'")
+    
+    if "model" in dataObject.keys():
+        model_list = dataObject["model"]
+        model = list(model_list.keys())
+    else:
+        model=[]
+    
+    return model, objectName
+
+def modelNumber(model):
+    """Assign a new or existing model number
+    
+    Args:
+        model (list): List of possible model number. Obtained from isModel
+        
+    Returns:
+        modelNum (int): The number of the model
+    """
+    if model:
+        print("There is " + str(len(model)) + " model(s) already available.")
+        choice = input("Do you want to create (c) another or override (o) one? ")
+        while choice !="c" and choice!= "o":
+               choice = input("Enter either c or o: ")
+        if choice == "c":
+            modelNum = len(model)
+        elif choice == "o":
+            if len(model) == 1:
+                modelNum = 0
+            else:
+                print("There is more than one model available.")
+                modelNum = int(input("Enter the number of the model you wish to override: "))        
+    else:
+        print("No previous model available. Creating model...")
+        modelNum = 0
+    
+    return modelNum    
+    
+"""
+Get entire tables
+"""
+
+def isMeasurement(csv_dict):
+    """ Check whether measurement tables are available
+    
+    Args:
+        csv_dict (dict): Dictionary of available csv
+    
+    Returns:
+        paleoMeasurementTables - List of available paleoMeasurementTables
+        chronMeasurementTables - List of available chronMeasurementTables
+    """
+    chronMeasurementTables = []
+    paleoMeasurementTables =[]
+    
+    for val in csv_dict.keys():
+        if "measurement" in val and "chron" in val:
+            chronMeasurementTables.append(val)
+        if "measurement" in val and "paleo" in val:
+            paleoMeasurementTables.append(val)
+            
+    return chronMeasurementTables, paleoMeasurementTables
+
+def whichMeasurement(measurementTableList, csv_dict):
+    """Select a measurement table from a list
+    
+    Use in conjunction with the function isMeasurement
+    
+    Args:
+        measurementTableList (list): List of measurement tables contained in the
+            LiPD file. Output from the isMeasurement function
+        csv_list (list): Dictionary of available csv     
+    
+    Returns:
+        csvName (str) - the name of the csv file
+    
+    """
+    if len(measurementTableList)>1:
+        print("More than one table is available.")
+        for idx, val in enumerate(measurementTableList):
+            print(idx, ": ", val)
+        csvName = measurementTableList[int(input("Which one would you like to use? "))]
+    else:
+        csvName = measurementTableList[0]       
+
+    return csvName       
+
+def getMeasurement(csvName, lipd):
+    """Extract the dictionary corresponding to the measurement table
+    
+    Args:
+        csvName (str): The name of the csv file
+        lipd (dict): The LiPD object from which to extract the data
+    
+    Returns:
+        ts_list - A dictionary containing data and metadata for each column in the
+            csv file.
+    
+    """
+    csvNameSplit = csvName.split('.')
+    for val in csvNameSplit:
+        if "chron" in val or "paleo" in val:
+            tableName = val
+    
+    if tableName[0] == 'c':
+        objectName = 'chron'+tableName.split('chron')[1][0]
+        ts_list = lipd["chronData"][objectName]["measurementTable"][tableName]["columns"]
+    elif tableName[0] == 'p':
+        objectName = 'paleo'+tableName.split('paleo')[1][0]
+        ts_list = lipd["paleoData"][objectName]["measurementTable"][tableName]["columns"]
+    else:
+        sys.exit("Key name should only include 'chron' or 'paleo'")
+                
+    return ts_list    
+
+"""
 Deal with ensembles
 """
 
@@ -287,11 +610,10 @@ def isEnsemble(csv_dict):
     
     Args:
         csv_dict (dict): Dictionary of available csv
-        option (str): check for a chron, paleo, or both
     
     Returns:
-        paleoEnsembleTables: List of available paleoEnsembleTables \n
-        chronEnsembleTables: List of availale chronEnsemble Tables
+        paleoEnsembleTables - List of available paleoEnsembleTables \n
+        chronEnsembleTables - List of availale chronEnsemble Tables
         
     """     
     chronEnsembleTables =[]
