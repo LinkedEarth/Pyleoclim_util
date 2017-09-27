@@ -1432,7 +1432,9 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
         wwz_default: If True, will use the following default parameters:
             
             wwz_default = {'tau':None,'freqs':None,'c':1/(8*np.pi**2),'Neff':3,'nMC':200,
-                               'nproc':8,'detrend':'no','method':'Kirchner_f2py'}.
+                               'nproc':8,'detrend':'no','params':['default',4,0,1],
+                               'gaussianize':False, 'standardize':True,
+                               'method':'Kirchner_f2py'}.
                 
             Modify the values for specific keys to change the default behavior.
                 
@@ -1444,6 +1446,9 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                           'nproc':8,
                           'nMC':200,
                           'detrend':'no',
+                          'params' : ["default",4,0,1],
+                          'gaussianize': False,
+                          'standardize':True,
                           'Neff':3,
                           'anti_alias':False,
                           'avgs':2,
@@ -1604,6 +1609,9 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                        'nproc':8,
                        'nMC':200,
                        'detrend':'no',
+                       'params' : ["default",4,0,1],
+                       'gaussianize': False,
+                       'standardize':True,
                        'Neff':3,
                        'anti_alias':False,
                        'avgs':2,
@@ -1621,6 +1629,9 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                        'nproc':8,
                        'nMC':200,
                        'detrend':'no',
+                       'params' : ["default",4,0,1],
+                       'gaussianize': False,
+                       'standardize':True,
                        'Neff':3,
                        'anti_alias':False,
                        'avgs':2,
@@ -1628,12 +1639,13 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                        }
             
         # Perform calculation
-        psd, freqs, psd_ar1_q95 = Spectral.wwz_psd(ys, ts, **psd_default)
+        psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts, **psd_default)
         
         # Wrap up the output dictionary
         dict_out = {'psd':psd,
                'freqs':freqs,
-               'psd_ar1_q95':psd_ar1_q95}
+               'psd_ar1_q95':psd_ar1_q95,
+               'psd_ar1':psd_ar1}
         
         # Plot if asked
         if fig is True:
@@ -1641,19 +1653,27 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
             if type(psdplot_default) is dict:
                 dict_in = psdplot_default
                 
-                psdplot_default={'lmstyle':None,
+                psdplot_default={'lmstyle':'-',
                                  'linewidth':None,
-                                 'xticks':None,
-                                 'xlim':None,
-                                 'ylim':None,
+                                 'color': sns.xkcd_rgb["denim blue"],
+                                 'ar1_lmstyle': '-',
+                                 'ar1_linewidth': None,
+                                 'period_ticks':None,
+                                 'psd_lim':None,
+                                 'period_lim':None,
                                  'figsize':[20,8],
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
+                                 'plot_ar1_ensemble': False,
+                                 'psd_ar1':None,
+                                 'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
                                  'ax':None,
-                                 'xlabel':'Period ('+ageunits+')',
-                                 'ylabel':'Spectral Density'}        
+                                 'vertical':False,
+                                 'period_label':'Period ('+ageunits+')',
+                                 'psd_label':'Spectral Density',
+                                 'zorder' : None}        
                                 
                 for key, value in dict_in.items():
                     if key in psdplot_default.keys():
@@ -1661,19 +1681,27 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                         
             else:
                    
-               psdplot_default={'lmstyle':None,
+               psdplot_default={'lmstyle':'-',
                                  'linewidth':None,
-                                 'xticks':None,
-                                 'xlim':None,
-                                 'ylim':None,
+                                 'color': sns.xkcd_rgb["denim blue"],
+                                 'ar1_lmstyle': '-',
+                                 'ar1_linewidth': None,
+                                 'period_ticks':None,
+                                 'psd_lim':None,
+                                 'period_lim':None,
                                  'figsize':[20,8],
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
+                                 'plot_ar1_ensemble': False,
+                                 'psd_ar1':None,
+                                 'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
                                  'ax':None,
-                                 'xlabel':'Period ('+ageunits+')',
-                                 'ylabel':'Spectral Density'}                 
+                                 'vertical':False,
+                                 'period_label':'Period ('+ageunits+')',
+                                 'psd_label':'Spectral Density',
+                                 'zorder' : None}                 
                 
             fig = Spectral.plot_psd(psd,freqs,**psdplot_default)
             
@@ -1697,7 +1725,12 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                            'nMC':200,
                            'nproc':8,
                            'detrend':'no',
-                           'method':'Kirchner_f2py'}
+                           'params' : ["default",4,0,1],
+                           'gaussianize': False,
+                           'standardize':True,
+                           'method':'Kirchner_f2py',
+                           'bc':'no',
+                           'len_bd':10}
             
             for key,value in dict_in.items():
                 if key in wwz_default.keys():
@@ -1712,7 +1745,12 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                            'nMC':200,
                            'nproc':8,
                            'detrend':'no',
-                           'method':'Kirchner_f2py'}
+                           'params' : ["default",4,0,1],
+                           'gaussianize': False,
+                           'standardize':True,
+                           'method':'Kirchner_f2py',
+                           'bc':'no',
+                           'len_bd':10}
         
         #Perform the calculation
         wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts, **wwz_default)
@@ -1732,8 +1770,7 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
             # Set the plot default
             if type(wwaplot_default) is dict:
                 dict_in = wwaplot_default
-                wwaplot_default={'Neff':3,
-                                 'AR1_q':AR1_q,
+                wwaplot_default={'AR1_q':AR1_q,
                                  'coi':coi,
                                  'levels':None,
                                  'tick_range':None,
@@ -1748,16 +1785,20 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'plot_signif':True,
                                  'signif_style':'contour',
                                  'plot_cone':True,
+                                 'title':None,
                                  'ax':None,
                                  'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')'}
+                                 'ylabel': 'Period ('+ageunits+')',
+                                 'cbar_orientation':'vertical',
+                                 'cbar_pad':0.05,
+                                 'cbar_frac':0.15,
+                                 'cbar_labelsize':None}
                 for key, value in dict_in.items():
                     if key in wwaplot_default.keys():
                         wwaplot_default[key] = value
             
             else:
-                wwaplot_default={'Neff':3,
-                                 'AR1_q':AR1_q,
+                wwaplot_default={'AR1_q':AR1_q,
                                  'coi':coi,
                                  'levels':None,
                                  'tick_range':None,
@@ -1772,9 +1813,14 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'plot_signif':True,
                                  'signif_style':'contour',
                                  'plot_cone':True,
+                                 'title':None,
                                  'ax':None,
                                  'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')'}
+                                 'ylabel': 'Period ('+ageunits+')',
+                                 'cbar_orientation':'vertical',
+                                 'cbar_pad':0.05,
+                                 'cbar_frac':0.15,
+                                 'cbar_labelsize':None}
             
             fig = Spectral.plot_wwa(wwa, freqs, tau, **wwaplot_default)
             
@@ -1799,6 +1845,9 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                        'nproc':8,
                        'nMC':200,
                        'detrend':'no',
+                       'params' : ["default",4,0,1],
+                       'gaussianize': False,
+                       'standardize':True,
                        'Neff':3,
                        'anti_alias':False,
                        'avgs':2,
@@ -1816,6 +1865,9 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                        'nproc':8,
                        'nMC':200,
                        'detrend':'no',
+                       'params' : ["default",4,0,1],
+                       'gaussianize': False,
+                       'standardize':True,
                        'Neff':3,
                        'anti_alias':False,
                        'avgs':2,
@@ -1832,7 +1884,13 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                            'nMC':200,
                            'nproc':8,
                            'detrend':'no',
-                           'method':'Kirchner_f2py'}
+                           'params' : ["default",4,0,1],
+                           'gaussianize': False,
+                           'standardize':True,
+                           'method':'Kirchner_f2py',
+                           'bc':'no',
+                           'len_bd':10}
+
             
             for key,value in dict_in.items():
                 if key in wwz_default.keys():
@@ -1847,10 +1905,16 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                            'nMC':200,
                            'nproc':8,
                            'detrend':'no',
-                           'method':'Kirchner_f2py'}
+                           'params' : ["default",4,0,1],
+                           'gaussianize': False,
+                           'standardize':True,
+                           'method':'Kirchner_f2py',
+                           'bc':'no',
+                           'len_bd':10}
+
             
         # Perform the calculations
-        psd, freqs, psd_ar1_q95 = Spectral.wwz_psd(ys, ts, **psd_default)
+        psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts, **psd_default)
         wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts, **wwz_default)
           
         #Wrap up the output dictionary
@@ -1863,7 +1927,8 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                     'Neffs':Neffs,
                     'coeff':coeff,
                     'psd':psd,
-                    'psd_ar1_q95':psd_ar1_q95}
+                    'psd_ar1_q95':psd_ar1_q95,
+                    'psd_ar1':psd_ar1}
         
         # Make the plot if asked
         if fig is True:
@@ -1893,8 +1958,7 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
             # Set the plot default
             if type(wwaplot_default) is dict:
                 dict_in = wwaplot_default
-                wwaplot_default={'Neff':3,
-                                 'AR1_q':AR1_q,
+                wwaplot_default={'AR1_q':AR1_q,
                                  'coi':coi,
                                  'levels':None,
                                  'tick_range':None,
@@ -1902,23 +1966,27 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'ylim':None,
                                  'xticks':None,
                                  'xlabels':None,
-                                 'figsize':figsize,
+                                 'figsize':[20,8],
                                  'clr_map':'OrRd',
                                  'cbar_drawedges':False,
                                  'cone_alpha':0.5,
                                  'plot_signif':True,
                                  'signif_style':'contour',
                                  'plot_cone':True,
+                                 'title':None,
                                  'ax':ax1,
                                  'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')'}
+                                 'ylabel': 'Period ('+ageunits+')',
+                                 'cbar_orientation':'vertical',
+                                 'cbar_pad':0.05,
+                                 'cbar_frac':0.15,
+                                 'cbar_labelsize':None}
                 for key, value in dict_in.items():
                     if key in wwaplot_default.keys():
                         wwaplot_default[key] = value
             
             else:
-                wwaplot_default={'Neff':3,
-                                 'AR1_q':AR1_q,
+                wwaplot_default={'AR1_q':AR1_q,
                                  'coi':coi,
                                  'levels':None,
                                  'tick_range':None,
@@ -1926,16 +1994,21 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'ylim':None,
                                  'xticks':None,
                                  'xlabels':None,
-                                 'figsize':figsize,
+                                 'figsize':[20,8],
                                  'clr_map':'OrRd',
                                  'cbar_drawedges':False,
                                  'cone_alpha':0.5,
                                  'plot_signif':True,
                                  'signif_style':'contour',
                                  'plot_cone':True,
+                                 'title':None,
                                  'ax':ax1,
                                  'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')'}
+                                 'ylabel': 'Period ('+ageunits+')',
+                                 'cbar_orientation':'vertical',
+                                 'cbar_pad':0.05,
+                                 'cbar_frac':0.15,
+                                 'cbar_labelsize':None}
                 
             Spectral.plot_wwa(wwa, freqs, tau, **wwaplot_default)    
             
@@ -1944,19 +2017,27 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
             if type(psdplot_default) is dict:
                 dict_in = psdplot_default
                 
-                psdplot_default={'lmstyle':None,
+                psdplot_default={'lmstyle':'-',
                                  'linewidth':None,
-                                 'xticks':None,
-                                 'xlim':None,
-                                 'ylim':None,
-                                 'figsize':figsize,
+                                 'color': sns.xkcd_rgb["denim blue"],
+                                 'ar1_lmstyle': '-',
+                                 'ar1_linewidth': None,
+                                 'period_ticks':None,
+                                 'psd_lim':None,
+                                 'period_lim':None,
+                                 'figsize':[20,8],
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
+                                 'plot_ar1_ensemble': False,
+                                 'psd_ar1':None,
+                                 'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
                                  'ax':ax2,
-                                 'xlabel':'Period ('+ageunits+')',
-                                 'ylabel':'Spectral Density'}        
+                                 'vertical':False,
+                                 'period_label':'Period ('+ageunits+')',
+                                 'psd_label':'Spectral Density',
+                                 'zorder': None}        
                                 
                 for key, value in dict_in.items():
                     if key in psdplot_default.keys():
@@ -1964,19 +2045,27 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                         
             else:
                    
-               psdplot_default={'lmstyle':None,
+               psdplot_default={'lmstyle':'-',
                                  'linewidth':None,
-                                 'xticks':None,
-                                 'xlim':None,
-                                 'ylim':None,
-                                 'figsize':figsize,
+                                 'color': sns.xkcd_rgb["denim blue"],
+                                 'ar1_lmstyle': '-',
+                                 'ar1_linewidth': None,
+                                 'period_ticks':None,
+                                 'psd_lim':None,
+                                 'period_lim':None,
+                                 'figsize':[20,8],
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
+                                 'plot_ar1_ensemble': False,
+                                 'psd_ar1':None,
+                                 'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
                                  'ax':ax2,
-                                 'xlabel':'Period ('+ageunits+')',
-                                 'ylabel':'Spectral Density'} 
+                                 'vertical':False,
+                                 'period_label':'Period ('+ageunits+')',
+                                 'psd_label':'Spectral Density',
+                                 'zorder': None} 
             
             Spectral.plot_psd(psd,freqs,**psdplot_default)
             
@@ -2110,6 +2199,28 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
         format (str): One of the file extensions supported by the active
             backend. Default is "eps". Most backend support png, pdf, ps, eps,
             and svg.
+    
+    Returns:
+        depth - the predicted positions (either same as the user or the default) \n
+        chron -  a numpy array of possible chronologies in each column.
+            The number of rows is the same as the length of depth
+        ageDist - the distribution of ages around each dates.
+        run - the full R object containing the outputs of the Bchron run        
+    
+    Warnings:
+        This function requires R and the Bchron package and all its
+            dependencies to be installed on the same machine.
+            
+    Reference:
+        - Haslett, J., and Parnell, A. C. (2008). A simple monotone 
+            process with application to radiocarbon-dated depth 
+            chronologies. Journal of the Royal Statistical Society, 
+            Series C, 57, 399-418. DOI:10.1111/j.1467-9876.2008.00623.x
+        - Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E., 
+            and Huntley, B. (2008). A flexible approach to assessing 
+            synchroneity of past events using Bayesian reconstructions
+            of sedimentation history. Quaternary Science Reviews, 
+            27(19-20), 1872-1885. DOI:10.1016/j.quascirev.2008.07.009        
     """
     
     # Get the csv_list
@@ -2283,146 +2394,147 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
                                                     positionScaleVal =positionScaleVal)
     
     ## Write into the LiPD file is asked
-    if saveLipd is True:
-        print("Placing all the tables in the LiPD object and saving...")
-        if "model" in lipd["chronData"][objectName].keys():
-            T = lipd["chronData"][objectName]["model"]
-        else:
-            T = lipd["chronData"][objectName].update({"model":{}})
-        #Grab the part of the LiPD dictionary with the chronObject/model
+    
+    print("Placing all the tables in the LiPD object...")
+    if "model" in lipd["chronData"][objectName].keys():
         T = lipd["chronData"][objectName]["model"]
+    else:
+        T = lipd["chronData"][objectName].update({"model":{}})
+    #Grab the part of the LiPD dictionary with the chronObject/model
+    T = lipd["chronData"][objectName]["model"]
+    
+    ## methods
+    inputs={"calCurves":calCurves,
+            "iterations":iterations,
+            "burn":burn,
+            "thin":thin,
+            "extractDate":extractDate,
+            "maxExtrap": maxExtrap,
+            "thetaMhSd": thetaMhSd,
+            "muMhSd":muMhSd,
+            "psiMhSd":psiMhSd,
+            "ageScaleVal":ageScaleVal,
+            "positionScaleVal":positionScaleVal}
+    
+    # Other None objects 
+    if type(reservoirAgeCorr) is np.ndarray:
+        reservoirAgeCorr = reservoirAgeCorr.tolist()
+        inputs.update({"reservoirAgeCorr":reservoirAgeCorr})
+    else:
+        inputs.update({"reservoirAgeCorr":"Not provided"})    
+    if type(rejectAges) is np.ndarray:
+        rejectAges = rejectAges.tolist()
+        inputs.update({"rejectAges":rejectAges})
+    else:
+        inputs.update({"rejectAges":"Not provided"})    
+    if type(positionsThickness) is np.ndarray:
+        positionsThickness = positionsThickness.tolist()
+        inputs.update({"positionsThickness":positionsThickness})
+    else:
+        inputs.update({"positionsThickness":"Not provided"})
+    if type(outlierProbs) is np.ndarray:
+        outlierProbs = outlierProbs.tolist()
+        inputs.update({"outlierProbs":outlierProbs})    
+    else:
+        inputs.update({"outlierProbs":"Not provided"}) 
         
-        ## methods
-        inputs={"calCurves":calCurves,
-                "iterations":iterations,
-                "burn":burn,
-                "thin":thin,
-                "extractDate":extractDate,
-                "maxExtrap": maxExtrap,
-                "thetaMhSd": thetaMhSd,
-                "muMhSd":muMhSd,
-                "psiMhSd":psiMhSd,
-                "ageScaleVal":ageScaleVal,
-                "positionScaleVal":positionScaleVal}
-        
-        # Other None objects 
-        if type(reservoirAgeCorr) is np.ndarray:
-            reservoirAgeCorr = reservoirAgeCorr.tolist()
-            inputs.update({"reservoirAgeCorr":reservoirAgeCorr})
-        else:
-            inputs.update({"reservoirAgeCorr":"Not provided"})    
-        if type(rejectAges) is np.ndarray:
-            rejectAges = rejectAges.tolist()
-            inputs.update({"rejectAges":rejectAges})
-        else:
-            inputs.update({"rejectAges":"Not provided"})    
-        if type(positionsThickness) is np.ndarray:
-            positionsThickness = positionsThickness.tolist()
-            inputs.update({"positionsThickness":positionsThickness})
-        else:
-            inputs.update({"positionsThickness":"Not provided"})
-        if type(outlierProbs) is np.ndarray:
-            outlierProbs = outlierProbs.tolist()
-            inputs.update({"outlierProbs":outlierProbs})    
-        else:
-            inputs.update({"outlierProbs":"Not provided"}) 
-            
-        methods = {"algorithm":"Bchron", "inputs":inputs,"runEnv":"python"}
-        
-        #create the key for the new model
-        key = str(objectName)+"model"+str(modelNum)
-        # Add the method to object
-        T.update({key:{}})
-        T[key].update({"method":methods})
-        
-        ##EnsembleTable
+    methods = {"algorithm":"Bchron", "inputs":inputs,"runEnv":"python"}
+    
+    #create the key for the new model
+    key = str(objectName)+"model"+str(modelNum)
+    # Add the method to object
+    T.update({key:{}})
+    T[key].update({"method":methods})
+    
+    ##EnsembleTable
+    d = OrderedDict()
+    T[key].update({"ensembleTable": d})
+    key_ens = key+"ensemble0" # Key for the ensemble table
+    T[key]["ensembleTable"].update({key_ens:{}})
+    d = OrderedDict() #RESET VERY IMPORTANT
+    T[key]["ensembleTable"][key_ens].update({"columns": d})
+    
+    #store age and depth info 
+    number_age = np.arange(2,np.shape(chron)[1]+2,1)
+    number_age = number_age.tolist()
+    chron_list = np.transpose(chron).tolist()
+    age_dict = {"number": number_age,
+                "units":agesUnit,
+                "variableName":"age",
+                "values":chron_list}
+    depth_dict = {"number":1,
+                  "units":predictPositionsUnits,
+                  "variableName":"depth",
+                  "values":depth}
+    T[key]["ensembleTable"][key_ens]["columns"].update({"depth":depth_dict})
+    T[key]["ensembleTable"][key_ens]["columns"].update({"age":age_dict}) 
+    
+    ## Summary Table
+    # First calculate some summary stats
+    quant = mquantiles(chron,[0.025,0.5,0.975],axis=1)
+    # Save as list for JSON
+    lower95 = quant[:,0].tolist()
+    medianAge = quant[:,1].tolist()
+    upper95 = quant[:,2].tolist()
+    meanVal = np.mean(chron, axis=1)
+    meanVal = meanVal.tolist()
+    # Put everything where it belongs
+    d = OrderedDict()
+    T[key].update({"summaryTable": d})
+    key_sum = key+"summary0"
+    T[key]["summaryTable"].update({key_sum:{}})
+    d = OrderedDict()
+    T[key]["summaryTable"][key_sum].update({"columns": d})
+    # Place each column as separate dictionary
+    T[key]["summaryTable"][key_sum]["columns"].update({"depth":{"variableName":"depth",
+                                                                "units":predictPositionsUnits,
+                                                                "values":depth,
+                                                                "number":1}})
+    T[key]["summaryTable"][key_sum]["columns"].update({"meanAge":{"variableName":"meanAge",
+                                                                "units":agesUnit,
+                                                                "values":meanVal,
+                                                                "number":2}})
+    T[key]["summaryTable"][key_sum]["columns"].update({"medianAge":{"variableName":"medianAge",
+                                                                "units":agesUnit,
+                                                                "values":medianAge,
+                                                                "number":3}})
+    T[key]["summaryTable"][key_sum]["columns"].update({"95Lower":{"variableName":"95Lower",
+                                                                "units":agesUnit,
+                                                                "values":lower95,
+                                                                "number":4}})
+    T[key]["summaryTable"][key_sum]["columns"].update({"95Higher":{"variableName":"95Higher",
+                                                                "units":agesUnit,
+                                                                "values":upper95,
+                                                                "number":5}})
+    
+    ## DistributionTables
+    d = OrderedDict()
+    T[key].update({"distributionTable": d})
+    
+    for i in np.arange(0,np.shape(ageDist)[1],1):
+        #Get the output in list form
+         
+        key_dist = key+"distribution"+str(i)
+        T[key]["distributionTable"].update({key_dist:{}})
         d = OrderedDict()
-        T[key].update({"ensembleTable": d})
-        key_ens = key+"ensemble0" # Key for the ensemble table
-        T[key]["ensembleTable"].update({key_ens:{}})
-        d = OrderedDict() #RESET VERY IMPORTANT
-        T[key]["ensembleTable"][key_ens].update({"columns": d})
-        
-        #store age and depth info 
-        number_age = np.arange(2,np.shape(chron)[1]+2,1)
-        number_age = number_age.tolist()
-        chron_list = np.transpose(chron).tolist()
-        age_dict = {"number": number_age,
-                    "units":agesUnit,
+        T[key]["distributionTable"][key_dist].update({"age14C":list(run[6][i][0])[0],
+                                                     "calibrationCurve":calCurves[i],
+                                                     "columns":d,
+                                                     "depth":list(run[6][i][2])[0],
+                                                     "depthUnits":predictPositionsUnits,
+                                                     "sd14C":list(run[6][i][1])[0]})
+        age_dict = {"number":1,
                     "variableName":"age",
-                    "values":chron_list}
-        depth_dict = {"number":1,
-                      "units":predictPositionsUnits,
-                      "variableName":"depth",
-                      "values":depth}
-        T[key]["ensembleTable"][key_ens]["columns"].update({"depth":depth_dict})
-        T[key]["ensembleTable"][key_ens]["columns"].update({"age":age_dict}) 
+                    "units":agesUnit,
+                    "values":list(run[6][i][4])}
+        density_dict = {"number":2,
+                    "variableName":"probabilityDensity",
+                    "values":list(run[6][i][5])}
         
-        ## Summary Table
-        # First calculate some summary stats
-        quant = mquantiles(chron,[0.025,0.5,0.975],axis=1)
-        # Save as list for JSON
-        lower95 = quant[:,0].tolist()
-        medianAge = quant[:,1].tolist()
-        upper95 = quant[:,2].tolist()
-        meanVal = np.mean(chron, axis=1)
-        meanVal = meanVal.tolist()
-        # Put everything where it belongs
-        d = OrderedDict()
-        T[key].update({"summaryTable": d})
-        key_sum = key+"summary0"
-        T[key]["summaryTable"].update({key_sum:{}})
-        d = OrderedDict()
-        T[key]["summaryTable"][key_sum].update({"columns": d})
-        # Place each column as separate dictionary
-        T[key]["summaryTable"][key_sum]["columns"].update({"depth":{"variableName":"depth",
-                                                                    "units":predictPositionsUnits,
-                                                                    "values":depth,
-                                                                    "number":1}})
-        T[key]["summaryTable"][key_sum]["columns"].update({"meanAge":{"variableName":"meanAge",
-                                                                    "units":agesUnit,
-                                                                    "values":meanVal,
-                                                                    "number":2}})
-        T[key]["summaryTable"][key_sum]["columns"].update({"medianAge":{"variableName":"medianAge",
-                                                                    "units":agesUnit,
-                                                                    "values":medianAge,
-                                                                    "number":3}})
-        T[key]["summaryTable"][key_sum]["columns"].update({"95Lower":{"variableName":"95Lower",
-                                                                    "units":agesUnit,
-                                                                    "values":lower95,
-                                                                    "number":4}})
-        T[key]["summaryTable"][key_sum]["columns"].update({"95Higher":{"variableName":"95Higher",
-                                                                    "units":agesUnit,
-                                                                    "values":upper95,
-                                                                    "number":5}})
-        
-        ## DistributionTables
-        d = OrderedDict()
-        T[key].update({"distributionTable": d})
-        
-        for i in np.arange(0,np.shape(ageDist)[1],1):
-            #Get the output in list form
-             
-            key_dist = key+"distribution"+str(i)
-            T[key]["distributionTable"].update({key_dist:{}})
-            d = OrderedDict()
-            T[key]["distributionTable"][key_dist].update({"age14C":list(run[6][i][0])[0],
-                                                         "calibrationCurve":calCurves[i],
-                                                         "columns":d,
-                                                         "depth":list(run[6][i][2])[0],
-                                                         "depthUnits":predictPositionsUnits,
-                                                         "sd14C":list(run[6][i][1])[0]})
-            age_dict = {"number":1,
-                        "variableName":"age",
-                        "units":agesUnit,
-                        "values":list(run[6][i][4])}
-            density_dict = {"number":2,
-                        "variableName":"probabilityDensity",
-                        "values":list(run[6][i][5])}
-            
-            T[key]["distributionTable"][key_dist]["columns"].update({"age":age_dict,
-                                                                     "probabilityDensity":density_dict})
+        T[key]["distributionTable"][key_dist]["columns"].update({"age":age_dict,
+                                                                 "probabilityDensity":density_dict})
         ## Finally write it out
+    if saveLipd is True:        
         print("Writing LiPD file...")
         lpd.writeLipd(lipd,path=os.getcwd()) 
         
