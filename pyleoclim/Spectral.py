@@ -1243,7 +1243,7 @@ class WaveletAnalysis(object):
 
         return wwz_func
 
-    def prepare_wwz(self, ys, ts, freqs=None, tau=None, bc='no', len_bd=10):
+    def prepare_wwz(self, ys, ts, freqs=None, tau=None, len_bd=0, bc_mode='reflect', reflect_type='odd'):
         ''' Return the truncated time series with NaNs deleted
 
         Args:
@@ -1252,9 +1252,9 @@ class WaveletAnalysis(object):
             freqs (array): vector of frequency
             tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
                 if the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so
-            bc (str): 'no' - no boundary conditions are applied;
-                      'odd' - creat ghost grids by making odd time series with respect to the boundary points
             len_bd (int): the number of the ghost grids want to creat on each boundary
+            bc_mode (str): see np.lib.pad()
+            reflect_type (str): see np.lib.pad()
 
         Returns:
             ys_cut (array): the truncated time series with NaNs deleted
@@ -1290,16 +1290,15 @@ class WaveletAnalysis(object):
             tau = np.linspace(tau_lb, tau_ub, np.size(tau))
 
         # boundary condition
-        dt = np.mean(np.diff(ts))
-        dtau = np.mean(np.diff(tau))
-        len_bd_tau = len_bd*dt//dtau
+        if len_bd > 0:
+            dt = np.mean(np.diff(ts))
+            dtau = np.mean(np.diff(tau))
+            len_bd_tau = len_bd*dt//dtau
 
-        if bc == 'odd':
-            ys_left_bd = ys[1:len_bd+1]
-            ys_left_bd = -(ys_left_bd[::-1] - ys[0]) + ys[0]
-            ys_right_bd = ys[-len_bd-1:-1]
-            ys_right_bd = -(ys_right_bd[::-1] - ys[-1]) + ys[-1]
-            ys = np.concatenate((ys_left_bd, ys, ys_right_bd))
+            if bc_mode in ['reflect', 'symmetric']:
+                ys = np.lib.pad(ys, (len_bd, len_bd), bc_mode, reflect_type=reflect_type)
+            else:
+                ys = np.lib.pad(ys, (len_bd, len_bd), bc_mode)
 
             ts_left_bd = np.linspace(ts[0]-dt*len_bd, ts[0]-dt, len_bd)
             ts_right_bd = np.linspace(ts[-1]+dt, ts[-1]+dt*len_bd, len_bd)
@@ -1442,25 +1441,24 @@ class WaveletAnalysis(object):
 
         return xw_coherence
 
-    def reconstruct_ts(self, coeff, freqs, tau, t, bc='no', len_bd=10):
+    def reconstruct_ts(self, coeff, freqs, tau, t, len_bd=0):
         ''' Reconstruct the normalized time series from the wavelet coefficients.
         Args:
             coeff (array): the coefficients of the corresponding basis functions a_1 and a_2
             freqs (array): vector of frequency of the basis functions
             tau (array): the evenly-spaced time points of the basis functions
-            t (array): the evenly-spaced time points of the reconstructed time series
-            bc (str): 'no' - no boundary conditions are applied;
-                      'odd' - creat ghost grids by making odd time series with respect to the boundary points
+            t (array): the specified evenly-spaced time points of the reconstructed time series
             len_bd (int): the number of the ghost grids want to creat on each boundary
 
         Returns:
             rec_ts (array): the reconstructed normalized time series
+            t (array): the evenly-spaced time points of the reconstructed time series
         '''
         omega = 2*np.pi*freqs
         nf = np.size(freqs)
 
         dt = np.mean(np.diff(t))
-        if bc == 'odd':
+        if len_bd > 0:
             t_left_bd = np.linspace(t[0]-dt*len_bd, t[0]-dt, len_bd)
             t_right_bd = np.linspace(t[-1]+dt, t[-1]+dt*len_bd, len_bd)
             t = np.concatenate((t_left_bd, t, t_right_bd))
@@ -1477,12 +1475,9 @@ class WaveletAnalysis(object):
 
                 rec_ts += (a_0[j, k] + a_1[j, k]*phi_1 + a_2[j, k]*phi_2)
 
-        if bc == 'odd':
-            rec_ts = rec_ts[len_bd:-len_bd]
-
         rec_ts = self.preprocess(rec_ts, detrend='no', gaussianize=False, standardize=True)
 
-        return rec_ts
+        return rec_ts, t
 
 class AliasFilter(object):
     '''Performing anti-alias filter on a psd @author: fzhu
@@ -1661,7 +1656,8 @@ def ar1_sim(ys, n, p, ts=None, detrend='no'):
 
 
 def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=200, nproc=8,
-        detrend='no', gaussianize=False, standardize=True, method='Kirchner_f2py', bc='no', len_bd=10):
+        detrend='no', gaussianize=False, standardize=True, method='Kirchner_f2py', len_bd=0,
+        bc_mode='reflect', reflect_type='odd'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients
 
     Args:
@@ -1679,9 +1675,9 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
-        bc (str): 'no' - no boundary conditions are applied;
-                  'odd' - creat ghost grids by making odd time series with respect to the boundary points
         len_bd (int): the number of the ghost grids want to creat on each boundary
+        bc_mode (str): see np.lib.pad()
+        reflect_type (str): see np.lib.pad()
 
     Returns:
         wwa (array): the weighted wavelet amplitude.
@@ -1700,7 +1696,8 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=
     wa = WaveletAnalysis()
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
-    ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau, bc=bc, len_bd=len_bd)
+    ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau,
+                                                len_bd=len_bd, bc_mode=bc_mode, reflect_type=reflect_type)
 
     wwz_func = wa.get_wwz_func(nproc, method)
     wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc,
