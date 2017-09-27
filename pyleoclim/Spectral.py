@@ -3,7 +3,7 @@
 """
 Created on Fri Apr 28 14:23:06 2017
 
-@author: deborahkhider
+@author: deborahkhider, fengzhu
 
 Spectral module for pyleoclim
 """
@@ -28,6 +28,8 @@ import warnings
 
 from pyleoclim import Timeseries
 import sys
+
+from math import factorial
 
 if sys.platform.startswith('darwin'):
     from . import f2py_wwz as f2py
@@ -62,43 +64,63 @@ class WaveletAnalysis(object):
 
         return check
 
-    def ar1_fit_evenly(self, ys, detrend='no', gaussianize=False):
+    def ar1_fit_evenly(self, ys, ts, detrend='no', params=["default",4,0,1], gaussianize=False):
         ''' Returns the lag-1 autocorrelation from ar1 fit.
 
         Args:
-            ys (array): vector of (flaot) numbers as a time series
+            ys (array): vector of (float) numbers as a time series
+            ts (array): The time axis for the timeseries. Necessary for use with
+                the Savitzky-Golay filters method since the series should be evenly spaced.
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussionize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
 
         Returns:
             g (float): lag-1 autocorrelation coefficient
 
         '''
-        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize)
+        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize)
         ar1_mod = sm.tsa.AR(pd_ys, missing='drop').fit(maxlag=1)
         g = ar1_mod.params[0]
 
         return g
 
-    def preprocess(self, ys, detrend='no', gaussianize=False, standardize=True):
+    def preprocess(self, ys, ts, detrend='no', params=["default",4,0,1], gaussianize=False, standardize=True):
         ''' Return the processed time series using (detrend and) standardization.
 
         Args:
             ys (array): a time series
+            ts (array): The time axis for the timeseries. Necessary for use with
+                the Savitzky-Golay filters method since the series should be evenly spaced.
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussionize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
 
         Returns:
             res (array): the processed time series
 
         '''
 
-        if detrend == 'linear':
-            ys_d = signal.detrend(ys, type='linear')
-        elif detrend == 'constant':
-            ys_d = signal.detrend(ys, type='constant')
+        if detrend is not 'no':
+            ys_d = Timeseries.detrend(ys, ts, method=detrend, params=params)
         else:
             ys_d = ys
 
@@ -112,7 +134,7 @@ class WaveletAnalysis(object):
 
         return res
 
-    def tau_estimation(self, ys, ts, detrend='no', gaussianize=False, standardize=True):
+    def tau_estimation(self, ys, ts, detrend='no', params=["default",4,0,1], gaussianize=False, standardize=True):
         ''' Return the estimated persistence of a givenevenly/unevenly spaced time series.
 
         Args:
@@ -121,6 +143,15 @@ class WaveletAnalysis(object):
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussionize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
 
         Returns:
             tau_est (float): the estimated persistence
@@ -130,7 +161,7 @@ class WaveletAnalysis(object):
                 Comput. Geosci. 28, 69–72 (2002).
 
         '''
-        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
         dt = np.diff(ts)
         #  assert dt > 0, "The time points should be increasing!"
 
@@ -182,7 +213,7 @@ class WaveletAnalysis(object):
 
         return r
 
-    def wwz_opt2(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no',
+    def wwz_opt2(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', params=["default",4,0,1],
                  gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
 
@@ -197,6 +228,15 @@ class WaveletAnalysis(object):
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussionize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -216,7 +256,7 @@ class WaveletAnalysis(object):
         nt = np.size(tau)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
         omega = self.make_omega(ts, freqs)
 
@@ -255,7 +295,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_opt1(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no',
+    def wwz_opt1(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', params=["default",4,0,1],
                  gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
 
@@ -270,6 +310,15 @@ class WaveletAnalysis(object):
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussionize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -289,7 +338,7 @@ class WaveletAnalysis(object):
         nt = np.size(tau)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
         omega = self.make_omega(ts, freqs)
 
@@ -331,7 +380,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no',
+    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', params=['default',4,0,1],
                   gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
 
@@ -346,6 +395,15 @@ class WaveletAnalysis(object):
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussionize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -365,7 +423,7 @@ class WaveletAnalysis(object):
         nt = np.size(tau)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
         omega = self.make_omega(ts, freqs)
 
@@ -416,7 +474,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend='no',
+    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend='no', params=['default',4,0,1],
                   gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
 
@@ -431,6 +489,15 @@ class WaveletAnalysis(object):
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussionize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -445,7 +512,7 @@ class WaveletAnalysis(object):
         nt = np.size(tau)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
         omega = self.make_omega(ts, freqs)
 
@@ -508,7 +575,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no',
+    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', params=["default",4,0,1],
                        gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -523,6 +590,15 @@ class WaveletAnalysis(object):
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussionize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -543,7 +619,7 @@ class WaveletAnalysis(object):
         nts = np.size(ts)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
         omega = self.make_omega(ts, freqs)
 
@@ -607,7 +683,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_opt(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no',
+    def kirchner_opt(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', params=["default",4,0,1],
                      gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -622,6 +698,15 @@ class WaveletAnalysis(object):
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussionize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -642,7 +727,7 @@ class WaveletAnalysis(object):
         nts = np.size(ts)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
         omega = self.make_omega(ts, freqs)
 
@@ -704,7 +789,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no',
+    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no', params=['default',4,0,1],
                        gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -719,6 +804,15 @@ class WaveletAnalysis(object):
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
+            'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussionize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -734,7 +828,7 @@ class WaveletAnalysis(object):
         nts = np.size(ts)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
         omega = self.make_omega(ts, freqs)
 
@@ -811,7 +905,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no',
+    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no', params=['default',4,0,1],
                       gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -826,6 +920,15 @@ class WaveletAnalysis(object):
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussionize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
 
         Returns:
             wwa (array): the weighted wavelet amplitude
@@ -840,7 +943,7 @@ class WaveletAnalysis(object):
         nts = np.size(ts)
         nf = np.size(freqs)
 
-        pd_ys = self.preprocess(ys, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
         omega = self.make_omega(ts, freqs)
 
@@ -1475,7 +1578,7 @@ class WaveletAnalysis(object):
 
                 rec_ts += (a_0[j, k] + a_1[j, k]*phi_1 + a_2[j, k]*phi_2)
 
-        rec_ts = self.preprocess(rec_ts, detrend='no', gaussianize=False, standardize=True)
+        rec_ts = self.preprocess(rec_ts, t, detrend='no', gaussianize=False, standardize=True)
 
         return rec_ts, t
 
@@ -1582,13 +1685,72 @@ class AliasFilter(object):
 
         return spectr
 
+class Filter(object):
+    """Group various Filters under a class
+    """
+    @staticmethod
+    def savitzky_golay(y, window_size, order, deriv=0, rate=1):
+        """ Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+
+        The Savitzky-Golay filter removes high frequency noise from data.
+        It has the advantage of preserving the original shape and
+        features of the signal better than other types of filtering
+        approaches, such as moving averages techniques.
+
+        The Savitzky-Golay is a type of low-pass filter, particularly
+        suited for smoothing noisy data. The main idea behind this
+        approach is to make for each point a least-square fit with a
+        polynomial of high order over a odd-sized window centered at
+        the point.
+
+        Args:
+            y (array): the values of the time history of the signal.
+            window_size (int) : the length of the window. Must be an odd integer number.
+            order (int) : the order of the polynomial used in the filtering. Must be less then `window_size` - 1.
+            deriv (int): the order of the derivative to compute (default = 0 means only smoothing)
+
+        Returns:
+
+            ys - ndarray of shape (N), the smoothed signal (or it's n-th derivative).
+
+        Reference:
+
+            - A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of
+                Data by Simplified Least Squares Procedures. Analytical
+                Chemistry, 1964, 36 (8), pp 1627-1639.
+            - Numerical Recipes 3rd Edition: The Art of Scientific Computing
+                W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
+                Cambridge University Press ISBN-13: 9780521880688
+            - SciPy Cookbook: shttps://github.com/scipy/scipy-cookbook/blob/master/ipython/SavitzkyGolay.ipynb
+        """
+        if type(window_size)is not int:
+            sys.exit("window_size should be of type int")
+        if type(order) is not int:
+            sys.exit("order should be of type int")
+        # Check window size and order
+        if window_size % 2 != 1 or window_size < 1:
+            raise TypeError("window_size size must be a positive odd number")
+        if window_size < order + 2:
+            raise TypeError("window_size is too small for the polynomials order")
+        order_range = range(order+1)
+        half_window = (window_size -1) // 2
+        # precompute coefficients
+        b = np.mat([[k**i for i in order_range] for k in range(-half_window, half_window+1)])
+        m = np.linalg.pinv(b).A[deriv] * rate**deriv * factorial(deriv)
+        # pad the signal at the extremes with
+        # values taken from the signal itself
+        firstvals = y[0] - np.abs( y[1:half_window+1][::-1] - y[0] )
+        lastvals = y[-1] + np.abs(y[-half_window-1:-1][::-1] - y[-1])
+        y = np.concatenate((firstvals, y, lastvals))
+
+        return np.convolve( m[::-1], y, mode='valid')
 
 '''
 Interface for the users below, more checks about the input will be performed here
 '''
 
 
-def ar1_fit(ys, ts=None, detrend='no'):
+def ar1_fit(ys, ts=None, detrend='no', params=["default",4,0,1]):
     ''' Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
 
     Args:
@@ -1597,6 +1759,13 @@ def ar1_fit(ys, ts=None, detrend='no'):
         detrend (str): 'no' - the original time series is assumed to have no trend;
                        'linear' - a linear least-squares fit to `ys` is subtracted;
                        'constant' - the mean of `ys` is subtracted
+                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
 
     Returns:
         g (float): lag-1 autocorrelation coefficient (for evenly-spaced time series)
@@ -1606,14 +1775,14 @@ def ar1_fit(ys, ts=None, detrend='no'):
     wa = WaveletAnalysis()
 
     if wa.is_evenly_spaced(ts):
-        g = wa.ar1_fit_evenly(ys, detrend=detrend)
+        g = wa.ar1_fit_evenly(ys, ts, detrend=detrend, params = params)
     else:
-        g = wa.tau_estimation(ys, ts, detrend=detrend)
+        g = wa.tau_estimation(ys, ts, detrend=detrend, params = params)
 
     return g
 
 
-def ar1_sim(ys, n, p, ts=None, detrend='no'):
+def ar1_sim(ys, n, p, ts=None, detrend='no', params=["default",4,0,1]):
     ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from `ys` and `ts`
 
     Args:
@@ -1623,6 +1792,13 @@ def ar1_sim(ys, n, p, ts=None, detrend='no'):
         detrend (str): 'no' - the original time series is assumed to have no trend;
                        'linear' - a linear least-squares fit to `ys` is subtracted;
                        'constant' - the mean of `ys` is subtracted
+                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+        params (list): The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
 
     Returns:
         red (matrix): n rows by p columns matrix of an AR1 process
@@ -1632,7 +1808,7 @@ def ar1_sim(ys, n, p, ts=None, detrend='no'):
 
     wa = WaveletAnalysis()
     if wa.is_evenly_spaced(ts):
-        g = ar1_fit(ys, ts=ts, detrend=detrend)
+        g = ar1_fit(ys, ts=ts, detrend=detrend, params=params)
         sig = np.std(ys)
 
         # specify model parameters (statsmodel wants lag0 coefficents as unity)
@@ -1645,7 +1821,7 @@ def ar1_sim(ys, n, p, ts=None, detrend='no'):
             red[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n)
 
     else:
-        tau_est = ar1_fit(ys, ts=ts, detrend=detrend)
+        tau_est = ar1_fit(ys, ts=ts, detrend=detrend, params=params)
         for i in np.arange(p):
             red[:, i] = wa.ar1_model(ts, tau_est, n=n)
 
@@ -1656,8 +1832,8 @@ def ar1_sim(ys, n, p, ts=None, detrend='no'):
 
 
 def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=200, nproc=8,
-        detrend='no', gaussianize=False, standardize=True, method='Kirchner_f2py', len_bd=0,
-        bc_mode='reflect', reflect_type='odd'):
+        detrend='no', params=['default',4,0,1], gaussianize=False, standardize=True,
+        method='Kirchner_f2py', len_bd=0, bc_mode='reflect', reflect_type='odd'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients
 
     Args:
@@ -1672,6 +1848,13 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=
         detrend (str): 'no' - the original time series is assumed to have no trend;
                        'linear' - a linear least-squares fit to `ys` is subtracted;
                        'constant' - the mean of `ys` is subtracted
+                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+        params (list): The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
@@ -1701,7 +1884,8 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=
 
     wwz_func = wa.get_wwz_func(nproc, method)
     wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc,
-                                        detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+                                        detrend=detrend, params=params,
+                                        gaussianize=gaussianize, standardize=standardize)
 
     # Monte-Carlo simulations of AR1 process
     nt = np.size(tau)
@@ -1717,7 +1901,8 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=
             #  r = wa.ar1_model(ts_cut, tauest)
             r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
             wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc,
-                                                 detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+                                                 detrend=detrend, params=params,
+                                                 gaussianize=gaussianize, standardize=standardize)
 
         for j in range(nt):
             for k in range(nf):
@@ -1733,7 +1918,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=
 
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
-            detrend='no', gaussianize=False, standardize=True,
+            detrend='no', params = ["default",4,0,1], gaussianize=False, standardize=True,
             Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
     ''' Return the psd of a timeseires directly using wwz method.
 
@@ -1748,7 +1933,15 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         detrend (str): 'no' - the original time series is assumed to have no trend;
                        'linear' - a linear least-squares fit to `ys` is subtracted;
                        'constant' - the mean of `ys` is subtracted
-        gaussianize (bool): gaussianize the time series or not
+                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+        params (list): The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussionize (bool): If True, gaussianizes the timeseries
+        standardize (bool): If True, standardizes the timeseries
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
@@ -1764,7 +1957,8 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
 
     # get wwa but AR1_q is not needed here so set nMC=0
     wwa, _, _, _, freqs, _, Neffs, _ = wwz(ys_cut, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
-                                           detrend=detrend, gaussianize=gaussianize, standardize=standardize, method=method)
+                                           detrend=detrend, params=params,
+                                           gaussianize=gaussianize, standardize=standardize, method=method)
 
     psd = wa.wwa2psd(wwa, ts_cut, Neffs, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
 
@@ -1780,7 +1974,8 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             #  r = wa.ar1_model(ts_cut, tauest)
             r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
             wwa_red, _, _, _, _, _, Neffs_red, _ = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
-                                                       detrend=detrend, gaussianize=gaussianize, standardize=standardize,
+                                                       detrend=detrend, params=params,
+                                                       gaussianize=gaussianize, standardize=standardize,
                                                        method=method)
             psd_ar1[i, :] = wa.wwa2psd(wwa_red, ts_cut, Neffs_red, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
 
@@ -1793,7 +1988,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
 
 
 def xwt(ys1, ts1, ys2, ts2,
-        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nproc=8, detrend='no',
+        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nproc=8, detrend='no', params=['default',4,0,1],
         gaussianize=False, standardize=True,
         method='Kirchner_f2py'):
     ''' Return the crosse wavelet transform of two time series.
@@ -1809,6 +2004,15 @@ def xwt(ys1, ts1, ys2, ts2,
         detrend (str): 'no' - the original time series is assumed to have no trend;
                        'linear' - a linear least-squares fit to `ys` is subtracted;
                        'constant' - the mean of `ys` is subtracted
+                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+        params (list): The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussionize (bool): If True, gaussianizes the timeseries
+        standardize (bool): If True, standardizes the timeseries
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
@@ -1830,12 +2034,14 @@ def xwt(ys1, ts1, ys2, ts2,
     ys2_cut, ts2_cut, freqs, tau = wa.prepare_wwz(ys2, ts2, freqs=freqs, tau=tau)
 
     wwa, phase, Neffs, coeff1 = wwz_func(ys1_cut, ts1_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
-                                         gaussianize=gaussianize, standardize=standardize)
+                                         params=params, gaussianize=gaussianize, standardize=standardize)
     wwa, phase, Neffs, coeff2 = wwz_func(ys2_cut, ts2_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
-                                         gaussianize=gaussianize, standardize=standardize)
+                                         params=params, gaussianize=gaussianize, standardize=standardize)
 
-    tauest1 = wa.tau_estimation(ys1_cut, ts1_cut, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
-    tauest2 = wa.tau_estimation(ys2_cut, ts2_cut, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+    tauest1 = wa.tau_estimation(ys1_cut, ts1_cut, detrend=detrend, params=params,
+                                gaussianize=gaussianize, standardize=standardize)
+    tauest2 = wa.tau_estimation(ys2_cut, ts2_cut, detrend=detrend, params=params,
+                                gaussianize=gaussianize, standardize=standardize)
     r1 = wa.ar1_model(ts1_cut, tauest1)
     r2 = wa.ar1_model(ts2_cut, tauest2)
     #  r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
@@ -1871,7 +2077,8 @@ def xwt(ys1, ts1, ys2, ts2,
 
 
 def xwc(ys1, ts1, ys2, ts2,
-        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no', nMC=200,
+        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no',
+        nMC=200, params=['default',4,0,1],
         gaussianize=False, standardize=True, method='Kirchner_f2py'):
     ''' Return the crosse wavelet coherence of two time series.
 
@@ -1887,6 +2094,15 @@ def xwc(ys1, ts1, ys2, ts2,
         detrend (str): 'no' - the original time series is assumed to have no trend;
                        'linear' - a linear least-squares fit to `ys` is subtracted;
                        'constant' - the mean of `ys` is subtracted
+                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+        params (list): The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussionize (bool): If True, gaussianizes the timeseries
+        standardize (bool): If True, standardizes the timeseries
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
@@ -1929,11 +2145,11 @@ def xwc(ys1, ts1, ys2, ts2,
         freqs = freqs1
 
     wwa1, phase1, AR1_q, coi, freqs, tau, Neffs, coeff1 = wwz(ys1_cut, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
-                                                              nproc=nproc, detrend=detrend, gaussianize=gaussianize,
-                                                              standardize=standardize, method=method)
+                                                              nproc=nproc, detrend=detrend, params=params,
+                                                              gaussianize=gaussianize, standardize=standardize, method=method)
     wwa2, phase2, AR1_q, coi, freqs, tau, Neffs, coeff2 = wwz(ys2_cut, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
-                                                              nproc=nproc, detrend=detrend, gaussianize=gaussianize,
-                                                              standardize=standardize, method=method)
+                                                              nproc=nproc, detrend=detrend, params=params,
+                                                              gaussianize=gaussianize, standardize=standardize, method=method)
 
     wt_coeff1 = coeff1[1] + coeff1[2]*1j
     wt_coeff2 = coeff2[1] + coeff2[2]*1j
@@ -1953,9 +2169,11 @@ def xwc(ys1, ts1, ys2, ts2,
             r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
             r2 = ar1_sim(ys2_cut, np.size(ts2_cut), 1, ts=ts2_cut)
             _, _, _, _, freqs, tau, _, coeffr1 = wwz(r1, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
-                                                     detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+                                                     detrend=detrend, params=params,
+                                                     gaussianize=gaussianize, standardize=standardize)
             _, _, _, _, freqs, tau, _, coeffr2 = wwz(r2, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
-                                                     detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+                                                     detrend=detrend, params=params,
+                                                     gaussianize=gaussianize, standardize=standardize)
 
             wt_coeffr1 = coeffr1[1] + coeffr1[2]*1j
             wt_coeffr2 = coeffr2[1] + coeffr2[2]*1j
@@ -2207,7 +2425,7 @@ def plot_wwadist(wwa, ylim=None):
 
 def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-', ar1_linewidth=None,
              period_ticks=None, psd_lim=None, period_lim=None,
-             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, plot_ar1_ensembel=False, psd_ar1=None, title=None,
+             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, psd_ar1=None, title=None,
              psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False,
              period_label='Period', psd_label='Spectral Density', zorder=None):
     """ Plot the wavelet amplitude

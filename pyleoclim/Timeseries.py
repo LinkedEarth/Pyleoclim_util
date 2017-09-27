@@ -13,6 +13,10 @@ import pandas as pd
 import warnings
 import copy
 from scipy import special
+import sys
+from scipy import signal
+
+from pyleoclim import Spectral
 
 
 def bin(x, y, bin_size="", start="", end=""):
@@ -93,8 +97,8 @@ def interp(x,y,interp_step="",start="",end=""):
     # Get the start and end point if not given
     if type(start) is str:
         start = np.nanmin(np.asarray(x))
-        if type(end) is str:
-            end = np.nanmax(np.asarray(x))
+    if type(end) is str:
+        end = np.nanmax(np.asarray(x))
 
     # Get the interpolated x-axis.
     xi = np.arange(start,end,interp_step)
@@ -313,3 +317,71 @@ def gaussianize_single(X_single):
     Xn_single[nz] = np.sqrt(2)*special.erfinv(2*CDF - 1)
 
     return Xn_single
+
+def detrend(y, x = None, method = "linear", params = ["default",4,0,1]):
+    """Detrend a timeseries according to three methods
+
+    Detrending methods include, "linear" (default), "constant", and using a low-pass
+        Savitzky-Golay filters.
+
+    Args:
+        y (array): The series to be detrended.
+        x (array): The time axis for the timeseries. Necessary for use with
+            the Savitzky-Golay filters method since the series should be evenly spaced.
+        method (str): The type of detrending. If linear (default), the result of
+            a linear least-squares fit to y is subtracted from y. If constant,
+            only the mean of data is subtrated. If "savitzy-golay", y is filtered
+            using the Savitzky-Golay filters and the resulting filtered series
+            is subtracted from y.
+        params (list): The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+
+    Returns:
+        ys (array) - the detrended timeseries.
+    """
+    option = ["linear", "constant", "savitzy-golay"]
+    if method not in option:
+        sys.exit("The selected method is not currently supported")
+
+    if method == "linear":
+        ys = signal.detrend(y,type='linear')
+    if method == 'constant':
+        ys = signal.detrend(y,type='constant')
+    else:
+        # Check that the timeseries is uneven and interpolate if needed
+        if x is None:
+            sys.exit("A time axis is needed for use with the Savitzky-Golay filters method")
+        # Check whether the timeseries is unvenly-spaced and interpolate if needed
+        if len(np.unique(np.diff(x)))>1:
+            warnings.warn("Timeseries is not evenly-spaced, interpolating...")
+            interp_step = np.nanmean(np.diff(x))
+            start = np.nanmin(x)
+            end = np.nanmax(x)
+            x_interp, y_interp = interp(x,y,interp_step=interp_step,\
+                                             start=start,end=end)
+        else:
+            x_interp = x
+            y_interp = y
+        if params[0] == "default":
+            l = len(y) # Use the length of the timeseries for the window side
+            l = np.ceil(l)//2*2+1 # Make sure this is an odd number
+            l = int(l) # Make sure that the type is int
+            o = int(params[1]) # Make sure the order is type int
+            d = int(params[2])
+            e = int(params[3])
+        else:
+            #Assume the users know what s/he is doing and just force to type int
+            l = int(params[0])
+            o = int(params[1])
+            d = int(params[2])
+            e = int(params[3])
+        # Now filter
+        y_filt = Spectral.Filter.savitzky_golay(y_interp,l,o,d,e)
+        # Put it all back on the original x axis
+        y_filt_x = np.interp(x,x_interp,y_filt)
+        ys = y-y_filt_x
+
+    return ys
