@@ -242,7 +242,7 @@ class WaveletAnalysis(object):
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients
+            coeff (array): the wavelet transform coefficients (a0, a1, a2)
 
         References:
             Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
@@ -324,7 +324,7 @@ class WaveletAnalysis(object):
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients
+            coeff (array): the wavelet transform coefficients (a0, a1, a2)
 
         References:
             Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
@@ -409,7 +409,7 @@ class WaveletAnalysis(object):
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients
+            coeff (array): the wavelet transform coefficients (a0, a1, a2)
 
         References:
             Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
@@ -503,7 +503,7 @@ class WaveletAnalysis(object):
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients
+            coeff (array): the wavelet transform coefficients (a0, a1, a2)
 
         '''
         assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -604,7 +604,7 @@ class WaveletAnalysis(object):
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients
+            coeff (array): the wavelet transform coefficients (a0, a1, a2)
 
         References:
             Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
@@ -712,7 +712,7 @@ class WaveletAnalysis(object):
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients
+            coeff (array): the wavelet transform coefficients (a0, a1, a2)
 
         References:
             Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
@@ -818,7 +818,7 @@ class WaveletAnalysis(object):
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients
+            coeff (array): the wavelet transform coefficients (a0, a1, a2)
 
         '''
         assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -934,7 +934,7 @@ class WaveletAnalysis(object):
             wwa (array): the weighted wavelet amplitude
             phase (array): the weighted wavelet phase
             Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients
+            coeff (array): the wavelet transform coefficients (a0, a1, a2)
 
         '''
         self.assertPositiveInt(Neff, nproc)
@@ -1547,7 +1547,7 @@ class WaveletAnalysis(object):
     def reconstruct_ts(self, coeff, freqs, tau, t, len_bd=0):
         ''' Reconstruct the normalized time series from the wavelet coefficients.
         Args:
-            coeff (array): the coefficients of the corresponding basis functions a_1 and a_2
+            coeff (array): the coefficients of the corresponding basis functions (a0, a1, a2)
             freqs (array): vector of frequency of the basis functions
             tau (array): the evenly-spaced time points of the basis functions
             t (array): the specified evenly-spaced time points of the reconstructed time series
