@@ -21,11 +21,11 @@ The LiPD utilities function lipd.extractTs() returns a list of dictionaries for
 the selected LiPD files, which need to be passed to Pyleoclim along with the path
 to the directory containing the LiPD files.
 
-This is done through the functions pyleoclim.openLiPD() and pyleoclim.fetchTs(),
+This is done through the functions pyleoclim.readLiPD() and pyleoclim.extracTs(),
  which are lightweight versions of their counterparts in the LiPD utilities:
 
-.. autofunction:: pyleoclim.openLipd
-.. autofunction:: pyleoclim.fetchTs
+.. autofunction:: pyleoclim.readLipd
+.. autofunction:: pyleoclim.extractTs
 
 Mapping
 ```````
@@ -63,8 +63,6 @@ Basic manipulations of the timeseries objects.
 .. autofunction:: pyleoclim.interpTs
 
 .. autofunction:: pyleoclim.standardizeTs
-
-.. autofunction:: pyleoclim.segmentTs
 
 Analysis in the frequency domain
 ````````````````````````````````

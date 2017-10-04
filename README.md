@@ -70,19 +70,25 @@ Pyleoclim is published through PyPi and easily installed via `pip`
 pip install pyleoclim
 ```
 
+**Warning**: Some dependencies require an installation through Conda
+
 ### <a name ="quickstart"> Quickstart guide </a>
 
 1. Open your command line application (Terminal or Command Prompt).
 
-2. Install with command: `pip install pyleoclim`
+2. Install the two packages requiring an install through Conda:  
+`conda install -c r rpy2`  
+`conda install -c conda-forge basemap`
 
-3. Wait for installation to complete, then:
+3. Install the pyleoclim package with command: `pip install pyleoclim`
 
-    3a. Import the package into your favorite Python environment (we recommend the use of Spyder, which comes standard with the Anaconda package)
+4. Wait for installation to complete, then:
 
-    3b. Use Jupyter Notebook to go through the tutorial contained in the `PyleoclimQuickstart.ipynb` Notebook, which can be downloaded [here](https://github.com/LinkedEarth/Pyleoclim_util/tree/master/Example).
+    4a. Import the package into your favorite Python environment (we recommend the use of Spyder, which comes standard with the Anaconda package)
 
-4. Help with functionalities can be found in the Documentation folder on [here](http://linkedearth.github.io/Pyleoclim_util/).
+    4b. Use Jupyter Notebook to go through the tutorial contained in the `PyleoclimQuickstart.ipynb` Notebook, which can be downloaded [here](https://github.com/LinkedEarth/Pyleoclim_util/tree/master/Example).
+
+5. Help with functionalities can be found in the Documentation folder on [here](http://linkedearth.github.io/Pyleoclim_util/).
 
 ### <a name="req">Requirements</a>
 
