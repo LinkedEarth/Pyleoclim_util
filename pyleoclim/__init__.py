@@ -1446,7 +1446,7 @@ def segmentTs(timeseries = "", factor = 2):
 # Spectral Analysis
 #"""
 
-def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
+def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = True,
           psd_default = True, wwaplot_default = True, psdplot_default = True,
           fig = True, saveFig = False, dir = "", format = "eps"):
     """Weigthed wavelet Z-transform analysis
@@ -1455,6 +1455,7 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
     
     Args:
         timeseries (dict): A LiPD timeseries object (Optional, will prompt for one.)
+        lim (list): Truncate the timeseries between min/max time (e.g., [0,10000])
         wwz (bool): If True, will perform wavelet analysis
         psd (bool): If True, will inform the power spectral density of the timeseries
         wwz_default: If True, will use the following default parameters:
@@ -1646,7 +1647,14 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
     ts, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
     
     # remove NaNs
-    ys,ts = Timeseries.clean_ts(ys,ts)  
+    ys,ts = Timeseries.clean_ts(ys,ts) 
+    
+    # Truncate the timeseries if asked
+    if lim is not None:
+        idx_low = np.where(ts>=lim[0])[0][0]
+        idx_high = np.where(ts<=lim[1])[0][-1]
+        ts = ts[idx_low:idx_high]
+        ys = ys[idx_low:idx_high]
     
     #Get the time units
     s = timeseries[label+"Units"]
