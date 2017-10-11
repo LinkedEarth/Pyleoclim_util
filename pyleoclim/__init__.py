@@ -2305,9 +2305,13 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
     match = LipdUtils.searchVar(ts_list,["radiocarbon","age14C"])
     if not match:
         sys.exit("No age data available")
-    ages = ts_list[match[0]]['values']
-    if "units" in ts_list[match[0]].keys():
-        agesUnit = ts_list[match[0]]['units']
+    ages = ts_list[match]['values']
+    ages = np.array(ages,dtype='float64')
+    # Remove NaNs (can happen in mixed chronologies)
+    idx = np.where(~np.isnan(ages))[0]
+    ages = ages[idx]
+    if "units" in ts_list[match].keys():
+        agesUnit = ts_list[match]['units']
     else:
         agesUnit =[]    
     print("Age data found.")
@@ -2317,9 +2321,11 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
     match = LipdUtils.searchVar(ts_list,["depth"]) 
     if not match:
         sys.exit("No age data available")
-    positions = ts_list[match[0]]['values']
-    if "units" in ts_list[match[0]].keys():
-        positionsUnits = ts_list[match[0]]['units']
+    positions = ts_list[match]['values']
+    positions = np.array(positions,dtype='float64')
+    positions = positions[idx]
+    if "units" in ts_list[match].keys():
+        positionsUnits = ts_list[match]['units']
     else:
         positionsUnits = []
     print("Depth information found.")
@@ -2329,7 +2335,9 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
     match = LipdUtils.searchVar(ts_list,["uncertainty"],exact=False)
     if not match:
         sys.exit("No uncertainty data available")
-    agesStd = ts_list[match[0]]['values']
+    agesStd = ts_list[match]['values']
+    agesStd = np.array(agesStd,dtype='float64')
+    agesStd = agesStd[idx]
     print("Uncertainty data found.")
     
     # See if there is a column of reject ages
@@ -2341,7 +2349,8 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
             rejectAges = None
             print("No ages rejected.")
         else:
-            rejectAges = ts_list[match[0]]['values']
+            rejectAges = ts_list[match]['values']
+            rejectAges = rejectAges[idx]
             print("Rejected ages found.")
     
     # Check if there are calibration curves
@@ -2354,7 +2363,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
             if len(calCurves) == 1 and len(positions)!=1:
                 calCurves = list(chain(*[[i]*len(positions) for i in calCurves]))
         else:
-            calCurves = ts_list[match[0]]['values']
+            calCurves = ts_list[match]['values']
             calCurves = RBchron.verifyCalCurves(calCurves)
     elif len(calCurves)==1 and len(positions)!=1:
         calCurves = RBchron.verifyCalCurves(calCurves)
@@ -2372,7 +2381,8 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
                                     ["reservoir","reservoirAge","correction"],\
                                     exact=True)
         if len(match)==1:
-            ageCorr = ts_list[match[0]]['values']
+            ageCorr = ts_list[match]['values']
+            ageCorr = ageCorr[idx]
             print("Reservoir Age correction found.")
             print("Looking for correction uncertainty...")
             match = LipdUtils.searchVar(ts_list,["reservoirUncertainty"],\
@@ -2382,7 +2392,8 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
                 corrU = float(input("Enter a value for the correction uncertainty: "))
                 ageCorrStd = corrU*np.ones((len(ageCorr),1))
             else:
-                ageCorrStd = ts_list[match[0]]['values']
+                ageCorrStd = ts_list[match]['values']
+                ageCorrStd = ageCorrStd[idx]
                     
         else:
             print("No match found.")
@@ -2413,9 +2424,9 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
             print("No paleoDepth information available, using Bchron default")
             predictPositions = None
         else:
-            predictPositions = paleots_list[match[0]]['values']
-            if "units" in paleots_list[match[0]].keys():
-                predictPositionsUnits = paleots_list[match[0]]['units']
+            predictPositions = paleots_list[match]['values']
+            if "units" in paleots_list[match].keys():
+                predictPositionsUnits = paleots_list[match]['units']
             else:
                 predictPositionsUnits = []
      

@@ -251,8 +251,8 @@ def searchVar(timeseries_list, key, exact = True, override = True):
                     name = ts_temp["chronData_variableName"]
                     if keyVal.lower() == name.lower():
                         match.append(val)        
-                elif "proxyObservationType" in ts_temp.keys():
-                    name = ts_temp["proxyObservationType"]
+                elif "ProxyObservationType" in ts_temp.keys():
+                    name = ts_temp["ProxyObservationType"]
                     if keyVal.lower() == name.lower():
                         match.append(val)
                 elif "paleoData_proxyObservationType" in ts_temp.keys():
@@ -263,8 +263,8 @@ def searchVar(timeseries_list, key, exact = True, override = True):
                     name = ts_temp["chronData_proxyObservationType"]
                     if keyVal.lower() == name.lower():
                         match.append(val)
-                elif "inferredVariableType" in ts_temp.keys():
-                    name = ts_temp["inferredVariableType"]
+                elif "InferredVariableType" in ts_temp.keys():
+                    name = ts_temp["InferredVariableType"]
                     if keyVal.lower() == name.lower():
                         match.append(val)
                 elif "paleoData_inferredVariableType" in ts_temp.keys():
@@ -292,8 +292,8 @@ def searchVar(timeseries_list, key, exact = True, override = True):
                     name = ts_temp["chronData_variableName"]
                     if keyVal.lower() in name.lower():
                         match.append(val)        
-                elif "proxyObservationType" in ts_temp.keys():
-                    name = ts_temp["proxyObservationType"]
+                elif "ProxyObservationType" in ts_temp.keys():
+                    name = ts_temp["ProxyObservationType"]
                     if keyVal.lower() in name.lower():
                         match.append(val)
                 elif "paleoData_proxyObservationType" in ts_temp.keys():
@@ -304,8 +304,8 @@ def searchVar(timeseries_list, key, exact = True, override = True):
                     name = ts_temp["chronData_proxyObservationType"]
                     if keyVal.lower() in name.lower():
                         match.append(val)
-                elif "inferredVariableType" in ts_temp.keys():
-                    name = ts_temp["inferredVariableType"]
+                elif "InferredVariableType" in ts_temp.keys():
+                    name = ts_temp["InferredVariableType"]
                     if keyVal.lower() in name.lower():
                         match.append(val)
                 elif "paleoData_inferredVariableType" in ts_temp.keys():
@@ -335,8 +335,8 @@ def searchVar(timeseries_list, key, exact = True, override = True):
                     name = ts_temp["chronData_variableName"]
                     if keyVal.lower() in name.lower():
                         match.append(val)        
-                elif "proxyObservationType" in ts_temp.keys():
-                    name = ts_temp["proxyObservationType"]
+                elif "ProxyObservationType" in ts_temp.keys():
+                    name = ts_temp["ProxyObservationType"]
                     if keyVal.lower() in name.lower():
                         match.append(val)
                 elif "paleoData_proxyObservationType" in ts_temp.keys():
@@ -347,8 +347,8 @@ def searchVar(timeseries_list, key, exact = True, override = True):
                     name = ts_temp["chronData_proxyObservationType"]
                     if keyVal.lower() in name.lower():
                         match.append(val)
-                elif "inferredVariableType" in ts_temp.keys():
-                    name = ts_temp["inferredVariableType"]
+                elif "InferredVariableType" in ts_temp.keys():
+                    name = ts_temp["InferredVariableType"]
                     if keyVal.lower() in name.lower():
                         match.append(val)
                 elif "paleoData_inferredVariableType" in ts_temp.keys():
@@ -378,10 +378,12 @@ def searchVar(timeseries_list, key, exact = True, override = True):
             print(idx,": ",val)
         choice = input("Please select the variable you'd like to use or enter to continue: ")
         if not choice:
-            match =[]
+            match =""
         else:
             choice = int(choice)
-            match = v[choice]    
+            match = v[choice]
+    else:
+        match = match[0]        
         
     return match
     

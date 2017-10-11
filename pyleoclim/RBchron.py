@@ -257,15 +257,15 @@ def runBchron(ages, agesStd, positions, rejectAges = None,\
     utils.install_packages(robjects.vectors.StrVector(packnames))
     Bchron = importr('Bchron')  
     
-    ages = np.array(ages)
-    agesStd = np.array(agesStd)
-    positions = np.array(positions)
+    ages = np.array(ages, dtype='float64')
+    agesStd = np.array(agesStd, dtype='float64')
+    positions = np.array(positions, dtype='float64')
 
     #Make sure that the vectors are of the same length
     assert np.size(positions) == np.size(ages) == np.size(agesStd)
     
     if positionsThickness:
-        positionsThickness = np.array(positionsThickness)
+        positionsThickness = np.array(positionsThickness, dtype='float64')
         assert np.size(positionsThickness)==np.size(positions)
            
     # Get the calCurve if not given
