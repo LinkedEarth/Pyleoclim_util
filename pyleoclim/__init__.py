@@ -666,18 +666,18 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
     else:
         x_label = label[0].upper()+label[1:]
     # ylabel
-    if "paleoData_InferredVariableType" in timeseries.keys():
+    if "paleoData_inferredVariableType" in timeseries.keys():
         if "paleoData_units" in timeseries.keys():
-            y_label = timeseries["paleoData_InferredVariableType"] + \
+            y_label = timeseries["paleoData_inferredVariableType"] + \
                       " (" + timeseries["paleoData_units"]+")"
         else:
-            y_label = timeseries["paleoData_InferredVariableType"]
-    elif "paleoData_ProxyObservationType" in timeseries.keys():
+            y_label = timeseries["paleoData_inferredVariableType"]
+    elif "paleoData_proxyObservationType" in timeseries.keys():
         if "paleoData_units" in timeseries.keys():
-            y_label = timeseries["paleoData_ProxyObservationType"] + \
+            y_label = timeseries["paleoData_proxyObservationType"] + \
                       " (" + timeseries["paleoData_units"]+")"
         else:
-            y_label = timeseries["paleoData_ProxyObservationType"]
+            y_label = timeseries["paleoData_proxyObservationType"]
     else:
         if "paleoData_units" in timeseries.keys():
             y_label = timeseries["paleoData_variableName"] + \
@@ -701,7 +701,7 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
 
     return fig
 
-def plotEnsTs(timeseries = "", ensTableName = None, ens = None, \
+def plotEnsTs(timeseries = "", lipd ="", ensTableName = None, ens = None, \
               color = "default", \
               alpha = 0.005, figsize = [10,4], \
               saveFig = False, dir = "",\
@@ -710,6 +710,7 @@ def plotEnsTs(timeseries = "", ensTableName = None, ens = None, \
     
     Args:
         timeseries (dict): LiPD timeseries object. By default, will prompt for one
+        lipd (dict): The LiPD dictionary. MUST be provided is timeseries is set.
         ensTableName (str): The name of the ensemble table, if known.
         ens (int): Number of ensembles to plot. By default, will plot either the 
             number of ensembles stored in the chronensembleTable or 500 of them,
@@ -729,33 +730,60 @@ def plotEnsTs(timeseries = "", ensTableName = None, ens = None, \
         The figure
         
     """
-    
     if not timeseries:
         if not 'ts_list' in globals():
             fetchTs()
-        timeseries = LipdUtils.getTs(ts_list)    
-    
+        timeseries = LipdUtils.getTs(ts_list)
+    elif not lipd and type(timeseries) is dict:
+        sys.exit("LiPD file should be provided when timeseries is set.")
+       
     # Get the csv files
-    if timeseries["dataSetName"] not in lipd_dict.keys():
-        # Print out warnings
-        print("Dataset name and LiPD file name don't match!")
-        print("Select your LiPD file from the list")
-        # Get the name of the LiPD files stored in memory
-        keylist = []
-        for val in lipd_dict.keys():
-            keylist.append(val)
-        #Print them out for the users
-        for idx, val in enumerate(keylist):
-            print(idx,": ",val)
-        # Ask the user to pick one    
-        sel = int(input("Enter the number of the LiPD file: "))
-        lipd_name = keylist[sel]
-        # Grab the csv list
-        csv_dict = lpd.getCsv(lipd_dict[lipd_name])
-        
-    else: #Just grab the csv directly
-        csv_dict = lpd.getCsv(lipd_dict[timeseries["dataSetName"]])
-        
+    if not lipd: 
+        if 'archiveType' in lipd_dict.keys():
+            csv_dict = lpd.getCsv[lipd_dict]
+        else:    
+            if timeseries["dataSetName"] not in lipd_dict.keys():
+                # Print out warnings
+                print("Dataset name and LiPD file name don't match!")
+                print("Select your LiPD file from the list")
+                # Get the name of the LiPD files stored in memory
+                keylist = []
+                for val in lipd_dict.keys():
+                    keylist.append(val)
+                #Print them out for the users
+                for idx, val in enumerate(keylist):
+                    print(idx,": ",val)
+                # Ask the user to pick one    
+                sel = int(input("Enter the number of the LiPD file: "))
+                lipd_name = keylist[sel]
+                # Grab the csv list
+                csv_dict = lpd.getCsv(lipd_dict[lipd_name])
+                
+            else: #Just grab the csv directly
+                csv_dict = lpd.getCsv(lipd_dict[timeseries["dataSetName"]])
+    else:
+        if 'archiveType' in lipd.keys():
+            csv_dict = lpd.getCsv(lipd)
+        else:            
+            if timeseries["dataSetName"] not in lipd.keys():
+                # Print out warnings
+                print("Dataset name and LiPD file name don't match!")
+                print("Select your LiPD file from the list")
+                # Get the name of the LiPD files stored in memory
+                keylist = []
+                for val in lipd.keys():
+                    keylist.append(val)
+                #Print them out for the users
+                for idx, val in enumerate(keylist):
+                    print(idx,": ",val)
+                # Ask the user to pick one    
+                sel = int(input("Enter the number of the LiPD file: "))
+                lipd_name = keylist[sel]
+                # Grab the csv list
+                csv_dict = lpd.getCsv(lipd[lipd_name])
+            else: #Just grab the csv directly
+                csv_dict = lpd.getCsv(lipd[timeseries["dataSetName"]]) 
+                
     # Get the ensemble tables
     if not ensTableName:
         chronEnsembleTables, paleoEnsembleTables = LipdUtils.isEnsemble(csv_dict)
@@ -780,8 +808,8 @@ def plotEnsTs(timeseries = "", ensTableName = None, ens = None, \
     depth, ensembleValues = LipdUtils.getEnsembleValues(ensemble_dict)
     
     # Get the paleoData values
-    ys = np.array(timeseries["paleoData_values"])
-    ds = np.array(timeseries["depth"])
+    ys = np.array(timeseries["paleoData_values"], dtype = 'float64')
+    ds = np.array(timeseries["depth"], dtype = 'float64')
     # Remove NaNs
     ys_tmp = np.copy(ys)
     ys = ys[~np.isnan(ys_tmp)]
@@ -1418,7 +1446,7 @@ def segmentTs(timeseries = "", factor = 2):
 # Spectral Analysis
 #"""
 
-def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
+def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = True,
           psd_default = True, wwaplot_default = True, psdplot_default = True,
           fig = True, saveFig = False, dir = "", format = "eps"):
     """Weigthed wavelet Z-transform analysis
@@ -1427,39 +1455,49 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
     
     Args:
         timeseries (dict): A LiPD timeseries object (Optional, will prompt for one.)
+        lim (list): Truncate the timeseries between min/max time (e.g., [0,10000])
         wwz (bool): If True, will perform wavelet analysis
         psd (bool): If True, will inform the power spectral density of the timeseries
         wwz_default: If True, will use the following default parameters:
             
-            wwz_default = {'tau':None,'freqs':None,'c':1/(8*np.pi**2),'Neff':3,'nMC':200,
-                               'nproc':8,'detrend':'no','params':['default',4,0,1],
-                               'gaussianize':False, 'standardize':True,
-                               'method':'Kirchner_f2py'}.
+            wwz_default = {'tau':None,
+                           'freqs':None,
+                           'c':1/(8*np.pi**2),
+                           'Neff':3,
+                           'nMC':200,
+                           'nproc':8,
+                           'detrend':'no',
+                           'params' : ["default",4,0,1],
+                           'gaussianize': False,
+                           'standardize':True,
+                           'method':'Kirchner_f2py',
+                           'bc':'no',
+                           'len_bd':10}
                 
             Modify the values for specific keys to change the default behavior.
                 
         psd_default: If True, will use the following default parameters:
             
             psd_default = {'tau':None,
-                          'freqs': None,
-                          'c':1e-3,
-                          'nproc':8,
-                          'nMC':200,
-                          'detrend':'no',
-                          'params' : ["default",4,0,1],
-                          'gaussianize': False,
-                          'standardize':True,
-                          'Neff':3,
-                          'anti_alias':False,
-                          'avgs':2,
-                          'method':'Kirchner_f2py'}
+                       'freqs': None,
+                       'c':1e-3,
+                       'nproc':8,
+                       'nMC':200,
+                       'detrend':'no',
+                       'params' : ["default",4,0,1],
+                       'gaussianize': False,
+                       'standardize':True,
+                       'Neff':3,
+                       'anti_alias':False,
+                       'avgs':2,
+                       'method':'Kirchner_f2py',
+                       }
             
             Modify the values for specific keys to change the default behavior.
             
         wwaplot_default: If True, will use the following default parameters:
             
-            wwaplot_default={'Neff':3,
-                                 'AR1_q':AR1_q,
+            wwaplot_default={'AR1_q':AR1_q,
                                  'coi':coi,
                                  'levels':None,
                                  'tick_range':None,
@@ -1473,21 +1511,39 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'cone_alpha':0.5,
                                  'plot_signif':True,
                                  'signif_style':'contour',
-                                 'plot_cone':True}
+                                 'plot_cone':True,
+                                 'title':None,
+                                 'ax':None,
+                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
+                                 'ylabel': 'Period ('+ageunits+')',
+                                 'cbar_orientation':'vertical',
+                                 'cbar_pad':0.05,
+                                 'cbar_frac':0.15,
+                                 'cbar_labelsize':None}
             
             Modify the values for specific keys to change the default behavior.
         psdplot_default: If True, will use the following default parameters:
             
-            psdplot_default={'lmstyle':None,
-                             'linewidth':None,
-                             'xticks':None,
-                             'xlim':None,
-                             'ylim':None,
-                             'figsize':[20,8],
-                             'label':'PSD',
-                             'plot_ar1':True,
-                             'psd_ar1_q95':psd_ar1_q95,
-                             'psd_ar1_color':sns.xkcd_rgb["pale red"]}
+            psdplot_default={'lmstyle':'-',
+                                 'linewidth':None,
+                                 'color': sns.xkcd_rgb["denim blue"],
+                                 'ar1_lmstyle': '-',
+                                 'ar1_linewidth': None,
+                                 'period_ticks':None,
+                                 'psd_lim':None,
+                                 'period_lim':None,
+                                 'figsize':[20,8],
+                                 'label':'PSD',
+                                 'plot_ar1':True,
+                                 'psd_ar1_q95':psd_ar1_q95,
+                                 'psd_ar1':None,
+                                 'title': None,
+                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
+                                 'ax':None,
+                                 'vertical':False,
+                                 'period_label':'Period ('+ageunits+')',
+                                 'psd_label':'Spectral Density',
+                                 'zorder' : None}  
             
             Modify the values for specific keys to change the default behavior.
             
@@ -1591,7 +1647,14 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
     ts, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
     
     # remove NaNs
-    ys,ts = Timeseries.clean_ts(ys,ts)  
+    ys,ts = Timeseries.clean_ts(ys,ts) 
+    
+    # Truncate the timeseries if asked
+    if lim is not None:
+        idx_low = np.where(ts>=lim[0])[0][0]
+        idx_high = np.where(ts<=lim[1])[0][-1]
+        ts = ts[idx_low:idx_high]
+        ys = ys[idx_low:idx_high]
     
     #Get the time units
     s = timeseries[label+"Units"]
@@ -1665,7 +1728,6 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'plot_ar1_ensemble': False,
                                  'psd_ar1':None,
                                  'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
@@ -1693,7 +1755,6 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'plot_ar1_ensemble': False,
                                  'psd_ar1':None,
                                  'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
@@ -2029,7 +2090,6 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'plot_ar1_ensemble': False,
                                  'psd_ar1':None,
                                  'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
@@ -2057,7 +2117,6 @@ def wwzTs(timeseries = "", wwz = False, psd = True, wwz_default = True,
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'plot_ar1_ensemble': False,
                                  'psd_ar1':None,
                                  'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
@@ -2246,9 +2305,13 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
     match = LipdUtils.searchVar(ts_list,["radiocarbon","age14C"])
     if not match:
         sys.exit("No age data available")
-    ages = ts_list[match[0]]['values']
-    if "units" in ts_list[match[0]].keys():
-        agesUnit = ts_list[match[0]]['units']
+    ages = ts_list[match]['values']
+    ages = np.array(ages,dtype='float64')
+    # Remove NaNs (can happen in mixed chronologies)
+    idx = np.where(~np.isnan(ages))[0]
+    ages = ages[idx]
+    if "units" in ts_list[match].keys():
+        agesUnit = ts_list[match]['units']
     else:
         agesUnit =[]    
     print("Age data found.")
@@ -2258,9 +2321,11 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
     match = LipdUtils.searchVar(ts_list,["depth"]) 
     if not match:
         sys.exit("No age data available")
-    positions = ts_list[match[0]]['values']
-    if "units" in ts_list[match[0]].keys():
-        positionsUnits = ts_list[match[0]]['units']
+    positions = ts_list[match]['values']
+    positions = np.array(positions,dtype='float64')
+    positions = positions[idx]
+    if "units" in ts_list[match].keys():
+        positionsUnits = ts_list[match]['units']
     else:
         positionsUnits = []
     print("Depth information found.")
@@ -2270,7 +2335,9 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
     match = LipdUtils.searchVar(ts_list,["uncertainty"],exact=False)
     if not match:
         sys.exit("No uncertainty data available")
-    agesStd = ts_list[match[0]]['values']
+    agesStd = ts_list[match]['values']
+    agesStd = np.array(agesStd,dtype='float64')
+    agesStd = agesStd[idx]
     print("Uncertainty data found.")
     
     # See if there is a column of reject ages
@@ -2282,7 +2349,8 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
             rejectAges = None
             print("No ages rejected.")
         else:
-            rejectAges = ts_list[match[0]]['values']
+            rejectAges = ts_list[match]['values']
+            rejectAges = rejectAges[idx]
             print("Rejected ages found.")
     
     # Check if there are calibration curves
@@ -2295,7 +2363,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
             if len(calCurves) == 1 and len(positions)!=1:
                 calCurves = list(chain(*[[i]*len(positions) for i in calCurves]))
         else:
-            calCurves = ts_list[match[0]]['values']
+            calCurves = ts_list[match]['values']
             calCurves = RBchron.verifyCalCurves(calCurves)
     elif len(calCurves)==1 and len(positions)!=1:
         calCurves = RBchron.verifyCalCurves(calCurves)
@@ -2313,7 +2381,8 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
                                     ["reservoir","reservoirAge","correction"],\
                                     exact=True)
         if len(match)==1:
-            ageCorr = ts_list[match[0]]['values']
+            ageCorr = ts_list[match]['values']
+            ageCorr = ageCorr[idx]
             print("Reservoir Age correction found.")
             print("Looking for correction uncertainty...")
             match = LipdUtils.searchVar(ts_list,["reservoirUncertainty"],\
@@ -2323,7 +2392,8 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
                 corrU = float(input("Enter a value for the correction uncertainty: "))
                 ageCorrStd = corrU*np.ones((len(ageCorr),1))
             else:
-                ageCorrStd = ts_list[match[0]]['values']
+                ageCorrStd = ts_list[match]['values']
+                ageCorrStd = ageCorrStd[idx]
                     
         else:
             print("No match found.")
@@ -2354,9 +2424,9 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
             print("No paleoDepth information available, using Bchron default")
             predictPositions = None
         else:
-            predictPositions = paleots_list[match[0]]['values']
-            if "units" in paleots_list[match[0]].keys():
-                predictPositionsUnits = paleots_list[match[0]]['units']
+            predictPositions = paleots_list[match]['values']
+            if "units" in paleots_list[match].keys():
+                predictPositionsUnits = paleots_list[match]['units']
             else:
                 predictPositionsUnits = []
      
