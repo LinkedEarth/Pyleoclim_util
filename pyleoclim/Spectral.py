@@ -1043,7 +1043,7 @@ class WaveletAnalysis(object):
         power = wwa**2 * 0.5 * dt * Neffs
 
         Neff_diff = Neffs - Neff
-        Neff_diff[Neff_diff < 0] = 0
+        #  Neff_diff[Neff_diff < 0] = 0
 
         sum_power = np.nansum(power * Neff_diff, axis=0)
         sum_eff = np.nansum(Neff_diff, axis=0)
