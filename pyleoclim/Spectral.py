@@ -981,7 +981,7 @@ class WaveletAnalysis(object):
         fourier_factor = 4*np.pi / (Neff+np.sqrt(2+Neff**2))
         coi_const = fourier_factor / np.sqrt(2)
 
-        dt = np.mean(np.diff(tau))
+        dt = np.median(np.diff(tau))
         nt_half = (nt+1)//2 - 1
 
         A = np.append(0.00001, np.arange(nt_half)+1)
@@ -1008,7 +1008,8 @@ class WaveletAnalysis(object):
             omega (array): the angular frequency vector
 
         '''
-        f_Nyquist = 0.5 / np.mean(np.diff(ts))  # for the frequency band larger than f_Nyquist, the wwa will be marked as NaNs
+        # for the frequency band larger than f_Nyquist, the wwa will be marked as NaNs
+        f_Nyquist = 0.5 / np.median(np.diff(ts))
         freqs_with_nan = np.copy(freqs)
         freqs_with_nan[freqs > f_Nyquist] = np.nan
         omega = 2*np.pi*freqs_with_nan
@@ -1038,7 +1039,7 @@ class WaveletAnalysis(object):
         af = AliasFilter()
 
         # weighted psd calculation start
-        dt = np.mean(np.diff(ts))
+        dt = np.median(np.diff(ts))
 
         power = wwa**2 * 0.5 * dt * Neffs
 
@@ -1053,7 +1054,7 @@ class WaveletAnalysis(object):
 
         if anti_alias:
             assert freqs is not None, "freqs is required for alias filter!"
-            dt = np.mean(np.diff(ts))
+            dt = np.median(np.diff(ts))
             f_sampling = 1/dt
             alpha, filtered_pwr, model_pwer, aliased_pwr = af.alias_filter(
                 freqs, psd, f_sampling, f_sampling*1e3, np.min(freqs), avgs)
@@ -1083,7 +1084,7 @@ class WaveletAnalysis(object):
         '''
         assert ofac >= 1 and hifac <= 1, "`ofac` should be >= 1, and `hifac` should be <= 1"
 
-        dt = np.mean(np.diff(ts))
+        dt = np.median(np.diff(ts))
         flo = (1/(2*dt)) / (np.size(ts)*ofac)
         fhi = hifac / (2*dt)
 
@@ -1109,7 +1110,7 @@ class WaveletAnalysis(object):
 
         '''
         nt = np.size(ts)
-        dt = np.mean(np.diff(ts))
+        dt = np.median(np.diff(ts))
         fs = 1 / dt
         if nt % 2 == 0:
             n_freqs = nt//2 + 1
@@ -1395,8 +1396,8 @@ class WaveletAnalysis(object):
 
         # boundary condition
         if len_bd > 0:
-            dt = np.mean(np.diff(ts))
-            dtau = np.mean(np.diff(tau))
+            dt = np.median(np.diff(ts))
+            dtau = np.median(np.diff(tau))
             len_bd_tau = len_bd*dt//dtau
 
             if bc_mode in ['reflect', 'symmetric']:
@@ -1527,7 +1528,7 @@ class WaveletAnalysis(object):
         power1 = np.abs(coeff1)**2
         power2 = np.abs(coeff2)**2
         scales = 1/freqs  # `scales` here is the `Period` axis in the wavelet plot
-        dt = np.mean(np.diff(tau))
+        dt = np.median(np.diff(tau))
         snorm = scales / dt  # normalized scales
 
         scale = 1/freqs
@@ -1561,7 +1562,7 @@ class WaveletAnalysis(object):
         omega = 2*np.pi*freqs
         nf = np.size(freqs)
 
-        dt = np.mean(np.diff(t))
+        dt = np.median(np.diff(t))
         if len_bd > 0:
             t_left_bd = np.linspace(t[0]-dt*len_bd, t[0]-dt, len_bd)
             t_right_bd = np.linspace(t[-1]+dt, t[-1]+dt*len_bd, len_bd)
@@ -1837,7 +1838,7 @@ def ar1_sim(ys, n, p, ts=None, detrend='no', params=["default", 4, 0, 1]):
     return red
 
 
-def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=200, nproc=8,
+def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=200, nproc=8,
         detrend='no', params=['default', 4, 0, 1], gaussianize=False, standardize=True,
         method='Kirchner_f2py', len_bd=0, bc_mode='reflect', reflect_type='odd'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients
@@ -2061,8 +2062,8 @@ def xwt(ys1, ts1, ys2, ts2,
     #                                        gaussianize=gaussianize, standardize=standardize)
     #  psd1_ar1 = wa.wwa2psd(wwa_red1, ts1_cut, Neffs_red1, freqs=freqs, Neff=Neff, anti_alias=False, avgs=2)
     #  psd2_ar1 = wa.wwa2psd(wwa_red2, ts2_cut, Neffs_red2, freqs=freqs, Neff=Neff, anti_alias=False, avgs=2)
-    dt1 = np.mean(np.diff(ts1))
-    dt2 = np.mean(np.diff(ts2))
+    dt1 = np.median(np.diff(ts1))
+    dt2 = np.median(np.diff(ts2))
     f_sampling_1 = 1/dt1
     f_sampling_2 = 1/dt2
     psd1_ar1 = wa.psd_ar(np.var(r1), freqs, tauest1, f_sampling_1)
@@ -2613,7 +2614,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     # plot psd
     sns.set(style="ticks", font_scale=1.5)
     ax3 = plt.subplot(gs[1:4, 9:])
-    psd, freqs, psd_ar1_q95 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC,
+    psd, freqs, psd_ar1_q95, psd_ar1 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC,
                                       detrend=detrend, gaussianize=gaussianize, standardize=standardize,
                                       anti_alias=anti_alias)
 
