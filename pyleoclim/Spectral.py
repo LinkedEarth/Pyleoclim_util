@@ -1957,6 +1957,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         psd (array): power spectral density
         freqs (array): vector of frequency
         psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes
+        psd_ar1 (array): the psds of AR1 processes
 
     '''
     wa = WaveletAnalysis()
@@ -2571,6 +2572,8 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     if period_ticks is not None:
         period_ticks = np.asarray(period_ticks)
 
+    ylim_min = np.min(period_ticks)
+
     gs = gridspec.GridSpec(6, 12)
     gs.update(wspace=0, hspace=0)
 
@@ -2601,12 +2604,12 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
             gaussianize=gaussianize, standardize=standardize)
 
     if wwa_xlabel is not None and wwa_ylabel is not None:
-        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[np.min(period_ticks), np.max(coi)],
+        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[ylim_min, np.max(coi)],
                  plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
                  )
     else:
-        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[np.min(period_ticks), np.max(coi)],
+        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[ylim_min, np.max(coi)],
                  plot_cone=True, plot_signif=True, ax=ax2,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
                  )
@@ -2618,6 +2621,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
                                       detrend=detrend, gaussianize=gaussianize, standardize=standardize,
                                       anti_alias=anti_alias)
 
+    # TODO: deal with period_ticks
     plot_psd(psd, freqs, plot_ar1=True, psd_ar1_q95=psd_ar1_q95, period_ticks=period_ticks[period_ticks < np.max(coi)],
              period_lim=[np.min(period_ticks), np.max(coi)], psd_lim=psd_lim,
              lmstyle=psd_lmstyle, ax=ax3, period_label='', label='Estimated spectrum', vertical=True)
