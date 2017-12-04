@@ -184,12 +184,12 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     mu = np.nanmean(x, axis=axis)  # the mean of the original time series
     sig = np.nanstd(x, axis=axis, ddof=ddof)  # the std of the original time series
 
-    mu2 = np.copy(mu)  # the mean used in the calculation of zscore
-    sig2 = np.copy(sig) / scale  # the std used in the calculation of zscore
+    mu2 = np.asarray(np.copy(mu))  # the mean used in the calculation of zscore
+    sig2 = np.asarray(np.copy(sig) / scale)  # the std used in the calculation of zscore
 
     if np.any(np.abs(sig) < eps):  # check if x contains (nearly) constant time series
         warnings.warn('Constant or nearly constant time series not rescaled.')
-        where_const = np.where(np.abs(sig) < eps)  # find out where we have (nearly) constant time series
+        where_const = np.abs(sig) < eps  # find out where we have (nearly) constant time series
 
         # if a vector is (nearly) constant, keep it the same as original, i.e., substract by 0 and divide by 1.
         mu2[where_const] = 0
