@@ -1016,7 +1016,7 @@ class WaveletAnalysis(object):
 
         return omega
 
-    def wwa2psd(self, wwa, ts, Neffs, freqs=None, Neff=3, anti_alias=False, avgs=2):
+    def wwa2psd(self, wwa, ts, Neffs, freqs=None, Neff=3, anti_alias=False, avgs=1):
         """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
         Args:
@@ -1926,7 +1926,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             detrend='no', params=["default", 4, 0, 1], gaussianize=False, standardize=True,
-            Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
+            Neff=3, anti_alias=False, avgs=1, method='Kirchner_f2py'):
     ''' Return the psd of a timeseires directly using wwz method.
 
     Args:
@@ -2061,8 +2061,8 @@ def xwt(ys1, ts1, ys2, ts2,
     #                                        gaussianize=gaussianize, standardize=standardize)
     #  wwa_red2, _, Neffs_red2, _ = wwz_func(r2, ts2_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend,
     #                                        gaussianize=gaussianize, standardize=standardize)
-    #  psd1_ar1 = wa.wwa2psd(wwa_red1, ts1_cut, Neffs_red1, freqs=freqs, Neff=Neff, anti_alias=False, avgs=2)
-    #  psd2_ar1 = wa.wwa2psd(wwa_red2, ts2_cut, Neffs_red2, freqs=freqs, Neff=Neff, anti_alias=False, avgs=2)
+    #  psd1_ar1 = wa.wwa2psd(wwa_red1, ts1_cut, Neffs_red1, freqs=freqs, Neff=Neff, anti_alias=False, avgs=1)
+    #  psd2_ar1 = wa.wwa2psd(wwa_red2, ts2_cut, Neffs_red2, freqs=freqs, Neff=Neff, anti_alias=False, avgs=1)
     dt1 = np.median(np.diff(ts1))
     dt2 = np.median(np.diff(ts2))
     f_sampling_1 = 1/dt1
@@ -2537,7 +2537,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
 
 
 def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=200, nproc=8, detrend='no',
-                 gaussianize=False, standardize=True,
+                 gaussianize=False, standardize=True, levels=None,
                  anti_alias=False, period_ticks=None, ts_color=None,
                  title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
                  psd_lmstyle='-', psd_lim=None, period_I=[1/8, 1/2], period_D=[1/200, 1/20]):
@@ -2605,13 +2605,13 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
 
     if wwa_xlabel is not None and wwa_ylabel is not None:
         plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[ylim_min, np.max(coi)],
-                 plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2,
+                 plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2, levels=levels,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
                  )
     else:
         plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[ylim_min, np.max(coi)],
                  plot_cone=True, plot_signif=True, ax=ax2,
-                 cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
+                 cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15, levels=levels,
                  )
 
     # plot psd
