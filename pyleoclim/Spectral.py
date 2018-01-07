@@ -2437,7 +2437,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
              period_ticks=None, psd_lim=None, period_lim=None,
              figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None,
              psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False,
-             period_label='Period', psd_label='Spectral Density', zorder=None):
+             period_label='Period (years)', psd_label='Spectral Density', zorder=None):
     """ Plot the wavelet amplitude
 
     Args:
