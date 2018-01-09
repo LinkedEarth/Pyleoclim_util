@@ -2200,7 +2200,7 @@ def xwc(ys1, ts1, ys2, ts2,
 
 
 def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
-             yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
+             yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
              cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
              plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical',
              cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
@@ -2268,12 +2268,13 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     plt.yscale('log', nonposy='clip')
 
     if yticks is not None:
-        plt.yticks(yticks)
+        plt.yticks(yticks, yticks_label)
 
     if xticks is not None:
-        plt.xticks(xticks, xlabels)
+        plt.xticks(xticks)
 
-    ax.get_yaxis().set_major_formatter(ScalarFormatter())
+    if yticks_label is None:
+        ax.get_yaxis().set_major_formatter(ScalarFormatter())
 
     if ylim is not None:
         plt.ylim(ylim)
@@ -2300,7 +2301,7 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     if title is not None:
         plt.title(title)
 
-    ax.set_ylim(ylim)
+    #  ax.set_ylim(ylim)
 
     return ax
 
@@ -2434,9 +2435,9 @@ def plot_wwadist(wwa, ylim=None):
 
 
 def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-', ar1_linewidth=None,
-             period_ticks=None, psd_lim=None, period_lim=None,
+             period_ticks=None, period_tickslabel=None, psd_lim=None, period_lim=None,
              figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None,
-             psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False,
+             psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False, plot_gridlines=True,
              period_label='Period (years)', psd_label='Spectral Density', zorder=None):
     """ Plot the wavelet amplitude
 
@@ -2507,7 +2508,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
             ax.set_xlim(psd_lim)
 
         if period_ticks is not None:
-            plt.yticks(period_ticks)
+            plt.yticks(period_ticks, period_tickslabel)
             ax.get_yaxis().set_major_formatter(ScalarFormatter())
             ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
         else:
@@ -2531,7 +2532,9 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
             ax.set_aspect('equal')
 
     plt.legend()
-    plt.grid()
+
+    if plot_gridlines:
+        plt.grid()
 
     return ax
 

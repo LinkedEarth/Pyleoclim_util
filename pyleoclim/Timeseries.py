@@ -275,6 +275,34 @@ def clean_ts(ys, ts):
     return ys, ts
 
 
+def annualize(ys, ts):
+    ''' Annualize a time series whose time resolution is finer than 1 year
+
+    Args:
+        ys (array): a time series, NaNs allowed
+        ts (array): the time axis of the time series, NaNs allowed
+
+    Returns:
+        ys_ann (array): the annualized time series
+        year_int (array): the time axis of the annualized time series
+
+    '''
+    year_int = list(set(np.floor(ts)))
+    year_int = np.asarray(list(map(int, year_int)))
+    n_year = len(year_int)
+    year_int_pad = list(year_int)
+    year_int_pad.append(np.max(year_int)+1)
+    ys_ann = np.zeros(n_year)
+
+    for i in range(n_year):
+        t_start = year_int_pad[i]
+        t_end = year_int_pad[i+1]
+        t_range = (ts >= t_start) & (ts < t_end)
+        ys_ann[i] = np.average(ys[t_range], axis=0)
+
+    return ys_ann, year_int
+
+
 def gaussianize(X):
     """ Transforms a (proxy) timeseries to Gaussian distribution.
 
@@ -317,6 +345,7 @@ def gaussianize_single(X_single):
     Xn_single[nz] = np.sqrt(2)*special.erfinv(2*CDF - 1)
 
     return Xn_single
+
 
 def detrend(y, x = None, method = "linear", params = ["default",4,0,1]):
     """Detrend a timeseries according to three methods
