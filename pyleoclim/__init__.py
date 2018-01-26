@@ -1076,16 +1076,20 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
                    
     # Perform the analysis
     default = {'tau':None,
-               'freqs':None,
-               'c':1e-3,
-               'nproc':8,
-               'nMC':200,
-               'detrend':'no',
-               'Neff':3,
-               'anti_alias':False,
-               'avgs':2,
-               'method':'Kirchner_f2py'}
-    psd, freqs, psd_ar1_q95 = Spectral.wwz_psd(y,x,**default)
+                       'freqs': None,
+                       'c':1e-3,
+                       'nproc':8,
+                       'nMC':200,
+                       'detrend':'no',
+                       'params' : ["default",4,0,1],
+                       'gaussianize': False,
+                       'standardize':True,
+                       'Neff':3,
+                       'anti_alias':False,
+                       'avgs':2,
+                       'method':'Kirchner_f2py',
+                       }
+    psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(y,x,**default)
     
     # Make the plot
     ax4.plot(1/freqs, psd, linewidth=1,  label='PSD', color = marker[0])
