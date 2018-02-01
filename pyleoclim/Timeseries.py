@@ -184,12 +184,12 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     mu = np.nanmean(x, axis=axis)  # the mean of the original time series
     sig = np.nanstd(x, axis=axis, ddof=ddof)  # the std of the original time series
 
-    mu2 = np.copy(mu)  # the mean used in the calculation of zscore
-    sig2 = np.copy(sig) / scale  # the std used in the calculation of zscore
+    mu2 = np.asarray(np.copy(mu))  # the mean used in the calculation of zscore
+    sig2 = np.asarray(np.copy(sig) / scale)  # the std used in the calculation of zscore
 
     if np.any(np.abs(sig) < eps):  # check if x contains (nearly) constant time series
         warnings.warn('Constant or nearly constant time series not rescaled.')
-        where_const = np.where(np.abs(sig) < eps)  # find out where we have (nearly) constant time series
+        where_const = np.abs(sig) < eps  # find out where we have (nearly) constant time series
 
         # if a vector is (nearly) constant, keep it the same as original, i.e., substract by 0 and divide by 1.
         mu2[where_const] = 0
@@ -260,6 +260,10 @@ def clean_ts(ys, ts):
 
     '''
     # delete NaNs if there is any
+    ys = np.asarray(ys, dtype=np.float)
+    ts = np.asarray(ts, dtype=np.float)
+    assert(ys.size == ts.size, 'The size of time axis and data value should be equal!')
+
     ys_tmp = np.copy(ys)
     ys = ys[~np.isnan(ys_tmp)]
     ts = ts[~np.isnan(ys_tmp)]
@@ -273,6 +277,34 @@ def clean_ts(ys, ts):
     ts = ts[sort_ind]
 
     return ys, ts
+
+
+def annualize(ys, ts):
+    ''' Annualize a time series whose time resolution is finer than 1 year
+
+    Args:
+        ys (array): a time series, NaNs allowed
+        ts (array): the time axis of the time series, NaNs allowed
+
+    Returns:
+        ys_ann (array): the annualized time series
+        year_int (array): the time axis of the annualized time series
+
+    '''
+    year_int = list(set(np.floor(ts)))
+    year_int = np.sort(list(map(int, year_int)))
+    n_year = len(year_int)
+    year_int_pad = list(year_int)
+    year_int_pad.append(np.max(year_int)+1)
+    ys_ann = np.zeros(n_year)
+
+    for i in range(n_year):
+        t_start = year_int_pad[i]
+        t_end = year_int_pad[i+1]
+        t_range = (ts >= t_start) & (ts < t_end)
+        ys_ann[i] = np.average(ys[t_range], axis=0)
+
+    return ys_ann, year_int
 
 
 def gaussianize(X):
@@ -317,6 +349,7 @@ def gaussianize_single(X_single):
     Xn_single[nz] = np.sqrt(2)*special.erfinv(2*CDF - 1)
 
     return Xn_single
+
 
 def detrend(y, x = None, method = "linear", params = ["default",4,0,1]):
     """Detrend a timeseries according to three methods

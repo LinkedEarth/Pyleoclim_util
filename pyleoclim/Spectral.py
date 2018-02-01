@@ -981,7 +981,7 @@ class WaveletAnalysis(object):
         fourier_factor = 4*np.pi / (Neff+np.sqrt(2+Neff**2))
         coi_const = fourier_factor / np.sqrt(2)
 
-        dt = np.mean(np.diff(tau))
+        dt = np.median(np.diff(tau))
         nt_half = (nt+1)//2 - 1
 
         A = np.append(0.00001, np.arange(nt_half)+1)
@@ -1008,14 +1008,15 @@ class WaveletAnalysis(object):
             omega (array): the angular frequency vector
 
         '''
-        f_Nyquist = 0.5 / np.mean(np.diff(ts))  # for the frequency band larger than f_Nyquist, the wwa will be marked as NaNs
+        # for the frequency band larger than f_Nyquist, the wwa will be marked as NaNs
+        f_Nyquist = 0.5 / np.median(np.diff(ts))
         freqs_with_nan = np.copy(freqs)
         freqs_with_nan[freqs > f_Nyquist] = np.nan
         omega = 2*np.pi*freqs_with_nan
 
         return omega
 
-    def wwa2psd(self, wwa, ts, Neffs, freqs=None, Neff=3, anti_alias=False, avgs=2):
+    def wwa2psd(self, wwa, ts, Neffs, freqs=None, Neff=3, anti_alias=False, avgs=1):
         """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
         Args:
@@ -1038,7 +1039,7 @@ class WaveletAnalysis(object):
         af = AliasFilter()
 
         # weighted psd calculation start
-        dt = np.mean(np.diff(ts))
+        dt = np.median(np.diff(ts))
 
         power = wwa**2 * 0.5 * dt * Neffs
 
@@ -1053,7 +1054,7 @@ class WaveletAnalysis(object):
 
         if anti_alias:
             assert freqs is not None, "freqs is required for alias filter!"
-            dt = np.mean(np.diff(ts))
+            dt = np.median(np.diff(ts))
             f_sampling = 1/dt
             alpha, filtered_pwr, model_pwer, aliased_pwr = af.alias_filter(
                 freqs, psd, f_sampling, f_sampling*1e3, np.min(freqs), avgs)
@@ -1083,7 +1084,7 @@ class WaveletAnalysis(object):
         '''
         assert ofac >= 1 and hifac <= 1, "`ofac` should be >= 1, and `hifac` should be <= 1"
 
-        dt = np.mean(np.diff(ts))
+        dt = np.median(np.diff(ts))
         flo = (1/(2*dt)) / (np.size(ts)*ofac)
         fhi = hifac / (2*dt)
 
@@ -1109,7 +1110,7 @@ class WaveletAnalysis(object):
 
         '''
         nt = np.size(ts)
-        dt = np.mean(np.diff(ts))
+        dt = np.median(np.diff(ts))
         fs = 1 / dt
         if nt % 2 == 0:
             n_freqs = nt//2 + 1
@@ -1395,8 +1396,8 @@ class WaveletAnalysis(object):
 
         # boundary condition
         if len_bd > 0:
-            dt = np.mean(np.diff(ts))
-            dtau = np.mean(np.diff(tau))
+            dt = np.median(np.diff(ts))
+            dtau = np.median(np.diff(tau))
             len_bd_tau = len_bd*dt//dtau
 
             if bc_mode in ['reflect', 'symmetric']:
@@ -1527,7 +1528,7 @@ class WaveletAnalysis(object):
         power1 = np.abs(coeff1)**2
         power2 = np.abs(coeff2)**2
         scales = 1/freqs  # `scales` here is the `Period` axis in the wavelet plot
-        dt = np.mean(np.diff(tau))
+        dt = np.median(np.diff(tau))
         snorm = scales / dt  # normalized scales
 
         scale = 1/freqs
@@ -1561,7 +1562,7 @@ class WaveletAnalysis(object):
         omega = 2*np.pi*freqs
         nf = np.size(freqs)
 
-        dt = np.mean(np.diff(t))
+        dt = np.median(np.diff(t))
         if len_bd > 0:
             t_left_bd = np.linspace(t[0]-dt*len_bd, t[0]-dt, len_bd)
             t_right_bd = np.linspace(t[-1]+dt, t[-1]+dt*len_bd, len_bd)
@@ -1837,7 +1838,7 @@ def ar1_sim(ys, n, p, ts=None, detrend='no', params=["default", 4, 0, 1]):
     return red
 
 
-def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=200, nproc=8,
+def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=200, nproc=8,
         detrend='no', params=['default', 4, 0, 1], gaussianize=False, standardize=True,
         method='Kirchner_f2py', len_bd=0, bc_mode='reflect', reflect_type='odd'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients
@@ -1925,7 +1926,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nMC=
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             detrend='no', params=["default", 4, 0, 1], gaussianize=False, standardize=True,
-            Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
+            Neff=3, anti_alias=False, avgs=1, method='Kirchner_f2py'):
     ''' Return the psd of a timeseires directly using wwz method.
 
     Args:
@@ -1956,6 +1957,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         psd (array): power spectral density
         freqs (array): vector of frequency
         psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes
+        psd_ar1 (array): the psds of AR1 processes
 
     '''
     wa = WaveletAnalysis()
@@ -2059,10 +2061,10 @@ def xwt(ys1, ts1, ys2, ts2,
     #                                        gaussianize=gaussianize, standardize=standardize)
     #  wwa_red2, _, Neffs_red2, _ = wwz_func(r2, ts2_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend,
     #                                        gaussianize=gaussianize, standardize=standardize)
-    #  psd1_ar1 = wa.wwa2psd(wwa_red1, ts1_cut, Neffs_red1, freqs=freqs, Neff=Neff, anti_alias=False, avgs=2)
-    #  psd2_ar1 = wa.wwa2psd(wwa_red2, ts2_cut, Neffs_red2, freqs=freqs, Neff=Neff, anti_alias=False, avgs=2)
-    dt1 = np.mean(np.diff(ts1))
-    dt2 = np.mean(np.diff(ts2))
+    #  psd1_ar1 = wa.wwa2psd(wwa_red1, ts1_cut, Neffs_red1, freqs=freqs, Neff=Neff, anti_alias=False, avgs=1)
+    #  psd2_ar1 = wa.wwa2psd(wwa_red2, ts2_cut, Neffs_red2, freqs=freqs, Neff=Neff, anti_alias=False, avgs=1)
+    dt1 = np.median(np.diff(ts1))
+    dt2 = np.median(np.diff(ts2))
     f_sampling_1 = 1/dt1
     f_sampling_2 = 1/dt2
     psd1_ar1 = wa.psd_ar(np.var(r1), freqs, tauest1, f_sampling_1)
@@ -2198,7 +2200,7 @@ def xwc(ys1, ts1, ys2, ts2,
 
 
 def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
-             yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
+             yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
              cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
              plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical',
              cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
@@ -2266,12 +2268,13 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     plt.yscale('log', nonposy='clip')
 
     if yticks is not None:
-        plt.yticks(yticks)
+        plt.yticks(yticks, yticks_label)
 
     if xticks is not None:
-        plt.xticks(xticks, xlabels)
+        plt.xticks(xticks)
 
-    ax.get_yaxis().set_major_formatter(ScalarFormatter())
+    if yticks_label is None:
+        ax.get_yaxis().set_major_formatter(ScalarFormatter())
 
     if ylim is not None:
         plt.ylim(ylim)
@@ -2298,7 +2301,7 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     if title is not None:
         plt.title(title)
 
-    ax.set_ylim(ylim)
+    #  ax.set_ylim(ylim)
 
     return ax
 
@@ -2432,10 +2435,10 @@ def plot_wwadist(wwa, ylim=None):
 
 
 def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-', ar1_linewidth=None,
-             period_ticks=None, psd_lim=None, period_lim=None,
-             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None,
-             psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False,
-             period_label='Period', psd_label='Spectral Density', zorder=None):
+             period_ticks=None, period_tickslabel=None, psd_lim=None, period_lim=None,
+             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None, legend=True,
+             psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False, plot_gridlines=True,
+             period_label='Period (years)', psd_label='Spectral Density', zorder=None):
     """ Plot the wavelet amplitude
 
     Args:
@@ -2465,7 +2468,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
         fig, ax = plt.subplots(figsize=figsize)
 
     if title is not None:
-        plt.title(title)
+        ax.set_title(title)
 
     if vertical:
         x_data = psd
@@ -2479,24 +2482,24 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
         y_data_ar1 = psd_ar1_q95
 
     if zorder is not None:
-        plt.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, zorder=zorder, color=color)
+        ax.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, zorder=zorder, color=color)
         if plot_ar1:
             assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
-            plt.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
-                     label='AR1 95%', color=psd_ar1_color, zorder=zorder-1)
+            ax.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
+                     label='AR(1) 95%', color=psd_ar1_color, zorder=zorder-1)
     else:
-        plt.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, color=color)
+        ax.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, color=color)
         if plot_ar1:
             assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
-            plt.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
-                     label='AR1 95%', color=psd_ar1_color)
+            ax.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
+                     label='AR(1) 95%', color=psd_ar1_color)
 
-    plt.xscale('log', nonposy='clip')
-    plt.yscale('log', nonposy='clip')
+    ax.set_xscale('log', nonposy='clip')
+    ax.set_yscale('log', nonposy='clip')
 
     if vertical:
-        plt.ylabel(period_label)
-        plt.xlabel(psd_label)
+        ax.set_ylabel(period_label)
+        ax.set_xlabel(psd_label)
 
         if period_lim is not None:
             ax.set_ylim(period_lim)
@@ -2505,14 +2508,14 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
             ax.set_xlim(psd_lim)
 
         if period_ticks is not None:
-            plt.yticks(period_ticks)
+            ax.set_yticks(period_ticks, period_tickslabel)
             ax.get_yaxis().set_major_formatter(ScalarFormatter())
             ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
         else:
             ax.set_aspect('equal')
     else:
-        plt.xlabel(period_label)
-        plt.ylabel(psd_label)
+        ax.set_xlabel(period_label)
+        ax.set_ylabel(psd_label)
 
         if period_lim is not None:
             ax.set_xlim(period_lim)
@@ -2521,21 +2524,24 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
             ax.set_ylim(psd_lim)
 
         if period_ticks is not None:
-            plt.xticks(period_ticks)
+            ax.set_xticks(period_ticks)
             ax.get_xaxis().set_major_formatter(ScalarFormatter())
             ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
             plt.gca().invert_xaxis()
         else:
             ax.set_aspect('equal')
 
-    plt.legend()
-    plt.grid()
+    if legend:
+        ax.legend()
+
+    if plot_gridlines:
+        ax.grid()
 
     return ax
 
 
 def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=200, nproc=8, detrend='no',
-                 gaussianize=False, standardize=True,
+                 gaussianize=False, standardize=True, levels=None,
                  anti_alias=False, period_ticks=None, ts_color=None,
                  title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
                  psd_lmstyle='-', psd_lim=None, period_I=[1/8, 1/2], period_D=[1/200, 1/20]):
@@ -2570,6 +2576,8 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     if period_ticks is not None:
         period_ticks = np.asarray(period_ticks)
 
+    ylim_min = np.min(period_ticks)
+
     gs = gridspec.GridSpec(6, 12)
     gs.update(wspace=0, hspace=0)
 
@@ -2600,23 +2608,24 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
             gaussianize=gaussianize, standardize=standardize)
 
     if wwa_xlabel is not None and wwa_ylabel is not None:
-        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[np.min(period_ticks), np.max(coi)],
-                 plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2,
+        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[ylim_min, np.max(coi)],
+                 plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2, levels=levels,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
                  )
     else:
-        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[np.min(period_ticks), np.max(coi)],
+        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[ylim_min, np.max(coi)],
                  plot_cone=True, plot_signif=True, ax=ax2,
-                 cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
+                 cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15, levels=levels,
                  )
 
     # plot psd
     sns.set(style="ticks", font_scale=1.5)
     ax3 = plt.subplot(gs[1:4, 9:])
-    psd, freqs, psd_ar1_q95 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC,
+    psd, freqs, psd_ar1_q95, psd_ar1 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC,
                                       detrend=detrend, gaussianize=gaussianize, standardize=standardize,
                                       anti_alias=anti_alias)
 
+    # TODO: deal with period_ticks
     plot_psd(psd, freqs, plot_ar1=True, psd_ar1_q95=psd_ar1_q95, period_ticks=period_ticks[period_ticks < np.max(coi)],
              period_lim=[np.min(period_ticks), np.max(coi)], psd_lim=psd_lim,
              lmstyle=psd_lmstyle, ax=ax3, period_label='', label='Estimated spectrum', vertical=True)
