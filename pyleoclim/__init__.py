@@ -947,7 +947,7 @@ def histTs(timeseries = "", bins = None, hist = True, \
     y = y[index]
 
     # Get the y_label
-        if "paleoData_inferredVariableType" in timeseries.keys():
+    if "paleoData_inferredVariableType" in timeseries.keys():
         #This if loop is needed because some files appear to have two
         #different inferredVariableType/proxyObservationType, which
         #should not be possible in the ontology. Just build some checks
