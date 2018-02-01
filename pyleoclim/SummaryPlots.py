@@ -70,7 +70,7 @@ def getMetadata(timeseries):
     if "paleoData_InferredVariableType" in timeseries.keys():
         if type(timeseries["paleoData_InferredVariableType"]) is list:
             Variable = timeseries["paleoData_InferredVariableType"][0]
-        else
+        else:
             Variable = timeseries["paleoData_InferredVariableType"]
     elif "paleoData_ProxyObservationType" in timeseries.keys():
         if type(timeseries["paleoData_ProxyObservationType"]) is list:
