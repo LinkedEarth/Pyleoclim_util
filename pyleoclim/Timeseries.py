@@ -260,6 +260,10 @@ def clean_ts(ys, ts):
 
     '''
     # delete NaNs if there is any
+    ys = np.asarray(ys, dtype=np.float)
+    ts = np.asarray(ts, dtype=np.float)
+    assert(ys.size == ts.size, 'The size of time axis and data value should be equal!')
+
     ys_tmp = np.copy(ys)
     ys = ys[~np.isnan(ys_tmp)]
     ts = ts[~np.isnan(ys_tmp)]
@@ -288,7 +292,7 @@ def annualize(ys, ts):
 
     '''
     year_int = list(set(np.floor(ts)))
-    year_int = np.asarray(list(map(int, year_int)))
+    year_int = np.sort(list(map(int, year_int)))
     n_year = len(year_int)
     year_int_pad = list(year_int)
     year_int_pad.append(np.max(year_int)+1)

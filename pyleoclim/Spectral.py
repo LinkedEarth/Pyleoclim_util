@@ -2436,7 +2436,7 @@ def plot_wwadist(wwa, ylim=None):
 
 def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-', ar1_linewidth=None,
              period_ticks=None, period_tickslabel=None, psd_lim=None, period_lim=None,
-             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None,
+             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None, legend=True,
              psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False, plot_gridlines=True,
              period_label='Period (years)', psd_label='Spectral Density', zorder=None):
     """ Plot the wavelet amplitude
@@ -2468,7 +2468,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
         fig, ax = plt.subplots(figsize=figsize)
 
     if title is not None:
-        plt.title(title)
+        ax.set_title(title)
 
     if vertical:
         x_data = psd
@@ -2482,24 +2482,24 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
         y_data_ar1 = psd_ar1_q95
 
     if zorder is not None:
-        plt.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, zorder=zorder, color=color)
+        ax.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, zorder=zorder, color=color)
         if plot_ar1:
             assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
-            plt.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
-                     label='AR1 95%', color=psd_ar1_color, zorder=zorder-1)
+            ax.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
+                     label='AR(1) 95%', color=psd_ar1_color, zorder=zorder-1)
     else:
-        plt.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, color=color)
+        ax.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, color=color)
         if plot_ar1:
             assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
-            plt.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
-                     label='AR1 95%', color=psd_ar1_color)
+            ax.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
+                     label='AR(1) 95%', color=psd_ar1_color)
 
-    plt.xscale('log', nonposy='clip')
-    plt.yscale('log', nonposy='clip')
+    ax.set_xscale('log', nonposy='clip')
+    ax.set_yscale('log', nonposy='clip')
 
     if vertical:
-        plt.ylabel(period_label)
-        plt.xlabel(psd_label)
+        ax.set_ylabel(period_label)
+        ax.set_xlabel(psd_label)
 
         if period_lim is not None:
             ax.set_ylim(period_lim)
@@ -2508,14 +2508,14 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
             ax.set_xlim(psd_lim)
 
         if period_ticks is not None:
-            plt.yticks(period_ticks, period_tickslabel)
+            ax.set_yticks(period_ticks, period_tickslabel)
             ax.get_yaxis().set_major_formatter(ScalarFormatter())
             ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
         else:
             ax.set_aspect('equal')
     else:
-        plt.xlabel(period_label)
-        plt.ylabel(psd_label)
+        ax.set_xlabel(period_label)
+        ax.set_ylabel(psd_label)
 
         if period_lim is not None:
             ax.set_xlim(period_lim)
@@ -2524,17 +2524,18 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
             ax.set_ylim(psd_lim)
 
         if period_ticks is not None:
-            plt.xticks(period_ticks)
+            ax.set_xticks(period_ticks)
             ax.get_xaxis().set_major_formatter(ScalarFormatter())
             ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
             plt.gca().invert_xaxis()
         else:
             ax.set_aspect('equal')
 
-    plt.legend()
+    if legend:
+        ax.legend()
 
     if plot_gridlines:
-        plt.grid()
+        ax.grid()
 
     return ax
 
