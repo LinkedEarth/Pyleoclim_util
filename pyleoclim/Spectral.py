@@ -2455,8 +2455,12 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
         figsize (list): the size for the figure
         ax (axis): Return as axis instead of figure (useful to integrate plot into a subplot)
         vertical (bool): plot in vertical layout or not
+        legend (bool): plot legend or not
+        lmstyle (str): the line style
+        linewidth (float): the line width
         period_label (str): the label for period
         psd_label (str): the label for psd
+        zorder (int): the order of the layer
 
     Returns:
         ax (figure): the 2-D plot of wavelet analysis
