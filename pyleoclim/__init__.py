@@ -135,8 +135,10 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
     """
     
     # Get the dictionary of LiPD files
-    if not lipds and 'lipd_dict' not in globals():
-        openLipd()
+    if not lipds:
+        if 'lipd_dict' not in globals():
+            openLipd()
+        lipds = lipd_dict
         
     # Initialize the various lists
     lat = []
@@ -144,8 +146,8 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
     archiveType = []
 
     # Loop ang grab the metadata
-    for idx, key in enumerate(lipd_dict):
-        d = lipd_dict[key]
+    for idx, key in enumerate(lipds):
+        d = lipds[key]
         lat.append(d['geo']['geometry']['coordinates'][1])
         lon.append(d['geo']['geometry']['coordinates'][0])
         archiveType.append(LipdUtils.LipdToOntology(d['archiveType']).lower())
@@ -368,7 +370,7 @@ class MapFilters():
         return lat, lon, archiveType, dataSetName, dist
         
 
-def MapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
+def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
                    sameArchive = False, projection = 'ortho', lat_0 = "", \
                    lon_0="", llcrnrlat = -90, urcrnrlat=90, llcrnrlon=-180, 
                    urcrnrlon=180, countries = True, counties = False, \
@@ -442,10 +444,10 @@ def MapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
     """
     
     # Get the dictionary of LiPD files
-    if not lipds and 'lipd_dict' not in globals():
-        lipd_dict = openLipd()
-    elif lipds:
-        lipd_dict = lipds
+    if not lipds:
+        if 'lipd_dict' not in globals():
+            openLipd()
+        lipds = lipd_dict
     
     # Get a timeseries if not given
     if not timeseries:
@@ -455,7 +457,7 @@ def MapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
     
     # Get the data
     newfilter = MapFilters()
-    lat, lon, archiveType, dataSetName = newfilter.getData(lipd_dict)
+    lat, lon, archiveType, dataSetName = newfilter.getData(lipds)
     # Calculate the distance
     dist = newfilter.computeDist(timeseries["geo_meanLat"],
                                  timeseries["geo_meanLon"],
@@ -667,25 +669,35 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
         x_label = label[0].upper()+label[1:]
     # ylabel
     if "paleoData_inferredVariableType" in timeseries.keys():
+        #This if loop is needed because some files appear to have two
+        #different inferredVariableType/proxyObservationType, which
+        #should not be possible in the ontology. Just build some checks
+        # in the system
+        if type(timeseries["paleoData_inferredVariableType"]) is list:
+            var = timeseries["paleoData_inferredVariableType"][0]
+        else:
+            var = timeseries["paleoData_inferredVariableType"]
         if "paleoData_units" in timeseries.keys():
-            y_label = timeseries["paleoData_inferredVariableType"] + \
+            y_label = var + \
                       " (" + timeseries["paleoData_units"]+")"
         else:
-            y_label = timeseries["paleoData_inferredVariableType"]
+            y_label = var
     elif "paleoData_proxyObservationType" in timeseries.keys():
+        if type(timeseries["paleoData_proxyObservationType"]) is list:
+            var = timeseries["paleoData_proxyObservationType"][0]
+        else: 
+            var = timeseries["paleoData_proxyObservationType"] 
         if "paleoData_units" in timeseries.keys():
-            y_label = timeseries["paleoData_proxyObservationType"] + \
+            y_label = var + \
                       " (" + timeseries["paleoData_units"]+")"
         else:
-            y_label = timeseries["paleoData_proxyObservationType"]
+            y_label = var
     else:
         if "paleoData_units" in timeseries.keys():
             y_label = timeseries["paleoData_variableName"] + \
                       " (" + timeseries["paleoData_units"]+")"
         else:
             y_label = timeseries["paleoData_variableName"]
-
-
     
     # make the plot
     fig = Plot.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
@@ -822,18 +834,30 @@ def plotEnsTs(timeseries = "", lipd ="", ensTableName = None, ens = None, \
     title = timeseries['dataSetName']
     x_label = "Age"
     # y_label
-    if "paleoData_InferredVariableType" in timeseries.keys():
+    if "paleoData_inferredVariableType" in timeseries.keys():
+        #This if loop is needed because some files appear to have two
+        #different inferredVariableType/proxyObservationType, which
+        #should not be possible in the ontology. Just build some checks
+        # in the system
+        if type(timeseries["paleoData_inferredVariableType"]) is list:
+            var = timeseries["paleoData_inferredVariableType"][0]
+        else:
+            var = timeseries["paleoData_inferredVariableType"]
         if "paleoData_units" in timeseries.keys():
-            y_label = timeseries["paleoData_InferredVariableType"] + \
+            y_label = var + \
                       " (" + timeseries["paleoData_units"]+")"
         else:
-            y_label = timeseries["paleoData_InferredVariableType"]
-    elif "paleoData_ProxyObservationType" in timeseries.keys():
+            y_label = var
+    elif "paleoData_proxyObservationType" in timeseries.keys():
+        if type(timeseries["paleoData_proxyObservationType"]) is list:
+            var = timeseries["paleoData_proxyObservationType"][0]
+        else: 
+            var = timeseries["paleoData_proxyObservationType"] 
         if "paleoData_units" in timeseries.keys():
-            y_label = timeseries["paleoData_ProxyObservationType"] + \
+            y_label = var + \
                       " (" + timeseries["paleoData_units"]+")"
         else:
-            y_label = timeseries["paleoData_ProxyObservationType"]
+            y_label = var
     else:
         if "paleoData_units" in timeseries.keys():
             y_label = timeseries["paleoData_variableName"] + \
@@ -923,18 +947,30 @@ def histTs(timeseries = "", bins = None, hist = True, \
     y = y[index]
 
     # Get the y_label
-    if "paleoData_InferredVariableType" in timeseries.keys():
+        if "paleoData_inferredVariableType" in timeseries.keys():
+        #This if loop is needed because some files appear to have two
+        #different inferredVariableType/proxyObservationType, which
+        #should not be possible in the ontology. Just build some checks
+        # in the system
+        if type(timeseries["paleoData_inferredVariableType"]) is list:
+            var = timeseries["paleoData_inferredVariableType"][0]
+        else:
+            var = timeseries["paleoData_inferredVariableType"]
         if "paleoData_units" in timeseries.keys():
-            y_label = timeseries["paleoData_InferredVariableType"] + \
+            y_label = var + \
                       " (" + timeseries["paleoData_units"]+")"
         else:
-            y_label = timeseries["paleoData_InferredVariableType"]
-    elif "paleoData_ProxyObservationType" in timeseries.keys():
+            y_label = var
+    elif "paleoData_proxyObservationType" in timeseries.keys():
+        if type(timeseries["paleoData_proxyObservationType"]) is list:
+            var = timeseries["paleoData_proxyObservationType"][0]
+        else: 
+            var = timeseries["paleoData_proxyObservationType"] 
         if "paleoData_units" in timeseries.keys():
-            y_label = timeseries["paleoData_ProxyObservationType"] + \
+            y_label = var + \
                       " (" + timeseries["paleoData_units"]+")"
         else:
-            y_label = timeseries["paleoData_ProxyObservationType"]
+            y_label = var
     else:
         if "paleoData_units" in timeseries.keys():
             y_label = timeseries["paleoData_variableName"] + \
