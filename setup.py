@@ -86,5 +86,6 @@ setup(
         "seaborn>=0.7.0",
         "scikit-learn>=0.17.1",
         "pathos>=0.2.0",
-        "tqdm>=4.14.0"]
+        "tqdm>=4.14.0",
+        "rpy2>=2.8.4"]
 )

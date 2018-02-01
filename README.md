@@ -46,20 +46,20 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>
-0.3.1: New functionalities: segment a timeseries using a gap detection criteria, update to summary plot to perform spectral analysis  
-0.3.0: Compatibility with LiPD 1.3 and Spectral module added  
-0.2.5: Fix error on loading (Looking for Spectral Module)  
-0.2.4: Fix load error from init  
-0.2.3: Freeze LiPD version to 1.2 to avoid conflicts with 1.3   
-0.2.2: Change progressbar to tqdm and add standardization function  
-0.2.1: Update package requirements  
-0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.  
-0.1.4: Rename function using camel case and consistency with LiPD utilities version 0.1.8.5  
-0.1.3: Compatible with LiPD utilities version 0.1.8.5.  
-Function openLiPD() renamed openLiPDs()  
-0.1.2: Compatible with LiPD utilities version 0.1.8.3. Uses basemap instead of cartopy  
-0.1.1: Freezes the package prior to version 0.1.8.2 of LiPD utilities  
-0.1.0: First release  
+0.3.1: New functionalities: segment a timeseries using a gap detection criteria, update to summary plot to perform spectral analysis
+0.3.0: Compatibility with LiPD 1.3 and Spectral module added
+0.2.5: Fix error on loading (Looking for Spectral Module)
+0.2.4: Fix load error from init
+0.2.3: Freeze LiPD version to 1.2 to avoid conflicts with 1.3
+0.2.2: Change progressbar to tqdm and add standardization function
+0.2.1: Update package requirements
+0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.
+0.1.4: Rename function using camel case and consistency with LiPD utilities version 0.1.8.5
+0.1.3: Compatible with LiPD utilities version 0.1.8.5.
+Function openLiPD() renamed openLiPDs()
+0.1.2: Compatible with LiPD utilities version 0.1.8.3. Uses basemap instead of cartopy
+0.1.1: Freezes the package prior to version 0.1.8.2 of LiPD utilities
+0.1.0: First release
 
 ### <a name = "install"> Installation </a>
 
@@ -70,19 +70,27 @@ Pyleoclim is published through PyPi and easily installed via `pip`
 pip install pyleoclim
 ```
 
+**Warning**: Some dependencies require an installation through Conda
+
 ### <a name ="quickstart"> Quickstart guide </a>
 
 1. Open your command line application (Terminal or Command Prompt).
 
-2. Install with command: `pip install pyleoclim`
+2. Install denpendencies that `pip` cannot handle
 
-3. Wait for installation to complete, then:
+    2a. Install `basemap` through Conda: `conda install -c conda-forge basemap`
 
-    3a. Import the package into your favorite Python environment (we recommend the use of Spyder, which comes standard with the Anaconda package)
+    2b. Download and install `R` through [CRAN](https://cran.rstudio.com/) and then `pip install rpy2` to enable the usage of the Bchron module. Note that `conda install rpy2` or `conda install r-essentials` will not work properly.
 
-    3b. Use Jupyter Notebook to go through the tutorial contained in the `PyleoclimQuickstart.ipynb` Notebook, which can be downloaded [here](https://github.com/LinkedEarth/Pyleoclim_util/tree/master/Example).
+3. Install the pyleoclim package with command: `pip install pyleoclim`
 
-4. Help with functionalities can be found in the Documentation folder on [here](http://linkedearth.github.io/Pyleoclim_util/).
+4. Wait for installation to complete, then:
+
+    4a. Import the package into your favorite Python environment (we recommend the use of Spyder, which comes standard with the Anaconda package)
+
+    4b. Use Jupyter Notebook to go through the tutorial contained in the `PyleoclimQuickstart.ipynb` Notebook, which can be downloaded [here](https://github.com/LinkedEarth/Pyleoclim_util/tree/master/Example).
+
+5. Help with functionalities can be found in the Documentation folder on [here](http://linkedearth.github.io/Pyleoclim_util/).
 
 ### <a name="req">Requirements</a>
 

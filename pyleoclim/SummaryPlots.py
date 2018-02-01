@@ -68,9 +68,15 @@ def getMetadata(timeseries):
         DOI = "NA"
     
     if "paleoData_InferredVariableType" in timeseries.keys():
-        Variable = timeseries["paleoData_InferredVariableType"]
+        if type(timeseries["paleoData_InferredVariableType"]) is list:
+            Variable = timeseries["paleoData_InferredVariableType"][0]
+        else:
+            Variable = timeseries["paleoData_InferredVariableType"]
     elif "paleoData_ProxyObservationType" in timeseries.keys():
-        Variable = timeseries["paleoData_ProxyObservationType"]
+        if type(timeseries["paleoData_ProxyObservationType"]) is list:
+            Variable = timeseries["paleoData_ProxyObservationType"][0]
+        else:
+            Variable = timeseries["paleoData_ProxyObservationType"]
     else:
         Variable = timeseries["paleoData_variableName"]
     

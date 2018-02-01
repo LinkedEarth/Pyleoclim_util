@@ -11,6 +11,12 @@ Basic manipulation of timeseries for the pyleoclim module
 import numpy as np
 import pandas as pd
 import warnings
+import copy
+from scipy import special
+import sys
+from scipy import signal
+
+from pyleoclim import Spectral
 
 
 def bin(x, y, bin_size="", start="", end=""):
@@ -42,8 +48,8 @@ def bin(x, y, bin_size="", start="", end=""):
     # Get the start/end if not given
     if type(start) is str:
         start = np.nanmin(x)
-    if type(end) is str:
-        end = np.nanmax(x)
+        if type(end) is str:
+            end = np.nanmax(x)
 
     # Set the bin medians
     bins = np.arange(start+bin_size/2, end + bin_size/2, bin_size)
@@ -73,12 +79,12 @@ def interp(x,y,interp_step="",start="",end=""):
         y (array): the y-axis
         interp_step (float): the interpolation step. Default is mean resolution.
         start (float): where/when to start the interpolation. Default is min..
-        end (float): where/when to stop the interpolation. Defaul is max.
+        end (float): where/when to stop the interpolation. Default is max.
 
     Returns:
         xi - the interpolated x-axis \n
         interp_values - the interpolated values
-     """
+        """
 
     #Make sure x and y are numpy arrays
     x = np.array(x,dtype='float64')
@@ -114,17 +120,17 @@ def onCommonAxis(x1, y1, x2, y2, interp_step="", start="", end=""):
         x2 (array): x-axis values of the second timeseries
         y2 (array): y-axis values of the second timeseries
         interp_step (float): The interpolation step. Default is mean resolution
-            of lowest resolution series
+        of lowest resolution series
         start (float): where/when to start. Default is the maximum of the minima of
-            the two timeseries
+        the two timeseries
         end (float): Where/when to end. Default is the minimum of the maxima of
-            the two timeseries
+        the two timeseries
 
     Returns:
         xi -  the interpolated x-axis \n
         interp_values1 -  the interpolated y-values for the first timeseries
         interp_values2 - the intespolated y-values for the second timeseries
-    """
+        """
 
     # make sure that x1, y1, x2, y2 are numpy arrays
     x1 = np.array(x1, dtype='float64')
@@ -135,8 +141,8 @@ def onCommonAxis(x1, y1, x2, y2, interp_step="", start="", end=""):
     # Find the mean/max x-axis is not provided
     if type(start) is str:
         start = np.nanmax([np.nanmin(x1), np.nanmin(x2)])
-    if type(end) is str:
-        end = np.nanmin([np.nanmax(x1), np.nanmax(x2)])
+        if type(end) is str:
+            end = np.nanmin([np.nanmax(x1), np.nanmax(x2)])
 
     # Get the interp_step
     if not interp_step:
@@ -178,12 +184,12 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     mu = np.nanmean(x, axis=axis)  # the mean of the original time series
     sig = np.nanstd(x, axis=axis, ddof=ddof)  # the std of the original time series
 
-    mu2 = np.copy(mu)  # the mean used in the calculation of zscore
-    sig2 = np.copy(sig) / scale  # the std used in the calculation of zscore
+    mu2 = np.asarray(np.copy(mu))  # the mean used in the calculation of zscore
+    sig2 = np.asarray(np.copy(sig) / scale)  # the std used in the calculation of zscore
 
     if np.any(np.abs(sig) < eps):  # check if x contains (nearly) constant time series
         warnings.warn('Constant or nearly constant time series not rescaled.')
-        where_const = np.where(np.abs(sig) < eps)  # find out where we have (nearly) constant time series
+        where_const = np.abs(sig) < eps  # find out where we have (nearly) constant time series
 
         # if a vector is (nearly) constant, keep it the same as original, i.e., substract by 0 and divide by 1.
         mu2[where_const] = 0
@@ -217,13 +223,8 @@ def ts2segments(ys, ts, factor=10):
 
     @author: fzhu
     '''
-    # delete the NaNs if there is any
-    ys_tmp = np.copy(ys)
-    ys = ys[~np.isnan(ys_tmp)]
-    ts = ts[~np.isnan(ys_tmp)]
-    ts_tmp = np.copy(ts)
-    ys = ys[~np.isnan(ts_tmp)]
-    ts = ts[~np.isnan(ts_tmp)]
+
+    ys, ts = clean_ts(ys, ts)
 
     nt = np.size(ts)
     dts = np.diff(ts)
@@ -244,3 +245,176 @@ def ts2segments(ys, ts, factor=10):
     seg_ts.append(ts[i_start:nt])
 
     return seg_ys, seg_ts, n_segs
+
+
+def clean_ts(ys, ts):
+    ''' Delete the NaNs in the time series and sort it with time axis ascending
+
+    Args:
+        ys (array): a time series, NaNs allowed
+        ts (array): the time axis of the time series, NaNs allowed
+
+    Returns:
+        ys (array): the time series without nans
+        ts (array): the time axis of the time series without nans
+
+    '''
+    # delete NaNs if there is any
+    ys = np.asarray(ys, dtype=np.float)
+    ts = np.asarray(ts, dtype=np.float)
+    assert(ys.size == ts.size, 'The size of time axis and data value should be equal!')
+
+    ys_tmp = np.copy(ys)
+    ys = ys[~np.isnan(ys_tmp)]
+    ts = ts[~np.isnan(ys_tmp)]
+    ts_tmp = np.copy(ts)
+    ys = ys[~np.isnan(ts_tmp)]
+    ts = ts[~np.isnan(ts_tmp)]
+
+    # sort the time series so that the time axis will be ascending
+    sort_ind = np.argsort(ts)
+    ys = ys[sort_ind]
+    ts = ts[sort_ind]
+
+    return ys, ts
+
+
+def annualize(ys, ts):
+    ''' Annualize a time series whose time resolution is finer than 1 year
+
+    Args:
+        ys (array): a time series, NaNs allowed
+        ts (array): the time axis of the time series, NaNs allowed
+
+    Returns:
+        ys_ann (array): the annualized time series
+        year_int (array): the time axis of the annualized time series
+
+    '''
+    year_int = list(set(np.floor(ts)))
+    year_int = np.sort(list(map(int, year_int)))
+    n_year = len(year_int)
+    year_int_pad = list(year_int)
+    year_int_pad.append(np.max(year_int)+1)
+    ys_ann = np.zeros(n_year)
+
+    for i in range(n_year):
+        t_start = year_int_pad[i]
+        t_end = year_int_pad[i+1]
+        t_range = (ts >= t_start) & (ts < t_end)
+        ys_ann[i] = np.average(ys[t_range], axis=0)
+
+    return ys_ann, year_int
+
+
+def gaussianize(X):
+    """ Transforms a (proxy) timeseries to Gaussian distribution.
+
+    Originator: Michael Erb, Univ. of Southern California - April 2017
+    """
+
+    # Give every record at least one dimensions, or else the code will crash.
+    X = np.atleast_1d(X)
+
+    # Make a blank copy of the array, retaining the data type of the original data variable.
+    Xn = copy.deepcopy(X)
+    Xn[:] = np.NAN
+
+    if len(X.shape) == 1:
+        Xn = gaussianize_single(X)
+    else:
+        for i in range(X.shape[1]):
+            Xn[:, i] = gaussianize_single(X[:, i])
+
+    return Xn
+
+
+def gaussianize_single(X_single):
+    """ Transforms a single (proxy) timeseries to Gaussian distribution.
+
+    Originator: Michael Erb, Univ. of Southern California - April 2017
+    """
+    # Count only elements with data.
+
+    n = X_single[~np.isnan(X_single)].shape[0]
+
+    # Create a blank copy of the array.
+    Xn_single = copy.deepcopy(X_single)
+    Xn_single[:] = np.NAN
+
+    nz = np.logical_not(np.isnan(X_single))
+    index = np.argsort(X_single[nz])
+    rank = np.argsort(index)
+    CDF = 1.*(rank+1)/(1.*n) - 1./(2*n)
+    Xn_single[nz] = np.sqrt(2)*special.erfinv(2*CDF - 1)
+
+    return Xn_single
+
+
+def detrend(y, x = None, method = "linear", params = ["default",4,0,1]):
+    """Detrend a timeseries according to three methods
+
+    Detrending methods include, "linear" (default), "constant", and using a low-pass
+        Savitzky-Golay filters.
+
+    Args:
+        y (array): The series to be detrended.
+        x (array): The time axis for the timeseries. Necessary for use with
+            the Savitzky-Golay filters method since the series should be evenly spaced.
+        method (str): The type of detrending. If linear (default), the result of
+            a linear least-squares fit to y is subtracted from y. If constant,
+            only the mean of data is subtrated. If "savitzy-golay", y is filtered
+            using the Savitzky-Golay filters and the resulting filtered series
+            is subtracted from y.
+        params (list): The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+
+    Returns:
+        ys (array) - the detrended timeseries.
+    """
+    option = ["linear", "constant", "savitzy-golay"]
+    if method not in option:
+        sys.exit("The selected method is not currently supported")
+
+    if method == "linear":
+        ys = signal.detrend(y,type='linear')
+    if method == 'constant':
+        ys = signal.detrend(y,type='constant')
+    else:
+        # Check that the timeseries is uneven and interpolate if needed
+        if x is None:
+            sys.exit("A time axis is needed for use with the Savitzky-Golay filters method")
+        # Check whether the timeseries is unvenly-spaced and interpolate if needed
+        if len(np.unique(np.diff(x)))>1:
+            warnings.warn("Timeseries is not evenly-spaced, interpolating...")
+            interp_step = np.nanmean(np.diff(x))
+            start = np.nanmin(x)
+            end = np.nanmax(x)
+            x_interp, y_interp = interp(x,y,interp_step=interp_step,\
+                                             start=start,end=end)
+        else:
+            x_interp = x
+            y_interp = y
+        if params[0] == "default":
+            l = len(y) # Use the length of the timeseries for the window side
+            l = np.ceil(l)//2*2+1 # Make sure this is an odd number
+            l = int(l) # Make sure that the type is int
+            o = int(params[1]) # Make sure the order is type int
+            d = int(params[2])
+            e = int(params[3])
+        else:
+            #Assume the users know what s/he is doing and just force to type int
+            l = int(params[0])
+            o = int(params[1])
+            d = int(params[2])
+            e = int(params[3])
+        # Now filter
+        y_filt = Spectral.Filter.savitzky_golay(y_interp,l,o,d,e)
+        # Put it all back on the original x axis
+        y_filt_x = np.interp(x,x_interp,y_filt)
+        ys = y-y_filt_x
+
+    return ys

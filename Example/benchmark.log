@@ -4,3 +4,7 @@ Benchmark - Function: readLipd , Time: 2.45 seconds
 Benchmark - Function: readLipd , Time: 5.88 seconds
 2017-07-12 10:45:44,097 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 0.54 seconds
 Benchmark - Function: extractTs , Time: 0.54 seconds
+2018-01-28 15:41:33,525 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.28 seconds
+Benchmark - Function: readLipd , Time: 6.28 seconds
+2018-01-28 15:41:42,798 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.87 seconds
+Benchmark - Function: extractTs , Time: 1.87 seconds
