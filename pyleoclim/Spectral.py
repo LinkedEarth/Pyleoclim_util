@@ -1056,10 +1056,12 @@ class WaveletAnalysis(object):
             assert freqs is not None, "freqs is required for alias filter!"
             dt = np.median(np.diff(ts))
             f_sampling = 1/dt
+            psd_copy = psd[1:]
+            freqs_copy = freqs[1:]
             alpha, filtered_pwr, model_pwer, aliased_pwr = af.alias_filter(
-                freqs, psd, f_sampling, f_sampling*1e3, np.min(freqs), avgs)
+                freqs_copy, psd_copy, f_sampling, f_sampling*1e3, np.min(freqs), avgs)
 
-            psd = np.copy(filtered_pwr)
+            psd[1:] = np.copy(filtered_pwr)
 
         return psd
 
@@ -1121,6 +1123,25 @@ class WaveletAnalysis(object):
 
         return freqs
 
+    def freq_vector_nfft(self, ts):
+        ''' Return the frequency vector based on NFFT
+
+        Args:
+            ts (array): time axis of the time series
+
+        Returns:
+            freqs (array): the frequency vector
+
+        '''
+        nt = np.size(ts)
+        dt = np.median(np.diff(ts))
+        fs = 1 / dt
+        n_freqs = nt//2 + 1
+
+        freqs = np.linspace(0, fs/2, n_freqs)
+
+        return freqs
+
     def make_freq_vector(self, ts):
         ''' Make frequency vector
 
@@ -1131,8 +1152,8 @@ class WaveletAnalysis(object):
             freqs (array): the frequency vector
 
         '''
-        freqs_welch = self.freq_vector_welch(ts)
-        freqs = freqs_welch[1:]  # discard the first element 0
+        freqs = self.freq_vector_nfft(ts)
+        #  freqs = freqs[1:]  # discard the first element 0
 
         return freqs
 
@@ -1151,9 +1172,20 @@ class WaveletAnalysis(object):
             Y_reg (array): prediction based on linear regression
 
         '''
+        # drop the PSD at frequency zero
+        if freqs[0] == 0:
+            psd = psd[1:]
+            freqs = freqs[1:]
+
+        if np.max(freqs) < fmax:
+            return np.nan, np.nan, np.nan, np.nan, np.nan
+
         # frequency binning start
         fminindx = np.where(freqs >= fmin)[0][0]
         fmaxindx = np.where(freqs <= fmax)[0][-1]
+
+        if fminindx >= fmaxindx:
+            return np.nan, np.nan, np.nan, np.nan, np.nan
 
         logf = np.log(freqs)
         logf_step = logf[fminindx+1] - logf[fminindx]
@@ -1187,11 +1219,16 @@ class WaveletAnalysis(object):
         model = sm.OLS(Y, X_ex)
         results = model.fit()
 
-        beta = -results.params[1]  # the slope we want
+        if np.size(results.params) < 2:
+            beta = np.nan
+            Y_reg = np.nan
+            std_err = np.nan
+        else:
+            beta = -results.params[1]  # the slope we want
+            Y_reg = 10**model.predict(results.params)  # prediction based on linear regression
+            std_err = results.bse[1]
 
-        Y_reg = 10**model.predict(results.params)  # prediction based on linear regression
-
-        return beta, f_binned, psd_binned, Y_reg
+        return beta, f_binned, psd_binned, Y_reg, std_err
 
     def beta2HurstIndex(self, beta):
         ''' Translate psd slope to Hurst index
@@ -1969,7 +2006,9 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
                                              gaussianize=gaussianize, standardize=standardize, method=method)
 
     psd = wa.wwa2psd(wwa, ts_cut, Neffs, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
-    psd[1/freqs > np.max(coi)] = np.nan  # cut off the unreliable part out of the coi
+    #  psd[1/freqs > np.max(coi)] = np.nan  # cut off the unreliable part out of the coi
+    #  psd = psd[1/freqs <= np.max(coi)] # cut off the unreliable part out of the coi
+    #  freqs = freqs[1/freqs <= np.max(coi)]
 
     # Monte-Carlo simulations of AR1 process
     nf = np.size(freqs)
@@ -1987,7 +2026,8 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
                                                                      gaussianize=gaussianize, standardize=standardize,
                                                                      method=method)
             psd_ar1[i, :] = wa.wwa2psd(wwa_red, ts_cut, Neffs_red, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
-            psd_ar1[i, 1/freqs_red > np.max(coi_red)] = np.nan  # cut off the unreliable part out of the coi
+            #  psd_ar1[i, 1/freqs_red > np.max(coi_red)] = np.nan  # cut off the unreliable part out of the coi
+            #  psd_ar1 = psd_ar1[1/freqs_red <= np.max(coi_red)] # cut off the unreliable part out of the coi
 
         psd_ar1_q95 = mquantiles(psd_ar1, 0.95, axis=0)[0]
 
@@ -2498,7 +2538,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
             ax.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
                      label='AR(1) 95%', color=psd_ar1_color)
 
-    ax.set_xscale('log', nonposy='clip')
+    ax.set_xscale('log', nonposx='clip')
     ax.set_yscale('log', nonposy='clip')
 
     if vertical:
@@ -2634,8 +2674,8 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
              period_lim=[np.min(period_ticks), np.max(coi)], psd_lim=psd_lim,
              lmstyle=psd_lmstyle, ax=ax3, period_label='', label='Estimated spectrum', vertical=True)
 
-    beta_1, f_binned_1, psd_binned_1, Y_reg_1 = beta_estimation(psd, freqs, period_I[0], period_I[1])
-    beta_2, f_binned_2, psd_binned_2, Y_reg_2 = beta_estimation(psd, freqs, period_D[0], period_D[1])
+    beta_1, f_binned_1, psd_binned_1, Y_reg_1, stderr_1 = beta_estimation(psd, freqs, period_I[0], period_I[1])
+    beta_2, f_binned_2, psd_binned_2, Y_reg_2, stderr_2 = beta_estimation(psd, freqs, period_D[0], period_D[1])
     ax3.plot(Y_reg_1, 1/f_binned_1, color='k',
              label=r'$\beta_I$ = {:.2f}'.format(beta_1) + ', ' + r'$\beta_D$ = {:.2f}'.format(beta_2))
     ax3.plot(Y_reg_2, 1/f_binned_2, color='k')
