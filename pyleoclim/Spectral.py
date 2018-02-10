@@ -28,6 +28,7 @@ import warnings
 
 from pyleoclim import Timeseries
 import sys
+import platform
 
 from math import factorial
 
@@ -1177,7 +1178,7 @@ class WaveletAnalysis(object):
             psd = psd[1:]
             freqs = freqs[1:]
 
-        if np.max(freqs) < fmax:
+        if np.max(freqs) < fmax or np.min(freqs) > fmin:
             return np.nan, np.nan, np.nan, np.nan, np.nan
 
         # frequency binning start
@@ -1916,9 +1917,14 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=
         coeff (array): the wavelet transform coefficents
 
     '''
-    if sys.platform.startswith('linux') and method == 'Kirchner_f2py':
-        warnings.warn("The f2py version is not supported for Linux right now; will use python version instead.")
-        method = 'Kirchner'
+    if method == 'Kirchner_f2py':
+        if not sys.platform.startswith('darwin'):
+            warnings.warn("WWZ method: the f2py version is only supported on macOS right now; will use python version instead.")
+            method = 'Kirchner'
+
+        elif platform.mac_ver()[0] < '10.11':
+            warnings.warn("WWZ method: the f2py version is only supported on macOS later than 10.11 right now; will use python version instead.")
+            method = 'Kirchner'
 
     wa = WaveletAnalysis()
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
