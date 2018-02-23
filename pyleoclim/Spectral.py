@@ -1921,10 +1921,13 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=
         if not sys.platform.startswith('darwin'):
             warnings.warn("WWZ method: the f2py version is only supported on macOS right now; will use python version instead.")
             method = 'Kirchner'
+<<<<<<< HEAD
 
         elif platform.mac_ver()[0] < '10.11':
             warnings.warn("WWZ method: the f2py version is only supported on macOS later than 10.11 right now; will use python version instead.")
             method = 'Kirchner'
+=======
+>>>>>>> dev-fzhu
 
     wa = WaveletAnalysis()
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
@@ -2314,6 +2317,7 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     plt.yscale('log', nonposy='clip')
 
     if yticks is not None:
+        yticks_label = list(map(str, yticks))
         plt.yticks(yticks, yticks_label)
 
     if xticks is not None:
@@ -2322,11 +2326,13 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     if yticks_label is None:
         ax.get_yaxis().set_major_formatter(ScalarFormatter())
 
-    if ylim is not None:
-        plt.ylim(ylim)
+    if ylim is None:
+        if coi is None:
+            ylim = [np.min(yticks), np.max(yticks)]
+        else:
+            ylim = [np.min(yticks), np.max(coi)]
 
-    else:
-        ylim = ax.get_ylim()
+    plt.ylim(ylim)
 
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
@@ -2346,8 +2352,6 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
 
     if title is not None:
         plt.title(title)
-
-    #  ax.set_ylim(ylim)
 
     return ax
 
@@ -2558,7 +2562,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
             ax.set_xlim(psd_lim)
 
         if period_ticks is not None:
-            ax.set_yticks(period_ticks, period_tickslabel)
+            ax.set_yticks(period_ticks)
             ax.get_yaxis().set_major_formatter(ScalarFormatter())
             ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
         else:
@@ -2573,13 +2577,18 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
         if psd_lim is not None:
             ax.set_ylim(psd_lim)
 
-        if period_ticks is not None:
-            ax.set_xticks(period_ticks)
-            ax.get_xaxis().set_major_formatter(ScalarFormatter())
-            ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
-            plt.gca().invert_xaxis()
+        if period_tickslabel is None:
+            if period_ticks is not None:
+                ax.set_xticks(period_ticks)
+                ax.get_xaxis().set_major_formatter(ScalarFormatter())
+                ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
+                plt.gca().invert_xaxis()
+            else:
+                ax.set_aspect('equal')
         else:
-            ax.set_aspect('equal')
+            ax.set_xticks(period_ticks)
+            ax.set_xticklabels(period_tickslabel)
+            plt.gca().invert_xaxis()
 
     if legend:
         ax.legend()
@@ -2591,7 +2600,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
 
 
 def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=200, nproc=8, detrend='no',
-                 gaussianize=False, standardize=True, levels=None,
+                 gaussianize=False, standardize=True, levels=None, method='Kirchner_f2py',
                  anti_alias=False, period_ticks=None, ts_color=None,
                  title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
                  psd_lmstyle='-', psd_lim=None, period_I=[1/8, 1/2], period_D=[1/200, 1/20]):
@@ -2625,6 +2634,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
 
     if period_ticks is not None:
         period_ticks = np.asarray(period_ticks)
+        period_tickslabel = list(map(str, period_ticks))
 
     ylim_min = np.min(period_ticks)
 
@@ -2654,16 +2664,18 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     ax2 = plt.subplot(gs[1:5, :-3])
 
     wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = \
-        wwz(ys, ts, freqs=freqs, tau=tau, c=c1, nMC=nMC, nproc=nproc, detrend=detrend,
+        wwz(ys, ts, freqs=freqs, tau=tau, c=c1, nMC=nMC, nproc=nproc, detrend=detrend, method=method,
             gaussianize=gaussianize, standardize=standardize)
 
     if wwa_xlabel is not None and wwa_ylabel is not None:
-        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[ylim_min, np.max(coi)],
+        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, yticks_label=period_tickslabel,
+                 ylim=[ylim_min, np.max(coi)],
                  plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2, levels=levels,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
                  )
     else:
-        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, ylim=[ylim_min, np.max(coi)],
+        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, yticks_label=period_tickslabel,
+                 ylim=[ylim_min, np.max(coi)],
                  plot_cone=True, plot_signif=True, ax=ax2,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15, levels=levels,
                  )
@@ -2671,7 +2683,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     # plot psd
     sns.set(style="ticks", font_scale=1.5)
     ax3 = plt.subplot(gs[1:4, 9:])
-    psd, freqs, psd_ar1_q95, psd_ar1 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC,
+    psd, freqs, psd_ar1_q95, psd_ar1 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC, method=method,
                                       detrend=detrend, gaussianize=gaussianize, standardize=standardize,
                                       anti_alias=anti_alias)
 
