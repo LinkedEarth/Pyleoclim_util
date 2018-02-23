@@ -16,8 +16,8 @@ from scipy import signal
 from scipy.stats.mstats import mquantiles
 import scipy.fftpack as fft
 
-import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 from matplotlib import gridspec
 
@@ -28,6 +28,7 @@ import warnings
 
 from pyleoclim import Timeseries
 import sys
+import collections
 
 from math import factorial
 
@@ -1177,15 +1178,18 @@ class WaveletAnalysis(object):
             psd = psd[1:]
             freqs = freqs[1:]
 
+        Results = collections.namedtuple('Results', ['beta', 'f_binned', 'psd_binned', 'Y_reg', 'std_err'])
         if np.max(freqs) < fmax or np.min(freqs) > fmin:
-            return np.nan, np.nan, np.nan, np.nan, np.nan
+            res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
+            return res
 
         # frequency binning start
         fminindx = np.where(freqs >= fmin)[0][0]
         fmaxindx = np.where(freqs <= fmax)[0][-1]
 
         if fminindx >= fmaxindx:
-            return np.nan, np.nan, np.nan, np.nan, np.nan
+            res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
+            return res
 
         logf = np.log(freqs)
         logf_step = logf[fminindx+1] - logf[fminindx]
@@ -1228,7 +1232,9 @@ class WaveletAnalysis(object):
             Y_reg = 10**model.predict(results.params)  # prediction based on linear regression
             std_err = results.bse[1]
 
-        return beta, f_binned, psd_binned, Y_reg, std_err
+        res = Results(beta=beta, f_binned=f_binned, psd_binned=psd_binned, Y_reg=Y_reg, std_err=std_err)
+
+        return res
 
     def beta2HurstIndex(self, beta):
         ''' Translate psd slope to Hurst index
@@ -1959,7 +1965,10 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=
     # calculate the cone of influence
     coi = wa.make_coi(tau, Neff=Neff_coi)
 
-    return wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff
+    Results = collections.namedtuple('Results', ['wwa', 'phase', 'AR1_q', 'coi', 'freqs', 'tau', 'Neffs', 'coeff'])
+    res = Results(wwa=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freqs=freqs, tau=tau, Neffs=Neffs, coeff=coeff)
+
+    return res
 
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
@@ -2002,11 +2011,12 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau)
 
     # get wwa but AR1_q is not needed here so set nMC=0
-    wwa, _, _, coi, freqs, _, Neffs, _ = wwz(ys_cut, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
-                                             detrend=detrend, params=params,
-                                             gaussianize=gaussianize, standardize=standardize, method=method)
+    #  wwa, _, _, coi, freqs, _, Neffs, _ = wwz(ys_cut, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
+    res_wwz = wwz(ys_cut, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
+              detrend=detrend, params=params,
+              gaussianize=gaussianize, standardize=standardize, method=method)
 
-    psd = wa.wwa2psd(wwa, ts_cut, Neffs, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+    psd = wa.wwa2psd(res_wwz.wwa, ts_cut, res_wwz.Neffs, freqs=res_wwz.freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
     #  psd[1/freqs > np.max(coi)] = np.nan  # cut off the unreliable part out of the coi
     #  psd = psd[1/freqs <= np.max(coi)] # cut off the unreliable part out of the coi
     #  freqs = freqs[1/freqs <= np.max(coi)]
@@ -2022,11 +2032,12 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             #  r = wa.ar1_model(ts_cut, tauest)
             r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
-            wwa_red, _, _, coi_red, freqs_red, _, Neffs_red, _ = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
+            res_red = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
                                                                      detrend=detrend, params=params,
                                                                      gaussianize=gaussianize, standardize=standardize,
                                                                      method=method)
-            psd_ar1[i, :] = wa.wwa2psd(wwa_red, ts_cut, Neffs_red, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+            psd_ar1[i, :] = wa.wwa2psd(res_red.wwa, ts_cut, res_red.Neffs,
+                                       freqs=res_red.freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
             #  psd_ar1[i, 1/freqs_red > np.max(coi_red)] = np.nan  # cut off the unreliable part out of the coi
             #  psd_ar1 = psd_ar1[1/freqs_red <= np.max(coi_red)] # cut off the unreliable part out of the coi
 
@@ -2035,7 +2046,10 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     else:
         psd_ar1_q95 = None
 
-    return psd, freqs, psd_ar1_q95, psd_ar1
+    Results = collections.namedtuple('Results', ['psd', 'freqs', 'psd_ar1_q95', 'psd_ar1'])
+    res = Results(psd=psd, freqs=freqs, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
+
+    return res
 
 
 def xwt(ys1, ts1, ys2, ts2,
@@ -2084,10 +2098,10 @@ def xwt(ys1, ts1, ys2, ts2,
     ys1_cut, ts1_cut, freqs, tau = wa.prepare_wwz(ys1, ts1, freqs=freqs, tau=tau)
     ys2_cut, ts2_cut, freqs, tau = wa.prepare_wwz(ys2, ts2, freqs=freqs, tau=tau)
 
-    wwa, phase, Neffs, coeff1 = wwz_func(ys1_cut, ts1_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
-                                         params=params, gaussianize=gaussianize, standardize=standardize)
-    wwa, phase, Neffs, coeff2 = wwz_func(ys2_cut, ts2_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
-                                         params=params, gaussianize=gaussianize, standardize=standardize)
+    res1 = wwz_func(ys1_cut, ts1_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
+                    params=params, gaussianize=gaussianize, standardize=standardize)
+    res2 = wwz_func(ys2_cut, ts2_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
+                    params=params, gaussianize=gaussianize, standardize=standardize)
 
     tauest1 = wa.tau_estimation(ys1_cut, ts1_cut, detrend=detrend, params=params,
                                 gaussianize=gaussianize, standardize=standardize)
@@ -2111,8 +2125,8 @@ def xwt(ys1, ts1, ys2, ts2,
     psd1_ar1 = wa.psd_ar(np.var(r1), freqs, tauest1, f_sampling_1)
     psd2_ar1 = wa.psd_ar(np.var(r2), freqs, tauest2, f_sampling_2)
 
-    wt_coeff1 = coeff1[1] + coeff1[2]*1j
-    wt_coeff2 = coeff2[1] + coeff2[2]*1j
+    wt_coeff1 = res1.coeff[1] + res1.coeff[2]*1j
+    wt_coeff2 = res2.coeff[1] + res2.coeff[2]*1j
     xwt, xw_amplitude, xw_phase = wa.cross_wt(wt_coeff1, wt_coeff2, freqs, tau)
 
     sigma_1 = np.std(ys1_cut)
@@ -2655,19 +2669,21 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     sns.set(style="ticks", font_scale=1.5)
     ax2 = plt.subplot(gs[1:5, :-3])
 
-    wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = \
-        wwz(ys, ts, freqs=freqs, tau=tau, c=c1, nMC=nMC, nproc=nproc, detrend=detrend, method=method,
-            gaussianize=gaussianize, standardize=standardize)
+    #  wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = \
+    res_wwz = wwz(ys, ts, freqs=freqs, tau=tau, c=c1, nMC=nMC, nproc=nproc, detrend=detrend, method=method,
+                  gaussianize=gaussianize, standardize=standardize)
 
     if wwa_xlabel is not None and wwa_ylabel is not None:
-        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, yticks_label=period_tickslabel,
-                 ylim=[ylim_min, np.max(coi)],
+        plot_wwa(res_wwz.wwa, res_wwz.freqs, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
+                 yticks=period_ticks, yticks_label=period_tickslabel,
+                 ylim=[ylim_min, np.max(res_wwz.coi)],
                  plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2, levels=levels,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
                  )
     else:
-        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, yticks_label=period_tickslabel,
-                 ylim=[ylim_min, np.max(coi)],
+        plot_wwa(res_wwz.wwa, res_wwz.freqs, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
+                 yticks=period_ticks, yticks_label=period_tickslabel,
+                 ylim=[ylim_min, np.max(res_wwz.coi)],
                  plot_cone=True, plot_signif=True, ax=ax2,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15, levels=levels,
                  )
@@ -2675,20 +2691,21 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     # plot psd
     sns.set(style="ticks", font_scale=1.5)
     ax3 = plt.subplot(gs[1:4, 9:])
-    psd, freqs, psd_ar1_q95, psd_ar1 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC, method=method,
-                                      detrend=detrend, gaussianize=gaussianize, standardize=standardize,
-                                      anti_alias=anti_alias)
+    res_psd = wwz_psd(ys, ts, freqs=None, tau=tau, c=c2, nproc=nproc, nMC=nMC, method=method,
+                      detrend=detrend, gaussianize=gaussianize, standardize=standardize,
+                      anti_alias=anti_alias)
 
     # TODO: deal with period_ticks
-    plot_psd(psd, freqs, plot_ar1=True, psd_ar1_q95=psd_ar1_q95, period_ticks=period_ticks[period_ticks < np.max(coi)],
-             period_lim=[np.min(period_ticks), np.max(coi)], psd_lim=psd_lim,
+    plot_psd(res_psd.psd, res_psd.freqs, plot_ar1=True, psd_ar1_q95=res_psd.psd_ar1_q95,
+             period_ticks=period_ticks[period_ticks < np.max(res_wwz.coi)],
+             period_lim=[np.min(period_ticks), np.max(res_wwz.coi)], psd_lim=psd_lim,
              lmstyle=psd_lmstyle, ax=ax3, period_label='', label='Estimated spectrum', vertical=True)
 
-    beta_1, f_binned_1, psd_binned_1, Y_reg_1, stderr_1 = beta_estimation(psd, freqs, period_I[0], period_I[1])
-    beta_2, f_binned_2, psd_binned_2, Y_reg_2, stderr_2 = beta_estimation(psd, freqs, period_D[0], period_D[1])
-    ax3.plot(Y_reg_1, 1/f_binned_1, color='k',
-             label=r'$\beta_I$ = {:.2f}'.format(beta_1) + ', ' + r'$\beta_D$ = {:.2f}'.format(beta_2))
-    ax3.plot(Y_reg_2, 1/f_binned_2, color='k')
+    res_beta1 = beta_estimation(res_psd.psd, res_psd.freqs, period_I[0], period_I[1])
+    res_beta2 = beta_estimation(res_psd.psd, res_psd.freqs, period_D[0], period_D[1])
+    ax3.plot(res_beta1.Y_reg, 1/res_beta1.f_binned, color='k',
+             label=r'$\beta_I$ = {:.2f}'.format(res_beta1.beta) + ', ' + r'$\beta_D$ = {:.2f}'.format(res_beta2.beta))
+    ax3.plot(res_beta2.Y_reg, 1/res_beta2.f_binned, color='k')
     plt.tick_params(axis='y', which='both', labelleft='off')
     plt.legend(fontsize=15, bbox_to_anchor=(0, 1.2), loc='upper left', ncol=1)
 
