@@ -1921,13 +1921,6 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=
         if not sys.platform.startswith('darwin'):
             warnings.warn("WWZ method: the f2py version is only supported on macOS right now; will use python version instead.")
             method = 'Kirchner'
-<<<<<<< HEAD
-
-        elif platform.mac_ver()[0] < '10.11':
-            warnings.warn("WWZ method: the f2py version is only supported on macOS later than 10.11 right now; will use python version instead.")
-            method = 'Kirchner'
-=======
->>>>>>> dev-fzhu
 
     wa = WaveletAnalysis()
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
