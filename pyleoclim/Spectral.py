@@ -82,7 +82,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -112,7 +112,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -151,7 +151,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -236,7 +236,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -318,7 +318,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -403,7 +403,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -497,7 +497,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -598,7 +598,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -706,7 +706,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -812,7 +812,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -928,7 +928,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -1994,7 +1994,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             while the second parameter correspond to the order of the filter
             (default is 4). The third parameter is the order of the derivative
             (the default is zero, which means only smoothing.)
-        gaussionize (bool): If True, gaussianizes the timeseries
+        gaussianize (bool): If True, gaussianizes the timeseries
         standardize (bool): If True, standardizes the timeseries
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
@@ -2076,7 +2076,7 @@ def xwt(ys1, ts1, ys2, ts2,
             while the second parameter correspond to the order of the filter
             (default is 4). The third parameter is the order of the derivative
             (the default is zero, which means only smoothing.)
-        gaussionize (bool): If True, gaussianizes the timeseries
+        gaussianize (bool): If True, gaussianizes the timeseries
         standardize (bool): If True, standardizes the timeseries
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
@@ -2098,10 +2098,10 @@ def xwt(ys1, ts1, ys2, ts2,
     ys1_cut, ts1_cut, freqs, tau = wa.prepare_wwz(ys1, ts1, freqs=freqs, tau=tau)
     ys2_cut, ts2_cut, freqs, tau = wa.prepare_wwz(ys2, ts2, freqs=freqs, tau=tau)
 
-    res1 = wwz_func(ys1_cut, ts1_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
-                    params=params, gaussianize=gaussianize, standardize=standardize)
-    res2 = wwz_func(ys2_cut, ts2_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
-                    params=params, gaussianize=gaussianize, standardize=standardize)
+    _, _, _, coeff1 = wwz_func(ys1_cut, ts1_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
+                               params=params, gaussianize=gaussianize, standardize=standardize)
+    _, _, _, coeff2 = wwz_func(ys2_cut, ts2_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
+                               params=params, gaussianize=gaussianize, standardize=standardize)
 
     tauest1 = wa.tau_estimation(ys1_cut, ts1_cut, detrend=detrend, params=params,
                                 gaussianize=gaussianize, standardize=standardize)
@@ -2125,8 +2125,8 @@ def xwt(ys1, ts1, ys2, ts2,
     psd1_ar1 = wa.psd_ar(np.var(r1), freqs, tauest1, f_sampling_1)
     psd2_ar1 = wa.psd_ar(np.var(r2), freqs, tauest2, f_sampling_2)
 
-    wt_coeff1 = res1.coeff[1] + res1.coeff[2]*1j
-    wt_coeff2 = res2.coeff[1] + res2.coeff[2]*1j
+    wt_coeff1 = coeff1[1] + coeff1[2]*1j
+    wt_coeff2 = coeff2[1] + coeff2[2]*1j
     xwt, xw_amplitude, xw_phase = wa.cross_wt(wt_coeff1, wt_coeff2, freqs, tau)
 
     sigma_1 = np.std(ys1_cut)
@@ -2166,7 +2166,7 @@ def xwc(ys1, ts1, ys2, ts2,
             while the second parameter correspond to the order of the filter
             (default is 4). The third parameter is the order of the derivative
             (the default is zero, which means only smoothing.)
-        gaussionize (bool): If True, gaussianizes the timeseries
+        gaussianize (bool): If True, gaussianizes the timeseries
         standardize (bool): If True, standardizes the timeseries
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
