@@ -2302,3 +2302,91 @@
 2018-01-28 15:41:42,773 [INFO] time_series: enter extract_columns
 2018-01-28 15:41:42,785 [INFO] time_series: exit extract_main
 2018-01-28 15:41:42,798 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.87 seconds
+2018-03-01 15:53:27,147 [DEBUG] parso.cache: pickle loaded: /Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/pyleoclim-0.3.1-py3.6.egg/pyleoclim/Spectral.py
+2018-03-01 15:53:27,823 [DEBUG] parso.python.diff: diff parser start
+2018-03-01 15:53:27,823 [DEBUG] parso.python.diff: diff parser calculated
+2018-03-01 15:53:27,823 [DEBUG] parso.python.diff: diff: line_lengths old: 2, new: 2
+2018-03-01 15:53:27,823 [DEBUG] parso.python.diff: diff replace old[1:1] new[1:1]
+2018-03-01 15:53:27,824 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 1 in part parser)
+2018-03-01 15:53:27,824 [DEBUG] parso.python.diff: diff equal old[2:2] new[2:2]
+2018-03-01 15:53:27,824 [DEBUG] parso.python.diff: diff actually copy 2 to 2
+2018-03-01 15:53:27,825 [DEBUG] parso.python.diff: diff parser end
+2018-03-01 15:53:27,964 [DEBUG] parso.python.diff: diff parser start
+2018-03-01 15:53:27,965 [DEBUG] parso.python.diff: diff parser calculated
+2018-03-01 15:53:27,965 [DEBUG] parso.python.diff: diff: line_lengths old: 2, new: 2
+2018-03-01 15:53:27,965 [DEBUG] parso.python.diff: diff replace old[1:1] new[1:1]
+2018-03-01 15:53:27,965 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 1 in part parser)
+2018-03-01 15:53:27,966 [DEBUG] parso.python.diff: diff equal old[2:2] new[2:2]
+2018-03-01 15:53:27,966 [DEBUG] parso.python.diff: diff actually copy 2 to 2
+2018-03-01 15:53:27,966 [DEBUG] parso.python.diff: diff parser end
+2018-03-01 15:53:28,175 [DEBUG] parso.python.diff: diff parser start
+2018-03-01 15:53:28,176 [DEBUG] parso.python.diff: diff parser calculated
+2018-03-01 15:53:28,176 [DEBUG] parso.python.diff: diff: line_lengths old: 2, new: 2
+2018-03-01 15:53:28,176 [DEBUG] parso.python.diff: diff replace old[1:1] new[1:1]
+2018-03-01 15:53:28,176 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 1 in part parser)
+2018-03-01 15:53:28,177 [DEBUG] parso.python.diff: diff equal old[2:2] new[2:2]
+2018-03-01 15:53:28,177 [DEBUG] parso.python.diff: diff actually copy 2 to 2
+2018-03-01 15:53:28,177 [DEBUG] parso.python.diff: diff parser end
+2018-03-01 15:53:28,379 [DEBUG] parso.python.diff: diff parser start
+2018-03-01 15:53:28,379 [DEBUG] parso.python.diff: diff parser calculated
+2018-03-01 15:53:28,380 [DEBUG] parso.python.diff: diff: line_lengths old: 2, new: 2
+2018-03-01 15:53:28,380 [DEBUG] parso.python.diff: diff replace old[1:1] new[1:1]
+2018-03-01 15:53:28,380 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 1 in part parser)
+2018-03-01 15:53:28,380 [DEBUG] parso.python.diff: diff equal old[2:2] new[2:2]
+2018-03-01 15:53:28,381 [DEBUG] parso.python.diff: diff actually copy 2 to 2
+2018-03-01 15:53:28,381 [DEBUG] parso.python.diff: diff parser end
+2018-03-01 15:53:28,994 [DEBUG] parso.python.diff: diff parser start
+2018-03-01 15:53:28,995 [DEBUG] parso.python.diff: diff parser calculated
+2018-03-01 15:53:28,995 [DEBUG] parso.python.diff: diff: line_lengths old: 2, new: 2
+2018-03-01 15:53:28,995 [DEBUG] parso.python.diff: diff replace old[1:1] new[1:1]
+2018-03-01 15:53:28,996 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 1 in part parser)
+2018-03-01 15:53:28,996 [DEBUG] parso.python.diff: diff equal old[2:2] new[2:2]
+2018-03-01 15:53:28,996 [DEBUG] parso.python.diff: diff actually copy 2 to 2
+2018-03-01 15:53:28,996 [DEBUG] parso.python.diff: diff parser end
+2018-03-01 15:53:29,007 [DEBUG] parso.cache: pickle loaded: /Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/warnings.py
+2018-03-01 15:53:29,100 [DEBUG] parso.python.diff: diff parser start
+2018-03-01 15:53:29,100 [DEBUG] parso.python.diff: diff parser calculated
+2018-03-01 15:53:29,100 [DEBUG] parso.python.diff: diff: line_lengths old: 2, new: 2
+2018-03-01 15:53:29,100 [DEBUG] parso.python.diff: diff replace old[1:1] new[1:1]
+2018-03-01 15:53:29,101 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 1 in part parser)
+2018-03-01 15:53:29,101 [DEBUG] parso.python.diff: diff equal old[2:2] new[2:2]
+2018-03-01 15:53:29,101 [DEBUG] parso.python.diff: diff actually copy 2 to 2
+2018-03-01 15:53:29,101 [DEBUG] parso.python.diff: diff parser end
+2018-03-01 15:53:29,298 [DEBUG] parso.python.diff: diff parser start
+2018-03-01 15:53:29,299 [DEBUG] parso.python.diff: diff parser calculated
+2018-03-01 15:53:29,299 [DEBUG] parso.python.diff: diff: line_lengths old: 2, new: 2
+2018-03-01 15:53:29,299 [DEBUG] parso.python.diff: diff replace old[1:1] new[1:1]
+2018-03-01 15:53:29,299 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 1 in part parser)
+2018-03-01 15:53:29,300 [DEBUG] parso.python.diff: diff equal old[2:2] new[2:2]
+2018-03-01 15:53:29,300 [DEBUG] parso.python.diff: diff actually copy 2 to 2
+2018-03-01 15:53:29,300 [DEBUG] parso.python.diff: diff parser end
+2018-03-01 15:53:29,888 [DEBUG] parso.python.diff: diff parser start
+2018-03-01 15:53:29,888 [DEBUG] parso.python.diff: diff parser calculated
+2018-03-01 15:53:29,888 [DEBUG] parso.python.diff: diff: line_lengths old: 2, new: 2
+2018-03-01 15:53:29,889 [DEBUG] parso.python.diff: diff replace old[1:1] new[1:1]
+2018-03-01 15:53:29,889 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 1 in part parser)
+2018-03-01 15:53:29,889 [DEBUG] parso.python.diff: diff equal old[2:2] new[2:2]
+2018-03-01 15:53:29,890 [DEBUG] parso.python.diff: diff actually copy 2 to 2
+2018-03-01 15:53:29,890 [DEBUG] parso.python.diff: diff parser end
+2018-03-01 15:53:30,284 [DEBUG] parso.python.diff: diff parser start
+2018-03-01 15:53:30,285 [DEBUG] parso.python.diff: diff parser calculated
+2018-03-01 15:53:30,285 [DEBUG] parso.python.diff: diff: line_lengths old: 2, new: 2
+2018-03-01 15:53:30,285 [DEBUG] parso.python.diff: diff replace old[1:1] new[1:1]
+2018-03-01 15:53:30,285 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 1 in part parser)
+2018-03-01 15:53:30,285 [DEBUG] parso.python.diff: diff equal old[2:2] new[2:2]
+2018-03-01 15:53:30,286 [DEBUG] parso.python.diff: diff actually copy 2 to 2
+2018-03-01 15:53:30,286 [DEBUG] parso.python.diff: diff parser end
+2018-03-01 15:53:43,725 [DEBUG] parso.python.diff: diff parser start
+2018-03-01 15:53:43,726 [DEBUG] parso.python.diff: diff parser calculated
+2018-03-01 15:53:43,726 [DEBUG] parso.python.diff: diff: line_lengths old: 2, new: 2
+2018-03-01 15:53:43,726 [DEBUG] parso.python.diff: diff replace old[1:2] new[1:2]
+2018-03-01 15:53:43,727 [DEBUG] parso.python.diff: parse_part from 1 to 2 (to 1 in part parser)
+2018-03-01 15:53:43,727 [DEBUG] parso.python.diff: diff parser end
+2018-03-01 15:53:50,767 [DEBUG] parso.python.diff: diff parser start
+2018-03-01 15:53:50,767 [DEBUG] parso.python.diff: diff parser calculated
+2018-03-01 15:53:50,768 [DEBUG] parso.python.diff: diff: line_lengths old: 2, new: 2
+2018-03-01 15:53:50,768 [DEBUG] parso.python.diff: diff equal old[1:1] new[1:1]
+2018-03-01 15:53:50,768 [DEBUG] parso.python.diff: diff actually copy 1 to 1
+2018-03-01 15:53:50,768 [DEBUG] parso.python.diff: diff replace old[2:2] new[2:2]
+2018-03-01 15:53:50,769 [DEBUG] parso.python.diff: parse_part from 2 to 2 (to 1 in part parser)
+2018-03-01 15:53:50,769 [DEBUG] parso.python.diff: diff parser end

@@ -1570,21 +1570,20 @@ class WaveletAnalysis(object):
         xwt = coeff1 * np.conj(coeff2)
         power1 = np.abs(coeff1)**2
         power2 = np.abs(coeff2)**2
+
         scales = 1/freqs  # `scales` here is the `Period` axis in the wavelet plot
         dt = np.median(np.diff(tau))
         snorm = scales / dt  # normalized scales
 
-        scale = 1/freqs
-
         # with WWZ method, we don't have a constant dj, so we will just take the average over the whole scale range
-        N = np.size(scale)
-        s0 = scale[-1]
-        sN = scale[0]
+        N = np.size(scales)
+        s0 = scales[-1]
+        sN = scales[0]
         dj = np.log2(sN/s0) / N
 
-        S12 = Smoothing(xwt/scale, snorm, dj)
-        S1 = Smoothing(power1/scale, snorm, dj)
-        S2 = Smoothing(power2/scale, snorm, dj)
+        S12 = Smoothing(xwt/scales, snorm, dj)
+        S1 = Smoothing(power1/scales, snorm, dj)
+        S2 = Smoothing(power2/scales, snorm, dj)
         xw_coherence = np.abs(S12)**2 / (S1*S2)
 
         return xw_coherence
@@ -2209,15 +2208,19 @@ def xwc(ys1, ts1, ys2, ts2,
     else:
         freqs = freqs1
 
-    wwa1, phase1, AR1_q, coi, freqs, tau, Neffs, coeff1 = wwz(ys1_cut, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
-                                                              nproc=nproc, detrend=detrend, params=params,
-                                                              gaussianize=gaussianize, standardize=standardize, method=method)
-    wwa2, phase2, AR1_q, coi, freqs, tau, Neffs, coeff2 = wwz(ys2_cut, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
-                                                              nproc=nproc, detrend=detrend, params=params,
-                                                              gaussianize=gaussianize, standardize=standardize, method=method)
+    if freqs[0] == 0:
+        freqs = freqs[1:] # delete 0 frequency if present
 
-    wt_coeff1 = coeff1[1] + coeff1[2]*1j
-    wt_coeff2 = coeff2[1] + coeff2[2]*1j
+    res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
+                   nproc=nproc, detrend=detrend, params=params,
+                   gaussianize=gaussianize, standardize=standardize, method=method)
+    res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
+                   nproc=nproc, detrend=detrend, params=params,
+                   gaussianize=gaussianize, standardize=standardize, method=method)
+
+    wt_coeff1 = res_wwz1.coeff[1] + res_wwz1.coeff[2]*1j
+    wt_coeff2 = res_wwz2.coeff[1] + res_wwz2.coeff[2]*1j
+
     xw_coherence = wa.wavelet_coherence(wt_coeff1, wt_coeff2, freqs, tau)
     xwt, xw_amplitude, xw_phase = wa.cross_wt(wt_coeff1, wt_coeff2, freqs, tau)
 
@@ -2233,15 +2236,15 @@ def xwc(ys1, ts1, ys2, ts2,
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
             r2 = ar1_sim(ys2_cut, np.size(ts2_cut), 1, ts=ts2_cut)
-            _, _, _, _, freqs, tau, _, coeffr1 = wwz(r1, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
+            res_wwz_r1 = wwz(r1, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
                                                      detrend=detrend, params=params,
                                                      gaussianize=gaussianize, standardize=standardize)
-            _, _, _, _, freqs, tau, _, coeffr2 = wwz(r2, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
+            res_wwz_r2 = wwz(r2, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
                                                      detrend=detrend, params=params,
                                                      gaussianize=gaussianize, standardize=standardize)
 
-            wt_coeffr1 = coeffr1[1] + coeffr1[2]*1j
-            wt_coeffr2 = coeffr2[1] + coeffr2[2]*1j
+            wt_coeffr1 = res_wwz_r1.coeff[1] + res_wwz_r2.coeff[2]*1j
+            wt_coeffr2 = res_wwz_r1.coeff[1] + res_wwz_r2.coeff[2]*1j
             coherence_red[i, :, :] = wa.wavelet_coherence(wt_coeffr1, wt_coeffr2, freqs, tau)
 
         for j in range(nt):
@@ -2251,7 +2254,12 @@ def xwc(ys1, ts1, ys2, ts2,
     else:
         AR1_q = None
 
-    return xw_coherence, xw_amplitude, xw_phase, freqs, tau, AR1_q, coi
+    coi = wa.make_coi(tau, Neff=Neff)
+    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'freqs', 'tau', 'AR1_q', 'coi'])
+    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase,
+                  freqs=freqs, tau=tau, AR1_q=AR1_q, coi=coi)
+
+    return res
 
 
 def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
@@ -2362,7 +2370,8 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     return ax
 
 
-def plot_coherence(xw_coherence, xw_phase, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None, basey=2,
+def plot_coherence(res_xwc,
+                   levels=None, tick_range=None, basey=2,
                    yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
                    exg=5, scale=30, width=0.004,
                    cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
@@ -2400,6 +2409,13 @@ def plot_coherence(xw_coherence, xw_phase, freqs, tau, AR1_q=None, coi=None, lev
         fig (figure): the 2-D plot of wavelet analysis
 
     """
+    xw_coherence = res_xwc.xw_coherence
+    xw_phase = res_xwc.xw_phase
+    freqs = res_xwc.freqs
+    tau = res_xwc.tau
+    AR1_q = res_xwc.AR1_q
+    coi = res_xwc.coi
+
     sns.set(style="ticks", font_scale=2)
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
