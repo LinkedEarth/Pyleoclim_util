@@ -2390,3 +2390,140 @@
 2018-03-01 15:53:50,768 [DEBUG] parso.python.diff: diff replace old[2:2] new[2:2]
 2018-03-01 15:53:50,769 [DEBUG] parso.python.diff: parse_part from 2 to 2 (to 1 in part parser)
 2018-03-01 15:53:50,769 [DEBUG] parso.python.diff: diff parser end
+2018-03-02 22:20:51,361 [ERROR] tornado.general: Uncaught exception, closing connection.
+Traceback (most recent call last):
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/zmq/eventloop/zmqstream.py", line 414, in _run_callback
+    callback(*args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/tornado/stack_context.py", line 277, in null_wrapper
+    return fn(*args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/kernelbase.py", line 283, in dispatcher
+    return self.dispatch_shell(stream, msg)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/kernelbase.py", line 233, in dispatch_shell
+    handler(stream, idents, msg)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/kernelbase.py", line 399, in execute_request
+    user_expressions, allow_stdin)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/ipkernel.py", line 208, in do_execute
+    res = shell.run_cell(code, store_history=store_history, silent=silent)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/zmqshell.py", line 537, in run_cell
+    return super(ZMQInteractiveShell, self).run_cell(*args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/interactiveshell.py", line 2737, in run_cell
+    self.events.trigger('post_execute')
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/events.py", line 73, in trigger
+    func(*args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/pylab/backend_inline.py", line 113, in flush_figures
+    return show(True)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/pylab/backend_inline.py", line 36, in show
+    display(figure_manager.canvas.figure)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/display.py", line 297, in display
+    format_dict, md_dict = format(obj, include=include, exclude=exclude)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/formatters.py", line 180, in format
+    data = formatter(obj)
+  File "<decorator-gen-9>", line 2, in __call__
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/formatters.py", line 224, in catch_format_error
+    r = method(self, *args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/formatters.py", line 341, in __call__
+    return printer(obj)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/pylabtools.py", line 238, in <lambda>
+    png_formatter.for_type(Figure, lambda fig: print_figure(fig, 'png', **kwargs))
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/pylabtools.py", line 122, in print_figure
+    fig.canvas.print_figure(bytes_io, **kw)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/backend_bases.py", line 2267, in print_figure
+    **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/backends/backend_agg.py", line 507, in print_png
+    FigureCanvasAgg.draw(self)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/backends/backend_agg.py", line 430, in draw
+    self.figure.draw(self.renderer)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/artist.py", line 55, in draw_wrapper
+    return draw(artist, renderer, *args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/figure.py", line 1299, in draw
+    renderer, self, artists, self.suppressComposite)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/image.py", line 138, in _draw_list_compositing_images
+    a.draw(renderer)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/artist.py", line 55, in draw_wrapper
+    return draw(artist, renderer, *args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/axes/_base.py", line 2437, in draw
+    mimage._draw_list_compositing_images(renderer, self, artists)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/image.py", line 138, in _draw_list_compositing_images
+    a.draw(renderer)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/artist.py", line 55, in draw_wrapper
+    return draw(artist, renderer, *args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/quiver.py", line 548, in draw
+    self.set_verts(verts, closed=False)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/collections.py", line 939, in set_verts
+    self._paths = [mpath.Path(xy) for xy in verts]
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/collections.py", line 939, in <listcomp>
+    self._paths = [mpath.Path(xy) for xy in verts]
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/path.py", line 160, in __init__
+    self._update_values()
+KeyboardInterrupt
+2018-03-02 22:20:51,372 [ERROR] tornado.general: Uncaught exception, closing connection.
+Traceback (most recent call last):
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/zmq/eventloop/zmqstream.py", line 440, in _handle_events
+    self._handle_recv()
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/zmq/eventloop/zmqstream.py", line 472, in _handle_recv
+    self._run_callback(callback, msg)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/zmq/eventloop/zmqstream.py", line 414, in _run_callback
+    callback(*args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/tornado/stack_context.py", line 277, in null_wrapper
+    return fn(*args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/kernelbase.py", line 283, in dispatcher
+    return self.dispatch_shell(stream, msg)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/kernelbase.py", line 233, in dispatch_shell
+    handler(stream, idents, msg)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/kernelbase.py", line 399, in execute_request
+    user_expressions, allow_stdin)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/ipkernel.py", line 208, in do_execute
+    res = shell.run_cell(code, store_history=store_history, silent=silent)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/zmqshell.py", line 537, in run_cell
+    return super(ZMQInteractiveShell, self).run_cell(*args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/interactiveshell.py", line 2737, in run_cell
+    self.events.trigger('post_execute')
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/events.py", line 73, in trigger
+    func(*args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/pylab/backend_inline.py", line 113, in flush_figures
+    return show(True)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/ipykernel/pylab/backend_inline.py", line 36, in show
+    display(figure_manager.canvas.figure)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/display.py", line 297, in display
+    format_dict, md_dict = format(obj, include=include, exclude=exclude)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/formatters.py", line 180, in format
+    data = formatter(obj)
+  File "<decorator-gen-9>", line 2, in __call__
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/formatters.py", line 224, in catch_format_error
+    r = method(self, *args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/formatters.py", line 341, in __call__
+    return printer(obj)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/pylabtools.py", line 238, in <lambda>
+    png_formatter.for_type(Figure, lambda fig: print_figure(fig, 'png', **kwargs))
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/IPython/core/pylabtools.py", line 122, in print_figure
+    fig.canvas.print_figure(bytes_io, **kw)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/backend_bases.py", line 2267, in print_figure
+    **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/backends/backend_agg.py", line 507, in print_png
+    FigureCanvasAgg.draw(self)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/backends/backend_agg.py", line 430, in draw
+    self.figure.draw(self.renderer)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/artist.py", line 55, in draw_wrapper
+    return draw(artist, renderer, *args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/figure.py", line 1299, in draw
+    renderer, self, artists, self.suppressComposite)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/image.py", line 138, in _draw_list_compositing_images
+    a.draw(renderer)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/artist.py", line 55, in draw_wrapper
+    return draw(artist, renderer, *args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/axes/_base.py", line 2437, in draw
+    mimage._draw_list_compositing_images(renderer, self, artists)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/image.py", line 138, in _draw_list_compositing_images
+    a.draw(renderer)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/artist.py", line 55, in draw_wrapper
+    return draw(artist, renderer, *args, **kwargs)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/quiver.py", line 548, in draw
+    self.set_verts(verts, closed=False)
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/collections.py", line 939, in set_verts
+    self._paths = [mpath.Path(xy) for xy in verts]
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/collections.py", line 939, in <listcomp>
+    self._paths = [mpath.Path(xy) for xy in verts]
+  File "/Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/matplotlib/path.py", line 160, in __init__
+    self._update_values()
+KeyboardInterrupt
+2018-03-02 22:23:18,256 [DEBUG] parso.cache: pickle loaded: /Users/fzhu/.pyenv/versions/anaconda3-5.0.1/envs/py3.6/lib/python3.6/site-packages/numpy/__init__.py

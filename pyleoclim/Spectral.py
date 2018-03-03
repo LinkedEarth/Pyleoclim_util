@@ -1466,7 +1466,7 @@ class WaveletAnalysis(object):
 
         return ys_cut, ts_cut, freqs, tau
 
-    def cross_wt(self, coeff1, coeff2, freqs, tau):
+    def cross_wt(self, coeff1, coeff2):
         ''' Return the cross wavelet transform.
 
         Args:
@@ -1489,7 +1489,7 @@ class WaveletAnalysis(object):
 
         return xwt, xw_amplitude, xw_phase
 
-    def wavelet_coherence(self, coeff1, coeff2, freqs, tau):
+    def wavelet_coherence(self, coeff1, coeff2, freqs, smooth_factor=0.25):
         ''' Return the cross wavelet transform.
 
         Args:
@@ -1527,7 +1527,7 @@ class WaveletAnalysis(object):
 
             return rect
 
-        def Smoothing(coeff, snorm, dj):
+        def Smoothing(coeff, snorm, dj, smooth_factor=smooth_factor):
             """ Soothing function adapted from https://github.com/regeirk/pycwt/blob/master/pycwt/helpers.py
 
             Args:
@@ -1551,7 +1551,7 @@ class WaveletAnalysis(object):
             # Notes by Smoothing by Gaussian window (absolute value of wavelet function)
             # using the convolution theorem: multiplication by Gaussian curve in
             # Fourier domain for each scale, outer product of scale and frequency
-            F = np.exp(-0.5 * (snorm[:, np.newaxis] ** 2) * k2)  # Outer product
+            F = np.exp(-smooth_factor * (snorm[:, np.newaxis] ** 2) * k2)  # Outer product
             smooth = fft.ifft(F * fft.fft(W, axis=1, **fft_kwargs(W[0, :])),
                               axis=1,  # Along Fourier frequencies
                               **fft_kwargs(W[0, :], overwrite_x=True))
@@ -1572,14 +1572,15 @@ class WaveletAnalysis(object):
         power2 = np.abs(coeff2)**2
 
         scales = 1/freqs  # `scales` here is the `Period` axis in the wavelet plot
-        dt = np.median(np.diff(tau))
-        snorm = scales / dt  # normalized scales
+        #  dt = np.median(np.diff(tau))
+        #  snorm = scales / dt  # normalized scales
 
         # with WWZ method, we don't have a constant dj, so we will just take the average over the whole scale range
         N = np.size(scales)
         s0 = scales[-1]
         sN = scales[0]
         dj = np.log2(sN/s0) / N
+        snorm = scales / dj
 
         S12 = Smoothing(xwt/scales, snorm, dj)
         S1 = Smoothing(power1/scales, snorm, dj)
@@ -2140,7 +2141,7 @@ def xwt(ys1, ts1, ys2, ts2,
     return xwt, xw_amplitude, xw_phase, freqs, tau, AR1_q, coi
 
 
-def xwc(ys1, ts1, ys2, ts2,
+def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no',
         nMC=200, params=['default', 4, 0, 1],
         gaussianize=False, standardize=True, method='Kirchner_f2py'):
@@ -2221,8 +2222,8 @@ def xwc(ys1, ts1, ys2, ts2,
     wt_coeff1 = res_wwz1.coeff[1] + res_wwz1.coeff[2]*1j
     wt_coeff2 = res_wwz2.coeff[1] + res_wwz2.coeff[2]*1j
 
-    xw_coherence = wa.wavelet_coherence(wt_coeff1, wt_coeff2, freqs, tau)
-    xwt, xw_amplitude, xw_phase = wa.cross_wt(wt_coeff1, wt_coeff2, freqs, tau)
+    xw_coherence = wa.wavelet_coherence(wt_coeff1, wt_coeff2, freqs, smooth_factor=smooth_factor)
+    xwt, xw_amplitude, xw_phase = wa.cross_wt(wt_coeff1, wt_coeff2)
 
     # Monte-Carlo simulations of AR1 process
     nt = np.size(tau)
@@ -2245,7 +2246,7 @@ def xwc(ys1, ts1, ys2, ts2,
 
             wt_coeffr1 = res_wwz_r1.coeff[1] + res_wwz_r2.coeff[2]*1j
             wt_coeffr2 = res_wwz_r1.coeff[1] + res_wwz_r2.coeff[2]*1j
-            coherence_red[i, :, :] = wa.wavelet_coherence(wt_coeffr1, wt_coeffr2, freqs, tau)
+            coherence_red[i, :, :] = wa.wavelet_coherence(wt_coeffr1, wt_coeffr2, freqs, smooth_factor=smooth_factor)
 
         for j in range(nt):
             for k in range(nf):
@@ -2370,10 +2371,10 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     return ax
 
 
-def plot_coherence(res_xwc,
+def plot_coherence(res_xwc, pt=0.5,
                    levels=None, tick_range=None, basey=2,
                    yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
-                   exg=5, scale=30, width=0.004,
+                   skip_x=5, skip_y=5, scale=30, width=0.004,
                    cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
                    plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical',
                    cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
@@ -2404,6 +2405,8 @@ def plot_coherence(res_xwc,
         cbar_pad (float): the pad for the colorbar
         c)bar_frac (float): the frac for the colorbar
         cbar_labelsize (float): the font size of the colorbar label
+        pt (float): plot arrows above pt value
+        skip_x, skip_y (float): scale factors for arrows
 
     Returns:
         fig (figure): the 2-D plot of wavelet analysis
@@ -2473,12 +2476,14 @@ def plot_coherence(res_xwc,
 
     # plot phase
     phase = np.copy(xw_phase)
-    phase[xw_coherence < .5] = np.nan
+    phase[xw_coherence < pt] = np.nan
 
     X, Y = np.meshgrid(tau, 1/freqs)
     U, V = np.cos(phase).T, np.sin(phase).T
 
-    ax.quiver(X[::exg, ::exg], Y[::exg, ::exg], U[::exg, ::exg], V[::exg, ::exg], scale=scale, width=width)
+    ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
+              U[::skip_y, ::skip_x], V[::skip_y, ::skip_x],
+              scale=scale, width=width)
 
     return ax
 
