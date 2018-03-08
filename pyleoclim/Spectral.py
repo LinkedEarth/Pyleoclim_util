@@ -28,7 +28,7 @@ import warnings
 
 from pyleoclim import Timeseries
 import sys
-import platform
+#import platform
 
 from math import factorial
 
@@ -1966,7 +1966,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             detrend='no', params=["default", 4, 0, 1], gaussianize=False, standardize=True,
             Neff=3, anti_alias=False, avgs=1, method='Kirchner_f2py'):
-    ''' Return the psd of a timeseires directly using wwz method.
+    ''' Return the psd of a timeseries directly using wwz method.
 
     Args:
         ys (array): a time series, NaNs will be deleted automatically

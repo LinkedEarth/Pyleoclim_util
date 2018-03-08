@@ -168,7 +168,7 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
     if saveFig == True:
         LipdUtils.saveFigure('mapLipds_archive', format, dir)
     else:
-        plt.show
+        plt.show()
 
     return fig
 
@@ -238,7 +238,7 @@ def mapLipd(timeseries="", countries = True, counties = False, \
     if saveFig == True:
         LipdUtils.saveFigure(timeseries['dataSetName']+'_map', format, dir)
     else:
-        plt.show
+        plt.show()
 
     return fig
 
@@ -604,7 +604,7 @@ def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
     if saveFig == True:
         LipdUtils.saveFigure(timeseries['dataSetName']+'_map', format, dir)
     else:
-        plt.show     
+        plt.show()
             
     return ax
 
@@ -722,7 +722,7 @@ def plotEnsTs(timeseries = "", lipd ="", ensTableName = None, ens = None, \
     
     Args:
         timeseries (dict): LiPD timeseries object. By default, will prompt for one
-        lipd (dict): The LiPD dictionary. MUST be provided is timeseries is set.
+        lipd (dict): The LiPD dictionary. MUST be provided if timeseries is set.
         ensTableName (str): The name of the ensemble table, if known.
         ens (int): Number of ensembles to plot. By default, will plot either the 
             number of ensembles stored in the chronensembleTable or 500 of them,
@@ -1111,38 +1111,37 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
             y,x = Timeseries.clean_ts(y,x)
                    
     # Perform the analysis
-    default = {'tau':None,
-                       'freqs': None,
-                       'c':1e-3,
-                       'nproc':8,
-                       'nMC':200,
-                       'detrend':'no',
-                       'params' : ["default",4,0,1],
-                       'gaussianize': False,
-                       'standardize':True,
-                       'Neff':3,
-                       'anti_alias':False,
-                       'avgs':2,
-                       'method':'Kirchner_f2py',
-                       }
-    psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(y,x,**default)
-    
-    # Make the plot
-    ax4.plot(1/freqs, psd, linewidth=1,  label='PSD', color = marker[0])
-    ax4.plot(1/freqs, psd_ar1_q95, linewidth=1,  label='AR1 95%', color=sns.xkcd_rgb["pale red"])
-    plt.ylabel('Spectral Density')
-    plt.xlabel('Period ('+\
-                x_label[x_label.find("(")+1:x_label.find(")")][0:x_label.find(" ")-1]+')')
-    
-    plt.xscale('log', nonposy='clip')
-    plt.yscale('log', nonposy='clip')
-    
-    ax4.set_aspect('equal')
-    
-    plt.gca().invert_xaxis()
-    plt.legend()    
+        default = {'tau':None,
+                           'freqs': None,
+                           'c':1e-3,
+                           'nproc':8,
+                           'nMC':200,
+                           'detrend':'no',
+                           'params' : ["default",4,0,1],
+                           'gaussianize': False,
+                           'standardize':True,
+                           'Neff':3,
+                           'anti_alias':False,
+                           'avgs':1,
+                           'method':'Kirchner_f2py',
+                           }
+        psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(y,x,**default)
         
-    
+        # Make the plot
+        ax4.plot(1/freqs, psd, linewidth=1,  label='PSD', color = marker[0])
+        ax4.plot(1/freqs, psd_ar1_q95, linewidth=1,  label='AR1 95%', color=sns.xkcd_rgb["pale red"])
+        plt.ylabel('Spectral Density')
+        plt.xlabel('Period ('+\
+                    x_label[x_label.find("(")+1:x_label.find(")")][0:x_label.find(" ")-1]+')')
+        
+        plt.xscale('log', nonposy='clip')
+        plt.yscale('log', nonposy='clip')
+        
+        ax4.set_aspect('equal')
+        
+        plt.gca().invert_xaxis()
+        plt.legend()    
+        
     #Add the metadata
     textstr = "archiveType: " + metadata["archiveType"]+"\n"+"\n"+\
               "Authors: " + metadata["authors"]+"\n"+"\n"+\
@@ -1504,6 +1503,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'freqs':None,
                            'c':1/(8*np.pi**2),
                            'Neff':3,
+                           'Neff_coi':3,
                            'nMC':200,
                            'nproc':8,
                            'detrend':'no',
@@ -1511,8 +1511,9 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'gaussianize': False,
                            'standardize':True,
                            'method':'Kirchner_f2py',
-                           'bc':'no',
-                           'len_bd':10}
+                           'bc_mode':'reflect',
+                           'reflect_type':'odd',
+                           'len_bd':0}
                 
             Modify the values for specific keys to change the default behavior.
                 
@@ -1529,7 +1530,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                        'standardize':True,
                        'Neff':3,
                        'anti_alias':False,
-                       'avgs':2,
+                       'avgs':1,
                        'method':'Kirchner_f2py',
                        }
             
@@ -1542,6 +1543,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                                  'levels':None,
                                  'tick_range':None,
                                  'yticks':None,
+                                 'yticks_label': None,
                                  'ylim':None,
                                  'xticks':None,
                                  'xlabels':None,
@@ -1567,23 +1569,24 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
             psdplot_default={'lmstyle':'-',
                                  'linewidth':None,
                                  'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle': '-',
-                                 'ar1_linewidth': None,
+                                 'ar1_lmstyle':'-',
+                                 'ar1_linewidth':1,
                                  'period_ticks':None,
+                                 'period_tickslabel':None,
                                  'psd_lim':None,
                                  'period_lim':None,
                                  'figsize':[20,8],
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'psd_ar1':None,
                                  'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
                                  'ax':None,
                                  'vertical':False,
+                                 'plot_gridlines':True,
                                  'period_label':'Period ('+ageunits+')',
                                  'psd_label':'Spectral Density',
-                                 'zorder' : None}  
+                                 'zorder' : None}    
             
             Modify the values for specific keys to change the default behavior.
             
@@ -1717,7 +1720,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                        'standardize':True,
                        'Neff':3,
                        'anti_alias':False,
-                       'avgs':2,
+                       'avgs':1,
                        'method':'Kirchner_f2py',
                        }
             
@@ -1737,7 +1740,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                        'standardize':True,
                        'Neff':3,
                        'anti_alias':False,
-                       'avgs':2,
+                       'avgs':1,
                        'method':'Kirchner_f2py',
                        }
             
@@ -1759,20 +1762,21 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                 psdplot_default={'lmstyle':'-',
                                  'linewidth':None,
                                  'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle': '-',
-                                 'ar1_linewidth': None,
+                                 'ar1_lmstyle':'-',
+                                 'ar1_linewidth':1,
                                  'period_ticks':None,
+                                 'period_tickslabel':None,
                                  'psd_lim':None,
                                  'period_lim':None,
                                  'figsize':[20,8],
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'psd_ar1':None,
                                  'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
                                  'ax':None,
                                  'vertical':False,
+                                 'plot_gridlines':True,
                                  'period_label':'Period ('+ageunits+')',
                                  'psd_label':'Spectral Density',
                                  'zorder' : None}        
@@ -1786,20 +1790,21 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                psdplot_default={'lmstyle':'-',
                                  'linewidth':None,
                                  'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle': '-',
-                                 'ar1_linewidth': None,
+                                 'ar1_lmstyle':'-',
+                                 'ar1_linewidth':1,
                                  'period_ticks':None,
+                                 'period_tickslabel':None,
                                  'psd_lim':None,
                                  'period_lim':None,
                                  'figsize':[20,8],
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'psd_ar1':None,
                                  'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
                                  'ax':None,
                                  'vertical':False,
+                                 'plot_gridlines':True,
                                  'period_label':'Period ('+ageunits+')',
                                  'psd_label':'Spectral Density',
                                  'zorder' : None}                 
@@ -1809,7 +1814,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
             if saveFig is True:
                 LipdUtils.saveFigure(timeseries['dataSetName']+'_PSDplot',format,dir)
             else:
-                plt.show               
+                plt.show()               
             
         else:
             fig = None
@@ -1823,6 +1828,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'freqs':None,
                            'c':1/(8*np.pi**2),
                            'Neff':3,
+                           'Neff_coi':3,
                            'nMC':200,
                            'nproc':8,
                            'detrend':'no',
@@ -1830,8 +1836,9 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'gaussianize': False,
                            'standardize':True,
                            'method':'Kirchner_f2py',
-                           'bc':'no',
-                           'len_bd':10}
+                           'bc_mode':'reflect',
+                           'reflect_type':'odd',
+                           'len_bd':0}
             
             for key,value in dict_in.items():
                 if key in wwz_default.keys():
@@ -1843,6 +1850,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'freqs':None,
                            'c':1/(8*np.pi**2),
                            'Neff':3,
+                           'Neff_coi':3,
                            'nMC':200,
                            'nproc':8,
                            'detrend':'no',
@@ -1850,8 +1858,9 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'gaussianize': False,
                            'standardize':True,
                            'method':'Kirchner_f2py',
-                           'bc':'no',
-                           'len_bd':10}
+                           'bc_mode':'reflect',
+                           'reflect_type':'odd',
+                           'len_bd':0}
         
         #Perform the calculation
         wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts, **wwz_default)
@@ -1876,6 +1885,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                                  'levels':None,
                                  'tick_range':None,
                                  'yticks':None,
+                                 'yticks_label': None,
                                  'ylim':None,
                                  'xticks':None,
                                  'xlabels':None,
@@ -1904,6 +1914,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                                  'levels':None,
                                  'tick_range':None,
                                  'yticks':None,
+                                 'yticks_label': None,
                                  'ylim':None,
                                  'xticks':None,
                                  'xlabels':None,
@@ -1928,7 +1939,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
             if saveFig is True:
                 LipdUtils.saveFigure(timeseries['dataSetName']+'_PSDplot',format,dir)
             else:
-                plt.show               
+                plt.show()               
             
         else:
             fig = None
@@ -1951,7 +1962,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                        'standardize':True,
                        'Neff':3,
                        'anti_alias':False,
-                       'avgs':2,
+                       'avgs':1,
                        'method':'Kirchner_f2py',
                        }
             
@@ -1971,7 +1982,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                        'standardize':True,
                        'Neff':3,
                        'anti_alias':False,
-                       'avgs':2,
+                       'avgs':1,
                        'method':'Kirchner_f2py',
                        }
            
@@ -1982,6 +1993,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'freqs':None,
                            'c':1/(8*np.pi**2),
                            'Neff':3,
+                           'Neff_coi':3,
                            'nMC':200,
                            'nproc':8,
                            'detrend':'no',
@@ -1989,8 +2001,9 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'gaussianize': False,
                            'standardize':True,
                            'method':'Kirchner_f2py',
-                           'bc':'no',
-                           'len_bd':10}
+                           'bc_mode':'reflect',
+                           'reflect_type':'odd',
+                           'len_bd':0}
 
             
             for key,value in dict_in.items():
@@ -2003,6 +2016,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'freqs':None,
                            'c':1/(8*np.pi**2),
                            'Neff':3,
+                           'Neff_coi':3,
                            'nMC':200,
                            'nproc':8,
                            'detrend':'no',
@@ -2010,8 +2024,9 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'gaussianize': False,
                            'standardize':True,
                            'method':'Kirchner_f2py',
-                           'bc':'no',
-                           'len_bd':10}
+                           'bc_mode':'reflect',
+                           'reflect_type':'odd',
+                           'len_bd':0}
 
             
         # Perform the calculations
@@ -2064,6 +2079,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                                  'levels':None,
                                  'tick_range':None,
                                  'yticks':None,
+                                 'yticks_label': None,
                                  'ylim':None,
                                  'xticks':None,
                                  'xlabels':None,
@@ -2075,7 +2091,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                                  'signif_style':'contour',
                                  'plot_cone':True,
                                  'title':None,
-                                 'ax':ax1,
+                                 'ax':None,
                                  'xlabel': label.upper()[0]+label[1:]+'('+s+')',
                                  'ylabel': 'Period ('+ageunits+')',
                                  'cbar_orientation':'vertical',
@@ -2092,6 +2108,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                                  'levels':None,
                                  'tick_range':None,
                                  'yticks':None,
+                                 'yticks_label': None,
                                  'ylim':None,
                                  'xticks':None,
                                  'xlabels':None,
@@ -2103,7 +2120,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                                  'signif_style':'contour',
                                  'plot_cone':True,
                                  'title':None,
-                                 'ax':ax1,
+                                 'ax':None,
                                  'xlabel': label.upper()[0]+label[1:]+'('+s+')',
                                  'ylabel': 'Period ('+ageunits+')',
                                  'cbar_orientation':'vertical',
@@ -2121,23 +2138,24 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                 psdplot_default={'lmstyle':'-',
                                  'linewidth':None,
                                  'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle': '-',
-                                 'ar1_linewidth': None,
+                                 'ar1_lmstyle':'-',
+                                 'ar1_linewidth':1,
                                  'period_ticks':None,
+                                 'period_tickslabel':None,
                                  'psd_lim':None,
                                  'period_lim':None,
                                  'figsize':[20,8],
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'psd_ar1':None,
                                  'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':ax2,
+                                 'ax':None,
                                  'vertical':False,
+                                 'plot_gridlines':True,
                                  'period_label':'Period ('+ageunits+')',
                                  'psd_label':'Spectral Density',
-                                 'zorder': None}        
+                                 'zorder' : None}       
                                 
                 for key, value in dict_in.items():
                     if key in psdplot_default.keys():
@@ -2148,30 +2166,31 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                psdplot_default={'lmstyle':'-',
                                  'linewidth':None,
                                  'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle': '-',
-                                 'ar1_linewidth': None,
+                                 'ar1_lmstyle':'-',
+                                 'ar1_linewidth':1,
                                  'period_ticks':None,
+                                 'period_tickslabel':None,
                                  'psd_lim':None,
                                  'period_lim':None,
                                  'figsize':[20,8],
                                  'label':'PSD',
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'psd_ar1':None,
                                  'title': None,
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':ax2,
+                                 'ax':None,
                                  'vertical':False,
+                                 'plot_gridlines':True,
                                  'period_label':'Period ('+ageunits+')',
                                  'psd_label':'Spectral Density',
-                                 'zorder': None} 
+                                 'zorder' : None} 
             
             Spectral.plot_psd(psd,freqs,**psdplot_default)
             
             if saveFig is True:
                 LipdUtils.saveFigure(timeseries['dataSetName']+'_PSDplot',format,dir)
             else:
-                plt.show               
+                plt.show()               
             
         else:
             fig = None
@@ -2304,7 +2323,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
         chron -  a numpy array of possible chronologies in each column.
             The number of rows is the same as the length of depth
         ageDist - the distribution of ages around each dates.
-        run - the full R object containing the outputs of the Bchron run        
+        fig - the figure        
     
     Warnings:
         This function requires R and the Bchron package and all its
@@ -2686,7 +2705,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
         if saveFig is True:
             LipdUtils.saveFigure(lipd['dataSetName']+'_Bchron',format,dir)
         else:
-            plt.show                   
+            plt.show()            
     else:
         fig = None
         

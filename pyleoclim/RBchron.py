@@ -252,10 +252,17 @@ def runBchron(ages, agesStd, positions, rejectAges = None,\
     
     # Install necessary R packages
     utils = importr("utils")
+    #Choose a CRAN Mirror for download in necessary
     utils.chooseCRANmirror(ind=1)
-    packnames = ('Bchron', 'stats', 'graphics')
-    utils.install_packages(robjects.vectors.StrVector(packnames))
-    Bchron = importr('Bchron')  
+    # Install the various packages if needed
+    try:
+        #Import BChron 
+        Bchron = importr('Bchron')
+    except:
+        packnames = ('Bchron', 'stats', 'graphics')
+        utils.install_packages(robjects.vectors.StrVector(packnames))
+        #Import Bchron
+        Bchron = importr('Bchron')  
     
     ages = np.array(ages, dtype='float64')
     agesStd = np.array(agesStd, dtype='float64')
