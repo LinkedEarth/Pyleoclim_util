@@ -3,7 +3,7 @@ import os
 import sys
 import io
 
-version = '0.3.1'
+version = '0.4.0'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
@@ -76,9 +76,9 @@ setup(
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
     install_requires=[
-        "LiPD>=0.2.2.0",
-        "pandas>=0.20.3",
-        "numpy>=1.12.1",
+        "LiPD>=0.2.5.1",
+        "pandas>=0.22.0",
+        "numpy>=1.14.1",
         "matplotlib>=2.0.0",
         "basemap>=1.0.7",
         "scipy>=0.19.0",

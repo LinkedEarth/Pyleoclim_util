@@ -1,4 +1,4 @@
-[![PyPI](https://img.shields.io/pypi/dm/pyleoclim.svg)](https://pypi.python.org/pypi/Pyleoclim)
+<!---[![PyPI](https://img.shields.io/pypi/dm/pyleoclim.svg)](https://pypi.python.org/pypi/Pyleoclim)-->
 [![PyPI](https://img.shields.io/pypi/v/pyleoclim.svg)]()
 [![PyPI](https://img.shields.io/badge/python-3.5-yellow.svg)]()
 [![license](https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg)]()
@@ -19,7 +19,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.3.1
+Current Version: 0.4.0
 
 ### <a name = "what">What is it?</a>
 
@@ -34,6 +34,7 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  - plotting maps, timeseries, and basic age model information
  - paleo-aware correlation analysis (isopersistent, isospectral and classical t-test)
  - weighted wavelet Z transform (WWZ)
+ - age modelling through Bchron  
 
 **Future capabilities**:
  - paleo-aware singular spectrum analysis (AR(1) null eigenvalue identification, missing data)
@@ -46,57 +47,52 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>
-0.3.1: New functionalities: segment a timeseries using a gap detection criteria, update to summary plot to perform spectral analysis
-0.3.0: Compatibility with LiPD 1.3 and Spectral module added
-0.2.5: Fix error on loading (Looking for Spectral Module)
-0.2.4: Fix load error from init
-0.2.3: Freeze LiPD version to 1.2 to avoid conflicts with 1.3
-0.2.2: Change progressbar to tqdm and add standardization function
-0.2.1: Update package requirements
-0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.
-0.1.4: Rename function using camel case and consistency with LiPD utilities version 0.1.8.5
-0.1.3: Compatible with LiPD utilities version 0.1.8.5.
-Function openLiPD() renamed openLiPDs()
-0.1.2: Compatible with LiPD utilities version 0.1.8.3. Uses basemap instead of cartopy
-0.1.1: Freezes the package prior to version 0.1.8.2 of LiPD utilities
-0.1.0: First release
+0.4.0: New functionalities: map nearest records by archive type, plot ensemble time series, age modelling through Bchron  
+0.3.1: New functionalities: segment a timeseries using a gap detection criteria, update to summary plot to perform spectral analysis  
+0.3.0: Compatibility with LiPD 1.3 and Spectral module added  
+0.2.5: Fix error on loading (Looking for Spectral Module)  
+0.2.4: Fix load error from init  
+0.2.3: Freeze LiPD version to 1.2 to avoid conflicts with 1.3   
+0.2.2: Change progressbar to tqdm and add standardization function  
+0.2.1: Update package requirements  
+0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.  
+0.1.4: Rename function using camel case and consistency with LiPD utilities version 0.1.8.5  
+0.1.3: Compatible with LiPD utilities version 0.1.8.5.  
+Function openLiPD() renamed openLiPDs()  
+0.1.2: Compatible with LiPD utilities version 0.1.8.3. Uses basemap instead of cartopy  
+0.1.1: Freezes the package prior to version 0.1.8.2 of LiPD utilities  
+0.1.0: First release  
 
 ### <a name = "install"> Installation </a>
 
-Python v3.4+ is required. Tested with Python v3.5
+Python v3.4+ is required. Tested with Python v3.5  
+
+Will not run on a Windows system  
 
 Pyleoclim is published through PyPi and easily installed via `pip`
 ```
 pip install pyleoclim
 ```
 
-**Warning**: Some dependencies require an installation through Conda
-
 ### <a name ="quickstart"> Quickstart guide </a>
 
 1. Open your command line application (Terminal or Command Prompt).
 
-2. Install denpendencies that `pip` cannot handle
+2. Install with command: `pip install pyleoclim`
 
-    2a. Install `basemap` through Conda: `conda install -c conda-forge basemap`
+3. Wait for installation to complete, then:
 
-    2b. Download and install `R` through [CRAN](https://cran.rstudio.com/) and then `pip install rpy2` to enable the usage of the Bchron module. Note that `conda install rpy2` or `conda install r-essentials` will not work properly.
+    3a. Import the package into your favorite Python environment (we recommend the use of Spyder, which comes standard with the Anaconda package)
 
-3. Install the pyleoclim package with command: `pip install pyleoclim`
+    3b. Use Jupyter Notebook to go through the tutorial contained in the `PyleoclimQuickstart.ipynb` Notebook, which can be downloaded [here](https://github.com/LinkedEarth/Pyleoclim_util/tree/master/Example).
 
-4. Wait for installation to complete, then:
-
-    4a. Import the package into your favorite Python environment (we recommend the use of Spyder, which comes standard with the Anaconda package)
-
-    4b. Use Jupyter Notebook to go through the tutorial contained in the `PyleoclimQuickstart.ipynb` Notebook, which can be downloaded [here](https://github.com/LinkedEarth/Pyleoclim_util/tree/master/Example).
-
-5. Help with functionalities can be found in the Documentation folder on [here](http://linkedearth.github.io/Pyleoclim_util/).
+4. Help with functionalities can be found in the Documentation folder on [here](http://linkedearth.github.io/Pyleoclim_util/).
 
 ### <a name="req">Requirements</a>
 
-- LiPD 0.2.2+
-- pandas v0.19+
-- numpy v1.12+
+- LiPD 0.2.5+
+- pandas v0.22+
+- numpy v1.14+
 - matplotlib v2.0+
 - Basemap v1.0.7+
 - scipy v0.19.0+
@@ -104,7 +100,9 @@ pip install pyleoclim
 - seaborn 0.7.0+
 - scikit-learn 0.17.1+
 - tqdm 4.14.0+
-- pathos 0.2.0+
+- pathos 0.2.0+  
+- tqdm 4.14+
+- rpy2 2.8.4+
 
 The installer will automatically check for the needed updates
 
