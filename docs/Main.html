@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Main Functions &#8212; Pyleoclim 0.3.1 documentation</title>
+    <title>Main Functions &#8212; Pyleoclim 0.4.0 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.1',
+        VERSION:     '0.4.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -58,6 +58,7 @@
 <li><a class="reference internal" href="#statistics">Statistics</a></li>
 <li><a class="reference internal" href="#timeseries">Timeseries</a></li>
 <li><a class="reference internal" href="#analysis-in-the-frequency-domain">Analysis in the frequency domain</a></li>
+<li><a class="reference internal" href="#age-modelling">Age modelling</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#using-pyleoclim-without-a-lipd-file">Using Pyleoclim without a LiPD file</a></li>
@@ -157,7 +158,7 @@ readLipd function</dd>
 <dt>Map of all the records into the workspace by archiveType.</dt>
 <dd>Uses the default color palette. Enter pyleoclim.plot_default for detail.</dd>
 <dt>Args:</dt>
-<dd><p class="first">lipds (dict): A dictionary of LiPD files. (Optional)
+<dd><p class="first">lipds (dict): A list of LiPD files. (Optional)
 markersize (int): The size of the markers. Default is 50
 background (str): Plots one of the following images on the map:</p>
 <blockquote>
@@ -221,6 +222,81 @@ and svg.</dd>
 </dd>
 <dt>Returns:</dt>
 <dd>The figure</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.mapNearRecords">
+<code class="descclassname">pyleoclim.</code><code class="descname">mapNearRecords</code><span class="sig-paren">(</span><em>timeseries='', lipds='', n=5, radius=None, sameArchive=False, projection='ortho', lat_0='', lon_0='', llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=200, markersize_adjust=True, marker_r='ko', marker_c='default', cmap='Reds', colorbar=True, location='right', label='Distance in km', figsize=[4, 4], ax=None, saveFig=False, dir='', format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.mapNearRecords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map the nearest records from the record of interest</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">timeseries (dict): A timeseries object. If none given, will prompt for one
+lipds (list): A list of LiPD files. (Optional)
+n (int): the number of records to match
+radius (float): The distance (in km) to search for nearby records.</p>
+<blockquote>
+<div>Default is to search the entire globe</div></blockquote>
+<dl class="docutils">
+<dt>sameArchive (bool): Returns only records with the same archiveType.</dt>
+<dd>Default is not to do so.</dd>
+<dt>projection (string): the map projection. Refers to the Basemap</dt>
+<dd>documentation for a list of available projections. Only projections
+supporting setting the map center with a single lat/lon or with
+the coordinates of the rectangle are currently supported. 
+Default is to use a Robinson projection.</dd>
+<dt>lat_0, lon_0 (float): the center coordinates for the map. Default is</dt>
+<dd>mean latitude/longitude in the list. 
+If the chosen projection doesn’t support it, Basemap will
+ignore the given values.</dd>
+<dt>llcrnrlat, urcrnrlat, llcrnrlon, urcrnrlon (float): The coordinates</dt>
+<dd>of the two opposite corners of the rectangle.</dd>
+</dl>
+<p>countries (bool): Draws the countries border. Defaults is off (False). 
+counties (bool): Draws the USA counties. Default is off (False).
+rivers (bool): Draws the rivers. Default is off (False).
+states (bool): Draws the American and Australian states borders.</p>
+<blockquote>
+<div>Default is off (False).</div></blockquote>
+<dl class="docutils">
+<dt>background (string): Plots one of the following images on the map: </dt>
+<dd>bluemarble, etopo, shadedrelief, or none (filled continents). 
+Default is none.</dd>
+<dt>scale (float): Useful to downgrade the original image resolution to</dt>
+<dd>speed up the process. Default is 0.5.</dd>
+</dl>
+<p>markersize (int): the size of the marker
+markersize_adjust (bool): If True, will proportionaly adjust the size of</p>
+<blockquote>
+<div>the marker according to distance.</div></blockquote>
+<dl class="docutils">
+<dt>marker_r (list or str): The color and shape of the marker for the</dt>
+<dd>reference record.</dd>
+<dt>marker_c (list or str): The color and shape of the marker for the other</dt>
+<dd>records. Default is to use the color palette by archiveType. If set
+to None then the color of the marker will represent the distance from
+the reference records.</dd>
+<dt>cmap (str): The colormap to use to represent the distance from the </dt>
+<dd>reference record if no marker is selected.</dd>
+</dl>
+<p>colorbar (bool): Create a colorbar. Default is True
+location (str): Location of the colorbar
+label (str): Label for the colorbar.
+figsize (list): the size for the figure
+ax: Return as axis instead of figure (useful to integrate plot into a subplot)
+saveFig (bool): default is to not save the figure
+dir (str): the full path of the directory in which to save the figure.</p>
+<blockquote>
+<div>If not provided, creates a default folder called ‘figures’ in the
+LiPD working directory (lipd.path).</div></blockquote>
+<dl class="last docutils">
+<dt>format (str): One of the file extensions supported by the active</dt>
+<dd>backend. Default is “eps”. Most backend support png, pdf, ps, eps,
+and svg.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>ax - The figure</dd>
 </dl>
 </dd></dl>
 
@@ -529,19 +605,33 @@ n_segs (int) - the number of segments</dd>
 <h3>Analysis in the frequency domain<a class="headerlink" href="#analysis-in-the-frequency-domain" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="pyleoclim.wwzTs">
-<code class="descclassname">pyleoclim.</code><code class="descname">wwzTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>wwz=False</em>, <em>psd=True</em>, <em>wwz_default=True</em>, <em>psd_default=True</em>, <em>wwaplot_default=True</em>, <em>psdplot_default=True</em>, <em>fig=True</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.wwzTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.</code><code class="descname">wwzTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>lim=None</em>, <em>wwz=False</em>, <em>psd=True</em>, <em>wwz_default=True</em>, <em>psd_default=True</em>, <em>wwaplot_default=True</em>, <em>psdplot_default=True</em>, <em>fig=True</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.wwzTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Weigthed wavelet Z-transform analysis</p>
 <p>Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)</p>
 <dl class="docutils">
 <dt>Args:</dt>
 <dd><p class="first">timeseries (dict): A LiPD timeseries object (Optional, will prompt for one.)
+lim (list): Truncate the timeseries between min/max time (e.g., [0,10000])
 wwz (bool): If True, will perform wavelet analysis
 psd (bool): If True, will inform the power spectral density of the timeseries
 wwz_default: If True, will use the following default parameters:</p>
 <blockquote>
 <div><dl class="docutils">
-<dt>wwz_default = {‘tau’:None,’freqs’:None,’c’:1/(8*np.pi**2),’Neff’:3,’nMC’:200,</dt>
-<dd>‘nproc’:8,’detrend’:’no’,’method’:’Kirchner_f2py’}.</dd>
+<dt>wwz_default = {‘tau’:None,</dt>
+<dd>‘freqs’:None,
+‘c’:1/(8*np.pi**2),
+‘Neff’:3,
+‘Neff_coi’:3,
+‘nMC’:200,
+‘nproc’:8,
+‘detrend’:’no’,
+‘params’ : [“default”,4,0,1],
+‘gaussianize’: False,
+‘standardize’:True,
+‘method’:’Kirchner_f2py’,
+‘bc_mode’:’reflect’,
+‘reflect_type’:’odd’,
+‘len_bd’:0}</dd>
 </dl>
 <p>Modify the values for specific keys to change the default behavior.</p>
 </div></blockquote>
@@ -554,22 +644,26 @@ wwz_default: If True, will use the following default parameters:</p>
 ‘nproc’:8,
 ‘nMC’:200,
 ‘detrend’:’no’,
+‘params’ : [“default”,4,0,1],
+‘gaussianize’: False,
+‘standardize’:True,
 ‘Neff’:3,
 ‘anti_alias’:False,
-‘avgs’:2,
-‘method’:’Kirchner_f2py’}</dd>
+‘avgs’:1,
+‘method’:’Kirchner_f2py’,
+}</dd>
 </dl>
 <p>Modify the values for specific keys to change the default behavior.</p>
 </div></blockquote>
 <p>wwaplot_default: If True, will use the following default parameters:</p>
 <blockquote>
 <div><dl class="docutils">
-<dt>wwaplot_default={‘Neff’:3,</dt>
-<dd>‘AR1_q’:AR1_q,
-‘coi’:coi,
+<dt>wwaplot_default={‘AR1_q’:AR1_q,</dt>
+<dd>‘coi’:coi,
 ‘levels’:None,
 ‘tick_range’:None,
 ‘yticks’:None,
+‘yticks_label’: None,
 ‘ylim’:None,
 ‘xticks’:None,
 ‘xlabels’:None,
@@ -579,23 +673,42 @@ wwz_default: If True, will use the following default parameters:</p>
 ‘cone_alpha’:0.5,
 ‘plot_signif’:True,
 ‘signif_style’:’contour’,
-‘plot_cone’:True}</dd>
+‘plot_cone’:True,
+‘title’:None,
+‘ax’:None,
+‘xlabel’: label.upper()[0]+label[1:]+’(‘+s+’)’,
+‘ylabel’: ‘Period (‘+ageunits+’)’,
+‘cbar_orientation’:’vertical’,
+‘cbar_pad’:0.05,
+‘cbar_frac’:0.15,
+‘cbar_labelsize’:None}</dd>
 </dl>
 <p>Modify the values for specific keys to change the default behavior.</p>
 </div></blockquote>
 <p>psdplot_default: If True, will use the following default parameters:</p>
 <blockquote>
 <div><dl class="docutils">
-<dt>psdplot_default={‘lmstyle’:None,</dt>
+<dt>psdplot_default={‘lmstyle’:’-‘,</dt>
 <dd>‘linewidth’:None,
-‘xticks’:None,
-‘xlim’:None,
-‘ylim’:None,
+‘color’: sns.xkcd_rgb[“denim blue”],
+‘ar1_lmstyle’:’-‘,
+‘ar1_linewidth’:1,
+‘period_ticks’:None,
+‘period_tickslabel’:None,
+‘psd_lim’:None,
+‘period_lim’:None,
 ‘figsize’:[20,8],
 ‘label’:’PSD’,
 ‘plot_ar1’:True,
 ‘psd_ar1_q95’:psd_ar1_q95,
-‘psd_ar1_color’:sns.xkcd_rgb[“pale red”]}</dd>
+‘title’: None,
+‘psd_ar1_color’:sns.xkcd_rgb[“pale red”],
+‘ax’:None,
+‘vertical’:False,
+‘plot_gridlines’:True,
+‘period_label’:’Period (‘+ageunits+’)’,
+‘psd_label’:’Spectral Density’,
+‘zorder’ : None}</dd>
 </dl>
 <p>Modify the values for specific keys to change the default behavior.</p>
 </div></blockquote>
@@ -659,6 +772,160 @@ sampled time series. The Astronomical Journal, 112(4), 1709-1729.</dd>
 </dd></dl>
 
 </div>
+<div class="section" id="age-modelling">
+<h3>Age modelling<a class="headerlink" href="#age-modelling" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="pyleoclim.Bchron">
+<code class="descclassname">pyleoclim.</code><code class="descname">Bchron</code><span class="sig-paren">(</span><em>lipd, modelNum=None, objectName=None, rejectAges=None, calCurves=None, reservoirAgeCorr=None, predictPositions='paleo', positionsThickness=None, outlierProbs=None, iterations=1000, burn=2000, thin=8, extractDate=-68, maxExtrap=500, thetaMhSd=0.5, muMhSd=0.1, psiMhSd=0.1, ageScaleVal=1000, positionScaleVal=100, saveLipd=True, plot=True, figsize=[4, 8], flipCoor=False, xlabel=None, ylabel=None, xlim=None, ylim=None, violinColor='#8B008B', medianLineColor='black', medianLineWidth=2.0, CIFillColor='Silver', samplePaths=True, samplePathNumber=10, alpha=0.5, saveFig=False, dir='', format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Bchron" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs Bchron and plot if asked</p>
+<p>Fits a non-parametric chronology model to age/position data according to
+the Compound Poisson-Gamma model defined by Haslett and Parnell (2008). 
+This version used a slightly modified Markov chain Monte-Carlo fitting
+algorithm which aims to converge quicker and requires fewer iterations.
+It also a slightly modified procedure for identifying outliers.</p>
+<p>The Bchronology functions fits a compounf Poisson-Gamma distribution to the
+incrememnts between the dated levels. This involves a stochastic linear
+interpolation step where the age gaps are Gamma distributed, and the position
+gaps are Exponential. Radiocarbon and non-radiocarbon dates (including outliers)
+are updated within the fucntion also by MCMC.</p>
+<p>This function also allows to save the ensemble, distributions, and probability
+tables as well as the parameters with which the model was run into the LiPD file.</p>
+<p>Finally allows to make a plot.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>lipd (dict): A dictionary containing the entry of a LiPD file. Can be</dt>
+<dd>obtained from lipd.readLipd() or pyleoclim.openLipd(). Please note
+that the Bchron function currently only allows for a single LiPD file
+(i.e., not the entire directory).</dd>
+<dt>modelNum (int): The model number in which to place the Bchron output. </dt>
+<dd>If unknown, the function will try to make a guess and/or prompt
+based on the number of already available models.</dd>
+<dt>objectName (str): The name of the chron object in which to store the new</dt>
+<dd>model (e.g. “chron0”)</dd>
+<dt>rejectAges (vector): A vector of 1/0 where 1 include the dates to be rejected. </dt>
+<dd>Default it None.</dd>
+<dt>calCurves (list): (Optional) A vector of values containing either ‘intcal13’,</dt>
+<dd>‘marine13’, ‘shcal13’, or ‘normal’. If none is provided, will
+prompt the user. Should be either of length =1 if using the same
+calibration for each age or the same length as the vector of ages.</dd>
+<dt>reservoirAgeCorr (array): (Optional) A list (matrix) of two floats that correspond to the</dt>
+<dd>DeltaR and DeltaR uncertainty. If already added to the ages and
+ages standard deviation, then enter [0,0] to bypass the prompt.
+Will only be applied if CalCurves is set to ‘marine13’. Otherwise,
+leave to none.</dd>
+<dt>predictPositions (array): (Optional) a vector of positions </dt>
+<dd>(e.g. depths) at which predicted age values are required. 
+Defaults to a sequence of length 100 from the top position to the
+bottom position.</dd>
+<dt>positionsThickness (array): (Optional) Thickness values for each of the positions.</dt>
+<dd>The thickness values should be the full thickness value of the
+slice. By default set to zero.</dd>
+<dt>outlierProbs (array): (Optional) A vector of prior outlier probabilities,</dt>
+<dd>one for each age. Defaults to 0.01</dd>
+<dt>iterations (int): (Optional) The number of iterations to start the procedure. </dt>
+<dd>Default and minimum should be 10000.</dd>
+<dt>burn (int): (Optional) The number of starting iterations to discard.</dt>
+<dd>Default is 200</dd>
+<dt>thin (int): (Optional) The step size for every iteration to keep beyond</dt>
+<dd>the burnin. Default is 8.</dd>
+<dt>extractDate (float): (Optional) The top age of the core. Used for</dt>
+<dd>extrapolation purposes so that no extrapolated ages go beyond the
+top age of the core. Defaults to the current year.</dd>
+<dt>maxExtrap (int): (Optional) The maximum number of extrapolations to</dt>
+<dd>perform before giving up and setting the predicted ages to NA. 
+Useful for when large amounts of extrapolation are required, i.e.
+some of the predictPositions are a long way from the dated
+positions. Defaults to 500.</dd>
+<dt>thetaMhSd (float):  (Optional)  The Metropolis-Hastings standard</dt>
+<dd>deviation for the age parameters. Defaults to 0.5.</dd>
+<dt>muMhSd (float): (Optional)  The Metropolis-Hastings standard deviation</dt>
+<dd>for the compound Poisson-Gamma Scale. Defaults to 0.1</dd>
+<dt>psiMhSd (float): (Optional) The Metropolis-Hastings standard deviation </dt>
+<dd>for the Compound Poisson-Gamma Scale.</dd>
+<dt>ageScaleVal (int): (Optional) A scale value for the ages. </dt>
+<dd>Bchronology works best when the ages are scaled to be 
+approximately between 0 and 100.
+The default value is thus 1000 for ages given in years.</dd>
+<dt>positionScaleVal (int):  (Optional) A scale value for the positions. </dt>
+<dd>Bchronology works best when the positions are scaled to be 
+approximately between 0 and 100. The default value is thus
+100 for positions given in cm.</dd>
+<dt>saveLipd (bool): If True, saves the ensemble, distribution, and probability</dt>
+<dd>tables along with the parameters used to run the model in the LiPD
+file.</dd>
+</dl>
+<p>plot (bool): If True, makes a plot for the chronology
+figsize (list): The figure size. Default is [4,8]
+flipCoor (bool): If True, plots depth on the y-axis.
+xlabel (str): The label for the x-axis
+ylabel (str): The label for the y-axis
+xlim (list): Limits for the x-axis. Default corresponds to the min/max</p>
+<blockquote>
+<div>of the depth vector.</div></blockquote>
+<p>ylim (list): Limits for the y-axis. Default set by matplotlib
+violinColor (str): The color for the violins. Default is purple
+medianLineColor (str): The color for the median line. Default is black.
+medianLineWidth (float): The width for the median line
+CIFillColor (str): Fill color in between the 95% confidence interval.</p>
+<blockquote>
+<div>Default is silver.</div></blockquote>
+<dl class="docutils">
+<dt>samplePaths (bool): If True, draws sample paths from the distribution.</dt>
+<dd>Use the same color as the violins.</dd>
+<dt>samplePathNumber (int): The number of sample paths to draw. Default is 10.</dt>
+<dd>Note: samplePaths need to be set to True.</dd>
+</dl>
+<p>alpha (float): The violins’ transparency. Number between 0 and 1
+saveFig (bool): default is to not save the figure
+dir (str): the full path of the directory in which to save the figure.</p>
+<blockquote>
+<div>If not provided, creates a default folder called ‘figures’ in the
+LiPD working directory (lipd.path).</div></blockquote>
+<dl class="last docutils">
+<dt>format (str): One of the file extensions supported by the active</dt>
+<dd>backend. Default is “eps”. Most backend support png, pdf, ps, eps,
+and svg.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd><p class="first">depth - the predicted positions (either same as the user or the default)</p>
+<dl class="docutils">
+<dt>chron -  a numpy array of possible chronologies in each column.</dt>
+<dd>The number of rows is the same as the length of depth</dd>
+</dl>
+<p class="last">ageDist - the distribution of ages around each dates.
+fig - the figure</p>
+</dd>
+<dt>Warnings:</dt>
+<dd><dl class="first last docutils">
+<dt>This function requires R and the Bchron package and all its</dt>
+<dd>dependencies to be installed on the same machine.</dd>
+</dl>
+</dd>
+<dt>Reference:</dt>
+<dd><ul class="first last simple">
+<li><dl class="first docutils">
+<dt>Haslett, J., and Parnell, A. C. (2008). A simple monotone </dt>
+<dd>process with application to radiocarbon-dated depth 
+chronologies. Journal of the Royal Statistical Society, 
+Series C, 57, 399-418. DOI:10.1111/j.1467-9876.2008.00623.x</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E., </dt>
+<dd>and Huntley, B. (2008). A flexible approach to assessing 
+synchroneity of past events using Bayesian reconstructions
+of sedimentation history. Quaternary Science Reviews, 
+27(19-20), 1872-1885. DOI:10.1016/j.quascirev.2008.07.009</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 </div>
 <div class="section" id="using-pyleoclim-without-a-lipd-file">
 <h2>Using Pyleoclim without a LiPD file<a class="headerlink" href="#using-pyleoclim-without-a-lipd-file" title="Permalink to this headline">¶</a></h2>
@@ -670,6 +937,7 @@ The following modules are available:</p>
 <li>pyleoclim.Stats: statistics (including correlation)</li>
 <li>pyleoclim.Timeseries: binning, interpolating</li>
 <li>pyleoclim.Spectral: analysis in the frequency domain</li>
+<li>pyleoclim.RBchron: Bchron age model analysis</li>
 </ul>
 <p>In addition, the pyleoclim.LipdUtils module allows the basic manipulation of LiPD files and the pyleoclim.SummaryPlots module
 contains some functions to extract information about a timeseries object.</p>
@@ -694,11 +962,11 @@ contains some functions to extract information about a timeseries object.</p>
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+        &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>

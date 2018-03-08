@@ -33,9 +33,13 @@ Mapping
 
 .. autofunction:: pyleoclim.mapLipd
 
+.. autofunction:: pyleoclim.mapNearRecords
+
 Plotting
 ````````
 .. autofunction:: pyleoclim.plotTs
+
+.. autofunction:: pyleoclim.plotEns
 
 .. autofunction:: pyleoclim.histTs
 
@@ -70,6 +74,11 @@ Analysis in the frequency domain
 ````````````````````````````````
 .. autofunction:: pyleoclim.wwzTs
 
+Age modelling
+`````````````
+
+.. autofunction:: pyleoclim.Bchron
+
 Using Pyleoclim without a LiPD file
 """""""""""""""""""""""""""""""""""
 
@@ -81,6 +90,7 @@ The following modules are available:
 * pyleoclim.Stats: statistics (including correlation)
 * pyleoclim.Timeseries: binning, interpolating
 * pyleoclim.Spectral: analysis in the frequency domain
+* pyleoclim.RBchron: Bchron age model analysis
 
 In addition, the pyleoclim.LipdUtils module allows the basic manipulation of LiPD files and the pyleoclim.SummaryPlots module
 contains some functions to extract information about a timeseries object.

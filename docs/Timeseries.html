@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Timeseries Functions &#8212; Pyleoclim 0.3.1 documentation</title>
+    <title>Timeseries Functions &#8212; Pyleoclim 0.4.0 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.1',
+        VERSION:     '0.4.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="Stats.html" title="Statistics Functions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -109,7 +109,7 @@ end (float): When/where to stop binning. Defulat is the maximum</dd>
 y (array): the y-axis
 interp_step (float): the interpolation step. Default is mean resolution.
 start (float): where/when to start the interpolation. Default is min..
-end (float): where/when to stop the interpolation. Defaul is max.</dd>
+end (float): where/when to stop the interpolation. Default is max.</dd>
 <dt>Returns:</dt>
 <dd><p class="first">xi - the interpolated x-axis</p>
 <p class="last">interp_values - the interpolated values</p>
@@ -123,20 +123,16 @@ end (float): where/when to stop the interpolation. Defaul is max.</dd>
 <dd><p>Places two timeseries on a common axis</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd><p class="first">x1 (array): x-axis values of the first timeseries
+<dd>x1 (array): x-axis values of the first timeseries
 y1 (array): y-axis values of the first timeseries
 x2 (array): x-axis values of the second timeseries
 y2 (array): y-axis values of the second timeseries
-interp_step (float): The interpolation step. Default is mean resolution</p>
-<blockquote>
-<div>of lowest resolution series</div></blockquote>
-<dl class="last docutils">
-<dt>start (float): where/when to start. Default is the maximum of the minima of</dt>
-<dd>the two timeseries</dd>
-<dt>end (float): Where/when to end. Default is the minimum of the maxima of</dt>
-<dd>the two timeseries</dd>
-</dl>
-</dd>
+interp_step (float): The interpolation step. Default is mean resolution
+of lowest resolution series
+start (float): where/when to start. Default is the maximum of the minima of
+the two timeseries
+end (float): Where/when to end. Default is the minimum of the maxima of
+the two timeseries</dd>
 <dt>Returns:</dt>
 <dd><p class="first">xi -  the interpolated x-axis</p>
 <p class="last">interp_values1 -  the interpolated y-values for the first timeseries
@@ -170,6 +166,85 @@ sig (real): the standard deviation of the original time series, std[X]</dd>
 <p>&#64;author: fzhu</p>
 </dd></dl>
 
+<dl class="function">
+<dt id="pyleoclim.Timeseries.ts2segments">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">ts2segments</code><span class="sig-paren">(</span><em>ys</em>, <em>ts</em>, <em>factor=10</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.ts2segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Chop a time series into several segments based on gap detection.</p>
+<dl class="docutils">
+<dt>The rule of gap detection is very simple:</dt>
+<dd>we define the intervals between time points as dts, then if dts[i] is larger than factor * dts[i-1],
+we think that the change of dts (or the gradient) is too large, and we regard it as a breaking point
+and chop the time series into two segments here</dd>
+<dt>Args:</dt>
+<dd>ys (array): a time series, NaNs allowed
+ts (array): the time points
+factor (float): the factor that adjusts the threshold for gap detection</dd>
+<dt>Returns:</dt>
+<dd>seg_ys (list): a list of several segments with potentially different lengths
+seg_ts (list): a list of the time axis of the several segments
+n_segs (int): the number of segments</dd>
+</dl>
+<p>&#64;author: fzhu</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Timeseries.clean_ts">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">clean_ts</code><span class="sig-paren">(</span><em>ys</em>, <em>ts</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.clean_ts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the NaNs in the time series and sort it with time axis ascending</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>ys (array): a time series, NaNs allowed
+ts (array): the time axis of the time series, NaNs allowed</dd>
+<dt>Returns:</dt>
+<dd>ys (array): the time series without nans
+ts (array): the time axis of the time series without nans</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Timeseries.gaussianize">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">gaussianize</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.gaussianize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms a (proxy) timeseries to Gaussian distribution.</p>
+<p>Originator: Michael Erb, Univ. of Southern California - April 2017</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Timeseries.gaussianize_single">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">gaussianize_single</code><span class="sig-paren">(</span><em>X_single</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.gaussianize_single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transforms a single (proxy) timeseries to Gaussian distribution.</p>
+<p>Originator: Michael Erb, Univ. of Southern California - April 2017</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Timeseries.detrend">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">detrend</code><span class="sig-paren">(</span><em>y, x=None, method='linear', params=['default', 4, 0, 1]</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.detrend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detrend a timeseries according to three methods</p>
+<dl class="docutils">
+<dt>Detrending methods include, “linear” (default), “constant”, and using a low-pass</dt>
+<dd>Savitzky-Golay filters.</dd>
+<dt>Args:</dt>
+<dd><p class="first">y (array): The series to be detrended. 
+x (array): The time axis for the timeseries. Necessary for use with</p>
+<blockquote>
+<div>the Savitzky-Golay filters method since the series should be evenly spaced.</div></blockquote>
+<dl class="last docutils">
+<dt>method (str): The type of detrending. If linear (default), the result of</dt>
+<dd>a linear least-squares fit to y is subtracted from y. If constant, 
+only the mean of data is subtrated. If “savitzy-golay”, y is filtered
+using the Savitzky-Golay filters and the resulting filtered series
+is subtracted from y.</dd>
+<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt>
+<dd>corresponds to the window size (default it set to half of the data) 
+while the second parameter correspond to the order of the filter 
+(default is 4). The third parameter is the order of the derivative
+(the default is zero, which means only smoothing.)</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>ys (array) - the detrended timeseries.</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
@@ -190,11 +265,11 @@ sig (real): the standard deviation of the original time series, std[X]</dd>
         <li class="right" >
           <a href="Stats.html" title="Statistics Functions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+        &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
