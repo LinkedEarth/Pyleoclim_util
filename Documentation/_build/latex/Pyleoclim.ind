@@ -1,0 +1,123 @@
+\begin{sphinxtheindex}
+\def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
+
+  \bigletter A
+  \item agemodelData() (in module pyleoclim.SummaryPlots), \hyperpage{32}
+  \item ar1\_fit() (in module pyleoclim.Spectral), \hyperpage{33}
+  \item ar1\_sim() (in module pyleoclim.Spectral), \hyperpage{33}
+
+  \indexspace
+  \bigletter B
+  \item Bchron() (in module pyleoclim), \hyperpage{15}
+  \item bin() (in module pyleoclim.Timeseries), \hyperpage{25}
+  \item binTs() (in module pyleoclim), \hyperpage{12}
+
+  \indexspace
+  \bigletter C
+  \item checkXaxis() (in module pyleoclim.LipdUtils), \hyperpage{28}
+  \item chooseCalCurves() (in module pyleoclim.RBchron), \hyperpage{39}
+  \item clean\_ts() (in module pyleoclim.Timeseries), \hyperpage{26}
+  \item corrsig() (in module pyleoclim.Stats), \hyperpage{23}
+  \item corrSigTs() (in module pyleoclim), \hyperpage{11}
+  \item createDir() (in module pyleoclim.LipdUtils), \hyperpage{27}
+
+  \indexspace
+  \bigletter D
+  \item detrend() (in module pyleoclim.Timeseries), \hyperpage{26}
+
+  \indexspace
+  \bigletter E
+  \item enumerateLipds() (in module pyleoclim.LipdUtils), \hyperpage{27}
+  \item enumerateTs() (in module pyleoclim.LipdUtils), \hyperpage{28}
+
+  \indexspace
+  \bigletter F
+  \item fetchTs() (in module pyleoclim), \hyperpage{7}
+
+  \indexspace
+  \bigletter G
+  \item gaussianize() (in module pyleoclim.Timeseries), \hyperpage{26}
+  \item gaussianize\_single() (in module pyleoclim.Timeseries), \hyperpage{26}
+  \item getLipd() (in module pyleoclim.LipdUtils), \hyperpage{27}
+  \item getMeasurement() (in module pyleoclim.LipdUtils), \hyperpage{29}
+  \item getMetadata() (in module pyleoclim.SummaryPlots), \hyperpage{31}
+  \item getTs() (in module pyleoclim.LipdUtils), \hyperpage{28}
+
+  \indexspace
+  \bigletter H
+  \item histTs() (in module pyleoclim), \hyperpage{10}
+
+  \indexspace
+  \bigletter I
+  \item interp() (in module pyleoclim.Timeseries), \hyperpage{25}
+  \item interpTs() (in module pyleoclim), \hyperpage{12}
+  \item isEnsemble() (in module pyleoclim.LipdUtils), \hyperpage{30}
+  \item isMeasurement() (in module pyleoclim.LipdUtils), \hyperpage{29}
+  \item isModel() (in module pyleoclim.LipdUtils), \hyperpage{29}
+
+  \indexspace
+  \bigletter L
+  \item LipdToOntology() (in module pyleoclim.LipdUtils), \hyperpage{29}
+
+  \indexspace
+  \bigletter M
+  \item mapAgeEnsembleToPaleoData() (in module pyleoclim.LipdUtils), \hyperpage{30}
+  \item mapAll() (in module pyleoclim.Map), \hyperpage{19}
+  \item mapAllArchive() (in module pyleoclim), \hyperpage{7}
+  \item mapLipd() (in module pyleoclim), \hyperpage{8}
+  \item mapNearRecords() (in module pyleoclim), \hyperpage{8}
+  \item mapOne() (in module pyleoclim.Map), \hyperpage{19}
+  \item modelNumber() (in module pyleoclim.LipdUtils), \hyperpage{29}
+
+  \indexspace
+  \bigletter O
+  \item onCommonAxis() (in module pyleoclim.Timeseries), \hyperpage{25}
+  \item openLipd() (in module pyleoclim), \hyperpage{7}
+
+  \indexspace
+  \bigletter P
+  \item plot() (in module pyleoclim.Plot), \hyperpage{21}
+  \item plot\_coherence() (in module pyleoclim.Spectral), \hyperpage{35}
+  \item plot\_hist() (in module pyleoclim.Plot), \hyperpage{21}
+  \item plot\_psd() (in module pyleoclim.Spectral), \hyperpage{36}
+  \item plot\_summary() (in module pyleoclim.Spectral), \hyperpage{36}
+  \item plot\_wwa() (in module pyleoclim.Spectral), \hyperpage{35}
+  \item plot\_wwadist() (in module pyleoclim.Spectral), \hyperpage{36}
+  \item plotBchron() (in module pyleoclim.RBchron), \hyperpage{41}
+  \item plotTs() (in module pyleoclim), \hyperpage{9}
+  \item promptForVariable() (in module pyleoclim.LipdUtils), \hyperpage{28}
+
+  \indexspace
+  \bigletter R
+  \item reservoirAgeCorrection() (in module pyleoclim.RBchron), \hyperpage{39}
+  \item runBchron() (in module pyleoclim.RBchron), \hyperpage{39}
+
+  \indexspace
+  \bigletter S
+  \item saveFigure() (in module pyleoclim.LipdUtils), \hyperpage{27}
+  \item searchVar() (in module pyleoclim.LipdUtils), \hyperpage{28}
+  \item segmentTs() (in module pyleoclim), \hyperpage{13}
+  \item simpleStats() (in module pyleoclim.Stats), \hyperpage{23}
+  \item standardize() (in module pyleoclim.Timeseries), \hyperpage{25}
+  \item standardizeTs() (in module pyleoclim), \hyperpage{13}
+  \item statsTs() (in module pyleoclim), \hyperpage{11}
+  \item summaryTs() (in module pyleoclim), \hyperpage{11}
+
+  \indexspace
+  \bigletter T
+  \item ts2segments() (in module pyleoclim.Timeseries), \hyperpage{26}
+  \item TsData() (in module pyleoclim.SummaryPlots), \hyperpage{31}
+
+  \indexspace
+  \bigletter W
+  \item whichMeasurement() (in module pyleoclim.LipdUtils), \hyperpage{29}
+  \item wwz() (in module pyleoclim.Spectral), \hyperpage{33}
+  \item wwz\_psd() (in module pyleoclim.Spectral), \hyperpage{34}
+  \item wwzTs() (in module pyleoclim), \hyperpage{13}
+
+  \indexspace
+  \bigletter X
+  \item xAxisTs() (in module pyleoclim.LipdUtils), \hyperpage{28}
+  \item xwc() (in module pyleoclim.Spectral), \hyperpage{34}
+
+\end{sphinxtheindex}

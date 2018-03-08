@@ -5,13 +5,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>LiPD Utilities &#8212; Pyleoclim 0.3.1 documentation</title>
+    <title>LiPD Utilities &#8212; Pyleoclim 0.4.0 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.1',
+        VERSION:     '0.4.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -40,7 +40,7 @@
         <li class="right" >
           <a href="Timeseries.html" title="Timeseries Functions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -53,6 +53,9 @@
 <li><a class="reference internal" href="#handling-variables">Handling Variables</a></li>
 <li><a class="reference internal" href="#handling-timeseries-objects">Handling timeseries objects</a></li>
 <li><a class="reference internal" href="#linking-lipds-to-the-linkedearth-ontology">Linking LiPDs to the LinkedEarth Ontology</a></li>
+<li><a class="reference internal" href="#dealing-with-models">Dealing with models</a></li>
+<li><a class="reference internal" href="#extracting-tables">Extracting tables</a></li>
+<li><a class="reference internal" href="#dealing-with-ensembles">Dealing with ensembles</a></li>
 </ul>
 </li>
 </ul>
@@ -146,8 +149,8 @@ and svg.</div></blockquote>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyleoclim.LipdUtils.promptForLipd">
-<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">promptForLipd</code><span class="sig-paren">(</span><em>lipds</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.promptForLipd" title="Permalink to this definition">¶</a></dt>
+<dt id="pyleoclim.LipdUtils.getLipd">
+<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">getLipd</code><span class="sig-paren">(</span><em>lipds</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.getLipd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prompt for a LiPD file</p>
 <p>Ask the user to select a LiPD file from a list
 Use this function in conjunction with enumerateLipds()</p>
@@ -207,6 +210,25 @@ x_axis (str) : the x-axis representation, either depth, age or year</dd>
 </dl>
 </dd></dl>
 
+<dl class="function">
+<dt id="pyleoclim.LipdUtils.searchVar">
+<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">searchVar</code><span class="sig-paren">(</span><em>timeseries_list</em>, <em>key</em>, <em>exact=True</em>, <em>override=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.searchVar" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function search for key words (exact match) for a variable</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>timeseries_list (list): A list of available series
+key (list): A list of keys to search
+exact (bool): if True, looks for an exact match.
+override (bool): if True, override the exact match if no match is found</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>match (list)- A list of keys for the timeseries that match the selection</dt>
+<dd>criteria.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="handling-timeseries-objects">
 <h2>Handling timeseries objects<a class="headerlink" href="#handling-timeseries-objects" title="Permalink to this headline">¶</a></h2>
@@ -227,18 +249,20 @@ pyleoclim package, use pyleo.time_series.</dd>
 
 <dl class="function">
 <dt id="pyleoclim.LipdUtils.getTs">
-<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">getTs</code><span class="sig-paren">(</span><em>timeseries_list</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.getTs" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">getTs</code><span class="sig-paren">(</span><em>timeseries_list</em>, <em>option=''</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.getTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a specific timeseries object from a dictionary of timeseries</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd><dl class="first last docutils">
+<dd><dl class="first docutils">
 <dt>timeseries_list: a  list of available timeseries objects. </dt>
 <dd>To use the timeseries loaded upon initiation of the 
 pyleoclim package, use pyleo.time_series.</dd>
 </dl>
+<p class="last">option: An expression to filter the datasets. Uses lipd.filterTs()</p>
 </dd>
 <dt>Returns:</dt>
-<dd>A single timeseries object</dd>
+<dd>A single timeseries object if not optional filter selected or a filtered
+list if optional arguments given</dd>
 </dl>
 </dd></dl>
 
@@ -255,6 +279,127 @@ pyleoclim package, use pyleo.time_series.</dd>
 <dd>archiveType (STR): name of the archiveType from the LiPD file</dd>
 <dt>Returns:</dt>
 <dd>archiveType according to the ontology</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="dealing-with-models">
+<h2>Dealing with models<a class="headerlink" href="#dealing-with-models" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyleoclim.LipdUtils.isModel">
+<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">isModel</code><span class="sig-paren">(</span><em>csvName</em>, <em>lipd</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.isModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for the presence of a model in the same object than the measurement table</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>csvName (str): The name of the csv file corresponding to the measurement table
+lipd (dict): A LiPD object</dd>
+<dt>Returns:</dt>
+<dd><p class="first">model (list): List of models already available</p>
+<dl class="last docutils">
+<dt>dataObject (str): The name of the paleoData or ChronData</dt>
+<dd>object in which the model(s) are stored</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.LipdUtils.modelNumber">
+<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">modelNumber</code><span class="sig-paren">(</span><em>model</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.modelNumber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign a new or existing model number</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>model (list): List of possible model number. Obtained from isModel</dd>
+<dt>Returns:</dt>
+<dd>modelNum (int): The number of the model</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="extracting-tables">
+<h2>Extracting tables<a class="headerlink" href="#extracting-tables" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyleoclim.LipdUtils.isMeasurement">
+<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">isMeasurement</code><span class="sig-paren">(</span><em>csv_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.isMeasurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether measurement tables are available</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>csv_dict (dict): Dictionary of available csv</dd>
+<dt>Returns:</dt>
+<dd>paleoMeasurementTables - List of available paleoMeasurementTables
+chronMeasurementTables - List of available chronMeasurementTables</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.LipdUtils.whichMeasurement">
+<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">whichMeasurement</code><span class="sig-paren">(</span><em>measurementTableList</em>, <em>csv_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.whichMeasurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a measurement table from a list</p>
+<p>Use in conjunction with the function isMeasurement</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first docutils">
+<dt>measurementTableList (list): List of measurement tables contained in the</dt>
+<dd>LiPD file. Output from the isMeasurement function</dd>
+</dl>
+<p class="last">csv_list (list): Dictionary of available csv</p>
+</dd>
+<dt>Returns:</dt>
+<dd>csvName (str) - the name of the csv file</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.LipdUtils.getMeasurement">
+<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">getMeasurement</code><span class="sig-paren">(</span><em>csvName</em>, <em>lipd</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.getMeasurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the dictionary corresponding to the measurement table</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>csvName (str): The name of the csv file
+lipd (dict): The LiPD object from which to extract the data</dd>
+<dt>Returns:</dt>
+<dd><dl class="first last docutils">
+<dt>ts_list - A dictionary containing data and metadata for each column in the</dt>
+<dd>csv file.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="dealing-with-ensembles">
+<h2>Dealing with ensembles<a class="headerlink" href="#dealing-with-ensembles" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyleoclim.LipdUtils.isEnsemble">
+<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">isEnsemble</code><span class="sig-paren">(</span><em>csv_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.isEnsemble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether ensembles are available</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>csv_dict (dict): Dictionary of available csv</dd>
+<dt>Returns:</dt>
+<dd><p class="first">paleoEnsembleTables - List of available paleoEnsembleTables</p>
+<p class="last">chronEnsembleTables - List of availale chronEnsemble Tables</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.LipdUtils.mapAgeEnsembleToPaleoData">
+<code class="descclassname">pyleoclim.LipdUtils.</code><code class="descname">mapAgeEnsembleToPaleoData</code><span class="sig-paren">(</span><em>ensembleValues</em>, <em>depthEnsemble</em>, <em>depthPaleo</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.mapAgeEnsembleToPaleoData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map the depth for the ensemble age values to the paleo depth</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>ensembleValues (array): A matrix of possible age models. Realizations</dt>
+<dd>should be stored in columns</dd>
+<dt>depthEnsemble (array): A vector of depth. The vector should have the same</dt>
+<dd>length as the number of rows in the ensembleValues</dd>
+<dt>depthPaleo (array): A vector corresponding to the depth at which there</dt>
+<dd>are paleodata information</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>ensembleValuesToPaleo - A matrix of age ensemble on the PaleoData scale</dd>
 </dl>
 </dd></dl>
 
@@ -279,11 +424,11 @@ pyleoclim package, use pyleo.time_series.</dd>
         <li class="right" >
           <a href="Timeseries.html" title="Timeseries Functions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.3.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+        &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>

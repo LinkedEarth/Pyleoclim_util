@@ -20,6 +20,7 @@ is aware of age ensembles stored via LiPD and uses them for time-uncertain analy
 * plotting maps, timeseries, and basic age model information
 * paleo-aware correlation analysis (isopersistent, isospectral, and classical t-test)
 * weighted wavelet Z transform (WWZ)
+* age modeling through Bchron
 
 **Future capabilities:**
 
@@ -33,6 +34,8 @@ is aware of age ensembles stored via LiPD and uses them for time-uncertain analy
 
 Version Information
 ```````````````````
+| 0.4.0: New functionalities: map nearest records by archive type, plot ensemble time series, age modelling through Bchron.
+| 0.3.1: New functionalities: segment a timeseries using a gap detection criteria, update to summary plot to perform spectral analysis
 | 0.3.0: Compatibility with LiPD 1.3 and Spectral module added
 | 0.2.5: Fix error on loading (Looking for Spectral Module)
 | 0.2.4: Fix load error from init
@@ -51,6 +54,9 @@ Version Information
 Installation
 ````````````
 Python v3.4+ is required. Tested with Python v3.5
+
+Will not run on a Windows system.
+
 Pyleoclim is published through Pypi and easily installed via pip::
 
   pip install pyleoclim
@@ -71,9 +77,9 @@ Quickstart guide
 Requirements
 ````````````
 
-* LiPD v0.2.2+
-* pandas v0.19+
-* numpy v1.12+
+* LiPD v0.2.5+
+* pandas v0.22+
+* numpy v1.14+
 * matplotlib v2.0+
 * Basemap v1.0.7+
 * scipy v0.19.0+
@@ -82,6 +88,8 @@ Requirements
 * scikit-learn v0.17.1+
 * tqdm v4.14.0+
 * pathos v0.2.0+
+* tqdm 4.14+
+* rpy2 2.8.4+
 
 The installer will automatically check for the needed updates.
 

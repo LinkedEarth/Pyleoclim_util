@@ -15,7 +15,7 @@ LiPD files
 
 .. autofunction:: pyleoclim.LipdUtils.enumerateLipds
 
-.. autofunction:: pyleoclim.LipdUtils.promptForLipd
+.. autofunction:: pyleoclim.LipdUtils.getLipd
 
 Handling Variables
 ``````````````````
@@ -25,6 +25,8 @@ Handling Variables
 .. autofunction:: pyleoclim.LipdUtils.xAxisTs
 
 .. autofunction:: pyleoclim.LipdUtils.checkXaxis
+
+.. autofunction:: pyleoclim.LipdUtils.searchVar
 
 Handling timeseries objects
 ```````````````````````````
@@ -37,3 +39,28 @@ Linking LiPDs to the LinkedEarth Ontology
 `````````````````````````````````````````
 
 .. autofunction:: pyleoclim.LipdUtils.LipdToOntology
+
+Dealing with models
+```````````````````
+
+.. autofunction:: pyleoclim.LipdUtils.isModel
+
+.. autofunction:: pyleoclim.LipdUtils.modelNumber
+
+Extracting tables
+`````````````````
+
+.. autofunction:: pyleoclim.LipdUtils.isMeasurement
+
+.. autofunction:: pyleoclim.LipdUtils.whichMeasurement
+
+.. autofunction:: pyleoclim.LipdUtils.getMeasurement
+
+Dealing with ensembles
+``````````````````````
+
+.. autofunction:: pyleoclim.LipdUtils.isEnsemble
+
+.. autofunction:: pyleocli.LipdUtils.getEnsembleValues
+
+.. autofunction:: pyleoclim.LipdUtils.mapAgeEnsembleToPaleoData

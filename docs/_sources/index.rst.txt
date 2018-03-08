@@ -20,6 +20,7 @@ Contents:
    LipdUtils
    SummaryPlots
    Spectral
+   RBchron
 
 
 Indices and tables

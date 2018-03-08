@@ -21,11 +21,11 @@ The LiPD utilities function lipd.extractTs() returns a list of dictionaries for
 the selected LiPD files, which need to be passed to Pyleoclim along with the path
 to the directory containing the LiPD files.
 
-This is done through the functions pyleoclim.readLiPD() and pyleoclim.extracTs(),
+This is done through the functions pyleoclim.openLiPD() and pyleoclim.fetchTs(),
  which are lightweight versions of their counterparts in the LiPD utilities:
 
-.. autofunction:: pyleoclim.readLipd
-.. autofunction:: pyleoclim.extractTs
+.. autofunction:: pyleoclim.openLipd
+.. autofunction:: pyleoclim.fetchTs
 
 Mapping
 ```````
@@ -33,9 +33,13 @@ Mapping
 
 .. autofunction:: pyleoclim.mapLipd
 
+.. autofunction:: pyleoclim.mapNearRecords
+
 Plotting
 ````````
 .. autofunction:: pyleoclim.plotTs
+
+.. autofunction:: pyleoclim.plotEns
 
 .. autofunction:: pyleoclim.histTs
 
@@ -64,9 +68,16 @@ Basic manipulations of the timeseries objects.
 
 .. autofunction:: pyleoclim.standardizeTs
 
+.. autofunction:: pyleoclim.segmentTs
+
 Analysis in the frequency domain
 ````````````````````````````````
 .. autofunction:: pyleoclim.wwzTs
+
+Age modelling
+`````````````
+
+.. autofunction:: pyleoclim.Bchron
 
 Using Pyleoclim without a LiPD file
 """""""""""""""""""""""""""""""""""
@@ -79,6 +90,7 @@ The following modules are available:
 * pyleoclim.Stats: statistics (including correlation)
 * pyleoclim.Timeseries: binning, interpolating
 * pyleoclim.Spectral: analysis in the frequency domain
+* pyleoclim.RBchron: Bchron age model analysis
 
 In addition, the pyleoclim.LipdUtils module allows the basic manipulation of LiPD files and the pyleoclim.SummaryPlots module
 contains some functions to extract information about a timeseries object.
