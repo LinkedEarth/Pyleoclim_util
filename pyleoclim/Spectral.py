@@ -1585,8 +1585,10 @@ class WaveletAnalysis(object):
         S1 = Smoothing(power1/scales, snorm, dj)
         S2 = Smoothing(power2/scales, snorm, dj)
         xw_coherence = np.abs(S12)**2 / (S1*S2)
+        wcs = S12 / (np.sqrt(S1)*np.sqrt(S2))
+        xw_phase = np.angle(wcs)
 
-        return xw_coherence
+        return xw_coherence, xw_phase
 
     def reconstruct_ts(self, coeff, freqs, tau, t, len_bd=0):
         ''' Reconstruct the normalized time series from the wavelet coefficients.
@@ -2218,11 +2220,11 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
                    nproc=nproc, detrend=detrend, params=params,
                    gaussianize=gaussianize, standardize=standardize, method=method)
 
-    wt_coeff1 = res_wwz1.coeff[1] + res_wwz1.coeff[2]*1j
-    wt_coeff2 = res_wwz2.coeff[1] + res_wwz2.coeff[2]*1j
+    wt_coeff1 = res_wwz1.coeff[1] - res_wwz1.coeff[2]*1j
+    wt_coeff2 = res_wwz2.coeff[1] - res_wwz2.coeff[2]*1j
 
-    xw_coherence = wa.wavelet_coherence(wt_coeff1, wt_coeff2, freqs, tau, smooth_factor=smooth_factor)
-    _, xw_amplitude, xw_phase = wa.cross_wt(wt_coeff1, wt_coeff2)
+    xw_coherence, xw_phase = wa.wavelet_coherence(wt_coeff1, wt_coeff2, freqs, tau, smooth_factor=smooth_factor)
+    xwt, xw_amplitude, _ = wa.cross_wt(wt_coeff1, wt_coeff2)
 
     # Monte-Carlo simulations of AR1 process
     nt = np.size(tau)
@@ -2243,9 +2245,9 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
                                                      detrend=detrend, params=params,
                                                      gaussianize=gaussianize, standardize=standardize)
 
-            wt_coeffr1 = res_wwz_r1.coeff[1] + res_wwz_r2.coeff[2]*1j
-            wt_coeffr2 = res_wwz_r1.coeff[1] + res_wwz_r2.coeff[2]*1j
-            coherence_red[i, :, :] = wa.wavelet_coherence(wt_coeffr1, wt_coeffr2, freqs, tau, smooth_factor=smooth_factor)
+            wt_coeffr1 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
+            wt_coeffr2 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
+            coherence_red[i, :, :], phase_red = wa.wavelet_coherence(wt_coeffr1, wt_coeffr2, freqs, tau, smooth_factor=smooth_factor)
 
         for j in range(nt):
             for k in range(nf):
@@ -2255,8 +2257,8 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         AR1_q = None
 
     coi = wa.make_coi(tau, Neff=Neff)
-    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'freqs', 'tau', 'AR1_q', 'coi'])
-    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase,
+    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xwt', 'freqs', 'tau', 'AR1_q', 'coi'])
+    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase, xwt=xwt,
                   freqs=freqs, tau=tau, AR1_q=AR1_q, coi=coi)
 
     return res
@@ -2478,7 +2480,7 @@ def plot_coherence(res_xwc, pt=0.5,
     phase[xw_coherence < pt] = np.nan
 
     X, Y = np.meshgrid(tau, 1/freqs)
-    U, V = np.cos(phase).T, -np.sin(phase).T
+    U, V = np.cos(phase).T, np.sin(phase).T
 
     ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
               U[::skip_y, ::skip_x], V[::skip_y, ::skip_x],
