@@ -2,6 +2,7 @@
 [![PyPI](https://img.shields.io/pypi/v/pyleoclim.svg)]()
 [![PyPI](https://img.shields.io/badge/python-3.5-yellow.svg)]()
 [![license](https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg)]()
+[![DOI](https://zenodo.org/badge/59611213.svg)](https://zenodo.org/badge/latestdoi/59611213)
 
 # Pyleoclim
 
