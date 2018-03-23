@@ -20,7 +20,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.4.0
+Current Version: 0.4.1
 
 ### <a name = "what">What is it?</a>
 
@@ -47,7 +47,8 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
 
  If you have specific requests, please contact linkedearth@gmail.com
 
-### <a name = "version">Version Information</a>
+### <a name = "version">Version Information</a>  
+0.4.1: Fix issues with tarball  
 0.4.0: New functionalities: map nearest records by archive type, plot ensemble time series, age modelling through Bchron  
 0.3.1: New functionalities: segment a timeseries using a gap detection criteria, update to summary plot to perform spectral analysis  
 0.3.0: Compatibility with LiPD 1.3 and Spectral module added  
