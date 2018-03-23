@@ -3,7 +3,7 @@ import os
 import sys
 import io
 
-version = '0.4.2'
+version = '0.4.3'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
@@ -13,26 +13,13 @@ readme_file = io.open('README.txt', encoding='utf-8')
 
 # Choose the right shared library to copy
 if sys.version_info.minor == 4:
-    if sys.platform.startswith('darwin'):
-        f2py_wwz_filename = 'f2py_wwz.so'
-    else:
-        f2py_wwz_filename = ''
+    f2py_wwz_filename = 'f2py_wwz.so'
 
 elif sys.version_info.minor == 5:
-    if sys.platform.startswith('darwin'):
-        f2py_wwz_filename = 'f2py_wwz.cpython-35m-darwin.so'
-    elif sys.platform.startswith('linux'):
-        f2py_wwz_filename = ''
-    else:
-        f2py_wwz_filename = ''
+    f2py_wwz_filename = 'f2py_wwz.cpython-35m-darwin.so'
 
 elif sys.version_info.minor == 6:
-    if sys.platform.startswith('darwin'):
-        f2py_wwz_filename = 'f2py_wwz.cpython-36m-darwin.so'
-    elif sys.platform.startswith('linux'):
-        f2py_wwz_filename = ''
-    else:
-        f2py_wwz_filename = ''
+    f2py_wwz_filename = 'f2py_wwz.cpython-36m-darwin.so'
 
 else:
     sys.exit('Your python version is not supported!')
@@ -72,7 +59,7 @@ setup(
     author='Deborah Khider',
     author_email='dkhider@gmail.com',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
-    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.4.2',
+    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.4.3',
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
     install_requires=[

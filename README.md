@@ -20,7 +20,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.4.2
+Current Version: 0.4.3
 
 ### <a name = "what">What is it?</a>
 
@@ -48,6 +48,7 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>  
+0.4.3: New fix for .so issue    
 0.4.2: Fix issue concerning download of .so files  
 0.4.1: Fix issues with tarball  
 0.4.0: New functionalities: map nearest records by archive type, plot ensemble time series, age modelling through Bchron  
