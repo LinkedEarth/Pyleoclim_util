@@ -4,3 +4,4 @@ setup.py
 Pyleoclim/__init__.py
 Pyleoclim/__main__.py
 Pyleoclim/start.py
+include pyleoclim/*.so
