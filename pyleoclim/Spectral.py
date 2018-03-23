@@ -2267,7 +2267,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
 def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
              yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
              cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
-             plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical',
+             plot_cone=False, ax=None, xlabel='Year (AD)', ylabel='Period (years)', cbar_orientation='vertical',
              cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
     """ Plot the wavelet amplitude
 
@@ -2631,7 +2631,9 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
                  gaussianize=False, standardize=True, levels=None, method='Kirchner_f2py',
                  anti_alias=False, period_ticks=None, ts_color=None,
                  title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
-                 psd_lmstyle='-', psd_lim=None, period_I=[1/8, 1/2], period_D=[1/200, 1/20]):
+                 psd_lmstyle='-', psd_lim=None,
+                 period_S_str='beta_I', period_S=[1/8, 1/2],
+                 period_L_str='beta_D', period_L=[1/200, 1/20]):
     """ Plot the time series with the wavelet analysis and psd
 
     Args:
@@ -2652,7 +2654,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
         wwa_ylabel (str): label for y-axis in the wwa plot
         psd_lmstyle (str): the line style in the psd plot
         psd_lim (list): the limits for psd
-        period_I, period_D (list): the ranges for beta estimation
+        period_S, period_L (list): the ranges for beta estimation
 
     Returns:
         fig (figure): the summary plot
@@ -2723,10 +2725,10 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
              period_lim=[np.min(period_ticks), np.max(res_wwz.coi)], psd_lim=psd_lim,
              lmstyle=psd_lmstyle, ax=ax3, period_label='', label='Estimated spectrum', vertical=True)
 
-    res_beta1 = beta_estimation(res_psd.psd, res_psd.freqs, period_I[0], period_I[1])
-    res_beta2 = beta_estimation(res_psd.psd, res_psd.freqs, period_D[0], period_D[1])
+    res_beta1 = beta_estimation(res_psd.psd, res_psd.freqs, period_S[0], period_S[1])
+    res_beta2 = beta_estimation(res_psd.psd, res_psd.freqs, period_L[0], period_L[1])
     ax3.plot(res_beta1.Y_reg, 1/res_beta1.f_binned, color='k',
-             label=r'$\beta_I$ = {:.2f}'.format(res_beta1.beta) + ', ' + r'$\beta_D$ = {:.2f}'.format(res_beta2.beta))
+             label=r'$\{}$ = {:.2f}'.format(period_S_str, res_beta1.beta) + ', ' + r'$\{}$ = {:.2f}'.format(period_L_str, res_beta2.beta))
     ax3.plot(res_beta2.Y_reg, 1/res_beta2.f_binned, color='k')
     plt.tick_params(axis='y', which='both', labelleft='off')
     plt.legend(fontsize=15, bbox_to_anchor=(0, 1.2), loc='upper left', ncol=1)
