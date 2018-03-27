@@ -2,6 +2,7 @@
 [![PyPI](https://img.shields.io/pypi/v/pyleoclim.svg)]()
 [![PyPI](https://img.shields.io/badge/python-3.5-yellow.svg)]()
 [![license](https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg)]()
+[![DOI](https://zenodo.org/badge/59611213.svg)](https://zenodo.org/badge/latestdoi/59611213)
 
 # Pyleoclim
 
@@ -19,7 +20,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.4.0
+Current Version: 0.4.6
 
 ### <a name = "what">What is it?</a>
 
@@ -46,7 +47,13 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
 
  If you have specific requests, please contact linkedearth@gmail.com
 
-### <a name = "version">Version Information</a>
+### <a name = "version">Version Information</a>  
+0.4.6: Fix an issue when copying the .so files  
+0.4.5: Update to setup.py to include proper .so file according to version  
+0.4.4: New fix for .so issue  
+0.4.3: New fix for .so issue    
+0.4.2: Fix issue concerning download of .so files  
+0.4.1: Fix issues with tarball  
 0.4.0: New functionalities: map nearest records by archive type, plot ensemble time series, age modelling through Bchron  
 0.3.1: New functionalities: segment a timeseries using a gap detection criteria, update to summary plot to perform spectral analysis  
 0.3.0: Compatibility with LiPD 1.3 and Spectral module added  
