@@ -48,6 +48,7 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>  
+0.4.5: Update to setup.py to include proper .so file according to version  
 0.4.4: New fix for .so issue  
 0.4.3: New fix for .so issue    
 0.4.2: Fix issue concerning download of .so files  

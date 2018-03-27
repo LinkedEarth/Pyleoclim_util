@@ -10,7 +10,7 @@ if os.path.exists('MANIFEST'):
 
 from setuptools import setup, find_packages    
 
-version = '0.4.4'
+version = '0.4.5'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
@@ -57,7 +57,6 @@ setup(
     name='pyleoclim',
     packages=find_packages(),
     package_dir={'pyleoclim': './pyleoclim'},
-    include_package_data=True,
     package_data={'pyleoclim': [f2py_wwz_filename]},
     zip_safe=False,
     version=version,
@@ -67,7 +66,7 @@ setup(
     author='Deborah Khider',
     author_email='dkhider@gmail.com',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
-    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.4.4',
+    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.4.5',
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
     install_requires=[
