@@ -3,39 +3,17 @@ import os
 import sys
 import io
 
+<<<<<<< HEAD
 version = '0.4.0'
+=======
+version = '0.5.0'
+>>>>>>> dev-fzhu
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
     os.system('pandoc README.md -f markdown -t rst -s -o README.txt')
 
 readme_file = io.open('README.txt', encoding='utf-8')
-
-# Choose the right shared library to copy
-if sys.version_info.minor == 4:
-    if sys.platform.startswith('darwin'):
-        f2py_wwz_filename = 'f2py_wwz.so'
-    else:
-        f2py_wwz_filename = ''
-
-elif sys.version_info.minor == 5:
-    if sys.platform.startswith('darwin'):
-        f2py_wwz_filename = 'f2py_wwz.cpython-35m-darwin.so'
-    elif sys.platform.startswith('linux'):
-        f2py_wwz_filename = ''
-    else:
-        f2py_wwz_filename = ''
-
-elif sys.version_info.minor == 6:
-    if sys.platform.startswith('darwin'):
-        f2py_wwz_filename = 'f2py_wwz.cpython-36m-darwin.so'
-    elif sys.platform.startswith('linux'):
-        f2py_wwz_filename = ''
-    else:
-        f2py_wwz_filename = ''
-
-else:
-    sys.exit('Your python version is not supported!')
 
 # Fallback long_description in case errors with readme file.
 long_description = "Welcome to Pyleoclim. Please reference the README file in the package for information"
@@ -62,8 +40,7 @@ elif sys.argv[-1] == 'publishtest':
 setup(
     name='pyleoclim',
     packages=find_packages(),
-    package_dir={'pyleoclim': './pyleoclim'},
-    package_data={'pyleoclim': [f2py_wwz_filename]},
+    include_package_data=True,
     zip_safe=False,
     version=version,
     license='GNU Public',
@@ -72,7 +49,7 @@ setup(
     author='Deborah Khider',
     author_email='dkhider@gmail.com',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
-    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.3.1',
+    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.5.0',
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
     install_requires=[
