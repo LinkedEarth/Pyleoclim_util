@@ -2,15 +2,9 @@ import os
 import sys
 import io
 
-# BEFORE importing setuptools, remove MANIFEST. Otherwise it may not be
-# properly updated when the contents of directories change (true for distutils,
-# not sure about setuptools).
-if os.path.exists('MANIFEST'):
-    os.remove('MANIFEST')
-
 from setuptools import setup, find_packages
 
-version = '0.4.6'
+version = '0.4.7'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
@@ -43,8 +37,6 @@ elif sys.argv[-1] == 'publishtest':
 setup(
     name='pyleoclim',
     packages=find_packages(),
-    package_dir={'pyleoclim': './pyleoclim'},
-    package_data={'pyleoclim': ['./f2py_*.so']},
     include_package_data=True,
     zip_safe=False,
     version=version,
@@ -54,7 +46,7 @@ setup(
     author='Deborah Khider',
     author_email='dkhider@gmail.com',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
-    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.4.6',
+    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.4.7',
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
     install_requires=[

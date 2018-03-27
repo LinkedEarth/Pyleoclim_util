@@ -16,8 +16,8 @@ from scipy import signal
 from scipy.stats.mstats import mquantiles
 import scipy.fftpack as fft
 
-import matplotlib.pyplot as plt
 import seaborn as sns
+import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 from matplotlib import gridspec
 
@@ -28,7 +28,7 @@ import warnings
 
 from pyleoclim import Timeseries
 import sys
-#import platform
+import collections
 
 from math import factorial
 
@@ -82,7 +82,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -112,7 +112,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -151,7 +151,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -236,7 +236,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -318,7 +318,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -403,7 +403,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -497,7 +497,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -598,7 +598,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -706,7 +706,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -812,7 +812,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -928,7 +928,7 @@ class WaveletAnalysis(object):
                 while the second parameter correspond to the order of the filter
                 (default is 4). The third parameter is the order of the derivative
                 (the default is zero, which means only smoothing.)
-            gaussionize (bool): If True, gaussianizes the timeseries
+            gaussianize (bool): If True, gaussianizes the timeseries
             standardize (bool): If True, standardizes the timeseries
 
         Returns:
@@ -1178,15 +1178,18 @@ class WaveletAnalysis(object):
             psd = psd[1:]
             freqs = freqs[1:]
 
+        Results = collections.namedtuple('Results', ['beta', 'f_binned', 'psd_binned', 'Y_reg', 'std_err'])
         if np.max(freqs) < fmax or np.min(freqs) > fmin:
-            return np.nan, np.nan, np.nan, np.nan, np.nan
+            res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
+            return res
 
         # frequency binning start
         fminindx = np.where(freqs >= fmin)[0][0]
         fmaxindx = np.where(freqs <= fmax)[0][-1]
 
         if fminindx >= fmaxindx:
-            return np.nan, np.nan, np.nan, np.nan, np.nan
+            res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
+            return res
 
         logf = np.log(freqs)
         logf_step = logf[fminindx+1] - logf[fminindx]
@@ -1229,7 +1232,9 @@ class WaveletAnalysis(object):
             Y_reg = 10**model.predict(results.params)  # prediction based on linear regression
             std_err = results.bse[1]
 
-        return beta, f_binned, psd_binned, Y_reg, std_err
+        res = Results(beta=beta, f_binned=f_binned, psd_binned=psd_binned, Y_reg=Y_reg, std_err=std_err)
+
+        return res
 
     def beta2HurstIndex(self, beta):
         ''' Translate psd slope to Hurst index
@@ -1461,7 +1466,7 @@ class WaveletAnalysis(object):
 
         return ys_cut, ts_cut, freqs, tau
 
-    def cross_wt(self, coeff1, coeff2, freqs, tau):
+    def cross_wt(self, coeff1, coeff2):
         ''' Return the cross wavelet transform.
 
         Args:
@@ -1484,7 +1489,7 @@ class WaveletAnalysis(object):
 
         return xwt, xw_amplitude, xw_phase
 
-    def wavelet_coherence(self, coeff1, coeff2, freqs, tau):
+    def wavelet_coherence(self, coeff1, coeff2, freqs, tau, smooth_factor=0.25):
         ''' Return the cross wavelet transform.
 
         Args:
@@ -1522,7 +1527,7 @@ class WaveletAnalysis(object):
 
             return rect
 
-        def Smoothing(coeff, snorm, dj):
+        def Smoothing(coeff, snorm, dj, smooth_factor=smooth_factor):
             """ Soothing function adapted from https://github.com/regeirk/pycwt/blob/master/pycwt/helpers.py
 
             Args:
@@ -1546,7 +1551,7 @@ class WaveletAnalysis(object):
             # Notes by Smoothing by Gaussian window (absolute value of wavelet function)
             # using the convolution theorem: multiplication by Gaussian curve in
             # Fourier domain for each scale, outer product of scale and frequency
-            F = np.exp(-0.5 * (snorm[:, np.newaxis] ** 2) * k2)  # Outer product
+            F = np.exp(-smooth_factor * (snorm[:, np.newaxis] ** 2) * k2)  # Outer product
             smooth = fft.ifft(F * fft.fft(W, axis=1, **fft_kwargs(W[0, :])),
                               axis=1,  # Along Fourier frequencies
                               **fft_kwargs(W[0, :], overwrite_x=True))
@@ -1565,24 +1570,25 @@ class WaveletAnalysis(object):
         xwt = coeff1 * np.conj(coeff2)
         power1 = np.abs(coeff1)**2
         power2 = np.abs(coeff2)**2
+
         scales = 1/freqs  # `scales` here is the `Period` axis in the wavelet plot
         dt = np.median(np.diff(tau))
         snorm = scales / dt  # normalized scales
 
-        scale = 1/freqs
-
         # with WWZ method, we don't have a constant dj, so we will just take the average over the whole scale range
-        N = np.size(scale)
-        s0 = scale[-1]
-        sN = scale[0]
+        N = np.size(scales)
+        s0 = scales[-1]
+        sN = scales[0]
         dj = np.log2(sN/s0) / N
 
-        S12 = Smoothing(xwt/scale, snorm, dj)
-        S1 = Smoothing(power1/scale, snorm, dj)
-        S2 = Smoothing(power2/scale, snorm, dj)
+        S12 = Smoothing(xwt/scales, snorm, dj)
+        S1 = Smoothing(power1/scales, snorm, dj)
+        S2 = Smoothing(power2/scales, snorm, dj)
         xw_coherence = np.abs(S12)**2 / (S1*S2)
+        wcs = S12 / (np.sqrt(S1)*np.sqrt(S2))
+        xw_phase = np.angle(wcs)
 
-        return xw_coherence
+        return xw_coherence, xw_phase
 
     def reconstruct_ts(self, coeff, freqs, tau, t, len_bd=0):
         ''' Reconstruct the normalized time series from the wavelet coefficients.
@@ -1960,7 +1966,10 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=
     # calculate the cone of influence
     coi = wa.make_coi(tau, Neff=Neff_coi)
 
-    return wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff
+    Results = collections.namedtuple('Results', ['wwa', 'phase', 'AR1_q', 'coi', 'freqs', 'tau', 'Neffs', 'coeff'])
+    res = Results(wwa=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freqs=freqs, tau=tau, Neffs=Neffs, coeff=coeff)
+
+    return res
 
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
@@ -1986,7 +1995,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             while the second parameter correspond to the order of the filter
             (default is 4). The third parameter is the order of the derivative
             (the default is zero, which means only smoothing.)
-        gaussionize (bool): If True, gaussianizes the timeseries
+        gaussianize (bool): If True, gaussianizes the timeseries
         standardize (bool): If True, standardizes the timeseries
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
@@ -2003,11 +2012,12 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau)
 
     # get wwa but AR1_q is not needed here so set nMC=0
-    wwa, _, _, coi, freqs, _, Neffs, _ = wwz(ys_cut, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
-                                             detrend=detrend, params=params,
-                                             gaussianize=gaussianize, standardize=standardize, method=method)
+    #  wwa, _, _, coi, freqs, _, Neffs, _ = wwz(ys_cut, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
+    res_wwz = wwz(ys_cut, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
+              detrend=detrend, params=params,
+              gaussianize=gaussianize, standardize=standardize, method=method)
 
-    psd = wa.wwa2psd(wwa, ts_cut, Neffs, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+    psd = wa.wwa2psd(res_wwz.wwa, ts_cut, res_wwz.Neffs, freqs=res_wwz.freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
     #  psd[1/freqs > np.max(coi)] = np.nan  # cut off the unreliable part out of the coi
     #  psd = psd[1/freqs <= np.max(coi)] # cut off the unreliable part out of the coi
     #  freqs = freqs[1/freqs <= np.max(coi)]
@@ -2023,11 +2033,12 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             #  r = wa.ar1_model(ts_cut, tauest)
             r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
-            wwa_red, _, _, coi_red, freqs_red, _, Neffs_red, _ = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
+            res_red = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
                                                                      detrend=detrend, params=params,
                                                                      gaussianize=gaussianize, standardize=standardize,
                                                                      method=method)
-            psd_ar1[i, :] = wa.wwa2psd(wwa_red, ts_cut, Neffs_red, freqs=freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+            psd_ar1[i, :] = wa.wwa2psd(res_red.wwa, ts_cut, res_red.Neffs,
+                                       freqs=res_red.freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
             #  psd_ar1[i, 1/freqs_red > np.max(coi_red)] = np.nan  # cut off the unreliable part out of the coi
             #  psd_ar1 = psd_ar1[1/freqs_red <= np.max(coi_red)] # cut off the unreliable part out of the coi
 
@@ -2036,7 +2047,10 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     else:
         psd_ar1_q95 = None
 
-    return psd, freqs, psd_ar1_q95, psd_ar1
+    Results = collections.namedtuple('Results', ['psd', 'freqs', 'psd_ar1_q95', 'psd_ar1'])
+    res = Results(psd=psd, freqs=freqs, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
+
+    return res
 
 
 def xwt(ys1, ts1, ys2, ts2,
@@ -2063,7 +2077,7 @@ def xwt(ys1, ts1, ys2, ts2,
             while the second parameter correspond to the order of the filter
             (default is 4). The third parameter is the order of the derivative
             (the default is zero, which means only smoothing.)
-        gaussionize (bool): If True, gaussianizes the timeseries
+        gaussianize (bool): If True, gaussianizes the timeseries
         standardize (bool): If True, standardizes the timeseries
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
@@ -2085,10 +2099,10 @@ def xwt(ys1, ts1, ys2, ts2,
     ys1_cut, ts1_cut, freqs, tau = wa.prepare_wwz(ys1, ts1, freqs=freqs, tau=tau)
     ys2_cut, ts2_cut, freqs, tau = wa.prepare_wwz(ys2, ts2, freqs=freqs, tau=tau)
 
-    wwa, phase, Neffs, coeff1 = wwz_func(ys1_cut, ts1_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
-                                         params=params, gaussianize=gaussianize, standardize=standardize)
-    wwa, phase, Neffs, coeff2 = wwz_func(ys2_cut, ts2_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
-                                         params=params, gaussianize=gaussianize, standardize=standardize)
+    _, _, _, coeff1 = wwz_func(ys1_cut, ts1_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
+                               params=params, gaussianize=gaussianize, standardize=standardize)
+    _, _, _, coeff2 = wwz_func(ys2_cut, ts2_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
+                               params=params, gaussianize=gaussianize, standardize=standardize)
 
     tauest1 = wa.tau_estimation(ys1_cut, ts1_cut, detrend=detrend, params=params,
                                 gaussianize=gaussianize, standardize=standardize)
@@ -2128,7 +2142,7 @@ def xwt(ys1, ts1, ys2, ts2,
     return xwt, xw_amplitude, xw_phase, freqs, tau, AR1_q, coi
 
 
-def xwc(ys1, ts1, ys2, ts2,
+def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no',
         nMC=200, params=['default', 4, 0, 1],
         gaussianize=False, standardize=True, method='Kirchner_f2py'):
@@ -2153,7 +2167,7 @@ def xwc(ys1, ts1, ys2, ts2,
             while the second parameter correspond to the order of the filter
             (default is 4). The third parameter is the order of the derivative
             (the default is zero, which means only smoothing.)
-        gaussionize (bool): If True, gaussianizes the timeseries
+        gaussianize (bool): If True, gaussianizes the timeseries
         standardize (bool): If True, standardizes the timeseries
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
@@ -2196,17 +2210,21 @@ def xwc(ys1, ts1, ys2, ts2,
     else:
         freqs = freqs1
 
-    wwa1, phase1, AR1_q, coi, freqs, tau, Neffs, coeff1 = wwz(ys1_cut, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
-                                                              nproc=nproc, detrend=detrend, params=params,
-                                                              gaussianize=gaussianize, standardize=standardize, method=method)
-    wwa2, phase2, AR1_q, coi, freqs, tau, Neffs, coeff2 = wwz(ys2_cut, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
-                                                              nproc=nproc, detrend=detrend, params=params,
-                                                              gaussianize=gaussianize, standardize=standardize, method=method)
+    if freqs[0] == 0:
+        freqs = freqs[1:] # delete 0 frequency if present
 
-    wt_coeff1 = coeff1[1] + coeff1[2]*1j
-    wt_coeff2 = coeff2[1] + coeff2[2]*1j
-    xw_coherence = wa.wavelet_coherence(wt_coeff1, wt_coeff2, freqs, tau)
-    xwt, xw_amplitude, xw_phase = wa.cross_wt(wt_coeff1, wt_coeff2, freqs, tau)
+    res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
+                   nproc=nproc, detrend=detrend, params=params,
+                   gaussianize=gaussianize, standardize=standardize, method=method)
+    res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
+                   nproc=nproc, detrend=detrend, params=params,
+                   gaussianize=gaussianize, standardize=standardize, method=method)
+
+    wt_coeff1 = res_wwz1.coeff[1] - res_wwz1.coeff[2]*1j
+    wt_coeff2 = res_wwz2.coeff[1] - res_wwz2.coeff[2]*1j
+
+    xw_coherence, xw_phase = wa.wavelet_coherence(wt_coeff1, wt_coeff2, freqs, tau, smooth_factor=smooth_factor)
+    xwt, xw_amplitude, _ = wa.cross_wt(wt_coeff1, wt_coeff2)
 
     # Monte-Carlo simulations of AR1 process
     nt = np.size(tau)
@@ -2220,16 +2238,16 @@ def xwc(ys1, ts1, ys2, ts2,
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
             r2 = ar1_sim(ys2_cut, np.size(ts2_cut), 1, ts=ts2_cut)
-            _, _, _, _, freqs, tau, _, coeffr1 = wwz(r1, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
+            res_wwz_r1 = wwz(r1, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
                                                      detrend=detrend, params=params,
                                                      gaussianize=gaussianize, standardize=standardize)
-            _, _, _, _, freqs, tau, _, coeffr2 = wwz(r2, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
+            res_wwz_r2 = wwz(r2, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
                                                      detrend=detrend, params=params,
                                                      gaussianize=gaussianize, standardize=standardize)
 
-            wt_coeffr1 = coeffr1[1] + coeffr1[2]*1j
-            wt_coeffr2 = coeffr2[1] + coeffr2[2]*1j
-            coherence_red[i, :, :] = wa.wavelet_coherence(wt_coeffr1, wt_coeffr2, freqs, tau)
+            wt_coeffr1 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
+            wt_coeffr2 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
+            coherence_red[i, :, :], phase_red = wa.wavelet_coherence(wt_coeffr1, wt_coeffr2, freqs, tau, smooth_factor=smooth_factor)
 
         for j in range(nt):
             for k in range(nf):
@@ -2238,13 +2256,18 @@ def xwc(ys1, ts1, ys2, ts2,
     else:
         AR1_q = None
 
-    return xw_coherence, xw_amplitude, xw_phase, freqs, tau, AR1_q, coi
+    coi = wa.make_coi(tau, Neff=Neff)
+    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xwt', 'freqs', 'tau', 'AR1_q', 'coi'])
+    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase, xwt=xwt,
+                  freqs=freqs, tau=tau, AR1_q=AR1_q, coi=coi)
+
+    return res
 
 
 def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
              yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
              cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
-             plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical',
+             plot_cone=False, ax=None, xlabel='Year (AD)', ylabel='Period (years)', cbar_orientation='vertical',
              cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
     """ Plot the wavelet amplitude
 
@@ -2349,9 +2372,10 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     return ax
 
 
-def plot_coherence(xw_coherence, xw_phase, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None, basey=2,
+def plot_coherence(res_xwc, pt=0.5,
+                   levels=None, tick_range=None, basey=2,
                    yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
-                   exg=5, scale=30, width=0.004,
+                   skip_x=5, skip_y=5, scale=30, width=0.004,
                    cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
                    plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical',
                    cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
@@ -2382,11 +2406,20 @@ def plot_coherence(xw_coherence, xw_phase, freqs, tau, AR1_q=None, coi=None, lev
         cbar_pad (float): the pad for the colorbar
         c)bar_frac (float): the frac for the colorbar
         cbar_labelsize (float): the font size of the colorbar label
+        pt (float): plot arrows above pt value
+        skip_x, skip_y (float): scale factors for arrows
 
     Returns:
         fig (figure): the 2-D plot of wavelet analysis
 
     """
+    xw_coherence = res_xwc.xw_coherence
+    xw_phase = res_xwc.xw_phase
+    freqs = res_xwc.freqs
+    tau = res_xwc.tau
+    AR1_q = res_xwc.AR1_q
+    coi = res_xwc.coi
+
     sns.set(style="ticks", font_scale=2)
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
@@ -2444,12 +2477,14 @@ def plot_coherence(xw_coherence, xw_phase, freqs, tau, AR1_q=None, coi=None, lev
 
     # plot phase
     phase = np.copy(xw_phase)
-    phase[xw_coherence < .5] = np.nan
+    phase[xw_coherence < pt] = np.nan
 
     X, Y = np.meshgrid(tau, 1/freqs)
     U, V = np.cos(phase).T, np.sin(phase).T
 
-    ax.quiver(X[::exg, ::exg], Y[::exg, ::exg], U[::exg, ::exg], V[::exg, ::exg], scale=scale, width=width)
+    ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
+              U[::skip_y, ::skip_x], V[::skip_y, ::skip_x],
+              scale=scale, width=width)
 
     return ax
 
@@ -2596,7 +2631,9 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
                  gaussianize=False, standardize=True, levels=None, method='Kirchner_f2py',
                  anti_alias=False, period_ticks=None, ts_color=None,
                  title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
-                 psd_lmstyle='-', psd_lim=None, period_I=[1/8, 1/2], period_D=[1/200, 1/20]):
+                 psd_lmstyle='-', psd_lim=None,
+                 period_S_str='beta_I', period_S=[1/8, 1/2],
+                 period_L_str='beta_D', period_L=[1/200, 1/20]):
     """ Plot the time series with the wavelet analysis and psd
 
     Args:
@@ -2617,7 +2654,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
         wwa_ylabel (str): label for y-axis in the wwa plot
         psd_lmstyle (str): the line style in the psd plot
         psd_lim (list): the limits for psd
-        period_I, period_D (list): the ranges for beta estimation
+        period_S, period_L (list): the ranges for beta estimation
 
     Returns:
         fig (figure): the summary plot
@@ -2656,19 +2693,21 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     sns.set(style="ticks", font_scale=1.5)
     ax2 = plt.subplot(gs[1:5, :-3])
 
-    wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = \
-        wwz(ys, ts, freqs=freqs, tau=tau, c=c1, nMC=nMC, nproc=nproc, detrend=detrend, method=method,
-            gaussianize=gaussianize, standardize=standardize)
+    #  wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = \
+    res_wwz = wwz(ys, ts, freqs=freqs, tau=tau, c=c1, nMC=nMC, nproc=nproc, detrend=detrend, method=method,
+                  gaussianize=gaussianize, standardize=standardize)
 
     if wwa_xlabel is not None and wwa_ylabel is not None:
-        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, yticks_label=period_tickslabel,
-                 ylim=[ylim_min, np.max(coi)],
+        plot_wwa(res_wwz.wwa, res_wwz.freqs, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
+                 yticks=period_ticks, yticks_label=period_tickslabel,
+                 ylim=[ylim_min, np.max(res_wwz.coi)],
                  plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2, levels=levels,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
                  )
     else:
-        plot_wwa(wwa, freqs, tau, coi=coi, AR1_q=AR1_q, yticks=period_ticks, yticks_label=period_tickslabel,
-                 ylim=[ylim_min, np.max(coi)],
+        plot_wwa(res_wwz.wwa, res_wwz.freqs, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
+                 yticks=period_ticks, yticks_label=period_tickslabel,
+                 ylim=[ylim_min, np.max(res_wwz.coi)],
                  plot_cone=True, plot_signif=True, ax=ax2,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15, levels=levels,
                  )
@@ -2676,20 +2715,21 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     # plot psd
     sns.set(style="ticks", font_scale=1.5)
     ax3 = plt.subplot(gs[1:4, 9:])
-    psd, freqs, psd_ar1_q95, psd_ar1 = wwz_psd(ys, ts, freqs=freqs, tau=tau, c=c2, nproc=nproc, nMC=nMC, method=method,
-                                      detrend=detrend, gaussianize=gaussianize, standardize=standardize,
-                                      anti_alias=anti_alias)
+    res_psd = wwz_psd(ys, ts, freqs=None, tau=tau, c=c2, nproc=nproc, nMC=nMC, method=method,
+                      detrend=detrend, gaussianize=gaussianize, standardize=standardize,
+                      anti_alias=anti_alias)
 
     # TODO: deal with period_ticks
-    plot_psd(psd, freqs, plot_ar1=True, psd_ar1_q95=psd_ar1_q95, period_ticks=period_ticks[period_ticks < np.max(coi)],
-             period_lim=[np.min(period_ticks), np.max(coi)], psd_lim=psd_lim,
+    plot_psd(res_psd.psd, res_psd.freqs, plot_ar1=True, psd_ar1_q95=res_psd.psd_ar1_q95,
+             period_ticks=period_ticks[period_ticks < np.max(res_wwz.coi)],
+             period_lim=[np.min(period_ticks), np.max(res_wwz.coi)], psd_lim=psd_lim,
              lmstyle=psd_lmstyle, ax=ax3, period_label='', label='Estimated spectrum', vertical=True)
 
-    beta_1, f_binned_1, psd_binned_1, Y_reg_1, stderr_1 = beta_estimation(psd, freqs, period_I[0], period_I[1])
-    beta_2, f_binned_2, psd_binned_2, Y_reg_2, stderr_2 = beta_estimation(psd, freqs, period_D[0], period_D[1])
-    ax3.plot(Y_reg_1, 1/f_binned_1, color='k',
-             label=r'$\beta_I$ = {:.2f}'.format(beta_1) + ', ' + r'$\beta_D$ = {:.2f}'.format(beta_2))
-    ax3.plot(Y_reg_2, 1/f_binned_2, color='k')
+    res_beta1 = beta_estimation(res_psd.psd, res_psd.freqs, period_S[0], period_S[1])
+    res_beta2 = beta_estimation(res_psd.psd, res_psd.freqs, period_L[0], period_L[1])
+    ax3.plot(res_beta1.Y_reg, 1/res_beta1.f_binned, color='k',
+             label=r'$\{}$ = {:.2f}'.format(period_S_str, res_beta1.beta) + ', ' + r'$\{}$ = {:.2f}'.format(period_L_str, res_beta2.beta))
+    ax3.plot(res_beta2.Y_reg, 1/res_beta2.f_binned, color='k')
     plt.tick_params(axis='y', which='both', labelleft='off')
     plt.legend(fontsize=15, bbox_to_anchor=(0, 1.2), loc='upper left', ncol=1)
 
