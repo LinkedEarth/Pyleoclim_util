@@ -3,11 +3,7 @@ import os
 import sys
 import io
 
-<<<<<<< HEAD
-version = '0.4.0'
-=======
 version = '0.5.0'
->>>>>>> dev-fzhu
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':

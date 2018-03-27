@@ -1111,7 +1111,6 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
             y,x = Timeseries.clean_ts(y,x)
 
     # Perform the analysis
-<<<<<<< HEAD
         default = {'tau':None,
                            'freqs': None,
                            'c':1e-3,
