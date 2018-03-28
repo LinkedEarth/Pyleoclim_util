@@ -20,7 +20,7 @@
 * [License](#license)
 * [Disclaimer](#disclaimer)
 
-Current Version: 0.4.6
+Current Version: 0.4.7
 
 ### <a name = "what">What is it?</a>
 
@@ -48,6 +48,7 @@ The package assumes that data are stored in the Linked Paleo Data ([LiPD](http:/
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>  
+0.4.7: Update to coherence function  
 0.4.6: Fix an issue when copying the .so files  
 0.4.5: Update to setup.py to include proper .so file according to version  
 0.4.4: New fix for .so issue  
