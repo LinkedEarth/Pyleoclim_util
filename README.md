@@ -133,6 +133,8 @@ Please report issues to <linkedearth@gmail.com>
 ### <a name ="license"> License </a>
 
 The project is licensed under the GNU Public License. Please refer to the file call license.
+If you use the code in publications, please credit the work using [this citation](https://zenodo.org/record/1212692#.WsaZ7maZNE4).
+
 
 ### <a name = "disclaimer"> Disclaimer </a>
 
