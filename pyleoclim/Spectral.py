@@ -2267,6 +2267,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
 def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
              yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
              cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
+             plot_cbar=True,
              plot_cone=False, ax=None, xlabel='Year (AD)', ylabel='Period (years)', cbar_orientation='vertical',
              cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
     """ Plot the wavelet amplitude
@@ -2324,11 +2325,12 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     else:
         plt.contourf(tau, 1/freqs, wwa.T, cmap=clr_map, origin=origin)
 
-    cb = plt.colorbar(drawedges=cbar_drawedges, orientation=cbar_orientation, fraction=cbar_frac, pad=cbar_pad,
-                      ticks=tick_range)
+    if plot_cbar:
+        cb = plt.colorbar(drawedges=cbar_drawedges, orientation=cbar_orientation, fraction=cbar_frac, pad=cbar_pad,
+                          ticks=tick_range)
 
-    if cbar_labelsize is not None:
-        cb.ax.tick_params(labelsize=cbar_labelsize)
+        if cbar_labelsize is not None:
+            cb.ax.tick_params(labelsize=cbar_labelsize)
 
     plt.yscale('log', nonposy='clip')
 
