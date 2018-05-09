@@ -1017,7 +1017,7 @@ class WaveletAnalysis(object):
 
         return omega
 
-    def wwa2psd(self, wwa, ts, Neffs, freqs=None, Neff=3, anti_alias=False, avgs=1):
+    def wwa2psd(self, wwa, ts, Neffs, freqs=None, Neff=3, anti_alias=False, avgs=2):
         """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
         Args:
@@ -1974,7 +1974,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             detrend='no', params=["default", 4, 0, 1], gaussianize=False, standardize=True,
-            Neff=3, anti_alias=False, avgs=1, method='Kirchner_f2py'):
+            Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
     ''' Return the psd of a timeseries directly using wwz method.
 
     Args:
@@ -2335,11 +2335,21 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     plt.yscale('log', nonposy='clip')
 
     if yticks is not None:
-        yticks_label = list(map(str, yticks))
+        if np.min(yticks) < 1e3:
+            yticks_label = list(map(str, yticks))
+        else:
+            yticks_label = list(map(str, yticks/1e3))
+            ylabel='Period (kyrs)'
+
         plt.yticks(yticks, yticks_label)
 
-    if xticks is not None:
-        plt.xticks(xticks)
+
+    #  xticks = ax.get_xticks()
+    #  if np.abs(np.min(xticks)) < 1e3:
+        #  xticks_label = list(map(str, xticks))
+    #  else:
+        #  xticks_label = list(map(str, xticks/1e3))
+    #  plt.xticks(xticks, xticks_label)
 
     if yticks_label is None:
         ax.get_yaxis().set_major_formatter(ScalarFormatter())
@@ -2631,7 +2641,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
 
 def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=200, nproc=8, detrend='no',
                  gaussianize=False, standardize=True, levels=None, method='Kirchner_f2py',
-                 anti_alias=False, period_ticks=None, ts_color=None,
+                 anti_alias=False, period_ticks=None, ts_color=None, ts_style='-o',
                  title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
                  psd_lmstyle='-', psd_lim=None,
                  period_S_str='beta_I', period_S=[1/8, 1/2],
@@ -2678,7 +2688,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     # plot the time series
     sns.set(style="ticks", font_scale=1.5)
     ax1 = plt.subplot(gs[0:1, :-3])
-    plt.plot(ts, ys, '-o', color=ts_color)
+    plt.plot(ts, ys, ts_style, color=ts_color)
 
     if title is not None:
         plt.title(title, **title_font)
@@ -2727,11 +2737,18 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
              period_lim=[np.min(period_ticks), np.max(res_wwz.coi)], psd_lim=psd_lim,
              lmstyle=psd_lmstyle, ax=ax3, period_label='', label='Estimated spectrum', vertical=True)
 
-    res_beta1 = beta_estimation(res_psd.psd, res_psd.freqs, period_S[0], period_S[1])
-    res_beta2 = beta_estimation(res_psd.psd, res_psd.freqs, period_L[0], period_L[1])
-    ax3.plot(res_beta1.Y_reg, 1/res_beta1.f_binned, color='k',
-             label=r'$\{}$ = {:.2f}'.format(period_S_str, res_beta1.beta) + ', ' + r'$\{}$ = {:.2f}'.format(period_L_str, res_beta2.beta))
-    ax3.plot(res_beta2.Y_reg, 1/res_beta2.f_binned, color='k')
+    if period_S is not None:
+        res_beta1 = beta_estimation(res_psd.psd, res_psd.freqs, period_S[0], period_S[1])
+
+        if period_L is not None:
+            res_beta2 = beta_estimation(res_psd.psd, res_psd.freqs, period_L[0], period_L[1])
+            ax3.plot(res_beta1.Y_reg, 1/res_beta1.f_binned, color='k',
+            label=r'$\{}$ = {:.2f}'.format(period_S_str, res_beta1.beta) + ', ' + r'$\{}$ = {:.2f}'.format(period_L_str, res_beta2.beta))
+            ax3.plot(res_beta2.Y_reg, 1/res_beta2.f_binned, color='k')
+        else:
+            ax3.plot(res_beta1.Y_reg, 1/res_beta1.f_binned, color='k',
+            label=r'$\{}$ = {:.2f}'.format(period_S_str, res_beta1.beta))
+
     plt.tick_params(axis='y', which='both', labelleft='off')
     plt.legend(fontsize=15, bbox_to_anchor=(0, 1.2), loc='upper left', ncol=1)
 
