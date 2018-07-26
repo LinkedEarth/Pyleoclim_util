@@ -262,7 +262,7 @@ def clean_ts(ys, ts):
     # delete NaNs if there is any
     ys = np.asarray(ys, dtype=np.float)
     ts = np.asarray(ts, dtype=np.float)
-    assert(ys.size == ts.size, 'The size of time axis and data value should be equal!')
+    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
 
     ys_tmp = np.copy(ys)
     ys = ys[~np.isnan(ys_tmp)]
