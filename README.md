@@ -50,8 +50,8 @@ The package is aware of age ensembles stored via LiPD and uses them for time-unc
  If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "version">Version Information</a>  
-0.4.7: Update to coherence function  
-0.4.6: Fix an issue when copying the .so files  
+0.4.7: Update to coherence function    
+0.4.6: Fix an issue when copying the .so files    
 0.4.5: Update to setup.py to include proper .so file according to version  
 0.4.4: New fix for .so issue  
 0.4.3: New fix for .so issue    
