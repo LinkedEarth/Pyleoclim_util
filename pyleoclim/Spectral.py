@@ -32,7 +32,7 @@ import collections
 
 from math import factorial
 
-if sys.platform.startswith('darwin'):
+if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
     from . import f2py_wwz as f2py
 
 '''
@@ -1045,7 +1045,7 @@ class WaveletAnalysis(object):
         power = wwa**2 * 0.5 * dt * Neffs
 
         Neff_diff = Neffs - Neff
-        #  Neff_diff[Neff_diff < 0] = 0
+        Neff_diff[Neff_diff < 0] = 0
 
         sum_power = np.nansum(power * Neff_diff, axis=0)
         sum_eff = np.nansum(Neff_diff, axis=0)
@@ -1281,7 +1281,8 @@ class WaveletAnalysis(object):
 
         Args:
             N (int): the length of the simulated time series
-            H (float): Hurst index, should be in (0, 1)
+            H (float): Hurst index, should be in (0, 1). The relationship between H and the scaling exponent beta is
+                H = (beta-1) / 2
 
         Returns:
             xfBm (array): the simulated fractional Brownian Motion time series
@@ -1923,10 +1924,10 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=
         coeff (array): the wavelet transform coefficents
 
     '''
-    if method == 'Kirchner_f2py':
-        if not sys.platform.startswith('darwin'):
-            warnings.warn("WWZ method: the f2py version is only supported on macOS right now; will use python version instead.")
-            method = 'Kirchner'
+    #  if method == 'Kirchner_f2py':
+    #      if not sys.platform.startswith('darwin'):
+    #          warnings.warn("WWZ method: the f2py version is only supported on macOS right now; will use python version instead.")
+    #          method = 'Kirchner'
 
     wa = WaveletAnalysis()
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
@@ -2182,8 +2183,8 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         coi (array): cone of influence
 
     '''
-    if sys.platform.startswith('linux') and method == 'Kirchner_f2py':
-        warnings.warn("The f2py version is not supported for Linux right now; will use python version instead.")
+    if (not sys.platform.startswith('darwin')) and (not sys.platform.startswith('linux')) and method == 'Kirchner_f2py':
+        warnings.warn("The f2py version of WWZ is only supported on macOS & Linux right now; will use the python version instead.")
         method = 'Kirchner'
 
     wa = WaveletAnalysis()
@@ -2338,7 +2339,7 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
         if np.min(yticks) < 1e3:
             yticks_label = list(map(str, yticks))
         else:
-            yticks_label = list(map(str, yticks/1e3))
+            yticks_label = list(map(str, np.asarray(yticks)/1e3))
             ylabel='Period (kyrs)'
 
         plt.yticks(yticks, yticks_label)
