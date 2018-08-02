@@ -2744,11 +2744,11 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
         if period_L is not None:
             res_beta2 = beta_estimation(res_psd.psd, res_psd.freqs, period_L[0], period_L[1])
             ax3.plot(res_beta1.Y_reg, 1/res_beta1.f_binned, color='k',
-            label=r'$\{}$ = {:.2f}'.format(period_S_str, res_beta1.beta) + ', ' + r'$\{}$ = {:.2f}'.format(period_L_str, res_beta2.beta))
+                    label=r'$\{}$ = {:.2f}$\pm${:.2f}'.format(period_S_str, res_beta1.beta, res_beta1.std_err) + ', ' + r'$\{}$ = {:.2f}$\pm${:.2f}'.format(period_L_str, res_beta2.beta, res_beta2.std_err))
             ax3.plot(res_beta2.Y_reg, 1/res_beta2.f_binned, color='k')
         else:
             ax3.plot(res_beta1.Y_reg, 1/res_beta1.f_binned, color='k',
-            label=r'$\{}$ = {:.2f}'.format(period_S_str, res_beta1.beta))
+                    label=r'$\{}$ = {:.2f}$\pm${:.2f}'.format(period_S_str, res_beta1.beta, res_beta1.std_err))
 
     plt.tick_params(axis='y', which='both', labelleft='off')
     plt.legend(fontsize=15, bbox_to_anchor=(0, 1.2), loc='upper left', ncol=1)
