@@ -5,6 +5,7 @@
    \let\sphinxpxdimen\pdfpxdimen\else\newdimen\sphinxpxdimen
 \fi \sphinxpxdimen=.75bp\relax
 
+\PassOptionsToPackage{warn}{textcomp}
 \usepackage[utf8]{inputenc}
 \ifdefined\DeclareUnicodeCharacter
  \ifdefined\DeclareUnicodeCharacterAsOptional
@@ -29,7 +30,7 @@
 \usepackage{babel}
 \usepackage{times}
 \usepackage[Bjarne]{fncychap}
-\usepackage[dontkeepoldnames]{sphinx}
+\usepackage{sphinx}
 
 \usepackage{geometry}
 
@@ -54,8 +55,8 @@
 
 
 \title{Pyleoclim Documentation}
-\date{Mar 08, 2018}
-\release{0.4.0}
+\date{Aug 06, 2018}
+\release{0.4.8}
 \author{Deborah Khider, Julien Emile-Geay, Feng Zhu}
 \newcommand{\sphinxlogo}{\vbox{}}
 \renewcommand{\releasename}{Release}
@@ -72,7 +73,7 @@ Contents:
 
 
 \chapter{Pyleoclim}
-\label{\detokenize{Introduction:pyleoclim}}\label{\detokenize{Introduction:welcome-to-pyleoclim-s-documentation}}\label{\detokenize{Introduction::doc}}
+\label{\detokenize{Introduction:pyleoclim}}\label{\detokenize{Introduction::doc}}
 
 \section{What is it?}
 \label{\detokenize{Introduction:what-is-it}}
@@ -133,6 +134,8 @@ ensemble methods for most of the above
 \section{Version Information}
 \label{\detokenize{Introduction:version-information}}
 \begin{DUlineblock}{0em}
+\item[] 0.4.8: Add support of f2py WWZ for Linux
+\item[] 0.4.7: Update to coherence function
 \item[] 0.4.0: New functionalities: map nearest records by archive type, plot ensemble time series, age modelling through Bchron.
 \item[] 0.3.1: New functionalities: segment a timeseries using a gap detection criteria, update to summary plot to perform spectral analysis
 \item[] 0.3.0: Compatibility with LiPD 1.3 and Spectral module added
@@ -166,6 +169,7 @@ Will not run on a Windows system.
 
 Pyleoclim is published through Pypi and easily installed via pip:
 
+\fvset{hllines={, ,}}%
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{n}{pip} \PYG{n}{install} \PYG{n}{pyleoclim}
 \end{sphinxVerbatim}
@@ -301,7 +305,7 @@ which are lightweight versions of their counterparts in the LiPD utilities:
 \index{openLipd() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.openLipd}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{openLipd}}{\emph{usr\_path=''}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.openLipd}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{openLipd}}}{\emph{usr\_path=''}}{}
 Read Lipd files into a dictionary
 
 Sets the dictionary as global variable so that it doesn’t have to be provided
@@ -320,7 +324,7 @@ lipd\_dict - a dictionary containing the LiPD library
 \index{fetchTs() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.fetchTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{fetchTs}}{\emph{lipds=None}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.fetchTs}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{fetchTs}}}{\emph{lipds=None}}{}
 Extract timeseries dictionary
 
 This function is based on the function of the same name in the LiPD utilities.
@@ -328,7 +332,7 @@ Set the dictionary as a global variable so that it doesn’t have to be
 provided as an argument for every function.
 \begin{description}
 \item[{Args:}] \leavevmode
-lipds (dict): A dictionary of LiPD files obtained through the 
+lipds (dict): A dictionary of LiPD files obtained through the
 readLipd function
 
 \item[{Returns:}] \leavevmode
@@ -344,7 +348,7 @@ ts\_list - A list of timeseries object
 \label{\detokenize{Main:mapping}}\index{mapAllArchive() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.mapAllArchive}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{mapAllArchive}}{\emph{lipds='', markersize=50, background='shadedrelief', figsize={[}10, 4{]}, saveFig=False, dir='', format='eps'}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.mapAllArchive}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{mapAllArchive}}}{\emph{lipds='', markersize=50, background='shadedrelief', figsize={[}10, 4{]}, saveFig=False, dir='', format='eps'}}{}
 Map all the available records loaded into the workspace by archiveType.
 \begin{description}
 \item[{Map of all the records into the workspace by archiveType.}] \leavevmode
@@ -361,7 +365,7 @@ Default is shadedrelief.
 \end{quote}
 
 figsize (list): the size for the figure
-ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
+ax: Return as axis instead of figure (useful to integrate plot into a subplot)
 saveFig (bool): Default is to not save the figure
 dir (str): The absolute path of the directory in which to save the
 \begin{quote}
@@ -386,7 +390,7 @@ The figure
 \index{mapLipd() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.mapLipd}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{mapLipd}}{\emph{timeseries='', countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=50, marker='default', figsize={[}4, 4{]}, saveFig=False, dir='', format='eps'}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.mapLipd}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{mapLipd}}}{\emph{timeseries='', countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=50, marker='default', figsize={[}4, 4{]}, saveFig=False, dir='', format='eps'}}{}
 Create a Map for a single record
 
 Orthographic projection map of a single record.
@@ -444,7 +448,7 @@ The figure
 \index{mapNearRecords() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.mapNearRecords}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{mapNearRecords}}{\emph{timeseries='', lipds='', n=5, radius=None, sameArchive=False, projection='ortho', lat\_0='', lon\_0='', llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=200, markersize\_adjust=True, marker\_r='ko', marker\_c='default', cmap='Reds', colorbar=True, location='right', label='Distance in km', figsize={[}4, 4{]}, ax=None, saveFig=False, dir='', format='eps'}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.mapNearRecords}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{mapNearRecords}}}{\emph{timeseries='', lipds='', n=5, radius=None, sameArchive=False, projection='ortho', lat\_0='', lon\_0='', llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=200, markersize\_adjust=True, marker\_r='ko', marker\_c='default', cmap='Reds', colorbar=True, location='right', label='Distance in km', figsize={[}4, 4{]}, ax=None, saveFig=False, dir='', format='eps'}}{}
 Map the nearest records from the record of interest
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -463,11 +467,11 @@ Default is not to do so.
 \item[{projection (string): the map projection. Refers to the Basemap}] \leavevmode
 documentation for a list of available projections. Only projections
 supporting setting the map center with a single lat/lon or with
-the coordinates of the rectangle are currently supported. 
+the coordinates of the rectangle are currently supported.
 Default is to use a Robinson projection.
 
 \item[{lat\_0, lon\_0 (float): the center coordinates for the map. Default is}] \leavevmode
-mean latitude/longitude in the list. 
+mean latitude/longitude in the list.
 If the chosen projection doesn’t support it, Basemap will
 ignore the given values.
 
@@ -476,7 +480,7 @@ of the two opposite corners of the rectangle.
 
 \end{description}
 
-countries (bool): Draws the countries border. Defaults is off (False). 
+countries (bool): Draws the countries border. Defaults is off (False).
 counties (bool): Draws the USA counties. Default is off (False).
 rivers (bool): Draws the rivers. Default is off (False).
 states (bool): Draws the American and Australian states borders.
@@ -485,8 +489,8 @@ states (bool): Draws the American and Australian states borders.
 Default is off (False).
 \end{quote}
 \begin{description}
-\item[{background (string): Plots one of the following images on the map: }] \leavevmode
-bluemarble, etopo, shadedrelief, or none (filled continents). 
+\item[{background (string): Plots one of the following images on the map:}] \leavevmode
+bluemarble, etopo, shadedrelief, or none (filled continents).
 Default is none.
 
 \item[{scale (float): Useful to downgrade the original image resolution to}] \leavevmode
@@ -509,7 +513,7 @@ records. Default is to use the color palette by archiveType. If set
 to None then the color of the marker will represent the distance from
 the reference records.
 
-\item[{cmap (str): The colormap to use to represent the distance from the }] \leavevmode
+\item[{cmap (str): The colormap to use to represent the distance from the}] \leavevmode
 reference record if no marker is selected.
 
 \end{description}
@@ -546,7 +550,7 @@ ax - The figure
 \label{\detokenize{Main:plotting}}\index{plotTs() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.plotTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{plotTs}}{\emph{timeseries='', x\_axis='', markersize=50, marker='default', figsize={[}10, 4{]}, saveFig=False, dir='', format='eps'}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.plotTs}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{plotTs}}}{\emph{timeseries='', x\_axis='', markersize=50, marker='default', figsize={[}10, 4{]}, saveFig=False, dir='', format='eps'}}{}
 Plot a single time series.
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -591,7 +595,7 @@ The figure.
 \index{histTs() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.histTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{histTs}}{\emph{timeseries='', bins=None, hist=True, kde=True, rug=False, fit=None, hist\_kws=\{'label': 'Histogram'\}, kde\_kws=\{'label': 'KDE fit'\}, rug\_kws=\{'label': 'Rug'\}, fit\_kws=\{'label': 'Fit'\}, color='default', vertical=False, norm\_hist=True, figsize={[}5, 5{]}, saveFig=False, format='eps', dir=''}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.histTs}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{histTs}}}{\emph{timeseries='', bins=None, hist=True, kde=True, rug=False, fit=None, hist\_kws=\{'label': 'Histogram'\}, kde\_kws=\{'label': 'KDE fit'\}, rug\_kws=\{'label': 'Rug'\}, fit\_kws=\{'label': 'Fit'\}, color='default', vertical=False, norm\_hist=True, figsize={[}5, 5{]}, saveFig=False, format='eps', dir=''}}{}
 Plot a univariate distribution of the PaleoData values
 
 This function is based on the seaborn displot function, which is
@@ -666,11 +670,11 @@ They allow to plot specific information about a timeseries but are not customiza
 \index{summaryTs() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.summaryTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{summaryTs}}{\emph{timeseries=''}, \emph{x\_axis=''}, \emph{saveFig=False}, \emph{dir=''}, \emph{format='eps'}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.summaryTs}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{summaryTs}}}{\emph{timeseries=''}, \emph{x\_axis=''}, \emph{saveFig=False}, \emph{dir=''}, \emph{format='eps'}}{}
 Basic summary plot
 
 Plots the following information: the time series, a histogram of
-the PaleoData\_values, location map, spectral density using the wwz 
+the PaleoData\_values, location map, spectral density using the wwz
 method, and metadata about the record.
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -709,7 +713,7 @@ The figure
 \label{\detokenize{Main:statistics}}\index{statsTs() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.statsTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{statsTs}}{\emph{timeseries=''}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.statsTs}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{statsTs}}}{\emph{timeseries=''}}{}
 Calculate simple statistics of a timeseries
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -720,6 +724,7 @@ the mean, median, min, max, standard deviation and the
 inter-quartile range (IQR) of a timeseries.
 
 \item[{Examples:}] \leavevmode
+\fvset{hllines={, ,}}%
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{mean}\PYG{p}{,} \PYG{n}{median}\PYG{p}{,} \PYG{n}{min\PYGZus{}}\PYG{p}{,} \PYG{n}{max\PYGZus{}}\PYG{p}{,} \PYG{n}{std}\PYG{p}{,} \PYG{n}{IQR} \PYG{o}{=} \PYG{n}{pyleo}\PYG{o}{.}\PYG{n}{statsTs}\PYG{p}{(}\PYG{n}{timeseries}\PYG{p}{)}
 \end{sphinxVerbatim}
@@ -731,7 +736,7 @@ inter-quartile range (IQR) of a timeseries.
 \index{corrSigTs() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.corrSigTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{corrSigTs}}{\emph{timeseries1=''}, \emph{timeseries2=''}, \emph{x\_axis=''}, \emph{interp\_step=''}, \emph{start=''}, \emph{end=''}, \emph{nsim=1000}, \emph{method='isospectral'}, \emph{alpha=0.5}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.corrSigTs}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{corrSigTs}}}{\emph{timeseries1=''}, \emph{timeseries2=''}, \emph{x\_axis=''}, \emph{interp\_step=''}, \emph{start=''}, \emph{end=''}, \emph{nsim=1000}, \emph{method='isospectral'}, \emph{alpha=0.5}}{}
 Estimates the significance of correlations between non IID timeseries.
 
 Function written by. F. Zhu.
@@ -809,7 +814,7 @@ Basic manipulations of the timeseries objects.
 \index{binTs() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.binTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{binTs}}{\emph{timeseries=''}, \emph{x\_axis=''}, \emph{bin\_size=''}, \emph{start=''}, \emph{end=''}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.binTs}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{binTs}}}{\emph{timeseries=''}, \emph{x\_axis=''}, \emph{bin\_size=''}, \emph{start=''}, \emph{end=''}}{}
 Bin the paleoData values of the timeseries
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -845,7 +850,7 @@ error- the standard error on the mean in each bin
 \index{interpTs() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.interpTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{interpTs}}{\emph{timeseries=''}, \emph{x\_axis=''}, \emph{interp\_step=''}, \emph{start=''}, \emph{end=''}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.interpTs}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{interpTs}}}{\emph{timeseries=''}, \emph{x\_axis=''}, \emph{interp\_step=''}, \emph{start=''}, \emph{end=''}}{}
 Simple linear interpolation
 
 Simple linear interpolation of the data using the numpy.interp method
@@ -876,7 +881,7 @@ interp\_values - the interpolated values
 \index{standardizeTs() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.standardizeTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{standardizeTs}}{\emph{timeseries=''}, \emph{scale=1}, \emph{ddof=0}, \emph{eps=0.001}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.standardizeTs}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{standardizeTs}}}{\emph{timeseries=''}, \emph{scale=1}, \emph{ddof=0}, \emph{eps=0.001}}{}
 Centers and normalizes the paleoData values of a  given time series.
 
 Constant or nearly constant time series not rescaled.
@@ -918,7 +923,7 @@ The zscore function in SciPy: \sphinxurl{https://github.com/scipy/scipy/blob/mas
 \index{segmentTs() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.segmentTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{segmentTs}}{\emph{timeseries=''}, \emph{factor=2}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.segmentTs}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{segmentTs}}}{\emph{timeseries=''}, \emph{factor=2}}{}
 Divides a time series into several segments using a gap detection algorithm
 
 Gap detection rule: If the time interval between some two data points is
@@ -935,7 +940,7 @@ Default is 2.
 
 \item[{Returns:}] \leavevmode
 seg\_y (list) - a list of several segments with potentially different length
-seg\_t (list) - A list of the time values for each y segment. 
+seg\_t (list) - A list of the time values for each y segment.
 n\_segs (int) - the number of segments
 
 \end{description}
@@ -948,7 +953,7 @@ n\_segs (int) - the number of segments
 \label{\detokenize{Main:analysis-in-the-frequency-domain}}\index{wwzTs() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.wwzTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{wwzTs}}{\emph{timeseries=''}, \emph{lim=None}, \emph{wwz=False}, \emph{psd=True}, \emph{wwz\_default=True}, \emph{psd\_default=True}, \emph{wwaplot\_default=True}, \emph{psdplot\_default=True}, \emph{fig=True}, \emph{saveFig=False}, \emph{dir=''}, \emph{format='eps'}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.wwzTs}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{wwzTs}}}{\emph{timeseries=''}, \emph{lim=None}, \emph{wwz=False}, \emph{psd=True}, \emph{wwz\_default=True}, \emph{psd\_default=True}, \emph{wwaplot\_default=True}, \emph{psdplot\_default=True}, \emph{fig=True}, \emph{saveFig=False}, \emph{dir=''}, \emph{format='eps'}}{}
 Weigthed wavelet Z-transform analysis
 
 Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)
@@ -1137,12 +1142,13 @@ psd\_ar1\_q95 (array): the 95\% quantile of the psds of AR1 processes
 fig: The figure
 \begin{description}
 \item[{References:}] \leavevmode
-Foster, G. (1996). Wavelets for period analysis of unevenly 
+Foster, G. (1996). Wavelets for period analysis of unevenly
 sampled time series. The Astronomical Journal, 112(4), 1709-1729.
 
 \item[{Examples:}] \leavevmode
 To run both wwz and psd:
 
+\fvset{hllines={, ,}}%
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 \PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{dict\PYGZus{}out}\PYG{p}{,} \PYG{n}{fig} \PYG{o}{=} \PYG{n}{pyleoclim}\PYG{o}{.}\PYG{n}{wwzTs}\PYG{p}{(}\PYG{n}{wwz}\PYG{o}{=}\PYG{k+kc}{True}\PYG{p}{)}
 \end{sphinxVerbatim}
@@ -1151,8 +1157,9 @@ Note: This will return a single figure with wwa and psd
 
 To change a default behavior:
 
+\fvset{hllines={, ,}}%
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{dict\PYGZus{}out}\PYG{p}{,} \PYG{n}{fig} \PYG{o}{=} \PYG{n}{pyleoclim}\PYG{o}{.}\PYG{n}{wwzTs}\PYG{p}{(}\PYG{n}{psd\PYGZus{}default} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{nMC}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+m+mi}{1000}\PYG{p}{\PYGZcb{}}\PYG{p}{)} 
+\PYG{g+gp}{\PYGZgt{}\PYGZgt{}\PYGZgt{} }\PYG{n}{dict\PYGZus{}out}\PYG{p}{,} \PYG{n}{fig} \PYG{o}{=} \PYG{n}{pyleoclim}\PYG{o}{.}\PYG{n}{wwzTs}\PYG{p}{(}\PYG{n}{psd\PYGZus{}default} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+s1}{nMC}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{:}\PYG{l+m+mi}{1000}\PYG{p}{\PYGZcb{}}\PYG{p}{)}
 \end{sphinxVerbatim}
 
 \end{description}
@@ -1167,11 +1174,11 @@ To change a default behavior:
 \label{\detokenize{Main:age-modelling}}\index{Bchron() (in module pyleoclim)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Main:pyleoclim.Bchron}}\pysiglinewithargsret{\sphinxcode{pyleoclim.}\sphinxbfcode{Bchron}}{\emph{lipd, modelNum=None, objectName=None, rejectAges=None, calCurves=None, reservoirAgeCorr=None, predictPositions='paleo', positionsThickness=None, outlierProbs=None, iterations=1000, burn=2000, thin=8, extractDate=-68, maxExtrap=500, thetaMhSd=0.5, muMhSd=0.1, psiMhSd=0.1, ageScaleVal=1000, positionScaleVal=100, saveLipd=True, plot=True, figsize={[}4, 8{]}, flipCoor=False, xlabel=None, ylabel=None, xlim=None, ylim=None, violinColor='\#8B008B', medianLineColor='black', medianLineWidth=2.0, CIFillColor='Silver', samplePaths=True, samplePathNumber=10, alpha=0.5, saveFig=False, dir='', format='eps'}}{}
+\phantomsection\label{\detokenize{Main:pyleoclim.Bchron}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.}}\sphinxbfcode{\sphinxupquote{Bchron}}}{\emph{lipd, modelNum=None, objectName=None, rejectAges=None, calCurves=None, reservoirAgeCorr=None, predictPositions='paleo', positionsThickness=None, outlierProbs=None, iterations=1000, burn=2000, thin=8, extractDate=-68, maxExtrap=500, thetaMhSd=0.5, muMhSd=0.1, psiMhSd=0.1, ageScaleVal=1000, positionScaleVal=100, saveLipd=True, plot=True, figsize={[}4, 8{]}, flipCoor=False, xlabel=None, ylabel=None, xlim=None, ylim=None, violinColor='\#8B008B', medianLineColor='black', medianLineWidth=2.0, CIFillColor='Silver', samplePaths=True, samplePathNumber=10, alpha=0.5, saveFig=False, dir='', format='eps'}}{}
 Runs Bchron and plot if asked
 
 Fits a non-parametric chronology model to age/position data according to
-the Compound Poisson-Gamma model defined by Haslett and Parnell (2008). 
+the Compound Poisson-Gamma model defined by Haslett and Parnell (2008).
 This version used a slightly modified Markov chain Monte-Carlo fitting
 algorithm which aims to converge quicker and requires fewer iterations.
 It also a slightly modified procedure for identifying outliers.
@@ -1193,14 +1200,14 @@ obtained from lipd.readLipd() or pyleoclim.openLipd(). Please note
 that the Bchron function currently only allows for a single LiPD file
 (i.e., not the entire directory).
 
-\item[{modelNum (int): The model number in which to place the Bchron output. }] \leavevmode
+\item[{modelNum (int): The model number in which to place the Bchron output.}] \leavevmode
 If unknown, the function will try to make a guess and/or prompt
 based on the number of already available models.
 
 \item[{objectName (str): The name of the chron object in which to store the new}] \leavevmode
 model (e.g. “chron0”)
 
-\item[{rejectAges (vector): A vector of 1/0 where 1 include the dates to be rejected. }] \leavevmode
+\item[{rejectAges (vector): A vector of 1/0 where 1 include the dates to be rejected.}] \leavevmode
 Default it None.
 
 \item[{calCurves (list): (Optional) A vector of values containing either ‘intcal13’,}] \leavevmode
@@ -1214,8 +1221,8 @@ ages standard deviation, then enter {[}0,0{]} to bypass the prompt.
 Will only be applied if CalCurves is set to ‘marine13’. Otherwise,
 leave to none.
 
-\item[{predictPositions (array): (Optional) a vector of positions }] \leavevmode
-(e.g. depths) at which predicted age values are required. 
+\item[{predictPositions (array): (Optional) a vector of positions}] \leavevmode
+(e.g. depths) at which predicted age values are required.
 Defaults to a sequence of length 100 from the top position to the
 bottom position.
 
@@ -1226,7 +1233,7 @@ slice. By default set to zero.
 \item[{outlierProbs (array): (Optional) A vector of prior outlier probabilities,}] \leavevmode
 one for each age. Defaults to 0.01
 
-\item[{iterations (int): (Optional) The number of iterations to start the procedure. }] \leavevmode
+\item[{iterations (int): (Optional) The number of iterations to start the procedure.}] \leavevmode
 Default and minimum should be 10000.
 
 \item[{burn (int): (Optional) The number of starting iterations to discard.}] \leavevmode
@@ -1240,7 +1247,7 @@ extrapolation purposes so that no extrapolated ages go beyond the
 top age of the core. Defaults to the current year.
 
 \item[{maxExtrap (int): (Optional) The maximum number of extrapolations to}] \leavevmode
-perform before giving up and setting the predicted ages to NA. 
+perform before giving up and setting the predicted ages to NA.
 Useful for when large amounts of extrapolation are required, i.e.
 some of the predictPositions are a long way from the dated
 positions. Defaults to 500.
@@ -1251,16 +1258,16 @@ deviation for the age parameters. Defaults to 0.5.
 \item[{muMhSd (float): (Optional)  The Metropolis-Hastings standard deviation}] \leavevmode
 for the compound Poisson-Gamma Scale. Defaults to 0.1
 
-\item[{psiMhSd (float): (Optional) The Metropolis-Hastings standard deviation }] \leavevmode
+\item[{psiMhSd (float): (Optional) The Metropolis-Hastings standard deviation}] \leavevmode
 for the Compound Poisson-Gamma Scale.
 
-\item[{ageScaleVal (int): (Optional) A scale value for the ages. }] \leavevmode
-Bchronology works best when the ages are scaled to be 
+\item[{ageScaleVal (int): (Optional) A scale value for the ages.}] \leavevmode
+Bchronology works best when the ages are scaled to be
 approximately between 0 and 100.
 The default value is thus 1000 for ages given in years.
 
-\item[{positionScaleVal (int):  (Optional) A scale value for the positions. }] \leavevmode
-Bchronology works best when the positions are scaled to be 
+\item[{positionScaleVal (int):  (Optional) A scale value for the positions.}] \leavevmode
+Bchronology works best when the positions are scaled to be
 approximately between 0 and 100. The default value is thus
 100 for positions given in cm.
 
@@ -1324,6 +1331,7 @@ The number of rows is the same as the length of depth
 
 ageDist - the distribution of ages around each dates.
 fig - the figure
+run - the full R object containing the outputs of the Bchron run
 
 \item[{Warnings:}] \leavevmode\begin{description}
 \item[{This function requires R and the Bchron package and all its}] \leavevmode
@@ -1333,18 +1341,18 @@ dependencies to be installed on the same machine.
 
 \item[{Reference:}] \leavevmode\begin{itemize}
 \item {} \begin{description}
-\item[{Haslett, J., and Parnell, A. C. (2008). A simple monotone }] \leavevmode
-process with application to radiocarbon-dated depth 
-chronologies. Journal of the Royal Statistical Society, 
+\item[{Haslett, J., and Parnell, A. C. (2008). A simple monotone}] \leavevmode
+process with application to radiocarbon-dated depth
+chronologies. Journal of the Royal Statistical Society,
 Series C, 57, 399-418. DOI:10.1111/j.1467-9876.2008.00623.x
 
 \end{description}
 
 \item {} \begin{description}
-\item[{Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E., }] \leavevmode
-and Huntley, B. (2008). A flexible approach to assessing 
+\item[{Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E.,}] \leavevmode
+and Huntley, B. (2008). A flexible approach to assessing
 synchroneity of past events using Bayesian reconstructions
-of sedimentation history. Quaternary Science Reviews, 
+of sedimentation history. Quaternary Science Reviews,
 27(19-20), 1872-1885. DOI:10.1016/j.quascirev.2008.07.009
 
 \end{description}
@@ -1392,7 +1400,7 @@ This module uses the Basemap package for mapping.
 \index{mapAll() (in module pyleoclim.Map)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Map:pyleoclim.Map.mapAll}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Map.}\sphinxbfcode{mapAll}}{\emph{lat, lon, criteria, projection='robin', lat\_0='', lon\_0='', llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, countries=False, counties=False, rivers=False, states=False, figsize={[}10, 4{]}, ax=None, background='none', scale=0.5, palette='', markersize=50}}{}
+\phantomsection\label{\detokenize{Map:pyleoclim.Map.mapAll}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Map.}}\sphinxbfcode{\sphinxupquote{mapAll}}}{\emph{lat, lon, criteria, projection='robin', lat\_0='', lon\_0='', llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, countries=False, counties=False, rivers=False, states=False, figsize={[}10, 4{]}, ax=None, background='none', scale=0.5, palette='', markersize=50}}{}
 Map the location of all lat/lon according to some criteria
 
 Map the location of all lat/lon according to some criteria. The choice of 
@@ -1462,7 +1470,7 @@ The figure
 \index{mapOne() (in module pyleoclim.Map)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Map:pyleoclim.Map.mapOne}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Map.}\sphinxbfcode{mapOne}}{\emph{lat, lon, projection='ortho', lat\_0='', lon\_0='', llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=50, marker='ro', figsize={[}4, 4{]}, ax=None}}{}
+\phantomsection\label{\detokenize{Map:pyleoclim.Map.mapOne}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Map.}}\sphinxbfcode{\sphinxupquote{mapOne}}}{\emph{lat, lon, projection='ortho', lat\_0='', lon\_0='', llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=50, marker='ro', figsize={[}4, 4{]}, ax=None}}{}
 Map one location on the globe
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -1517,10 +1525,10 @@ ax: Return as axis instead of figure (useful to integrate plot into a subplot)
 
 
 \chapter{Plotting Functions}
-\label{\detokenize{Plot::doc}}\label{\detokenize{Plot:plotting-functions}}\index{plot() (in module pyleoclim.Plot)}
+\label{\detokenize{Plot:plotting-functions}}\label{\detokenize{Plot::doc}}\index{plot() (in module pyleoclim.Plot)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Plot:pyleoclim.Plot.plot}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Plot.}\sphinxbfcode{plot}}{\emph{x, y, markersize=50, marker='ro', x\_label='', y\_label='', title='', figsize={[}10, 4{]}, ax=None}}{}
+\phantomsection\label{\detokenize{Plot:pyleoclim.Plot.plot}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Plot.}}\sphinxbfcode{\sphinxupquote{plot}}}{\emph{x, y, markersize=50, marker='ro', x\_label='', y\_label='', title='', figsize={[}10, 4{]}, ax=None}}{}
 Make a 2-D plot
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -1544,7 +1552,7 @@ The figure
 \index{plot\_hist() (in module pyleoclim.Plot)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Plot:pyleoclim.Plot.plot_hist}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Plot.}\sphinxbfcode{plot\_hist}}{\emph{y, bins=None, hist=True, label='', kde=True, rug=False, fit=None, hist\_kws=\{'label': 'Histogram'\}, kde\_kws=\{'label': 'KDE fit'\}, rug\_kws=\{'label': 'rug'\}, fit\_kws=\{'label': 'fit'\}, color='0.7', vertical=False, norm\_hist=True, figsize={[}5, 5{]}, ax=None}}{}
+\phantomsection\label{\detokenize{Plot:pyleoclim.Plot.plot_hist}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Plot.}}\sphinxbfcode{\sphinxupquote{plot\_hist}}}{\emph{y, bins=None, hist=True, label='', kde=True, rug=False, fit=None, hist\_kws=\{'label': 'Histogram'\}, kde\_kws=\{'label': 'KDE fit'\}, rug\_kws=\{'label': 'rug'\}, fit\_kws=\{'label': 'fit'\}, color='0.7', vertical=False, norm\_hist=True, figsize={[}5, 5{]}, ax=None}}{}
 Plot a univariate distribution of the PaleoData values
 
 This function is based on the seaborn displot function, which is
@@ -1601,10 +1609,10 @@ fig - The figure
 
 
 \chapter{Statistics Functions}
-\label{\detokenize{Stats::doc}}\label{\detokenize{Stats:statistics-functions}}\index{simpleStats() (in module pyleoclim.Stats)}
+\label{\detokenize{Stats:statistics-functions}}\label{\detokenize{Stats::doc}}\index{simpleStats() (in module pyleoclim.Stats)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Stats:pyleoclim.Stats.simpleStats}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Stats.}\sphinxbfcode{simpleStats}}{\emph{y}, \emph{axis=None}}{}
+\phantomsection\label{\detokenize{Stats:pyleoclim.Stats.simpleStats}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Stats.}}\sphinxbfcode{\sphinxupquote{simpleStats}}}{\emph{y}, \emph{axis=None}}{}
 Computes simple statistics
 
 Computes the mean, median, min, max, standard deviation, and interquartile
@@ -1629,7 +1637,7 @@ The mean, median, min, max, standard deviation and IQR by columns
 \index{corrsig() (in module pyleoclim.Stats)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Stats:pyleoclim.Stats.corrsig}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Stats.}\sphinxbfcode{corrsig}}{\emph{y1}, \emph{y2}, \emph{nsim=1000}, \emph{method='isospectral'}, \emph{alpha=0.5}}{}~\begin{description}
+\phantomsection\label{\detokenize{Stats:pyleoclim.Stats.corrsig}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Stats.}}\sphinxbfcode{\sphinxupquote{corrsig}}}{\emph{y1}, \emph{y2}, \emph{nsim=1000}, \emph{method='isospectral'}, \emph{alpha=0.5}}{}~\begin{description}
 \item[{Estimates the significance of correlations between non IID time series by 3 independent methods:}] \leavevmode\begin{enumerate}
 \item {} 
 ‘ttest’: T-test where d.o.f are corrected for the effect of serial correlation
@@ -1672,7 +1680,7 @@ This module allows the manipulation of timeseries.
 \index{bin() (in module pyleoclim.Timeseries)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.bin}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Timeseries.}\sphinxbfcode{bin}}{\emph{x}, \emph{y}, \emph{bin\_size=''}, \emph{start=''}, \emph{end=''}}{}
+\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.bin}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Timeseries.}}\sphinxbfcode{\sphinxupquote{bin}}}{\emph{x}, \emph{y}, \emph{bin\_size=''}, \emph{start=''}, \emph{end=''}}{}
 Bin the values
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -1698,7 +1706,7 @@ error -  the standard error on the mean in each bin
 \index{interp() (in module pyleoclim.Timeseries)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.interp}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Timeseries.}\sphinxbfcode{interp}}{\emph{x}, \emph{y}, \emph{interp\_step=''}, \emph{start=''}, \emph{end=''}}{}
+\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.interp}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Timeseries.}}\sphinxbfcode{\sphinxupquote{interp}}}{\emph{x}, \emph{y}, \emph{interp\_step=''}, \emph{start=''}, \emph{end=''}}{}
 Linear interpolation onto a new x-axis
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -1720,7 +1728,7 @@ interp\_values - the interpolated values
 \index{onCommonAxis() (in module pyleoclim.Timeseries)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.onCommonAxis}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Timeseries.}\sphinxbfcode{onCommonAxis}}{\emph{x1}, \emph{y1}, \emph{x2}, \emph{y2}, \emph{interp\_step=''}, \emph{start=''}, \emph{end=''}}{}
+\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.onCommonAxis}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Timeseries.}}\sphinxbfcode{\sphinxupquote{onCommonAxis}}}{\emph{x1}, \emph{y1}, \emph{x2}, \emph{y2}, \emph{interp\_step=''}, \emph{start=''}, \emph{end=''}}{}
 Places two timeseries on a common axis
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -1748,7 +1756,7 @@ interp\_values2 - the intespolated y-values for the second timeseries
 \index{standardize() (in module pyleoclim.Timeseries)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.standardize}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Timeseries.}\sphinxbfcode{standardize}}{\emph{x}, \emph{scale=1}, \emph{axis=0}, \emph{ddof=0}, \emph{eps=0.001}}{}
+\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.standardize}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Timeseries.}}\sphinxbfcode{\sphinxupquote{standardize}}}{\emph{x}, \emph{scale=1}, \emph{axis=0}, \emph{ddof=0}, \emph{eps=0.001}}{}
 Centers and normalizes a given time series. Constant or nearly constant time series not rescaled.
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -1781,7 +1789,7 @@ The zscore function in SciPy: \sphinxurl{https://github.com/scipy/scipy/blob/mas
 \index{ts2segments() (in module pyleoclim.Timeseries)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.ts2segments}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Timeseries.}\sphinxbfcode{ts2segments}}{\emph{ys}, \emph{ts}, \emph{factor=10}}{}
+\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.ts2segments}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Timeseries.}}\sphinxbfcode{\sphinxupquote{ts2segments}}}{\emph{ys}, \emph{ts}, \emph{factor=10}}{}
 Chop a time series into several segments based on gap detection.
 \begin{description}
 \item[{The rule of gap detection is very simple:}] \leavevmode
@@ -1808,7 +1816,7 @@ n\_segs (int): the number of segments
 \index{clean\_ts() (in module pyleoclim.Timeseries)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.clean_ts}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Timeseries.}\sphinxbfcode{clean\_ts}}{\emph{ys}, \emph{ts}}{}
+\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.clean_ts}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Timeseries.}}\sphinxbfcode{\sphinxupquote{clean\_ts}}}{\emph{ys}, \emph{ts}}{}
 Delete the NaNs in the time series and sort it with time axis ascending
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -1823,10 +1831,28 @@ ts (array): the time axis of the time series without nans
 
 \end{fulllineitems}
 
+\index{annualize() (in module pyleoclim.Timeseries)}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.annualize}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Timeseries.}}\sphinxbfcode{\sphinxupquote{annualize}}}{\emph{ys}, \emph{ts}}{}
+Annualize a time series whose time resolution is finer than 1 year
+\begin{description}
+\item[{Args:}] \leavevmode
+ys (array): a time series, NaNs allowed
+ts (array): the time axis of the time series, NaNs allowed
+
+\item[{Returns:}] \leavevmode
+ys\_ann (array): the annualized time series
+year\_int (array): the time axis of the annualized time series
+
+\end{description}
+
+\end{fulllineitems}
+
 \index{gaussianize() (in module pyleoclim.Timeseries)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.gaussianize}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Timeseries.}\sphinxbfcode{gaussianize}}{\emph{X}}{}
+\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.gaussianize}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Timeseries.}}\sphinxbfcode{\sphinxupquote{gaussianize}}}{\emph{X}}{}
 Transforms a (proxy) timeseries to Gaussian distribution.
 
 Originator: Michael Erb, Univ. of Southern California - April 2017
@@ -1836,7 +1862,7 @@ Originator: Michael Erb, Univ. of Southern California - April 2017
 \index{gaussianize\_single() (in module pyleoclim.Timeseries)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.gaussianize_single}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Timeseries.}\sphinxbfcode{gaussianize\_single}}{\emph{X\_single}}{}
+\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.gaussianize_single}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Timeseries.}}\sphinxbfcode{\sphinxupquote{gaussianize\_single}}}{\emph{X\_single}}{}
 Transforms a single (proxy) timeseries to Gaussian distribution.
 
 Originator: Michael Erb, Univ. of Southern California - April 2017
@@ -1846,14 +1872,14 @@ Originator: Michael Erb, Univ. of Southern California - April 2017
 \index{detrend() (in module pyleoclim.Timeseries)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.detrend}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Timeseries.}\sphinxbfcode{detrend}}{\emph{y, x=None, method='linear', params={[}'default', 4, 0, 1{]}}}{}
+\phantomsection\label{\detokenize{Timeseries:pyleoclim.Timeseries.detrend}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Timeseries.}}\sphinxbfcode{\sphinxupquote{detrend}}}{\emph{y, x=None, method='linear', params={[}'default', 4, 0, 1{]}}}{}
 Detrend a timeseries according to three methods
 \begin{description}
 \item[{Detrending methods include, “linear” (default), “constant”, and using a low-pass}] \leavevmode
 Savitzky-Golay filters.
 
 \item[{Args:}] \leavevmode
-y (array): The series to be detrended. 
+y (array): The series to be detrended.
 x (array): The time axis for the timeseries. Necessary for use with
 \begin{quote}
 
@@ -1861,14 +1887,14 @@ the Savitzky-Golay filters method since the series should be evenly spaced.
 \end{quote}
 \begin{description}
 \item[{method (str): The type of detrending. If linear (default), the result of}] \leavevmode
-a linear least-squares fit to y is subtracted from y. If constant, 
+a linear least-squares fit to y is subtracted from y. If constant,
 only the mean of data is subtrated. If “savitzy-golay”, y is filtered
 using the Savitzky-Golay filters and the resulting filtered series
 is subtracted from y.
 
 \item[{params (list): The paramters for the Savitzky-Golay filters. The first parameter}] \leavevmode
-corresponds to the window size (default it set to half of the data) 
-while the second parameter correspond to the order of the filter 
+corresponds to the window size (default it set to half of the data)
+while the second parameter correspond to the order of the filter
 (default is 4). The third parameter is the order of the derivative
 (the default is zero, which means only smoothing.)
 
@@ -1876,393 +1902,6 @@ while the second parameter correspond to the order of the filter
 
 \item[{Returns:}] \leavevmode
 ys (array) - the detrended timeseries.
-
-\end{description}
-
-\end{fulllineitems}
-
-
-
-\chapter{LiPD Utilities}
-\label{\detokenize{LipdUtils:lipd-utilities}}\label{\detokenize{LipdUtils::doc}}
-This modules allow basic manipulation of LiPD files
-
-
-\section{Creating Directories and saving}
-\label{\detokenize{LipdUtils:creating-directories-and-saving}}\index{createDir() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.createDir}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{createDir}}{\emph{path}, \emph{foldername}}{}
-Create a new folder in a working directory
-
-Create a new folder in a working directory to save outputs from Pyleoclim.
-\begin{description}
-\item[{Args:}] \leavevmode
-path(str): the path to the new folder.
-foldername(str): the name of the folder to be created
-
-\item[{Returns:}] \leavevmode
-newdir - the full path to the new directory
-
-\end{description}
-
-\end{fulllineitems}
-
-\index{saveFigure() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.saveFigure}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{saveFigure}}{\emph{name}, \emph{format='eps'}, \emph{dir=''}}{}
-Save a figure
-
-Save the figure in the directory. If not given, creates a folder in the 
-current working directory.
-\begin{description}
-\item[{Args:}] \leavevmode
-name (str): name of the file
-format (str): One of the file extensions supported by the active
-\begin{quote}
-
-backend. Default is “eps”. Most backend support png, pdf, ps, eps,
-and svg.
-\end{quote}
-\begin{description}
-\item[{dir (str): the name of the folder in the LiPD working directory.}] \leavevmode
-If not provided, creates a default folder called ‘figures’.
-
-\end{description}
-
-\end{description}
-
-\end{fulllineitems}
-
-
-
-\section{LiPD files}
-\label{\detokenize{LipdUtils:lipd-files}}\index{enumerateLipds() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.enumerateLipds}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{enumerateLipds}}{\emph{lipds}}{}
-Enumerate the LiPD files loaded in the workspace
-\begin{description}
-\item[{Args:}] \leavevmode\begin{description}
-\item[{lipds (dict): A dictionary of LiPD files. Can be obtained from}] \leavevmode
-pyleoclim.readLipd()
-
-\end{description}
-
-\end{description}
-
-\end{fulllineitems}
-
-\index{getLipd() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.getLipd}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{getLipd}}{\emph{lipds}}{}
-Prompt for a LiPD file
-
-Ask the user to select a LiPD file from a list
-Use this function in conjunction with enumerateLipds()
-\begin{description}
-\item[{Args:}] \leavevmode\begin{description}
-\item[{lipds (dict): A dictionary of LiPD files. Can be obtained from}] \leavevmode
-pyleoclim.readLipd()
-
-\end{description}
-
-\item[{Returns:}] \leavevmode
-The index of the LiPD file
-
-\end{description}
-
-\end{fulllineitems}
-
-
-
-\section{Handling Variables}
-\label{\detokenize{LipdUtils:handling-variables}}\index{promptForVariable() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.promptForVariable}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{promptForVariable}}{}{}
-Prompt for a specific variable
-
-Ask the user to select the variable they are interested in.
-Use this function in conjunction with readHeaders() or getTSO()
-\begin{description}
-\item[{Returns:}] \leavevmode
-The index of the variable
-
-\end{description}
-
-\end{fulllineitems}
-
-\index{xAxisTs() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.xAxisTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{xAxisTs}}{\emph{timeseries}}{}
-Prompt the user to choose a x-axis representation for the timeseries.
-\begin{description}
-\item[{Args:}] \leavevmode
-timeseries: a timeseries object
-
-\item[{Returns:}] \leavevmode
-x\_axis - the values for the x-axis representation,
-
-label - returns either “age”, “year”, or “depth”
-
-\end{description}
-
-\end{fulllineitems}
-
-\index{checkXaxis() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.checkXaxis}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{checkXaxis}}{\emph{timeseries}, \emph{x\_axis=''}}{}
-Check that a x-axis is present for the timeseries
-\begin{description}
-\item[{Args:}] \leavevmode
-timeseries : a timeseries
-x\_axis (str) : the x-axis representation, either depth, age or year
-
-\item[{Returns:}] \leavevmode
-x - the values for the x-axis representation,
-
-label - returns either “age”, “year”, or “depth”
-
-\end{description}
-
-\end{fulllineitems}
-
-\index{searchVar() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.searchVar}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{searchVar}}{\emph{timeseries\_list}, \emph{key}, \emph{exact=True}, \emph{override=True}}{}
-This function search for key words (exact match) for a variable
-\begin{description}
-\item[{Args:}] \leavevmode
-timeseries\_list (list): A list of available series
-key (list): A list of keys to search
-exact (bool): if True, looks for an exact match.
-override (bool): if True, override the exact match if no match is found
-
-\item[{Returns:}] \leavevmode\begin{description}
-\item[{match (list)- A list of keys for the timeseries that match the selection}] \leavevmode
-criteria.
-
-\end{description}
-
-\end{description}
-
-\end{fulllineitems}
-
-
-
-\section{Handling timeseries objects}
-\label{\detokenize{LipdUtils:handling-timeseries-objects}}\index{enumerateTs() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.enumerateTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{enumerateTs}}{\emph{timeseries\_list}}{}
-Enumerate the available time series objects
-\begin{description}
-\item[{Args:}] \leavevmode\begin{description}
-\item[{timeseries\_list: a  list of available timeseries objects. }] \leavevmode
-To use the timeseries loaded upon initiation of the 
-pyleoclim package, use pyleo.time\_series.
-
-\end{description}
-
-\end{description}
-
-\end{fulllineitems}
-
-\index{getTs() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.getTs}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{getTs}}{\emph{timeseries\_list}, \emph{option=''}}{}
-Get a specific timeseries object from a dictionary of timeseries
-\begin{description}
-\item[{Args:}] \leavevmode\begin{description}
-\item[{timeseries\_list: a  list of available timeseries objects. }] \leavevmode
-To use the timeseries loaded upon initiation of the 
-pyleoclim package, use pyleo.time\_series.
-
-\end{description}
-
-option: An expression to filter the datasets. Uses lipd.filterTs()
-
-\item[{Returns:}] \leavevmode
-A single timeseries object if not optional filter selected or a filtered
-list if optional arguments given
-
-\end{description}
-
-\end{fulllineitems}
-
-
-
-\section{Linking LiPDs to the LinkedEarth Ontology}
-\label{\detokenize{LipdUtils:linking-lipds-to-the-linkedearth-ontology}}\index{LipdToOntology() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.LipdToOntology}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{LipdToOntology}}{\emph{archiveType}}{}
-standardize archiveType
-
-Transform the archiveType from their LiPD name to their ontology counterpart
-\begin{description}
-\item[{Args:}] \leavevmode
-archiveType (STR): name of the archiveType from the LiPD file
-
-\item[{Returns:}] \leavevmode
-archiveType according to the ontology
-
-\end{description}
-
-\end{fulllineitems}
-
-
-
-\section{Dealing with models}
-\label{\detokenize{LipdUtils:dealing-with-models}}\index{isModel() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.isModel}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{isModel}}{\emph{csvName}, \emph{lipd}}{}
-Check for the presence of a model in the same object than the measurement table
-\begin{description}
-\item[{Args:}] \leavevmode
-csvName (str): The name of the csv file corresponding to the measurement table
-lipd (dict): A LiPD object
-
-\item[{Returns:}] \leavevmode
-model (list): List of models already available
-\begin{description}
-\item[{dataObject (str): The name of the paleoData or ChronData}] \leavevmode
-object in which the model(s) are stored
-
-\end{description}
-
-\end{description}
-
-\end{fulllineitems}
-
-\index{modelNumber() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.modelNumber}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{modelNumber}}{\emph{model}}{}
-Assign a new or existing model number
-\begin{description}
-\item[{Args:}] \leavevmode
-model (list): List of possible model number. Obtained from isModel
-
-\item[{Returns:}] \leavevmode
-modelNum (int): The number of the model
-
-\end{description}
-
-\end{fulllineitems}
-
-
-
-\section{Extracting tables}
-\label{\detokenize{LipdUtils:extracting-tables}}\index{isMeasurement() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.isMeasurement}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{isMeasurement}}{\emph{csv\_dict}}{}
-Check whether measurement tables are available
-\begin{description}
-\item[{Args:}] \leavevmode
-csv\_dict (dict): Dictionary of available csv
-
-\item[{Returns:}] \leavevmode
-paleoMeasurementTables - List of available paleoMeasurementTables
-chronMeasurementTables - List of available chronMeasurementTables
-
-\end{description}
-
-\end{fulllineitems}
-
-\index{whichMeasurement() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.whichMeasurement}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{whichMeasurement}}{\emph{measurementTableList}, \emph{csv\_dict}}{}
-Select a measurement table from a list
-
-Use in conjunction with the function isMeasurement
-\begin{description}
-\item[{Args:}] \leavevmode\begin{description}
-\item[{measurementTableList (list): List of measurement tables contained in the}] \leavevmode
-LiPD file. Output from the isMeasurement function
-
-\end{description}
-
-csv\_list (list): Dictionary of available csv
-
-\item[{Returns:}] \leavevmode
-csvName (str) - the name of the csv file
-
-\end{description}
-
-\end{fulllineitems}
-
-\index{getMeasurement() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.getMeasurement}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{getMeasurement}}{\emph{csvName}, \emph{lipd}}{}
-Extract the dictionary corresponding to the measurement table
-\begin{description}
-\item[{Args:}] \leavevmode
-csvName (str): The name of the csv file
-lipd (dict): The LiPD object from which to extract the data
-
-\item[{Returns:}] \leavevmode\begin{description}
-\item[{ts\_list - A dictionary containing data and metadata for each column in the}] \leavevmode
-csv file.
-
-\end{description}
-
-\end{description}
-
-\end{fulllineitems}
-
-
-
-\section{Dealing with ensembles}
-\label{\detokenize{LipdUtils:dealing-with-ensembles}}\index{isEnsemble() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.isEnsemble}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{isEnsemble}}{\emph{csv\_dict}}{}
-Check whether ensembles are available
-\begin{description}
-\item[{Args:}] \leavevmode
-csv\_dict (dict): Dictionary of available csv
-
-\item[{Returns:}] \leavevmode
-paleoEnsembleTables - List of available paleoEnsembleTables
-
-chronEnsembleTables - List of availale chronEnsemble Tables
-
-\end{description}
-
-\end{fulllineitems}
-
-\index{mapAgeEnsembleToPaleoData() (in module pyleoclim.LipdUtils)}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{LipdUtils:pyleoclim.LipdUtils.mapAgeEnsembleToPaleoData}}\pysiglinewithargsret{\sphinxcode{pyleoclim.LipdUtils.}\sphinxbfcode{mapAgeEnsembleToPaleoData}}{\emph{ensembleValues}, \emph{depthEnsemble}, \emph{depthPaleo}}{}
-Map the depth for the ensemble age values to the paleo depth
-\begin{description}
-\item[{Args:}] \leavevmode\begin{description}
-\item[{ensembleValues (array): A matrix of possible age models. Realizations}] \leavevmode
-should be stored in columns
-
-\item[{depthEnsemble (array): A vector of depth. The vector should have the same}] \leavevmode
-length as the number of rows in the ensembleValues
-
-\item[{depthPaleo (array): A vector corresponding to the depth at which there}] \leavevmode
-are paleodata information
-
-\end{description}
-
-\item[{Returns:}] \leavevmode
-ensembleValuesToPaleo - A matrix of age ensemble on the PaleoData scale
 
 \end{description}
 
@@ -2278,7 +1917,7 @@ This module handles some basic return for the summary plots.
 \index{getMetadata() (in module pyleoclim.SummaryPlots)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{SummaryPlots:pyleoclim.SummaryPlots.getMetadata}}\pysiglinewithargsret{\sphinxcode{pyleoclim.SummaryPlots.}\sphinxbfcode{getMetadata}}{\emph{timeseries}}{}
+\phantomsection\label{\detokenize{SummaryPlots:pyleoclim.SummaryPlots.getMetadata}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.SummaryPlots.}}\sphinxbfcode{\sphinxupquote{getMetadata}}}{\emph{timeseries}}{}
 Get the necessary metadata to be printed out automatically
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -2314,7 +1953,7 @@ Calibration Notes
 \index{TsData() (in module pyleoclim.SummaryPlots)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{SummaryPlots:pyleoclim.SummaryPlots.TsData}}\pysiglinewithargsret{\sphinxcode{pyleoclim.SummaryPlots.}\sphinxbfcode{TsData}}{\emph{timeseries}, \emph{x\_axis=''}}{}
+\phantomsection\label{\detokenize{SummaryPlots:pyleoclim.SummaryPlots.TsData}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.SummaryPlots.}}\sphinxbfcode{\sphinxupquote{TsData}}}{\emph{timeseries}, \emph{x\_axis=''}}{}
 Get the PaleoData with age/depth information
 
 Get the necessary information for the TS plots/necessary to allow for
@@ -2351,7 +1990,7 @@ label - the results of the x-axis query. Either depth, year, or age
 \index{agemodelData() (in module pyleoclim.SummaryPlots)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{SummaryPlots:pyleoclim.SummaryPlots.agemodelData}}\pysiglinewithargsret{\sphinxcode{pyleoclim.SummaryPlots.}\sphinxbfcode{agemodelData}}{\emph{timeseries}}{}
+\phantomsection\label{\detokenize{SummaryPlots:pyleoclim.SummaryPlots.agemodelData}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.SummaryPlots.}}\sphinxbfcode{\sphinxupquote{agemodelData}}}{\emph{timeseries}}{}
 Get the necessary information for the agemodel plot
 \begin{description}
 \item[{Args:}] \leavevmode\begin{description}
@@ -2383,7 +2022,7 @@ This module allows analysis in the frequency domain
 \index{ar1\_fit() (in module pyleoclim.Spectral)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.ar1_fit}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{ar1\_fit}}{\emph{ys, ts=None, detrend='no', params={[}'default', 4, 0, 1{]}}}{}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.ar1_fit}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Spectral.}}\sphinxbfcode{\sphinxupquote{ar1\_fit}}}{\emph{ys, ts=None, detrend='no', params={[}'default', 4, 0, 1{]}}}{}
 Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -2422,7 +2061,7 @@ OR estimated persistence (for unevenly-spaced time series)
 \index{ar1\_sim() (in module pyleoclim.Spectral)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.ar1_sim}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{ar1\_sim}}{\emph{ys, n, p, ts=None, detrend='no', params={[}'default', 4, 0, 1{]}}}{}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.ar1_sim}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Spectral.}}\sphinxbfcode{\sphinxupquote{ar1\_sim}}}{\emph{ys, n, p, ts=None, detrend='no', params={[}'default', 4, 0, 1{]}}}{}
 Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from \sphinxtitleref{ys} and \sphinxtitleref{ts}
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -2459,7 +2098,7 @@ red (matrix): n rows by p columns matrix of an AR1 process
 \index{wwz() (in module pyleoclim.Spectral)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.wwz}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{wwz}}{\emph{ys, ts, tau=None, freqs=None, c=0.012665147955292222, Neff=3, Neff\_coi=3, nMC=200, nproc=8, detrend='no', params={[}'default', 4, 0, 1{]}, gaussianize=False, standardize=True, method='Kirchner\_f2py', len\_bd=0, bc\_mode='reflect', reflect\_type='odd'}}{}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.wwz}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Spectral.}}\sphinxbfcode{\sphinxupquote{wwz}}}{\emph{ys, ts, tau=None, freqs=None, c=0.012665147955292222, Neff=3, Neff\_coi=3, nMC=200, nproc=8, detrend='no', params={[}'default', 4, 0, 1{]}, gaussianize=False, standardize=True, method='Kirchner\_f2py', len\_bd=0, bc\_mode='reflect', reflect\_type='odd'}}{}
 Return the weighted wavelet amplitude (WWA) with phase, AR1\_q, and cone of influence, as well as WT coeeficients
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -2515,7 +2154,7 @@ coeff (array): the wavelet transform coefficents
 \index{wwz\_psd() (in module pyleoclim.Spectral)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.wwz_psd}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{wwz\_psd}}{\emph{ys, ts, freqs=None, tau=None, c=0.001, nproc=8, nMC=200, detrend='no', params={[}'default', 4, 0, 1{]}, gaussianize=False, standardize=True, Neff=3, anti\_alias=False, avgs=1, method='Kirchner\_f2py'}}{}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.wwz_psd}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Spectral.}}\sphinxbfcode{\sphinxupquote{wwz\_psd}}}{\emph{ys, ts, freqs=None, tau=None, c=0.001, nproc=8, nMC=200, detrend='no', params={[}'default', 4, 0, 1{]}, gaussianize=False, standardize=True, Neff=3, anti\_alias=False, avgs=2, method='Kirchner\_f2py'}}{}
 Return the psd of a timeseries directly using wwz method.
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -2546,7 +2185,7 @@ while the second parameter correspond to the order of the filter
 
 \end{description}
 
-gaussionize (bool): If True, gaussianizes the timeseries
+gaussianize (bool): If True, gaussianizes the timeseries
 standardize (bool): If True, standardizes the timeseries
 method (str): ‘Foster’ - the original WWZ method;
 \begin{quote}
@@ -2568,7 +2207,7 @@ psd\_ar1 (array): the psds of AR1 processes
 \index{xwc() (in module pyleoclim.Spectral)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.xwc}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{xwc}}{\emph{ys1, ts1, ys2, ts2, tau=None, freqs=None, c=0.012665147955292222, Neff=3, nproc=8, detrend='no', nMC=200, params={[}'default', 4, 0, 1{]}, gaussianize=False, standardize=True, method='Kirchner\_f2py'}}{}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.xwc}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Spectral.}}\sphinxbfcode{\sphinxupquote{xwc}}}{\emph{ys1, ts1, ys2, ts2, smooth\_factor=0.25, tau=None, freqs=None, c=0.012665147955292222, Neff=3, nproc=8, detrend='no', nMC=200, params={[}'default', 4, 0, 1{]}, gaussianize=False, standardize=True, method='Kirchner\_f2py'}}{}
 Return the crosse wavelet coherence of two time series.
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -2600,7 +2239,7 @@ while the second parameter correspond to the order of the filter
 
 \end{description}
 
-gaussionize (bool): If True, gaussianizes the timeseries
+gaussianize (bool): If True, gaussianizes the timeseries
 standardize (bool): If True, standardizes the timeseries
 method (str): ‘Foster’ - the original WWZ method;
 \begin{quote}
@@ -2624,7 +2263,7 @@ coi (array): cone of influence
 \index{plot\_wwa() (in module pyleoclim.Spectral)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_wwa}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{plot\_wwa}}{\emph{wwa, freqs, tau, AR1\_q=None, coi=None, levels=None, tick\_range=None, yticks=None, yticks\_label=None, ylim=None, xticks=None, xlabels=None, figsize={[}20, 8{]}, clr\_map='OrRd', cbar\_drawedges=False, cone\_alpha=0.5, plot\_signif=False, signif\_style='contour', title=None, plot\_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar\_orientation='vertical', cbar\_pad=0.05, cbar\_frac=0.15, cbar\_labelsize=None}}{}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_wwa}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Spectral.}}\sphinxbfcode{\sphinxupquote{plot\_wwa}}}{\emph{wwa, freqs, tau, AR1\_q=None, coi=None, levels=None, tick\_range=None, yticks=None, yticks\_label=None, ylim=None, xticks=None, xlabels=None, figsize={[}20, 8{]}, clr\_map='OrRd', cbar\_drawedges=False, cone\_alpha=0.5, plot\_signif=False, signif\_style='contour', title=None, plot\_cbar=True, plot\_cone=False, ax=None, xlabel='Year (AD)', ylabel='Period (years)', cbar\_orientation='vertical', cbar\_pad=0.05, cbar\_frac=0.15, cbar\_labelsize=None}}{}
 Plot the wavelet amplitude
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -2662,7 +2301,7 @@ fig (figure): the 2-D plot of wavelet analysis
 \index{plot\_coherence() (in module pyleoclim.Spectral)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_coherence}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{plot\_coherence}}{\emph{xw\_coherence, xw\_phase, freqs, tau, AR1\_q=None, coi=None, levels=None, tick\_range=None, basey=2, yticks=None, ylim=None, xticks=None, xlabels=None, figsize={[}20, 8{]}, clr\_map='OrRd', exg=5, scale=30, width=0.004, cbar\_drawedges=False, cone\_alpha=0.5, plot\_signif=False, signif\_style='contour', title=None, plot\_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar\_orientation='vertical', cbar\_pad=0.05, cbar\_frac=0.15, cbar\_labelsize=None}}{}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_coherence}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Spectral.}}\sphinxbfcode{\sphinxupquote{plot\_coherence}}}{\emph{res\_xwc, pt=0.5, levels=None, tick\_range=None, basey=2, yticks=None, ylim=None, xticks=None, xlabels=None, figsize={[}20, 8{]}, clr\_map='OrRd', skip\_x=5, skip\_y=5, scale=30, width=0.004, cbar\_drawedges=False, cone\_alpha=0.5, plot\_signif=False, signif\_style='contour', title=None, plot\_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar\_orientation='vertical', cbar\_pad=0.05, cbar\_frac=0.15, cbar\_labelsize=None}}{}
 Plot the wavelet amplitude
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -2690,6 +2329,8 @@ ylabel (str): The y-axis label
 cbar\_pad (float): the pad for the colorbar
 c)bar\_frac (float): the frac for the colorbar
 cbar\_labelsize (float): the font size of the colorbar label
+pt (float): plot arrows above pt value
+skip\_x, skip\_y (float): scale factors for arrows
 
 \item[{Returns:}] \leavevmode
 fig (figure): the 2-D plot of wavelet analysis
@@ -2701,7 +2342,7 @@ fig (figure): the 2-D plot of wavelet analysis
 \index{plot\_wwadist() (in module pyleoclim.Spectral)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_wwadist}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{plot\_wwadist}}{\emph{wwa}, \emph{ylim=None}}{}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_wwadist}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Spectral.}}\sphinxbfcode{\sphinxupquote{plot\_wwadist}}}{\emph{wwa}, \emph{ylim=None}}{}
 Plot the distribution of wwa with the 95\% quantile line.
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -2718,7 +2359,7 @@ fig (figure): the 2-D plot of wavelet analysis
 \index{plot\_psd() (in module pyleoclim.Spectral)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_psd}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{plot\_psd}}{\emph{psd, freqs, lmstyle='-', linewidth=None, color='\#3b5b92', ar1\_lmstyle='-', ar1\_linewidth=None, period\_ticks=None, period\_tickslabel=None, psd\_lim=None, period\_lim=None, figsize={[}20, 8{]}, label='PSD', plot\_ar1=False, psd\_ar1\_q95=None, title=None, legend=True, psd\_ar1\_color='\#d9544d', ax=None, vertical=False, plot\_gridlines=True, period\_label='Period (years)', psd\_label='Spectral Density', zorder=None}}{}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_psd}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Spectral.}}\sphinxbfcode{\sphinxupquote{plot\_psd}}}{\emph{psd, freqs, lmstyle='-', linewidth=None, color='\#3b5b92', ar1\_lmstyle='-', ar1\_linewidth=None, period\_ticks=None, period\_tickslabel=None, psd\_lim=None, period\_lim=None, figsize={[}20, 8{]}, label='PSD', plot\_ar1=False, psd\_ar1\_q95=None, title=None, legend=True, psd\_ar1\_color='\#d9544d', ax=None, vertical=False, plot\_gridlines=True, period\_label='Period (years)', psd\_label='Spectral Density', zorder=None}}{}
 Plot the wavelet amplitude
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -2752,7 +2393,7 @@ ax (figure): the 2-D plot of wavelet analysis
 \index{plot\_summary() (in module pyleoclim.Spectral)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_summary}}\pysiglinewithargsret{\sphinxcode{pyleoclim.Spectral.}\sphinxbfcode{plot\_summary}}{\emph{ys, ts, freqs=None, tau=None, c1=0.012665147955292222, c2=0.001, nMC=200, nproc=8, detrend='no', gaussianize=False, standardize=True, levels=None, method='Kirchner\_f2py', anti\_alias=False, period\_ticks=None, ts\_color=None, title=None, ts\_ylabel=None, wwa\_xlabel=None, wwa\_ylabel=None, psd\_lmstyle='-', psd\_lim=None, period\_I={[}0.125, 0.5{]}, period\_D={[}0.005, 0.05{]}}}{}
+\phantomsection\label{\detokenize{Spectral:pyleoclim.Spectral.plot_summary}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.Spectral.}}\sphinxbfcode{\sphinxupquote{plot\_summary}}}{\emph{ys, ts, freqs=None, tau=None, c1=0.012665147955292222, c2=0.001, nMC=200, nproc=8, detrend='no', gaussianize=False, standardize=True, levels=None, method='Kirchner\_f2py', anti\_alias=False, period\_ticks=None, ts\_color=None, ts\_style='-o', title=None, ts\_ylabel=None, wwa\_xlabel=None, wwa\_ylabel=None, psd\_lmstyle='-', psd\_lim=None, period\_S\_str='beta\_I', period\_S={[}0.125, 0.5{]}, period\_L\_str='beta\_D', period\_L={[}0.005, 0.05{]}}}{}
 Plot the time series with the wavelet analysis and psd
 \begin{description}
 \item[{Args:}] \leavevmode
@@ -2777,7 +2418,7 @@ wwa\_xlabel (str): label for x-axis in the wwa plot
 wwa\_ylabel (str): label for y-axis in the wwa plot
 psd\_lmstyle (str): the line style in the psd plot
 psd\_lim (list): the limits for psd
-period\_I, period\_D (list): the ranges for beta estimation
+period\_S, period\_L (list): the ranges for beta estimation
 
 \item[{Returns:}] \leavevmode
 fig (figure): the summary plot
@@ -2789,7 +2430,7 @@ fig (figure): the summary plot
 
 
 \chapter{RBchron}
-\label{\detokenize{RBchron::doc}}\label{\detokenize{RBchron:rbchron}}
+\label{\detokenize{RBchron:rbchron}}\label{\detokenize{RBchron::doc}}
 This module helps in the preparation of a Bchron run.
 
 When using this module, please cite:
@@ -2798,7 +2439,7 @@ When using this module, please cite:
 \index{chooseCalCurves() (in module pyleoclim.RBchron)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{RBchron:pyleoclim.RBchron.chooseCalCurves}}\pysiglinewithargsret{\sphinxcode{pyleoclim.RBchron.}\sphinxbfcode{chooseCalCurves}}{}{}
+\phantomsection\label{\detokenize{RBchron:pyleoclim.RBchron.chooseCalCurves}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.RBchron.}}\sphinxbfcode{\sphinxupquote{chooseCalCurves}}}{}{}
 Prompt for a calibration curve if not given by the user.
 
 Prompt the user for the name of a calibration curve used to run the Bchron 
@@ -2816,7 +2457,7 @@ A list of calibration curves to be applied
 \index{reservoirAgeCorrection() (in module pyleoclim.RBchron)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{RBchron:pyleoclim.RBchron.reservoirAgeCorrection}}\pysiglinewithargsret{\sphinxcode{pyleoclim.RBchron.}\sphinxbfcode{reservoirAgeCorrection}}{}{}
+\phantomsection\label{\detokenize{RBchron:pyleoclim.RBchron.reservoirAgeCorrection}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.RBchron.}}\sphinxbfcode{\sphinxupquote{reservoirAgeCorrection}}}{}{}
 Estimate reservoir age correction
 
 Assists in estimating the reservoir age correction for marine records.
@@ -2836,7 +2477,7 @@ mean if using the 14Chrono Marine Reservoir database.
 \index{runBchron() (in module pyleoclim.RBchron)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{RBchron:pyleoclim.RBchron.runBchron}}\pysiglinewithargsret{\sphinxcode{pyleoclim.RBchron.}\sphinxbfcode{runBchron}}{\emph{ages}, \emph{agesStd}, \emph{positions}, \emph{rejectAges=None}, \emph{positionsThickness=None}, \emph{calCurves=None}, \emph{reservoirAgeCorr=None}, \emph{outlierProbs=None}, \emph{predictPositions=None}, \emph{iterations=10000}, \emph{burn=2000}, \emph{thin=8}, \emph{extractDate=-68}, \emph{maxExtrap=500}, \emph{thetaMhSd=0.5}, \emph{muMhSd=0.1}, \emph{psiMhSd=0.1}, \emph{ageScaleVal=1000}, \emph{positionScaleVal=100}}{}
+\phantomsection\label{\detokenize{RBchron:pyleoclim.RBchron.runBchron}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.RBchron.}}\sphinxbfcode{\sphinxupquote{runBchron}}}{\emph{ages}, \emph{agesStd}, \emph{positions}, \emph{rejectAges=None}, \emph{positionsThickness=None}, \emph{calCurves=None}, \emph{reservoirAgeCorr=None}, \emph{outlierProbs=None}, \emph{predictPositions=None}, \emph{iterations=10000}, \emph{burn=2000}, \emph{thin=8}, \emph{extractDate=-68}, \emph{maxExtrap=500}, \emph{thetaMhSd=0.5}, \emph{muMhSd=0.1}, \emph{psiMhSd=0.1}, \emph{ageScaleVal=1000}, \emph{positionScaleVal=100}}{}
 Age model for Tie-Point chronologies
 
 Fits a non-parametric chronology model to age/position data according to
@@ -2968,7 +2609,7 @@ of sedimentation history. Quaternary Science Reviews,
 \index{plotBchron() (in module pyleoclim.RBchron)}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{RBchron:pyleoclim.RBchron.plotBchron}}\pysiglinewithargsret{\sphinxcode{pyleoclim.RBchron.}\sphinxbfcode{plotBchron}}{\emph{depth, chron, positions, ageDist, flipCoor=False, xlabel='Depth', ylabel='Age', xlim=None, ylim=None, violinColor='\#8B008B', medianLineColor='black', medianLineWidth=2.0, CIFillColor='Silver', samplePaths=True, samplePathNumber=10, alpha=0.5, figsize={[}4, 8{]}, ax=None}}{}
+\phantomsection\label{\detokenize{RBchron:pyleoclim.RBchron.plotBchron}}\pysiglinewithargsret{\sphinxcode{\sphinxupquote{pyleoclim.RBchron.}}\sphinxbfcode{\sphinxupquote{plotBchron}}}{\emph{depth, chron, positions, ageDist, flipCoor=False, xlabel='Depth', ylabel='Age', xlim=None, ylim=None, violinColor='\#8B008B', medianLineColor='black', medianLineWidth=2.0, CIFillColor='Silver', samplePaths=True, samplePathNumber=10, alpha=0.5, figsize={[}4, 8{]}, ax=None}}{}
 Plot a Bchron output
 
 This function creates a plot showing the calibrated calendar ages and

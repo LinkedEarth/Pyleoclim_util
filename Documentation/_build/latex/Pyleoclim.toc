@@ -24,17 +24,8 @@
 \contentsline {chapter}{\numberline {4}Plotting Functions}{21}{chapter.4}
 \contentsline {chapter}{\numberline {5}Statistics Functions}{23}{chapter.5}
 \contentsline {chapter}{\numberline {6}Timeseries Functions}{25}{chapter.6}
-\contentsline {chapter}{\numberline {7}LiPD Utilities}{27}{chapter.7}
-\contentsline {section}{\numberline {7.1}Creating Directories and saving}{27}{section.7.1}
-\contentsline {section}{\numberline {7.2}LiPD files}{27}{section.7.2}
-\contentsline {section}{\numberline {7.3}Handling Variables}{28}{section.7.3}
-\contentsline {section}{\numberline {7.4}Handling timeseries objects}{28}{section.7.4}
-\contentsline {section}{\numberline {7.5}Linking LiPDs to the LinkedEarth Ontology}{29}{section.7.5}
-\contentsline {section}{\numberline {7.6}Dealing with models}{29}{section.7.6}
-\contentsline {section}{\numberline {7.7}Extracting tables}{29}{section.7.7}
-\contentsline {section}{\numberline {7.8}Dealing with ensembles}{30}{section.7.8}
-\contentsline {chapter}{\numberline {8}Summary Plots}{31}{chapter.8}
-\contentsline {chapter}{\numberline {9}Spectral Functions}{33}{chapter.9}
-\contentsline {chapter}{\numberline {10}RBchron}{39}{chapter.10}
-\contentsline {chapter}{\numberline {11}Indices and tables}{43}{chapter.11}
-\contentsline {chapter}{Index}{45}{section*.70}
+\contentsline {chapter}{\numberline {7}Summary Plots}{29}{chapter.7}
+\contentsline {chapter}{\numberline {8}Spectral Functions}{31}{chapter.8}
+\contentsline {chapter}{\numberline {9}RBchron}{37}{chapter.9}
+\contentsline {chapter}{\numberline {10}Indices and tables}{41}{chapter.10}
+\contentsline {chapter}{Index}{43}{section*.53}
