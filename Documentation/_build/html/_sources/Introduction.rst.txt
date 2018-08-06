@@ -34,6 +34,8 @@ is aware of age ensembles stored via LiPD and uses them for time-uncertain analy
 
 Version Information
 ```````````````````
+| 0.4.8: Add support of f2py WWZ for Linux
+| 0.4.7: Update to coherence function
 | 0.4.0: New functionalities: map nearest records by archive type, plot ensemble time series, age modelling through Bchron.
 | 0.3.1: New functionalities: segment a timeseries using a gap detection criteria, update to summary plot to perform spectral analysis
 | 0.3.0: Compatibility with LiPD 1.3 and Spectral module added

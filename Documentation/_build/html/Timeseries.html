@@ -4,30 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Timeseries Functions &#8212; Pyleoclim 0.4.0 documentation</title>
+    <title>Timeseries Functions &#8212; Pyleoclim 0.4.8 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.4.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="LiPD Utilities" href="LipdUtils.html" />
+    <link rel="next" title="Summary Plots" href="SummaryPlots.html" />
     <link rel="prev" title="Statistics Functions" href="Stats.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -35,12 +26,12 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="LipdUtils.html" title="LiPD Utilities"
+          <a href="SummaryPlots.html" title="Summary Plots"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="Stats.html" title="Statistics Functions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -49,8 +40,8 @@
   <p class="topless"><a href="Stats.html"
                         title="previous chapter">Statistics Functions</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="LipdUtils.html"
-                        title="next chapter">LiPD Utilities</a></p>
+  <p class="topless"><a href="SummaryPlots.html"
+                        title="next chapter">Summary Plots</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -60,12 +51,14 @@
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -202,6 +195,20 @@ ts (array): the time axis of the time series without nans</dd>
 </dd></dl>
 
 <dl class="function">
+<dt id="pyleoclim.Timeseries.annualize">
+<code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">annualize</code><span class="sig-paren">(</span><em>ys</em>, <em>ts</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.annualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annualize a time series whose time resolution is finer than 1 year</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>ys (array): a time series, NaNs allowed
+ts (array): the time axis of the time series, NaNs allowed</dd>
+<dt>Returns:</dt>
+<dd>ys_ann (array): the annualized time series
+year_int (array): the time axis of the annualized time series</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="pyleoclim.Timeseries.gaussianize">
 <code class="descclassname">pyleoclim.Timeseries.</code><code class="descname">gaussianize</code><span class="sig-paren">(</span><em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.gaussianize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transforms a (proxy) timeseries to Gaussian distribution.</p>
@@ -223,19 +230,19 @@ ts (array): the time axis of the time series without nans</dd>
 <dt>Detrending methods include, “linear” (default), “constant”, and using a low-pass</dt>
 <dd>Savitzky-Golay filters.</dd>
 <dt>Args:</dt>
-<dd><p class="first">y (array): The series to be detrended. 
+<dd><p class="first">y (array): The series to be detrended.
 x (array): The time axis for the timeseries. Necessary for use with</p>
 <blockquote>
 <div>the Savitzky-Golay filters method since the series should be evenly spaced.</div></blockquote>
 <dl class="last docutils">
 <dt>method (str): The type of detrending. If linear (default), the result of</dt>
-<dd>a linear least-squares fit to y is subtracted from y. If constant, 
+<dd>a linear least-squares fit to y is subtracted from y. If constant,
 only the mean of data is subtrated. If “savitzy-golay”, y is filtered
 using the Savitzky-Golay filters and the resulting filtered series
 is subtracted from y.</dd>
 <dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt>
-<dd>corresponds to the window size (default it set to half of the data) 
-while the second parameter correspond to the order of the filter 
+<dd>corresponds to the window size (default it set to half of the data)
+while the second parameter correspond to the order of the filter
 (default is 4). The third parameter is the order of the derivative
 (the default is zero, which means only smoothing.)</dd>
 </dl>
@@ -260,17 +267,17 @@ while the second parameter correspond to the order of the filter
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="LipdUtils.html" title="LiPD Utilities"
+          <a href="SummaryPlots.html" title="Summary Plots"
              >next</a> |</li>
         <li class="right" >
           <a href="Stats.html" title="Statistics Functions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
     </div>
   </body>
 </html>

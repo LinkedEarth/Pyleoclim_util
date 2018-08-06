@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Spectral Functions &#8212; Pyleoclim 0.4.0 documentation</title>
+    <title>Spectral Functions &#8212; Pyleoclim 0.4.8 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.4.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -26,8 +18,7 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="RBchron" href="RBchron.html" />
     <link rel="prev" title="Summary Plots" href="SummaryPlots.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -40,7 +31,7 @@
         <li class="right" >
           <a href="SummaryPlots.html" title="Summary Plots"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -60,12 +51,14 @@
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -190,7 +183,7 @@ coeff (array): the wavelet transform coefficents</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.wwz_psd">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">wwz_psd</code><span class="sig-paren">(</span><em>ys, ts, freqs=None, tau=None, c=0.001, nproc=8, nMC=200, detrend='no', params=['default', 4, 0, 1], gaussianize=False, standardize=True, Neff=3, anti_alias=False, avgs=1, method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.wwz_psd" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">wwz_psd</code><span class="sig-paren">(</span><em>ys, ts, freqs=None, tau=None, c=0.001, nproc=8, nMC=200, detrend='no', params=['default', 4, 0, 1], gaussianize=False, standardize=True, Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.wwz_psd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the psd of a timeseries directly using wwz method.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -216,7 +209,7 @@ while the second parameter correspond to the order of the filter
 (default is 4). The third parameter is the order of the derivative
 (the default is zero, which means only smoothing.)</dd>
 </dl>
-<p>gaussionize (bool): If True, gaussianizes the timeseries
+<p>gaussianize (bool): If True, gaussianizes the timeseries
 standardize (bool): If True, standardizes the timeseries
 method (str): ‘Foster’ - the original WWZ method;</p>
 <blockquote class="last">
@@ -233,7 +226,7 @@ psd_ar1 (array): the psds of AR1 processes</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.xwc">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">xwc</code><span class="sig-paren">(</span><em>ys1, ts1, ys2, ts2, tau=None, freqs=None, c=0.012665147955292222, Neff=3, nproc=8, detrend='no', nMC=200, params=['default', 4, 0, 1], gaussianize=False, standardize=True, method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.xwc" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">xwc</code><span class="sig-paren">(</span><em>ys1, ts1, ys2, ts2, smooth_factor=0.25, tau=None, freqs=None, c=0.012665147955292222, Neff=3, nproc=8, detrend='no', nMC=200, params=['default', 4, 0, 1], gaussianize=False, standardize=True, method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.xwc" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the crosse wavelet coherence of two time series.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -260,7 +253,7 @@ while the second parameter correspond to the order of the filter
 (default is 4). The third parameter is the order of the derivative
 (the default is zero, which means only smoothing.)</dd>
 </dl>
-<p>gaussionize (bool): If True, gaussianizes the timeseries
+<p>gaussianize (bool): If True, gaussianizes the timeseries
 standardize (bool): If True, standardizes the timeseries
 method (str): ‘Foster’ - the original WWZ method;</p>
 <blockquote class="last">
@@ -279,7 +272,7 @@ coi (array): cone of influence</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_wwa">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_wwa</code><span class="sig-paren">(</span><em>wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None, yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwa" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_wwa</code><span class="sig-paren">(</span><em>wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None, yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, plot_cbar=True, plot_cone=False, ax=None, xlabel='Year (AD)', ylabel='Period (years)', cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwa" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the wavelet amplitude</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -313,7 +306,7 @@ cbar_labelsize (float): the font size of the colorbar label</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_coherence">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_coherence</code><span class="sig-paren">(</span><em>xw_coherence, xw_phase, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None, basey=2, yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', exg=5, scale=30, width=0.004, cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_coherence" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_coherence</code><span class="sig-paren">(</span><em>res_xwc, pt=0.5, levels=None, tick_range=None, basey=2, yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', skip_x=5, skip_y=5, scale=30, width=0.004, cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_coherence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the wavelet amplitude</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -340,7 +333,9 @@ xlabel (str): The x-axis label
 ylabel (str): The y-axis label
 cbar_pad (float): the pad for the colorbar
 c)bar_frac (float): the frac for the colorbar
-cbar_labelsize (float): the font size of the colorbar label</dd>
+cbar_labelsize (float): the font size of the colorbar label
+pt (float): plot arrows above pt value
+skip_x, skip_y (float): scale factors for arrows</dd>
 <dt>Returns:</dt>
 <dd>fig (figure): the 2-D plot of wavelet analysis</dd>
 </dl>
@@ -391,7 +386,7 @@ zorder (int): the order of the layer</dd>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_summary">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_summary</code><span class="sig-paren">(</span><em>ys, ts, freqs=None, tau=None, c1=0.012665147955292222, c2=0.001, nMC=200, nproc=8, detrend='no', gaussianize=False, standardize=True, levels=None, method='Kirchner_f2py', anti_alias=False, period_ticks=None, ts_color=None, title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None, psd_lmstyle='-', psd_lim=None, period_I=[0.125, 0.5], period_D=[0.005, 0.05]</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_summary" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_summary</code><span class="sig-paren">(</span><em>ys, ts, freqs=None, tau=None, c1=0.012665147955292222, c2=0.001, nMC=200, nproc=8, detrend='no', gaussianize=False, standardize=True, levels=None, method='Kirchner_f2py', anti_alias=False, period_ticks=None, ts_color=None, ts_style='-o', title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None, psd_lmstyle='-', psd_lim=None, period_S_str='beta_I', period_S=[0.125, 0.5], period_L_str='beta_D', period_L=[0.005, 0.05]</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the time series with the wavelet analysis and psd</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -413,7 +408,7 @@ wwa_xlabel (str): label for x-axis in the wwa plot
 wwa_ylabel (str): label for y-axis in the wwa plot
 psd_lmstyle (str): the line style in the psd plot
 psd_lim (list): the limits for psd
-period_I, period_D (list): the ranges for beta estimation</p>
+period_S, period_L (list): the ranges for beta estimation</p>
 </dd>
 <dt>Returns:</dt>
 <dd>fig (figure): the summary plot</dd>
@@ -440,12 +435,12 @@ period_I, period_D (list): the ranges for beta estimation</p>
         <li class="right" >
           <a href="SummaryPlots.html" title="Summary Plots"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
     </div>
   </body>
 </html>

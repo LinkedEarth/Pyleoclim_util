@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Main Functions &#8212; Pyleoclim 0.4.0 documentation</title>
+    <title>Main Functions &#8212; Pyleoclim 0.4.8 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.4.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -26,8 +18,7 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Mapping Functions" href="Map.html" />
     <link rel="prev" title="Pyleoclim" href="Introduction.html" /> 
-  </head>
-  <body>
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -40,7 +31,7 @@
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -81,12 +72,14 @@
    </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -140,7 +133,7 @@ Set the dictionary as a global variable so that it doesn’t have to be
 provided as an argument for every function.</p>
 <dl class="docutils">
 <dt>Args:</dt>
-<dd>lipds (dict): A dictionary of LiPD files obtained through the 
+<dd>lipds (dict): A dictionary of LiPD files obtained through the
 readLipd function</dd>
 <dt>Returns:</dt>
 <dd>ts_list - A list of timeseries object</dd>
@@ -165,7 +158,7 @@ background (str): Plots one of the following images on the map:</p>
 <div>bluemarble, etopo, shadedrelief, or none (filled continents).
 Default is shadedrelief.</div></blockquote>
 <p>figsize (list): the size for the figure
-ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
+ax: Return as axis instead of figure (useful to integrate plot into a subplot)
 saveFig (bool): Default is to not save the figure
 dir (str): The absolute path of the directory in which to save the</p>
 <blockquote>
@@ -243,24 +236,24 @@ radius (float): The distance (in km) to search for nearby records.</p>
 <dt>projection (string): the map projection. Refers to the Basemap</dt>
 <dd>documentation for a list of available projections. Only projections
 supporting setting the map center with a single lat/lon or with
-the coordinates of the rectangle are currently supported. 
+the coordinates of the rectangle are currently supported.
 Default is to use a Robinson projection.</dd>
 <dt>lat_0, lon_0 (float): the center coordinates for the map. Default is</dt>
-<dd>mean latitude/longitude in the list. 
+<dd>mean latitude/longitude in the list.
 If the chosen projection doesn’t support it, Basemap will
 ignore the given values.</dd>
 <dt>llcrnrlat, urcrnrlat, llcrnrlon, urcrnrlon (float): The coordinates</dt>
 <dd>of the two opposite corners of the rectangle.</dd>
 </dl>
-<p>countries (bool): Draws the countries border. Defaults is off (False). 
+<p>countries (bool): Draws the countries border. Defaults is off (False).
 counties (bool): Draws the USA counties. Default is off (False).
 rivers (bool): Draws the rivers. Default is off (False).
 states (bool): Draws the American and Australian states borders.</p>
 <blockquote>
 <div>Default is off (False).</div></blockquote>
 <dl class="docutils">
-<dt>background (string): Plots one of the following images on the map: </dt>
-<dd>bluemarble, etopo, shadedrelief, or none (filled continents). 
+<dt>background (string): Plots one of the following images on the map:</dt>
+<dd>bluemarble, etopo, shadedrelief, or none (filled continents).
 Default is none.</dd>
 <dt>scale (float): Useful to downgrade the original image resolution to</dt>
 <dd>speed up the process. Default is 0.5.</dd>
@@ -276,7 +269,7 @@ markersize_adjust (bool): If True, will proportionaly adjust the size of</p>
 <dd>records. Default is to use the color palette by archiveType. If set
 to None then the color of the marker will represent the distance from
 the reference records.</dd>
-<dt>cmap (str): The colormap to use to represent the distance from the </dt>
+<dt>cmap (str): The colormap to use to represent the distance from the</dt>
 <dd>reference record if no marker is selected.</dd>
 </dl>
 <p>colorbar (bool): Create a colorbar. Default is True
@@ -396,7 +389,7 @@ They allow to plot specific information about a timeseries but are not customiza
 <code class="descclassname">pyleoclim.</code><code class="descname">summaryTs</code><span class="sig-paren">(</span><em>timeseries=''</em>, <em>x_axis=''</em>, <em>saveFig=False</em>, <em>dir=''</em>, <em>format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.summaryTs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Basic summary plot</p>
 <p>Plots the following information: the time series, a histogram of
-the PaleoData_values, location map, spectral density using the wwz 
+the PaleoData_values, location map, spectral density using the wwz
 method, and metadata about the record.</p>
 <dl class="docutils">
 <dt>Args:</dt>
@@ -436,7 +429,7 @@ and svg.</dd>
 <dd>the mean, median, min, max, standard deviation and the
 inter-quartile range (IQR) of a timeseries.</dd>
 <dt>Examples:</dt>
-<dd><div class="first last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mean</span><span class="p">,</span> <span class="n">median</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">IQR</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">statsTs</span><span class="p">(</span><span class="n">timeseries</span><span class="p">)</span>
+<dd><div class="first last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mean</span><span class="p">,</span> <span class="n">median</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">IQR</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">statsTs</span><span class="p">(</span><span class="n">timeseries</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd>
@@ -595,7 +588,7 @@ factor (float): factor to adjust the threshold. threshold = factor*dt_mean.</p>
 </dd>
 <dt>Returns:</dt>
 <dd>seg_y (list) - a list of several segments with potentially different length
-seg_t (list) - A list of the time values for each y segment. 
+seg_t (list) - A list of the time values for each y segment.
 n_segs (int) - the number of segments</dd>
 </dl>
 </dd></dl>
@@ -753,16 +746,16 @@ and svg.</dd>
 <p>fig: The figure</p>
 <dl class="last docutils">
 <dt>References:</dt>
-<dd>Foster, G. (1996). Wavelets for period analysis of unevenly 
+<dd>Foster, G. (1996). Wavelets for period analysis of unevenly
 sampled time series. The Astronomical Journal, 112(4), 1709-1729.</dd>
 <dt>Examples:</dt>
 <dd><p class="first">To run both wwz and psd:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">wwz</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">wwz</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Note: This will return a single figure with wwa and psd</p>
 <p>To change a default behavior:</p>
-<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">psd_default</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nMC&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">})</span> 
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">psd_default</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nMC&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">})</span>
 </pre></div>
 </div>
 </dd>
@@ -779,7 +772,7 @@ sampled time series. The Astronomical Journal, 112(4), 1709-1729.</dd>
 <code class="descclassname">pyleoclim.</code><code class="descname">Bchron</code><span class="sig-paren">(</span><em>lipd, modelNum=None, objectName=None, rejectAges=None, calCurves=None, reservoirAgeCorr=None, predictPositions='paleo', positionsThickness=None, outlierProbs=None, iterations=1000, burn=2000, thin=8, extractDate=-68, maxExtrap=500, thetaMhSd=0.5, muMhSd=0.1, psiMhSd=0.1, ageScaleVal=1000, positionScaleVal=100, saveLipd=True, plot=True, figsize=[4, 8], flipCoor=False, xlabel=None, ylabel=None, xlim=None, ylim=None, violinColor='#8B008B', medianLineColor='black', medianLineWidth=2.0, CIFillColor='Silver', samplePaths=True, samplePathNumber=10, alpha=0.5, saveFig=False, dir='', format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Bchron" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs Bchron and plot if asked</p>
 <p>Fits a non-parametric chronology model to age/position data according to
-the Compound Poisson-Gamma model defined by Haslett and Parnell (2008). 
+the Compound Poisson-Gamma model defined by Haslett and Parnell (2008).
 This version used a slightly modified Markov chain Monte-Carlo fitting
 algorithm which aims to converge quicker and requires fewer iterations.
 It also a slightly modified procedure for identifying outliers.</p>
@@ -798,12 +791,12 @@ tables as well as the parameters with which the model was run into the LiPD file
 <dd>obtained from lipd.readLipd() or pyleoclim.openLipd(). Please note
 that the Bchron function currently only allows for a single LiPD file
 (i.e., not the entire directory).</dd>
-<dt>modelNum (int): The model number in which to place the Bchron output. </dt>
+<dt>modelNum (int): The model number in which to place the Bchron output.</dt>
 <dd>If unknown, the function will try to make a guess and/or prompt
 based on the number of already available models.</dd>
 <dt>objectName (str): The name of the chron object in which to store the new</dt>
 <dd>model (e.g. “chron0”)</dd>
-<dt>rejectAges (vector): A vector of 1/0 where 1 include the dates to be rejected. </dt>
+<dt>rejectAges (vector): A vector of 1/0 where 1 include the dates to be rejected.</dt>
 <dd>Default it None.</dd>
 <dt>calCurves (list): (Optional) A vector of values containing either ‘intcal13’,</dt>
 <dd>‘marine13’, ‘shcal13’, or ‘normal’. If none is provided, will
@@ -814,8 +807,8 @@ calibration for each age or the same length as the vector of ages.</dd>
 ages standard deviation, then enter [0,0] to bypass the prompt.
 Will only be applied if CalCurves is set to ‘marine13’. Otherwise,
 leave to none.</dd>
-<dt>predictPositions (array): (Optional) a vector of positions </dt>
-<dd>(e.g. depths) at which predicted age values are required. 
+<dt>predictPositions (array): (Optional) a vector of positions</dt>
+<dd>(e.g. depths) at which predicted age values are required.
 Defaults to a sequence of length 100 from the top position to the
 bottom position.</dd>
 <dt>positionsThickness (array): (Optional) Thickness values for each of the positions.</dt>
@@ -823,7 +816,7 @@ bottom position.</dd>
 slice. By default set to zero.</dd>
 <dt>outlierProbs (array): (Optional) A vector of prior outlier probabilities,</dt>
 <dd>one for each age. Defaults to 0.01</dd>
-<dt>iterations (int): (Optional) The number of iterations to start the procedure. </dt>
+<dt>iterations (int): (Optional) The number of iterations to start the procedure.</dt>
 <dd>Default and minimum should be 10000.</dd>
 <dt>burn (int): (Optional) The number of starting iterations to discard.</dt>
 <dd>Default is 200</dd>
@@ -833,7 +826,7 @@ slice. By default set to zero.</dd>
 <dd>extrapolation purposes so that no extrapolated ages go beyond the
 top age of the core. Defaults to the current year.</dd>
 <dt>maxExtrap (int): (Optional) The maximum number of extrapolations to</dt>
-<dd>perform before giving up and setting the predicted ages to NA. 
+<dd>perform before giving up and setting the predicted ages to NA.
 Useful for when large amounts of extrapolation are required, i.e.
 some of the predictPositions are a long way from the dated
 positions. Defaults to 500.</dd>
@@ -841,14 +834,14 @@ positions. Defaults to 500.</dd>
 <dd>deviation for the age parameters. Defaults to 0.5.</dd>
 <dt>muMhSd (float): (Optional)  The Metropolis-Hastings standard deviation</dt>
 <dd>for the compound Poisson-Gamma Scale. Defaults to 0.1</dd>
-<dt>psiMhSd (float): (Optional) The Metropolis-Hastings standard deviation </dt>
+<dt>psiMhSd (float): (Optional) The Metropolis-Hastings standard deviation</dt>
 <dd>for the Compound Poisson-Gamma Scale.</dd>
-<dt>ageScaleVal (int): (Optional) A scale value for the ages. </dt>
-<dd>Bchronology works best when the ages are scaled to be 
+<dt>ageScaleVal (int): (Optional) A scale value for the ages.</dt>
+<dd>Bchronology works best when the ages are scaled to be
 approximately between 0 and 100.
 The default value is thus 1000 for ages given in years.</dd>
-<dt>positionScaleVal (int):  (Optional) A scale value for the positions. </dt>
-<dd>Bchronology works best when the positions are scaled to be 
+<dt>positionScaleVal (int):  (Optional) A scale value for the positions.</dt>
+<dd>Bchronology works best when the positions are scaled to be
 approximately between 0 and 100. The default value is thus
 100 for positions given in cm.</dd>
 <dt>saveLipd (bool): If True, saves the ensemble, distribution, and probability</dt>
@@ -895,7 +888,8 @@ and svg.</dd>
 <dd>The number of rows is the same as the length of depth</dd>
 </dl>
 <p class="last">ageDist - the distribution of ages around each dates.
-fig - the figure</p>
+fig - the figure
+run - the full R object containing the outputs of the Bchron run</p>
 </dd>
 <dt>Warnings:</dt>
 <dd><dl class="first last docutils">
@@ -906,17 +900,17 @@ fig - the figure</p>
 <dt>Reference:</dt>
 <dd><ul class="first last simple">
 <li><dl class="first docutils">
-<dt>Haslett, J., and Parnell, A. C. (2008). A simple monotone </dt>
-<dd>process with application to radiocarbon-dated depth 
-chronologies. Journal of the Royal Statistical Society, 
+<dt>Haslett, J., and Parnell, A. C. (2008). A simple monotone</dt>
+<dd>process with application to radiocarbon-dated depth
+chronologies. Journal of the Royal Statistical Society,
 Series C, 57, 399-418. DOI:10.1111/j.1467-9876.2008.00623.x</dd>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt>Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E., </dt>
-<dd>and Huntley, B. (2008). A flexible approach to assessing 
+<dt>Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E.,</dt>
+<dd>and Huntley, B. (2008). A flexible approach to assessing
 synchroneity of past events using Bayesian reconstructions
-of sedimentation history. Quaternary Science Reviews, 
+of sedimentation history. Quaternary Science Reviews,
 27(19-20), 1872-1885. DOI:10.1016/j.quascirev.2008.07.009</dd>
 </dl>
 </li>
@@ -962,12 +956,12 @@ contains some functions to extract information about a timeseries object.</p>
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
     </div>
   </body>
 </html>
