@@ -1040,9 +1040,7 @@ class WaveletAnalysis(object):
         af = AliasFilter()
 
         # weighted psd calculation start
-        dt = np.median(np.diff(ts))
-
-        power = wwa**2 * 0.5 * dt * Neffs
+        power = wwa**2 * 0.5 * (np.max(ts)-np.min(ts))/np.size(ts) * Neffs
 
         Neff_diff = Neffs - Neff
         Neff_diff[Neff_diff < 0] = 0
