@@ -79,7 +79,7 @@ Function openLiPD() renamed openLiPDs()
 
 ### <a name = "install"> Installation </a>
 
-Python v3.4+ is required. Tested with Python v3.5 and v3.6
+Python v3.4+ is required. Tested with Python v3.5 and v3.6, but not v3.7. Currently, we recommend v3.6. [Here](https://github.com/LinkedEarth/Pyleoclim_util/tree/master/python-env-setup) is a tutorial of how to setup a Python environment for Pyleoclim and other general purposes for geosciences.
 
 Will not run on a Windows system
 

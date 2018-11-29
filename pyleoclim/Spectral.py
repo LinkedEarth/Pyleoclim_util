@@ -2524,7 +2524,7 @@ def plot_wwadist(wwa, ylim=None):
 
 
 def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-', ar1_linewidth=None,
-             period_ticks=None, period_tickslabel=None, psd_lim=None, period_lim=None,
+             period_ticks=None, period_tickslabel=None, psd_lim=None, period_lim=None, alpha=1,
              figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None, legend=True,
              psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False, plot_gridlines=True,
              period_label='Period (years)', psd_label='Spectral Density', zorder=None):
@@ -2575,13 +2575,13 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
         y_data_ar1 = psd_ar1_q95
 
     if zorder is not None:
-        ax.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, zorder=zorder, color=color)
+        ax.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, zorder=zorder, color=color, alpha=alpha)
         if plot_ar1:
             assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
             ax.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
                      label='AR(1) 95%', color=psd_ar1_color, zorder=zorder-1)
     else:
-        ax.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, color=color)
+        ax.plot(x_data, y_data, lmstyle, linewidth=linewidth, label=label, color=color, alpha=alpha)
         if plot_ar1:
             assert psd_ar1_q95 is not None, "psd_ar1_q95 is required!"
             ax.plot(x_data_ar1, y_data_ar1, ar1_lmstyle, linewidth=ar1_linewidth,
@@ -2642,7 +2642,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
                  gaussianize=False, standardize=True, levels=None, method='Kirchner_f2py',
                  anti_alias=False, period_ticks=None, ts_color=None, ts_style='-o',
                  title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
-                 psd_lmstyle='-', psd_lim=None,
+                 psd_lmstyle='-', psd_lim=None, font_scale=1.5,
                  period_S_str='beta_I', period_S=[1/8, 1/2],
                  period_L_str='beta_D', period_L=[1/200, 1/20]):
     """ Plot the time series with the wavelet analysis and psd
@@ -2685,7 +2685,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     fig = plt.figure(figsize=(15, 15))
 
     # plot the time series
-    sns.set(style="ticks", font_scale=1.5)
+    sns.set(style="ticks", font_scale=font_scale)
     ax1 = plt.subplot(gs[0:1, :-3])
     plt.plot(ts, ys, ts_style, color=ts_color)
 
