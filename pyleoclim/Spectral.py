@@ -2754,6 +2754,41 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     return fig
 
 
+def calc_plot_psd(Xo, to, ntau=501, dcon=1e-3, standardize=False,
+                  anti_alias=False, plot_fig=True, method='Kirchner_f2py', nproc=8,
+                  period_ticks=[0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000], color=None,
+                  figsize=[10, 6], font_scale=2, lw=3, label='PSD', zorder=None,
+                  xlim=None, ylim=None, loc='upper right', bbox_to_anchor=None):
+    if color is None:
+        color = sns.xkcd_rgb['denim blue']
+
+    tau = np.linspace(np.min(to), np.max(to), ntau)
+    res_psd = wwz_psd(Xo, to, freqs=None, tau=tau, c=dcon, standardize=standardize, nMC=0,
+                      method=method, anti_alias=anti_alias, nproc=nproc)
+    if plot_fig:
+        sns.set(style='ticks', font_scale=font_scale)
+        fig, ax = plt.subplots(figsize=figsize)
+        ax.loglog(1/res_psd.freqs, res_psd.psd, lw=lw, color=color, label=label,
+                  zorder=zorder)
+        ax.set_xticks(period_ticks)
+        ax.get_xaxis().set_major_formatter(ScalarFormatter())
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
+        ax.invert_xaxis()
+        ax.set_ylabel('Spectral Density')
+        ax.set_xlabel('Period (years)')
+
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        if ylim:
+            ax.set_ylim(ylim)
+        if xlim:
+            ax.set_xlim(xlim)
+        ax.legend(bbox_to_anchor=bbox_to_anchor, loc=loc, frameon=False)
+        return fig, res_psd.psd, res_psd.freqs
+    else:
+        return res_psd.psd, res_psd.freqs
+
+
 # some alias
 wa = WaveletAnalysis()
 beta_estimation = wa.beta_estimation
