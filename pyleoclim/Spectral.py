@@ -2754,16 +2754,36 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
     return fig
 
 
-def calc_plot_psd(Xo, to, ntau=501, dcon=1e-3, standardize=False,
+def calc_plot_psd(ys, ts, ntau=501, dcon=1e-3, standardize=False,
                   anti_alias=False, plot_fig=True, method='Kirchner_f2py', nproc=8,
                   period_ticks=[0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000], color=None,
                   figsize=[10, 6], font_scale=2, lw=3, label='PSD', zorder=None,
                   xlim=None, ylim=None, loc='upper right', bbox_to_anchor=None):
+    """ Calculate the PSD and plot the result
+
+    Args:
+        ys (array): a time series
+        ts (array): time axis of the time series
+        natu (int): the length of tau, the evenly-spaced time points, namely the time shift for wavelet analysis
+        dcon (float): the decay constant
+        standardize(bool): perform standardization or not
+        anti_alias(bool): perform anti-alising procedure or not
+        plot_fig (bool): plot the result or not
+        method (str): the WWZ method to use
+        nproc (int): the number of threads
+        other kwargs: for plotting purpose
+
+    Returns:
+        fig (figure): the summary plot
+        psd (array): the spectral density
+        freqs (array): the frequency vector
+
+    """
     if color is None:
         color = sns.xkcd_rgb['denim blue']
 
-    tau = np.linspace(np.min(to), np.max(to), ntau)
-    res_psd = wwz_psd(Xo, to, freqs=None, tau=tau, c=dcon, standardize=standardize, nMC=0,
+    tau = np.linspace(np.min(ts), np.max(ts), ntau)
+    res_psd = wwz_psd(ys, ts, freqs=None, tau=tau, c=dcon, standardize=standardize, nMC=0,
                       method=method, anti_alias=anti_alias, nproc=nproc)
     if plot_fig:
         sns.set(style='ticks', font_scale=font_scale)
