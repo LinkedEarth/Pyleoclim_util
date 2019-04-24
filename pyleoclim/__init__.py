@@ -21,6 +21,8 @@ from scipy.stats.mstats import mquantiles
 import datetime
 import os
 from collections import OrderedDict
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
 
 # Import internal modules to pyleoclim
@@ -106,9 +108,11 @@ plot_default = {'ice/rock': ['#FFD600','h'],
 """
 Mapping
 """
-def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
-                  figsize = [10,4],\
-                  saveFig = False, dir="", format='eps'):
+def mapAllArchive(lipds = "", markersize = 50, projection = 'Robinson',\
+                  proj_default = True, background = True,borders = False,\
+                  rivers = False, lakes = False, \
+                  figsize = [10,4], saveFig = False, dir="", format='eps'):
+    
     """Map all the available records loaded into the workspace by archiveType.
 
     Map of all the records into the workspace by archiveType.
@@ -117,11 +121,26 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
     Args:
         lipds (dict): A list of LiPD files. (Optional)
         markersize (int): The size of the markers. Default is 50
-        background (str): Plots one of the following images on the map:
-            bluemarble, etopo, shadedrelief, or none (filled continents).
-            Default is shadedrelief.
+        projection (string): the map projection. Available projections:
+            'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+            'Sinusoidal','Stereographic','TransverseMercator','UTM',
+            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+            'Geostationary','NearsidePerspective','EckertI','EckertII',
+            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+        proj_default (bool): If True, uses the standard projection attributes, including centering.
+            Enter new attributes in a dictionary to change them. Lists of attributes
+            can be found in the Cartopy documentation: 
+                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+        background (bool): If True, uses a shaded relief background (only one 
+            available in Cartopy)
+        borders (bool): Draws the countries border. Defaults is off (False). 
+        rivers (bool): Draws major rivers. Default is off (False).
+        lakes (bool): Draws major lakes. 
+            Default is off (False).
         figsize (list): the size for the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot)
         saveFig (bool): Default is to not save the figure
         dir (str): The absolute path of the directory in which to save the
             figure. If not provided, creates a default folder called 'figures'
@@ -160,9 +179,11 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
 
 
     # Make the map
-    fig = Map.mapAll(lat,lon,archiveType,lat_0=0,lon_0=0,palette=plot_default,\
-                     background = background, markersize = markersize,\
-                     figsize=figsize, ax=None)
+    fig = Map.mapAll(lat,lon,archiveType,projection = projection, \
+                     proj_default = proj_default,background = background,\
+                     borders = borders, rivers = rivers, lakes = lakes,\
+                     figsize = figsize, ax = None, palette=plot_default,\
+                     markersize = markersize)
 
     # Save the figure if asked
     if saveFig == True:
@@ -172,31 +193,38 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
 
     return fig
 
-def mapLipd(timeseries="", countries = True, counties = False, \
-        rivers = False, states = False, background = "shadedrelief",\
-        scale = 0.5, markersize = 50, marker = "default", \
-        figsize = [4,4], \
-        saveFig = False, dir = "", format="eps"):
+def mapLipd(timeseries="", projection = 'Orthographic', proj_default = True,\
+           background = True,borders = False, rivers = False, lakes = False,\
+           markersize = 50, marker = "default",figsize = [4,4], \
+           saveFig = False, dir = "", format="eps"):
     """ Create a Map for a single record
 
     Orthographic projection map of a single record.
 
     Args:
         timeseries: a LiPD timeseries object. Will prompt for one if not given
-        countries (bool): Draws the country borders. Default is on (True).
-        counties (bool): Draws the USA counties. Default is off (False).
-        rivers (bool): Draws the rivers. Default is off (False).
-        states (bool): Draws the American and Australian states borders.
-            Default is off (False)
-        background (str): Plots one of the following images on the map:
-            bluemarble, etopo, shadedrelief, or none (filled continents).
-            Default is shadedrelief
-        scale (float): useful to downgrade the original image resolution to
-            speed up the process. Default is 0.5.
-        markersize (int): default is 50
-        marker (str): a string (or list) containing the color and shape of the
-            marker. Default is by archiveType. Type pyleo.plot_default to see
-            the default palette.
+        projection (string): the map projection. Available projections:
+            'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+            'Sinusoidal','Stereographic','TransverseMercator','UTM',
+            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+            'Geostationary','NearsidePerspective','EckertI','EckertII',
+            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+        proj_default (bool): If True, uses the standard projection attributes, including centering.
+            Enter new attributes in a dictionary to change them. Lists of attributes
+            can be found in the Cartopy documentation: 
+                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+        background (bool): If True, uses a shaded relief background (only one 
+            available in Cartopy)
+        borders (bool): Draws the countries border. Defaults is off (False). 
+        rivers (bool): Draws major rivers. Default is off (False).
+        lakes (bool): Draws major lakes. 
+            Default is off (False).
+        markersize (int): The size of the marker.
+        marker (str or list): color and type of marker. Default will use the
+        default color palette for archives
         figsize (list): the size for the figure
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
@@ -229,10 +257,10 @@ def mapLipd(timeseries="", countries = True, counties = False, \
         marker = plot_default[archiveType]
 
 
-    fig = Map.mapOne(lat,lon,marker=marker,markersize=markersize,\
-                     countries = countries, counties = counties,rivers = rivers, \
-                     states = states, background = background, scale =scale,
-                     ax=None, figsize = figsize)
+    fig = Map.mapOne(lat, lon, projection = projection, proj_default = proj_default,\
+           background = background, borders = borders, rivers = rivers, lakes = lakes,\
+           markersize = markersize, marker = marker, figsize = figsize, \
+           ax = None)
 
     # Save the figure if asked
     if saveFig == True:
@@ -371,11 +399,9 @@ class MapFilters():
 
 
 def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
-                   sameArchive = False, projection = 'ortho', lat_0 = "", \
-                   lon_0="", llcrnrlat = -90, urcrnrlat=90, llcrnrlon=-180,
-                   urcrnrlon=180, countries = True, counties = False, \
-                   rivers = False, states = False, \
-                   background = "shadedrelief", scale = 0.5, markersize = 200,\
+                   sameArchive = False, projection = 'Orthographic',\
+                   proj_default = True, borders = False, rivers = False, \
+                   lakes = False, background = True , markersize = 200,\
                    markersize_adjust = True, marker_r = "ko", \
                    marker_c = "default", cmap = "Reds", colorbar = True,\
                    location = "right", label = "Distance in km",
@@ -392,27 +418,25 @@ def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
             Default is to search the entire globe
         sameArchive (bool): Returns only records with the same archiveType.
             Default is not to do so.
-        projection (string): the map projection. Refers to the Basemap
-            documentation for a list of available projections. Only projections
-            supporting setting the map center with a single lat/lon or with
-            the coordinates of the rectangle are currently supported.
-            Default is to use a Robinson projection.
-        lat_0, lon_0 (float): the center coordinates for the map. Default is
-            mean latitude/longitude in the list.
-            If the chosen projection doesn't support it, Basemap will
-            ignore the given values.
-        llcrnrlat, urcrnrlat, llcrnrlon, urcrnrlon (float): The coordinates
-            of the two opposite corners of the rectangle.
-        countries (bool): Draws the countries border. Defaults is off (False).
-        counties (bool): Draws the USA counties. Default is off (False).
-        rivers (bool): Draws the rivers. Default is off (False).
-        states (bool): Draws the American and Australian states borders.
+        projection (string): the map projection. Available projections:
+            'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+            'Sinusoidal','Stereographic','TransverseMercator','UTM',
+            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+            'Geostationary','NearsidePerspective','EckertI','EckertII',
+            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+        proj_default (bool): If True, uses the standard projection attributes, including centering.
+            Enter new attributes in a dictionary to change them. Lists of attributes
+            can be found in the Cartopy documentation: 
+                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+        background (bool): If True, uses a shaded relief background (only one 
+            available in Cartopy)
+        borders (bool): Draws the countries border. Defaults is off (False). 
+        rivers (bool): Draws major rivers. Default is off (False).
+        lakes (bool): Draws major lakes. 
             Default is off (False).
-        background (string): Plots one of the following images on the map:
-            bluemarble, etopo, shadedrelief, or none (filled continents).
-            Default is none.
-        scale (float): Useful to downgrade the original image resolution to
-            speed up the process. Default is 0.5.
         markersize (int): the size of the marker
         markersize_adjust (bool): If True, will proportionaly adjust the size of
             the marker according to distance.
@@ -519,55 +543,48 @@ def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
     dataSetName = dataSetName[0:n]
 
     # Make the map
-    if not lon_0:
-        lon_0 = timeseries["geo_meanLon"]
-
-    if not lat_0:
-        lat_0 = timeseries["geo_meanLat"]
+    # get the projection:
+    if proj_default is True:
+        proj_default = {'central_longitude':timeseries["geo_meanLon"]}
+    proj = Map.setProj(projection=projection, proj_default=proj_default)  
 
     if not ax:
-        fig,ax =  plt.subplots(figsize=figsize)
-
-    map = Basemap(projection=projection, lat_0 = lat_0, lon_0 = lon_0,\
-                  llcrnrlat=llcrnrlat, urcrnrlat=urcrnrlat,\
-                  llcrnrlon=llcrnrlon, urcrnrlon=urcrnrlon)
-
-    map.drawcoastlines()
-
+        fig, ax = plt.subplots(figsize=figsize,subplot_kw=dict(projection=proj))     
+    # draw the coastlines    
+    ax.coastlines()
+    
     # Background
-    if background == "shadedrelief":
-        map.shadedrelief(scale = scale)
-    elif background == "bluemarble":
-        map.bluemarble(scale=scale)
-    elif background == "etopo":
-        map.etopo(scale=scale)
-    elif not background:
-        map.fillcontinents(color='0.5')
-    else:
-        sys.exit("Enter either 'shadedrelief','bluemarble','etopo',or None")
+    if background is True:
+        ax.stock_img()
+    
+    #Other extra information
+    if borders is True:
+        ax.add_feature(cfeature.BORDERS)
+    if lakes is True:
+        ax.add_feature(cfeature.LAKES)
+    if rivers is True:
+        ax.add_feature(cfeature.RIVERS)
 
-    # Other extra information
+    # Make the scatter plot
+    ax.scatter(timeseries["geo_meanLon"],
+               timeseries["geo_meanLat"],
+               s= markersize,
+               facecolor = marker_r[0],
+               marker = marker_r[1],
+               zorder = 10,
+               transform=ccrs.PlateCarree())
 
-    if countries == True:
-        map.drawcountries()
-    if counties == True:
-        map.drawcounties()
-    if rivers == True:
-        map.drawrivers()
-    if states == True:
-        map.drawrivers()
-
-
-    X_r,Y_r = map(timeseries["geo_meanLon"],timeseries["geo_meanLat"])
-    map.scatter(X_r, Y_r, s=markersize, facecolor = marker_r[0], \
-                marker = marker_r[1], zorder =10)
 
     #Either plot single color or gradient
 
-    if not marker_c:
-        X_c, Y_c = map(lon,lat)
-        CS = map.scatter(X_c, Y_c, s=markersize, c = dist, zorder =10, cmap = cmap,\
-                         marker = '^')
+    if marker_c is None:
+        CS = ax.scatter(lon,lat,
+               s= markersize,
+               c = dist,
+               zorder = 10,
+               cmap = cmap,
+               marker = '^',
+               transform=ccrs.PlateCarree())
         if colorbar == True:
            cb = map.colorbar(CS,location)
            if not not label:
@@ -578,27 +595,33 @@ def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
         #Use the archive specific markers
         for archive in archiveType:
            index = [i for i,x, in enumerate(archiveType) if x == archive]
-           X_c, Y_c = map(lon[index],lat[index])
            if markersize_adjust == True:
-               map.scatter(X_c, Y_c, s = dist_adj[index],
+               ax.scatter(np.array(lon)[index], np.array(lat)[index],
+                       s = dist_adj[index],
                        facecolor = plot_default[archive][0],
                        marker = plot_default[archive][1],
-                       zorder = 10)
+                       zorder = 10,
+                       transform=ccrs.PlateCarree())
            else:
-               map.scatter(X_c, Y_c, s = markersize,
+               ax.scatter(np.array(lon)[index], np.arry(lat)[index],
+                       s = markersize,
                        facecolor = plot_default[archive][0],
                        marker = plot_default[archive][1],
-                       zorder = 10)
+                       zorder = 10,
+                       transform=ccrs.PlateCarree())
     else:
-        X_c, Y_c = map(lon,lat)
         dist_max = np.max(dist)
         dist_adj = np.ceil(dist*markersize/dist_max)
         if markersize_adjust == True:
-            map.scatter(X_c, Y_c, s=dist_adj, zorder =10, marker = marker_c[1],\
-                    facecolor = marker_c[0])
+            ax.scatter(np.array(lon), np.array(lat), 
+                    s=dist_adj, zorder =10, 
+                    marker = marker_c[1],
+                    facecolor = marker_c[0],
+                    transform=ccrs.PlateCarree())
         else:
-            map.scatter(X_c, Y_c, s=markersize, zorder =10, marker = marker_c[1],\
-                    facecolor = marker_c[0])
+            ax.scatter(np.array(lon), np.array(lat),
+                    s=markersize, zorder =10, marker = marker_c[1],
+                    facecolor = marker_c[0],transform=ccrs.PlateCarree())
 
     # Save the figure if asked
     if saveFig == True:
@@ -1079,16 +1102,20 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
     lat = timeseries["geo_meanLat"]
     lon = timeseries["geo_meanLon"]
 
-    ax3 = fig.add_subplot(gs[1,0])
-    map = Basemap(projection='ortho', lon_0=lon, lat_0=lat)
-    map.drawcoastlines()
-    map.shadedrelief(scale=0.5)
-    map.drawcountries()
-    X,Y = map(lon,lat)
-    map.scatter(X,Y,
-               s = 150,
-               color = marker[0],
-               marker = marker[1])
+    
+    proj_default = {'central_longitude':lon}
+    proj = Map.setProj(projection='Orthographic', proj_default=proj_default)
+    ax3 = fig.add_subplot(gs[1,0], projection = proj)
+    ax3.coastlines() # add coastlines
+    ax3.stock_img() # add the relief
+    ax3.scatter(np.array(lon),np.array(lat),
+               s= 150,
+               facecolor = marker[0],
+               marker = marker[1],
+               zorder = 10,
+               transform=ccrs.PlateCarree())
+
+    
 
     # Spectral analysis
 
@@ -1674,16 +1701,16 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
     #Make sure the default have the proper type
     if psd_default is not True and type(psd_default) is not dict:
         sys.exit('The default for the psd calculation should either be provided'+
-                 ' as a dictionary are set to True')
+                 ' as a dictionary or set to True')
     if psdplot_default is not True and type(psdplot_default) is not dict:
         sys.exit('The default for the psd figure should either be provided'+
-                 ' as a dictionary are set to True')
+                 ' as a dictionary or  set to True')
     if wwz_default is not True and type(wwz_default) is not dict:
         sys.exit('The default for the wwz calculation should either be provided'+
-                 ' as a dictionary are set to True')
+                 ' as a dictionary or  set to True')
     if wwaplot_default is not True and type(wwaplot_default) is not dict:
         sys.exit('The default for the wwa figure should either be provided'+
-                 ' as a dictionary are set to True')
+                 ' as a dictionary or set to True')
 
     # Get the values
     ys = np.array(timeseries['paleoData_values'], dtype = 'float64')
