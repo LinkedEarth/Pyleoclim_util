@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 """
 Created on Mon Nov 21 13:07:07 2016
 
@@ -41,7 +41,7 @@ def createDir(path, foldername):
 
     return newdir 
 
-def saveFigure(name, format="eps",dir=""):
+def saveFigure(name, format="eps",dir= None):
     """Save a figure
     
     Save the figure in the directory. If not given, creates a folder in the 
@@ -173,7 +173,7 @@ def xAxisTs(timeseries):
         
     return x_axis, label  
 
-def checkXaxis(timeseries, x_axis=""):
+def checkXaxis(timeseries, x_axis= None):
     """Check that a x-axis is present for the timeseries
     
     Args:
@@ -411,7 +411,7 @@ def enumerateTs(timeseries_list):
     for idx,val in enumerate(available_y):
         print(idx,': ',dataSetName[idx], ': ', val)     
 
-def getTs(timeseries_list, option = ""):
+def getTs(timeseries_list, option = None):
     """Get a specific timeseries object from a dictionary of timeseries
     
     Args:

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+yt# -*- coding: utf-8 -*-
 """
 Created on Wed May 11 10:42:34 2016
 
@@ -40,7 +40,7 @@ Open Lipd files and extract timeseries (set them as global variable)
 
 """
 
-def openLipd(usr_path=""):
+def openLipd(usr_path=None):
     """Read Lipd files into a dictionary
 
     Sets the dictionary as global variable so that it doesn't have to be provided
@@ -54,7 +54,10 @@ def openLipd(usr_path=""):
 
     """
     global lipd_dict
-    lipd_dict = lpd.readLipd(usr_path=usr_path)
+    if usr_path is None:
+        sys.exit("Enter a valid path")
+    else:
+        lipd_dict = lpd.readLipd(usr_path=usr_path)
     return lipd_dict
 
 def fetchTs(lipds=None):
@@ -107,10 +110,10 @@ plot_default = {'ice/rock': ['#FFD600','h'],
 """
 Mapping
 """
-def mapAllArchive(lipds = "", markersize = 50, projection = 'Robinson',\
+def mapAllArchive(lipds = None, markersize = 50, projection = 'Robinson',\
                   proj_default = True, background = True,borders = False,\
                   rivers = False, lakes = False, \
-                  figsize = [10,4], saveFig = False, dir="", format='eps'):
+                  figsize = [10,4], saveFig = False, dir=None, format='eps'):
     
     """Map all the available records loaded into the workspace by archiveType.
 
@@ -153,7 +156,7 @@ def mapAllArchive(lipds = "", markersize = 50, projection = 'Robinson',\
     """
 
     # Get the dictionary of LiPD files
-    if not lipds:
+    if lipds is None:
         if 'lipd_dict' not in globals():
             openLipd()
         lipds = lipd_dict
@@ -192,10 +195,10 @@ def mapAllArchive(lipds = "", markersize = 50, projection = 'Robinson',\
 
     return fig
 
-def mapLipd(timeseries="", projection = 'Orthographic', proj_default = True,\
+def mapLipd(timeseries=None, projection = 'Orthographic', proj_default = True,\
            background = True,borders = False, rivers = False, lakes = False,\
            markersize = 50, marker = "default",figsize = [4,4], \
-           saveFig = False, dir = "", format="eps"):
+           saveFig = False, dir = None, format="eps"):
     """ Create a Map for a single record
 
     Orthographic projection map of a single record.
@@ -238,7 +241,7 @@ def mapLipd(timeseries="", projection = 'Orthographic', proj_default = True,\
 
     """
     # Make sure there are LiPD files to plot
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -397,14 +400,14 @@ class MapFilters():
         return lat, lon, archiveType, dataSetName, dist
 
 
-def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
+def mapNearRecords(timeseries = None, lipds = None, n = 5, radius = None, \
                    sameArchive = False, projection = 'Orthographic',\
                    proj_default = True, borders = False, rivers = False, \
                    lakes = False, background = True , markersize = 200,\
                    markersize_adjust = True, marker_r = "ko", \
                    marker_c = "default", cmap = "Reds", colorbar = True,\
                    location = "right", label = "Distance in km",
-                   figsize = [4,4],ax = None, saveFig = False, dir = "", \
+                   figsize = [4,4],ax = None, saveFig = False, dir = None, \
                    format = "eps"):
 
     """ Map the nearest records from the record of interest
@@ -467,13 +470,13 @@ def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
     """
 
     # Get the dictionary of LiPD files
-    if not lipds:
+    if lipds is None:
         if 'lipd_dict' not in globals():
             openLipd()
         lipds = lipd_dict
 
     # Get a timeseries if not given
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -635,9 +638,9 @@ def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
 Plotting
 """
 
-def plotTs(timeseries = "", x_axis = "", markersize = 50,\
+def plotTs(timeseries = None, x_axis = None, markersize = 50,\
             marker = "default", figsize =[10,4],\
-            saveFig = False, dir = "",\
+            saveFig = False, dir = None,\
             format="eps"):
     """Plot a single time series.
 
@@ -663,7 +666,7 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
         The figure.
 
     """
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -735,10 +738,10 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
 
     return fig
 
-def plotEnsTs(timeseries = "", lipd ="", ensTableName = None, ens = None, \
+def plotEnsTs(timeseries = None, lipd = None, ensTableName = None, ens = None, \
               color = "default", \
               alpha = 0.005, figsize = [10,4], \
-              saveFig = False, dir = "",\
+              saveFig = False, dir = None,\
               format="eps"):
     """ Plot timeseries on various ensemble ages
 
@@ -764,15 +767,15 @@ def plotEnsTs(timeseries = "", lipd ="", ensTableName = None, ens = None, \
         The figure
 
     """
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
-    elif not lipd and type(timeseries) is dict:
+    elif lipd is None and type(timeseries) is dict:
         sys.exit("LiPD file should be provided when timeseries is set.")
 
     # Get the csv files
-    if not lipd:
+    if lipd is None:
         if 'archiveType' in lipd_dict.keys():
             csv_dict = lpd.getCsv[lipd_dict]
         else:
@@ -909,13 +912,13 @@ def plotEnsTs(timeseries = "", lipd ="", ensTableName = None, ens = None, \
 
     return fig
 
-def histTs(timeseries = "", bins = None, hist = True, \
+def histTs(timeseries = None, bins = None, hist = True, \
              kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},\
              kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"Rug"}, \
              fit_kws = {"label":"Fit"}, color = "default", vertical = False, \
              norm_hist = True, figsize = [5,5],\
              saveFig = False, format ="eps",\
-             dir = ""):
+             dir = None):
     """ Plot a univariate distribution of the PaleoData values
 
     This function is based on the seaborn displot function, which is
@@ -956,7 +959,7 @@ def histTs(timeseries = "", bins = None, hist = True, \
         fig - The figure
 
     """
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -1028,7 +1031,7 @@ def histTs(timeseries = "", bins = None, hist = True, \
 SummaryPlots
 """
 
-def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
+def summaryTs(timeseries = None, x_axis = None, saveFig = False, dir = None,
                format ="eps"):
     """Basic summary plot
 
@@ -1054,7 +1057,7 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
 
     """
 
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -1199,7 +1202,7 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
 Statistics
 """
 
-def statsTs(timeseries=""):
+def statsTs(timeseries=None):
     """ Calculate simple statistics of a timeseries
 
     Args:
@@ -1213,7 +1216,7 @@ def statsTs(timeseries=""):
         >>> mean, median, min_, max_, std, IQR = pyleo.statsTs(timeseries)
 
     """
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -1225,8 +1228,8 @@ def statsTs(timeseries=""):
 
     return mean, median, min_, max_, std, IQR
 
-def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
-                 interp_step = "", start = "", end = "", nsim = 1000, \
+def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
+                 interp_step = None, start = None, end = None, nsim = 1000, \
                  method = 'isospectral', alpha = 0.5):
     """ Estimates the significance of correlations between non IID timeseries.
 
@@ -1335,8 +1338,8 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
 
     return r, sig, p
 
-def liang_causalityTS(timeseries1="",timeseries2="",x_axis="",interp_step = "",\
-                    start = "", end = "", p= 1):
+def liang_causalityTS(timeseries1 = None,timeseries2 = None, x_axis = None,\
+                      interp_step = None, start = None, end = None, p= 1):
     """
     Estimate T21, the Liang information transfer from series x2 to series x1
     dt is taken to be 1.
@@ -1449,7 +1452,8 @@ def liang_causalityTS(timeseries1="",timeseries2="",x_axis="",interp_step = "",\
 Timeseries manipulation
 """
 
-def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
+def binTs(timeseries = None, x_axis = None, bin_size = None, \
+          start = None, end = None):
     """Bin the paleoData values of the timeseries
 
     Args:
@@ -1487,7 +1491,8 @@ def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
 
     return bins, binned_values, n, error
 
-def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = ""):
+def interpTs(timeseries = None, x_axis = None, interp_step = None,\
+             start = None, end = None):
     """Simple linear interpolation
 
     Simple linear interpolation of the data using the numpy.interp method
@@ -1525,7 +1530,7 @@ def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
 
     return interp_age, interp_values
 
-def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
+def standardizeTs(timeseries = None, scale = 1, ddof = 0, eps = 1e-3):
     """ Centers and normalizes the paleoData values of a  given time series.
 
     Constant or nearly constant time series not rescaled.
@@ -1565,7 +1570,7 @@ def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
 
     return z, mu, sig
 
-def segmentTs(timeseries = "", factor = 2):
+def segmentTs(timeseries = None, factor = 2):
     """Divides a time series into several segments using a gap detection algorithm
 
     Gap detection rule: If the time interval between some two data points is
@@ -1620,9 +1625,9 @@ def segmentTs(timeseries = "", factor = 2):
 # Spectral Analysis
 #"""
 
-def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = True,
+def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = True,
           psd_default = True, wwaplot_default = True, psdplot_default = True,
-          fig = True, saveFig = False, dir = "", format = "eps"):
+          fig = True, saveFig = False, dir = None, format = "eps"):
     """Weigthed wavelet Z-transform analysis
 
     Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)
@@ -2340,7 +2345,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
            xlim = None, ylim = None, violinColor = '#8B008B',\
            medianLineColor = "black", medianLineWidth = 2.0,\
            CIFillColor = "Silver", samplePaths = True, samplePathNumber =10,\
-           alpha = 0.5, saveFig = False, dir = "", format = "eps"):
+           alpha = 0.5, saveFig = False, dir = None, format = "eps"):
     """ Runs Bchron and plot if asked
 
     Fits a non-parametric chronology model to age/position data according to

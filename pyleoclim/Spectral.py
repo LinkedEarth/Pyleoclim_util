@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+h#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Fri Apr 28 14:23:06 2017
@@ -65,15 +65,14 @@ class WaveletAnalysis(object):
 
         return check
 
-    def ar1_fit_evenly(self, ys, ts, detrend='no', params=["default", 4, 0, 1], gaussianize=False):
+    def ar1_fit_evenly(self, ys, ts, detrend=False, params=["default", 4, 0, 1], gaussianize=False):
         ''' Returns the lag-1 autocorrelation from ar1 fit.
 
         Args:
             ys (array): vector of (float) numbers as a time series
             ts (array): The time axis for the timeseries. Necessary for use with
                 the Savitzky-Golay filters method since the series should be evenly spaced.
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
+            detrend (str): 'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
                            'savitzy-golay' - ys is filtered using the Savitzky-Golay
                                filters and the resulting filtered series is subtracted from y.
@@ -91,19 +90,18 @@ class WaveletAnalysis(object):
         '''
         pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize)
         ar1_mod = sm.tsa.AR(pd_ys, missing='drop').fit(maxlag=1)
-        g = ar1_mod.params[0]
+        g = ar1_mod.params[1]
 
         return g
 
-    def preprocess(self, ys, ts, detrend='no', params=["default", 4, 0, 1], gaussianize=False, standardize=True):
-        ''' Return the processed time series using (detrend and) standardization.
+    def preprocess(self, ys, ts, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
+        ''' Return the processed time series using detrend and standardization.
 
         Args:
             ys (array): a time series
             ts (array): The time axis for the timeseries. Necessary for use with
                 the Savitzky-Golay filters method since the series should be evenly spaced.
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
+            detrend (str): 'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
                            'savitzy-golay' - ys is filtered using the Savitzky-Golay
                                filters and the resulting filtered series is subtracted from y.
@@ -120,7 +118,7 @@ class WaveletAnalysis(object):
 
         '''
 
-        if detrend is not 'no':
+        if detrend is True:
             ys_d = Timeseries.detrend(ys, ts, method=detrend, params=params)
         else:
             ys_d = ys
@@ -135,14 +133,13 @@ class WaveletAnalysis(object):
 
         return res
 
-    def tau_estimation(self, ys, ts, detrend='no', params=["default", 4, 0, 1], gaussianize=False, standardize=True):
+    def tau_estimation(self, ys, ts, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
         ''' Return the estimated persistence of a givenevenly/unevenly spaced time series.
 
         Args:
             ys (array): a time series
             ts (array): time axis of the time series
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
+            detrend (str): 'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
                            'savitzy-golay' - ys is filtered using the Savitzky-Golay
                                filters and the resulting filtered series is subtracted from y.
@@ -214,176 +211,11 @@ class WaveletAnalysis(object):
 
         return r
 
-    def wwz_opt2(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', params=["default", 4, 0, 1],
-                 gaussianize=False, standardize=True):
-        ''' Return the weighted wavelet amplitude (WWA).
-
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-            c (float): the decay constant
-            Neff (int): the threshold of the number of effective degree of freedom
-            nproc (int): fake argument, just for convenience
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
-
-        Returns:
-            wwa (array): the weighted wavelet amplitude
-            phase (array): the weighted wavelet phase
-            Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients (a0, a1, a2)
-
-        References:
-            Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
-            Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
-                Nonlinear Processes in Geophysics 12, 345–352 (2005).
-
-        '''
-        assert nproc == 1, "wwz_basic() only supports nproc=1"
-        self.assertPositiveInt(Neff)
-
-        nt = np.size(tau)
-        nf = np.size(freqs)
-
-        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
-
-        omega = self.make_omega(ts, freqs)
-
-        Neffs = np.ndarray(shape=(nt, nf))
-        ywave_1 = np.ndarray(shape=(nt, nf))
-        ywave_2 = np.ndarray(shape=(nt, nf))
-        ywave_3 = np.ndarray(shape=(nt, nf))
-
-        for k in range(nf):
-            for j in range(nt):
-                dz = omega[k] * (ts - tau[j])
-                weights = np.exp(-c*dz**2)
-
-                sum_w = np.sum(weights)
-                Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
-
-                if Neffs[j, k] <= Neff:
-                    ywave_2[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
-                    ywave_3[j, k] = np.nan
-                else:
-                    phi2 = np.cos(dz)
-                    phi3 = np.sin(dz)
-
-                    weighted_one = np.sum(weights*pd_ys) / sum_w
-                    weighted_phi2 = np.sum(weights*phi2*pd_ys) / sum_w
-                    weighted_phi3 = np.sum(weights*phi3*pd_ys) / sum_w
-
-                    ywave_1[j, k] = weighted_one
-                    ywave_2[j, k] = 2*weighted_phi2
-                    ywave_3[j, k] = 2*weighted_phi3
-
-        wwa = np.sqrt(ywave_2**2 + ywave_3**2)
-        phase = np.arctan2(ywave_3, ywave_2)
-        #  coeff = ywave_2 + ywave_3*1j
-        coeff = (ywave_1, ywave_2, ywave_3)
-
-        return wwa, phase, Neffs, coeff
-
-    def wwz_opt1(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', params=["default", 4, 0, 1],
-                 gaussianize=False, standardize=True):
-        ''' Return the weighted wavelet amplitude (WWA).
-
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-            c (float): the decay constant
-            Neff (int): the threshold of the number of effective degree of freedom
-            nproc (int): fake argument, just for convenience
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
-
-        Returns:
-            wwa (array): the weighted wavelet amplitude
-            phase (array): the weighted wavelet phase
-            Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients (a0, a1, a2)
-
-        References:
-            Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
-            Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
-                Nonlinear Processes in Geophysics 12, 345–352 (2005).
-
-        '''
-        assert nproc == 1, "wwz_basic() only supports nproc=1"
-        self.assertPositiveInt(Neff)
-
-        nt = np.size(tau)
-        nf = np.size(freqs)
-
-        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
-
-        omega = self.make_omega(ts, freqs)
-
-        Neffs = np.ndarray(shape=(nt, nf))
-        ywave_1 = np.ndarray(shape=(nt, nf))
-        ywave_2 = np.ndarray(shape=(nt, nf))
-        ywave_3 = np.ndarray(shape=(nt, nf))
-
-        for k in range(nf):
-            for j in range(nt):
-                dz = omega[k] * (ts - tau[j])
-                weights = np.exp(-c*dz**2)
-
-                sum_w = np.sum(weights)
-                Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
-
-                if Neffs[j, k] <= Neff:
-                    ywave_1[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
-                    ywave_2[j, k] = np.nan
-                    ywave_3[j, k] = np.nan
-                else:
-                    phi2 = np.cos(dz)
-                    phi3 = np.sin(dz)
-
-                    weighted_phi2 = np.sum(weights*phi2*pd_ys) / sum_w
-                    weighted_phi3 = np.sum(weights*phi3*pd_ys) / sum_w
-                    weighted_one = np.sum(weights*pd_ys) / sum_w
-                    cos_shift_one = np.sum(weights*phi2) / sum_w
-                    sin_shift_one = np.sum(weights*phi3) / sum_w
-
-                    ywave_1[j, k] = weighted_one
-                    ywave_2[j, k] = 2*(weighted_phi2-weighted_one*cos_shift_one)
-                    ywave_3[j, k] = 2*(weighted_phi3-weighted_one*sin_shift_one)
-
-        wwa = np.sqrt(ywave_2**2 + ywave_3**2)
-        phase = np.arctan2(ywave_3, ywave_2)
-        #  coeff = ywave_2 + ywave_3*1j
-        coeff = (ywave_1, ywave_2, ywave_3)
-
-        return wwa, phase, Neffs, coeff
-
-    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', params=['default', 4, 0, 1],
+    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, params=['default', 4, 0, 1],
                   gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
+        
+        Original method from Foster. Not multiprocessing.
 
         Args:
             ys (array): a time series
@@ -475,9 +307,11 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend='no', params=['default', 4, 0, 1],
+    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=False, params=['default', 4, 0, 1],
                   gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
+        
+        Original method from Foster. Supports multiprocessing. 
 
         Args:
             ys (array): a time series
@@ -576,10 +410,12 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', params=["default", 4, 0, 1],
+    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, params=["default", 4, 0, 1],
                        gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
+        Method modified by Kirchner. No multiprocessing.
+        
         Args:
             ys (array): a time series
             ts (array): time axis of the time series
@@ -684,115 +520,11 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_opt(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend='no', params=["default", 4, 0, 1],
-                     gaussianize=False, standardize=True):
-        ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
-
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-            c (float): the decay constant
-            Neff (int): the threshold of the number of effective degree of freedom
-            nproc (int): fake argument, just for convenience
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
-
-        Returns:
-            wwa (array): the weighted wavelet amplitude
-            phase (array): the weighted wavelet phase
-            Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients (a0, a1, a2)
-
-        References:
-            Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
-            Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
-                Nonlinear Processes in Geophysics 12, 345–352 (2005).
-
-        '''
-        assert nproc == 1, "kirchner_opt() only supports nproc=1"
-        self.assertPositiveInt(Neff)
-
-        nt = np.size(tau)
-        nts = np.size(ts)
-        nf = np.size(freqs)
-
-        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
-
-        omega = self.make_omega(ts, freqs)
-
-        Neffs = np.ndarray(shape=(nt, nf))
-        a0 = np.ndarray(shape=(nt, nf))
-        a1 = np.ndarray(shape=(nt, nf))
-        a2 = np.ndarray(shape=(nt, nf))
-
-        for k in range(nf):
-            for j in range(nt):
-                dz = omega[k] * (ts - tau[j])
-                weights = np.exp(-c*dz**2)
-
-                sum_w = np.sum(weights)
-                Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
-
-                if Neffs[j, k] <= Neff:
-                    a0[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
-                    a1[j, k] = np.nan
-                    a2[j, k] = np.nan
-                else:
-                    def w_prod(xs, ys):
-                        return np.sum(weights*xs*ys) / sum_w
-
-                    sin_basis = np.sin(omega[k]*ts)
-                    cos_basis = np.cos(omega[k]*ts)
-                    one_v = np.ones(nts)
-
-                    sin_one = w_prod(sin_basis, one_v)
-                    cos_one = w_prod(cos_basis, one_v)
-                    sin_cos = w_prod(sin_basis, cos_basis)
-                    sin_sin = w_prod(sin_basis, sin_basis)
-                    cos_cos = w_prod(cos_basis, cos_basis)
-
-                    numerator = 2 * (sin_cos - sin_one * cos_one)
-                    denominator = (cos_cos - cos_one**2) - (sin_sin - sin_one**2)
-                    time_shift = np.arctan2(numerator, denominator) / (2*omega[k])  # Eq. (S5)
-
-                    sin_shift = np.sin(omega[k]*(ts - time_shift))
-                    cos_shift = np.cos(omega[k]*(ts - time_shift))
-                    ys_one = w_prod(pd_ys, one_v)
-                    sin_tau_center = np.sin(omega[k]*(time_shift - tau[j]))
-                    cos_tau_center = np.cos(omega[k]*(time_shift - tau[j]))
-
-                    ys_cos_shift = w_prod(pd_ys, cos_shift)
-                    ys_sin_shift = w_prod(pd_ys, sin_shift)
-
-                    A = 2*ys_cos_shift
-                    B = 2*ys_sin_shift
-
-                    a0[j, k] = ys_one
-                    a1[j, k] = cos_tau_center*A - sin_tau_center*B  # Eq. (S6)
-                    a2[j, k] = sin_tau_center*A + cos_tau_center*B  # Eq. (S7)
-
-        wwa = np.sqrt(a1**2 + a2**2)
-        phase = np.arctan2(a2, a1)
-        #  coeff = a1 + a2*1j
-        coeff = (a0, a1, a2)
-
-        return wwa, phase, Neffs, coeff
-
-    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no', params=['default', 4, 0, 1],
+    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, params=['default', 4, 0, 1],
                        gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
+
+        Method modified by kirchner. Supports multiprocessing. 
 
         Args:
             ys (array): a time series
@@ -906,10 +638,12 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no', params=['default', 4, 0, 1],
+    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, params=['default', 4, 0, 1],
                       gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
+        Fastest method. Calls Fortran libraries.
+        
         Args:
             ys (array): a time series
             ts (array): time axis of the time series
@@ -1098,7 +832,7 @@ class WaveletAnalysis(object):
         return freqs
 
     def freq_vector_welch(self, ts):
-        ''' Return the frequency vector based on the Weltch's method.
+        ''' Return the frequency vector based on the Welch's method.
 
         Args:
             ts (array): time axis of the time series
@@ -1141,17 +875,34 @@ class WaveletAnalysis(object):
 
         return freqs
 
-    def make_freq_vector(self, ts):
-        ''' Make frequency vector
+    def make_freq_vector(self, ts, method = 'nfft', **kwargs):
+        ''' Make frequency vector- Selector function.
+        
+        This function selects among various methods to obtain the frequency 
+        vector. 
 
         Args:
             ts (array): time axis of the time series
-
+            method (str): The method to use. Options are 'nfft' (default), 'Lomb-Scargle', 'Welch'
+                For Lomb_Scargle, additional parameters may be passed:
+                    nf (int): number of frequency points
+                    ofac (float): Oversampling rate that influences the resolution of the frequency axis,
+                         when equals to 1, it means no oversamling (should be >= 1).
+                         The default value 4 is usaually a good value.
+                    hifac (float): fhi/fnyq (should be >= 1), where fhi is the highest frequency that
+                          can be analyzed by the Lomb-Scargle algorithm and fnyq is the Nyquist frequency.
+        
         Returns:
             freqs (array): the frequency vector
 
         '''
-        freqs = self.freq_vector_nfft(ts)
+        
+        if method is 'Lomb-Scargle':
+            freqs = self.freq_vector_lomb_scargle(ts,**kwargs)
+        elif method is 'Welch':
+            freqs = self.freq_vector_welch(ts)        
+        else:
+            freqs = self.freq_vector_nfft(ts)
         #  freqs = freqs[1:]  # discard the first element 0
 
         return freqs
@@ -1356,7 +1107,7 @@ class WaveletAnalysis(object):
             nproc (int): the number of processes for multiprocessing
             method (str): 'Foster' - the original WWZ method;
                           'Kirchner' - the method Kirchner adapted from Foster;
-                          'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+                          'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py (default)
         Returns:
             wwz_func (function): the wwz function to use
 
@@ -1375,31 +1126,22 @@ class WaveletAnalysis(object):
                 wwz_func = wa.kirchner_basic
             else:
                 wwz_func = wa.kirchner_nproc
-
-        elif method == 'Kirchner_opt':
-            wwz_func = wa.kirchner_opt
-
-        elif method == 'Foster_opt1':
-            wwz_func = wa.wwz_opt1
-
-        elif method == 'Foster_opt2':
-            wwz_func = wa.wwz_opt2
-
         else:
             wwz_func = wa.kirchner_f2py
 
         return wwz_func
 
-    def prepare_wwz(self, ys, ts, freqs=None, tau=None, len_bd=0, bc_mode='reflect', reflect_type='odd'):
-        ''' Return the truncated time series with NaNs deleted
+    def prepare_wwz(self, ys, ts, freqs='nfft', tau=None, len_bd=0, bc_mode='reflect', reflect_type='odd', **kwargs):
+        ''' Return the truncated time series with NaNs deleted and estimate frequency vector and tau
 
         Args:
             ys (array): a time series, NaNs will be deleted automatically
             ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
-            freqs (array): vector of frequency
+            freqs (array): vector of frequency. If None, use the nfft method.If using Lomb-Scargle, additional parameters
+                may be set. See make_freq_vector
             tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
                 if the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so
-            len_bd (int): the number of the ghost grids want to creat on each boundary
+            len_bd (int): the number of the ghost grids want to create on each boundary
             bc_mode (str): see np.lib.pad()
             reflect_type (str): see np.lib.pad()
 
@@ -1460,8 +1202,7 @@ class WaveletAnalysis(object):
         ts_cut = ts[(np.min(tau) <= ts) & (ts <= np.max(tau))]
         ys_cut = ys[(np.min(tau) <= ts) & (ts <= np.max(tau))]
 
-        if freqs is None:
-            freqs = self.make_freq_vector(ts_cut)
+        freqs = self.make_freq_vector(ts_cut, method = 'nfft')
 
         return ys_cut, ts_cut, freqs, tau
 
@@ -1489,11 +1230,11 @@ class WaveletAnalysis(object):
         return xwt, xw_amplitude, xw_phase
 
     def wavelet_coherence(self, coeff1, coeff2, freqs, tau, smooth_factor=0.25):
-        ''' Return the cross wavelet transform.
+        ''' Return the cross wavelet coherence.
 
         Args:
             coeff1, coeff2 (array): the two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
-            freqs (array): vector of frequency
+            freqs (array): vector of frequency.
             tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
 
         Returns:
@@ -1591,6 +1332,7 @@ class WaveletAnalysis(object):
 
     def reconstruct_ts(self, coeff, freqs, tau, t, len_bd=0):
         ''' Reconstruct the normalized time series from the wavelet coefficients.
+        
         Args:
             coeff (array): the coefficients of the corresponding basis functions (a0, a1, a2)
             freqs (array): vector of frequency of the basis functions
@@ -1626,7 +1368,7 @@ class WaveletAnalysis(object):
 
                     rec_ts += (a_0[j, k] + a_1[j, k]*phi_1 + a_2[j, k]*phi_2)
 
-        rec_ts = self.preprocess(rec_ts, t, detrend='no', gaussianize=False, standardize=True)
+        rec_ts = self.preprocess(rec_ts, t, detrend=False, gaussianize=False, standardize=True)
 
         return rec_ts, t
 
@@ -1636,7 +1378,8 @@ class AliasFilter(object):
     '''
 
     def alias_filter(self, freq, pwr, fs, fc, f_limit, avgs):
-        '''
+        ''' anti_alias filter
+        
         Args:
             freq (array): vector of frequencies in power spectrum
             pwr (array): vector of spectral power corresponding to frequencies "freq"
@@ -1800,14 +1543,13 @@ Interface for the users below, more checks about the input will be performed her
 '''
 
 
-def ar1_fit(ys, ts=None, detrend='no', params=["default", 4, 0, 1]):
+def ar1_fit(ys, ts=None, detrend= None, params=["default", 4, 0, 1]):
     ''' Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
 
     Args:
         ys (array): the time series
         ts (array): the time axis of that series
-        detrend (str): 'no' - the original time series is assumed to have no trend;
-                       'linear' - a linear least-squares fit to `ys` is subtracted;
+        detrend (str): 'linear' - a linear least-squares fit to `ys` is subtracted;
                        'constant' - the mean of `ys` is subtracted
                        'savitzy-golay' - ys is filtered using the Savitzky-Golay
                                filters and the resulting filtered series is subtracted from y.
@@ -1832,7 +1574,7 @@ def ar1_fit(ys, ts=None, detrend='no', params=["default", 4, 0, 1]):
     return g
 
 
-def ar1_sim(ys, n, p, ts=None, detrend='no', params=["default", 4, 0, 1]):
+def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
     ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from `ys` and `ts`
 
     Args:
@@ -1882,9 +1624,9 @@ def ar1_sim(ys, n, p, ts=None, detrend='no', params=["default", 4, 0, 1]):
 
 
 def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=200, nproc=8,
-        detrend='no', params=['default', 4, 0, 1], gaussianize=False, standardize=True,
+        detrend=False, params=['default', 4, 0, 1], gaussianize=False, standardize=True,
         method='Kirchner_f2py', len_bd=0, bc_mode='reflect', reflect_type='odd'):
-    ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients
+    ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coefficients
 
     Args:
         ys (array): a time series, NaNs will be deleted automatically
@@ -1928,7 +1670,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=
     #          method = 'Kirchner'
 
     wa = WaveletAnalysis()
-    assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
+    assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
 
     ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau,
                                                 len_bd=len_bd, bc_mode=bc_mode, reflect_type=reflect_type)
@@ -1972,8 +1714,9 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=
 
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
-            detrend='no', params=["default", 4, 0, 1], gaussianize=False, standardize=True,
-            Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'):
+            detrend=False, params=["default", 4, 0, 1], gaussianize=False, 
+            standardize=True, Neff=3, anti_alias=False, avgs=2, 
+            method='Kirchner_f2py'):
     ''' Return the psd of a timeseries directly using wwz method.
 
     Args:
@@ -1999,6 +1742,9 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+        Neff (int):
+        anti_alias (bool): If True, uses anti-aliasing
+        avgs (int): 
 
     Returns:
         psd (array): power spectral density
@@ -2053,10 +1799,11 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
 
 
 def xwt(ys1, ts1, ys2, ts2,
-        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nproc=8, detrend='no', params=['default', 4, 0, 1],
+        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nproc=8,
+        detrend=False, params=['default', 4, 0, 1],
         gaussianize=False, standardize=True,
         method='Kirchner_f2py'):
-    ''' Return the crosse wavelet transform of two time series.
+    ''' Return the cross-wavelet transform of two time series.
 
     Args:
         ys1, ys2 (array): the two time series
@@ -2142,10 +1889,10 @@ def xwt(ys1, ts1, ys2, ts2,
 
 
 def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
-        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend='no',
+        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False,
         nMC=200, params=['default', 4, 0, 1],
         gaussianize=False, standardize=True, method='Kirchner_f2py'):
-    ''' Return the crosse wavelet coherence of two time series.
+    ''' Return the cross-wavelet coherence of two time series.
 
     Args:
         ys1, ys2 (array): the two time series
@@ -2173,12 +1920,8 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
 
     Returns:
-        xw_coherence (array): the cross wavelet coherence
-        xw_phase (array): the cross wavelet phase
-        freqs (array): vector of frequency
-        tau (array): the evenly-spaced time points
-        AR1_q (array): AR1 simulations
-        coi (array): cone of influence
+        res (dict): contains the cross wavelet coherence, cross-wavelet phase,
+            vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
 
     '''
     if (not sys.platform.startswith('darwin')) and (not sys.platform.startswith('linux')) and method == 'Kirchner_f2py':
@@ -2264,10 +2007,11 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
 
 
 def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
-             yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
-             cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
-             plot_cbar=True,
-             plot_cone=False, ax=None, xlabel='Year (AD)', ylabel='Period (years)', cbar_orientation='vertical',
+             yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, 
+             figsize=[20, 8], clr_map='OrRd',cbar_drawedges=False, cone_alpha=0.5, 
+             plot_signif=False, signif_style='contour', title=None,
+             plot_cbar=True, plot_cone=False, ax=None, xlabel='Year CE', 
+             ylabel='Period (years)', cbar_orientation='vertical',
              cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
     """ Plot the wavelet amplitude
 
@@ -2288,7 +2032,9 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
         cone_alpha (float): the alpha value for the area covered by cone of influence
         plot_signif (bool): plot 95% significant area or not
         signif_style (str): plot 95% significant area with `contour` or `shade`
-        plot_cone (bool): plot cone of influence or not
+        title (str): Title for the plot
+        plot_cbar (bool): Plot the color scale bar
+        plot_cone (bool): plot cone of influence
         ax: Return as axis instead of figure (useful to integrate plot into a subplot)
         xlabel (str): The x-axis label
         ylabel (str): The y-axis label
@@ -2385,41 +2131,48 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
 
 def plot_coherence(res_xwc, pt=0.5,
                    levels=None, tick_range=None, basey=2,
-                   yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd',
+                   yticks=None, ylim=None, xticks=None, xlabels=None, 
+                   figsize=[20, 8], clr_map='OrRd',
                    skip_x=5, skip_y=5, scale=30, width=0.004,
-                   cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None,
-                   plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical',
+                   cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, 
+                   signif_style='contour', title=None,
+                   plot_cone=False, ax=None, xlabel='Year', ylabel='Period',
+                   cbar_orientation='vertical',
                    cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
-    """ Plot the wavelet amplitude
+    """ Plot the wavelet coherence
 
     Args:
-        xw_coherence (array): the wavelet cohernce
-        xw_phase (array): the wavelet cohernce phase
-        freqs (array): vector of frequency
-        tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-        AR1_q (array): AR1 simulations
-        coi (array): cone of influence
+        res_xwc (dict): contains the cross wavelet coherence, cross-wavelet phase,
+            vector of frequency, evenly-spaced time points, AR1 sims, 
+            cone of influence. See xwc
+        pt (float): plot arrows above pt value
         levels (array): levels of values to plot
         tick_range (array): levels of ticks to show on the colorbar
+        basey (int): log base for y. Default is 2. 
         yticks (list): ticks on y-axis
         ylim (list): limitations for y-axis
         xticks (list): ticks on x-axis
+        xlabels (list): List of labels for the x-axis ticks
         figsize (list): the size for the figure
         clr_map (str): the name of the colormap
+        skip_x, skip_y (float): plot every x,y points
+        scale (int): Scale factor for arrows
+        width (float):  Width of the arrows  
         cbar_drawedges (bool): whether to draw edges on the colorbar or not
         cone_alpha (float): the alpha value for the area covered by cone of influence
-        plot_signif (bool): plot 95% significant area or not
+        plot_signif (bool): plot 95% significant area
         signif_style (str): plot 95% significant area with `contour` or `shade`
-        plot_cone (bool): plot cone of influence or not
+        title (str): Add a title to the plot
+        plot_cone (bool): plot cone of influence
         ax: Return as axis instead of figure (useful to integrate plot into a subplot)
         xlabel (str): The x-axis label
         ylabel (str): The y-axis label
+        cbar_orientation (str): the orientation of the colorbar. Default is vertical
         cbar_pad (float): the pad for the colorbar
-        c)bar_frac (float): the frac for the colorbar
+        cbar_frac (float): the frac for the colorbar
         cbar_labelsize (float): the font size of the colorbar label
-        pt (float): plot arrows above pt value
-        skip_x, skip_y (float): scale factors for arrows
-
+        
+        
     Returns:
         fig (figure): the 2-D plot of wavelet analysis
 
@@ -2469,7 +2222,7 @@ def plot_coherence(res_xwc, pt=0.5,
     plt.ylabel(ylabel)
 
     if plot_signif:
-        assert AR1_q is not None, "Please set values for `AR1_q`!"
+        assert AR1_q is not None, "Set values for `AR1_q`!"
         signif = xw_coherence / AR1_q
         if signif_style == 'contour':
             plt.contour(tau, 1/freqs, signif.T, [-99, 1], colors='k')
@@ -2523,20 +2276,26 @@ def plot_wwadist(wwa, ylim=None):
     return fig
 
 
-def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-', ar1_linewidth=None,
-             period_ticks=None, period_tickslabel=None, psd_lim=None, period_lim=None, alpha=1,
-             figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None, legend=True,
-             psd_ar1_color=sns.xkcd_rgb["pale red"], ax=None, vertical=False, plot_gridlines=True,
-             period_label='Period (years)', psd_label='Spectral Density', zorder=None):
-    """ Plot the wavelet amplitude
+def plot_psd(psd, freqs, lmstyle='-', linewidth=None, 
+             color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-', 
+             ar1_linewidth=None, period_ticks=None, period_tickslabel=None, 
+             psd_lim=None, period_lim=None, alpha=1,
+             figsize=[20, 8], label='PSD', plot_ar1=False, 
+             psd_ar1_q95=None, title=None, legend=True,
+             psd_ar1_color=sns.xkcd_rgb["pale red"], 
+             ax=None, vertical=False, plot_gridlines=True,
+             period_label='Period (years)', psd_label='Spectral Density', 
+             zorder=None):
+    """ Plot power spectral density
 
     Args:
         psd (array): power spectral density
         freqs (array): vector of frequency
         period_ticks (list): ticks for period
+        period_tickslabel (list): Labels for the period ticks
         psd_lim (list): limits for spectral density axis
         label (str): the label for the PSD
-        plot_ar1 (bool): plot the ar1 curve or not
+        plot_ar1 (bool): plot the ar1 curve
         psd_ar1_q95 (array): the 95% quantile of the AR1 PSD
         psd_ar1_color (str): the color for the 95% quantile of the AR1 PSD
         title (str): the title for the figure
@@ -2544,12 +2303,22 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
         figsize (list): the size for the figure
         ax (axis): Return as axis instead of figure (useful to integrate plot into a subplot)
         vertical (bool): plot in vertical layout or not
-        legend (bool): plot legend or not
+        legend (bool): plot legend
         lmstyle (str): the line style
         linewidth (float): the line width
+        color (str): Color of the line
+        ar1_lmstyle (str): line style for the AR1 ensemble
+        ar1_linewidth (int): line width for AR1 ensemble
         period_label (str): the label for period
         psd_label (str): the label for psd
         zorder (int): the order of the layer
+        period_tickslabel (str): Label for the period tick. 
+        alpha (float): set transparency
+        label (str): Label for the figure
+        plot_gridlines (bool): Plot gridlines
+        period_label (str): Label for the period axis
+        psd_label (str): label for the PSD axis      
+                
 
     Returns:
         ax (figure): the 2-D plot of wavelet analysis
@@ -2638,7 +2407,8 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None, color=sns.xkcd_rgb["denim 
     return ax
 
 
-def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=200, nproc=8, detrend='no',
+def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, 
+                 nMC=200, nproc=1, detrend=False, params=["default", 4, 0, 1],
                  gaussianize=False, standardize=True, levels=None, method='Kirchner_f2py',
                  anti_alias=False, period_ticks=None, ts_color=None, ts_style='-o',
                  title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
@@ -2652,20 +2422,36 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
         ts (array): time axis of the time series
         freqs (array): vector of frequency
         tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-        c (float): the decay constant
-        Neff (int): the threshold of the number of effective degree of freedom
+        c1 (float): the decay constant (wwz method)
+        c2 (float): the decay constant (wwz_psd method)
+        nMC(int): Number of Monte-Carlo simulations
         nproc (int): fake argument, just for convenience
-        detrend (str): 'no' - the original time series is assumed to have no trend;
-                       'linear' - a linear least-squares fit to `ys` is subtracted;
+        detrend (str): 'linear' - a linear least-squares fit to `ys` is subtracted;
                        'constant' - the mean of `ys` is subtracted
+                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+        params (list): The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussianize (bool): If True, gaussianizes the timeseries
+        standardize (bool): If True, standardizes the timeseries
+        levels (array): levels of values to plot
+        method (str): method for the WWZ transform. Default is Kirchner_f2py
+        anti_alias (bool): If True, uses anti-aliasing
+        period_ticks (list): ticks for period
         ts_color (str): the color for the time series curve
+        ts_style (str): Style for the line
         title (str): the title for the time series plot
         ts_ylabel (str): label for y-axis in the time series plot
         wwa_xlabel (str): label for x-axis in the wwa plot
         wwa_ylabel (str): label for y-axis in the wwa plot
         psd_lmstyle (str): the line style in the psd plot
         psd_lim (list): the limits for psd
+        font_scale (float): Scaling factor for the font on the plot
         period_S, period_L (list): the ranges for beta estimation
+        period_S_str, period_L_str (str): String for beta estimation
 
     Returns:
         fig (figure): the summary plot
@@ -2681,7 +2467,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, nMC=2
 
     gs = gridspec.GridSpec(6, 12)
     gs.update(wspace=0, hspace=0)
-
+    
     fig = plt.figure(figsize=(15, 15))
 
     # plot the time series
@@ -2764,14 +2550,29 @@ def calc_plot_psd(ys, ts, ntau=501, dcon=1e-3, standardize=False,
     Args:
         ys (array): a time series
         ts (array): time axis of the time series
-        natu (int): the length of tau, the evenly-spaced time points, namely the time shift for wavelet analysis
+        natu (int): the length of tau, the evenly-spaced time points, 
+            namely the time shift for wavelet analysis
         dcon (float): the decay constant
         standardize(bool): perform standardization or not
         anti_alias(bool): perform anti-alising procedure or not
         plot_fig (bool): plot the result or not
         method (str): the WWZ method to use
         nproc (int): the number of threads
-        other kwargs: for plotting purpose
+        period_ticks (list): List of period ticks
+        color (str): set color
+        figsize (list): Size of the figure
+        font_scale(float): Scale of the font
+        lw (float): For plotting purposes
+        label (str): Labeld for the y-axis
+        zorder (int): the order of the layer
+        xlim (list): x-axis limits
+        ylim (list): y-axis limits
+        loc (str): location for the legend
+        bbox_to_anchor (list): gives a great degree of control for manual 
+            legend placement. For example, if you want your axes legend
+            located at the figure’s top right-hand corner instead of the axes’
+            corner, simply specify the corner’s location, and the coordinate 
+            system of that location
 
     Returns:
         fig (figure): the summary plot
