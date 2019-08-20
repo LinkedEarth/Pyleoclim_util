@@ -1,4 +1,4 @@
-p# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Created on Thu Apr 21 11:00:07 2016
 
@@ -40,143 +40,143 @@ def setProj(projection='Robinson', proj_default = True):
                  ' as a dictionary or set to True')
     
     # Set the projection
-    if projection is 'Robinson':
+    if projection == 'Robinson':
         if proj_default is True:
             proj = ccrs.Robinson() 
         else: proj = ccrs.Robinson(**proj_default) 
-    elif projection is 'PlateCarree':
+    elif projection == 'PlateCarree':
         if proj_default is True:
             proj = ccrs.PlateCarree() 
         else: proj = ccrs.PlateCarree(**proj_default) 
-    elif projection is 'AlbersEqualArea':
+    elif projection == 'AlbersEqualArea':
         if proj_default is True:
             proj = ccrs.AlbersEqualArea() 
         else: proj = ccrs.AlbersEqualArea(**proj_default) 
-    elif projection is 'AzimuthalEquidistant':
+    elif projection == 'AzimuthalEquidistant':
         if proj_default is True:
             proj = ccrs.AzimuthalEquidistant() 
         else: proj = ccrs.AzimuthalEquidistant(**proj_default)
-    elif projection is 'EquidistantConic':
+    elif projection == 'EquidistantConic':
         if proj_default is True:
             proj = ccrs.EquidistantConic() 
         else: proj = ccrs.EquidistantConic(**proj_default)
-    elif projection is 'LambertConformal':
+    elif projection == 'LambertConformal':
         if proj_default is True:
             proj = ccrs.LambertConformal() 
         else: proj = ccrs.LambertConformal(**proj_default)
-    elif projection is 'LambertCylindrical':
+    elif projection == 'LambertCylindrical':
         if proj_default is True:
             proj = ccrs.LambertCylindrical() 
         else: proj = ccrs.LambertCylindrical(**proj_default)
-    elif projection is 'Mercator':
+    elif projection == 'Mercator':
         if proj_default is True:
             proj = ccrs.Mercator() 
         else: proj = ccrs.Mercator(**proj_default)
-    elif projection is 'Miller':
+    elif projection == 'Miller':
         if proj_default is True:
             proj = ccrs.Miller() 
         else: proj = ccrs.Miller(**proj_default)
-    elif projection is 'Mollweide':
+    elif projection == 'Mollweide':
         if proj_default is True:
             proj = ccrs.Mollweide() 
         else: proj = ccrs.Mollweide(**proj_default)
-    elif projection is 'Orthographic':
+    elif projection == 'Orthographic':
         if proj_default is True:
             proj = ccrs.Orthographic() 
         else: proj = ccrs.Orthographic(**proj_default)
-    elif projection is 'Sinusoidal':
+    elif projection == 'Sinusoidal':
         if proj_default is True:
             proj = ccrs.Sinusoidal() 
         else: proj = ccrs.Sinusoidal(**proj_default)
-    elif projection is 'Stereographic':
+    elif projection == 'Stereographic':
         if proj_default is True:
             proj = ccrs.Stereographic() 
         else: proj = ccrs.Stereographic(**proj_default)
-    elif projection is 'TransverseMercator':
+    elif projection == 'TransverseMercator':
         if proj_default is True:
             proj = ccrs.TransverseMercator() 
         else: proj = ccrs.TransverseMercator(**proj_default)
-    elif projection is 'TransverseMercator':
+    elif projection == 'TransverseMercator':
         if proj_default is True:
             proj = ccrs.TransverseMercator() 
         else: proj = ccrs.TransverseMercator(**proj_default)
-    elif projection is 'UTM':
+    elif projection == 'UTM':
         if proj_default is True:
             proj = ccrs.UTM() 
         else: proj = ccrs.UTM(**proj_default)
-    elif projection is 'UTM':
+    elif projection == 'UTM':
         if proj_default is True:
             proj = ccrs.UTM() 
         else: proj = ccrs.UTM(**proj_default)
-    elif projection is 'InterruptedGoodeHomolosine':
+    elif projection == 'InterruptedGoodeHomolosine':
         if proj_default is True:
             proj = ccrs.InterruptedGoodeHomolosine() 
         else: proj = ccrs.InterruptedGoodeHomolosine(**proj_default)
-    elif projection is 'RotatedPole':
+    elif projection == 'RotatedPole':
         if proj_default is True:
             proj = ccrs.RotatedPole() 
         else: proj = ccrs.RotatedPole(**proj_default)
-    elif projection is 'OSGB':
+    elif projection == 'OSGB':
         if proj_default is True:
             proj = ccrs.OSGB() 
         else: proj = ccrs.OSGB(**proj_default)
-    elif projection is 'EuroPP':
+    elif projection == 'EuroPP':
         if proj_default is True:
             proj = ccrs.EuroPP() 
         else: proj = ccrs.EuroPP(**proj_default)
-    elif projection is 'Geostationary':
+    elif projection == 'Geostationary':
         if proj_default is True:
             proj = ccrs.Geostationary() 
         else: proj = ccrs.Geostationary(**proj_default)
-    elif projection is 'NearsidePerspective':
+    elif projection == 'NearsidePerspective':
         if proj_default is True:
             proj = ccrs.NearsidePerspective() 
         else: proj = ccrs.NearsidePerspective(**proj_default)
-    elif projection is 'EckertI':
+    elif projection == 'EckertI':
         if proj_default is True:
             proj = ccrs.EckertI() 
         else: proj = ccrs.EckertI(**proj_default)
-    elif projection is 'EckertII':
+    elif projection == 'EckertII':
         if proj_default is True:
             proj = ccrs.EckertII() 
         else: proj = ccrs.EckertII(**proj_default)
-    elif projection is 'EckertIII':
+    elif projection == 'EckertIII':
         if proj_default is True:
             proj = ccrs.EckertIII() 
         else: proj = ccrs.EckertIII(**proj_default)
-    elif projection is 'EckertIV':
+    elif projection == 'EckertIV':
         if proj_default is True:
             proj = ccrs.EckertIV() 
         else: proj = ccrs.EckertIV(**proj_default)
-    elif projection is 'EckertV':
+    elif projection == 'EckertV':
         if proj_default is True:
             proj = ccrs.EckertV() 
         else: proj = ccrs.EckertV(**proj_default)
-    elif projection is 'EckertVI':
+    elif projection == 'EckertVI':
         if proj_default is True:
             proj = ccrs.EckertVI() 
         else: proj = ccrs.EckertVI(**proj_default)
-    elif projection is 'EqualEarth':
+    elif projection == 'EqualEarth':
         if proj_default is True:
             proj = ccrs.EqualEarth() 
         else: proj = ccrs.EqualEarth(**proj_default)
-    elif projection is 'Gnomonic':
+    elif projection == 'Gnomonic':
         if proj_default is True:
             proj = ccrs.Gnomonic() 
         else: proj = ccrs.Gnomonic(**proj_default)
-    elif projection is 'LambertAzimuthalEqualArea':
+    elif projection == 'LambertAzimuthalEqualArea':
         if proj_default is True:
             proj = ccrs.LambertAzimuthalEqualArea() 
         else: proj = ccrs.LambertAzimuthalEqualArea(**proj_default)
-    elif projection is 'NorthPolarStereo':
+    elif projection == 'NorthPolarStereo':
         if proj_default is True:
             proj = ccrs.NorthPolarStereo() 
         else: proj = ccrs.NorthPolarStereo(**proj_default)
-    elif projection is 'OSNI':
+    elif projection == 'OSNI':
         if proj_default is True:
             proj = ccrs.OSNI() 
         else: proj = ccrs.OSNI(**proj_default)
-    elif projection is 'OSNI':
+    elif projection == 'OSNI':
         if proj_default is True:
             proj = ccrs.SouthPolarStereo() 
         else: proj = ccrs.SouthPolarStereo(**proj_default)
@@ -291,7 +291,7 @@ def mapAll(lat, lon, criteria, projection = 'Robinson', proj_default = True,\
     
     return ax    
         
-def mapOne(lat, lon, projection = 'Orthographic', proj_default = True,\
+def mapOne(lat, lon, projection = 'Orthographic', proj_default = True, label = None,\
            background = True,borders = False, rivers = False, lakes = False,\
            markersize = 50, marker = "ro", figsize = [4,4], \
            ax = None):
@@ -315,6 +315,7 @@ def mapOne(lat, lon, projection = 'Orthographic', proj_default = True,\
                 https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
         background (bool): If True, uses a shaded relief background (only one 
             available in Cartopy)
+        label (str): label for the point. Default is None. 
         borders (bool): Draws the countries border. Defaults is off (False). 
         rivers (bool): Draws major rivers. Default is off (False).
         lakes (bool): Draws major lakes. 
@@ -337,8 +338,7 @@ def mapOne(lat, lon, projection = 'Orthographic', proj_default = True,\
     
     # Background
     if background is True:
-        ax.stock_img()
-    
+        ax.stock_img()  
     
     #Other extra information
     if borders is True:
@@ -355,5 +355,10 @@ def mapOne(lat, lon, projection = 'Orthographic', proj_default = True,\
                marker = marker[1],
                zorder = 10,
                transform=ccrs.PlateCarree())
+    
+    # Add a label if necessary
+    if label is not None:
+       assert type(label) is str, 'Label should be of type string'
+       ax.annotate(label,(np.array(lon),np.array(lat)),fontweight='bold')
         
     return ax

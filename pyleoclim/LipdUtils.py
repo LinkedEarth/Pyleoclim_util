@@ -405,8 +405,9 @@ def enumerateTs(timeseries_list):
         for key, value in val.items():
             if 'dataSetName' in key:
                 dataSetName.append(value)
-            if 'variableName' in key:
+            if 'Data_variableName' in key:
                 available_y.append(value)
+
              
     for idx,val in enumerate(available_y):
         print(idx,': ',dataSetName[idx], ': ', val)     

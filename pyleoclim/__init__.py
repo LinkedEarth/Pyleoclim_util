@@ -1,4 +1,4 @@
-yt# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Created on Wed May 11 10:42:34 2016
 
@@ -54,10 +54,7 @@ def openLipd(usr_path=None):
 
     """
     global lipd_dict
-    if usr_path is None:
-        sys.exit("Enter a valid path")
-    else:
-        lipd_dict = lpd.readLipd(usr_path=usr_path)
+    lipd_dict = lpd.readLipd(usr_path=usr_path)
     return lipd_dict
 
 def fetchTs(lipds=None):
@@ -196,7 +193,8 @@ def mapAllArchive(lipds = None, markersize = 50, projection = 'Robinson',\
     return fig
 
 def mapLipd(timeseries=None, projection = 'Orthographic', proj_default = True,\
-           background = True,borders = False, rivers = False, lakes = False,\
+           background = True, label = 'default', borders = False, \
+           rivers = False, lakes = False,\
            markersize = 50, marker = "default",figsize = [4,4], \
            saveFig = False, dir = None, format="eps"):
     """ Create a Map for a single record
@@ -220,6 +218,9 @@ def mapLipd(timeseries=None, projection = 'Orthographic', proj_default = True,\
                 https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
         background (bool): If True, uses a shaded relief background (only one 
             available in Cartopy)
+        label (str): label for archive marker. Default is to use the name of the 
+            physical sample. If no archive name is available, default to
+            None. None returns no label. 
         borders (bool): Draws the countries border. Defaults is off (False). 
         rivers (bool): Draws major rivers. Default is off (False).
         lakes (bool): Draws major lakes. 
@@ -258,9 +259,26 @@ def mapLipd(timeseries=None, projection = 'Orthographic', proj_default = True,\
             archiveType = 'other'
         marker = plot_default[archiveType]
 
+    # Get the label
+    if label == 'default':
+        label=[]
+        for i in timeseries.keys():
+            if 'physicalSample_name' in i:
+                label.append(timeseries[i])
+            elif 'measuredOn_name' in i:
+                label.append(timeseries[i])
+        if not label:
+            label = None
+        label = label[0]
+        
+    elif label is None:
+        label = None
+    else:
+        assert type(label) is str, 'the argument label should be of type str'
 
     fig = Map.mapOne(lat, lon, projection = projection, proj_default = proj_default,\
-           background = background, borders = borders, rivers = rivers, lakes = lakes,\
+           background = background, label = label, borders = borders, \
+           rivers = rivers, lakes = lakes,\
            markersize = markersize, marker = marker, figsize = figsize, \
            ax = None)
 
