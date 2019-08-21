@@ -1644,8 +1644,8 @@ def segmentTs(timeseries = None, factor = 2):
 #"""
 
 def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = True,
-          psd_default = True, wwaplot_default = True, psdplot_default = True,
-          fig = True, saveFig = False, dir = None, format = "eps"):
+          psd_default = True, fig = True, wwaplot_default = True, psdplot_default = True,
+          saveFig = False, dir = None, format = "eps"):
     """Weigthed wavelet Z-transform analysis
 
     Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)
@@ -1664,7 +1664,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                            'Neff_coi':3,
                            'nMC':200,
                            'nproc':8,
-                           'detrend':'no',
+                           'detrend':False,
                            'params' : ["default",4,0,1],
                            'gaussianize': False,
                            'standardize':True,
@@ -1674,6 +1674,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                            'len_bd':0}
 
             Modify the values for specific keys to change the default behavior.
+            See Spectral.wwz for details
 
         psd_default: If True, will use the following default parameters:
 
@@ -1682,18 +1683,19 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                        'c':1e-3,
                        'nproc':8,
                        'nMC':200,
-                       'detrend':'no',
+                       'detrend':False,
                        'params' : ["default",4,0,1],
                        'gaussianize': False,
                        'standardize':True,
                        'Neff':3,
                        'anti_alias':False,
-                       'avgs':1,
+                       'avgs':2,
                        'method':'Kirchner_f2py',
                        }
 
             Modify the values for specific keys to change the default behavior.
-
+            See Spectral.wwz_psd for detail.s 
+        fig (bool): If True, plots the figure    
         wwaplot_default: If True, will use the following default parameters:
 
             wwaplot_default={'AR1_q':AR1_q,
@@ -1714,8 +1716,9 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                                  'plot_cone':True,
                                  'title':None,
                                  'ax':None,
-                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')',
+                                 'xlabel': the chondata label,
+                                 'ylabel': 'Period (units from ChronData)',
+                                 'plot_cbar':'True',
                                  'cbar_orientation':'vertical',
                                  'cbar_pad':0.05,
                                  'cbar_frac':0.15,
@@ -1733,22 +1736,23 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                                  'period_tickslabel':None,
                                  'psd_lim':None,
                                  'period_lim':None,
+                                 'alpha':1,
                                  'figsize':[20,8],
                                  'label':'PSD',
                                  'plot_ar1':True,
-                                 'psd_ar1_q95':psd_ar1_q95,
+                                 'psd_ar1_q95':95% quantile from psd,
                                  'title': None,
+                                 'legend': 'True'
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
                                  'ax':None,
                                  'vertical':False,
                                  'plot_gridlines':True,
-                                 'period_label':'Period ('+ageunits+')',
+                                 'period_label':'Period (units of age)',
                                  'psd_label':'Spectral Density',
                                  'zorder' : None}
 
             Modify the values for specific keys to change the default behavior.
 
-        fig (bool): If True, plots the figure
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
             If not provided, creates a default folder called 'figures' in the
@@ -1863,48 +1867,12 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
 
     # Perform the calculations
     if psd is True and wwz is False: # PSD only
-
-        if type(psd_default) is dict:
-            dict_in = psd_default
-
-            psd_default = {'tau':None,
-                       'freqs': None,
-                       'c':1e-3,
-                       'nproc':8,
-                       'nMC':200,
-                       'detrend':'no',
-                       'params' : ["default",4,0,1],
-                       'gaussianize': False,
-                       'standardize':True,
-                       'Neff':3,
-                       'anti_alias':False,
-                       'avgs':1,
-                       'method':'Kirchner_f2py',
-                       }
-
-            for key, value in dict_in.items():
-                if key in psd_default.keys():
-                    psd_default[key] = value
-
+        if psd_default == True:
+            psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts)
+        elif type(psd_default) is dict:
+            psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts, **psd_default)
         else:
-          psd_default = {'tau':None,
-                       'freqs': None,
-                       'c':1e-3,
-                       'nproc':8,
-                       'nMC':200,
-                       'detrend':'no',
-                       'params' : ["default",4,0,1],
-                       'gaussianize': False,
-                       'standardize':True,
-                       'Neff':3,
-                       'anti_alias':False,
-                       'avgs':1,
-                       'method':'Kirchner_f2py',
-                       }
-
-        # Perform calculation
-        psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts, **psd_default)
-
+            sys.exit('Options for psd calculation must be passed as a dictionary')
         # Wrap up the output dictionary
         dict_out = {'psd':psd,
                'freqs':freqs,
@@ -1913,60 +1881,25 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
 
         # Plot if asked
         if fig is True:
-
-            if type(psdplot_default) is dict:
-                dict_in = psdplot_default
-
-                psdplot_default={'lmstyle':'-',
-                                 'linewidth':None,
-                                 'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle':'-',
-                                 'ar1_linewidth':1,
-                                 'period_ticks':None,
-                                 'period_tickslabel':None,
-                                 'psd_lim':None,
-                                 'period_lim':None,
-                                 'figsize':[20,8],
-                                 'label':'PSD',
+            if psdplot_default == True:
+                psdplot_default={'ar1_linewidth':1,
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'title': None,
-                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None,
-                                 'vertical':False,
-                                 'plot_gridlines':True,
-                                 'period_label':'Period ('+ageunits+')',
-                                 'psd_label':'Spectral Density',
-                                 'zorder' : None}
-
-                for key, value in dict_in.items():
-                    if key in psdplot_default.keys():
-                        psdplot_default[key] = value
-
+                                 'period_label':'Period ('+ageunits+')'}
+           
+            if type(psdplot_default) is dict: #necessary since not same defaults
+                if 'ar1_linewidth' not in psdplot_default.keys():
+                    psdplot_default['ar1_linewidth'] =1
+                if 'plot_ar1' not in psdplot_default.keys():
+                    psdplot_default['plot_ar1'] = True
+                if 'psd_ar1_q95' not in psdplot_default.keys():
+                    psdplot_default['psd_ar1_q95'] = psd_ar1_q95
+                if 'period_label' not in psdplot_default.keys():
+                    psdplot_default['period_label'] = 'Period ('+ageunits+')'
+                
             else:
-
-               psdplot_default={'lmstyle':'-',
-                                 'linewidth':None,
-                                 'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle':'-',
-                                 'ar1_linewidth':1,
-                                 'period_ticks':None,
-                                 'period_tickslabel':None,
-                                 'psd_lim':None,
-                                 'period_lim':None,
-                                 'figsize':[20,8],
-                                 'label':'PSD',
-                                 'plot_ar1':True,
-                                 'psd_ar1_q95':psd_ar1_q95,
-                                 'title': None,
-                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None,
-                                 'vertical':False,
-                                 'plot_gridlines':True,
-                                 'period_label':'Period ('+ageunits+')',
-                                 'psd_label':'Spectral Density',
-                                 'zorder' : None}
-
+                sys.exit('Options for psd plot must be passed as a dictionary')
+            
             fig = Spectral.plot_psd(psd,freqs,**psdplot_default)
 
             if saveFig is True:
@@ -1979,48 +1912,17 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
 
     elif psd is False and wwz is True: #WWZ only
         # Set default
-        if type(wwz_default) is dict:
-            dict_in = wwz_default
-
-            wwz_default = {'tau':None,
-                           'freqs':None,
-                           'c':1/(8*np.pi**2),
-                           'Neff':3,
-                           'Neff_coi':3,
-                           'nMC':200,
-                           'nproc':8,
-                           'detrend':'no',
-                           'params' : ["default",4,0,1],
-                           'gaussianize': False,
-                           'standardize':True,
-                           'method':'Kirchner_f2py',
-                           'bc_mode':'reflect',
-                           'reflect_type':'odd',
-                           'len_bd':0}
-            for key,value in dict_in.items():
-                if key in wwz_default.keys():
-                    wwz_default[key]=value
+        if wwz_default == True:
+            #Perform the calculation
+            wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts)
+        
+        elif type(wwz_default) is dict:
+            #Perform the calculation
+            wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts, **wwz_default)
 
         else:
-
-            wwz_default = {'tau':None,
-                           'freqs':None,
-                           'c':1/(8*np.pi**2),
-                           'Neff':3,
-                           'Neff_coi':3,
-                           'nMC':200,
-                           'nproc':8,
-                           'detrend':'no',
-                           'params' : ["default",4,0,1],
-                           'gaussianize': False,
-                           'standardize':True,
-                           'method':'Kirchner_f2py',
-                           'bc_mode':'reflect',
-                           'reflect_type':'odd',
-                           'len_bd':0}
-        #Perform the calculation
-        wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts, **wwz_default)
-
+            sys.exit('Options for wwz calculation must be passed as a dictionary')
+        
         #Wrap up the output dictionary
         dict_out = {'wwa':wwa,
                     'phase':phase,
@@ -2031,64 +1933,31 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                     'Neffs':Neffs,
                     'coeff':coeff}
 
-        #PLot if asked
+        #Plot if asked
         if fig is True:
             # Set the plot default
-            if type(wwaplot_default) is dict:
-                dict_in = wwaplot_default
-                wwaplot_default={'AR1_q':AR1_q,
-                                 'coi':coi,
-                                 'levels':None,
-                                 'tick_range':None,
-                                 'yticks':None,
-                                 'yticks_label': None,
-                                 'ylim':None,
-                                 'xticks':None,
-                                 'xlabels':None,
-                                 'figsize':[20,8],
-                                 'clr_map':'OrRd',
-                                 'cbar_drawedges':False,
-                                 'cone_alpha':0.5,
-                                 'plot_signif':True,
-                                 'signif_style':'contour',
-                                 'plot_cone':True,
-                                 'title':None,
-                                 'ax':None,
-                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')',
-                                 'cbar_orientation':'vertical',
-                                 'cbar_pad':0.05,
-                                 'cbar_frac':0.15,
-                                 'cbar_labelsize':None}
-                for key, value in dict_in.items():
-                    if key in wwaplot_default.keys():
-                        wwaplot_default[key] = value
-
+            if wwaplot_default == True:
+                wwaplot_default = {'AR1_q':AR1_q,
+                                   'coi':coi,
+                                   'plot_signif':True,
+                                   'plot_cone':True,
+                                   'xlabel': s,
+                                   'ylabel': 'Period ('+ageunits+')'}
+            
+            elif type(wwaplot_default) is dict: #necessary since not same defaults
+                if 'AR1_q' not in wwaplot_default:
+                    wwaplot_default['AR1_q'] = AR1_q
+                if 'coi' not in wwaplot_default:
+                    wwaplot_default['coi']=coi
+                if 'plot_signif' not in wwaplot_default:
+                    wwaplot_default['plot_signif'] = True
+                if 'xlabel' not in wwaplot_default:
+                    wwaplot_default['xlabel'] = s
+                if 'ylabel' not in wwaplot_default:
+                    wwaplot_default['ylabel'] = 'Period ('+ageunits+')'
+                
             else:
-                wwaplot_default={'AR1_q':AR1_q,
-                                 'coi':coi,
-                                 'levels':None,
-                                 'tick_range':None,
-                                 'yticks':None,
-                                 'yticks_label': None,
-                                 'ylim':None,
-                                 'xticks':None,
-                                 'xlabels':None,
-                                 'figsize':[20,8],
-                                 'clr_map':'OrRd',
-                                 'cbar_drawedges':False,
-                                 'cone_alpha':0.5,
-                                 'plot_signif':True,
-                                 'signif_style':'contour',
-                                 'plot_cone':True,
-                                 'title':None,
-                                 'ax':None,
-                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')',
-                                 'cbar_orientation':'vertical',
-                                 'cbar_pad':0.05,
-                                 'cbar_frac':0.15,
-                                 'cbar_labelsize':None}
+                sys.exit('Options for wwz plot must be passed as a dictionary')
 
             fig = Spectral.plot_wwa(wwa, freqs, tau, **wwaplot_default)
 
@@ -2101,93 +1970,26 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
 
     elif psd is True and wwz is True: # perform both
 
-        # Set the defaults
-
-        if type(psd_default) is dict:
-            dict_in = psd_default
-
-            psd_default = {'tau':None,
-                       'freqs': None,
-                       'c':1e-3,
-                       'nproc':8,
-                       'nMC':200,
-                       'detrend':'no',
-                       'params' : ["default",4,0,1],
-                       'gaussianize': False,
-                       'standardize':True,
-                       'Neff':3,
-                       'anti_alias':False,
-                       'avgs':1,
-                       'method':'Kirchner_f2py',
-                       }
-
-            for key, value in dict_in.items():
-                if key in psd_default.keys():
-                    psd_default[key] = value
+        # PSD calculations
+        if psd_default == True:
+            psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts)
+        elif type(psd_default) is dict:
+            psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts, **psd_default)
+        else:
+            sys.exit('Options for psd calculation must be passed as a dictionary')
+        
+        #WWZ calculations
+        if wwz_default == True:
+            #Perform the calculation
+            wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts)
+        
+        elif type(wwz_default) is dict:
+            #Perform the calculation
+            wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts, **wwz_default)
 
         else:
-          psd_default = {'tau':None,
-                       'freqs': None,
-                       'c':1e-3,
-                       'nproc':8,
-                       'nMC':200,
-                       'detrend':'no',
-                       'params' : ["default",4,0,1],
-                       'gaussianize': False,
-                       'standardize':True,
-                       'Neff':3,
-                       'anti_alias':False,
-                       'avgs':1,
-                       'method':'Kirchner_f2py',
-                       }
-
-        if type(wwz_default) is dict:
-            dict_in = wwz_default
-
-            wwz_default = {'tau':None,
-                           'freqs':None,
-                           'c':1/(8*np.pi**2),
-                           'Neff':3,
-                           'Neff_coi':3,
-                           'nMC':200,
-                           'nproc':8,
-                           'detrend':'no',
-                           'params' : ["default",4,0,1],
-                           'gaussianize': False,
-                           'standardize':True,
-                           'method':'Kirchner_f2py',
-                           'bc_mode':'reflect',
-                           'reflect_type':'odd',
-                           'len_bd':0}
-
-
-            for key,value in dict_in.items():
-                if key in wwz_default.keys():
-                    wwz_default[key]=value
-
-        else:
-
-            wwz_default = {'tau':None,
-                           'freqs':None,
-                           'c':1/(8*np.pi**2),
-                           'Neff':3,
-                           'Neff_coi':3,
-                           'nMC':200,
-                           'nproc':8,
-                           'detrend':'no',
-                           'params' : ["default",4,0,1],
-                           'gaussianize': False,
-                           'standardize':True,
-                           'method':'Kirchner_f2py',
-                           'bc_mode':'reflect',
-                           'reflect_type':'odd',
-                           'len_bd':0}
-
-
-        # Perform the calculations
-        psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts, **psd_default)
-        wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts, **wwz_default)
-
+            sys.exit('Options for wwz calculation must be passed as a dictionary')
+        
         #Wrap up the output dictionary
         dict_out = {'wwa':wwa,
                     'phase':phase,
@@ -2203,7 +2005,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
 
         # Make the plot if asked
         if fig is True:
-
+            #Figure out the figure size
             if type(wwaplot_default) is dict and type(psdplot_default)is dict:
                 if 'figsize' in wwaplot_default.keys():
                     figsize = wwaplot_default['figsize']
@@ -2226,118 +2028,59 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
             fig = plt.figure(figsize = figsize)
             ax1 = plt.subplot2grid((1,3),(0,0), colspan =2)
 
-            # Set the plot default
-            if type(wwaplot_default) is dict:
-                dict_in = wwaplot_default
-                wwaplot_default={'AR1_q':AR1_q,
-                                 'coi':coi,
-                                 'levels':None,
-                                 'tick_range':None,
-                                 'yticks':None,
-                                 'yticks_label': None,
-                                 'ylim':None,
-                                 'xticks':None,
-                                 'xlabels':None,
-                                 'figsize':[20,8],
-                                 'clr_map':'OrRd',
-                                 'cbar_drawedges':False,
-                                 'cone_alpha':0.5,
-                                 'plot_signif':True,
-                                 'signif_style':'contour',
-                                 'plot_cone':True,
-                                 'title':None,
-                                 'ax':None,
-                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')',
-                                 'cbar_orientation':'vertical',
-                                 'cbar_pad':0.05,
-                                 'cbar_frac':0.15,
-                                 'cbar_labelsize':None}
-                for key, value in dict_in.items():
-                    if key in wwaplot_default.keys():
-                        wwaplot_default[key] = value
-
+            if wwaplot_default == True:
+                wwaplot_default = {'AR1_q':AR1_q,
+                                   'coi':coi,
+                                   'plot_signif':True,
+                                   'plot_cone':True,
+                                   'xlabel': s,
+                                   'ylabel': 'Period ('+ageunits+')',
+                                   'ax':ax1}
+            
+            elif type(wwaplot_default) is dict: #necessary since not same defaults
+                if 'AR1_q' not in wwaplot_default:
+                    wwaplot_default['AR1_q'] = AR1_q
+                if 'coi' not in wwaplot_default:
+                    wwaplot_default['coi']=coi
+                if 'plot_signif' not in wwaplot_default:
+                    wwaplot_default['plot_signif'] = True
+                if 'xlabel' not in wwaplot_default:
+                    wwaplot_default['xlabel'] = s
+                if 'ylabel' not in wwaplot_default:
+                    wwaplot_default['ylabel'] = 'Period ('+ageunits+')'
+                if 'ax' not in wwaplot_default:
+                    wwaplot_default['ax'] = ax1
+                
             else:
-                wwaplot_default={'AR1_q':AR1_q,
-                                 'coi':coi,
-                                 'levels':None,
-                                 'tick_range':None,
-                                 'yticks':None,
-                                 'yticks_label': None,
-                                 'ylim':None,
-                                 'xticks':None,
-                                 'xlabels':None,
-                                 'figsize':[20,8],
-                                 'clr_map':'OrRd',
-                                 'cbar_drawedges':False,
-                                 'cone_alpha':0.5,
-                                 'plot_signif':True,
-                                 'signif_style':'contour',
-                                 'plot_cone':True,
-                                 'title':None,
-                                 'ax':None,
-                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')',
-                                 'cbar_orientation':'vertical',
-                                 'cbar_pad':0.05,
-                                 'cbar_frac':0.15,
-                                 'cbar_labelsize':None}
+                sys.exit('Options for wwz plot must be passed as a dictionary')
+
 
             Spectral.plot_wwa(wwa, freqs, tau, **wwaplot_default)
 
             ax2 = plt.subplot2grid((1,3),(0,2))
 
-            if type(psdplot_default) is dict:
-                dict_in = psdplot_default
-
-                psdplot_default={'lmstyle':'-',
-                                 'linewidth':None,
-                                 'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle':'-',
-                                 'ar1_linewidth':1,
-                                 'period_ticks':None,
-                                 'period_tickslabel':None,
-                                 'psd_lim':None,
-                                 'period_lim':None,
-                                 'figsize':[20,8],
-                                 'label':'PSD',
+            if psdplot_default == True:
+                psdplot_default={'ar1_linewidth':1,
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'title': None,
-                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None,
-                                 'vertical':False,
-                                 'plot_gridlines':True,
                                  'period_label':'Period ('+ageunits+')',
-                                 'psd_label':'Spectral Density',
-                                 'zorder' : None}
-                for key, value in dict_in.items():
-                    if key in psdplot_default.keys():
-                        psdplot_default[key] = value
-
+                                 'ax': ax2}
+           
+            if type(psdplot_default) is dict: #necessary since not same defaults
+                if 'ar1_linewidth' not in psdplot_default.keys():
+                    psdplot_default['ar1_linewidth'] =1
+                if 'plot_ar1' not in psdplot_default.keys():
+                    psdplot_default['plot_ar1'] = True
+                if 'psd_ar1_q95' not in psdplot_default.keys():
+                    psdplot_default['psd_ar1_q95'] = psd_ar1_q95
+                if 'period_label' not in psdplot_default.keys():
+                    psdplot_default['period_label'] = 'Period ('+ageunits+')'
+                if 'ax' not in psdplot_default.keys():
+                    psdplot_default['ax'] = ax2
+                
             else:
-
-               psdplot_default={'lmstyle':'-',
-                                 'linewidth':None,
-                                 'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle':'-',
-                                 'ar1_linewidth':1,
-                                 'period_ticks':None,
-                                 'period_tickslabel':None,
-                                 'psd_lim':None,
-                                 'period_lim':None,
-                                 'figsize':[20,8],
-                                 'label':'PSD',
-                                 'plot_ar1':True,
-                                 'psd_ar1_q95':psd_ar1_q95,
-                                 'title': None,
-                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None,
-                                 'vertical':False,
-                                 'plot_gridlines':True,
-                                 'period_label':'Period ('+ageunits+')',
-                                 'psd_label':'Spectral Density',
-                                 'zorder' : None}
+                sys.exit('Options for psd plot must be passed as a dictionary')
+            
             Spectral.plot_psd(psd,freqs,**psdplot_default)
 
             if saveFig is True:

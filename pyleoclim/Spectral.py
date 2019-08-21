@@ -1,4 +1,4 @@
-h#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Created on Fri Apr 28 14:23:06 2017
@@ -1623,9 +1623,10 @@ def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
     return red
 
 
-def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3, nMC=200, nproc=8,
-        detrend=False, params=['default', 4, 0, 1], gaussianize=False, standardize=True,
-        method='Kirchner_f2py', len_bd=0, bc_mode='reflect', reflect_type='odd'):
+def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
+        nMC=200, nproc=8, detrend=False, params=['default', 4, 0, 1],\
+        gaussianize=False, standardize=True, method='Kirchner_f2py', len_bd=0,\
+        bc_mode='reflect', reflect_type='odd'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coefficients
 
     Args:
