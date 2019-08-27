@@ -211,6 +211,45 @@ def checkXaxis(timeseries, x_axis= None):
   
     return x, label
 
+def checkTimeAxis(timeseries, x_axis = None):
+    """ This function makes sure that time is available for the timeseries
+    
+    Args:
+        timeseries (dict): A LiPD timeseries object
+    
+    Returns:
+        x: the time values for the timeseries
+        label: the time representation for the timeseries
+    """
+    if x_axis is None:
+        if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
+            sys.exit("No time information available")
+        elif 'age' in timeseries.keys() and 'year' in timeseries.keys():
+            print("Both age and year information are available.")
+            label = input("Which one would you like to use? ")
+            while label != "year" and label != "age":
+                label = input("Only enter year or age: ")
+        elif 'age' in timeseries.keys():
+            label = 'age'
+        elif 'year' in timeseries.keys():
+            label = 'year'
+    elif x_axis == 'age':
+        if not 'age' in timeseries.keys():
+            sys.exit('Age is not available for this record')
+        else:
+            label = 'age'
+    elif x_axis == 'year':
+        if not 'year' in timeseries.keys():
+            sys.exit('Year is not available for this record')
+        else:
+            label='year'
+    else:
+        sys.exit('Only None, year and age are valid entries for x_axis parameter')
+    
+    x = np.array(timeseries[label], dtype = 'float64')
+    
+    return x, label
+
 def searchVar(timeseries_list, key, exact = True, override = True):
     """ This function search for key words (exact match) for a variable
     
@@ -436,7 +475,7 @@ def getTs(timeseries_list, option = None):
     return timeseries   
 
 """ 
-Handle mapping to LinkedEarth Ontology if needed
+Functions to handle data on the wiki
 """    
 def LipdToOntology(archiveType):
     """ standardize archiveType
@@ -462,6 +501,38 @@ def LipdToOntology(archiveType):
     
     return archiveType
 
+def timeUnitsCheck(units):
+    """ This function attempts to make sense of the time units by checking for equivalence
+    
+    Args:
+        units (str): The units string for the timeseries
+        
+    Returns:
+        unit_group (str): Whether the units belongs to age_units, kage_units, year_units, or undefined
+    """
+    
+    age_units = ['year B.P.','yr B.P.','yr BP','BP','yrs BP','years B.P.',\
+                 'yr. BP','yr. B.P.', 'cal. BP', 'cal B.P.', \
+                 'year BP','years BP']
+    kage_units = ['kyr BP','kaBP','ka BP','ky','kyr','kyr B.P.', 'ka B.P.']
+    year_units = ['AD','CE','year C.E.','year A.D.', 'year CE','year AD',\
+                  'years C.E.','years A.D.','yr CE','yr AD','yr C.E.'\
+                  'yr A.D.', 'yrs C.E.', 'yrs A.D.', 'yrs CE', 'yrs AD']
+    undefined = ['years', 'yr','year','yrs']
+    
+    if units in age_units:
+        unit_group = 'age_units'
+    elif units in kage_units:
+        unit_group = 'kage_units'
+    elif units in year_units:
+        unit_group = 'year_units'
+    elif units in undefined:
+        unit_group = 'undefined'
+    else:
+        unit_group = 'unknown'
+    
+    return unit_group
+    
 """
 Deal with models
 """

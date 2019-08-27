@@ -1247,11 +1247,11 @@ def statsTs(timeseries=None):
     return mean, median, min_, max_, std, IQR
 
 def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
+                 autocorrect = True, autocorrect_param = 1950,\
                  interp_step = None, start = None, end = None, nsim = 1000, \
                  method = 'isospectral', alpha = 0.5):
     """ Estimates the significance of correlations between non IID timeseries.
 
-        Function written by. F. Zhu.
 
         Args:
             timeseries1, timeseries2: timeseries object. Default is blank.
@@ -1259,6 +1259,10 @@ def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
                 paleo-data. Options are "age", "year", and "depth".
                 Default is to let the system choose if only one available
                 or prompt the user.
+            autocorrect (bool): If applicable, convert age to year automatically.
+                If set to False, timeseries objects should have converted time
+                axis and updated units label in the dictionary
+            autocorrect_param (float): Reference for age/year conversion.
             interp_step (float): the step size. By default, will prompt the user.
             start (float): Start time/age/depth. Default is the maximum of
                 the minima of the two timeseries
@@ -1293,41 +1297,62 @@ def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
         if not 'ts_list' in globals():
             fetchTs()
         timeseries2 = LipdUtils.getTs(ts_list)
-
+        
+    
     # Get the first time and paleoData values
     y1 = np.array(timeseries1['paleoData_values'], dtype = 'float64')
-    x1, label1 = LipdUtils.checkXaxis(timeseries1, x_axis=x_axis)
+    x1, label1 = LipdUtils.checkTimeaxis(timeseries1, x_axis=x_axis)
 
     # Get the second one
     y2 = np.array(timeseries2['paleoData_values'], dtype = 'float64')
-    x2, label2 = LipdUtils.checkXaxis(timeseries2, x_axis=x_axis)
+    x2, label2 = LipdUtils.checTimeXaxis(timeseries2, x_axis=x_axis)
+    
+    #Make sure that the label is the same
+    if label1 != label2:
+        if autocorrect == True:
+            print("Converting year to age...")
+            if label1 == 'year':
+                x1 = autocorrect_param-x1
+                units1 = 'yr BP'
+                units2 = timeseries2[label2+'Units']
+                label1 = 'year B.P.'
+            elif label2 == 'year':
+                x2 = autocorrect_param-x2
+                units2 = 'yr BP'
+                units1 = timeseries1[label1+'Units']
+        else:
+            sys.exit("The two timeseries share a different time representation")
+    else: 
+        units2 = timeseries2[label2+'Units']
+        units1 = timeseries1[label1+'Units']
+   
+    # Tranform the units if necessary
+    
+    if units1 != units2:
+        units1_group = LipdUtils.timeUnitsCheck(units1)
+        units2_group = LipdUtils.timeUnitsCheck(units2)
+        assert units1_group != 'unknown', 'Units unknown, manual conversion needed'
+        assert units2_group != 'unknown', 'Units unknown, manual conversion needed'
+        if units1_group == 'undefined':
+            if label1 == 'year':
+                units1_group = 'year_units'
+            elif label1 == 'age':
+                units2_group = 'age_units'
+        if units2_group == 'undefined':
+            if label2 == 'year':
+                units2_group = 'year_units'
+            elif label2 == 'age':
+                units2_group = 'age_units'
+        #convert kyr to yr if needed
+        if units1_group != units2_group:
+            if units1_group == 'kage_units':
+                x1 = x1*1000
+            if units2_group == 'kage_units':
+                x2 = x2*1000
 
     # Remove NaNs and ordered
     y1,x1 = Timeseries.clean_ts(y1,x1)
     y2,x2 = Timeseries.clean_ts(y2,x2)
-
-    # Make sure that the series have the same units:
-    units1 = timeseries1[label1+'Units']
-    units2 = timeseries2[label2+'Units']
-
-    if units2!=units1:
-        print('Warning: The two timeseries are on different time units!')
-        print('The units of timeseries1 are '+units1)
-        print('The units of timeseries2 are '+units2)
-        answer = input('Enter an equation to convert the units of x2 onto x1.'+
-                       " The equation should be written in Python format"+
-                       " (e.g., a*x2+b or 1950-a*x2) or press enter to abort: ")
-
-        if not answer:
-            sys.exit("Aborted by User")
-        elif "x2" not in answer:
-            answer = input("The form must be a valid python expression and contain x2!"+
-                           "Enter a valid expression: ")
-            while "x2" not in answer:
-                answer = input("The form must be a valid python expression and contain x2!"+
-                           "Enter a valid expression: ")
-        else: x2 = eval(answer)
-
 
     #Check that the two timeseries have the same lenght and if not interpolate
     if len(y1) != len(y2):
@@ -1820,17 +1845,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
         timeseries = LipdUtils.getTs(ts_list)
 
     # Raise an error if age or year not in the keys
-    if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
-        sys.exit("No time information available")
-    elif 'age' in timeseries.keys() and 'year' in timeseries.keys():
-        print("Both age and year information are available.")
-        x_axis = input("Which one would you like to use? ")
-        while x_axis != "year" and x_axis != "age":
-            x_axis = input("Only enter year or age: ")
-    elif 'age' in timeseries.keys():
-        x_axis = 'age'
-    elif 'year' in timeseries.keys():
-        x_axis = 'year'
+    x_axis = LipdUtils.checkTimeAxis(timeseries)
 
     # Set the defaults
     #Make sure the default have the proper type
@@ -1941,7 +1956,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                                    'coi':coi,
                                    'plot_signif':True,
                                    'plot_cone':True,
-                                   'xlabel': s,
+                                   'xlabel': x_axis,
                                    'ylabel': 'Period ('+ageunits+')'}
             
             elif type(wwaplot_default) is dict: #necessary since not same defaults
@@ -2033,7 +2048,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                                    'coi':coi,
                                    'plot_signif':True,
                                    'plot_cone':True,
-                                   'xlabel': s,
+                                   'xlabel': x_axis,
                                    'ylabel': 'Period ('+ageunits+')',
                                    'ax':ax1}
             
@@ -2091,6 +2106,49 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
             fig = None
 
     return dict_out, fig
+
+## Cross wavelet transform
+#def xwtTs(timeseries1 = None, timeseries2 = None, lim =None, xwt_default = True):
+#    """Cross Wavelet transform of two timeseries
+#    
+#    Args:
+#        timeseries1 (dict): a LiPD timeseries object (Optional, will prompt for one)
+#        timeseries2 (dict): a LiPD timeseries object (Optional, will prompt for one)
+#        lim (list): Truncate the timeseries between min/max time (e.g., [0,10000])
+#        xwt_default: If True, will use the followinf default parameters
+#            
+#            xwt_default = {'tau': None,
+#                           'feqs': None,
+#                           'c': 1/(8*np.pi**2),
+#                           'Neff': 3,
+#                           'Neff_coi': 6,
+#                           'nproc': 8,
+#                           'detrend': False,
+#                           'params': ['default', 4, 0, 1],
+#                           'gaussianize': False,
+#                           'standardize':True,
+#                           'method':'Kirchner_f2py'}
+#            Modify the values for specific keys to change the default behavior.
+#            See Spectral.xwt for details
+#    """
+#    #Get timeseries
+#    if not timeseries1:
+#        if not 'ts_list' in globals():
+#            fetchTs()
+#        timeseries1 = LipdUtils.getTs(ts_list)
+#    if not timeseries2:
+#        if not 'ts_list' in globals():
+#            fetchTs()
+#        timeseries2 = LipdUtils.getTs(ts_list)
+#    
+#    # Make sure that everything checks out with the time axis
+#    x_axis1 = LipdUtils.checkTimeAxis(timeseries1)
+#    x_axis2 = LipdUtils.checkTimeAxis(timeseries2)
+#    
+#    assert x_axis1 == x_axis2, 'Timeseries should be using the same age representation'
+#    
+#    # Check the units
+        
 
 """
 Age model
