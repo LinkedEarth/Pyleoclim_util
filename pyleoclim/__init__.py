@@ -261,16 +261,13 @@ def mapLipd(timeseries=None, projection = 'Orthographic', proj_default = True,\
 
     # Get the label
     if label == 'default':
-        label=[]
         for i in timeseries.keys():
             if 'physicalSample_name' in i:
-                label.append(timeseries[i])
+                label = timeseries[i]
             elif 'measuredOn_name' in i:
-                label.append(timeseries[i])
-        if not label:
+                label = timeseries[i]
+        if label == 'default':
             label = None
-        label = label[0]
-        
     elif label is None:
         label = None
     else:
@@ -1249,7 +1246,7 @@ def statsTs(timeseries=None):
 def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
                  autocorrect = True, autocorrect_param = 1950, interp_method = 'interpolation',\
                  interp_step = None, start = None, end = None, nsim = 1000, \
-                 method = 'isospectral', alpha = 0.5):
+                 method = 'isospectral', alpha = 0.05):
     """ Estimates the significance of correlations between non IID timeseries.
 
 
@@ -1304,11 +1301,11 @@ def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
     
     # Get the first time and paleoData values
     y1 = np.array(timeseries1['paleoData_values'], dtype = 'float64')
-    x1, label1 = LipdUtils.checkTimeaxis(timeseries1, x_axis=x_axis)
+    x1, label1 = LipdUtils.checkTimeAxis(timeseries1, x_axis=x_axis)
 
     # Get the second one
     y2 = np.array(timeseries2['paleoData_values'], dtype = 'float64')
-    x2, label2 = LipdUtils.checTimeXaxis(timeseries2, x_axis=x_axis)
+    x2, label2 = LipdUtils.checkTimeAxis(timeseries2, x_axis=x_axis)
     
     #Make sure that the label is the same
     if label1 != label2:
@@ -1584,16 +1581,15 @@ def standardizeTs(timeseries = None, scale = 1, ddof = 0, eps = 1e-3):
     Constant or nearly constant time series not rescaled.
 
     Args:
-        x (array): vector of (real) numbers as a time series, NaNs allowed
+        timeseries (array): A LiPD timeseries object 
         scale (real): a scale factor used to scale a record to a match a given variance
-        axis (int or None): axis along which to operate, if None, compute over the whole array
         ddof (int): degress of freedom correction in the calculation of the standard deviation
         eps (real): a threshold to determine if the standard deviation is too close to zero
 
     Returns:
-        - z (array): the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed \n
-        - mu (real): the mean of the original time series, E[X] \n
-        - sig (real): the standard deviation of the original time series, std[X] \n
+        z (array): the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed \n
+        mu (real): the mean of the original time series, E[X] \n
+        sig (real): the standard deviation of the original time series, std[X] \n
 
     References:
         1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
@@ -1850,7 +1846,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
         timeseries = LipdUtils.getTs(ts_list)
 
     # Raise an error if age or year not in the keys
-    x_axis = LipdUtils.checkTimeAxis(timeseries)
+    ts, label = LipdUtils.checkTimeAxis(timeseries)
 
     # Set the defaults
     #Make sure the default have the proper type
@@ -1869,7 +1865,6 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
 
     # Get the values
     ys = np.array(timeseries['paleoData_values'], dtype = 'float64')
-    ts, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
 
     # remove NaNs
     ys,ts = Timeseries.clean_ts(ys,ts)
@@ -1961,7 +1956,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                                    'coi':coi,
                                    'plot_signif':True,
                                    'plot_cone':True,
-                                   'xlabel': x_axis,
+                                   'xlabel': label,
                                    'ylabel': 'Period ('+ageunits+')'}
             
             elif type(wwaplot_default) is dict: #necessary since not same defaults
@@ -2053,7 +2048,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                                    'coi':coi,
                                    'plot_signif':True,
                                    'plot_cone':True,
-                                   'xlabel': x_axis,
+                                   'xlabel': label,
                                    'ylabel': 'Period ('+ageunits+')',
                                    'ax':ax1}
             
@@ -2601,7 +2596,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
 
     for i in np.arange(0,np.shape(ageDist)[1],1):
         #Get the output in list form
-
+        i = int(i)
         key_dist = key+"distribution"+str(i)
         T[key]["distributionTable"].update({key_dist:{}})
         d = OrderedDict()

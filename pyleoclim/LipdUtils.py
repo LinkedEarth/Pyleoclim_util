@@ -185,7 +185,7 @@ def checkXaxis(timeseries, x_axis= None):
         label - returns either "age", "year", or "depth"    
     
     """
-    if not x_axis:
+    if x_axis is None:
         x, label = xAxisTs(timeseries)
         x = np.array(x, dtype = 'float64')
     elif x_axis == "depth":
