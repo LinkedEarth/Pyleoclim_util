@@ -1,0 +1,278 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>RBchron &#8212; Pyleoclim 0.4.8 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Spectral Functions" href="Spectral.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Spectral.html" title="Spectral Functions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Spectral.html"
+                        title="previous chapter">Spectral Functions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/RBchron.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="rbchron">
+<h1>RBchron<a class="headerlink" href="#rbchron" title="Permalink to this headline">¶</a></h1>
+<p>This module helps in the preparation of a Bchron run.</p>
+<p>When using this module, please cite:
+* Haslett, J., and Parnell, A.C. (2008). A simple monotone process with application to radiocarbon-dated depth chronologies. Journal of the Royal Statistical Society, Series C, 57, 399-418, DOI:10.111/j.1467-9876.2008.00623.x
+* Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E.,  and Huntley, B. (2008). A flexible approach to assessing  synchroneity of past events using Bayesian reconstructions of sedimentation history. Quaternary Science Reviews, 27(19-20), 1872-1885. DOI:10.1016/j.quascirev.2008.07.009</p>
+<dl class="function">
+<dt id="pyleoclim.RBchron.chooseCalCurves">
+<code class="sig-prename descclassname">pyleoclim.RBchron.</code><code class="sig-name descname">chooseCalCurves</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.RBchron.chooseCalCurves" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prompt for a calibration curve if not given by the user.</p>
+<p>Prompt the user for the name of a calibration curve used to run the Bchron 
+software package. The user can enter either enter only one name that will
+be applied to each age or a list of names of different ages. To enter a list, 
+separate each name with a comma. No quotation marks needed.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>A list of calibration curves to be applied</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.RBchron.reservoirAgeCorrection">
+<code class="sig-prename descclassname">pyleoclim.RBchron.</code><code class="sig-name descname">reservoirAgeCorrection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.RBchron.reservoirAgeCorrection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate reservoir age correction</p>
+<p>Assists in estimating the reservoir age correction for marine records.
+If unknown, will direct the user to copy and paste the table available
+on the 14Chrono Marine Reservoir database: <a class="reference external" href="http://intcal.qub.ac.uk/marine/">http://intcal.qub.ac.uk/marine/</a></p>
+<dl>
+<dt>Returns:</dt><dd><p>ageCorr -  the DeltaR for the site.</p>
+<p>ageCorrStd - The error on DeltaR estimated as the standard error on the 
+mean if using the 14Chrono Marine Reservoir database.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.RBchron.runBchron">
+<code class="sig-prename descclassname">pyleoclim.RBchron.</code><code class="sig-name descname">runBchron</code><span class="sig-paren">(</span><em class="sig-param">ages</em>, <em class="sig-param">agesStd</em>, <em class="sig-param">positions</em>, <em class="sig-param">rejectAges=None</em>, <em class="sig-param">positionsThickness=None</em>, <em class="sig-param">calCurves=None</em>, <em class="sig-param">reservoirAgeCorr=None</em>, <em class="sig-param">outlierProbs=None</em>, <em class="sig-param">predictPositions=None</em>, <em class="sig-param">iterations=10000</em>, <em class="sig-param">burn=2000</em>, <em class="sig-param">thin=8</em>, <em class="sig-param">extractDate=-69</em>, <em class="sig-param">maxExtrap=500</em>, <em class="sig-param">thetaMhSd=0.5</em>, <em class="sig-param">muMhSd=0.1</em>, <em class="sig-param">psiMhSd=0.1</em>, <em class="sig-param">ageScaleVal=1000</em>, <em class="sig-param">positionScaleVal=100</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.RBchron.runBchron" title="Permalink to this definition">¶</a></dt>
+<dd><p>Age model for Tie-Point chronologies</p>
+<p>Fits a non-parametric chronology model to age/position data according to
+the Compound Poisson-Gamma model defined by Haslett and Parnell (2008). 
+This version used a slightly modified Markov chain Monte-Carlo fitting
+algorithm which aims to converge quicker and requires fewer iterations.
+It also a slightly modified procedure for identifying outliers.</p>
+<p>The Bchronology functions fits a compounf Poisson-Gamma distribution to the
+incrememnts between the dated levels. This involves a stochastic linear
+interpolation step where the age gaps are Gamma distributed, and the position
+gaps are Exponential. Radiocarbon and non-radiocarbon dates (including outliers)
+are updated within the fucntion also by MCMC.</p>
+<dl>
+<dt>Args:</dt><dd><p>ages (array): A vector of ages (most likely 14C)
+ageSds (array): A vector of 1-sigma values for the ages given above
+positions (array): Position values (e.g. depths) for each age
+rejectAges (vector): A vector of 1/0 where 1 include the dates to be rejected.</p>
+<blockquote>
+<div><p>Default it None.</p>
+</div></blockquote>
+<dl>
+<dt>positionsThickness (array): (Optional) Thickness values for each of the positions.</dt><dd><p>The thickness values should be the full thickness value of the
+slice. By default set to zero.</p>
+</dd>
+<dt>calCurves (list): (Optional) A vector of values containing either ‘intcal13’,</dt><dd><p>‘marine13’, ‘shcal13’, or ‘normal’. If none is provided, will
+prompt the user. Should be either of length =1 if using the same
+calibration for each age or the same length as the vector of ages.</p>
+</dd>
+<dt>reservoirAgeCorr (array): (Optional) A list (matrix) of two floats that correspond to the</dt><dd><p>DeltaR and DeltaR uncertainty. If already added to the ages and
+ages standard deviation, then enter [0,0] to bypass the prompt.
+Will only be applied if CalCurves is set to ‘marine13’. Otherwise,
+leave to none.</p>
+</dd>
+<dt>outlierProbs (array): (Optional) A vector of prior outlier probabilities,</dt><dd><p>one for each age. Defaults to 0.01</p>
+</dd>
+<dt>predictPositions (array): (Optional) a vector of positions </dt><dd><p>(e.g. depths) at which predicted age values are required. 
+Defaults to a sequence of length 100 from the top position to the
+bottom position.</p>
+</dd>
+<dt>iterations (int): (Optional) The number of iterations to start the procedure. </dt><dd><p>Default and minimum should be 10000.</p>
+</dd>
+<dt>burn (int): (Optional) The number of starting iterations to discard.</dt><dd><p>Default is 200</p>
+</dd>
+<dt>thin (int): (Optional) The step size for every iteration to keep beyond</dt><dd><p>the burnin. Default is 8.</p>
+</dd>
+<dt>extractDate (float): (Optional) The top age of the core. Used for</dt><dd><p>extrapolation purposes so that no extrapolated ages go beyond the
+top age of the core. Defaults to the current year.</p>
+</dd>
+<dt>maxExtrap (int): (Optional) The maximum number of extrapolations to</dt><dd><p>perform before giving up and setting the predicted ages to NA. 
+Useful for when large amounts of extrapolation are required, i.e.
+some of the predictPositions are a long way from the dated
+positions. Defaults to 500.</p>
+</dd>
+<dt>thetaMhSd (float):  (Optional)  The Metropolis-Hastings standard</dt><dd><p>deviation for the age parameters. Defaults to 0.5.</p>
+</dd>
+<dt>muMhSd (float): (Optional)  The Metropolis-Hastings standard deviation</dt><dd><p>for the compound Poisson-Gamma Scale. Defaults to 0.1</p>
+</dd>
+<dt>psiMhSd (float): (Optional) The Metropolis-Hastings standard deviation </dt><dd><p>for the Compound Poisson-Gamma Scale.</p>
+</dd>
+<dt>ageScaleVal (int): (Optional) A scale value for the ages. </dt><dd><p>Bchronology works best when the ages are scaled to be 
+approximately between 0 and 100.
+The default value is thus 1000 for ages given in years.</p>
+</dd>
+<dt>positionScaleVal (int):  (Optional) A scale value for the positions. </dt><dd><p>Bchronology works best when the positions are scaled to be 
+approximately between 0 and 100. The default value is thus
+100 for positions given in cm.</p>
+</dd>
+<dt>Returns:</dt><dd><p>depth - the predicted positions (either same as the user or the default)</p>
+<dl class="simple">
+<dt>chron -  a numpy array of possible chronologies in each column.</dt><dd><p>The number of rows is the same as the length of depth</p>
+</dd>
+</dl>
+<p>ageDist - the distribution of ages around each dates.
+run - the full R object containing the outputs of the Bchron run</p>
+</dd>
+<dt>Warnings:</dt><dd><dl class="simple">
+<dt>This function requires R and the Bchron package and all its</dt><dd><p>dependencies to be installed on the same machine.</p>
+</dd>
+</dl>
+</dd>
+<dt>Reference:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>Haslett, J., and Parnell, A. C. (2008). A simple monotone </dt><dd><p>process with application to radiocarbon-dated depth 
+chronologies. Journal of the Royal Statistical Society, 
+Series C, 57, 399-418. DOI:10.1111/j.1467-9876.2008.00623.x</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E., </dt><dd><p>and Huntley, B. (2008). A flexible approach to assessing 
+synchroneity of past events using Bayesian reconstructions
+of sedimentation history. Quaternary Science Reviews, 
+27(19-20), 1872-1885. DOI:10.1016/j.quascirev.2008.07.009</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.RBchron.plotBchron">
+<code class="sig-prename descclassname">pyleoclim.RBchron.</code><code class="sig-name descname">plotBchron</code><span class="sig-paren">(</span><em class="sig-param">depth, chron, positions, ageDist, flipCoor=False, xlabel='Depth', ylabel='Age', xlim=None, ylim=None, violinColor='#8B008B', medianLineColor='black', medianLineWidth=2.0, CIFillColor='Silver', samplePaths=True, samplePathNumber=10, alpha=0.5, figsize=[4, 8], ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.RBchron.plotBchron" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot a Bchron output</p>
+<p>This function creates a plot showing the calibrated calendar ages and
+associated 95% confidence interval as error bars, the 95% ensemble from
+the produced age model as well as randomly drawn members of the ensemble.</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>depth (array): the positions in the archive (often referred to as</dt><dd><p>depth) where the age model was interpolated to. Should be a vector</p>
+</dd>
+<dt>chron (array): The possible age models returned by BChron. The number</dt><dd><p>of rows should be the same length as the depth vector, with each
+possible realization stored in the columns.</p>
+</dd>
+<dt>positions (array): The depth on the archive at which chronological</dt><dd><p>measurements have been made. Should be a vector</p>
+</dd>
+<dt>agesDist (array): The distribution of ages for each chronological tie</dt><dd><p>points. The number of columns should correspond to the number of
+chronological tie points available.</p>
+</dd>
+</dl>
+<p>flipCoor (bool): If True, plots depth on the y-axis.     
+xlabel (str): The label for the x-axis
+ylabel (str): The label for the y-axis
+xlim (list): Limits for the x-axis. Default corresponds to the min/max</p>
+<blockquote>
+<div><p>of the depth vector.</p>
+</div></blockquote>
+<p>ylim (list): Limits for the y-axis. Default set by matplotlib
+violinColor (str): The color for the violins. Default is purple
+medianLineColor (str): The color for the median line. Default is black.
+medianLineWidth (float): The width for the median line
+CIFillColor (str): Fill color in between the 95% confidence interval.</p>
+<blockquote>
+<div><p>Default is silver.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>samplePaths (bool): If True, draws sample paths from the distribution.</dt><dd><p>Use the same color as the violins.</p>
+</dd>
+<dt>samplePathNumber (int): The number of sample paths to draw. Default is 10.</dt><dd><p>Note: samplePaths need to be set to True.</p>
+</dd>
+</dl>
+<p>alpha (float): The violins’ transparency. Number between 0 and 1
+figsize (list): The figure size. Default is [4,8]
+ax: Default is None. Useful to set for subplots.</p>
+</dd>
+<dt>Returns:</dt><dd><ul class="simple">
+<li><p>fig: the figure.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Spectral.html" title="Spectral Functions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+    </div>
+  </body>
+</html>
