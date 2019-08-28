@@ -21192,3 +21192,9 @@
 2019-08-21 13:30:44,976 [INFO] time_series: enter extract_columns
 2019-08-21 13:30:44,977 [INFO] time_series: exit extract_main
 2019-08-21 13:30:44,977 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.96 seconds
+2019-08-28 12:35:33,905 [DEBUG] shapely.geos: Trying `CDLL(//anaconda3/envs/py36P/bin/../lib/libgeos_c.dylib)`
+2019-08-28 12:35:33,909 [DEBUG] shapely.geos: Library path: '//anaconda3/envs/py36P/bin/../lib/libgeos_c.dylib'
+2019-08-28 12:35:33,909 [DEBUG] shapely.geos: DLL: <CDLL '//anaconda3/envs/py36P/bin/../lib/libgeos_c.dylib', handle 7fd5c5fa4530 at 0x121da9cc0>
+2019-08-28 12:35:33,910 [DEBUG] shapely.geos: Trying `CDLL(/usr/lib/libc.dylib)`
+2019-08-28 12:35:33,910 [DEBUG] shapely.geos: Library path: '/usr/lib/libc.dylib'
+2019-08-28 12:35:33,911 [DEBUG] shapely.geos: DLL: <CDLL '/usr/lib/libc.dylib', handle 11be74050 at 0x121da9c50>

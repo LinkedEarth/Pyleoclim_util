@@ -1247,7 +1247,7 @@ def statsTs(timeseries=None):
     return mean, median, min_, max_, std, IQR
 
 def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
-                 autocorrect = True, autocorrect_param = 1950,\
+                 autocorrect = True, autocorrect_param = 1950, interp_method = 'interpolation',\
                  interp_step = None, start = None, end = None, nsim = 1000, \
                  method = 'isospectral', alpha = 0.5):
     """ Estimates the significance of correlations between non IID timeseries.
@@ -1259,6 +1259,9 @@ def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
                 paleo-data. Options are "age", "year", and "depth".
                 Default is to let the system choose if only one available
                 or prompt the user.
+            interp_method (str): If the timeseries are not on the same axis, which
+                interpolation method to use. Valid entries are 'interpolation'
+                (default) and 'bin'. 
             autocorrect (bool): If applicable, convert age to year automatically.
                 If set to False, timeseries objects should have converted time
                 axis and updated units label in the dictionary
@@ -1349,7 +1352,7 @@ def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
                 x1 = x1*1000
             if units2_group == 'kage_units':
                 x2 = x2*1000
-
+    
     # Remove NaNs and ordered
     y1,x1 = Timeseries.clean_ts(y1,x1)
     y2,x2 = Timeseries.clean_ts(y2,x2)
@@ -1358,13 +1361,15 @@ def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
     if len(y1) != len(y2):
         print("The two series don't have the same length. Interpolating ...")
         xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
-                                                                     interp_step = interp_step,
+                                                                     method = interp_method,
+                                                                     step = interp_step,
                                                                      start =start,
                                                                      end=end)
     elif min(x1) != min(x2) and max(x1) != max(x2):
         print("The two series don't have the same length. Interpolating ...")
         xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
-                                                                     interp_step = interp_step,
+                                                                     method = interp_method,
+                                                                     step = interp_step,
                                                                      start =start,
                                                                      end=end)
     else:
@@ -1381,115 +1386,115 @@ def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
 
     return r, sig, p
 
-def liang_causalityTS(timeseries1 = None,timeseries2 = None, x_axis = None,\
-                      interp_step = None, start = None, end = None, p= 1):
-    """
-    Estimate T21, the Liang information transfer from series x2 to series x1
-    dt is taken to be 1.
-
-    Args:
-        timeseries1, timeseries2: timeseries object. Default is blank
-        x-axis (str): The representation against which to express the
-                paleo-data. Options are "age", "year", and "depth".
-                Default is to let the system choose if only one available
-                or prompt the user.
-            interp_step (float): the step size. By default, will prompt the user.
-            start (float): Start time/age/depth. Default is the maximum of
-                the minima of the two timeseries
-            end (float): End time/age/depth. Default is the minimum of the
-                maxima of the two timeseries
-        p (int >=1 ) -  time advance in performing Euler forward differencing, e.g., 1, 2. Unless the series are generated \
-                        with a highly chaotic deterministic system, p=1 should be used.
-
-    Returns:
-        T21 - info flow from X2 to X1	(Note: Not X1 -> X2!)
-        err90(float) - standard error at 90% significance level
-        err95(float) - standard error at 95% significance level
-        err99(float) - standard error at 99% significance level
-
-    References:
-        - Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and
-            Applications. Entropy, 15, 327-360, doi:10.3390/e15010327
-        - Liang, X.S. (2014) Unraveling the cause-efect relation between timeseries.
-            Physical review, E 90, 052150
-        - Liang, X.S. (2015) Normalizing the causality between time series.
-            Physical review, E 92, 022126
-        - Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio.
-            Physical review, E 94, 052201
-    """
-    if not timeseries1:
-        if not 'ts_list' in globals():
-            fetchTs()
-        timeseries1 = LipdUtils.getTs(ts_list)
-
-    if not timeseries2:
-        if not 'ts_list' in globals():
-            fetchTs()
-        timeseries2 = LipdUtils.getTs(ts_list)
-
-    # Get the first time and paleoData values
-    y1 = np.array(timeseries1['paleoData_values'], dtype = 'float64')
-    x1, label1 = LipdUtils.checkXaxis(timeseries1, x_axis=x_axis)
-
-    # Get the second one
-    y2 = np.array(timeseries2['paleoData_values'], dtype = 'float64')
-    x2, label2 = LipdUtils.checkXaxis(timeseries2, x_axis=x_axis)
-
-    # Remove NaNs and ordered
-    y1,x1 = Timeseries.clean_ts(y1,x1)
-    y2,x2 = Timeseries.clean_ts(y2,x2)
-
-    # Make sure that the series have the same units:
-    units1 = timeseries1[label1+'Units']
-    units2 = timeseries2[label2+'Units']
-
-    if units2!=units1:
-        print('Warning: The two timeseries are on different time units!')
-        print('The units of timeseries1 are '+units1)
-        print('The units of timeseries2 are '+units2)
-        answer = input('Enter an equation to convert the units of x2 onto x1.'+
-                       " The equation should be written in Python format"+
-                       " (e.g., a*x2+b or 1950-a*x2) or press enter to abort: ")
-
-        if not answer:
-            sys.exit("Aborted by User")
-        elif "x2" not in answer:
-            answer = input("The form must be a valid python expression and contain x2!"+
-                           "Enter a valid expression: ")
-            while "x2" not in answer:
-                answer = input("The form must be a valid python expression and contain x2!"+
-                           "Enter a valid expression: ")
-        else: x2 = eval(answer)
-
-
-    #Check that the two timeseries have the same lenght and if not interpolate
-    if len(y1) != len(y2):
-        print("The two series don't have the same length. Interpolating ...")
-        xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
-                                                                     interp_step = interp_step,
-                                                                     start =start,
-                                                                     end=end)
-    elif min(x1) != min(x2) and max(x1) != max(x2):
-        print("The two series don't have the same length. Interpolating ...")
-        xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
-                                                                     interp_step = interp_step,
-                                                                     start =start,
-                                                                     end=end)
-    else:
-        #xi = x1
-        interp_values1 = y1
-        interp_values2 = y2
-
-    #Make sure that these vectors are not empty, otherwise return an error
-    if np.size(interp_values1) == 0 or np.size(interp_values2) == 0:
-        sys.exit("No common time period between the two time series.")
-    
-    # Perform causality
-    T21, err90, err95, err99 = Timeseries.liang_causality(interp_values1,
-                                                          interp_values2,
-                                                          p =p)
-    
-    return T21, err90, err95, err99
+#def liang_causalityTS(timeseries1 = None,timeseries2 = None, x_axis = None,\
+#                      interp_step = None, start = None, end = None, p= 1):
+#    """
+#    Estimate T21, the Liang information transfer from series x2 to series x1
+#    dt is taken to be 1.
+#
+#    Args:
+#        timeseries1, timeseries2: timeseries object. Default is blank
+#        x-axis (str): The representation against which to express the
+#                paleo-data. Options are "age", "year", and "depth".
+#                Default is to let the system choose if only one available
+#                or prompt the user.
+#            interp_step (float): the step size. By default, will prompt the user.
+#            start (float): Start time/age/depth. Default is the maximum of
+#                the minima of the two timeseries
+#            end (float): End time/age/depth. Default is the minimum of the
+#                maxima of the two timeseries
+#        p (int >=1 ) -  time advance in performing Euler forward differencing, e.g., 1, 2. Unless the series are generated \
+#                        with a highly chaotic deterministic system, p=1 should be used.
+#
+#    Returns:
+#        T21 - info flow from X2 to X1	(Note: Not X1 -> X2!)
+#        err90(float) - standard error at 90% significance level
+#        err95(float) - standard error at 95% significance level
+#        err99(float) - standard error at 99% significance level
+#
+#    References:
+#        - Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and
+#            Applications. Entropy, 15, 327-360, doi:10.3390/e15010327
+#        - Liang, X.S. (2014) Unraveling the cause-efect relation between timeseries.
+#            Physical review, E 90, 052150
+#        - Liang, X.S. (2015) Normalizing the causality between time series.
+#            Physical review, E 92, 022126
+#        - Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio.
+#            Physical review, E 94, 052201
+#    """
+#    if not timeseries1:
+#        if not 'ts_list' in globals():
+#            fetchTs()
+#        timeseries1 = LipdUtils.getTs(ts_list)
+#
+#    if not timeseries2:
+#        if not 'ts_list' in globals():
+#            fetchTs()
+#        timeseries2 = LipdUtils.getTs(ts_list)
+#
+#    # Get the first time and paleoData values
+#    y1 = np.array(timeseries1['paleoData_values'], dtype = 'float64')
+#    x1, label1 = LipdUtils.checkXaxis(timeseries1, x_axis=x_axis)
+#
+#    # Get the second one
+#    y2 = np.array(timeseries2['paleoData_values'], dtype = 'float64')
+#    x2, label2 = LipdUtils.checkXaxis(timeseries2, x_axis=x_axis)
+#
+#    # Remove NaNs and ordered
+#    y1,x1 = Timeseries.clean_ts(y1,x1)
+#    y2,x2 = Timeseries.clean_ts(y2,x2)
+#
+#    # Make sure that the series have the same units:
+#    units1 = timeseries1[label1+'Units']
+#    units2 = timeseries2[label2+'Units']
+#
+#    if units2!=units1:
+#        print('Warning: The two timeseries are on different time units!')
+#        print('The units of timeseries1 are '+units1)
+#        print('The units of timeseries2 are '+units2)
+#        answer = input('Enter an equation to convert the units of x2 onto x1.'+
+#                       " The equation should be written in Python format"+
+#                       " (e.g., a*x2+b or 1950-a*x2) or press enter to abort: ")
+#
+#        if not answer:
+#            sys.exit("Aborted by User")
+#        elif "x2" not in answer:
+#            answer = input("The form must be a valid python expression and contain x2!"+
+#                           "Enter a valid expression: ")
+#            while "x2" not in answer:
+#                answer = input("The form must be a valid python expression and contain x2!"+
+#                           "Enter a valid expression: ")
+#        else: x2 = eval(answer)
+#
+#
+#    #Check that the two timeseries have the same lenght and if not interpolate
+#    if len(y1) != len(y2):
+#        print("The two series don't have the same length. Interpolating ...")
+#        xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+#                                                                     interp_step = interp_step,
+#                                                                     start =start,
+#                                                                     end=end)
+#    elif min(x1) != min(x2) and max(x1) != max(x2):
+#        print("The two series don't have the same length. Interpolating ...")
+#        xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+#                                                                     interp_step = interp_step,
+#                                                                     start =start,
+#                                                                     end=end)
+#    else:
+#        #xi = x1
+#        interp_values1 = y1
+#        interp_values2 = y2
+#
+#    #Make sure that these vectors are not empty, otherwise return an error
+#    if np.size(interp_values1) == 0 or np.size(interp_values2) == 0:
+#        sys.exit("No common time period between the two time series.")
+#    
+#    # Perform causality
+#    T21, err90, err95, err99 = Timeseries.liang_causality(interp_values1,
+#                                                          interp_values2,
+#                                                          p =p)
+#    
+#    return T21, err90, err95, err99
 
 """
 Timeseries manipulation
@@ -1529,7 +1534,7 @@ def binTs(timeseries = None, x_axis = None, bin_size = None, \
     y,x = Timeseries.clean_ts(y,x)
 
     #Bin the timeseries:
-    bins, binned_values, n, error = Timeseries.bin(x,y, bin_size = bin_size,\
+    bins, binned_values, n, error = Timeseries.binvalues(x,y, bin_size = bin_size,\
                                                    start = start, end = end)
 
     return bins, binned_values, n, error
