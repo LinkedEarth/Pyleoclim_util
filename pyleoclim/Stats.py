@@ -61,7 +61,7 @@ Correlation
 class Correlation(object):
     """ Estimates the significance of correlations
     """
-    def corr_sig(self, y1, y2, nsim=1000, method='isospectral', alpha=0.5):
+    def corr_sig(self, y1, y2, nsim=1000, method='isospectral', alpha=0.05):
         """ Estimates the significance of correlations between non IID time series by 3 independent methods:
         1) 'ttest': T-test where d.o.f are corrected for the effect of serial correlation
         2) 'isopersistent': AR(1) modeling of x and y.
@@ -220,7 +220,7 @@ class Correlation(object):
 
 
         ar1_mod = sm.tsa.AR(ts, missing='drop').fit(maxlag=1, trend='nc')
-        g = ar1_mod.params[0]
+        g = ar1_mod.params[1]
 
         return g
 
@@ -371,7 +371,7 @@ class Correlation(object):
         return surrblk
 
 
-def corrsig(y1, y2, nsim=1000, method='isospectral', alpha=0.5):
+def corrsig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     """
     Estimates the significance of correlations between non IID time series by 3 independent methods:
         1) 'ttest': T-test where d.o.f are corrected for the effect of serial correlation

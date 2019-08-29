@@ -19,7 +19,7 @@ from scipy import signal
 from pyleoclim import Spectral
 
 
-def bin(x, y, bin_size="", start="", end=""):
+def binvalues(x, y, bin_size=None, start=None, end=None):
     """ Bin the values
 
     Args:
@@ -42,14 +42,14 @@ def bin(x, y, bin_size="", start="", end=""):
     y = np.array(y, dtype='float64')
 
     # Get the bin_size if not available
-    if not bin_size:
+    if bin_size is None:
         bin_size = np.nanmean(np.diff(x))
 
     # Get the start/end if not given
-    if type(start) is str:
+    if start is None:
         start = np.nanmin(x)
-        if type(end) is str:
-            end = np.nanmax(x)
+    if end is None:
+        end = np.nanmax(x)
 
     # Set the bin medians
     bins = np.arange(start+bin_size/2, end + bin_size/2, bin_size)
@@ -71,7 +71,7 @@ def bin(x, y, bin_size="", start="", end=""):
 
     return bins, binned_values, n, error
 
-def interp(x,y,interp_step="",start="",end=""):
+def interp(x,y,interp_step=None,start=None,end=None):
     """ Linear interpolation onto a new x-axis
 
     Args:
@@ -91,13 +91,13 @@ def interp(x,y,interp_step="",start="",end=""):
     y = np.array(y,dtype='float64')
 
     # get the interpolation step if not available
-    if not interp_step:
+    if interp_step is None:
         interp_step = np.nanmean(np.diff(x))
 
     # Get the start and end point if not given
-    if type(start) is str:
+    if start is None:
         start = np.nanmin(np.asarray(x))
-    if type(end) is str:
+    if end is None:
         end = np.nanmax(np.asarray(x))
 
     # Get the interpolated x-axis.
@@ -111,7 +111,7 @@ def interp(x,y,interp_step="",start="",end=""):
     return xi, interp_values
 
 
-def onCommonAxis(x1, y1, x2, y2, interp_step="", start="", end=""):
+def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None, end=None):
     """Places two timeseries on a common axis
 
     Args:
@@ -119,7 +119,9 @@ def onCommonAxis(x1, y1, x2, y2, interp_step="", start="", end=""):
         y1 (array): y-axis values of the first timeseries
         x2 (array): x-axis values of the second timeseries
         y2 (array): y-axis values of the second timeseries
-        interp_step (float): The interpolation step. Default is mean resolution
+        method (str): Which method to use to get the timeseries on the same x axis.
+            Valid entries: 'interpolation' (default), 'bin'
+        step (float): The interpolation step. Default is mean resolution
         of lowest resolution series
         start (float): where/when to start. Default is the maximum of the minima of
         the two timeseries
@@ -131,7 +133,11 @@ def onCommonAxis(x1, y1, x2, y2, interp_step="", start="", end=""):
         interp_values1 -  the interpolated y-values for the first timeseries
         interp_values2 - the intespolated y-values for the second timeseries
         """
-
+    
+    #make sure the method is correct
+    method_list = ['interpolation', 'bin']
+    assert method in method_list, 'Invalid method.'
+    
     # make sure that x1, y1, x2, y2 are numpy arrays
     x1 = np.array(x1, dtype='float64')
     y1 = np.array(y1, dtype='float64')
@@ -139,19 +145,25 @@ def onCommonAxis(x1, y1, x2, y2, interp_step="", start="", end=""):
     y2 = np.array(y2, dtype='float64')
 
     # Find the mean/max x-axis is not provided
-    if type(start) is str:
+    if start is None:
         start = np.nanmax([np.nanmin(x1), np.nanmin(x2)])
-        if type(end) is str:
-            end = np.nanmin([np.nanmax(x1), np.nanmax(x2)])
+    if end is None:
+        end = np.nanmin([np.nanmax(x1), np.nanmax(x2)])
 
     # Get the interp_step
-    if not interp_step:
-        interp_step = np.nanmin([np.nanmean(np.diff(x1)), np.nanmean(np.diff(x2))])
+    if step is None:
+        step = np.nanmin([np.nanmean(np.diff(x1)), np.nanmean(np.diff(x2))])
 
+    if method == 'interpolation':
     # perform the interpolation
-    xi, interp_values1 = interp(x1, y1, interp_step=interp_step, start=start,
+        xi, interp_values1 = interp(x1, y1, interp_step=step, start=start,
                                 end=end)
-    xi, interp_values2 = interp(x2, y2, interp_step=interp_step, start=start,
+        xi, interp_values2 = interp(x2, y2, interp_step=step, start=start,
+                                end=end)
+    elif method == 'bin':
+        xi, interp_values1 = binvalues(x1, y1, bin_size=step, start=start,
+                                end=end)
+        xi, interp_values2 = binvalues(x2, y2, bin_size=step, start=start,
                                 end=end)
 
     return xi, interp_values1, interp_values2
@@ -418,3 +430,104 @@ def detrend(y, x = None, method = "linear", params = ["default",4,0,1]):
         ys = y-y_filt_x
 
     return ys
+
+#def liang_causality(xx1, xx2, p=1):
+#    """
+#    Estimate T21, the Liang information transfer from series x2 to series x1
+#    dt is taken to be 1.
+#
+#    Args:
+#        x1, x2 (array) - vectors of (real) numbers with identical length, no NaNs allowed
+#        p (int >=1 ) -  time advance in performing Euler forward differencing, e.g., 1, 2. Unless the series are generated \
+#                        with a highly chaotic deterministic system, p=1 should be used.
+#
+#    Returns:
+#        T21 - info flow from X2 to X1	(Note: Not X1 -> X2!)
+#        err90(float) - standard error at 90% significance level
+#        err95(float) - standard error at 95% significance level
+#        err99(float) - standard error at 99% significance level
+#
+#    References:
+#        - Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and
+#            Applications. Entropy, 15, 327-360, doi:10.3390/e15010327
+#        - Liang, X.S. (2014) Unraveling the cause-efect relation between timeseries.
+#            Physical review, E 90, 052150
+#        - Liang, X.S. (2015) Normalizing the causality between time series.
+#            Physical review, E 92, 022126
+#        - Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio.
+#            Physical review, E 94, 052201
+#    """
+#    dt = 1
+#
+#    x1 = xx1[:len(xx1)-p, ]
+#    dx1 = (xx1[p:,] - x1) / (p * dt)
+#
+#    x2 = xx2[:len(xx2)-p, ]
+#    dx2 = (xx2[p:, ] - x2) / (p * dt)
+#
+#    N = len(xx1) - p
+#
+#    C = np.cov(x1, x2)
+#
+#    x1_normalized = x1 - np.mean(x1)
+#    x2_normalized = x2 - np.mean(x2)
+#    dx1_normalized = dx1 - np.mean(dx1)
+#    dx2_normalized = dx2 - np.mean(dx2)
+#
+#    dC = np.matrix([[np.sum(np.multiply(x1_normalized, dx1_normalized)), np.sum(np.multiply(x1_normalized, dx2_normalized))],\
+#        [np.sum(np.multiply(x2_normalized, dx1_normalized)), np.sum(np.multiply(x2_normalized, dx2_normalized))]]) / (N - 1)
+#
+#    C_infty = C
+#    det_C = np.linalg.det(C)
+#
+#
+#    a11 = C[1,1] * dC[0,0] - C[0,1] * dC[1,0]
+#    a12 = -C[0,1] * dC[0,0] + C[0,0] * dC[1,0]
+#
+#    a11 = a11 / det_C
+#    a12 = a12 / det_C
+#
+#    f1 = np.mean(dx1) - a11 * np.mean(x1) - a12 * np.mean(x2)
+#    R1 = dx1 - (f1 + a11*x1 + a12*x2)
+#    Q1 = np.sum(np.multiply(R1,R1))
+#    b1 = np.sqrt(Q1 * dt / N)
+#
+#    #print(f1, R1,Q1,b1)
+#
+#    # covariance matrix of the estimation of (f1, a11, a12, b1)
+#    NI = np.matrix(np.zeros((4, 4)))
+#    NI[0,0] = N * dt / b1/b1
+#    NI[1,1] = dt/b1/b1 * np.sum(np.multiply(x1, x1))
+#    NI[2,2] = dt/b1/b1 * np.sum(np.multiply(x2, x2))
+#    NI[3,3] = 3*dt/np.power(b1, 4) * np.sum(np.multiply(R1, R1)) - N/b1/b1
+#    NI[0,1] = dt/b1/b1 * np.sum(x1)
+#    NI[0,2] = dt/b1/b1 * np.sum(x2)
+#    NI[0,3] = 2*dt/np.power(b1,3) * np.sum(R1)
+#    NI[1,2] = dt/b1/b1 * np.sum(np.multiply(x1, x2))
+#    NI[1,3] = 2*dt/np.power(b1, 3) * np.sum(np.multiply(R1, x1))
+#    NI[2,3] = 2*dt/np.power(b1, 3) * np.sum(np.multiply(R1, x2))
+#
+#    NI[1,0] = NI[0,1]
+#    NI[2,0] = NI[0,2]
+#    NI[2,1] = NI[1,2]
+#    NI[3,0] = NI[0,3]
+#    NI[3,1] = NI[1,3]
+#    NI[3,2] = NI[2,3]
+#
+#    invNI = np.linalg.inv(NI)
+#    var_a12 = invNI[2,2]
+#
+#    T21 = C_infty[0,1]/C_infty[0,0] * (-C[1,0]*dC[0,0] + C[0,0]*dC[1,0]) / det_C
+#    var_T21 = np.power((C_infty[0,1]/C_infty[0,0]),2) * var_a12
+#
+## From the standard normal distribution table,
+## significance level alpha=95%, z=1.96
+##		           99%, z=2.56
+##			   90%, z=1.65
+#    z99 = 2.56
+#    z95 = 1.96
+#    z90 = 1.65
+#    err90 = np.sqrt(var_T21) * z90
+#    err95 = np.sqrt(var_T21) * z95
+#    err99 = np.sqrt(var_T21) * z99
+#    return T21, err90, err95, err99

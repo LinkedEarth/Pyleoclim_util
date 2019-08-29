@@ -12,7 +12,6 @@ https://github.com/LinkedEarth/Pyleoclim_util/blob/master/license
 import lipd as lpd
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.basemap import Basemap
 from matplotlib import gridspec
 import seaborn as sns
 import sys
@@ -21,6 +20,8 @@ from scipy.stats.mstats import mquantiles
 import datetime
 import os
 from collections import OrderedDict
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
 
 # Import internal modules to pyleoclim
@@ -39,7 +40,7 @@ Open Lipd files and extract timeseries (set them as global variable)
 
 """
 
-def openLipd(usr_path=""):
+def openLipd(usr_path=None):
     """Read Lipd files into a dictionary
 
     Sets the dictionary as global variable so that it doesn't have to be provided
@@ -106,9 +107,11 @@ plot_default = {'ice/rock': ['#FFD600','h'],
 """
 Mapping
 """
-def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
-                  figsize = [10,4],\
-                  saveFig = False, dir="", format='eps'):
+def mapAllArchive(lipds = None, markersize = 50, projection = 'Robinson',\
+                  proj_default = True, background = True,borders = False,\
+                  rivers = False, lakes = False, \
+                  figsize = [10,4], saveFig = False, dir=None, format='eps'):
+    
     """Map all the available records loaded into the workspace by archiveType.
 
     Map of all the records into the workspace by archiveType.
@@ -117,11 +120,26 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
     Args:
         lipds (dict): A list of LiPD files. (Optional)
         markersize (int): The size of the markers. Default is 50
-        background (str): Plots one of the following images on the map:
-            bluemarble, etopo, shadedrelief, or none (filled continents).
-            Default is shadedrelief.
+        projection (string): the map projection. Available projections:
+            'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+            'Sinusoidal','Stereographic','TransverseMercator','UTM',
+            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+            'Geostationary','NearsidePerspective','EckertI','EckertII',
+            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+        proj_default (bool): If True, uses the standard projection attributes, including centering.
+            Enter new attributes in a dictionary to change them. Lists of attributes
+            can be found in the Cartopy documentation: 
+                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+        background (bool): If True, uses a shaded relief background (only one 
+            available in Cartopy)
+        borders (bool): Draws the countries border. Defaults is off (False). 
+        rivers (bool): Draws major rivers. Default is off (False).
+        lakes (bool): Draws major lakes. 
+            Default is off (False).
         figsize (list): the size for the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot)
         saveFig (bool): Default is to not save the figure
         dir (str): The absolute path of the directory in which to save the
             figure. If not provided, creates a default folder called 'figures'
@@ -135,7 +153,7 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
     """
 
     # Get the dictionary of LiPD files
-    if not lipds:
+    if lipds is None:
         if 'lipd_dict' not in globals():
             openLipd()
         lipds = lipd_dict
@@ -160,9 +178,11 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
 
 
     # Make the map
-    fig = Map.mapAll(lat,lon,archiveType,lat_0=0,lon_0=0,palette=plot_default,\
-                     background = background, markersize = markersize,\
-                     figsize=figsize, ax=None)
+    fig = Map.mapAll(lat,lon,archiveType,projection = projection, \
+                     proj_default = proj_default,background = background,\
+                     borders = borders, rivers = rivers, lakes = lakes,\
+                     figsize = figsize, ax = None, palette=plot_default,\
+                     markersize = markersize)
 
     # Save the figure if asked
     if saveFig == True:
@@ -172,31 +192,42 @@ def mapAllArchive(lipds = "", markersize = 50, background = 'shadedrelief',\
 
     return fig
 
-def mapLipd(timeseries="", countries = True, counties = False, \
-        rivers = False, states = False, background = "shadedrelief",\
-        scale = 0.5, markersize = 50, marker = "default", \
-        figsize = [4,4], \
-        saveFig = False, dir = "", format="eps"):
+def mapLipd(timeseries=None, projection = 'Orthographic', proj_default = True,\
+           background = True, label = 'default', borders = False, \
+           rivers = False, lakes = False,\
+           markersize = 50, marker = "default",figsize = [4,4], \
+           saveFig = False, dir = None, format="eps"):
     """ Create a Map for a single record
 
     Orthographic projection map of a single record.
 
     Args:
         timeseries: a LiPD timeseries object. Will prompt for one if not given
-        countries (bool): Draws the country borders. Default is on (True).
-        counties (bool): Draws the USA counties. Default is off (False).
-        rivers (bool): Draws the rivers. Default is off (False).
-        states (bool): Draws the American and Australian states borders.
-            Default is off (False)
-        background (str): Plots one of the following images on the map:
-            bluemarble, etopo, shadedrelief, or none (filled continents).
-            Default is shadedrelief
-        scale (float): useful to downgrade the original image resolution to
-            speed up the process. Default is 0.5.
-        markersize (int): default is 50
-        marker (str): a string (or list) containing the color and shape of the
-            marker. Default is by archiveType. Type pyleo.plot_default to see
-            the default palette.
+        projection (string): the map projection. Available projections:
+            'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+            'Sinusoidal','Stereographic','TransverseMercator','UTM',
+            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+            'Geostationary','NearsidePerspective','EckertI','EckertII',
+            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+        proj_default (bool): If True, uses the standard projection attributes, including centering.
+            Enter new attributes in a dictionary to change them. Lists of attributes
+            can be found in the Cartopy documentation: 
+                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+        background (bool): If True, uses a shaded relief background (only one 
+            available in Cartopy)
+        label (str): label for archive marker. Default is to use the name of the 
+            physical sample. If no archive name is available, default to
+            None. None returns no label. 
+        borders (bool): Draws the countries border. Defaults is off (False). 
+        rivers (bool): Draws major rivers. Default is off (False).
+        lakes (bool): Draws major lakes. 
+            Default is off (False).
+        markersize (int): The size of the marker.
+        marker (str or list): color and type of marker. Default will use the
+        default color palette for archives
         figsize (list): the size for the figure
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
@@ -211,7 +242,7 @@ def mapLipd(timeseries="", countries = True, counties = False, \
 
     """
     # Make sure there are LiPD files to plot
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -228,11 +259,25 @@ def mapLipd(timeseries="", countries = True, counties = False, \
             archiveType = 'other'
         marker = plot_default[archiveType]
 
+    # Get the label
+    if label == 'default':
+        for i in timeseries.keys():
+            if 'physicalSample_name' in i:
+                label = timeseries[i]
+            elif 'measuredOn_name' in i:
+                label = timeseries[i]
+        if label == 'default':
+            label = None
+    elif label is None:
+        label = None
+    else:
+        assert type(label) is str, 'the argument label should be of type str'
 
-    fig = Map.mapOne(lat,lon,marker=marker,markersize=markersize,\
-                     countries = countries, counties = counties,rivers = rivers, \
-                     states = states, background = background, scale =scale,
-                     ax=None, figsize = figsize)
+    fig = Map.mapOne(lat, lon, projection = projection, proj_default = proj_default,\
+           background = background, label = label, borders = borders, \
+           rivers = rivers, lakes = lakes,\
+           markersize = markersize, marker = marker, figsize = figsize, \
+           ax = None)
 
     # Save the figure if asked
     if saveFig == True:
@@ -370,16 +415,14 @@ class MapFilters():
         return lat, lon, archiveType, dataSetName, dist
 
 
-def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
-                   sameArchive = False, projection = 'ortho', lat_0 = "", \
-                   lon_0="", llcrnrlat = -90, urcrnrlat=90, llcrnrlon=-180,
-                   urcrnrlon=180, countries = True, counties = False, \
-                   rivers = False, states = False, \
-                   background = "shadedrelief", scale = 0.5, markersize = 200,\
+def mapNearRecords(timeseries = None, lipds = None, n = 5, radius = None, \
+                   sameArchive = False, projection = 'Orthographic',\
+                   proj_default = True, borders = False, rivers = False, \
+                   lakes = False, background = True , markersize = 200,\
                    markersize_adjust = True, marker_r = "ko", \
                    marker_c = "default", cmap = "Reds", colorbar = True,\
                    location = "right", label = "Distance in km",
-                   figsize = [4,4],ax = None, saveFig = False, dir = "", \
+                   figsize = [4,4],ax = None, saveFig = False, dir = None, \
                    format = "eps"):
 
     """ Map the nearest records from the record of interest
@@ -392,27 +435,25 @@ def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
             Default is to search the entire globe
         sameArchive (bool): Returns only records with the same archiveType.
             Default is not to do so.
-        projection (string): the map projection. Refers to the Basemap
-            documentation for a list of available projections. Only projections
-            supporting setting the map center with a single lat/lon or with
-            the coordinates of the rectangle are currently supported.
-            Default is to use a Robinson projection.
-        lat_0, lon_0 (float): the center coordinates for the map. Default is
-            mean latitude/longitude in the list.
-            If the chosen projection doesn't support it, Basemap will
-            ignore the given values.
-        llcrnrlat, urcrnrlat, llcrnrlon, urcrnrlon (float): The coordinates
-            of the two opposite corners of the rectangle.
-        countries (bool): Draws the countries border. Defaults is off (False).
-        counties (bool): Draws the USA counties. Default is off (False).
-        rivers (bool): Draws the rivers. Default is off (False).
-        states (bool): Draws the American and Australian states borders.
+        projection (string): the map projection. Available projections:
+            'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+            'Sinusoidal','Stereographic','TransverseMercator','UTM',
+            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+            'Geostationary','NearsidePerspective','EckertI','EckertII',
+            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+        proj_default (bool): If True, uses the standard projection attributes, including centering.
+            Enter new attributes in a dictionary to change them. Lists of attributes
+            can be found in the Cartopy documentation: 
+                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+        background (bool): If True, uses a shaded relief background (only one 
+            available in Cartopy)
+        borders (bool): Draws the countries border. Defaults is off (False). 
+        rivers (bool): Draws major rivers. Default is off (False).
+        lakes (bool): Draws major lakes. 
             Default is off (False).
-        background (string): Plots one of the following images on the map:
-            bluemarble, etopo, shadedrelief, or none (filled continents).
-            Default is none.
-        scale (float): Useful to downgrade the original image resolution to
-            speed up the process. Default is 0.5.
         markersize (int): the size of the marker
         markersize_adjust (bool): If True, will proportionaly adjust the size of
             the marker according to distance.
@@ -444,13 +485,13 @@ def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
     """
 
     # Get the dictionary of LiPD files
-    if not lipds:
+    if lipds is None:
         if 'lipd_dict' not in globals():
             openLipd()
         lipds = lipd_dict
 
     # Get a timeseries if not given
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -519,55 +560,48 @@ def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
     dataSetName = dataSetName[0:n]
 
     # Make the map
-    if not lon_0:
-        lon_0 = timeseries["geo_meanLon"]
-
-    if not lat_0:
-        lat_0 = timeseries["geo_meanLat"]
+    # get the projection:
+    if proj_default is True:
+        proj_default = {'central_longitude':timeseries["geo_meanLon"]}
+    proj = Map.setProj(projection=projection, proj_default=proj_default)  
 
     if not ax:
-        fig,ax =  plt.subplots(figsize=figsize)
-
-    map = Basemap(projection=projection, lat_0 = lat_0, lon_0 = lon_0,\
-                  llcrnrlat=llcrnrlat, urcrnrlat=urcrnrlat,\
-                  llcrnrlon=llcrnrlon, urcrnrlon=urcrnrlon)
-
-    map.drawcoastlines()
-
+        fig, ax = plt.subplots(figsize=figsize,subplot_kw=dict(projection=proj))     
+    # draw the coastlines    
+    ax.coastlines()
+    
     # Background
-    if background == "shadedrelief":
-        map.shadedrelief(scale = scale)
-    elif background == "bluemarble":
-        map.bluemarble(scale=scale)
-    elif background == "etopo":
-        map.etopo(scale=scale)
-    elif not background:
-        map.fillcontinents(color='0.5')
-    else:
-        sys.exit("Enter either 'shadedrelief','bluemarble','etopo',or None")
+    if background is True:
+        ax.stock_img()
+    
+    #Other extra information
+    if borders is True:
+        ax.add_feature(cfeature.BORDERS)
+    if lakes is True:
+        ax.add_feature(cfeature.LAKES)
+    if rivers is True:
+        ax.add_feature(cfeature.RIVERS)
 
-    # Other extra information
+    # Make the scatter plot
+    ax.scatter(timeseries["geo_meanLon"],
+               timeseries["geo_meanLat"],
+               s= markersize,
+               facecolor = marker_r[0],
+               marker = marker_r[1],
+               zorder = 10,
+               transform=ccrs.PlateCarree())
 
-    if countries == True:
-        map.drawcountries()
-    if counties == True:
-        map.drawcounties()
-    if rivers == True:
-        map.drawrivers()
-    if states == True:
-        map.drawrivers()
-
-
-    X_r,Y_r = map(timeseries["geo_meanLon"],timeseries["geo_meanLat"])
-    map.scatter(X_r, Y_r, s=markersize, facecolor = marker_r[0], \
-                marker = marker_r[1], zorder =10)
 
     #Either plot single color or gradient
 
-    if not marker_c:
-        X_c, Y_c = map(lon,lat)
-        CS = map.scatter(X_c, Y_c, s=markersize, c = dist, zorder =10, cmap = cmap,\
-                         marker = '^')
+    if marker_c is None:
+        CS = ax.scatter(lon,lat,
+               s= markersize,
+               c = dist,
+               zorder = 10,
+               cmap = cmap,
+               marker = '^',
+               transform=ccrs.PlateCarree())
         if colorbar == True:
            cb = map.colorbar(CS,location)
            if not not label:
@@ -578,27 +612,33 @@ def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
         #Use the archive specific markers
         for archive in archiveType:
            index = [i for i,x, in enumerate(archiveType) if x == archive]
-           X_c, Y_c = map(lon[index],lat[index])
            if markersize_adjust == True:
-               map.scatter(X_c, Y_c, s = dist_adj[index],
+               ax.scatter(np.array(lon)[index], np.array(lat)[index],
+                       s = dist_adj[index],
                        facecolor = plot_default[archive][0],
                        marker = plot_default[archive][1],
-                       zorder = 10)
+                       zorder = 10,
+                       transform=ccrs.PlateCarree())
            else:
-               map.scatter(X_c, Y_c, s = markersize,
+               ax.scatter(np.array(lon)[index], np.arry(lat)[index],
+                       s = markersize,
                        facecolor = plot_default[archive][0],
                        marker = plot_default[archive][1],
-                       zorder = 10)
+                       zorder = 10,
+                       transform=ccrs.PlateCarree())
     else:
-        X_c, Y_c = map(lon,lat)
         dist_max = np.max(dist)
         dist_adj = np.ceil(dist*markersize/dist_max)
         if markersize_adjust == True:
-            map.scatter(X_c, Y_c, s=dist_adj, zorder =10, marker = marker_c[1],\
-                    facecolor = marker_c[0])
+            ax.scatter(np.array(lon), np.array(lat), 
+                    s=dist_adj, zorder =10, 
+                    marker = marker_c[1],
+                    facecolor = marker_c[0],
+                    transform=ccrs.PlateCarree())
         else:
-            map.scatter(X_c, Y_c, s=markersize, zorder =10, marker = marker_c[1],\
-                    facecolor = marker_c[0])
+            ax.scatter(np.array(lon), np.array(lat),
+                    s=markersize, zorder =10, marker = marker_c[1],
+                    facecolor = marker_c[0],transform=ccrs.PlateCarree())
 
     # Save the figure if asked
     if saveFig == True:
@@ -613,9 +653,9 @@ def mapNearRecords(timeseries = "", lipds = "", n = 5, radius = None, \
 Plotting
 """
 
-def plotTs(timeseries = "", x_axis = "", markersize = 50,\
+def plotTs(timeseries = None, x_axis = None, markersize = 50,\
             marker = "default", figsize =[10,4],\
-            saveFig = False, dir = "",\
+            saveFig = False, dir = None,\
             format="eps"):
     """Plot a single time series.
 
@@ -641,7 +681,7 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
         The figure.
 
     """
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -713,10 +753,10 @@ def plotTs(timeseries = "", x_axis = "", markersize = 50,\
 
     return fig
 
-def plotEnsTs(timeseries = "", lipd ="", ensTableName = None, ens = None, \
+def plotEnsTs(timeseries = None, lipd = None, ensTableName = None, ens = None, \
               color = "default", \
               alpha = 0.005, figsize = [10,4], \
-              saveFig = False, dir = "",\
+              saveFig = False, dir = None,\
               format="eps"):
     """ Plot timeseries on various ensemble ages
 
@@ -742,15 +782,15 @@ def plotEnsTs(timeseries = "", lipd ="", ensTableName = None, ens = None, \
         The figure
 
     """
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
-    elif not lipd and type(timeseries) is dict:
+    elif lipd is None and type(timeseries) is dict:
         sys.exit("LiPD file should be provided when timeseries is set.")
 
     # Get the csv files
-    if not lipd:
+    if lipd is None:
         if 'archiveType' in lipd_dict.keys():
             csv_dict = lpd.getCsv[lipd_dict]
         else:
@@ -887,13 +927,13 @@ def plotEnsTs(timeseries = "", lipd ="", ensTableName = None, ens = None, \
 
     return fig
 
-def histTs(timeseries = "", bins = None, hist = True, \
+def histTs(timeseries = None, bins = None, hist = True, \
              kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},\
              kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"Rug"}, \
              fit_kws = {"label":"Fit"}, color = "default", vertical = False, \
              norm_hist = True, figsize = [5,5],\
              saveFig = False, format ="eps",\
-             dir = ""):
+             dir = None):
     """ Plot a univariate distribution of the PaleoData values
 
     This function is based on the seaborn displot function, which is
@@ -934,7 +974,7 @@ def histTs(timeseries = "", bins = None, hist = True, \
         fig - The figure
 
     """
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -1006,7 +1046,7 @@ def histTs(timeseries = "", bins = None, hist = True, \
 SummaryPlots
 """
 
-def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
+def summaryTs(timeseries = None, x_axis = None, saveFig = False, dir = None,
                format ="eps"):
     """Basic summary plot
 
@@ -1032,7 +1072,7 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
 
     """
 
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -1079,16 +1119,20 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
     lat = timeseries["geo_meanLat"]
     lon = timeseries["geo_meanLon"]
 
-    ax3 = fig.add_subplot(gs[1,0])
-    map = Basemap(projection='ortho', lon_0=lon, lat_0=lat)
-    map.drawcoastlines()
-    map.shadedrelief(scale=0.5)
-    map.drawcountries()
-    X,Y = map(lon,lat)
-    map.scatter(X,Y,
-               s = 150,
-               color = marker[0],
-               marker = marker[1])
+    
+    proj_default = {'central_longitude':lon}
+    proj = Map.setProj(projection='Orthographic', proj_default=proj_default)
+    ax3 = fig.add_subplot(gs[1,0], projection = proj)
+    ax3.coastlines() # add coastlines
+    ax3.stock_img() # add the relief
+    ax3.scatter(np.array(lon),np.array(lat),
+               s= 150,
+               facecolor = marker[0],
+               marker = marker[1],
+               zorder = 10,
+               transform=ccrs.PlateCarree())
+
+    
 
     # Spectral analysis
 
@@ -1173,7 +1217,7 @@ def summaryTs(timeseries = "", x_axis = "", saveFig = False, dir = "",
 Statistics
 """
 
-def statsTs(timeseries=""):
+def statsTs(timeseries=None):
     """ Calculate simple statistics of a timeseries
 
     Args:
@@ -1187,7 +1231,7 @@ def statsTs(timeseries=""):
         >>> mean, median, min_, max_, std, IQR = pyleo.statsTs(timeseries)
 
     """
-    if not timeseries:
+    if timeseries is None:
         if not 'ts_list' in globals():
             fetchTs()
         timeseries = LipdUtils.getTs(ts_list)
@@ -1199,12 +1243,12 @@ def statsTs(timeseries=""):
 
     return mean, median, min_, max_, std, IQR
 
-def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
-                 interp_step = "", start = "", end = "", nsim = 1000, \
-                 method = 'isospectral', alpha = 0.5):
+def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
+                 autocorrect = True, autocorrect_param = 1950, interp_method = 'interpolation',\
+                 interp_step = None, start = None, end = None, nsim = 1000, \
+                 method = 'isospectral', alpha = 0.05):
     """ Estimates the significance of correlations between non IID timeseries.
 
-        Function written by. F. Zhu.
 
         Args:
             timeseries1, timeseries2: timeseries object. Default is blank.
@@ -1212,6 +1256,13 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
                 paleo-data. Options are "age", "year", and "depth".
                 Default is to let the system choose if only one available
                 or prompt the user.
+            interp_method (str): If the timeseries are not on the same axis, which
+                interpolation method to use. Valid entries are 'interpolation'
+                (default) and 'bin'. 
+            autocorrect (bool): If applicable, convert age to year automatically.
+                If set to False, timeseries objects should have converted time
+                axis and updated units label in the dictionary
+            autocorrect_param (float): Reference for age/year conversion.
             interp_step (float): the step size. By default, will prompt the user.
             start (float): Start time/age/depth. Default is the maximum of
                 the minima of the two timeseries
@@ -1246,53 +1297,76 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
         if not 'ts_list' in globals():
             fetchTs()
         timeseries2 = LipdUtils.getTs(ts_list)
-
+        
+    
     # Get the first time and paleoData values
     y1 = np.array(timeseries1['paleoData_values'], dtype = 'float64')
-    x1, label1 = LipdUtils.checkXaxis(timeseries1, x_axis=x_axis)
+    x1, label1 = LipdUtils.checkTimeAxis(timeseries1, x_axis=x_axis)
 
     # Get the second one
     y2 = np.array(timeseries2['paleoData_values'], dtype = 'float64')
-    x2, label2 = LipdUtils.checkXaxis(timeseries2, x_axis=x_axis)
-
+    x2, label2 = LipdUtils.checkTimeAxis(timeseries2, x_axis=x_axis)
+    
+    #Make sure that the label is the same
+    if label1 != label2:
+        if autocorrect == True:
+            print("Converting year to age...")
+            if label1 == 'year':
+                x1 = autocorrect_param-x1
+                units1 = 'yr BP'
+                units2 = timeseries2[label2+'Units']
+                label1 = 'year B.P.'
+            elif label2 == 'year':
+                x2 = autocorrect_param-x2
+                units2 = 'yr BP'
+                units1 = timeseries1[label1+'Units']
+        else:
+            sys.exit("The two timeseries share a different time representation")
+    else: 
+        units2 = timeseries2[label2+'Units']
+        units1 = timeseries1[label1+'Units']
+   
+    # Tranform the units if necessary
+    
+    if units1 != units2:
+        units1_group = LipdUtils.timeUnitsCheck(units1)
+        units2_group = LipdUtils.timeUnitsCheck(units2)
+        assert units1_group != 'unknown', 'Units unknown, manual conversion needed'
+        assert units2_group != 'unknown', 'Units unknown, manual conversion needed'
+        if units1_group == 'undefined':
+            if label1 == 'year':
+                units1_group = 'year_units'
+            elif label1 == 'age':
+                units2_group = 'age_units'
+        if units2_group == 'undefined':
+            if label2 == 'year':
+                units2_group = 'year_units'
+            elif label2 == 'age':
+                units2_group = 'age_units'
+        #convert kyr to yr if needed
+        if units1_group != units2_group:
+            if units1_group == 'kage_units':
+                x1 = x1*1000
+            if units2_group == 'kage_units':
+                x2 = x2*1000
+    
     # Remove NaNs and ordered
     y1,x1 = Timeseries.clean_ts(y1,x1)
     y2,x2 = Timeseries.clean_ts(y2,x2)
-
-    # Make sure that the series have the same units:
-    units1 = timeseries1[label1+'Units']
-    units2 = timeseries2[label2+'Units']
-
-    if units2!=units1:
-        print('Warning: The two timeseries are on different time units!')
-        print('The units of timeseries1 are '+units1)
-        print('The units of timeseries2 are '+units2)
-        answer = input('Enter an equation to convert the units of x2 onto x1.'+
-                       " The equation should be written in Python format"+
-                       " (e.g., a*x2+b or 1950-a*x2) or press enter to abort: ")
-
-        if not answer:
-            sys.exit("Aborted by User")
-        elif "x2" not in answer:
-            answer = input("The form must be a valid python expression and contain x2!"+
-                           "Enter a valid expression: ")
-            while "x2" not in answer:
-                answer = input("The form must be a valid python expression and contain x2!"+
-                           "Enter a valid expression: ")
-        else: x2 = eval(answer)
-
 
     #Check that the two timeseries have the same lenght and if not interpolate
     if len(y1) != len(y2):
         print("The two series don't have the same length. Interpolating ...")
         xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
-                                                                     interp_step = interp_step,
+                                                                     method = interp_method,
+                                                                     step = interp_step,
                                                                      start =start,
                                                                      end=end)
     elif min(x1) != min(x2) and max(x1) != max(x2):
         print("The two series don't have the same length. Interpolating ...")
         xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
-                                                                     interp_step = interp_step,
+                                                                     method = interp_method,
+                                                                     step = interp_step,
                                                                      start =start,
                                                                      end=end)
     else:
@@ -1309,12 +1383,122 @@ def corrSigTs(timeseries1 = "", timeseries2 = "", x_axis = "", \
 
     return r, sig, p
 
+#def liang_causalityTS(timeseries1 = None,timeseries2 = None, x_axis = None,\
+#                      interp_step = None, start = None, end = None, p= 1):
+#    """
+#    Estimate T21, the Liang information transfer from series x2 to series x1
+#    dt is taken to be 1.
+#
+#    Args:
+#        timeseries1, timeseries2: timeseries object. Default is blank
+#        x-axis (str): The representation against which to express the
+#                paleo-data. Options are "age", "year", and "depth".
+#                Default is to let the system choose if only one available
+#                or prompt the user.
+#            interp_step (float): the step size. By default, will prompt the user.
+#            start (float): Start time/age/depth. Default is the maximum of
+#                the minima of the two timeseries
+#            end (float): End time/age/depth. Default is the minimum of the
+#                maxima of the two timeseries
+#        p (int >=1 ) -  time advance in performing Euler forward differencing, e.g., 1, 2. Unless the series are generated \
+#                        with a highly chaotic deterministic system, p=1 should be used.
+#
+#    Returns:
+#        T21 - info flow from X2 to X1	(Note: Not X1 -> X2!)
+#        err90(float) - standard error at 90% significance level
+#        err95(float) - standard error at 95% significance level
+#        err99(float) - standard error at 99% significance level
+#
+#    References:
+#        - Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and
+#            Applications. Entropy, 15, 327-360, doi:10.3390/e15010327
+#        - Liang, X.S. (2014) Unraveling the cause-efect relation between timeseries.
+#            Physical review, E 90, 052150
+#        - Liang, X.S. (2015) Normalizing the causality between time series.
+#            Physical review, E 92, 022126
+#        - Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio.
+#            Physical review, E 94, 052201
+#    """
+#    if not timeseries1:
+#        if not 'ts_list' in globals():
+#            fetchTs()
+#        timeseries1 = LipdUtils.getTs(ts_list)
+#
+#    if not timeseries2:
+#        if not 'ts_list' in globals():
+#            fetchTs()
+#        timeseries2 = LipdUtils.getTs(ts_list)
+#
+#    # Get the first time and paleoData values
+#    y1 = np.array(timeseries1['paleoData_values'], dtype = 'float64')
+#    x1, label1 = LipdUtils.checkXaxis(timeseries1, x_axis=x_axis)
+#
+#    # Get the second one
+#    y2 = np.array(timeseries2['paleoData_values'], dtype = 'float64')
+#    x2, label2 = LipdUtils.checkXaxis(timeseries2, x_axis=x_axis)
+#
+#    # Remove NaNs and ordered
+#    y1,x1 = Timeseries.clean_ts(y1,x1)
+#    y2,x2 = Timeseries.clean_ts(y2,x2)
+#
+#    # Make sure that the series have the same units:
+#    units1 = timeseries1[label1+'Units']
+#    units2 = timeseries2[label2+'Units']
+#
+#    if units2!=units1:
+#        print('Warning: The two timeseries are on different time units!')
+#        print('The units of timeseries1 are '+units1)
+#        print('The units of timeseries2 are '+units2)
+#        answer = input('Enter an equation to convert the units of x2 onto x1.'+
+#                       " The equation should be written in Python format"+
+#                       " (e.g., a*x2+b or 1950-a*x2) or press enter to abort: ")
+#
+#        if not answer:
+#            sys.exit("Aborted by User")
+#        elif "x2" not in answer:
+#            answer = input("The form must be a valid python expression and contain x2!"+
+#                           "Enter a valid expression: ")
+#            while "x2" not in answer:
+#                answer = input("The form must be a valid python expression and contain x2!"+
+#                           "Enter a valid expression: ")
+#        else: x2 = eval(answer)
+#
+#
+#    #Check that the two timeseries have the same lenght and if not interpolate
+#    if len(y1) != len(y2):
+#        print("The two series don't have the same length. Interpolating ...")
+#        xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+#                                                                     interp_step = interp_step,
+#                                                                     start =start,
+#                                                                     end=end)
+#    elif min(x1) != min(x2) and max(x1) != max(x2):
+#        print("The two series don't have the same length. Interpolating ...")
+#        xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+#                                                                     interp_step = interp_step,
+#                                                                     start =start,
+#                                                                     end=end)
+#    else:
+#        #xi = x1
+#        interp_values1 = y1
+#        interp_values2 = y2
+#
+#    #Make sure that these vectors are not empty, otherwise return an error
+#    if np.size(interp_values1) == 0 or np.size(interp_values2) == 0:
+#        sys.exit("No common time period between the two time series.")
+#    
+#    # Perform causality
+#    T21, err90, err95, err99 = Timeseries.liang_causality(interp_values1,
+#                                                          interp_values2,
+#                                                          p =p)
+#    
+#    return T21, err90, err95, err99
 
 """
 Timeseries manipulation
 """
 
-def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
+def binTs(timeseries = None, x_axis = None, bin_size = None, \
+          start = None, end = None):
     """Bin the paleoData values of the timeseries
 
     Args:
@@ -1347,12 +1531,13 @@ def binTs(timeseries="", x_axis = "", bin_size = "", start = "", end = ""):
     y,x = Timeseries.clean_ts(y,x)
 
     #Bin the timeseries:
-    bins, binned_values, n, error = Timeseries.bin(x,y, bin_size = bin_size,\
+    bins, binned_values, n, error = Timeseries.binvalues(x,y, bin_size = bin_size,\
                                                    start = start, end = end)
 
     return bins, binned_values, n, error
 
-def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = ""):
+def interpTs(timeseries = None, x_axis = None, interp_step = None,\
+             start = None, end = None):
     """Simple linear interpolation
 
     Simple linear interpolation of the data using the numpy.interp method
@@ -1390,22 +1575,21 @@ def interpTs(timeseries="", x_axis = "", interp_step = "", start = "", end = "")
 
     return interp_age, interp_values
 
-def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
+def standardizeTs(timeseries = None, scale = 1, ddof = 0, eps = 1e-3):
     """ Centers and normalizes the paleoData values of a  given time series.
 
     Constant or nearly constant time series not rescaled.
 
     Args:
-        x (array): vector of (real) numbers as a time series, NaNs allowed
+        timeseries (array): A LiPD timeseries object 
         scale (real): a scale factor used to scale a record to a match a given variance
-        axis (int or None): axis along which to operate, if None, compute over the whole array
         ddof (int): degress of freedom correction in the calculation of the standard deviation
         eps (real): a threshold to determine if the standard deviation is too close to zero
 
     Returns:
-        - z (array): the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed \n
-        - mu (real): the mean of the original time series, E[X] \n
-        - sig (real): the standard deviation of the original time series, std[X] \n
+        z (array): the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed \n
+        mu (real): the mean of the original time series, E[X] \n
+        sig (real): the standard deviation of the original time series, std[X] \n
 
     References:
         1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
@@ -1430,7 +1614,7 @@ def standardizeTs(timeseries = "", scale = 1, ddof = 0, eps = 1e-3):
 
     return z, mu, sig
 
-def segmentTs(timeseries = "", factor = 2):
+def segmentTs(timeseries = None, factor = 2):
     """Divides a time series into several segments using a gap detection algorithm
 
     Gap detection rule: If the time interval between some two data points is
@@ -1485,9 +1669,9 @@ def segmentTs(timeseries = "", factor = 2):
 # Spectral Analysis
 #"""
 
-def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = True,
-          psd_default = True, wwaplot_default = True, psdplot_default = True,
-          fig = True, saveFig = False, dir = "", format = "eps"):
+def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = True,
+          psd_default = True, fig = True, wwaplot_default = True, psdplot_default = True,
+          saveFig = False, dir = None, format = "eps"):
     """Weigthed wavelet Z-transform analysis
 
     Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)
@@ -1506,7 +1690,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'Neff_coi':3,
                            'nMC':200,
                            'nproc':8,
-                           'detrend':'no',
+                           'detrend':False,
                            'params' : ["default",4,0,1],
                            'gaussianize': False,
                            'standardize':True,
@@ -1516,6 +1700,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                            'len_bd':0}
 
             Modify the values for specific keys to change the default behavior.
+            See Spectral.wwz for details
 
         psd_default: If True, will use the following default parameters:
 
@@ -1524,18 +1709,19 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                        'c':1e-3,
                        'nproc':8,
                        'nMC':200,
-                       'detrend':'no',
+                       'detrend':False,
                        'params' : ["default",4,0,1],
                        'gaussianize': False,
                        'standardize':True,
                        'Neff':3,
                        'anti_alias':False,
-                       'avgs':1,
+                       'avgs':2,
                        'method':'Kirchner_f2py',
                        }
 
             Modify the values for specific keys to change the default behavior.
-
+            See Spectral.wwz_psd for detail.s 
+        fig (bool): If True, plots the figure    
         wwaplot_default: If True, will use the following default parameters:
 
             wwaplot_default={'AR1_q':AR1_q,
@@ -1556,8 +1742,9 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                                  'plot_cone':True,
                                  'title':None,
                                  'ax':None,
-                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')',
+                                 'xlabel': the chondata label,
+                                 'ylabel': 'Period (units from ChronData)',
+                                 'plot_cbar':'True',
                                  'cbar_orientation':'vertical',
                                  'cbar_pad':0.05,
                                  'cbar_frac':0.15,
@@ -1575,22 +1762,23 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                                  'period_tickslabel':None,
                                  'psd_lim':None,
                                  'period_lim':None,
+                                 'alpha':1,
                                  'figsize':[20,8],
                                  'label':'PSD',
                                  'plot_ar1':True,
-                                 'psd_ar1_q95':psd_ar1_q95,
+                                 'psd_ar1_q95':95% quantile from psd,
                                  'title': None,
+                                 'legend': 'True'
                                  'psd_ar1_color':sns.xkcd_rgb["pale red"],
                                  'ax':None,
                                  'vertical':False,
                                  'plot_gridlines':True,
-                                 'period_label':'Period ('+ageunits+')',
+                                 'period_label':'Period (units of age)',
                                  'psd_label':'Spectral Density',
                                  'zorder' : None}
 
             Modify the values for specific keys to change the default behavior.
 
-        fig (bool): If True, plots the figure
         saveFig (bool): default is to not save the figure
         dir (str): the full path of the directory in which to save the figure.
             If not provided, creates a default folder called 'figures' in the
@@ -1658,36 +1846,25 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
         timeseries = LipdUtils.getTs(ts_list)
 
     # Raise an error if age or year not in the keys
-    if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
-        sys.exit("No time information available")
-    elif 'age' in timeseries.keys() and 'year' in timeseries.keys():
-        print("Both age and year information are available.")
-        x_axis = input("Which one would you like to use? ")
-        while x_axis != "year" and x_axis != "age":
-            x_axis = input("Only enter year or age: ")
-    elif 'age' in timeseries.keys():
-        x_axis = 'age'
-    elif 'year' in timeseries.keys():
-        x_axis = 'year'
+    ts, label = LipdUtils.checkTimeAxis(timeseries)
 
     # Set the defaults
     #Make sure the default have the proper type
     if psd_default is not True and type(psd_default) is not dict:
         sys.exit('The default for the psd calculation should either be provided'+
-                 ' as a dictionary are set to True')
+                 ' as a dictionary or set to True')
     if psdplot_default is not True and type(psdplot_default) is not dict:
         sys.exit('The default for the psd figure should either be provided'+
-                 ' as a dictionary are set to True')
+                 ' as a dictionary or  set to True')
     if wwz_default is not True and type(wwz_default) is not dict:
         sys.exit('The default for the wwz calculation should either be provided'+
-                 ' as a dictionary are set to True')
+                 ' as a dictionary or  set to True')
     if wwaplot_default is not True and type(wwaplot_default) is not dict:
         sys.exit('The default for the wwa figure should either be provided'+
-                 ' as a dictionary are set to True')
+                 ' as a dictionary or set to True')
 
     # Get the values
     ys = np.array(timeseries['paleoData_values'], dtype = 'float64')
-    ts, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
 
     # remove NaNs
     ys,ts = Timeseries.clean_ts(ys,ts)
@@ -1705,48 +1882,12 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
 
     # Perform the calculations
     if psd is True and wwz is False: # PSD only
-
-        if type(psd_default) is dict:
-            dict_in = psd_default
-
-            psd_default = {'tau':None,
-                       'freqs': None,
-                       'c':1e-3,
-                       'nproc':8,
-                       'nMC':200,
-                       'detrend':'no',
-                       'params' : ["default",4,0,1],
-                       'gaussianize': False,
-                       'standardize':True,
-                       'Neff':3,
-                       'anti_alias':False,
-                       'avgs':1,
-                       'method':'Kirchner_f2py',
-                       }
-
-            for key, value in dict_in.items():
-                if key in psd_default.keys():
-                    psd_default[key] = value
-
+        if psd_default == True:
+            psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts)
+        elif type(psd_default) is dict:
+            psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts, **psd_default)
         else:
-          psd_default = {'tau':None,
-                       'freqs': None,
-                       'c':1e-3,
-                       'nproc':8,
-                       'nMC':200,
-                       'detrend':'no',
-                       'params' : ["default",4,0,1],
-                       'gaussianize': False,
-                       'standardize':True,
-                       'Neff':3,
-                       'anti_alias':False,
-                       'avgs':1,
-                       'method':'Kirchner_f2py',
-                       }
-
-        # Perform calculation
-        psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts, **psd_default)
-
+            sys.exit('Options for psd calculation must be passed as a dictionary')
         # Wrap up the output dictionary
         dict_out = {'psd':psd,
                'freqs':freqs,
@@ -1755,60 +1896,25 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
 
         # Plot if asked
         if fig is True:
-
-            if type(psdplot_default) is dict:
-                dict_in = psdplot_default
-
-                psdplot_default={'lmstyle':'-',
-                                 'linewidth':None,
-                                 'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle':'-',
-                                 'ar1_linewidth':1,
-                                 'period_ticks':None,
-                                 'period_tickslabel':None,
-                                 'psd_lim':None,
-                                 'period_lim':None,
-                                 'figsize':[20,8],
-                                 'label':'PSD',
+            if psdplot_default == True:
+                psdplot_default={'ar1_linewidth':1,
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'title': None,
-                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None,
-                                 'vertical':False,
-                                 'plot_gridlines':True,
-                                 'period_label':'Period ('+ageunits+')',
-                                 'psd_label':'Spectral Density',
-                                 'zorder' : None}
-
-                for key, value in dict_in.items():
-                    if key in psdplot_default.keys():
-                        psdplot_default[key] = value
-
+                                 'period_label':'Period ('+ageunits+')'}
+           
+            if type(psdplot_default) is dict: #necessary since not same defaults
+                if 'ar1_linewidth' not in psdplot_default.keys():
+                    psdplot_default['ar1_linewidth'] =1
+                if 'plot_ar1' not in psdplot_default.keys():
+                    psdplot_default['plot_ar1'] = True
+                if 'psd_ar1_q95' not in psdplot_default.keys():
+                    psdplot_default['psd_ar1_q95'] = psd_ar1_q95
+                if 'period_label' not in psdplot_default.keys():
+                    psdplot_default['period_label'] = 'Period ('+ageunits+')'
+                
             else:
-
-               psdplot_default={'lmstyle':'-',
-                                 'linewidth':None,
-                                 'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle':'-',
-                                 'ar1_linewidth':1,
-                                 'period_ticks':None,
-                                 'period_tickslabel':None,
-                                 'psd_lim':None,
-                                 'period_lim':None,
-                                 'figsize':[20,8],
-                                 'label':'PSD',
-                                 'plot_ar1':True,
-                                 'psd_ar1_q95':psd_ar1_q95,
-                                 'title': None,
-                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None,
-                                 'vertical':False,
-                                 'plot_gridlines':True,
-                                 'period_label':'Period ('+ageunits+')',
-                                 'psd_label':'Spectral Density',
-                                 'zorder' : None}
-
+                sys.exit('Options for psd plot must be passed as a dictionary')
+            
             fig = Spectral.plot_psd(psd,freqs,**psdplot_default)
 
             if saveFig is True:
@@ -1821,48 +1927,17 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
 
     elif psd is False and wwz is True: #WWZ only
         # Set default
-        if type(wwz_default) is dict:
-            dict_in = wwz_default
-
-            wwz_default = {'tau':None,
-                           'freqs':None,
-                           'c':1/(8*np.pi**2),
-                           'Neff':3,
-                           'Neff_coi':3,
-                           'nMC':200,
-                           'nproc':8,
-                           'detrend':'no',
-                           'params' : ["default",4,0,1],
-                           'gaussianize': False,
-                           'standardize':True,
-                           'method':'Kirchner_f2py',
-                           'bc_mode':'reflect',
-                           'reflect_type':'odd',
-                           'len_bd':0}
-            for key,value in dict_in.items():
-                if key in wwz_default.keys():
-                    wwz_default[key]=value
+        if wwz_default == True:
+            #Perform the calculation
+            wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts)
+        
+        elif type(wwz_default) is dict:
+            #Perform the calculation
+            wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts, **wwz_default)
 
         else:
-
-            wwz_default = {'tau':None,
-                           'freqs':None,
-                           'c':1/(8*np.pi**2),
-                           'Neff':3,
-                           'Neff_coi':3,
-                           'nMC':200,
-                           'nproc':8,
-                           'detrend':'no',
-                           'params' : ["default",4,0,1],
-                           'gaussianize': False,
-                           'standardize':True,
-                           'method':'Kirchner_f2py',
-                           'bc_mode':'reflect',
-                           'reflect_type':'odd',
-                           'len_bd':0}
-        #Perform the calculation
-        wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts, **wwz_default)
-
+            sys.exit('Options for wwz calculation must be passed as a dictionary')
+        
         #Wrap up the output dictionary
         dict_out = {'wwa':wwa,
                     'phase':phase,
@@ -1873,64 +1948,31 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
                     'Neffs':Neffs,
                     'coeff':coeff}
 
-        #PLot if asked
+        #Plot if asked
         if fig is True:
             # Set the plot default
-            if type(wwaplot_default) is dict:
-                dict_in = wwaplot_default
-                wwaplot_default={'AR1_q':AR1_q,
-                                 'coi':coi,
-                                 'levels':None,
-                                 'tick_range':None,
-                                 'yticks':None,
-                                 'yticks_label': None,
-                                 'ylim':None,
-                                 'xticks':None,
-                                 'xlabels':None,
-                                 'figsize':[20,8],
-                                 'clr_map':'OrRd',
-                                 'cbar_drawedges':False,
-                                 'cone_alpha':0.5,
-                                 'plot_signif':True,
-                                 'signif_style':'contour',
-                                 'plot_cone':True,
-                                 'title':None,
-                                 'ax':None,
-                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')',
-                                 'cbar_orientation':'vertical',
-                                 'cbar_pad':0.05,
-                                 'cbar_frac':0.15,
-                                 'cbar_labelsize':None}
-                for key, value in dict_in.items():
-                    if key in wwaplot_default.keys():
-                        wwaplot_default[key] = value
-
+            if wwaplot_default == True:
+                wwaplot_default = {'AR1_q':AR1_q,
+                                   'coi':coi,
+                                   'plot_signif':True,
+                                   'plot_cone':True,
+                                   'xlabel': label,
+                                   'ylabel': 'Period ('+ageunits+')'}
+            
+            elif type(wwaplot_default) is dict: #necessary since not same defaults
+                if 'AR1_q' not in wwaplot_default:
+                    wwaplot_default['AR1_q'] = AR1_q
+                if 'coi' not in wwaplot_default:
+                    wwaplot_default['coi']=coi
+                if 'plot_signif' not in wwaplot_default:
+                    wwaplot_default['plot_signif'] = True
+                if 'xlabel' not in wwaplot_default:
+                    wwaplot_default['xlabel'] = s
+                if 'ylabel' not in wwaplot_default:
+                    wwaplot_default['ylabel'] = 'Period ('+ageunits+')'
+                
             else:
-                wwaplot_default={'AR1_q':AR1_q,
-                                 'coi':coi,
-                                 'levels':None,
-                                 'tick_range':None,
-                                 'yticks':None,
-                                 'yticks_label': None,
-                                 'ylim':None,
-                                 'xticks':None,
-                                 'xlabels':None,
-                                 'figsize':[20,8],
-                                 'clr_map':'OrRd',
-                                 'cbar_drawedges':False,
-                                 'cone_alpha':0.5,
-                                 'plot_signif':True,
-                                 'signif_style':'contour',
-                                 'plot_cone':True,
-                                 'title':None,
-                                 'ax':None,
-                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')',
-                                 'cbar_orientation':'vertical',
-                                 'cbar_pad':0.05,
-                                 'cbar_frac':0.15,
-                                 'cbar_labelsize':None}
+                sys.exit('Options for wwz plot must be passed as a dictionary')
 
             fig = Spectral.plot_wwa(wwa, freqs, tau, **wwaplot_default)
 
@@ -1943,93 +1985,26 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
 
     elif psd is True and wwz is True: # perform both
 
-        # Set the defaults
-
-        if type(psd_default) is dict:
-            dict_in = psd_default
-
-            psd_default = {'tau':None,
-                       'freqs': None,
-                       'c':1e-3,
-                       'nproc':8,
-                       'nMC':200,
-                       'detrend':'no',
-                       'params' : ["default",4,0,1],
-                       'gaussianize': False,
-                       'standardize':True,
-                       'Neff':3,
-                       'anti_alias':False,
-                       'avgs':1,
-                       'method':'Kirchner_f2py',
-                       }
-
-            for key, value in dict_in.items():
-                if key in psd_default.keys():
-                    psd_default[key] = value
+        # PSD calculations
+        if psd_default == True:
+            psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts)
+        elif type(psd_default) is dict:
+            psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts, **psd_default)
+        else:
+            sys.exit('Options for psd calculation must be passed as a dictionary')
+        
+        #WWZ calculations
+        if wwz_default == True:
+            #Perform the calculation
+            wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts)
+        
+        elif type(wwz_default) is dict:
+            #Perform the calculation
+            wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts, **wwz_default)
 
         else:
-          psd_default = {'tau':None,
-                       'freqs': None,
-                       'c':1e-3,
-                       'nproc':8,
-                       'nMC':200,
-                       'detrend':'no',
-                       'params' : ["default",4,0,1],
-                       'gaussianize': False,
-                       'standardize':True,
-                       'Neff':3,
-                       'anti_alias':False,
-                       'avgs':1,
-                       'method':'Kirchner_f2py',
-                       }
-
-        if type(wwz_default) is dict:
-            dict_in = wwz_default
-
-            wwz_default = {'tau':None,
-                           'freqs':None,
-                           'c':1/(8*np.pi**2),
-                           'Neff':3,
-                           'Neff_coi':3,
-                           'nMC':200,
-                           'nproc':8,
-                           'detrend':'no',
-                           'params' : ["default",4,0,1],
-                           'gaussianize': False,
-                           'standardize':True,
-                           'method':'Kirchner_f2py',
-                           'bc_mode':'reflect',
-                           'reflect_type':'odd',
-                           'len_bd':0}
-
-
-            for key,value in dict_in.items():
-                if key in wwz_default.keys():
-                    wwz_default[key]=value
-
-        else:
-
-            wwz_default = {'tau':None,
-                           'freqs':None,
-                           'c':1/(8*np.pi**2),
-                           'Neff':3,
-                           'Neff_coi':3,
-                           'nMC':200,
-                           'nproc':8,
-                           'detrend':'no',
-                           'params' : ["default",4,0,1],
-                           'gaussianize': False,
-                           'standardize':True,
-                           'method':'Kirchner_f2py',
-                           'bc_mode':'reflect',
-                           'reflect_type':'odd',
-                           'len_bd':0}
-
-
-        # Perform the calculations
-        psd, freqs, psd_ar1_q95, psd_ar1 = Spectral.wwz_psd(ys, ts, **psd_default)
-        wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = Spectral.wwz(ys,ts, **wwz_default)
-
+            sys.exit('Options for wwz calculation must be passed as a dictionary')
+        
         #Wrap up the output dictionary
         dict_out = {'wwa':wwa,
                     'phase':phase,
@@ -2045,7 +2020,7 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
 
         # Make the plot if asked
         if fig is True:
-
+            #Figure out the figure size
             if type(wwaplot_default) is dict and type(psdplot_default)is dict:
                 if 'figsize' in wwaplot_default.keys():
                     figsize = wwaplot_default['figsize']
@@ -2068,118 +2043,59 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
             fig = plt.figure(figsize = figsize)
             ax1 = plt.subplot2grid((1,3),(0,0), colspan =2)
 
-            # Set the plot default
-            if type(wwaplot_default) is dict:
-                dict_in = wwaplot_default
-                wwaplot_default={'AR1_q':AR1_q,
-                                 'coi':coi,
-                                 'levels':None,
-                                 'tick_range':None,
-                                 'yticks':None,
-                                 'yticks_label': None,
-                                 'ylim':None,
-                                 'xticks':None,
-                                 'xlabels':None,
-                                 'figsize':[20,8],
-                                 'clr_map':'OrRd',
-                                 'cbar_drawedges':False,
-                                 'cone_alpha':0.5,
-                                 'plot_signif':True,
-                                 'signif_style':'contour',
-                                 'plot_cone':True,
-                                 'title':None,
-                                 'ax':None,
-                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')',
-                                 'cbar_orientation':'vertical',
-                                 'cbar_pad':0.05,
-                                 'cbar_frac':0.15,
-                                 'cbar_labelsize':None}
-                for key, value in dict_in.items():
-                    if key in wwaplot_default.keys():
-                        wwaplot_default[key] = value
-
+            if wwaplot_default == True:
+                wwaplot_default = {'AR1_q':AR1_q,
+                                   'coi':coi,
+                                   'plot_signif':True,
+                                   'plot_cone':True,
+                                   'xlabel': label,
+                                   'ylabel': 'Period ('+ageunits+')',
+                                   'ax':ax1}
+            
+            elif type(wwaplot_default) is dict: #necessary since not same defaults
+                if 'AR1_q' not in wwaplot_default:
+                    wwaplot_default['AR1_q'] = AR1_q
+                if 'coi' not in wwaplot_default:
+                    wwaplot_default['coi']=coi
+                if 'plot_signif' not in wwaplot_default:
+                    wwaplot_default['plot_signif'] = True
+                if 'xlabel' not in wwaplot_default:
+                    wwaplot_default['xlabel'] = s
+                if 'ylabel' not in wwaplot_default:
+                    wwaplot_default['ylabel'] = 'Period ('+ageunits+')'
+                if 'ax' not in wwaplot_default:
+                    wwaplot_default['ax'] = ax1
+                
             else:
-                wwaplot_default={'AR1_q':AR1_q,
-                                 'coi':coi,
-                                 'levels':None,
-                                 'tick_range':None,
-                                 'yticks':None,
-                                 'yticks_label': None,
-                                 'ylim':None,
-                                 'xticks':None,
-                                 'xlabels':None,
-                                 'figsize':[20,8],
-                                 'clr_map':'OrRd',
-                                 'cbar_drawedges':False,
-                                 'cone_alpha':0.5,
-                                 'plot_signif':True,
-                                 'signif_style':'contour',
-                                 'plot_cone':True,
-                                 'title':None,
-                                 'ax':None,
-                                 'xlabel': label.upper()[0]+label[1:]+'('+s+')',
-                                 'ylabel': 'Period ('+ageunits+')',
-                                 'cbar_orientation':'vertical',
-                                 'cbar_pad':0.05,
-                                 'cbar_frac':0.15,
-                                 'cbar_labelsize':None}
+                sys.exit('Options for wwz plot must be passed as a dictionary')
+
 
             Spectral.plot_wwa(wwa, freqs, tau, **wwaplot_default)
 
             ax2 = plt.subplot2grid((1,3),(0,2))
 
-            if type(psdplot_default) is dict:
-                dict_in = psdplot_default
-
-                psdplot_default={'lmstyle':'-',
-                                 'linewidth':None,
-                                 'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle':'-',
-                                 'ar1_linewidth':1,
-                                 'period_ticks':None,
-                                 'period_tickslabel':None,
-                                 'psd_lim':None,
-                                 'period_lim':None,
-                                 'figsize':[20,8],
-                                 'label':'PSD',
+            if psdplot_default == True:
+                psdplot_default={'ar1_linewidth':1,
                                  'plot_ar1':True,
                                  'psd_ar1_q95':psd_ar1_q95,
-                                 'title': None,
-                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None,
-                                 'vertical':False,
-                                 'plot_gridlines':True,
                                  'period_label':'Period ('+ageunits+')',
-                                 'psd_label':'Spectral Density',
-                                 'zorder' : None}
-                for key, value in dict_in.items():
-                    if key in psdplot_default.keys():
-                        psdplot_default[key] = value
-
+                                 'ax': ax2}
+           
+            if type(psdplot_default) is dict: #necessary since not same defaults
+                if 'ar1_linewidth' not in psdplot_default.keys():
+                    psdplot_default['ar1_linewidth'] =1
+                if 'plot_ar1' not in psdplot_default.keys():
+                    psdplot_default['plot_ar1'] = True
+                if 'psd_ar1_q95' not in psdplot_default.keys():
+                    psdplot_default['psd_ar1_q95'] = psd_ar1_q95
+                if 'period_label' not in psdplot_default.keys():
+                    psdplot_default['period_label'] = 'Period ('+ageunits+')'
+                if 'ax' not in psdplot_default.keys():
+                    psdplot_default['ax'] = ax2
+                
             else:
-
-               psdplot_default={'lmstyle':'-',
-                                 'linewidth':None,
-                                 'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle':'-',
-                                 'ar1_linewidth':1,
-                                 'period_ticks':None,
-                                 'period_tickslabel':None,
-                                 'psd_lim':None,
-                                 'period_lim':None,
-                                 'figsize':[20,8],
-                                 'label':'PSD',
-                                 'plot_ar1':True,
-                                 'psd_ar1_q95':psd_ar1_q95,
-                                 'title': None,
-                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None,
-                                 'vertical':False,
-                                 'plot_gridlines':True,
-                                 'period_label':'Period ('+ageunits+')',
-                                 'psd_label':'Spectral Density',
-                                 'zorder' : None}
+                sys.exit('Options for psd plot must be passed as a dictionary')
+            
             Spectral.plot_psd(psd,freqs,**psdplot_default)
 
             if saveFig is True:
@@ -2190,6 +2106,49 @@ def wwzTs(timeseries = "", lim = None, wwz = False, psd = True, wwz_default = Tr
             fig = None
 
     return dict_out, fig
+
+## Cross wavelet transform
+#def xwtTs(timeseries1 = None, timeseries2 = None, lim =None, xwt_default = True):
+#    """Cross Wavelet transform of two timeseries
+#    
+#    Args:
+#        timeseries1 (dict): a LiPD timeseries object (Optional, will prompt for one)
+#        timeseries2 (dict): a LiPD timeseries object (Optional, will prompt for one)
+#        lim (list): Truncate the timeseries between min/max time (e.g., [0,10000])
+#        xwt_default: If True, will use the followinf default parameters
+#            
+#            xwt_default = {'tau': None,
+#                           'feqs': None,
+#                           'c': 1/(8*np.pi**2),
+#                           'Neff': 3,
+#                           'Neff_coi': 6,
+#                           'nproc': 8,
+#                           'detrend': False,
+#                           'params': ['default', 4, 0, 1],
+#                           'gaussianize': False,
+#                           'standardize':True,
+#                           'method':'Kirchner_f2py'}
+#            Modify the values for specific keys to change the default behavior.
+#            See Spectral.xwt for details
+#    """
+#    #Get timeseries
+#    if not timeseries1:
+#        if not 'ts_list' in globals():
+#            fetchTs()
+#        timeseries1 = LipdUtils.getTs(ts_list)
+#    if not timeseries2:
+#        if not 'ts_list' in globals():
+#            fetchTs()
+#        timeseries2 = LipdUtils.getTs(ts_list)
+#    
+#    # Make sure that everything checks out with the time axis
+#    x_axis1 = LipdUtils.checkTimeAxis(timeseries1)
+#    x_axis2 = LipdUtils.checkTimeAxis(timeseries2)
+#    
+#    assert x_axis1 == x_axis2, 'Timeseries should be using the same age representation'
+#    
+#    # Check the units
+        
 
 """
 Age model
@@ -2205,7 +2164,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
            xlim = None, ylim = None, violinColor = '#8B008B',\
            medianLineColor = "black", medianLineWidth = 2.0,\
            CIFillColor = "Silver", samplePaths = True, samplePathNumber =10,\
-           alpha = 0.5, saveFig = False, dir = "", format = "eps"):
+           alpha = 0.5, saveFig = False, dir = None, format = "eps"):
     """ Runs Bchron and plot if asked
 
     Fits a non-parametric chronology model to age/position data according to
@@ -2637,7 +2596,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
 
     for i in np.arange(0,np.shape(ageDist)[1],1):
         #Get the output in list form
-
+        i = int(i)
         key_dist = key+"distribution"+str(i)
         T[key]["distributionTable"].update({key_dist:{}})
         d = OrderedDict()

@@ -1,0 +1,200 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Mapping Functions &#8212; Pyleoclim 0.4.8 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Plotting Functions" href="Plot.html" />
+    <link rel="prev" title="Main Functions" href="Main.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="Plot.html" title="Plotting Functions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Main.html" title="Main Functions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Main.html"
+                        title="previous chapter">Main Functions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="Plot.html"
+                        title="next chapter">Plotting Functions</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Map.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="mapping-functions">
+<h1>Mapping Functions<a class="headerlink" href="#mapping-functions" title="Permalink to this headline">¶</a></h1>
+<p>This module uses the Basemap package for mapping.</p>
+<dl class="function">
+<dt id="pyleoclim.Map.mapAll">
+<code class="descclassname">pyleoclim.Map.</code><code class="descname">mapAll</code><span class="sig-paren">(</span><em>lat, lon, criteria, projection='robin', lat_0='', lon_0='', llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, countries=False, counties=False, rivers=False, states=False, figsize=[10, 4], ax=None, background='none', scale=0.5, palette='', markersize=50</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Map.mapAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map the location of all lat/lon according to some criteria</p>
+<p>Map the location of all lat/lon according to some criteria. The choice of 
+plotting color/marker is passed through palette according to unique 
+criteria (e.g., record name, archive type, proxy observation type).</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">lat (list): a list of latitude.
+lon (list): a list of longitude.
+criteria (list): a list of criteria for plotting purposes. For instance,</p>
+<blockquote>
+<div>a map by the types of archive present in the dataset or proxy
+observations.</div></blockquote>
+<dl class="docutils">
+<dt>projection (string): the map projection. Refers to the Basemap</dt>
+<dd>documentation for a list of available projections. Only projections
+supporting setting the map center with a single lat/lon or with
+the coordinates of the rectangle are currently supported. 
+Default is to use a Robinson projection.</dd>
+<dt>lat_0, lon_0 (float): the center coordinates for the map. Default is</dt>
+<dd>mean latitude/longitude in the list. 
+If the chosen projection doesn’t support it, Basemap will
+ignore the given values.</dd>
+<dt>llcrnrlat, urcrnrlat, llcrnrlon, urcrnrlon (float): The coordinates</dt>
+<dd>of the two opposite corners of the rectangle.</dd>
+</dl>
+<p>countries (bool): Draws the countries border. Defaults is off (False). 
+counties (bool): Draws the USA counties. Default is off (False).
+rivers (bool): Draws the rivers. Default is off (False).
+states (bool): Draws the American and Australian states borders.</p>
+<blockquote>
+<div>Default is off (False).</div></blockquote>
+<dl class="docutils">
+<dt>background (string): Plots one of the following images on the map: </dt>
+<dd>bluemarble, etopo, shadedrelief, or none (filled continents). 
+Default is none.</dd>
+<dt>scale (float): Useful to downgrade the original image resolution to</dt>
+<dd>speed up the process. Default is 0.5.</dd>
+<dt>palette (dict): A dictionary of plotting color/marker by criteria. The</dt>
+<dd>keys should correspond to <strong>*unique*</strong> criteria with a list of 
+associated values. The list should be in the format 
+[‘color’, ‘marker’].</dd>
+</dl>
+<p class="last">markersize (int): The size of the marker.
+figsize (list): the size for the figure
+ax: Return as axis instead of figure (useful to integrate plot into a subplot)</p>
+</dd>
+<dt>Returns:</dt>
+<dd>The figure</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Map.mapOne">
+<code class="descclassname">pyleoclim.Map.</code><code class="descname">mapOne</code><span class="sig-paren">(</span><em>lat, lon, projection='ortho', lat_0='', lon_0='', llcrnrlat=-90, urcrnrlat=90, llcrnrlon=-180, urcrnrlon=180, countries=True, counties=False, rivers=False, states=False, background='shadedrelief', scale=0.5, markersize=50, marker='ro', figsize=[4, 4], ax=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Map.mapOne" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map one location on the globe</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">lat (float): a float number representing latitude
+lon (float): a float number representing longitude
+projection (string): the map projection. Refers to the Basemap</p>
+<blockquote>
+<div>documentation for a list of available projections. Only projections
+supporting setting the map center with a single lat/lon or with
+the coordinates of the rectangle are currently supported. 
+Default is to use a Robinson projection.</div></blockquote>
+<dl class="docutils">
+<dt>lat_0, lon_0 (float): the center coordinates for the map. Default is</dt>
+<dd>mean latitude/longitude in the list. 
+If the chosen projection doesn’t support it, Basemap will
+ignore the given values.</dd>
+<dt>llcrnrlat, urcrnrlat, llcrnrlon, urcrnrlon (float): The coordinates</dt>
+<dd>of the two opposite corners of the rectangle.</dd>
+</dl>
+<p>countries (bool): Draws the countries border. Defaults is off (False). 
+counties (bool): Draws the USA counties. Default is off (False).
+rivers (bool): Draws the rivers. Default is off (False).
+states (bool): Draws the American and Australian states borders.</p>
+<blockquote>
+<div>Default is off (False).</div></blockquote>
+<dl class="docutils">
+<dt>background (string): Plots one of the following images on the map: </dt>
+<dd>bluemarble, etopo, shadedrelief, or none (filled continents). 
+Default is none.</dd>
+<dt>scale (float): Useful to downgrade the original image resolution to</dt>
+<dd>speed up the process. Default is 0.5.</dd>
+</dl>
+<p class="last">markersize (int): The size of the marker.
+marker (str or list): color and type of marker. 
+figsize (list): the size for the figure
+ax: Return as axis instead of figure (useful to integrate plot into a subplot)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="Plot.html" title="Plotting Functions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Main.html" title="Main Functions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,136 @@
+2019-04-18 11:55:31,657 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 7.02 seconds
+Benchmark - Function: readLipd , Time: 7.02 seconds
+2019-04-18 11:55:40,477 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 2.1 seconds
+Benchmark - Function: extractTs , Time: 2.1 seconds
+2019-04-23 14:47:11,478 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.99 seconds
+Benchmark - Function: readLipd , Time: 6.99 seconds
+2019-04-23 14:47:13,489 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 2.0 seconds
+Benchmark - Function: extractTs , Time: 2.0 seconds
+2019-04-23 14:54:06,151 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.65 seconds
+Benchmark - Function: readLipd , Time: 6.65 seconds
+2019-04-23 14:54:07,983 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.83 seconds
+Benchmark - Function: extractTs , Time: 1.83 seconds
+2019-04-23 14:58:43,738 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.69 seconds
+Benchmark - Function: readLipd , Time: 6.69 seconds
+2019-04-23 14:58:45,579 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.84 seconds
+Benchmark - Function: extractTs , Time: 1.84 seconds
+2019-04-23 15:06:57,683 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.6 seconds
+Benchmark - Function: readLipd , Time: 6.6 seconds
+2019-04-23 15:06:59,566 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.88 seconds
+Benchmark - Function: extractTs , Time: 1.88 seconds
+2019-04-23 15:08:09,479 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.77 seconds
+Benchmark - Function: readLipd , Time: 6.77 seconds
+2019-04-23 15:08:11,327 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.84 seconds
+Benchmark - Function: extractTs , Time: 1.84 seconds
+2019-04-23 15:12:43,689 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.73 seconds
+Benchmark - Function: readLipd , Time: 6.73 seconds
+2019-04-23 15:12:45,543 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.85 seconds
+Benchmark - Function: extractTs , Time: 1.85 seconds
+2019-04-23 17:09:16,107 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 7.01 seconds
+Benchmark - Function: readLipd , Time: 7.01 seconds
+2019-04-23 17:09:18,099 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.98 seconds
+Benchmark - Function: extractTs , Time: 1.98 seconds
+2019-08-14 14:04:21,840 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 2.78 seconds
+Benchmark - Function: readLipd , Time: 2.78 seconds
+2019-08-14 14:12:58,315 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 0.76 seconds
+Benchmark - Function: extractTs , Time: 0.76 seconds
+2019-08-20 13:44:40,638 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.7 seconds
+Benchmark - Function: readLipd , Time: 6.7 seconds
+2019-08-20 13:44:42,569 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.92 seconds
+Benchmark - Function: extractTs , Time: 1.92 seconds
+2019-08-20 13:57:06,596 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 7.03 seconds
+Benchmark - Function: readLipd , Time: 7.03 seconds
+2019-08-20 13:57:08,562 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.95 seconds
+Benchmark - Function: extractTs , Time: 1.95 seconds
+2019-08-20 13:59:11,189 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.89 seconds
+Benchmark - Function: readLipd , Time: 6.89 seconds
+2019-08-20 13:59:13,058 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.86 seconds
+Benchmark - Function: extractTs , Time: 1.86 seconds
+2019-08-20 14:01:05,728 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.71 seconds
+Benchmark - Function: readLipd , Time: 6.71 seconds
+2019-08-20 14:01:07,598 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.86 seconds
+Benchmark - Function: extractTs , Time: 1.86 seconds
+2019-08-20 14:02:11,878 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.99 seconds
+Benchmark - Function: readLipd , Time: 6.99 seconds
+2019-08-20 14:02:13,925 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 2.03 seconds
+Benchmark - Function: extractTs , Time: 2.03 seconds
+2019-08-20 20:04:34,423 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.78 seconds
+Benchmark - Function: readLipd , Time: 6.78 seconds
+2019-08-20 20:04:36,294 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.86 seconds
+Benchmark - Function: extractTs , Time: 1.86 seconds
+2019-08-21 13:30:43,012 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.82 seconds
+Benchmark - Function: readLipd , Time: 6.82 seconds
+2019-08-21 13:30:44,977 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.96 seconds
+Benchmark - Function: extractTs , Time: 1.96 seconds
+2019-08-28 13:56:24,158 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.71 seconds
+Benchmark - Function: readLipd , Time: 6.71 seconds
+2019-08-28 13:56:30,235 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.98 seconds
+Benchmark - Function: extractTs , Time: 1.98 seconds
+2019-08-28 14:03:46,415 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 7.08 seconds
+Benchmark - Function: readLipd , Time: 7.08 seconds
+2019-08-28 14:04:08,853 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.65 seconds
+Benchmark - Function: readLipd , Time: 6.65 seconds
+2019-08-28 14:04:13,617 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 2.03 seconds
+Benchmark - Function: extractTs , Time: 2.03 seconds
+2019-08-28 14:08:32,680 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.67 seconds
+Benchmark - Function: readLipd , Time: 6.67 seconds
+2019-08-28 14:08:36,863 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.91 seconds
+Benchmark - Function: extractTs , Time: 1.91 seconds
+2019-08-28 14:09:39,277 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.92 seconds
+Benchmark - Function: readLipd , Time: 6.92 seconds
+2019-08-28 14:09:46,501 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.99 seconds
+Benchmark - Function: extractTs , Time: 1.99 seconds
+2019-08-28 14:40:21,909 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.71 seconds
+Benchmark - Function: readLipd , Time: 6.71 seconds
+2019-08-28 14:40:26,484 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.99 seconds
+Benchmark - Function: extractTs , Time: 1.99 seconds
+2019-08-28 14:41:36,220 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.9 seconds
+Benchmark - Function: readLipd , Time: 6.9 seconds
+2019-08-28 14:41:41,441 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.85 seconds
+Benchmark - Function: extractTs , Time: 1.85 seconds
+2019-08-28 14:42:35,342 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.57 seconds
+Benchmark - Function: readLipd , Time: 6.57 seconds
+2019-08-28 14:42:44,645 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.93 seconds
+Benchmark - Function: extractTs , Time: 1.93 seconds
+2019-08-28 14:43:19,380 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.56 seconds
+Benchmark - Function: readLipd , Time: 6.56 seconds
+2019-08-28 14:43:24,063 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.92 seconds
+Benchmark - Function: extractTs , Time: 1.92 seconds
+2019-08-28 14:44:04,010 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.72 seconds
+Benchmark - Function: readLipd , Time: 6.72 seconds
+2019-08-28 14:44:14,308 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.94 seconds
+Benchmark - Function: extractTs , Time: 1.94 seconds
+2019-08-28 14:44:59,631 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.62 seconds
+Benchmark - Function: readLipd , Time: 6.62 seconds
+2019-08-28 15:12:59,381 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 2.04 seconds
+Benchmark - Function: extractTs , Time: 2.04 seconds
+2019-08-28 15:36:46,034 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.82 seconds
+Benchmark - Function: readLipd , Time: 6.82 seconds
+2019-08-28 15:36:47,933 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.89 seconds
+Benchmark - Function: extractTs , Time: 1.89 seconds
+2019-08-28 15:39:39,119 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.84 seconds
+Benchmark - Function: readLipd , Time: 6.84 seconds
+2019-08-28 15:39:41,057 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.93 seconds
+Benchmark - Function: extractTs , Time: 1.93 seconds
+2019-08-28 15:40:15,303 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.77 seconds
+Benchmark - Function: readLipd , Time: 6.77 seconds
+2019-08-28 15:40:18,121 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 2.43 seconds
+Benchmark - Function: extractTs , Time: 2.43 seconds
+2019-08-28 15:41:14,993 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.85 seconds
+Benchmark - Function: readLipd , Time: 6.85 seconds
+2019-08-28 15:41:19,975 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 2.08 seconds
+Benchmark - Function: extractTs , Time: 2.08 seconds
+2019-08-28 15:48:31,174 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.66 seconds
+Benchmark - Function: readLipd , Time: 6.66 seconds
+2019-08-28 15:48:35,882 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 1.98 seconds
+Benchmark - Function: extractTs , Time: 1.98 seconds
+2019-08-28 15:50:39,139 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 2.79 seconds
+Benchmark - Function: readLipd , Time: 2.79 seconds
+2019-08-28 16:00:39,171 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 2.95 seconds
+Benchmark - Function: readLipd , Time: 2.95 seconds
+2019-08-28 16:11:43,317 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 7.01 seconds
+Benchmark - Function: readLipd , Time: 7.01 seconds
+2019-08-28 16:11:47,023 [INFO] benchmarks: Benchmark - Function: extractTs , Time: 2.03 seconds
+Benchmark - Function: extractTs , Time: 2.03 seconds
+2019-08-28 16:12:01,019 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 2.75 seconds
+Benchmark - Function: readLipd , Time: 2.75 seconds
