@@ -16,7 +16,7 @@ if sys.argv[-1] == 'publish':
     os.system('python3 setup.py register -r pypi')
     os.system('python3 setup.py sdist')
     os.system('twine upload dist/*')
-    os.remove('README.txt')
+    #os.remove('README.txt')
     sys.exit()
 
 # Publish the package to the test server
