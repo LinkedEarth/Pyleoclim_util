@@ -4,7 +4,7 @@ import io
 
 from setuptools import setup, find_packages
 
-version = '0.4.9'
+version = '0.4.10'
 
 # Read the readme file contents into variable
 this_directory = os.path.abspath(path.dirname(__file__))
