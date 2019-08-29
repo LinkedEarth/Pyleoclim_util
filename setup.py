@@ -4,18 +4,12 @@ import io
 
 from setuptools import setup, find_packages
 
-version = '0.4.9'
+version = '0.4.10'
 
 # Read the readme file contents into variable
-if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
-    os.system('pandoc README.md -f markdown -t rst -s -o README.txt')
-
-readme_file = io.open('README.txt', encoding='utf-8')
-
-# Fallback long_description in case errors with readme file.
-long_description = "Welcome to Pyleoclim. Please reference the README file in the package for information"
-with readme_file:
-    long_description = readme_file.read()
+this_directory = os.path.abspath(path.dirname(__file__))
+with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 # Publish the package to the live server
 if sys.argv[-1] == 'publish':
@@ -43,6 +37,7 @@ setup(
     license='GNU Public',
     description='A Python package for paleoclimate data analysis',
     long_description=long_description,
+    long_description_content_type = 'text/markdown'
     author='Deborah Khider',
     author_email='dkhider@gmail.com',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
