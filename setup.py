@@ -4,7 +4,7 @@ import io
 
 from setuptools import setup, find_packages
 
-version = '0.4.8'
+version = '0.4.9'
 
 # Read the readme file contents into variable
 if sys.argv[-1] == 'publish' or sys.argv[-1] == 'publishtest':
@@ -50,16 +50,15 @@ setup(
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
     install_requires=[
-        "LiPD>=0.2.5.1",
-        "pandas>=0.22.0",
-        "numpy>=1.14.1",
-        "matplotlib>=2.0.0",
-        "basemap>=1.0.7",
-        "scipy>=0.19.0",
+        "LiPD>=0.2.7",
+        "pandas>=0.25.0",
+        "numpy>=1.16.4",
+        "matplotlib>=3.1.0",
+        "scipy>=1.3.1",
         "statsmodels>=0.8.0",
-        "seaborn>=0.7.0",
-        "scikit-learn>=0.17.1",
-        "pathos>=0.2.0",
-        "tqdm>=4.14.0",
-        "rpy2>=2.8.4"]
+        "seaborn>=0.9.0",
+        "scikit-learn>=0.21.3",
+        "pathos>=0.2.4",
+        "tqdm>=4.33.0",
+        "rpy2>=3.0.5"]
 )
