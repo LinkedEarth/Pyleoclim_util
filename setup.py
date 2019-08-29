@@ -4,28 +4,29 @@ import io
 
 from setuptools import setup, find_packages
 
-version = '0.4.10'
+version = '0.4.9'
 
 # Read the readme file contents into variable
-this_directory = os.path.abspath(path.dirname(__file__))
-with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
-    long_description = f.read()
+def read(fname):
+    return open(os.path.join(os.path.dirname('__file__'), fname)).read()
 
 # Publish the package to the live server
 if sys.argv[-1] == 'publish':
     # Register the tarball, upload it, and trash the temp readme rst file
-    os.system('python setup.py register -r pypi')
-    os.system('python setup.py sdist upload -r pypi')
+    os.system('python3 setup.py register -r pypi')
+    os.system('python3 setup.py sdist')
+    os.system('twine upload dist/*')
     os.remove('README.txt')
     sys.exit()
 
 # Publish the package to the test server
 elif sys.argv[-1] == 'publishtest':
     # Create dist tarball, register it to test site, upload tarball, and remove temp readme file
-    os.system('python setup.py register upload -r pypitest')
-    os.system('python setup.py sdist upload -r pypitest')
+    os.system('python3 setup.py register upload -r pypitest')
+    os.system('python3 setup.py sdist')
+    os.system('twine upload -r test dist/LiPD-' + version + '.tar.gz')
     # Trash the temp rst readme file
-    os.remove('README.txt')
+    #os.remove('README.txt')
     sys.exit()
 
 setup(
@@ -36,12 +37,12 @@ setup(
     version=version,
     license='GNU Public',
     description='A Python package for paleoclimate data analysis',
-    long_description=long_description,
+    long_description=read("README.md"),
     long_description_content_type = 'text/markdown'
     author='Deborah Khider',
-    author_email='dkhider@gmail.com',
+    author_email='khider@usc.edu',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
-    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.4.8',
+    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.4.9',
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
     install_requires=[
@@ -56,4 +57,5 @@ setup(
         "pathos>=0.2.4",
         "tqdm>=4.33.0",
         "rpy2>=3.0.5"]
+    python_requires=">=3.5.0"
 )
