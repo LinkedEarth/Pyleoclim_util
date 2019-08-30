@@ -38,7 +38,7 @@ setup(
     license='GNU Public',
     description='A Python package for paleoclimate data analysis',
     long_description=read("README.md"),
-    long_description_content_type = 'text/markdown'
+    long_description_content_type = 'text/markdown',
     author='Deborah Khider',
     author_email='khider@usc.edu',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
@@ -56,6 +56,6 @@ setup(
         "scikit-learn>=0.21.3",
         "pathos>=0.2.4",
         "tqdm>=4.33.0",
-        "rpy2>=3.0.5"]
+        "rpy2>=3.0.5"],
     python_requires=">=3.5.0"
 )
