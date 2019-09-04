@@ -37,7 +37,7 @@ The package is aware of age ensembles stored via LiPD and uses them for time-unc
  - plotting maps, timeseries, and basic age model information
  - paleo-aware correlation analysis (isopersistent, isospectral and classical t-test)
  - weighted wavelet Z transform (WWZ)
- - age modelling through Bchron
+ - age modeling through Bchron
 
 **Future capabilities**:
  - paleo-aware singular spectrum analysis (AR(1) null eigenvalue identification, missing data)
@@ -48,25 +48,28 @@ The package is aware of age ensembles stored via LiPD and uses them for time-unc
  - causality
  - ensemble methods for most of the above
 
-
- If you have specific requests, please contact linkedearth@gmail.com
+If you have specific requests, please contact linkedearth@gmail.com
 
 ### <a name = "install"> Installation </a>
 
-Python v3.6 is required. Some functionalities may not work under v3.5 and v3.7.
-We recommend using Anaconda (See documentation for details)
+Python v3.6 is **required**.
 
-To install Pyleoclim, **first** install Cartopy through Anaconda
+We recommend using [Anaconda](https://www.anaconda.com/distribution/), with an environment dedicated to Pyleoclim. See the documentation for details.
+
+To install Pyleoclim, **first** install numpy and Cartopy through Anaconda
+```
+conda install numpy
+```
+
 ```
 conda install -c conda-forge cartopy
 ```
-
 Then install pyleoclim via `pip`
 ```
 pip install pyleoclim
 ```
 
-Some functionalities require R.
+Some functionalities require [R](https://www.r-project.org/about.html).
 
 ### <a name = "version">Version Information</a>
 
@@ -100,7 +103,7 @@ Function openLiPD() renamed openLiPDs()
 
 ### <a name ="quickstart"> Quickstart guide </a>
 
-1. [Install](install) Pyleoclim.
+1. [Install](#install) Pyleoclim.
 
 3. Wait for installation to complete, then:
 
@@ -131,6 +134,7 @@ The installer will automatically check for the needed updates.
 ### <a name='issues'> Known Issues</a>
 
 * Some of the packages supporting Pyleoclim do not have a build for Windows
+* The wavelet Z transform uses a pre-compiled Fortran code, numpy **must** be installed prior to Pyleoclim. 
 * Known issues with proj4 v5.0-5.1, make sure your environment is set up with v5.2
 
 ### <a name="further_info">Further information</a>

@@ -1,19 +1,17 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Spectral Functions &#8212; Pyleoclim 0.4.8 documentation</title>
+    <meta charset="utf-8" />
+    <title>Spectral Functions &#8212; Pyleoclim 0.4.9 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="RBchron" href="RBchron.html" />
@@ -31,7 +29,7 @@
         <li class="right" >
           <a href="SummaryPlots.html" title="Summary Plots"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -50,13 +48,11 @@
     </ul>
    </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
@@ -74,43 +70,41 @@
 <p>This module allows analysis in the frequency domain</p>
 <dl class="function">
 <dt id="pyleoclim.Spectral.ar1_fit">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">ar1_fit</code><span class="sig-paren">(</span><em>ys, ts=None, detrend='no', params=['default', 4, 0, 1]</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.ar1_fit" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">ar1_fit</code><span class="sig-paren">(</span><em class="sig-param">ys, ts=None, detrend=None, params=['default', 4, 0, 1]</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.ar1_fit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">ys (array): the time series
+<dl>
+<dt>Args:</dt><dd><p>ys (array): the time series
 ts (array): the time axis of that series
-detrend (str): ‘no’ - the original time series is assumed to have no trend;</p>
-<blockquote class="last">
+detrend (str): ‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;</p>
+<blockquote>
 <div><blockquote>
-<div><p>‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;
-‘constant’ - the mean of <cite>ys</cite> is subtracted
+<div><p>‘constant’ - the mean of <cite>ys</cite> is subtracted
 ‘savitzy-golay’ - ys is filtered using the Savitzky-Golay</p>
 <blockquote>
-<div>filters and the resulting filtered series is subtracted from y.</div></blockquote>
+<div><p>filters and the resulting filtered series is subtracted from y.</p>
 </div></blockquote>
-<dl class="docutils">
-<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt>
-<dd>corresponds to the window size (default it set to half of the data)
+</div></blockquote>
+<dl class="simple">
+<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt><dd><p>corresponds to the window size (default it set to half of the data)
 while the second parameter correspond to the order of the filter
 (default is 4). The third parameter is the order of the derivative
-(the default is zero, which means only smoothing.)</dd>
+(the default is zero, which means only smoothing.)</p>
+</dd>
 </dl>
 </div></blockquote>
 </dd>
-<dt>Returns:</dt>
-<dd>g (float): lag-1 autocorrelation coefficient (for evenly-spaced time series)
-OR estimated persistence (for unevenly-spaced time series)</dd>
+<dt>Returns:</dt><dd><p>g (float): lag-1 autocorrelation coefficient (for evenly-spaced time series)
+OR estimated persistence (for unevenly-spaced time series)</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.ar1_sim">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">ar1_sim</code><span class="sig-paren">(</span><em>ys, n, p, ts=None, detrend='no', params=['default', 4, 0, 1]</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.ar1_sim" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">ar1_sim</code><span class="sig-paren">(</span><em class="sig-param">ys, n, p, ts=None, detrend=False, params=['default', 4, 0, 1]</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.ar1_sim" title="Permalink to this definition">¶</a></dt>
 <dd><p>Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from <cite>ys</cite> and <cite>ts</cite></p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">ys (array): a time series
+<dl>
+<dt>Args:</dt><dd><p>ys (array): a time series
 n, p (int): dimensions as n rows by p columns
 ts (array): the time axis of that series
 detrend (str): ‘no’ - the original time series is assumed to have no trend;</p>
@@ -119,28 +113,28 @@ detrend (str): ‘no’ - the original time series is assumed to have no trend;<
 ‘constant’ - the mean of <cite>ys</cite> is subtracted
 ‘savitzy-golay’ - ys is filtered using the Savitzky-Golay</p>
 <blockquote>
-<div>filters and the resulting filtered series is subtracted from y.</div></blockquote>
+<div><p>filters and the resulting filtered series is subtracted from y.</p>
 </div></blockquote>
-<dl class="last docutils">
-<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt>
-<dd>corresponds to the window size (default it set to half of the data)
+</div></blockquote>
+<dl class="simple">
+<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt><dd><p>corresponds to the window size (default it set to half of the data)
 while the second parameter correspond to the order of the filter
 (default is 4). The third parameter is the order of the derivative
-(the default is zero, which means only smoothing.)</dd>
+(the default is zero, which means only smoothing.)</p>
+</dd>
 </dl>
 </dd>
-<dt>Returns:</dt>
-<dd>red (matrix): n rows by p columns matrix of an AR1 process</dd>
+<dt>Returns:</dt><dd><p>red (matrix): n rows by p columns matrix of an AR1 process</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.wwz">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">wwz</code><span class="sig-paren">(</span><em>ys, ts, tau=None, freqs=None, c=0.012665147955292222, Neff=3, Neff_coi=3, nMC=200, nproc=8, detrend='no', params=['default', 4, 0, 1], gaussianize=False, standardize=True, method='Kirchner_f2py', len_bd=0, bc_mode='reflect', reflect_type='odd'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.wwz" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coeeficients</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">ys (array): a time series, NaNs will be deleted automatically
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">wwz</code><span class="sig-paren">(</span><em class="sig-param">ys, ts, tau=None, freqs=None, c=0.012665147955292222, Neff=3, Neff_coi=3, nMC=200, nproc=8, detrend=False, params=['default', 4, 0, 1], gaussianize=False, standardize=True, method='Kirchner_f2py', len_bd=0, bc_mode='reflect', reflect_type='odd'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.wwz" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coefficients</p>
+<dl>
+<dt>Args:</dt><dd><p>ys (array): a time series, NaNs will be deleted automatically
 ts (array): the time points, if <cite>ys</cite> contains any NaNs, some of the time points will be deleted accordingly
 tau (array): the evenly-spaced time points
 freqs (array): vector of frequency
@@ -154,40 +148,40 @@ detrend (str): ‘no’ - the original time series is assumed to have no trend;<
 ‘constant’ - the mean of <cite>ys</cite> is subtracted
 ‘savitzy-golay’ - ys is filtered using the Savitzky-Golay</p>
 <blockquote>
-<div>filters and the resulting filtered series is subtracted from y.</div></blockquote>
+<div><p>filters and the resulting filtered series is subtracted from y.</p>
 </div></blockquote>
-<dl class="docutils">
-<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt>
-<dd>corresponds to the window size (default it set to half of the data)
+</div></blockquote>
+<dl class="simple">
+<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt><dd><p>corresponds to the window size (default it set to half of the data)
 while the second parameter correspond to the order of the filter
 (default is 4). The third parameter is the order of the derivative
-(the default is zero, which means only smoothing.)</dd>
-<dt>method (str): ‘Foster’ - the original WWZ method;</dt>
-<dd>‘Kirchner’ - the method Kirchner adapted from Foster;
-‘Kirchner_f2py’ - the method Kirchner adapted from Foster with f2py</dd>
+(the default is zero, which means only smoothing.)</p>
+</dd>
+<dt>method (str): ‘Foster’ - the original WWZ method;</dt><dd><p>‘Kirchner’ - the method Kirchner adapted from Foster;
+‘Kirchner_f2py’ - the method Kirchner adapted from Foster with f2py</p>
+</dd>
 </dl>
-<p class="last">len_bd (int): the number of the ghost grids want to creat on each boundary
+<p>len_bd (int): the number of the ghost grids want to creat on each boundary
 bc_mode (str): see np.lib.pad()
 reflect_type (str): see np.lib.pad()</p>
 </dd>
-<dt>Returns:</dt>
-<dd>wwa (array): the weighted wavelet amplitude.
+<dt>Returns:</dt><dd><p>wwa (array): the weighted wavelet amplitude.
 AR1_q (array): AR1 simulations
 coi (array): cone of influence
 freqs (array): vector of frequency
 tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
 Neffs (array): the matrix of effective number of points in the time-scale coordinates
-coeff (array): the wavelet transform coefficents</dd>
+coeff (array): the wavelet transform coefficents</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.wwz_psd">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">wwz_psd</code><span class="sig-paren">(</span><em>ys, ts, freqs=None, tau=None, c=0.001, nproc=8, nMC=200, detrend='no', params=['default', 4, 0, 1], gaussianize=False, standardize=True, Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.wwz_psd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">wwz_psd</code><span class="sig-paren">(</span><em class="sig-param">ys, ts, freqs=None, tau=None, c=0.001, nproc=8, nMC=200, detrend=False, params=['default', 4, 0, 1], gaussianize=False, standardize=True, Neff=3, anti_alias=False, avgs=2, method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.wwz_psd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the psd of a timeseries directly using wwz method.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">ys (array): a time series, NaNs will be deleted automatically
+<dl>
+<dt>Args:</dt><dd><p>ys (array): a time series, NaNs will be deleted automatically
 ts (array): the time points, if <cite>ys</cite> contains any NaNs, some of the time points will be deleted accordingly
 freqs (array): vector of frequency
 tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -200,37 +194,87 @@ detrend (str): ‘no’ - the original time series is assumed to have no trend;<
 ‘constant’ - the mean of <cite>ys</cite> is subtracted
 ‘savitzy-golay’ - ys is filtered using the Savitzky-Golay</p>
 <blockquote>
-<div>filters and the resulting filtered series is subtracted from y.</div></blockquote>
+<div><p>filters and the resulting filtered series is subtracted from y.</p>
 </div></blockquote>
-<dl class="docutils">
-<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt>
-<dd>corresponds to the window size (default it set to half of the data)
+</div></blockquote>
+<dl class="simple">
+<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt><dd><p>corresponds to the window size (default it set to half of the data)
 while the second parameter correspond to the order of the filter
 (default is 4). The third parameter is the order of the derivative
-(the default is zero, which means only smoothing.)</dd>
+(the default is zero, which means only smoothing.)</p>
+</dd>
 </dl>
 <p>gaussianize (bool): If True, gaussianizes the timeseries
 standardize (bool): If True, standardizes the timeseries
 method (str): ‘Foster’ - the original WWZ method;</p>
-<blockquote class="last">
-<div>‘Kirchner’ - the method Kirchner adapted from Foster;
-‘Kirchner_f2py’ - the method Kirchner adapted from Foster with f2py</div></blockquote>
+<blockquote>
+<div><p>‘Kirchner’ - the method Kirchner adapted from Foster;
+‘Kirchner_f2py’ - the method Kirchner adapted from Foster with f2py</p>
+</div></blockquote>
+<p>Neff (int):
+anti_alias (bool): If True, uses anti-aliasing
+avgs (int):</p>
 </dd>
-<dt>Returns:</dt>
-<dd>psd (array): power spectral density
+<dt>Returns:</dt><dd><p>psd (array): power spectral density
 freqs (array): vector of frequency
 psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes
-psd_ar1 (array): the psds of AR1 processes</dd>
+psd_ar1 (array): the psds of AR1 processes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Spectral.xwt">
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">xwt</code><span class="sig-paren">(</span><em class="sig-param">ys1, ts1, ys2, ts2, tau=None, freqs=None, c=0.012665147955292222, Neff=3, Neff_coi=6, nproc=8, detrend=False, params=['default', 4, 0, 1], gaussianize=False, standardize=True, method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.xwt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cross-wavelet transform of two time series.</p>
+<dl>
+<dt>Args:</dt><dd><p>ys1, ys2 (array): the two time series
+ts1, ts2 (array): the time axis of the two time series
+tau (array): the evenly-spaced time points
+freqs (array): vector of frequency
+c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+Neff (int): effective number of points
+nproc (int): the number of processes for multiprocessing
+detrend (str): ‘no’ - the original time series is assumed to have no trend;</p>
+<blockquote>
+<div><p>‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;
+‘constant’ - the mean of <cite>ys</cite> is subtracted
+‘savitzy-golay’ - ys is filtered using the Savitzky-Golay</p>
+<blockquote>
+<div><p>filters and the resulting filtered series is subtracted from y.</p>
+</div></blockquote>
+</div></blockquote>
+<dl class="simple">
+<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt><dd><p>corresponds to the window size (default it set to half of the data)
+while the second parameter correspond to the order of the filter
+(default is 4). The third parameter is the order of the derivative
+(the default is zero, which means only smoothing.)</p>
+</dd>
+</dl>
+<p>gaussianize (bool): If True, gaussianizes the timeseries
+standardize (bool): If True, standardizes the timeseries
+method (str): ‘Foster’ - the original WWZ method;</p>
+<blockquote>
+<div><p>‘Kirchner’ - the method Kirchner adapted from Foster;
+‘Kirchner_f2py’ - the method Kirchner adapted from Foster with f2py</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>xw_amplitude (array): the cross wavelet amplitude
+xw_phase (array): the cross wavelet phase
+freqs (array): vector of frequency
+tau (array): the evenly-spaced time points
+AR1_q (array): AR1 simulations
+coi (array): cone of influence</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.xwc">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">xwc</code><span class="sig-paren">(</span><em>ys1, ts1, ys2, ts2, smooth_factor=0.25, tau=None, freqs=None, c=0.012665147955292222, Neff=3, nproc=8, detrend='no', nMC=200, params=['default', 4, 0, 1], gaussianize=False, standardize=True, method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.xwc" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the crosse wavelet coherence of two time series.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">ys1, ys2 (array): the two time series
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">xwc</code><span class="sig-paren">(</span><em class="sig-param">ys1, ts1, ys2, ts2, smooth_factor=0.25, tau=None, freqs=None, c=0.012665147955292222, Neff=3, nproc=8, detrend=False, nMC=200, params=['default', 4, 0, 1], gaussianize=False, standardize=True, method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.xwc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cross-wavelet coherence of two time series.</p>
+<dl>
+<dt>Args:</dt><dd><p>ys1, ys2 (array): the two time series
 ts1, ts2 (array): the time axis of the two time series
 tau (array): the evenly-spaced time points
 freqs (array): vector of frequency
@@ -244,39 +288,38 @@ detrend (str): ‘no’ - the original time series is assumed to have no trend;<
 ‘constant’ - the mean of <cite>ys</cite> is subtracted
 ‘savitzy-golay’ - ys is filtered using the Savitzky-Golay</p>
 <blockquote>
-<div>filters and the resulting filtered series is subtracted from y.</div></blockquote>
+<div><p>filters and the resulting filtered series is subtracted from y.</p>
 </div></blockquote>
-<dl class="docutils">
-<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt>
-<dd>corresponds to the window size (default it set to half of the data)
+</div></blockquote>
+<dl class="simple">
+<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt><dd><p>corresponds to the window size (default it set to half of the data)
 while the second parameter correspond to the order of the filter
 (default is 4). The third parameter is the order of the derivative
-(the default is zero, which means only smoothing.)</dd>
+(the default is zero, which means only smoothing.)</p>
+</dd>
 </dl>
 <p>gaussianize (bool): If True, gaussianizes the timeseries
 standardize (bool): If True, standardizes the timeseries
 method (str): ‘Foster’ - the original WWZ method;</p>
-<blockquote class="last">
-<div>‘Kirchner’ - the method Kirchner adapted from Foster;
-‘Kirchner_f2py’ - the method Kirchner adapted from Foster with f2py</div></blockquote>
+<blockquote>
+<div><p>‘Kirchner’ - the method Kirchner adapted from Foster;
+‘Kirchner_f2py’ - the method Kirchner adapted from Foster with f2py</p>
+</div></blockquote>
 </dd>
-<dt>Returns:</dt>
-<dd>xw_coherence (array): the cross wavelet coherence
-xw_phase (array): the cross wavelet phase
-freqs (array): vector of frequency
-tau (array): the evenly-spaced time points
-AR1_q (array): AR1 simulations
-coi (array): cone of influence</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>res (dict): contains the cross wavelet coherence, cross-wavelet phase,</dt><dd><p>vector of frequency, evenly-spaced time points, AR1 sims, cone of influence</p>
+</dd>
+</dl>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_wwa">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_wwa</code><span class="sig-paren">(</span><em>wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None, yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, plot_cbar=True, plot_cone=False, ax=None, xlabel='Year (AD)', ylabel='Period (years)', cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_wwa</code><span class="sig-paren">(</span><em class="sig-param">wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None, yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, plot_cbar=True, plot_cone=False, ax=None, xlabel='Year CE', ylabel='Period (years)', cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwa" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the wavelet amplitude</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>wwa (array): the weighted wavelet amplitude.
+<dl class="simple">
+<dt>Args:</dt><dd><p>wwa (array): the weighted wavelet amplitude.
 freqs (array): vector of frequency
 tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
 AR1_q (array): AR1 simulations
@@ -292,80 +335,88 @@ cbar_drawedges (bool): whether to draw edges on the colorbar or not
 cone_alpha (float): the alpha value for the area covered by cone of influence
 plot_signif (bool): plot 95% significant area or not
 signif_style (str): plot 95% significant area with <cite>contour</cite> or <cite>shade</cite>
-plot_cone (bool): plot cone of influence or not
+title (str): Title for the plot
+plot_cbar (bool): Plot the color scale bar
+plot_cone (bool): plot cone of influence
 ax: Return as axis instead of figure (useful to integrate plot into a subplot)
 xlabel (str): The x-axis label
 ylabel (str): The y-axis label
 cbar_pad (float): the pad for the colorbar
 cbar_frac (float): the frac for the colorbar
-cbar_labelsize (float): the font size of the colorbar label</dd>
-<dt>Returns:</dt>
-<dd>fig (figure): the 2-D plot of wavelet analysis</dd>
+cbar_labelsize (float): the font size of the colorbar label</p>
+</dd>
+<dt>Returns:</dt><dd><p>fig (figure): the 2-D plot of wavelet analysis</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_coherence">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_coherence</code><span class="sig-paren">(</span><em>res_xwc, pt=0.5, levels=None, tick_range=None, basey=2, yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', skip_x=5, skip_y=5, scale=30, width=0.004, cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_coherence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the wavelet amplitude</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>xw_coherence (array): the wavelet cohernce
-xw_phase (array): the wavelet cohernce phase
-freqs (array): vector of frequency
-tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-AR1_q (array): AR1 simulations
-coi (array): cone of influence
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_coherence</code><span class="sig-paren">(</span><em class="sig-param">res_xwc, pt=0.5, levels=None, tick_range=None, basey=2, yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', skip_x=5, skip_y=5, scale=30, width=0.004, cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_coherence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the wavelet coherence</p>
+<dl>
+<dt>Args:</dt><dd><dl class="simple">
+<dt>res_xwc (dict): contains the cross wavelet coherence, cross-wavelet phase,</dt><dd><p>vector of frequency, evenly-spaced time points, AR1 sims, 
+cone of influence. See xwc</p>
+</dd>
+</dl>
+<p>pt (float): plot arrows above pt value
 levels (array): levels of values to plot
 tick_range (array): levels of ticks to show on the colorbar
+basey (int): log base for y. Default is 2. 
 yticks (list): ticks on y-axis
 ylim (list): limitations for y-axis
 xticks (list): ticks on x-axis
+xlabels (list): List of labels for the x-axis ticks
 figsize (list): the size for the figure
 clr_map (str): the name of the colormap
+skip_x, skip_y (float): plot every x,y points
+scale (int): Scale factor for arrows
+width (float):  Width of the arrows  
 cbar_drawedges (bool): whether to draw edges on the colorbar or not
 cone_alpha (float): the alpha value for the area covered by cone of influence
-plot_signif (bool): plot 95% significant area or not
+plot_signif (bool): plot 95% significant area
 signif_style (str): plot 95% significant area with <cite>contour</cite> or <cite>shade</cite>
-plot_cone (bool): plot cone of influence or not
+title (str): Add a title to the plot
+plot_cone (bool): plot cone of influence
 ax: Return as axis instead of figure (useful to integrate plot into a subplot)
 xlabel (str): The x-axis label
 ylabel (str): The y-axis label
+cbar_orientation (str): the orientation of the colorbar. Default is vertical
 cbar_pad (float): the pad for the colorbar
-c)bar_frac (float): the frac for the colorbar
-cbar_labelsize (float): the font size of the colorbar label
-pt (float): plot arrows above pt value
-skip_x, skip_y (float): scale factors for arrows</dd>
-<dt>Returns:</dt>
-<dd>fig (figure): the 2-D plot of wavelet analysis</dd>
+cbar_frac (float): the frac for the colorbar
+cbar_labelsize (float): the font size of the colorbar label</p>
+</dd>
+<dt>Returns:</dt><dd><p>fig (figure): the 2-D plot of wavelet analysis</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_wwadist">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_wwadist</code><span class="sig-paren">(</span><em>wwa</em>, <em>ylim=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwadist" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_wwadist</code><span class="sig-paren">(</span><em class="sig-param">wwa</em>, <em class="sig-param">ylim=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwadist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the distribution of wwa with the 95% quantile line.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>wwa (array): the weighted wavelet amplitude.
-ylim (list): limitations for y-axis</dd>
-<dt>Returns:</dt>
-<dd>fig (figure): the 2-D plot of wavelet analysis</dd>
+<dl class="simple">
+<dt>Args:</dt><dd><p>wwa (array): the weighted wavelet amplitude.
+ylim (list): limitations for y-axis</p>
+</dd>
+<dt>Returns:</dt><dd><p>fig (figure): the 2-D plot of wavelet analysis</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_psd">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_psd</code><span class="sig-paren">(</span><em>psd, freqs, lmstyle='-', linewidth=None, color='#3b5b92', ar1_lmstyle='-', ar1_linewidth=None, period_ticks=None, period_tickslabel=None, psd_lim=None, period_lim=None, figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None, legend=True, psd_ar1_color='#d9544d', ax=None, vertical=False, plot_gridlines=True, period_label='Period (years)', psd_label='Spectral Density', zorder=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_psd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the wavelet amplitude</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>psd (array): power spectral density
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_psd</code><span class="sig-paren">(</span><em class="sig-param">psd, freqs, lmstyle='-', linewidth=None, color='#3b5b92', ar1_lmstyle='-', ar1_linewidth=None, period_ticks=None, period_tickslabel=None, psd_lim=None, period_lim=None, alpha=1, figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None, legend=True, psd_ar1_color='#d9544d', ax=None, vertical=False, plot_gridlines=True, period_label='Period (years)', psd_label='Spectral Density', zorder=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_psd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot power spectral density</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>psd (array): power spectral density
 freqs (array): vector of frequency
 period_ticks (list): ticks for period
+period_tickslabel (list): Labels for the period ticks
 psd_lim (list): limits for spectral density axis
 label (str): the label for the PSD
-plot_ar1 (bool): plot the ar1 curve or not
+plot_ar1 (bool): plot the ar1 curve
 psd_ar1_q95 (array): the 95% quantile of the AR1 PSD
 psd_ar1_color (str): the color for the 95% quantile of the AR1 PSD
 title (str): the title for the figure
@@ -373,45 +424,117 @@ period_lim (list): limits for period axis
 figsize (list): the size for the figure
 ax (axis): Return as axis instead of figure (useful to integrate plot into a subplot)
 vertical (bool): plot in vertical layout or not
-legend (bool): plot legend or not
+legend (bool): plot legend
 lmstyle (str): the line style
 linewidth (float): the line width
+color (str): Color of the line
+ar1_lmstyle (str): line style for the AR1 ensemble
+ar1_linewidth (int): line width for AR1 ensemble
 period_label (str): the label for period
 psd_label (str): the label for psd
-zorder (int): the order of the layer</dd>
-<dt>Returns:</dt>
-<dd>ax (figure): the 2-D plot of wavelet analysis</dd>
+zorder (int): the order of the layer
+period_tickslabel (str): Label for the period tick. 
+alpha (float): set transparency
+label (str): Label for the figure
+plot_gridlines (bool): Plot gridlines
+period_label (str): Label for the period axis
+psd_label (str): label for the PSD axis</p>
+</dd>
+<dt>Returns:</dt><dd><p>ax (figure): the 2-D plot of wavelet analysis</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_summary">
-<code class="descclassname">pyleoclim.Spectral.</code><code class="descname">plot_summary</code><span class="sig-paren">(</span><em>ys, ts, freqs=None, tau=None, c1=0.012665147955292222, c2=0.001, nMC=200, nproc=8, detrend='no', gaussianize=False, standardize=True, levels=None, method='Kirchner_f2py', anti_alias=False, period_ticks=None, ts_color=None, ts_style='-o', title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None, psd_lmstyle='-', psd_lim=None, period_S_str='beta_I', period_S=[0.125, 0.5], period_L_str='beta_D', period_L=[0.005, 0.05]</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_summary" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_summary</code><span class="sig-paren">(</span><em class="sig-param">ys, ts, freqs=None, tau=None, c1=0.012665147955292222, c2=0.001, nMC=200, nproc=1, detrend=False, params=['default', 4, 0, 1], gaussianize=False, standardize=True, levels=None, method='Kirchner_f2py', anti_alias=False, period_ticks=None, ts_color=None, ts_style='-o', title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None, psd_lmstyle='-', psd_lim=None, font_scale=1.5, period_S_str='beta_I', period_S=[0.125, 0.5], period_L_str='beta_D', period_L=[0.005, 0.05]</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_summary" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the time series with the wavelet analysis and psd</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">ys (array): a time series
+<dl>
+<dt>Args:</dt><dd><p>ys (array): a time series
 ts (array): time axis of the time series
 freqs (array): vector of frequency
 tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-c (float): the decay constant
-Neff (int): the threshold of the number of effective degree of freedom
+c1 (float): the decay constant (wwz method)
+c2 (float): the decay constant (wwz_psd method)
+nMC(int): Number of Monte-Carlo simulations
 nproc (int): fake argument, just for convenience
-detrend (str): ‘no’ - the original time series is assumed to have no trend;</p>
+detrend (str): ‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;</p>
 <blockquote>
-<div>‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;
-‘constant’ - the mean of <cite>ys</cite> is subtracted</div></blockquote>
-<p class="last">ts_color (str): the color for the time series curve
+<div><p>‘constant’ - the mean of <cite>ys</cite> is subtracted
+‘savitzy-golay’ - ys is filtered using the Savitzky-Golay</p>
+<blockquote>
+<div><p>filters and the resulting filtered series is subtracted from y.</p>
+</div></blockquote>
+</div></blockquote>
+<dl class="simple">
+<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt><dd><p>corresponds to the window size (default it set to half of the data)
+while the second parameter correspond to the order of the filter
+(default is 4). The third parameter is the order of the derivative
+(the default is zero, which means only smoothing.)</p>
+</dd>
+</dl>
+<p>gaussianize (bool): If True, gaussianizes the timeseries
+standardize (bool): If True, standardizes the timeseries
+levels (array): levels of values to plot
+method (str): method for the WWZ transform. Default is Kirchner_f2py
+anti_alias (bool): If True, uses anti-aliasing
+period_ticks (list): ticks for period
+ts_color (str): the color for the time series curve
+ts_style (str): Style for the line
 title (str): the title for the time series plot
 ts_ylabel (str): label for y-axis in the time series plot
 wwa_xlabel (str): label for x-axis in the wwa plot
 wwa_ylabel (str): label for y-axis in the wwa plot
 psd_lmstyle (str): the line style in the psd plot
 psd_lim (list): the limits for psd
-period_S, period_L (list): the ranges for beta estimation</p>
+font_scale (float): Scaling factor for the font on the plot
+period_S, period_L (list): the ranges for beta estimation
+period_S_str, period_L_str (str): String for beta estimation</p>
 </dd>
-<dt>Returns:</dt>
-<dd>fig (figure): the summary plot</dd>
+<dt>Returns:</dt><dd><p>fig (figure): the summary plot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Spectral.calc_plot_psd">
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">calc_plot_psd</code><span class="sig-paren">(</span><em class="sig-param">ys, ts, ntau=501, dcon=0.001, standardize=False, anti_alias=False, plot_fig=True, method='Kirchner_f2py', nproc=8, period_ticks=[0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000], color=None, figsize=[10, 6], font_scale=2, lw=3, label='PSD', zorder=None, xlim=None, ylim=None, loc='upper right', bbox_to_anchor=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.calc_plot_psd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the PSD and plot the result</p>
+<dl>
+<dt>Args:</dt><dd><p>ys (array): a time series
+ts (array): time axis of the time series
+natu (int): the length of tau, the evenly-spaced time points,</p>
+<blockquote>
+<div><p>namely the time shift for wavelet analysis</p>
+</div></blockquote>
+<p>dcon (float): the decay constant
+standardize(bool): perform standardization or not
+anti_alias(bool): perform anti-alising procedure or not
+plot_fig (bool): plot the result or not
+method (str): the WWZ method to use
+nproc (int): the number of threads
+period_ticks (list): List of period ticks
+color (str): set color
+figsize (list): Size of the figure
+font_scale(float): Scale of the font
+lw (float): For plotting purposes
+label (str): Labeld for the y-axis
+zorder (int): the order of the layer
+xlim (list): x-axis limits
+ylim (list): y-axis limits
+loc (str): location for the legend
+bbox_to_anchor (list): gives a great degree of control for manual</p>
+<blockquote>
+<div><p>legend placement. For example, if you want your axes legend
+located at the figure’s top right-hand corner instead of the axes’
+corner, simply specify the corner’s location, and the coordinate 
+system of that location</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>fig (figure): the summary plot
+psd (array): the spectral density
+freqs (array): the frequency vector</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -435,12 +558,12 @@ period_S, period_L (list): the ranges for beta estimation</p>
         <li class="right" >
           <a href="SummaryPlots.html" title="Summary Plots"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.6.
+        &#169; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

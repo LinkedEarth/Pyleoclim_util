@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>RBchron &#8212; Pyleoclim 0.4.8 documentation</title>
+    <title>RBchron &#8212; Pyleoclim 0.4.9 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -25,7 +25,7 @@
         <li class="right" >
           <a href="Spectral.html" title="Spectral Functions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -74,6 +74,24 @@ be applied to each age or a list of names of different ages. To enter a list,
 separate each name with a comma. No quotation marks needed.</p>
 <dl class="simple">
 <dt>Returns:</dt><dd><p>A list of calibration curves to be applied</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.RBchron.verifyCalCurves">
+<code class="sig-prename descclassname">pyleoclim.RBchron.</code><code class="sig-name descname">verifyCalCurves</code><span class="sig-paren">(</span><em class="sig-param">CalCurves</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.RBchron.verifyCalCurves" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verify that the list of calibration curves contain valid entries for BChron</p>
+<p>Performs a verification that the names entered in the list of calibration
+curves are conformed to the names used by Bchron. Will prompt the user to
+replace the name if needed.</p>
+<dl class="simple">
+<dt>Agrs:</dt><dd><dl class="simple">
+<dt>CalCurves (list): A list of strings containing the name(s) of the</dt><dd><p>calibration curves to be used</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>CalCurves - Checked list of calibration curves names</p>
 </dd>
 </dl>
 </dd></dl>
@@ -267,11 +285,11 @@ ax: Default is None. Useful to set for subplots.</p>
         <li class="right" >
           <a href="Spectral.html" title="Spectral Functions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+        &#169; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>

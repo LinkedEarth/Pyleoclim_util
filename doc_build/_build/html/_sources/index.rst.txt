@@ -12,12 +12,13 @@ Contents:
    :maxdepth: 3
 
    Introduction
+   Installation
    Main
    Map
    Plot
    Stats
    Timeseries
-   LipdUtils
+   LIPDutils
    SummaryPlots
    Spectral
    RBchron

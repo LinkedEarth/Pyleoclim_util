@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>LiPD Utilities &#8212; Pyleoclim 0.4.8 documentation</title>
+    <title>LiPD Utilities &#8212; Pyleoclim 0.4.9 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -13,7 +13,9 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Summary Plots" href="SummaryPlots.html" />
+    <link rel="prev" title="Timeseries Functions" href="Timeseries.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -21,7 +23,13 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="SummaryPlots.html" title="Summary Plots"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="Timeseries.html" title="Timeseries Functions"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -41,6 +49,12 @@
 </li>
 </ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Timeseries.html"
+                        title="previous chapter">Timeseries Functions</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="SummaryPlots.html"
+                        title="next chapter">Summary Plots</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -182,6 +196,19 @@ x_axis (str) : the x-axis representation, either depth, age or year</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="pyleoclim.LipdUtils.checkTimeAxis">
+<code class="sig-prename descclassname">pyleoclim.LipdUtils.</code><code class="sig-name descname">checkTimeAxis</code><span class="sig-paren">(</span><em class="sig-param">timeseries</em>, <em class="sig-param">x_axis=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.checkTimeAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function makes sure that time is available for the timeseries</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>timeseries (dict): A LiPD timeseries object</p>
+</dd>
+<dt>Returns:</dt><dd><p>x: the time values for the timeseries
+label: the time representation for the timeseries</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
 <dt id="pyleoclim.LipdUtils.searchVar">
 <code class="sig-prename descclassname">pyleoclim.LipdUtils.</code><code class="sig-name descname">searchVar</code><span class="sig-paren">(</span><em class="sig-param">timeseries_list</em>, <em class="sig-param">key</em>, <em class="sig-param">exact=True</em>, <em class="sig-param">override=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.searchVar" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function search for key words (exact match) for a variable</p>
@@ -246,6 +273,18 @@ list if optional arguments given</p>
 <dt>Args:</dt><dd><p>archiveType (STR): name of the archiveType from the LiPD file</p>
 </dd>
 <dt>Returns:</dt><dd><p>archiveType according to the ontology</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.LipdUtils.timeUnitsCheck">
+<code class="sig-prename descclassname">pyleoclim.LipdUtils.</code><code class="sig-name descname">timeUnitsCheck</code><span class="sig-paren">(</span><em class="sig-param">units</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.LipdUtils.timeUnitsCheck" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function attempts to make sense of the time units by checking for equivalence</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>units (str): The units string for the timeseries</p>
+</dd>
+<dt>Returns:</dt><dd><p>unit_group (str): Whether the units belongs to age_units, kage_units, year_units, or undefined</p>
 </dd>
 </dl>
 </dd></dl>
@@ -381,11 +420,17 @@ lipd (dict): The LiPD object from which to extract the data</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+        <li class="right" >
+          <a href="SummaryPlots.html" title="Summary Plots"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="Timeseries.html" title="Timeseries Functions"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+        &#169; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>

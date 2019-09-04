@@ -9,7 +9,7 @@ When using this module, please cite:
 
 .. autofunction:: pyleoclim.RBchron.chooseCalCurves
 
-.. autofunction:: pyleoclim.RBchron.verufyCalCurves
+.. autofunction:: pyleoclim.RBchron.verifyCalCurves
 
 .. autofunction:: pyleoclim.RBchron.reservoirAgeCorrection
 

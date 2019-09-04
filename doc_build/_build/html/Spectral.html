@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Spectral Functions &#8212; Pyleoclim 0.4.8 documentation</title>
+    <title>Spectral Functions &#8212; Pyleoclim 0.4.9 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,7 +29,7 @@
         <li class="right" >
           <a href="SummaryPlots.html" title="Summary Plots"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -219,6 +219,52 @@ avgs (int):</p>
 freqs (array): vector of frequency
 psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes
 psd_ar1 (array): the psds of AR1 processes</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyleoclim.Spectral.xwt">
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">xwt</code><span class="sig-paren">(</span><em class="sig-param">ys1, ts1, ys2, ts2, tau=None, freqs=None, c=0.012665147955292222, Neff=3, Neff_coi=6, nproc=8, detrend=False, params=['default', 4, 0, 1], gaussianize=False, standardize=True, method='Kirchner_f2py'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.xwt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cross-wavelet transform of two time series.</p>
+<dl>
+<dt>Args:</dt><dd><p>ys1, ys2 (array): the two time series
+ts1, ts2 (array): the time axis of the two time series
+tau (array): the evenly-spaced time points
+freqs (array): vector of frequency
+c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+Neff (int): effective number of points
+nproc (int): the number of processes for multiprocessing
+detrend (str): ‘no’ - the original time series is assumed to have no trend;</p>
+<blockquote>
+<div><p>‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;
+‘constant’ - the mean of <cite>ys</cite> is subtracted
+‘savitzy-golay’ - ys is filtered using the Savitzky-Golay</p>
+<blockquote>
+<div><p>filters and the resulting filtered series is subtracted from y.</p>
+</div></blockquote>
+</div></blockquote>
+<dl class="simple">
+<dt>params (list): The paramters for the Savitzky-Golay filters. The first parameter</dt><dd><p>corresponds to the window size (default it set to half of the data)
+while the second parameter correspond to the order of the filter
+(default is 4). The third parameter is the order of the derivative
+(the default is zero, which means only smoothing.)</p>
+</dd>
+</dl>
+<p>gaussianize (bool): If True, gaussianizes the timeseries
+standardize (bool): If True, standardizes the timeseries
+method (str): ‘Foster’ - the original WWZ method;</p>
+<blockquote>
+<div><p>‘Kirchner’ - the method Kirchner adapted from Foster;
+‘Kirchner_f2py’ - the method Kirchner adapted from Foster with f2py</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>xw_amplitude (array): the cross wavelet amplitude
+xw_phase (array): the cross wavelet phase
+freqs (array): vector of frequency
+tau (array): the evenly-spaced time points
+AR1_q (array): AR1 simulations
+coi (array): cone of influence</p>
 </dd>
 </dl>
 </dd></dl>
@@ -450,6 +496,48 @@ period_S_str, period_L_str (str): String for beta estimation</p>
 </dl>
 </dd></dl>
 
+<dl class="function">
+<dt id="pyleoclim.Spectral.calc_plot_psd">
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">calc_plot_psd</code><span class="sig-paren">(</span><em class="sig-param">ys, ts, ntau=501, dcon=0.001, standardize=False, anti_alias=False, plot_fig=True, method='Kirchner_f2py', nproc=8, period_ticks=[0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000], color=None, figsize=[10, 6], font_scale=2, lw=3, label='PSD', zorder=None, xlim=None, ylim=None, loc='upper right', bbox_to_anchor=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.calc_plot_psd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the PSD and plot the result</p>
+<dl>
+<dt>Args:</dt><dd><p>ys (array): a time series
+ts (array): time axis of the time series
+natu (int): the length of tau, the evenly-spaced time points,</p>
+<blockquote>
+<div><p>namely the time shift for wavelet analysis</p>
+</div></blockquote>
+<p>dcon (float): the decay constant
+standardize(bool): perform standardization or not
+anti_alias(bool): perform anti-alising procedure or not
+plot_fig (bool): plot the result or not
+method (str): the WWZ method to use
+nproc (int): the number of threads
+period_ticks (list): List of period ticks
+color (str): set color
+figsize (list): Size of the figure
+font_scale(float): Scale of the font
+lw (float): For plotting purposes
+label (str): Labeld for the y-axis
+zorder (int): the order of the layer
+xlim (list): x-axis limits
+ylim (list): y-axis limits
+loc (str): location for the legend
+bbox_to_anchor (list): gives a great degree of control for manual</p>
+<blockquote>
+<div><p>legend placement. For example, if you want your axes legend
+located at the figure’s top right-hand corner instead of the axes’
+corner, simply specify the corner’s location, and the coordinate 
+system of that location</p>
+</div></blockquote>
+</dd>
+<dt>Returns:</dt><dd><p>fig (figure): the summary plot
+psd (array): the spectral density
+freqs (array): the frequency vector</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 
 
@@ -470,11 +558,11 @@ period_S_str, period_L_str (str): String for beta estimation</p>
         <li class="right" >
           <a href="SummaryPlots.html" title="Summary Plots"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+        &#169; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>

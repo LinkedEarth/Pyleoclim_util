@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Timeseries Functions &#8212; Pyleoclim 0.4.8 documentation</title>
+    <title>Timeseries Functions &#8212; Pyleoclim 0.4.9 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -14,7 +14,7 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Summary Plots" href="SummaryPlots.html" />
+    <link rel="next" title="LiPD Utilities" href="LIPDutils.html" />
     <link rel="prev" title="Statistics Functions" href="Stats.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -24,12 +24,12 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="SummaryPlots.html" title="Summary Plots"
+          <a href="LIPDutils.html" title="LiPD Utilities"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="Stats.html" title="Statistics Functions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -38,8 +38,8 @@
   <p class="topless"><a href="Stats.html"
                         title="previous chapter">Statistics Functions</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="SummaryPlots.html"
-                        title="next chapter">Summary Plots</a></p>
+  <p class="topless"><a href="LIPDutils.html"
+                        title="next chapter">LiPD Utilities</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -68,6 +68,25 @@
   <div class="section" id="timeseries-functions">
 <h1>Timeseries Functions<a class="headerlink" href="#timeseries-functions" title="Permalink to this headline">¶</a></h1>
 <p>This module allows the manipulation of timeseries.</p>
+<dl class="function">
+<dt id="pyleoclim.Timeseries.binvalues">
+<code class="sig-prename descclassname">pyleoclim.Timeseries.</code><code class="sig-name descname">binvalues</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">bin_size=None</em>, <em class="sig-param">start=None</em>, <em class="sig-param">end=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.binvalues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bin the values</p>
+<dl>
+<dt>Args:</dt><dd><p>x (array): the x-axis series.
+y (array): the y-axis series.
+bin_size (float): The size of the bins. Default is the average resolution
+start (float): Where/when to start binning. Default is the minimum
+end (float): When/where to stop binning. Defulat is the maximum</p>
+</dd>
+<dt>Returns:</dt><dd><p>binned_values - the binned output</p>
+<p>bins - the bins (centered on the median, i.e., the 100-200 bin is 150)</p>
+<p>n - number of data points in each bin</p>
+<p>error -  the standard error on the mean in each bin</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="function">
 <dt id="pyleoclim.Timeseries.interp">
 <code class="sig-prename descclassname">pyleoclim.Timeseries.</code><code class="sig-name descname">interp</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">interp_step=None</em>, <em class="sig-param">start=None</em>, <em class="sig-param">end=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.interp" title="Permalink to this definition">¶</a></dt>
@@ -244,16 +263,16 @@ while the second parameter correspond to the order of the filter
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="SummaryPlots.html" title="Summary Plots"
+          <a href="LIPDutils.html" title="LiPD Utilities"
              >next</a> |</li>
         <li class="right" >
           <a href="Stats.html" title="Statistics Functions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017-2018, Deborah Khider, Julien Emile-Geay, Feng Zhu.
+        &#169; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>

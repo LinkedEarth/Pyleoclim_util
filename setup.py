@@ -3,12 +3,14 @@ import sys
 import io
 
 from setuptools import setup, find_packages
+#from numpy.distutils.core import Extension
+#from numpy.distutils.core import setup
 
 version = '0.4.9'
 
 # Read the readme file contents into variable
 def read(fname):
-    return open(os.path.join(os.path.dirname('__file__'), fname)).read()
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 # Publish the package to the live server
 if sys.argv[-1] == 'publish':
@@ -16,18 +18,21 @@ if sys.argv[-1] == 'publish':
     os.system('python3 setup.py register -r pypi')
     os.system('python3 setup.py sdist')
     os.system('twine upload dist/*')
-    #os.remove('README.txt')
     sys.exit()
 
 # Publish the package to the test server
 elif sys.argv[-1] == 'publishtest':
     # Create dist tarball, register it to test site, upload tarball, and remove temp readme file
-    os.system('python3 setup.py register upload -r pypitest')
+    os.system('python3 setup.py register -r pypitest')
     os.system('python3 setup.py sdist')
     os.system('twine upload -r test dist/LiPD-' + version + '.tar.gz')
-    # Trash the temp rst readme file
-    #os.remove('README.txt')
     sys.exit()
+
+#f2py_wwz = Extension(
+    #name='pyleoclim.f2py_wwz',
+    #extra_compile_args=['-O3'],
+    #sources=['pyleoclim/src/f2py_wwz.f90']
+#)
 
 setup(
     name='pyleoclim',
@@ -45,6 +50,7 @@ setup(
     download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.4.9',
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
+    #ext_modules=[f2py_wwz],
     install_requires=[
         "LiPD>=0.2.7",
         "pandas>=0.25.0",

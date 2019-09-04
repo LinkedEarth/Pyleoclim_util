@@ -26,6 +26,8 @@ Handling Variables
 
 .. autofunction:: pyleoclim.LipdUtils.checkXaxis
 
+.. autofunction:: pyleoclim.LipdUtils.checkTimeAxis
+
 .. autofunction:: pyleoclim.LipdUtils.searchVar
 
 Handling timeseries objects
@@ -39,6 +41,8 @@ Linking LiPDs to the LinkedEarth Ontology
 `````````````````````````````````````````
 
 .. autofunction:: pyleoclim.LipdUtils.LipdToOntology
+
+.. autofunction:: pyleoclim.LipdUtils.timeUnitsCheck
 
 Dealing with models
 ```````````````````

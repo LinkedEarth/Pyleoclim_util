@@ -3,7 +3,7 @@ Timeseries Functions
 
 This module allows the manipulation of timeseries.
 
-.. autofunction:: pyleoclim.Timeseries.bin
+.. autofunction:: pyleoclim.Timeseries.binvalues
 
 .. autofunction:: pyleoclim.Timeseries.interp
 
