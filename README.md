@@ -54,7 +54,7 @@ If you have specific requests, please contact linkedearth@gmail.com
 
 Python v3.6 is **required**.
 
-We recommend using [Anaconda](https://www.anaconda.com/distribution/), with an environment dedicated to Pyleoclim. See the documentation for details.
+We recommend using [Anaconda](https://www.anaconda.com/distribution/), with an environment dedicated to Pyleoclim. See the [documentation](http://linkedearth.github.io/Pyleoclim_util/Introduction.html#installation) for details.
 
 To install Pyleoclim, **first** install numpy and Cartopy through Anaconda
 ```
