@@ -15,17 +15,17 @@ def read(fname):
 # Publish the package to the live server
 if sys.argv[-1] == 'publish':
     # Register the tarball, upload it, and trash the temp readme rst file
-    os.system('python3 setup.py register -r pypi')
+    #os.system('python3 setup.py register -r pypi')
     os.system('python3 setup.py sdist')
-    os.system('twine upload dist/*')
+    os.system('twine upload -r pypi dist/pyleoclim-'+version+'tar.gz')
     sys.exit()
 
 # Publish the package to the test server
 elif sys.argv[-1] == 'publishtest':
     # Create dist tarball, register it to test site, upload tarball, and remove temp readme file
-    os.system('python3 setup.py register -r pypitest')
+    #os.system('python3 setup.py register -r pypitest')
     os.system('python3 setup.py sdist')
-    os.system('twine upload -r test dist/LiPD-' + version + '.tar.gz')
+    os.system('twine upload -r pypitest dist/pyleoclim-'+version+'tar.gz'')
     sys.exit()
 
 #f2py_wwz = Extension(
