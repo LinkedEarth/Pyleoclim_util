@@ -5,13 +5,18 @@ What is it?
 ```````````
 
 Pyleoclim is a Python package primarily geared towards the analysis and visualization of paleoclimate data.
-Such data often come in the form of timeseries with missing values and age uncertainties, and the package
-includes several low-level methods to deal with these issues, as well as high-level methods that re-use those
-to perform scientific workflows.
+Such data often come in the form of timeseries with missing values and age uncertainties,
+so the package includes several low-level methods to deal with these issues,
+as well as high-level methods that re-use those within scientific workflows.
 
-The package assumes that the data are stored in the Linked Paleo Data (`LiPD <http://www.clim-past.net/12/1093/2016/>`_)
-format and makes extensive use of the `LiPD utilities <http://nickmckay.github.io/LiPD-utilities/>`_. The package
-is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses very much like `GeoChronR <http://nickmckay.github.io/GeoChronR/>`_.
+High-level modules assume that data are stored in the Linked Paleo Data (`LiPD <http://www.clim-past.net/12/1093/2016/>`_) format
+and makes extensive use of the `LiPD utilities <http://nickmckay.github.io/LiPD-utilities/>`_. Low-level modules are primarily
+based on numpy arrays or Pandas dataframes, so Pyleoclim contains a lot of
+timeseries analysis code (e.g. spectral analysis, singular spectrum analysis,
+wavelet analysis, correlation analysis) that can apply to these more common types
+as well. See the example folder for details.
+
+The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses very much like `GeoChronR <http://nickmckay.github.io/GeoChronR/>`_.
 
 **Current Capabilities:**
 
@@ -29,11 +34,39 @@ is aware of age ensembles stored via LiPD and uses them for time-uncertain analy
 * cross-wavelet analysis
 * index reconstruction
 * climate reconstruction
-
+* causality
 * ensemble methods for most of the above
+
+Installation
+````````````
+Python v3.6 is **required**.
+
+We recommend using `Anaconda <https://www.anaconda.com/distribution/>`_ and creating a new environment:
+
+  conda create --name pyleoclim python=3.6
+
+Activate the environment:
+
+  conda activate pyleoclim
+
+To install Pyleoclim, first install Cartopy and Numpy through Anaconda.
+
+  conda install -c conda-forge cartopy
+  conda install numpy
+
+Pyleoclim is published through Pypi and easily installed via pip::
+
+  pip install pyleoclim
+
+Some functionalities require R. See Installation for details.
 
 Version Information
 ```````````````````
+**Current Version**
+
+| 0.4.9: Major bug fixes; mapping module based on cartopy; compatibility with latest numpy package
+
+**Past Version**
 | 0.4.8: Add support of f2py WWZ for Linux
 | 0.4.7: Update to coherence function
 | 0.4.0: New functionalities: map nearest records by archive type, plot ensemble time series, age modelling through Bchron.
@@ -53,23 +86,11 @@ Version Information
 | 0.1.1: Freezes the package prior to version 0.1.8.2 of LiPD utilities
 | 0.1.0: First release
 
-Installation
-````````````
-Python v3.4+ is required. Tested with Python v3.5
-
-Will not run on a Windows system.
-
-Pyleoclim is published through Pypi and easily installed via pip::
-
-  pip install pyleoclim
 
 Quickstart guide
 ````````````````
 
-1. Open your command line application (Terminal or Command Prompt)
-2. Install with command::
-
-  pip install pyleoclim
+1. Install Pyleoclim
 
 3. Wait for installation to complete, then:
 
@@ -79,21 +100,27 @@ Quickstart guide
 Requirements
 ````````````
 
-* LiPD v0.2.5+
-* pandas v0.22+
-* numpy v1.14+
-* matplotlib v2.0+
-* Basemap v1.0.7+
-* scipy v0.19.0+
-* statsmodel v0.8.0+
-* seaborn v0.7.0+
-* scikit-learn v0.17.1+
-* tqdm v4.14.0+
-* pathos v0.2.0+
-* tqdm 4.14+
-* rpy2 2.8.4+
+Tested with:
+
+* LiPD 0.2.7
+* pandas v0.25.0
+* numpy v1.16.4
+* matplotlib v3.1.0
+* Cartopy v1.17.0
+* scipy v1.3.1
+* statsmodel v0.8.0
+* seaborn 0.9.0
+* scikit-learn 0.21.3
+* tqdm 4.33.0
+* pathos 0.2.4
+* rpy2 3.0.5
 
 The installer will automatically check for the needed updates.
+
+Known issues
+````````````
+* Some of the packages supporting Pyleoclim do not have a build for Windows
+* Known issues with proj4 v5.0-5.1, make sure your environment is setup with 5.2
 
 Further information
 ```````````````````
@@ -109,6 +136,7 @@ Please report issues to `linkedearth@gmail.com <linkedearth@gmail.com>`_
 License
 ```````
 The project is licensed under the `GNU Public License <https://github.com/LinkedEarth/Pyleoclim_util/blob/master/license>`_ .
+If you use the code in publications, please credit the work using `this citation <https://zenodo.org/record/1212692#.WsaZ7maZNE4>`_.
 
 Disclaimer
 ``````````
