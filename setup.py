@@ -32,6 +32,7 @@ elif sys.argv[-1] == 'publishtest':
 f2py_wwz = Extension(
     name='pyleoclim.f2py_wwz',
     extra_compile_args=['-O3'],
+    extra_f90_compile_args=['-fopenmp', '-O3'],
     sources=['pyleoclim/src/f2py_wwz.f90']
 )
 
