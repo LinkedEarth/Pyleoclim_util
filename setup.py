@@ -7,7 +7,7 @@ from setuptools import find_packages
 from numpy.distutils.core import Extension
 from numpy.distutils.core import setup
 
-version = '0.4.9'
+version = '0.5.0'
 
 # Read the readme file contents into variable
 def read(fname):
@@ -32,7 +32,8 @@ elif sys.argv[-1] == 'publishtest':
 f2py_wwz = Extension(
     name='pyleoclim.f2py_wwz',
     extra_compile_args=['-O3'],
-    extra_f90_compile_args=['-fopenmp', '-O3'],
+    extra_f90_compile_args=['-fopenmp', '-O3'],  # compiling with gfortran
+    #  extra_f90_compile_args=['-qopenmp', '-O3', '-mkl=parallel'],  # compiling with ifort
     sources=['pyleoclim/src/f2py_wwz.f90']
 )
 
@@ -65,5 +66,5 @@ setup(
         "pathos>=0.2.4",
         "tqdm>=4.33.0",
         "rpy2>=3.0.5"],
-    python_requires=">=3.5.0"
+    python_requires=">=3.6.0"
 )

@@ -353,7 +353,8 @@ class Correlation(object):
 
         surrblk = np.zeros((nfrms, nsurr))
 
-        for k in tqdm(np.arange(nsurr)):
+        #  for k in tqdm(np.arange(nsurr)):
+        for k in np.arange(nsurr):
             ph_rnd = np.random.rand(len_ser)
 
             # Create the random phases for all the time series
