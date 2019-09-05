@@ -25,7 +25,7 @@ elif sys.argv[-1] == 'publishtest':
     # Create dist tarball, register it to test site, upload tarball, and remove temp readme file
     #os.system('python3 setup.py register -r pypitest')
     os.system('python3 setup.py sdist')
-    os.system('twine upload -r pypitest dist/pyleoclim-'+version+'tar.gz'')
+    os.system('twine upload -r pypitest dist/pyleoclim-'+version+'tar.gz')
     sys.exit()
 
 #f2py_wwz = Extension(
