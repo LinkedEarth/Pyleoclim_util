@@ -11,6 +11,8 @@ This module allows analysis in the frequency domain
 
 .. autofunction:: pyleoclim.Spectral.wwz_psd
 
+.. autofunction:: pyleoclim.Spectral.xwt
+
 .. autofunction:: pyleoclim.Spectral.xwc
 
 .. autofunction:: pyleoclim.Spectral.plot_wwa
@@ -22,3 +24,5 @@ This module allows analysis in the frequency domain
 .. autofunction:: pyleoclim.Spectral.plot_psd
 
 .. autofunction:: pyleoclim.Spectral.plot_summary
+
+.. autofunction:: pyleoclim.Spectral.calc_plot_psd
