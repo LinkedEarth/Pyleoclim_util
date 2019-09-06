@@ -147,10 +147,10 @@ The installer will automatically check for the needed updates.
 
 ### <a name="further_info">Further information</a>
 
-GitHub: https://github.com/LinkedEarth/Pyleoclim_util
-LinkedEarth: http://linked.earth
-Python and Anaconda: http://conda.pydata.org/docs/test-drive.html
-Jupyter Notebook: http://jupyter.org
+GitHub: https://github.com/LinkedEarth/Pyleoclim_util. 
+LinkedEarth: http://linked.earth. 
+Python and Anaconda: http://conda.pydata.org/docs/test-drive.html. 
+Jupyter Notebook: http://jupyter.org. 
 
 ### <a name = "contact"> Contact </a>
 
