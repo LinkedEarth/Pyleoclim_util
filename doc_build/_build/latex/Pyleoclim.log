@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  4 SEP 2019 13:56
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.4.16)  5 SEP 2019 17:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -855,245 +855,245 @@ LaTeX Font Info:    Try loading font information for T1+pcr on input line 185.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
-) [4] [5] [6
-
-]
+) [4] [5] [6]
 Chapter 2.
-[7] [8]
+[7
+
+] [8]
 Chapter 3.
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <10> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 444.
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 478.
 [9
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 499--507
+Underfull \hbox (badness 10000) in paragraph at lines 533--541
 []\T1/ptm/m/n/10 `Robinson', `Plate-Car-ree', `Al-bert-sE-qualArea', `Az-imutha
 lE-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 499--507
+Underfull \hbox (badness 10000) in paragraph at lines 533--541
 \T1/ptm/m/n/10 quidis-tant','EquidistantConic','LambertConformal', `Lam-bert-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 499--507
+Underfull \hbox (badness 10000) in paragraph at lines 533--541
 \T1/ptm/m/n/10 Cylin-dri-cal','Mercator','Miller','Mollweide','Orthographic' (D
 e-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 499--507
+Underfull \hbox (badness 10000) in paragraph at lines 533--541
 \T1/ptm/m/n/10 fault), `Si-nu-soidal','Stereographic','TransverseMercator','UTM
 ',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 499--507
+Underfull \hbox (badness 10000) in paragraph at lines 533--541
 \T1/ptm/m/n/10 `In-ter-rupt-ed-Good-e-Ho-molo-sine','RotatedPole','OSGB','EuroP
 P',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 499--507
+Underfull \hbox (badness 10000) in paragraph at lines 533--541
 \T1/ptm/m/n/10 `Geo-sta-tion-ary','NearsidePerspective','EckertI','EckertII', `
 Eck-er-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 499--507
+Underfull \hbox (badness 10000) in paragraph at lines 533--541
 \T1/ptm/m/n/10 tIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic', `
 Lam-ber-tAz-imuthalE-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 555--555
+Underfull \hbox (badness 10000) in paragraph at lines 589--589
 []\T1/ptm/m/it/10 timeseries=None, pro-jec-tion='Orthographic', proj_default=Tr
 ue, back-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 555--555
+Underfull \hbox (badness 10000) in paragraph at lines 589--589
 \T1/ptm/m/it/10 ground=True, la-bel='default', bor-ders=False, rivers=False, la
 kes=False,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 565--573
+Underfull \hbox (badness 10000) in paragraph at lines 599--607
 []\T1/ptm/m/n/10 `Robinson', `Plate-Car-ree', `Al-bert-sE-qualArea', `Az-imutha
 lE-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 565--573
+Underfull \hbox (badness 10000) in paragraph at lines 599--607
 \T1/ptm/m/n/10 quidis-tant','EquidistantConic','LambertConformal', `Lam-bert-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 565--573
+Underfull \hbox (badness 10000) in paragraph at lines 599--607
 \T1/ptm/m/n/10 Cylin-dri-cal','Mercator','Miller','Mollweide','Orthographic' (D
 e-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 565--573
+Underfull \hbox (badness 10000) in paragraph at lines 599--607
 \T1/ptm/m/n/10 fault), `Si-nu-soidal','Stereographic','TransverseMercator','UTM
 ',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 565--573
+Underfull \hbox (badness 10000) in paragraph at lines 599--607
 \T1/ptm/m/n/10 `In-ter-rupt-ed-Good-e-Ho-molo-sine','RotatedPole','OSGB','EuroP
 P',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 565--573
+Underfull \hbox (badness 10000) in paragraph at lines 599--607
 \T1/ptm/m/n/10 `Geo-sta-tion-ary','NearsidePerspective','EckertI','EckertII', `
 Eck-er-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 565--573
+Underfull \hbox (badness 10000) in paragraph at lines 599--607
 \T1/ptm/m/n/10 tIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic', `
 Lam-ber-tAz-imuthalE-
  []
 
 [10]
-Underfull \hbox (badness 10000) in paragraph at lines 628--628
+Underfull \hbox (badness 10000) in paragraph at lines 662--662
 \T1/ptm/m/it/10 pro-jec-tion='Orthographic', proj_default=True, bor-ders=False,
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 644--653
+Underfull \hbox (badness 10000) in paragraph at lines 678--687
 []\T1/ptm/m/n/10 `Robinson', `Plate-Car-ree',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 644--653
+Underfull \hbox (badness 10000) in paragraph at lines 678--687
 \T1/ptm/m/n/10 `Al-bert-sE-qualArea', `Az-imuthalE-quidis-tant','EquidistantCon
 ic','LambertConformal',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 644--653
+Underfull \hbox (badness 10000) in paragraph at lines 678--687
 \T1/ptm/m/n/10 `Lam-bert-Cylin-dri-cal','Mercator','Miller','Mollweide','Orthog
 raphic' (De-fault), `Si-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 644--653
+Underfull \hbox (badness 10000) in paragraph at lines 678--687
 \T1/ptm/m/n/10 nu-soidal','Stereographic','TransverseMercator','UTM', `In-ter-r
 upt-ed-Good-e-Ho-molo-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 644--653
+Underfull \hbox (badness 10000) in paragraph at lines 678--687
 \T1/ptm/m/n/10 sine','RotatedPole','OSGB','EuroPP', `Geo-sta-tion-ary','Nearsid
 ePerspective','EckertI','EckertII',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 644--653
+Underfull \hbox (badness 10000) in paragraph at lines 678--687
 \T1/ptm/m/n/10 `Eck-er-tIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnom
 onic', `Lam-ber-tAz-imuthalE-
  []
 
 [11]
-Underfull \hbox (badness 10000) in paragraph at lines 772--772
+Underfull \hbox (badness 10000) in paragraph at lines 806--806
 []\T1/ptm/m/it/10 timeseries=None, bins=None, hist=True, kde=True, rug=False, f
 it=None,
  []
 
 [12] [13]
 LaTeX Font Info:    Font shape `T1/pcr/bx/n' in size <9> not available
-(Font)              Font shape `T1/pcr/b/n' tried instead on input line 902.
+(Font)              Font shape `T1/pcr/b/n' tried instead on input line 936.
 
-Underfull \hbox (badness 10000) in paragraph at lines 912--912
+Underfull \hbox (badness 10000) in paragraph at lines 946--946
 \T1/ptm/m/it/10 to-cor-rect_param=1950\T1/ptm/m/n/10 , \T1/ptm/m/it/10 in-terp_
 method='interpolation'\T1/ptm/m/n/10 , \T1/ptm/m/it/10 in-terp_step=None\T1/ptm
 /m/n/10 ,
  []
 
 [14] [15]
-Underfull \hbox (badness 10000) in paragraph at lines 1135--1135
+Underfull \hbox (badness 10000) in paragraph at lines 1169--1169
 []\T1/ptm/m/it/10 timeseries=None\T1/ptm/m/n/10 , \T1/ptm/m/it/10 lim=None\T1/p
 tm/m/n/10 , \T1/ptm/m/it/10 wwz=False\T1/ptm/m/n/10 , \T1/ptm/m/it/10 psd=True\
 T1/ptm/m/n/10 , \T1/ptm/m/it/10 wwz_default=True\T1/ptm/m/n/10 ,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1148--1163
+Underfull \hbox (badness 10000) in paragraph at lines 1182--1197
 []\T1/ptm/m/n/10 `freqs':None, `c':1/(8*np.pi**2), `Neff':3, `Neff_coi':3,
  []
 
 
-Underfull \hbox (badness 7397) in paragraph at lines 1173--1187
+Underfull \hbox (badness 7397) in paragraph at lines 1207--1221
 \T1/ptm/m/n/10 `params' : [^^Pde-fault^^Q,4,0,1], `gaus-sian-ize': False, `stan
 -dard-ize':True, `Neff':3,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1198--1223
+Underfull \hbox (badness 10000) in paragraph at lines 1232--1257
 []\T1/ptm/m/n/10 `coi':coi, `lev-els':None, `tick_range':None, `yt-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1198--1223
+Underfull \hbox (badness 10000) in paragraph at lines 1232--1257
 \T1/ptm/m/n/10 icks':None, `yt-icks_label': None, `ylim':None, `xticks':None, `
 xla-bels':None,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1198--1223
+Underfull \hbox (badness 10000) in paragraph at lines 1232--1257
 \T1/ptm/m/n/10 `fig-size':[20,8], `clr_map':'OrRd', `cbar_drawedges':False, `co
 ne_alpha':0.5,
  []
 
 [16]
-Underfull \hbox (badness 10000) in paragraph at lines 1232--1255
+Underfull \hbox (badness 10000) in paragraph at lines 1266--1289
 []\T1/ptm/m/n/10 `linewidth':None, `color': sns.xkcd_rgb[^^Pdenim blue^^Q],
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1232--1255
+Underfull \hbox (badness 10000) in paragraph at lines 1266--1289
 \T1/ptm/m/n/10 `ar1_lmstyle':'-`, `ar1_linewidth':1, `pe-riod_ticks':None, `pe-
 riod_tickslabel':None,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1232--1255
+Underfull \hbox (badness 10000) in paragraph at lines 1266--1289
 \T1/ptm/m/n/10 `psd_lim':None, `pe-riod_lim':None, `al-pha':1, `fig-size':[20,8
 ], `la-bel':'PSD',
  []
 
-LaTeX Font Info:    Try loading font information for TS1+pcr on input line 1344
+LaTeX Font Info:    Try loading font information for TS1+pcr on input line 1378
 .
 (/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/ts1pcr.fd
 File: ts1pcr.fd 2001/06/04 font definitions for TS1/pcr.
 ) [17]
-Underfull \hbox (badness 10000) in paragraph at lines 1400--1405
+Underfull \hbox (badness 10000) in paragraph at lines 1434--1439
 []\T1/ptm/m/n/10 DeltaR
  []
 
 [18]
-Underfull \hbox (badness 5431) in paragraph at lines 1486--1488
+Underfull \hbox (badness 5431) in paragraph at lines 1520--1522
 []\T1/ptm/m/n/10 Note: sam-plePaths
  []
 
 [19]
-Underfull \hbox (badness 10000) in paragraph at lines 1526--1530
+Underfull \hbox (badness 10000) in paragraph at lines 1560--1564
 []\T1/ptm/m/n/10 process with ap-pli-ca-tion to
  []
 
 
-Underfull \hbox (badness 5985) in paragraph at lines 1534--1539
+Underfull \hbox (badness 5985) in paragraph at lines 1568--1573
 []\T1/ptm/m/n/10 and Hunt-ley, B. (2008). A flex-i-
  []
 
 
-Underfull \hbox (badness 7613) in paragraph at lines 1534--1539
+Underfull \hbox (badness 7613) in paragraph at lines 1568--1573
 \T1/ptm/m/n/10 ble ap-proach to as-sess-ing syn-chrone-ity of past events us-in
 g Bayesian re-con-struc-
  []
@@ -1101,77 +1101,77 @@ g Bayesian re-con-struc-
 [20]
 Chapter 4.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1589--1598
+Underfull \hbox (badness 10000) in paragraph at lines 1623--1632
 []\T1/ptm/m/n/10 `Robinson' (de-fault), `Plate-Car-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1589--1598
+Underfull \hbox (badness 10000) in paragraph at lines 1623--1632
 \T1/ptm/m/n/10 ree', `Al-bert-sE-qualArea', `Az-imuthalE-quidis-tant','Equidist
 antConic','LambertConformal',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1589--1598
+Underfull \hbox (badness 10000) in paragraph at lines 1623--1632
 \T1/ptm/m/n/10 `Lam-bert-Cylin-dri-cal','Mercator','Miller','Mollweide','Orthog
 raphic', `Si-nu-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1589--1598
+Underfull \hbox (badness 10000) in paragraph at lines 1623--1632
 \T1/ptm/m/n/10 soidal','Stereographic','TransverseMercator','UTM', `In-ter-rupt
 -ed-Good-e-Ho-molo-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1589--1598
+Underfull \hbox (badness 10000) in paragraph at lines 1623--1632
 \T1/ptm/m/n/10 sine','RotatedPole','OSGB','EuroPP', `Geo-sta-tion-ary','Nearsid
 ePerspective','EckertI','EckertII',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1589--1598
+Underfull \hbox (badness 10000) in paragraph at lines 1623--1632
 \T1/ptm/m/n/10 `Eck-er-tIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnom
 onic', `Lam-ber-tAz-imuthalE-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1619--1619
+Underfull \hbox (badness 10000) in paragraph at lines 1653--1653
 \T1/ptm/m/it/10 bor-ders=False, rivers=False, lakes=False, fig-size=[10, 4], ax
 =None,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1636--1645
+Underfull \hbox (badness 10000) in paragraph at lines 1670--1679
 []\T1/ptm/m/n/10 `Robinson' (de-fault), `Plate-Car-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1636--1645
+Underfull \hbox (badness 10000) in paragraph at lines 1670--1679
 \T1/ptm/m/n/10 ree', `Al-bert-sE-qualArea', `Az-imuthalE-quidis-tant','Equidist
 antConic','LambertConformal',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1636--1645
+Underfull \hbox (badness 10000) in paragraph at lines 1670--1679
 \T1/ptm/m/n/10 `Lam-bert-Cylin-dri-cal','Mercator','Miller','Mollweide','Orthog
 raphic', `Si-nu-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1636--1645
+Underfull \hbox (badness 10000) in paragraph at lines 1670--1679
 \T1/ptm/m/n/10 soidal','Stereographic','TransverseMercator','UTM', `In-ter-rupt
 -ed-Good-e-Ho-molo-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1636--1645
+Underfull \hbox (badness 10000) in paragraph at lines 1670--1679
 \T1/ptm/m/n/10 sine','RotatedPole','OSGB','EuroPP', `Geo-sta-tion-ary','Nearsid
 ePerspective','EckertI','EckertII',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1636--1645
+Underfull \hbox (badness 10000) in paragraph at lines 1670--1679
 \T1/ptm/m/n/10 `Eck-er-tIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnom
 onic', `Lam-ber-tAz-imuthalE-
  []
@@ -1179,47 +1179,47 @@ onic', `Lam-ber-tAz-imuthalE-
 [21
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 1667--1671
+Underfull \hbox (badness 10000) in paragraph at lines 1701--1705
 []\T1/ptm/m/n/10 keys should cor-re-spond to
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1697--1705
+Underfull \hbox (badness 10000) in paragraph at lines 1731--1739
 []\T1/ptm/m/n/10 `Robinson', `Plate-Car-ree', `Al-bert-sE-qualArea', `Az-imutha
 lE-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1697--1705
+Underfull \hbox (badness 10000) in paragraph at lines 1731--1739
 \T1/ptm/m/n/10 quidis-tant','EquidistantConic','LambertConformal', `Lam-bert-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1697--1705
+Underfull \hbox (badness 10000) in paragraph at lines 1731--1739
 \T1/ptm/m/n/10 Cylin-dri-cal','Mercator','Miller','Mollweide','Orthographic' (D
 e-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1697--1705
+Underfull \hbox (badness 10000) in paragraph at lines 1731--1739
 \T1/ptm/m/n/10 fault), `Si-nu-soidal','Stereographic','TransverseMercator','UTM
 ',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1697--1705
+Underfull \hbox (badness 10000) in paragraph at lines 1731--1739
 \T1/ptm/m/n/10 `In-ter-rupt-ed-Good-e-Ho-molo-sine','RotatedPole','OSGB','EuroP
 P',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1697--1705
+Underfull \hbox (badness 10000) in paragraph at lines 1731--1739
 \T1/ptm/m/n/10 `Geo-sta-tion-ary','NearsidePerspective','EckertI','EckertII', `
 Eck-er-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1697--1705
+Underfull \hbox (badness 10000) in paragraph at lines 1731--1739
 \T1/ptm/m/n/10 tIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic', `
 Lam-ber-tAz-imuthalE-
  []
@@ -1227,7 +1227,7 @@ Lam-ber-tAz-imuthalE-
 [22]
 Chapter 5.
 
-Underfull \hbox (badness 6204) in paragraph at lines 1768--1768
+Underfull \hbox (badness 6204) in paragraph at lines 1802--1802
 \T1/ptm/m/it/10 hist_kws={'label': 'His-togram'}, kde_kws={'label': 'KDE fit'},
 
  []
@@ -1243,7 +1243,7 @@ Chapter 6.
 ]
 Chapter 7.
 
-Underfull \hbox (badness 5862) in paragraph at lines 1947--1947
+Underfull \hbox (badness 5862) in paragraph at lines 1981--1981
 []\T1/ptm/m/it/10 x1\T1/ptm/m/n/10 , \T1/ptm/m/it/10 y1\T1/ptm/m/n/10 , \T1/ptm
 /m/it/10 x2\T1/ptm/m/n/10 , \T1/ptm/m/it/10 y2\T1/ptm/m/n/10 , \T1/ptm/m/it/10 
 method='interpolation'\T1/ptm/m/n/10 , \T1/ptm/m/it/10 step=None\T1/ptm/m/n/10 
@@ -1261,12 +1261,12 @@ Chapter 9.
 ] [36]
 Chapter 10.
 
-Underfull \hbox (badness 10000) in paragraph at lines 2688--2693
+Underfull \hbox (badness 10000) in paragraph at lines 2722--2727
 []
  []
 
 
-Underfull \hbox (badness 7415) in paragraph at lines 2745--2745
+Underfull \hbox (badness 7415) in paragraph at lines 2779--2779
 []\T1/ptm/m/it/10 ys, ts, tau=None, freqs=None, c=0.012665147955292222, Neff=3,
 
  []
@@ -1274,103 +1274,103 @@ Underfull \hbox (badness 7415) in paragraph at lines 2745--2745
 [37
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 2801--2801
+Underfull \hbox (badness 10000) in paragraph at lines 2835--2835
 \T1/ptm/m/it/10 de-trend=False, params=['default', 4, 0, 1], gaus-sian-
  []
 
 [38]
-Underfull \hbox (badness 10000) in paragraph at lines 2913--2913
+Underfull \hbox (badness 10000) in paragraph at lines 2947--2947
 []\T1/ptm/m/it/10 ys1, ts1, ys2, ts2, smooth_factor=0.25, tau=None, freqs=None,
 
  []
 
 
-Underfull \hbox (badness 7522) in paragraph at lines 2913--2913
+Underfull \hbox (badness 7522) in paragraph at lines 2947--2947
 \T1/ptm/m/it/10 params=['default', 4, 0, 1], gaus-sian-ize=False, stan-dard-ize
 =True,
  []
 
 [39]
-Underfull \hbox (badness 10000) in paragraph at lines 2967--2967
+Underfull \hbox (badness 10000) in paragraph at lines 3001--3001
 []\T1/ptm/m/it/10 wwa, freqs, tau, AR1_q=None, coi=None, lev-els=None,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2967--2967
+Underfull \hbox (badness 10000) in paragraph at lines 3001--3001
 \T1/ptm/m/it/10 ax=None, xla-bel='Year CE', yla-bel='Period (years)',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2967--2967
+Underfull \hbox (badness 10000) in paragraph at lines 3001--3001
 \T1/ptm/m/it/10 cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3007--3007
+Underfull \hbox (badness 10000) in paragraph at lines 3041--3041
 []\T1/ptm/m/it/10 res_xwc, pt=0.5, lev-els=None, tick_range=None,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3011--3014
+Underfull \hbox (badness 10000) in paragraph at lines 3045--3048
 []\T1/ptm/m/n/10 vector of fre-quency,
  []
 
 [40]
-Underfull \hbox (badness 10000) in paragraph at lines 3071--3071
+Underfull \hbox (badness 10000) in paragraph at lines 3105--3105
 []\T1/ptm/m/it/10 psd, freqs, lmstyle='-', linewidth=None, color='#3b5b92',
  []
 
 
-Underfull \hbox (badness 8038) in paragraph at lines 3071--3071
+Underfull \hbox (badness 8038) in paragraph at lines 3105--3105
 \T1/ptm/m/it/10 ar1_lmstyle='-', ar1_linewidth=None, pe-riod_ticks=None, pe-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3115--3115
+Underfull \hbox (badness 10000) in paragraph at lines 3149--3149
 \T1/ptm/m/it/10 c2=0.001, nMC=200, nproc=1, de-trend=False,
  []
 
 
-Underfull \hbox (badness 7415) in paragraph at lines 3115--3115
+Underfull \hbox (badness 7415) in paragraph at lines 3149--3149
 \T1/ptm/m/it/10 params=['default', 4, 0, 1], gaus-sian-ize=False, stan-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3115--3115
+Underfull \hbox (badness 10000) in paragraph at lines 3149--3149
 \T1/ptm/m/it/10 dard-ize=True, lev-els=None, method='Kirchner_f2py',
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3115--3115
+Underfull \hbox (badness 10000) in paragraph at lines 3149--3149
 \T1/ptm/m/it/10 anti_alias=False, pe-riod_ticks=None, ts_color=None,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3115--3115
+Underfull \hbox (badness 10000) in paragraph at lines 3149--3149
 \T1/ptm/m/it/10 wwa_ylabel=None, psd_lmstyle='-', psd_lim=None,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3115--3115
+Underfull \hbox (badness 10000) in paragraph at lines 3149--3149
 \T1/ptm/m/it/10 font_scale=1.5, pe-riod_S_str='beta_I', pe-riod_S=[0.125,
  []
 
 [41]
-Underfull \hbox (badness 10000) in paragraph at lines 3174--3174
+Underfull \hbox (badness 10000) in paragraph at lines 3208--3208
 []\T1/ptm/m/it/10 ys, ts, ntau=501, dcon=0.001, stan-dard-ize=False,
  []
 
 [42]
 Chapter 11.
 
-Underfull \hbox (badness 10000) in paragraph at lines 3293--3293
+Underfull \hbox (badness 10000) in paragraph at lines 3327--3327
 []\T1/ptm/m/it/10 ages\T1/ptm/m/n/10 , \T1/ptm/m/it/10 agesStd\T1/ptm/m/n/10 , 
 \T1/ptm/m/it/10 po-si-tions\T1/ptm/m/n/10 , \T1/ptm/m/it/10 re-jec-tAges=None\T
 1/ptm/m/n/10 , \T1/ptm/m/it/10 po-si-tion-sThick-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3293--3293
+Underfull \hbox (badness 10000) in paragraph at lines 3327--3327
 \T1/ptm/m/it/10 thin=8\T1/ptm/m/n/10 , \T1/ptm/m/it/10 extractDate=-69\T1/ptm/m
 /n/10 , \T1/ptm/m/it/10 max-Ex-trap=500\T1/ptm/m/n/10 , \T1/ptm/m/it/10 thetaMh
 Sd=0.5\T1/ptm/m/n/10 ,
@@ -1379,32 +1379,32 @@ Sd=0.5\T1/ptm/m/n/10 ,
 [43
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 3327--3332
+Underfull \hbox (badness 10000) in paragraph at lines 3361--3366
 []\T1/ptm/m/n/10 DeltaR
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3366--3368
+Underfull \hbox (badness 10000) in paragraph at lines 3400--3402
 []\T1/ptm/m/n/10 for the Com-pound
  []
 
 [44]
-Underfull \hbox (badness 10000) in paragraph at lines 3398--3402
+Underfull \hbox (badness 10000) in paragraph at lines 3432--3436
 []\T1/ptm/m/n/10 process with ap-pli-ca-tion to
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3425--3425
+Underfull \hbox (badness 10000) in paragraph at lines 3459--3459
 \T1/ptm/m/it/10 me-di-an-Line-Color='black', me-di-an-LineWidth=2.0, CIFill-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 3425--3425
+Underfull \hbox (badness 10000) in paragraph at lines 3459--3459
 \T1/ptm/m/it/10 Color='Silver', sam-plePaths=True, sam-plePath-Num-ber=10,
  []
 
 
-Underfull \hbox (badness 5431) in paragraph at lines 3471--3473
+Underfull \hbox (badness 5431) in paragraph at lines 3505--3507
 []\T1/ptm/m/n/10 Note: sam-plePaths
  []
 
@@ -1461,21 +1461,21 @@ pyleo-
 [50
 
 ])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3509.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 3509.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3543.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 3543.
  (./Pyleoclim.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3509.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3509.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3543.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3543.
 
 Package rerunfilecheck Info: File `Pyleoclim.out' has not changed.
-(rerunfilecheck)             Checksum: 2010E7D35124C267DCCCE8FE6D416B12;6277.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3509.
+(rerunfilecheck)             Checksum: 488EDB5AAE04E3A6C4E48793B7E31486;6438.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 3543.
  ) 
 Here is how much of TeX's memory you used:
- 13657 strings out of 492649
- 193212 string characters out of 6129622
- 290538 words of memory out of 5000000
- 17058 multiletter control sequences out of 15000+600000
+ 13660 strings out of 492649
+ 193271 string characters out of 6129622
+ 290586 words of memory out of 5000000
+ 17060 multiletter control sequences out of 15000+600000
  50475 words of font info for 72 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
  37i,12n,51p,802b,621s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1488,10 +1488,10 @@ type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/u
 rw/times/utmb8a.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/urw/times/u
 tmr8a.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1/urw/times/utmri8a.pfb
 >
-Output written on Pyleoclim.pdf (54 pages, 221194 bytes).
+Output written on Pyleoclim.pdf (54 pages, 221699 bytes).
 PDF statistics:
- 723 PDF objects out of 1000 (max. 8388607)
- 647 compressed objects within 7 object streams
- 183 named destinations out of 1000 (max. 500000)
- 373 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 728 PDF objects out of 1000 (max. 8388607)
+ 652 compressed objects within 7 object streams
+ 184 named destinations out of 1000 (max. 500000)
+ 381 words of extra memory for PDF output out of 10000 (max. 10000000)
 

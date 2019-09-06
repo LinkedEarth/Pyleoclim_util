@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Installation &#8212; Pyleoclim 0.4.9 documentation</title>
+    <title>Installation &#8212; Pyleoclim 0.4.10 documentation</title>
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,7 +29,7 @@
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.10 documentation</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -40,6 +40,7 @@
 <li><a class="reference internal" href="#installing-anaconda-or-miniconda">Installing Anaconda or Miniconda</a></li>
 <li><a class="reference internal" href="#creating-a-new-anaconda-environment">Creating a new Anaconda environment</a></li>
 <li><a class="reference internal" href="#installing-pyleoclim">Installing Pyleoclim</a></li>
+<li><a class="reference internal" href="#building-from-source">Building from source</a></li>
 <li><a class="reference internal" href="#installing-r">Installing R</a></li>
 </ul>
 </li>
@@ -125,6 +126,15 @@ conda install -c conda-forge cartopy</p>
 <div><p>pip install pyleoclim</p>
 </div></blockquote>
 </div>
+<div class="section" id="building-from-source">
+<h2>Building from source<a class="headerlink" href="#building-from-source" title="Permalink to this headline">¶</a></h2>
+<p>Note that the pip command line above will trigger the installation of (most of) the dependencies, as well as the local compilation of the Fortran code for WWZ with the GNU Fortran compiler gfortran. If you have the Intel’s Fortran compiler ifort installed, then further accerlation for WWZ could be achieved by compiling the Fortran code with ifort, and below are the steps:</p>
+<ul class="simple">
+<li><p>download the source code, either via git clone or just download the .zip file</p></li>
+<li><p>modify setup.py by commenting out the line of extra_f90_compile_args for gfortran, and use the line below for ifort</p></li>
+<li><p>run python setup.py build_ext –fcompiler=intelem &amp;&amp; python setup.py install</p></li>
+</ul>
+</div>
 <div class="section" id="installing-r">
 <h2>Installing R<a class="headerlink" href="#installing-r" title="Permalink to this headline">¶</a></h2>
 <p>Some functionalities require an installation of <a class="reference external" href="https://www.r-project.org?">R</a>.</p>
@@ -152,7 +162,7 @@ Note that Rstudio is not needed when calling R from Python.</p>
         <li class="right" >
           <a href="Introduction.html" title="Pyleoclim"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.9 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">Pyleoclim 0.4.10 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

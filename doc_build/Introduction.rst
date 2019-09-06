@@ -58,33 +58,39 @@ Pyleoclim is published through Pypi and easily installed via pip::
 
   pip install pyleoclim
 
+Note that the pip command line above will trigger the installation of (most of) the dependencies, as well as the local compilation of the Fortran code for WWZ with the GNU Fortran compiler gfortran. If you have the Intel's Fortran compiler ifort installed, then further accerlation for WWZ could be achieved by compiling the Fortran code with ifort, and below are the steps:
+
+- download the source code, either via git clone or just download the .zip file
+- modify setup.py by commenting out the line of extra_f90_compile_args for gfortran, and use the line below for ifort
+- run python setup.py build_ext --fcompiler=intelem && python setup.py install.
+
 Some functionalities require R. See Installation for details.
 
 Version Information
 ```````````````````
 **Current Version**
-
-| 0.4.9: Major bug fixes; mapping module based on cartopy; compatibility with latest numpy package
+0.4.10: Support local compilation of the Fortran code for WWZ; precompiled .so files have been removed.
 
 **Past Version**
-| 0.4.8: Add support of f2py WWZ for Linux
-| 0.4.7: Update to coherence function
-| 0.4.0: New functionalities: map nearest records by archive type, plot ensemble time series, age modelling through Bchron.
-| 0.3.1: New functionalities: segment a timeseries using a gap detection criteria, update to summary plot to perform spectral analysis
-| 0.3.0: Compatibility with LiPD 1.3 and Spectral module added
-| 0.2.5: Fix error on loading (Looking for Spectral Module)
-| 0.2.4: Fix load error from init
-| 0.2.3: Freeze LiPD version to 1.2 to avoid conflicts with 1.3
-| 0.2.2: Change progressbar to tqdm and add standardization function
-| 0.2.1: Update package requirements
-| 0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.
-| 0.1.4: Rename functions using camel case convention and consistency with LiPD utilities version 0.1.8.5
-| 0.1.3: Compatible with LiPD utilities version 0.1.8.5
-|        Function openLiPD() renamed openLiPDs()
-| 0.1.2: Compatible with LiPD utilities version 0.1.8.3
-|        Uses Basemap instead of cartopy
-| 0.1.1: Freezes the package prior to version 0.1.8.2 of LiPD utilities
-| 0.1.0: First release
+0.4.9: Major bug fixes; mapping module based on cartopy; compatibility with latest numpy package
+0.4.8: Add support of f2py WWZ for Linux
+0.4.7: Update to coherence function
+0.4.0: New functionalities: map nearest records by archive type, plot ensemble time series, age modelling through Bchron.
+0.3.1: New functionalities: segment a timeseries using a gap detection criteria, update to summary plot to perform spectral analysis
+0.3.0: Compatibility with LiPD 1.3 and Spectral module added
+0.2.5: Fix error on loading (Looking for Spectral Module)
+0.2.4: Fix load error from init
+0.2.3: Freeze LiPD version to 1.2 to avoid conflicts with 1.3
+0.2.2: Change progressbar to tqdm and add standardization function
+0.2.1: Update package requirements
+0.2.0: Restructure the package so that the main functions can be called without the use of a LiPD files and associated timeseries objects.
+0.1.4: Rename functions using camel case convention and consistency with LiPD utilities version 0.1.8.5
+0.1.3: Compatible with LiPD utilities version 0.1.8.5
+        Function openLiPD() renamed openLiPDs()
+0.1.2: Compatible with LiPD utilities version 0.1.8.3
+        Uses Basemap instead of cartopy
+0.1.1: Freezes the package prior to version 0.1.8.2 of LiPD utilities
+0.1.0: First release
 
 
 Quickstart guide
