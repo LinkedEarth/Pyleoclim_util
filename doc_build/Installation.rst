@@ -51,6 +51,15 @@ Install Pyleoclim
 
   pip install pyleoclim
 
+Building from source
+""""""""""""""""""""
+
+Note that the pip command line above will trigger the installation of (most of) the dependencies, as well as the local compilation of the Fortran code for WWZ with the GNU Fortran compiler gfortran. If you have the Intel's Fortran compiler ifort installed, then further accerlation for WWZ could be achieved by compiling the Fortran code with ifort, and below are the steps:
+
+- download the source code, either via git clone or just download the .zip file
+- modify setup.py by commenting out the line of extra_f90_compile_args for gfortran, and use the line below for ifort
+- run python setup.py build_ext --fcompiler=intelem && python setup.py install
+
 Installing R
 """"""""""""
 

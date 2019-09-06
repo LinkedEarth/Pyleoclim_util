@@ -7,7 +7,7 @@ from setuptools import find_packages
 from numpy.distutils.core import Extension
 from numpy.distutils.core import setup
 
-version = '0.5.0'
+version = '0.4.10'
 
 # Read the readme file contents into variable
 def read(fname):
@@ -50,7 +50,7 @@ setup(
     author='Deborah Khider',
     author_email='khider@usc.edu',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
-    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/0.4.9',
+    download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/'+version,
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
     ext_modules=[f2py_wwz],
