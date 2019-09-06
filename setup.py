@@ -27,6 +27,7 @@ elif sys.argv[-1] == 'publishtest':
     #os.system('python3 setup.py register -r pypitest')
     os.system('python3 setup.py sdist')
     os.system('twine upload --repository-url https://test.pypi.org/legacy/ dist/pyleoclim-'+version+'tar.gz')
+
     sys.exit()
 
 f2py_wwz = Extension(
