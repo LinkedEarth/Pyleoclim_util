@@ -1131,7 +1131,7 @@ class WaveletAnalysis(object):
 
         return wwz_func
 
-    def prepare_wwz(self, ys, ts, freqs='nfft', tau=None, len_bd=0, bc_mode='reflect', reflect_type='odd', **kwargs):
+    def prepare_wwz(self, ys, ts, freqs=None, tau=None, len_bd=0, bc_mode='reflect', reflect_type='odd', **kwargs):
         ''' Return the truncated time series with NaNs deleted and estimate frequency vector and tau
 
         Args:
@@ -1202,7 +1202,8 @@ class WaveletAnalysis(object):
         ts_cut = ts[(np.min(tau) <= ts) & (ts <= np.max(tau))]
         ys_cut = ys[(np.min(tau) <= ts) & (ts <= np.max(tau))]
 
-        freqs = self.make_freq_vector(ts_cut, method = 'nfft')
+        if freqs is None:
+            freqs = self.make_freq_vector(ts_cut, method='nfft')
 
         return ys_cut, ts_cut, freqs, tau
 
@@ -1931,6 +1932,25 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
 
     wa = WaveletAnalysis()
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
+
+    if tau is None:
+        lb1, ub1 = np.min(ts1), np.max(ts1)
+        lb2, ub2 = np.min(ts2), np.max(ts2)
+        lb = np.max([lb1, lb2])
+        ub = np.min([ub1, ub2])
+
+        inside = ts1[(ts1>=lb) & (ts1<=ub)]
+        tau = np.linspace(lb, ub, np.size(inside)//10)
+        print(f'Setting tau={tau[:3]}...{tau[-3:]}, ntau={np.size(tau)}')
+
+    if freqs is None:
+        s0 = 2*np.median(np.diff(ts1))
+        nv = 12
+        a0 = 2**(1/nv)
+        noct = np.floor(np.log2(np.size(ts1)))-1
+        scale = s0*a0**(np.arange(noct*nv+1))
+        freqs = 1/scale[::-1]
+        print(f'Setting freqs={freqs[:3]}...{freqs[-3:]}, nfreqs={np.size(freqs)}')
 
     ys1_cut, ts1_cut, freqs1, tau1 = wa.prepare_wwz(ys1, ts1, freqs=freqs, tau=tau)
     ys2_cut, ts2_cut, freqs2, tau2 = wa.prepare_wwz(ys2, ts2, freqs=freqs, tau=tau)
