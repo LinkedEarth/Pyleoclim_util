@@ -120,7 +120,9 @@ def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None
         x2 (array): x-axis values of the second timeseries
         y2 (array): y-axis values of the second timeseries
         method (str): Which method to use to get the timeseries on the same x axis.
-            Valid entries: 'interpolation' (default), 'bin'
+            Valid entries: 'interpolation' (default), 'bin', 'None'. 'None' only 
+            cuts the timeseries to the common period but does not attempt
+            to generate a common time axis
         step (float): The interpolation step. Default is mean resolution
         of lowest resolution series
         start (float): where/when to start. Default is the maximum of the minima of
@@ -129,13 +131,12 @@ def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None
         the two timeseries
 
     Returns:
-        xi -  the interpolated x-axis \n
-        interp_values1 -  the interpolated y-values for the first timeseries
-        interp_values2 - the intespolated y-values for the second timeseries
+        xi1, xi2 -  the interpolated x-axis \n
+        interp_values1, interp_values2 -  the interpolated y-values
         """
     
     #make sure the method is correct
-    method_list = ['interpolation', 'bin']
+    method_list = ['interpolation', 'bin',None]
     assert method in method_list, 'Invalid method.'
     
     # make sure that x1, y1, x2, y2 are numpy arrays
@@ -156,17 +157,28 @@ def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None
 
     if method == 'interpolation':
     # perform the interpolation
-        xi, interp_values1 = interp(x1, y1, interp_step=step, start=start,
+        xi1, interp_values1 = interp(x1, y1, interp_step=step, start=start,
                                 end=end)
-        xi, interp_values2 = interp(x2, y2, interp_step=step, start=start,
+        xi2, interp_values2 = interp(x2, y2, interp_step=step, start=start,
                                 end=end)
     elif method == 'bin':
-        xi, interp_values1 = binvalues(x1, y1, bin_size=step, start=start,
+        xi1, interp_values1 = binvalues(x1, y1, bin_size=step, start=start,
                                 end=end)
-        xi, interp_values2 = binvalues(x2, y2, bin_size=step, start=start,
+        xi2, interp_values2 = binvalues(x2, y2, bin_size=step, start=start,
                                 end=end)
+    elif method == None:
+        min_idx1 = np.where(x1>=start)[0][0]
+        min_idx2 = np.where(x2>=start)[0][0]
+        max_idx1 = np.where(x1<=end)[0][-1]
+        max_idx2 = np.where(x2<=end)[0][-1]
+        
+        xi1 = x1[min_idx1:max_idx1+1]
+        xi2 = x2[min_idx2:max_idx2+1]
+        interp_values1 = y1[min_idx1:max_idx1+1]
+        interp_values2 = y2[min_idx1:max_idx1+1]
 
-    return xi, interp_values1, interp_values2
+
+    return xi1, xi2, interp_values1, interp_values2
 
 
 def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
@@ -363,11 +375,11 @@ def gaussianize_single(X_single):
     return Xn_single
 
 
-def detrend(y, x = None, method = "linear", params = ["default",4,0,1]):
+def detrend(y, x = None, method = "savitzy-golay", params = ["default",4,0,1]):
     """Detrend a timeseries according to three methods
 
-    Detrending methods include, "linear" (default), "constant", and using a low-pass
-        Savitzky-Golay filters.
+    Detrending methods include, "linear", "constant", and using a low-pass
+        Savitzky-Golay filters (default).
 
     Args:
         y (array): The series to be detrended.
