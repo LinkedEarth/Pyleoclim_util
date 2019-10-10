@@ -101,7 +101,8 @@ class WaveletAnalysis(object):
             ys (array): a time series
             ts (array): The time axis for the timeseries. Necessary for use with
                 the Savitzky-Golay filters method since the series should be evenly spaced.
-            detrend (str): 'linear' - a linear least-squares fit to `ys` is subtracted;
+            detrend (str): 'none'/False/None - no detrending will be applied;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
                            'savitzy-golay' - ys is filtered using the Savitzky-Golay
                                filters and the resulting filtered series is subtracted from y.
@@ -118,10 +119,10 @@ class WaveletAnalysis(object):
 
         '''
 
-        if detrend is True:
-            ys_d = Timeseries.detrend(ys, ts, method=detrend, params=params)
-        else:
+        if detrend is 'none' or detrend is False or detrend is None:
             ys_d = ys
+        else:
+            ys_d = Timeseries.detrend(ys, ts, method=detrend, params=params)
 
         if standardize:
             res, _, _ = Timeseries.standardize(ys_d)
