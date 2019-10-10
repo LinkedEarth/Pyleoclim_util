@@ -399,15 +399,12 @@ def detrend(y, x = None, method = "savitzy-golay", params = ["default",4,0,1]):
     Returns:
         ys (array) - the detrended timeseries.
     """
-    option = ["linear", "constant", "savitzy-golay"]
-    if method not in option:
-        sys.exit("The selected method is not currently supported")
 
     if method == "linear":
         ys = signal.detrend(y,type='linear')
-    if method == 'constant':
+    elif method == 'constant':
         ys = signal.detrend(y,type='constant')
-    else:
+    elif method == "savitzy-golay":
         # Check that the timeseries is uneven and interpolate if needed
         if x is None:
             sys.exit("A time axis is needed for use with the Savitzky-Golay filters method")
@@ -440,6 +437,8 @@ def detrend(y, x = None, method = "savitzy-golay", params = ["default",4,0,1]):
         # Put it all back on the original x axis
         y_filt_x = np.interp(x,x_interp,y_filt)
         ys = y-y_filt_x
+    else:
+        raise KeyError('Not a valid detrending method') 
 
     return ys
 
