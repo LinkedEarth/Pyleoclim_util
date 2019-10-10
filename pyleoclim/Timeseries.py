@@ -15,6 +15,7 @@ import copy
 from scipy import special
 import sys
 from scipy import signal
+from pyhht import EMD
 
 from pyleoclim import Spectral
 
@@ -375,7 +376,7 @@ def gaussianize_single(X_single):
     return Xn_single
 
 
-def detrend(y, x = None, method = "savitzy-golay", params = ["default",4,0,1]):
+def detrend(y, x = None, method = "hht", params = ["default",4,0,1]):
     """Detrend a timeseries according to three methods
 
     Detrending methods include, "linear", "constant", and using a low-pass
@@ -437,8 +438,13 @@ def detrend(y, x = None, method = "savitzy-golay", params = ["default",4,0,1]):
         # Put it all back on the original x axis
         y_filt_x = np.interp(x,x_interp,y_filt)
         ys = y-y_filt_x
+    elif method == "hht":
+        decomposer = EMD(y)
+        imfs = decomposer.decompose()
+        trend = imfs[-1]
+        ys = y-trend
     else:
-        raise KeyError('Not a valid detrending method') 
+        raise KeyError('Not a valid detrending method')
 
     return ys
 

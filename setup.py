@@ -66,6 +66,9 @@ setup(
         "scikit-learn>=0.21.3",
         "pathos>=0.2.4",
         "tqdm>=4.33.0",
-        "rpy2>=3.0.5"],
+        "rpy2>=3.0.5",
+        "tftb",
+        "pyhht",
+    ],
     python_requires=">=3.6.0"
 )
