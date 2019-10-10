@@ -1357,14 +1357,14 @@ def corrSigTs(timeseries1 = None, timeseries2 = None, x_axis = None, \
     #Check that the two timeseries have the same lenght and if not interpolate
     if len(y1) != len(y2):
         print("The two series don't have the same length. Interpolating ...")
-        xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+        xi1, xi2, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
                                                                      method = interp_method,
                                                                      step = interp_step,
                                                                      start =start,
                                                                      end=end)
     elif min(x1) != min(x2) and max(x1) != max(x2):
         print("The two series don't have the same length. Interpolating ...")
-        xi, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+        xi1, xi2, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
                                                                      method = interp_method,
                                                                      step = interp_step,
                                                                      start =start,
@@ -1666,7 +1666,7 @@ def segmentTs(timeseries = None, factor = 2):
     return seg_y, seg_t, n_segs
 
 #"""
-# Spectral Analysis
+# Spectral and Wavelet Analysis
 #"""
 
 def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = True,
@@ -2108,46 +2108,49 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
     return dict_out, fig
 
 ## Cross wavelet transform
-#def xwtTs(timeseries1 = None, timeseries2 = None, lim =None, xwt_default = True):
-#    """Cross Wavelet transform of two timeseries
-#    
-#    Args:
-#        timeseries1 (dict): a LiPD timeseries object (Optional, will prompt for one)
-#        timeseries2 (dict): a LiPD timeseries object (Optional, will prompt for one)
-#        lim (list): Truncate the timeseries between min/max time (e.g., [0,10000])
-#        xwt_default: If True, will use the followinf default parameters
-#            
-#            xwt_default = {'tau': None,
-#                           'feqs': None,
-#                           'c': 1/(8*np.pi**2),
-#                           'Neff': 3,
-#                           'Neff_coi': 6,
-#                           'nproc': 8,
-#                           'detrend': False,
-#                           'params': ['default', 4, 0, 1],
-#                           'gaussianize': False,
-#                           'standardize':True,
-#                           'method':'Kirchner_f2py'}
-#            Modify the values for specific keys to change the default behavior.
-#            See Spectral.xwt for details
-#    """
-#    #Get timeseries
-#    if not timeseries1:
-#        if not 'ts_list' in globals():
-#            fetchTs()
-#        timeseries1 = LipdUtils.getTs(ts_list)
-#    if not timeseries2:
-#        if not 'ts_list' in globals():
-#            fetchTs()
-#        timeseries2 = LipdUtils.getTs(ts_list)
-#    
-#    # Make sure that everything checks out with the time axis
-#    x_axis1 = LipdUtils.checkTimeAxis(timeseries1)
-#    x_axis2 = LipdUtils.checkTimeAxis(timeseries2)
-#    
-#    assert x_axis1 == x_axis2, 'Timeseries should be using the same age representation'
-#    
-#    # Check the units
+def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None, 
+          autocorrect = True, autocorrect_param =1950, xwt_default = True,
+          fig = True, xwcplot_default = True,
+          saveFig = False, dir = None, format = "eps"):
+    """Cross Wavelet transform of two timeseries
+    
+    Args:
+        timeseries1 (dict): a LiPD timeseries object (Optional, will prompt for one)
+        timeseries2 (dict): a LiPD timeseries object (Optional, will prompt for one)
+        lim (list): Truncate the timeseries between min/max time (e.g., [0,10000])
+        xwt_default: If True, will use the followinf default parameters
+            
+            xwt_default = {'tau': None,
+                           'feqs': None,
+                           'c': 1/(8*np.pi**2),
+                           'Neff': 3,
+                           'Neff_coi': 6,
+                           'nproc': 8,
+                           'detrend': False,
+                           'params': ['default', 4, 0, 1],
+                           'gaussianize': False,
+                           'standardize':True,
+                           'method':'Kirchner_f2py'}
+            Modify the values for specific keys to change the default behavior.
+            See Spectral.xwt for details
+    """
+    #Get timeseries
+    if not timeseries1:
+        if not 'ts_list' in globals():
+            fetchTs()
+        timeseries1 = LipdUtils.getTs(ts_list)
+    if not timeseries2:
+        if not 'ts_list' in globals():
+            fetchTs()
+        timeseries2 = LipdUtils.getTs(ts_list)
+    
+    # Make sure that everything checks out with the time axis
+    x_axis1 = LipdUtils.checkTimeAxis(timeseries1)
+    x_axis2 = LipdUtils.checkTimeAxis(timeseries2)
+    
+    assert x_axis1 == x_axis2, 'Timeseries should be using the same age representation'
+    
+    # Check the units
         
 
 """
