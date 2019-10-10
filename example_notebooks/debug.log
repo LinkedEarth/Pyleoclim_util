@@ -1,0 +1,542 @@
+2019-10-10 14:37:54,826 [DEBUG] matplotlib: $HOME=/Users/deborahkhider
+2019-10-10 14:37:54,827 [DEBUG] matplotlib: CONFIGDIR=/Users/deborahkhider/.matplotlib
+2019-10-10 14:37:54,828 [DEBUG] matplotlib: matplotlib data path: //anaconda3/envs/py36P/lib/python3.6/site-packages/matplotlib/mpl-data
+2019-10-10 14:37:54,833 [DEBUG] matplotlib: loaded rc file //anaconda3/envs/py36P/lib/python3.6/site-packages/matplotlib/mpl-data/matplotlibrc
+2019-10-10 14:37:54,835 [DEBUG] matplotlib: matplotlib version 3.1.0
+2019-10-10 14:37:54,835 [DEBUG] matplotlib: interactive is False
+2019-10-10 14:37:54,836 [DEBUG] matplotlib: platform is darwin
+2019-10-10 14:37:54,836 [DEBUG] matplotlib: loaded modules: ['builtins', 'sys', '_frozen_importlib', '_imp', '_warnings', '_thread', '_weakref', '_frozen_importlib_external', '_io', 'marshal', 'posix', 'zipimport', 'encodings', 'codecs', '_codecs', 'encodings.aliases', 'encodings.utf_8', '_signal', '__main__', 'encodings.latin_1', 'io', 'abc', '_weakrefset', '_bootlocale', '_locale', 'site', 'os', 'errno', 'stat', '_stat', 'posixpath', 'genericpath', 'os.path', '_collections_abc', '_sitebuiltins', 'sysconfig', '_sysconfigdata_m_darwin_darwin', '_osx_support', 're', 'enum', 'types', 'functools', '_functools', 'collections', 'operator', '_operator', 'keyword', 'heapq', '_heapq', 'itertools', 'reprlib', '_collections', 'weakref', 'collections.abc', 'sre_compile', '_sre', 'sre_parse', 'sre_constants', 'copyreg', 'importlib', 'importlib._bootstrap', 'importlib._bootstrap_external', 'warnings', 'importlib.util', 'importlib.abc', 'importlib.machinery', 'contextlib', 'mpl_toolkits', 'sphinxcontrib', 'runpy', 'pkgutil', 'ipykernel', 'ipykernel._version', 'ipykernel.connect', '__future__', 'json', 'json.decoder', 'json.scanner', '_json', 'json.encoder', 'subprocess', 'time', 'signal', '_posixsubprocess', 'select', 'selectors', 'math', 'threading', 'traceback', 'linecache', 'tokenize', 'token', 'IPython', 'IPython.core', 'IPython.core.getipython', 'IPython.core.release', 'IPython.core.application', 'atexit', 'copy', 'glob', 'fnmatch', 'logging', 'string', '_string', 'shutil', 'zlib', 'bz2', '_compression', '_bz2', 'lzma', '_lzma', 'pwd', 'grp', 'traitlets', 'traitlets.traitlets', 'inspect', 'ast', '_ast', 'dis', 'opcode', '_opcode', 'six', 'struct', '_struct', 'traitlets.utils', 'traitlets.utils.getargspec', 'traitlets.utils.importstring', 'ipython_genutils', 'ipython_genutils._version', 'ipython_genutils.py3compat', 'ipython_genutils.encoding', 'locale', 'platform', 'traitlets.utils.sentinel', 'traitlets.utils.bunch', 'traitlets._version', 'traitlets.config', 'traitlets.config.application', 'decorator', 'traitlets.config.configurable', 'traitlets.config.loader', 'argparse', 'textwrap', 'gettext', 'ipython_genutils.path', 'random', 'hashlib', '_hashlib', '_blake2', '_sha3', 'bisect', '_bisect', '_random', 'ipython_genutils.text', 'ipython_genutils.importstring', 'IPython.core.crashhandler', 'pprint', 'IPython.core.ultratb', 'pydoc', 'urllib', 'urllib.parse', 'IPython.core.debugger', 'bdb', 'IPython.utils', 'IPython.utils.PyColorize', 'IPython.utils.coloransi', 'IPython.utils.ipstruct', 'IPython.utils.colorable', 'pygments', 'pygments.util', 'IPython.utils.py3compat', 'IPython.utils.encoding', 'IPython.core.excolors', 'IPython.testing', 'IPython.testing.skipdoctest', 'pdb', 'cmd', 'code', 'codeop', 'IPython.core.display_trap', 'IPython.utils.path', 'IPython.utils.process', 'IPython.utils._process_posix', 'pexpect', 'pexpect.exceptions', 'pexpect.utils', 'pexpect.expect', 'pexpect.pty_spawn', 'pty', 'tty', 'termios', 'ptyprocess', 'ptyprocess.ptyprocess', 'fcntl', 'resource', 'ptyprocess.util', 'pexpect.spawnbase', 'pexpect.run', 'IPython.utils._process_common', 'shlex', 'IPython.utils.decorators', 'IPython.utils.data', 'IPython.utils.terminal', 'IPython.utils.sysinfo', 'IPython.utils._sysinfo', 'IPython.core.profiledir', 'IPython.paths', 'tempfile', 'IPython.utils.importstring', 'IPython.terminal', 'IPython.terminal.embed', 'IPython.core.compilerop', 'IPython.core.magic_arguments', 'IPython.core.error', 'IPython.utils.text', 'pathlib', 'ntpath', 'IPython.core.magic', 'getopt', 'IPython.core.oinspect', 'IPython.core.page', 'IPython.core.display', 'binascii', 'mimetypes', 'IPython.lib', 'IPython.lib.security', 'getpass', 'IPython.lib.pretty', 'datetime', '_datetime', 'IPython.utils.openpy', 'IPython.utils.dir2', 'IPython.utils.wildcard', 'pygments.lexers', 'pygments.lexers._mapping', 'pygments.modeline', 'pygments.plugin', 'pygments.lexers.python', 'pygments.lexer', 'pygments.filter', 'pygments.filters', 'pygments.token', 'pygments.regexopt', 'pygments.unistring', 'pygments.formatters', 'pygments.formatters._mapping', 'pygments.formatters.html', 'pygments.formatter', 'pygments.styles', 'IPython.core.inputtransformer2', 'typing', 'typing.io', 'typing.re', 'IPython.core.interactiveshell', 'asyncio', 'asyncio.base_events', 'concurrent', 'concurrent.futures', 'concurrent.futures._base', 'concurrent.futures.process', 'queue', 'multiprocessing', 'multiprocessing.context', 'multiprocessing.process', 'multiprocessing.reduction', 'pickle', '_compat_pickle', '_pickle', 'socket', '_socket', 'array', '__mp_main__', 'multiprocessing.connection', '_multiprocessing', 'multiprocessing.util', 'concurrent.futures.thread', 'asyncio.compat', 'asyncio.coroutines', 'asyncio.constants', 'asyncio.events', 'asyncio.base_futures', 'asyncio.log', 'asyncio.futures', 'asyncio.base_tasks', '_asyncio', 'asyncio.tasks', 'asyncio.locks', 'asyncio.protocols', 'asyncio.queues', 'asyncio.streams', 'asyncio.subprocess', 'asyncio.transports', 'asyncio.unix_events', 'asyncio.base_subprocess', 'asyncio.selector_events', 'ssl', 'ipaddress', '_ssl', 'base64', 'asyncio.sslproto', 'pickleshare', 'IPython.core.prefilter', 'IPython.core.autocall', 'IPython.core.macro', 'IPython.core.splitinput', 'IPython.core.alias', 'IPython.core.builtin_trap', 'IPython.core.events', 'backcall', 'backcall.backcall', 'IPython.core.displayhook', 'IPython.core.displaypub', 'IPython.core.extensions', 'IPython.core.formatters', 'IPython.utils.sentinel', 'IPython.core.history', 'sqlite3', 'sqlite3.dbapi2', '_sqlite3', 'IPython.core.logger', 'IPython.core.payload', 'IPython.core.usage', 'IPython.display', 'IPython.lib.display', 'html', 'html.entities', 'IPython.utils.io', 'IPython.utils.capture', 'IPython.utils.strdispatch', 'IPython.core.hooks', 'IPython.utils.syspathcontext', 'IPython.utils.tempdir', 'IPython.utils.contexts', 'IPython.core.async_helpers', 'IPython.terminal.interactiveshell', 'prompt_toolkit', 'prompt_toolkit.application', 'prompt_toolkit.application.application', 'prompt_toolkit.buffer', 'prompt_toolkit.application.current', 'prompt_toolkit.eventloop', 'prompt_toolkit.eventloop.base', 'prompt_toolkit.log', 'prompt_toolkit.eventloop.coroutine', 'prompt_toolkit.eventloop.defaults', 'prompt_toolkit.utils', 'six.moves', 'wcwidth', 'wcwidth.wcwidth', 'wcwidth.table_wide', 'wcwidth.table_zero', 'prompt_toolkit.cache', 'prompt_toolkit.eventloop.future', 'prompt_toolkit.eventloop.context', 'prompt_toolkit.eventloop.async_generator', 'six.moves.queue', 'prompt_toolkit.eventloop.event', 'prompt_toolkit.application.run_in_terminal', 'prompt_toolkit.auto_suggest', 'prompt_toolkit.filters', 'prompt_toolkit.filters.base', 'prompt_toolkit.filters.app', 'prompt_toolkit.enums', 'prompt_toolkit.filters.utils', 'prompt_toolkit.filters.cli', 'prompt_toolkit.clipboard', 'prompt_toolkit.clipboard.base', 'prompt_toolkit.selection', 'prompt_toolkit.clipboard.in_memory', 'prompt_toolkit.completion', 'prompt_toolkit.completion.base', 'prompt_toolkit.completion.filesystem', 'prompt_toolkit.completion.word_completer', 'prompt_toolkit.completion.fuzzy_completer', 'prompt_toolkit.document', 'prompt_toolkit.history', 'prompt_toolkit.search', 'prompt_toolkit.key_binding', 'prompt_toolkit.key_binding.key_bindings', 'prompt_toolkit.keys', 'prompt_toolkit.key_binding.vi_state', 'prompt_toolkit.validation', 'prompt_toolkit.input', 'prompt_toolkit.input.base', 'prompt_toolkit.input.defaults', 'prompt_toolkit.input.typeahead', 'prompt_toolkit.key_binding.bindings', 'prompt_toolkit.key_binding.bindings.page_navigation', 'prompt_toolkit.key_binding.bindings.scroll', 'prompt_toolkit.key_binding.defaults', 'prompt_toolkit.key_binding.bindings.basic', 'prompt_toolkit.key_binding.key_processor', 'prompt_toolkit.key_binding.bindings.named_commands', 'prompt_toolkit.key_binding.bindings.completion', 'prompt_toolkit.key_binding.bindings.emacs', 'prompt_toolkit.key_binding.bindings.vi', 'prompt_toolkit.input.vt100_parser', 'prompt_toolkit.input.ansi_escape_sequences', 'prompt_toolkit.key_binding.digraphs', 'prompt_toolkit.key_binding.bindings.mouse', 'prompt_toolkit.layout', 'prompt_toolkit.layout.containers', 'prompt_toolkit.layout.controls', 'prompt_toolkit.formatted_text', 'prompt_toolkit.formatted_text.base', 'prompt_toolkit.formatted_text.html', 'xml', 'xml.dom', 'xml.dom.domreg', 'xml.dom.minidom', 'xml.dom.minicompat', 'xml.dom.xmlbuilder', 'xml.dom.NodeFilter', 'prompt_toolkit.formatted_text.ansi', 'prompt_toolkit.output', 'prompt_toolkit.output.base', 'prompt_toolkit.layout.screen', 'prompt_toolkit.output.defaults', 'prompt_toolkit.output.color_depth', 'prompt_toolkit.output.vt100', 'prompt_toolkit.styles', 'prompt_toolkit.styles.base', 'prompt_toolkit.styles.defaults', 'prompt_toolkit.styles.style', 'prompt_toolkit.styles.named_colors', 'prompt_toolkit.styles.pygments', 'prompt_toolkit.styles.style_transformation', 'colorsys', 'prompt_toolkit.formatted_text.pygments', 'prompt_toolkit.formatted_text.utils', 'prompt_toolkit.lexers', 'prompt_toolkit.lexers.base', 'prompt_toolkit.lexers.pygments', 'prompt_toolkit.mouse_events', 'prompt_toolkit.layout.processors', 'prompt_toolkit.layout.utils', 'prompt_toolkit.layout.dimension', 'prompt_toolkit.layout.margins', 'prompt_toolkit.layout.layout', 'prompt_toolkit.layout.menus', 'prompt_toolkit.renderer', 'prompt_toolkit.layout.mouse_handlers', 'prompt_toolkit.key_binding.bindings.cpr', 'prompt_toolkit.key_binding.emacs_state', 'prompt_toolkit.layout.dummy', 'prompt_toolkit.application.dummy', 'prompt_toolkit.shortcuts', 'prompt_toolkit.shortcuts.dialogs', 'prompt_toolkit.key_binding.bindings.focus', 'prompt_toolkit.widgets', 'prompt_toolkit.widgets.base', 'prompt_toolkit.widgets.toolbars', 'prompt_toolkit.widgets.dialogs', 'prompt_toolkit.widgets.menus', 'prompt_toolkit.shortcuts.prompt', 'prompt_toolkit.key_binding.bindings.auto_suggest', 'prompt_toolkit.key_binding.bindings.open_in_editor', 'prompt_toolkit.shortcuts.utils', 'prompt_toolkit.shortcuts.progress_bar', 'prompt_toolkit.shortcuts.progress_bar.base', 'prompt_toolkit.shortcuts.progress_bar.formatters', 'prompt_toolkit.patch_stdout', 'pygments.style', 'IPython.terminal.debugger', 'IPython.core.completer', 'unicodedata', 'IPython.core.latex_symbols', 'IPython.utils.generics', 'jedi', 'jedi.api', 'parso', 'parso.parser', 'parso.tree', 'parso._compatibility', 'parso.utils', 'parso.pgen2', 'parso.pgen2.generator', 'parso.pgen2.grammar_parser', 'parso.python', 'parso.python.tokenize', 'parso.python.token', 'parso.grammar', 'parso.python.diff', 'difflib', 'parso.python.parser', 'parso.python.tree', 'parso.python.prefix', 'parso.cache', 'gc', 'parso.python.errors', 'parso.normalizer', 'parso.python.pep8', 'parso.file_io', 'jedi._compatibility', 'jedi.parser_utils', 'jedi.debug', 'jedi.settings', 'jedi.cache', 'jedi.api.classes', 'jedi.evaluate', 'jedi.evaluate.utils', 'jedi.evaluate.imports', 'jedi.evaluate.sys_path', 'jedi.evaluate.cache', 'jedi.evaluate.base_context', 'jedi.common', 'jedi.common.context', 'jedi.evaluate.helpers', 'jedi.common.utils', 'jedi.evaluate.compiled', 'jedi.evaluate.compiled.context', 'jedi.evaluate.filters', 'jedi.evaluate.flow_analysis', 'jedi.evaluate.recursion', 'jedi.evaluate.lazy_context', 'jedi.evaluate.compiled.access', 'jedi.evaluate.compiled.getattr_static', 'jedi.evaluate.compiled.fake', 'jedi.evaluate.analysis', 'jedi.evaluate.context', 'jedi.evaluate.context.module', 'jedi.evaluate.context.klass', 'jedi.evaluate.context.function', 'jedi.evaluate.docstrings', 'jedi.evaluate.pep0484', 'jedi.evaluate.arguments', 'jedi.evaluate.context.iterable', 'jedi.evaluate.param', 'jedi.evaluate.context.asynchronous', 'jedi.evaluate.parser_cache', 'jedi.evaluate.context.instance', 'jedi.evaluate.syntax_tree', 'jedi.evaluate.finder', 'jedi.api.keywords', 'pydoc_data', 'pydoc_data.topics', 'jedi.api.interpreter', 'jedi.evaluate.compiled.mixed', 'jedi.api.helpers', 'jedi.api.completion', 'jedi.api.environment', 'filecmp', 'jedi.evaluate.compiled.subprocess', 'jedi.evaluate.compiled.subprocess.functions', 'jedi.api.exceptions', 'jedi.api.project', 'jedi.evaluate.usages', 'IPython.terminal.ptutils', 'IPython.terminal.shortcuts', 'IPython.terminal.magics', 'IPython.lib.clipboard', 'IPython.terminal.pt_inputhooks', 'IPython.terminal.prompts', 'IPython.terminal.ipapp', 'IPython.core.magics', 'IPython.core.magics.auto', 'IPython.core.magics.basic', 'IPython.core.magics.code', 'urllib.request', 'email', 'http', 'http.client', 'email.parser', 'email.feedparser', 'email.errors', 'email._policybase', 'email.header', 'email.quoprimime', 'email.base64mime', 'email.charset', 'email.encoders', 'quopri', 'email.utils', 'email._parseaddr', 'calendar', 'email.message', 'uu', 'email._encoded_words', 'email.iterators', 'urllib.error', 'urllib.response', '_scproxy', 'IPython.core.magics.config', 'IPython.core.magics.display', 'IPython.core.magics.execution', 'timeit', 'cProfile', '_lsprof', 'profile', 'optparse', 'pstats', 'IPython.utils.module_paths', 'IPython.utils.timing', 'IPython.core.magics.extension', 'IPython.core.magics.history', 'IPython.core.magics.logging', 'IPython.core.magics.namespace', 'IPython.core.magics.osm', 'IPython.core.magics.packaging', 'IPython.core.magics.pylab', 'IPython.core.pylabtools', 'IPython.core.magics.script', 'IPython.lib.backgroundjobs', 'IPython.core.shellapp', 'IPython.extensions', 'IPython.extensions.storemagic', 'IPython.utils.frame', 'jupyter_client', 'jupyter_client._version', 'jupyter_client.connect', 'zmq', 'ctypes', '_ctypes', 'ctypes._endian', 'zmq.backend', 'zmq.backend.select', 'zmq.backend.cython', 'zmq.backend.cython.constants', 'cython_runtime', 'zmq.backend.cython.error', '_cython_0_29_5', 'zmq.backend.cython.message', 'zmq.error', 'zmq.backend.cython.context', 'zmq.backend.cython.socket', 'zmq.backend.cython.utils', 'zmq.backend.cython._poll', 'zmq.backend.cython._version', 'zmq.backend.cython._device', 'zmq.backend.cython._proxy_steerable', 'zmq.sugar', 'zmq.sugar.constants', 'zmq.utils', 'zmq.utils.constant_names', 'zmq.sugar.context', 'zmq.sugar.attrsettr', 'zmq.sugar.socket', 'zmq.sugar.poll', 'zmq.utils.jsonapi', 'zmq.utils.strtypes', 'zmq.sugar.frame', 'zmq.sugar.tracker', 'zmq.sugar.version', 'zmq.sugar.stopwatch', 'jupyter_client.localinterfaces', 'jupyter_core', 'jupyter_core.version', 'jupyter_core.paths', 'jupyter_client.launcher', 'traitlets.log', 'jupyter_client.client', 'jupyter_client.channels', 'jupyter_client.channelsabc', 'jupyter_client.clientabc', 'jupyter_client.manager', 'jupyter_client.kernelspec', 'jupyter_client.managerabc', 'jupyter_client.blocking', 'jupyter_client.blocking.client', 'jupyter_client.blocking.channels', 'jupyter_client.multikernelmanager', 'uuid', 'ctypes.util', 'ctypes.macholib', 'ctypes.macholib.dyld', 'ctypes.macholib.framework', 'ctypes.macholib.dylib', 'ipykernel.kernelapp', 'tornado', 'tornado.ioloop', 'numbers', 'tornado.concurrent', 'tornado.log', 'logging.handlers', 'tornado.escape', 'tornado.util', 'tornado.speedups', 'curses', '_curses', 'zmq.eventloop', 'zmq.eventloop.ioloop', 'tornado.platform', 'tornado.platform.asyncio', 'tornado.gen', 'zmq.eventloop.zmqstream', 'ipykernel.iostream', 'imp', 'jupyter_client.session', 'hmac', 'jupyter_client.jsonutil', 'dateutil', 'dateutil._version', 'dateutil.parser', 'dateutil.parser._parser', 'decimal', '_decimal', 'dateutil.relativedelta', 'dateutil._common', 'dateutil.tz', 'dateutil.tz.tz', 'dateutil.tz._common', 'dateutil.tz._factories', 'dateutil.parser.isoparser', '_strptime', 'jupyter_client.adapter', 'ipykernel.heartbeat', 'ipykernel.ipkernel', 'IPython.utils.tokenutil', 'ipykernel.comm', 'ipykernel.comm.manager', 'ipykernel.comm.comm', 'ipykernel.kernelbase', 'tornado.queues', 'tornado.locks', 'ipykernel.jsonutil', 'ipykernel.zmqshell', 'IPython.core.payloadpage', 'ipykernel.displayhook', 'ipykernel.parentpoller', 'faulthandler', 'ipykernel.datapub', 'ipykernel.serialize', 'ipykernel.pickleutil', 'ipykernel.codeutil', 'IPython.core.completerlib', 'storemagic', 'ipywidgets', 'ipywidgets._version', 'ipywidgets.widgets', 'ipywidgets.widgets.widget', 'ipywidgets.widgets.domwidget', 'ipywidgets.widgets.trait_types', 'ipywidgets.widgets.util', 'ipywidgets.widgets.widget_layout', 'ipywidgets.widgets.widget_style', 'ipywidgets.widgets.valuewidget', 'ipywidgets.widgets.widget_core', 'ipywidgets.widgets.widget_bool', 'ipywidgets.widgets.widget_description', 'ipywidgets.widgets.widget_button', 'ipywidgets.widgets.widget_box', 'ipywidgets.widgets.docutils', 'ipywidgets.widgets.widget_float', 'ipywidgets.widgets.widget_int', 'ipywidgets.widgets.widget_color', 'ipywidgets.widgets.widget_date', 'ipywidgets.widgets.widget_output', 'ipywidgets.widgets.widget_selection', 'ipywidgets.widgets.widget_selectioncontainer', 'ipywidgets.widgets.widget_string', 'ipywidgets.widgets.widget_controller', 'ipywidgets.widgets.interaction', 'ipywidgets.widgets.widget_link', 'ipywidgets.widgets.widget_media', 'ipywidgets.widgets.widget_templates', 'ipywidgets.widgets.widget_upload', 'pyleoclim', 'lipd', 'lipd.lipd_io', 'lipd.zips', 'zipfile', 'lipd.loggers', 'logging.config', 'socketserver', 'lipd.directory', 'lipd.bag', 'bagit', 'pkg_resources', 'plistlib', 'xml.parsers', 'xml.parsers.expat', 'pyexpat.errors', 'pyexpat.model', 'pyexpat', 'xml.parsers.expat.model', 'xml.parsers.expat.errors', 'pkg_resources.extern', 'pkg_resources._vendor', 'pkg_resources.extern.six', 'pkg_resources._vendor.six', 'pkg_resources.extern.six.moves', 'pkg_resources._vendor.six.moves', 'pkg_resources.py31compat', 'pkg_resources.extern.appdirs', 'pkg_resources._vendor.packaging.__about__', 'pkg_resources.extern.packaging', 'pkg_resources.extern.packaging.version', 'pkg_resources.extern.packaging._structures', 'pkg_resources.extern.packaging.specifiers', 'pkg_resources.extern.packaging._compat', 'pkg_resources.extern.packaging.requirements', 'pkg_resources.extern.pyparsing', 'pkg_resources.extern.six.moves.urllib', 'pkg_resources.extern.packaging.markers', 'lipd.csvs', 'csv', '_csv', 'lipd.inferred_data', 'numpy', 'numpy._globals', 'numpy.__config__', 'numpy.version', 'numpy._distributor_init', 'numpy._mklinit', 'numpy.core', 'numpy.core.info', 'numpy.core.multiarray', 'numpy.core.overrides', 'numpy.core._multiarray_umath', 'numpy.compat', 'numpy.compat._inspect', 'numpy.compat.py3k', 'numpy.core.umath', 'numpy.core.numerictypes', 'numpy.core._string_helpers', 'numpy.core._type_aliases', 'numpy.core._dtype', 'numpy.core.numeric', 'numpy.core._internal', 'numpy.core.fromnumeric', 'numpy.core._methods', 'numpy.core.arrayprint', 'numpy.core.defchararray', 'numpy.core.records', 'numpy.core.memmap', 'numpy.core.function_base', 'numpy.core.machar', 'numpy.core.getlimits', 'numpy.core.shape_base', 'numpy.core.einsumfunc', 'numpy.core._add_newdocs', 'numpy.core._multiarray_tests', 'numpy.core._dtype_ctypes', 'numpy._pytesttester', 'numpy.lib', 'numpy.lib.info', 'numpy.lib.type_check', 'numpy.lib.ufunclike', 'numpy.lib.index_tricks', 'numpy.matrixlib', 'numpy.matrixlib.defmatrix', 'numpy.linalg', 'numpy.linalg.info', 'numpy.linalg.linalg', 'numpy.lib.twodim_base', 'numpy.linalg.lapack_lite', 'numpy.linalg._umath_linalg', 'numpy.lib.function_base', 'numpy.lib.utils', 'numpy.lib.histograms', 'numpy.lib.stride_tricks', 'numpy.lib.mixins', 'numpy.lib.nanfunctions', 'numpy.lib.shape_base', 'numpy.lib.scimath', 'numpy.lib.polynomial', 'numpy.lib.arraysetops', 'numpy.lib.npyio', 'numpy.lib.format', 'numpy.lib._datasource', 'numpy.lib._iotools', 'numpy.lib.financial', 'numpy.lib.arrayterator', 'numpy.lib.arraypad', 'numpy.lib._version', 'numpy.fft', 'numpy.fft.info', 'numpy.fft.fftpack', 'numpy.fft.fftpack_lite', 'numpy.fft.helper', 'mkl_fft', 'mkl_fft._pydfti', '_cython_0_29_7', 'mkl_fft._version', 'mkl_fft._numpy_fft', 'numpy.polynomial', 'numpy.polynomial.polynomial', 'numpy.polynomial.polyutils', 'numpy.polynomial._polybase', 'numpy.polynomial.chebyshev', 'numpy.polynomial.legendre', 'numpy.polynomial.hermite', 'numpy.polynomial.hermite_e', 'numpy.polynomial.laguerre', 'numpy.random', 'numpy.random.mtrand', 'mtrand', 'numpy.ctypeslib', 'numpy.ma', 'numpy.ma.core', 'numpy.ma.extras', 'numpy.testing', 'unittest', 'unittest.result', 'unittest.util', 'unittest.case', 'unittest.suite', 'unittest.loader', 'unittest.main', 'unittest.runner', 'unittest.signals', 'numpy.testing._private', 'numpy.testing._private.utils', 'numpy.testing._private.decorators', 'numpy.testing._private.nosetester', 'lipd.misc', 'lipd.alternates', 'lipd.blanks', 'lipd.regexes', 'lipd.jsons', 'demjson', 'lipd.versions', 'lipd.timeseries', 'lipd.doi_main', 'lipd.doi_resolver', 'requests', 'urllib3', 'urllib3.connectionpool', 'urllib3.exceptions', 'urllib3.packages', 'urllib3.packages.ssl_match_hostname', 'urllib3.packages.six', 'urllib3.packages.six.moves', 'urllib3.packages.six.moves.http_client', 'urllib3.connection', 'urllib3.util', 'urllib3.util.connection', 'urllib3.util.wait', 'urllib3.contrib', 'urllib3.contrib._appengine_environ', 'urllib3.util.request', 'urllib3.util.response', 'urllib3.util.ssl_', 'urllib3.util.timeout', 'urllib3.util.retry', 'urllib3.util.url', 'urllib3._collections', 'urllib3.request', 'urllib3.filepost', 'urllib3.fields', 'urllib3.packages.six.moves.urllib', 'urllib3.packages.six.moves.urllib.parse', 'urllib3.response', 'urllib3.util.queue', 'urllib3.poolmanager', 'chardet', 'chardet.compat', 'chardet.universaldetector', 'chardet.charsetgroupprober', 'chardet.enums', 'chardet.charsetprober', 'chardet.escprober', 'chardet.codingstatemachine', 'chardet.escsm', 'chardet.latin1prober', 'chardet.mbcsgroupprober', 'chardet.utf8prober', 'chardet.mbcssm', 'chardet.sjisprober', 'chardet.mbcharsetprober', 'chardet.chardistribution', 'chardet.euctwfreq', 'chardet.euckrfreq', 'chardet.gb2312freq', 'chardet.big5freq', 'chardet.jisfreq', 'chardet.jpcntx', 'chardet.eucjpprober', 'chardet.gb2312prober', 'chardet.euckrprober', 'chardet.cp949prober', 'chardet.big5prober', 'chardet.euctwprober', 'chardet.sbcsgroupprober', 'chardet.sbcharsetprober', 'chardet.langcyrillicmodel', 'chardet.langgreekmodel', 'chardet.langbulgarianmodel', 'chardet.langthaimodel', 'chardet.langhebrewmodel', 'chardet.hebrewprober', 'chardet.langturkishmodel', 'chardet.version', 'requests.exceptions', 'urllib3.contrib.pyopenssl', 'OpenSSL', 'OpenSSL.crypto', 'cryptography', 'cryptography.__about__', 'cryptography.x509', 'cryptography.x509.certificate_transparency', 'cryptography.x509.base', 'cryptography.utils', 'cryptography.hazmat', 'cryptography.hazmat.primitives', 'cryptography.hazmat.primitives.asymmetric', 'cryptography.hazmat.primitives.asymmetric.dsa', 'cryptography.hazmat.primitives.asymmetric.ec', 'cryptography.hazmat._oid', 'cryptography.hazmat.primitives.asymmetric.rsa', 'cryptography.exceptions', 'cryptography.hazmat.backends', 'cryptography.hazmat.backends.interfaces', 'cryptography.x509.extensions', 'asn1crypto', 'asn1crypto.version', 'asn1crypto.keys', 'asn1crypto._elliptic_curve', 'asn1crypto._int', 'asn1crypto.util', 'asn1crypto._errors', 'asn1crypto._iri', 'encodings.idna', 'stringprep', 'asn1crypto._types', 'asn1crypto._ordereddict', 'asn1crypto._ffi', 'asn1crypto._perf', 'asn1crypto._perf._big_num_ctypes', 'asn1crypto.algos', 'asn1crypto.core', 'asn1crypto._teletex_codec', 'asn1crypto.parser', 'cryptography.hazmat.primitives.constant_time', 'cryptography.hazmat.bindings', '_cffi_backend', '_constant_time.lib', '_constant_time', 'cryptography.hazmat.bindings._constant_time', 'cryptography.hazmat.primitives.serialization', 'cryptography.hazmat.primitives.serialization.base', 'cryptography.hazmat.primitives.serialization.ssh', 'cryptography.hazmat.primitives.asymmetric.ed25519', 'cryptography.x509.general_name', 'cryptography.x509.name', 'cryptography.x509.oid', 'cryptography.hazmat.primitives.hashes', 'OpenSSL._util', 'cryptography.hazmat.bindings.openssl', 'cryptography.hazmat.bindings.openssl.binding', '_openssl.lib', '_openssl', 'cryptography.hazmat.bindings._openssl', 'cryptography.hazmat.bindings.openssl._conditional', 'OpenSSL.SSL', 'OpenSSL.version', 'cryptography.hazmat.backends.openssl', 'cryptography.hazmat.backends.openssl.backend', 'cryptography.hazmat.backends.openssl.aead', 'cryptography.hazmat.backends.openssl.ciphers', 'cryptography.hazmat.primitives.ciphers', 'cryptography.hazmat.primitives.ciphers.base', 'cryptography.hazmat.primitives.ciphers.modes', 'cryptography.hazmat.backends.openssl.cmac', 'cryptography.hazmat.backends.openssl.decode_asn1', 'cryptography.hazmat.backends.openssl.dh', 'cryptography.hazmat.primitives.asymmetric.dh', 'cryptography.hazmat.backends.openssl.dsa', 'cryptography.hazmat.backends.openssl.utils', 'cryptography.hazmat.primitives.asymmetric.utils', 'cryptography.hazmat.backends.openssl.ec', 'cryptography.hazmat.backends.openssl.ed25519', 'cryptography.hazmat.backends.openssl.ed448', 'cryptography.hazmat.primitives.asymmetric.ed448', 'cryptography.hazmat.backends.openssl.encode_asn1', 'cryptography.hazmat.backends.openssl.hashes', 'cryptography.hazmat.backends.openssl.hmac', 'cryptography.hazmat.backends.openssl.ocsp', 'cryptography.hazmat.backends.openssl.x509', 'cryptography.x509.ocsp', 'cryptography.hazmat.backends.openssl.poly1305', 'cryptography.hazmat.backends.openssl.rsa', 'cryptography.hazmat.primitives.asymmetric.padding', 'cryptography.hazmat.backends.openssl.x25519', 'cryptography.hazmat.primitives.asymmetric.x25519', 'cryptography.hazmat.backends.openssl.x448', 'cryptography.hazmat.primitives.asymmetric.x448', 'cryptography.hazmat.primitives.ciphers.algorithms', 'cryptography.hazmat.primitives.kdf', 'cryptography.hazmat.primitives.kdf.scrypt', 'urllib3.packages.backports', 'urllib3.packages.backports.makefile', 'requests.__version__', 'requests.utils', 'requests.certs', 'certifi', 'certifi.core', 'requests._internal_utils', 'requests.compat', 'http.cookiejar', 'http.cookies', 'requests.cookies', 'requests.structures', 'requests.packages', 'requests.packages.urllib3', 'requests.packages.urllib3.connectionpool', 'requests.packages.urllib3.exceptions', 'requests.packages.urllib3.packages', 'requests.packages.urllib3.packages.ssl_match_hostname', 'requests.packages.urllib3.packages.six', 'requests.packages.urllib3.packages.six.moves', 'requests.packages.urllib3.packages.six.moves.http_client', 'requests.packages.urllib3.connection', 'requests.packages.urllib3.util', 'requests.packages.urllib3.util.connection', 'requests.packages.urllib3.util.wait', 'requests.packages.urllib3.contrib', 'requests.packages.urllib3.contrib._appengine_environ', 'requests.packages.urllib3.util.request', 'requests.packages.urllib3.util.response', 'requests.packages.urllib3.util.ssl_', 'requests.packages.urllib3.util.timeout', 'requests.packages.urllib3.util.retry', 'requests.packages.urllib3.util.url', 'requests.packages.urllib3._collections', 'requests.packages.urllib3.request', 'requests.packages.urllib3.filepost', 'requests.packages.urllib3.fields', 'requests.packages.urllib3.packages.six.moves.urllib', 'requests.packages.urllib3.packages.six.moves.urllib.parse', 'requests.packages.urllib3.response', 'requests.packages.urllib3.util.queue', 'requests.packages.urllib3.poolmanager', 'requests.packages.urllib3.contrib.pyopenssl', 'requests.packages.urllib3.packages.backports', 'requests.packages.urllib3.packages.backports.makefile', 'idna', 'idna.package_data', 'idna.core', 'idna.idnadata', 'idna.intranges', 'requests.packages.idna', 'requests.packages.idna.package_data', 'requests.packages.idna.core', 'requests.packages.idna.idnadata', 'requests.packages.idna.intranges', 'requests.packages.chardet', 'requests.packages.chardet.compat', 'requests.packages.chardet.universaldetector', 'requests.packages.chardet.charsetgroupprober', 'requests.packages.chardet.enums', 'requests.packages.chardet.charsetprober', 'requests.packages.chardet.escprober', 'requests.packages.chardet.codingstatemachine', 'requests.packages.chardet.escsm', 'requests.packages.chardet.latin1prober', 'requests.packages.chardet.mbcsgroupprober', 'requests.packages.chardet.utf8prober', 'requests.packages.chardet.mbcssm', 'requests.packages.chardet.sjisprober', 'requests.packages.chardet.mbcharsetprober', 'requests.packages.chardet.chardistribution', 'requests.packages.chardet.euctwfreq', 'requests.packages.chardet.euckrfreq', 'requests.packages.chardet.gb2312freq', 'requests.packages.chardet.big5freq', 'requests.packages.chardet.jisfreq', 'requests.packages.chardet.jpcntx', 'requests.packages.chardet.eucjpprober', 'requests.packages.chardet.gb2312prober', 'requests.packages.chardet.euckrprober', 'requests.packages.chardet.cp949prober', 'requests.packages.chardet.big5prober', 'requests.packages.chardet.euctwprober', 'requests.packages.chardet.sbcsgroupprober', 'requests.packages.chardet.sbcharsetprober', 'requests.packages.chardet.langcyrillicmodel', 'requests.packages.chardet.langgreekmodel', 'requests.packages.chardet.langbulgarianmodel', 'requests.packages.chardet.langthaimodel', 'requests.packages.chardet.langhebrewmodel', 'requests.packages.chardet.hebrewprober', 'requests.packages.chardet.langturkishmodel', 'requests.packages.chardet.version', 'requests.models', 'requests.hooks', 'requests.auth', 'requests.status_codes', 'requests.api', 'requests.sessions', 'requests.adapters', 'urllib3.contrib.socks', 'socks', 'lipd.excel', 'xlrd', 'xlrd.info', 'xlrd.timemachine', 'xlrd.biffh', 'xlrd.formula', 'xlrd.book', 'xlrd.sheet', 'xlrd.formatting', 'xlrd.compdoc', 'mmap', 'xlrd.xldate', 'xlrd.xlsx', 'lipd.noaa', 'lipd.lpd_noaa', 'lipd.noaa_lpd', 'lipd.dataframes', 'pandas', 'pytz', 'pytz.exceptions', 'pytz.lazy', 'pytz.tzinfo', 'pytz.tzfile', 'pandas.compat', 'pandas.compat.numpy', 'distutils', 'distutils.version', 'pandas._libs', 'pandas._libs.tslibs', 'pandas._libs.tslibs.conversion', 'pandas._libs.tslibs.c_timestamp', 'pandas._libs.tslibs.nattype', '_cython_0_29_12', 'pandas._libs.tslibs.np_datetime', 'pandas._libs.tslibs.timezones', 'pandas._libs.tslibs.tzconversion', 'pandas._libs.tslibs.timedeltas', 'pandas._libs.tslibs.offsets', 'pandas._libs.tslibs.ccalendar', 'pandas._config', 'pandas._config.config', 'pandas._config.dates', 'pandas._config.display', 'pandas._config.localization', 'pandas._libs.tslibs.strptime', 'pandas._libs.tslibs.fields', 'pandas._libs.tslibs.parsing', 'pandas._libs.tslibs.period', 'pandas._libs.tslibs.frequencies', 'pandas._libs.tslibs.timestamps', 'pandas._libs.tslibs.resolution', 'pandas._libs.hashtable', 'pandas._libs.missing', 'pandas._libs.lib', 'fractions', 'pandas._libs.tslib', 'pandas.core', 'pandas.core.config_init', 'pandas.core.api', 'pandas.core.arrays', 'pandas.core.arrays.array_', 'pandas.core.dtypes', 'pandas.core.dtypes.common', 'pandas._libs.algos', 'pandas.core.dtypes.dtypes', 'pandas._libs.interval', 'pandas.core.dtypes.generic', 'pandas.core.dtypes.base', 'pandas.errors', 'pandas.core.dtypes.inference', 'pandas._typing', 'pandas.core.arrays.base', 'pandas.compat.numpy.function', 'pandas.util', 'pandas.util._decorators', 'pandas._libs.properties', 'pandas.core.util', 'pandas.core.util.hashing', 'pandas._libs.hashing', 'pandas.core.dtypes.cast', 'pandas.core.dtypes.missing', 'pandas.util._validators', 'pandas.core.ops', 'pandas._libs.ops', 'pandas.core.common', 'pandas.core.ops.missing', 'pandas.core.ops.roperator', 'pandas.core.ops.docstrings', 'pandas.core.sorting', 'pandas.core.algorithms', 'pandas.core.indexers', 'pandas.core.arrays.categorical', 'pandas.core.accessor', 'pandas.core.base', 'pandas.core.nanops', 'pandas.compat._optional', 'pandas.core.missing', 'pandas.io', 'pandas.io.formats', 'pandas.io.formats.console', 'pandas.core.arrays.datetimes', 'pandas.core.arrays.datetimelike', 'pandas.tseries', 'pandas.tseries.frequencies', 'pandas.tseries.offsets', 'dateutil.easter', 'pandas.core.tools', 'pandas.core.tools.datetimes', 'pandas.core.arrays._ranges', 'pandas.core.arrays.integer', 'pandas.core.tools.numeric', 'pandas.core.arrays.interval', 'pandas.core.indexes', 'pandas.core.indexes.base', 'pandas._libs.index', 'pandas._libs.join', 'pandas.core.dtypes.concat', 'pandas.core.indexes.frozen', 'pandas.io.formats.printing', 'pandas.core.strings', 'pandas.core.arrays.numpy_', 'pandas.core.arrays.period', 'pandas.core.arrays.sparse', 'pandas._libs.sparse', 'pandas.core.arrays.timedeltas', 'pandas.core.groupby', 'pandas.core.groupby.generic', 'pandas.core.frame', 'pandas.core.generic', 'pandas.core.index', 'pandas.core.indexes.api', 'pandas.core.indexes.category', 'pandas.core.indexes.datetimes', 'pandas.core.indexes.datetimelike', 'pandas.core.tools.timedeltas', 'pandas.core.indexes.numeric', 'pandas.core.indexes.interval', 'pandas.util._exceptions', 'pandas.core.indexes.multi', 'pandas.core.indexes.timedeltas', 'pandas.core.indexes.period', 'pandas.core.indexes.range', 'pandas.core.indexing', 'pandas._libs.indexing', 'pandas.core.internals', 'pandas.core.internals.blocks', 'pandas._libs.internals', 'pandas.core.internals.arrays', 'pandas.core.internals.managers', 'pandas.core.internals.concat', 'pandas.io.formats.format', 'pandas.io.common', 'gzip', 'pandas.core.internals.construction', 'pandas.core.series', 'pandas._libs.reshape', 'pandas.core.indexes.accessors', 'pandas.plotting', 'pandas.plotting._core', 'pandas.plotting._matplotlib', 'pandas.plotting._matplotlib.boxplot', 'matplotlib', 'matplotlib.cbook', 'matplotlib.cbook.deprecation', 'matplotlib.rcsetup', 'matplotlib.fontconfig_pattern', 'pyparsing', 'matplotlib.colors', 'matplotlib._color_data', 'cycler', 'matplotlib._version', 'kiwisolver']
+2019-10-10 14:37:54,896 [DEBUG] matplotlib: CACHEDIR=/Users/deborahkhider/.matplotlib
+2019-10-10 14:37:54,899 [DEBUG] matplotlib.font_manager: Using fontManager instance from /Users/deborahkhider/.matplotlib/fontlist-v310.json
+2019-10-10 14:37:55,283 [DEBUG] matplotlib.pyplot: Loaded backend module://ipykernel.pylab.backend_inline version unknown.
+2019-10-10 14:37:56,069 [DEBUG] shapely.geos: Trying `CDLL(//anaconda3/envs/py36P/bin/../lib/libgeos_c.dylib)`
+2019-10-10 14:37:56,080 [DEBUG] shapely.geos: Library path: '//anaconda3/envs/py36P/bin/../lib/libgeos_c.dylib'
+2019-10-10 14:37:56,080 [DEBUG] shapely.geos: DLL: <CDLL '//anaconda3/envs/py36P/bin/../lib/libgeos_c.dylib', handle 7ff1d1bdc810 at 0x1a1d188f98>
+2019-10-10 14:37:56,081 [DEBUG] shapely.geos: Trying `CDLL(/usr/lib/libc.dylib)`
+2019-10-10 14:37:56,082 [DEBUG] shapely.geos: Library path: '/usr/lib/libc.dylib'
+2019-10-10 14:37:56,082 [DEBUG] shapely.geos: DLL: <CDLL '/usr/lib/libc.dylib', handle 11388e050 at 0x1a1d194710>
+2019-10-10 14:37:57,318 [DEBUG] matplotlib.pyplot: Loaded backend module://ipykernel.pylab.backend_inline version unknown.
+2019-10-10 14:38:00,074 [INFO] directory: enter list_files
+2019-10-10 14:38:00,075 [INFO] directory: exit list_files
+2019-10-10 14:38:00,077 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmpxzckxgq8
+2019-10-10 14:38:00,078 [INFO] zips: enter unzip
+2019-10-10 14:38:00,083 [INFO] zips: exit unzip
+2019-10-10 14:38:00,114 [INFO] jsons: Read JSONLD successful: Arc-Yukon.DArrigo.2006.jsonld
+2019-10-10 14:38:00,114 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:00,115 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:00,115 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:00,115 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:00,115 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:00,116 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:00,116 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:00,116 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:00,116 [INFO] directory: enter list_files
+2019-10-10 14:38:00,117 [INFO] directory: exit list_files
+2019-10-10 14:38:00,117 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:00,117 [INFO] csvs: open file: Arc-Yukon.DArrigo.2006.paleo1measurement1.csv
+2019-10-10 14:38:00,118 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:00,118 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:00,118 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:00,120 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:00,120 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:00,121 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:00,121 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:00,122 [INFO] csvs: enter get_csv_from_section: Arc-Yukon.D'Arrigo.2006.paleo
+2019-10-10 14:38:00,122 [INFO] csvs: exit get_csv_from_section: Arc-Yukon.D'Arrigo.2006.paleo
+2019-10-10 14:38:00,122 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:00,123 [INFO] LiPD: lipd_read: record loaded: ../example_data/Arc-Yukon.D'Arrigo.2006.lpd
+2019-10-10 14:38:00,124 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmp1awvdcpt
+2019-10-10 14:38:00,124 [INFO] zips: enter unzip
+2019-10-10 14:38:00,128 [INFO] zips: exit unzip
+2019-10-10 14:38:00,553 [INFO] jsons: Read JSONLD successful: MD97-2121.Marr.2013.jsonld
+2019-10-10 14:38:00,554 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:00,559 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:00,560 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:00,560 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:00,560 [INFO] jsons: enter import_data: chron
+2019-10-10 14:38:00,561 [INFO] jsons: exit import_data: chron
+2019-10-10 14:38:00,561 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:00,561 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:00,561 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:00,565 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:00,565 [INFO] directory: enter list_files
+2019-10-10 14:38:00,565 [INFO] directory: exit list_files
+2019-10-10 14:38:00,566 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:00,566 [INFO] csvs: open file: MD97-2121.Marr.2013.chron1measurement1.csv
+2019-10-10 14:38:00,566 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:00,567 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:00,567 [INFO] csvs: open file: MD97-2121.Marr.2013.paleo1measurement3.csv
+2019-10-10 14:38:00,568 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:00,568 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:00,569 [INFO] csvs: open file: MD97-2121.Marr.2013.paleo1measurement2.csv
+2019-10-10 14:38:00,570 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:00,570 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:00,570 [INFO] csvs: open file: MD97-2121.Marr.2013.paleo1measurement1.csv
+2019-10-10 14:38:00,571 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:00,571 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:00,572 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:00,579 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:00,585 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:00,590 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:00,591 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:00,591 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:00,591 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: tephra/ams
+2019-10-10 14:38:00,592 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:00,593 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:00,593 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:00,593 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:00,599 [INFO] csvs: enter get_csv_from_section: MD97-2121.Marr.2013.paleo
+2019-10-10 14:38:00,600 [INFO] csvs: exit get_csv_from_section: MD97-2121.Marr.2013.paleo
+2019-10-10 14:38:00,600 [INFO] csvs: enter get_csv_from_section: MD97-2121.Marr.2013.chron
+2019-10-10 14:38:00,600 [INFO] csvs: exit get_csv_from_section: MD97-2121.Marr.2013.chron
+2019-10-10 14:38:00,601 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:00,603 [INFO] LiPD: lipd_read: record loaded: ../example_data/MD97-2121.Marr.2013.lpd
+2019-10-10 14:38:00,604 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmpd1lqwb4j
+2019-10-10 14:38:00,604 [INFO] zips: enter unzip
+2019-10-10 14:38:00,606 [INFO] zips: exit unzip
+2019-10-10 14:38:00,633 [INFO] jsons: Read JSONLD successful: Eur-NorthernSpain.Mart├¡n-Chivelet.2011.jsonld
+2019-10-10 14:38:00,633 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:00,634 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:00,634 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:00,634 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:00,634 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:00,635 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:00,635 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:00,635 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:00,636 [INFO] directory: enter list_files
+2019-10-10 14:38:00,636 [INFO] directory: exit list_files
+2019-10-10 14:38:00,636 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:00,637 [INFO] csvs: open file: Eur-NorthernSpain.Martn-Chivelet.2011.paleo1measurement1.csv
+2019-10-10 14:38:00,638 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:00,639 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:00,639 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:00,641 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:00,641 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:00,641 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:00,641 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:00,643 [INFO] csvs: enter get_csv_from_section: Eur-NorthernSpain.Martín-Chivelet.2011.paleo
+2019-10-10 14:38:00,643 [INFO] csvs: exit get_csv_from_section: Eur-NorthernSpain.Martín-Chivelet.2011.paleo
+2019-10-10 14:38:00,643 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:00,644 [INFO] LiPD: lipd_read: record loaded: ../example_data/Eur-NorthernSpain.Martín-Chivelet.2011.lpd
+2019-10-10 14:38:00,645 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmpifruw9lk
+2019-10-10 14:38:00,645 [INFO] zips: enter unzip
+2019-10-10 14:38:00,699 [INFO] zips: exit unzip
+2019-10-10 14:38:00,965 [INFO] jsons: Read JSONLD successful: Arc-LakeNatauj├ñrvi.Ojala.2005.jsonld
+2019-10-10 14:38:00,966 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:00,970 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:00,970 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:00,970 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:00,971 [INFO] jsons: enter import_data: chron
+2019-10-10 14:38:00,971 [INFO] jsons: enter import_model
+2019-10-10 14:38:00,971 [INFO] jsons: exit import_model: chron0model
+2019-10-10 14:38:00,971 [INFO] jsons: exit import_data: chron
+2019-10-10 14:38:00,972 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:00,972 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:00,972 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:00,974 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:00,975 [INFO] directory: enter list_files
+2019-10-10 14:38:00,975 [INFO] directory: exit list_files
+2019-10-10 14:38:00,975 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:00,976 [INFO] csvs: open file: Arc-LakeNataujrvi.Ojala.2005.chron1model1ensemble.csv
+2019-10-10 14:38:01,842 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:01,843 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:01,843 [INFO] csvs: open file: Arc-LakeNataujrvi.Ojala.2005.paleo1measurement1.csv
+2019-10-10 14:38:01,849 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:01,850 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:01,850 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:01,853 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:01,854 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:01,854 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:01,854 [INFO] csvs: enter merge_csv_model
+2019-10-10 14:38:02,382 [INFO] csvs: exit merge_csv_model
+2019-10-10 14:38:02,382 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:02,383 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:02,383 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:03,405 [INFO] csvs: enter get_csv_from_section: Arc-LakeNataujärvi.Ojala.2005.paleo
+2019-10-10 14:38:03,406 [INFO] csvs: exit get_csv_from_section: Arc-LakeNataujärvi.Ojala.2005.paleo
+2019-10-10 14:38:03,406 [INFO] csvs: enter get_csv_from_section: Arc-LakeNataujärvi.Ojala.2005.chron
+2019-10-10 14:38:03,407 [INFO] csvs: enter get_csv_from_model: Arc-LakeNataujärvi.Ojala.2005.chron0model
+2019-10-10 14:38:03,407 [INFO] csvs: exit get_csv_from_section: Arc-LakeNataujärvi.Ojala.2005.chron
+2019-10-10 14:38:03,407 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:03,411 [INFO] LiPD: lipd_read: record loaded: ../example_data/Arc-LakeNataujärvi.Ojala.2005.lpd
+2019-10-10 14:38:03,431 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmpxxhihtpb
+2019-10-10 14:38:03,432 [INFO] zips: enter unzip
+2019-10-10 14:38:03,572 [INFO] zips: exit unzip
+2019-10-10 14:38:03,759 [INFO] jsons: Read JSONLD successful: metadata.jsonld
+2019-10-10 14:38:03,759 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:03,761 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:03,762 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:03,762 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:03,762 [INFO] jsons: enter import_data: chron
+2019-10-10 14:38:03,763 [INFO] jsons: enter import_model
+2019-10-10 14:38:03,763 [INFO] jsons: exit import_model: chron0model
+2019-10-10 14:38:03,763 [INFO] jsons: exit import_data: chron
+2019-10-10 14:38:03,764 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:03,764 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:03,764 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:03,766 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:03,766 [INFO] directory: enter list_files
+2019-10-10 14:38:03,767 [INFO] directory: exit list_files
+2019-10-10 14:38:03,767 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:03,767 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0summary0.csv
+2019-10-10 14:38:03,769 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:03,769 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:03,769 [INFO] csvs: open file: MD982176.Stott.2004.paleo0measurement0.csv
+2019-10-10 14:38:03,771 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:03,771 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:03,771 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution8.csv
+2019-10-10 14:38:03,861 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:03,862 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:03,862 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution9.csv
+2019-10-10 14:38:03,947 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:03,947 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:03,947 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution1.csv
+2019-10-10 14:38:04,033 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,033 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:04,034 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution0.csv
+2019-10-10 14:38:04,131 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,131 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:04,131 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution2.csv
+2019-10-10 14:38:04,218 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,218 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:04,218 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution3.csv
+2019-10-10 14:38:04,304 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,304 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:04,304 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution7.csv
+2019-10-10 14:38:04,389 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,390 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:04,390 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution6.csv
+2019-10-10 14:38:04,478 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,479 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:04,479 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution11.csv
+2019-10-10 14:38:04,562 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,562 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:04,563 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution4.csv
+2019-10-10 14:38:04,655 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,656 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:04,656 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0ensemble0.csv
+2019-10-10 14:38:04,788 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,788 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:04,789 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution5.csv
+2019-10-10 14:38:04,881 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,881 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:04,882 [INFO] csvs: open file: MD982176.Stott.2004.chron0measurement0.csv
+2019-10-10 14:38:04,883 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,883 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:04,883 [INFO] csvs: open file: MD982176.Stott.2004.chron0model0distribution10.csv
+2019-10-10 14:38:04,975 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:04,975 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:04,975 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:04,978 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:04,978 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:04,979 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: ams number
+2019-10-10 14:38:04,980 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:04,980 [INFO] csvs: enter merge_csv_model
+2019-10-10 14:38:04,981 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,083 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,115 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,146 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,178 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,209 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,241 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,274 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,306 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,337 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,369 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,400 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,433 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:05,433 [INFO] csvs: exit merge_csv_model
+2019-10-10 14:38:05,434 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:05,434 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:05,434 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:06,195 [INFO] csvs: enter get_csv_from_section: MD982176.Stott.2004.paleo
+2019-10-10 14:38:06,195 [INFO] csvs: exit get_csv_from_section: MD982176.Stott.2004.paleo
+2019-10-10 14:38:06,196 [INFO] csvs: enter get_csv_from_section: MD982176.Stott.2004.chron
+2019-10-10 14:38:06,196 [INFO] csvs: enter get_csv_from_model: MD982176.Stott.2004.chron0model
+2019-10-10 14:38:06,196 [INFO] csvs: exit get_csv_from_section: MD982176.Stott.2004.chron
+2019-10-10 14:38:06,197 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:06,200 [INFO] LiPD: lipd_read: record loaded: ../example_data/MD982176.Stott.2004.lpd
+2019-10-10 14:38:06,207 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmpu_w_g0_o
+2019-10-10 14:38:06,207 [INFO] zips: enter unzip
+2019-10-10 14:38:06,211 [INFO] zips: exit unzip
+2019-10-10 14:38:06,296 [INFO] jsons: Read JSONLD successful: Juxtlahuaca.Lachniet.2012.jsonld
+2019-10-10 14:38:06,296 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:06,299 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:06,299 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:06,300 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:06,300 [INFO] jsons: enter import_data: chron
+2019-10-10 14:38:06,300 [INFO] jsons: exit import_data: chron
+2019-10-10 14:38:06,301 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:06,301 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:06,301 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:06,302 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:06,303 [INFO] directory: enter list_files
+2019-10-10 14:38:06,303 [INFO] directory: exit list_files
+2019-10-10 14:38:06,303 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,303 [INFO] csvs: open file: Juxtlahuaca.Lachniet.2012.Chron1.measurementTable1.csv
+2019-10-10 14:38:06,304 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,304 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,305 [INFO] csvs: open file: Juxtlahuaca.Lachniet.2012.Paleo1.measurementTable1.csv
+2019-10-10 14:38:06,310 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,311 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:06,311 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,317 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,317 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,318 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,319 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: is_date_used_original_model
+2019-10-10 14:38:06,321 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: decay_constants_used
+2019-10-10 14:38:06,321 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: modern_reference
+2019-10-10 14:38:06,322 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,322 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,322 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:06,322 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:06,327 [INFO] csvs: enter get_csv_from_section: Juxtlahuaca.Lachniet.2012.paleo
+2019-10-10 14:38:06,327 [INFO] csvs: exit get_csv_from_section: Juxtlahuaca.Lachniet.2012.paleo
+2019-10-10 14:38:06,327 [INFO] csvs: enter get_csv_from_section: Juxtlahuaca.Lachniet.2012.chron
+2019-10-10 14:38:06,327 [INFO] csvs: exit get_csv_from_section: Juxtlahuaca.Lachniet.2012.chron
+2019-10-10 14:38:06,327 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:06,328 [INFO] LiPD: lipd_read: record loaded: ../example_data/Juxtlahuaca.Lachniet.2012.lpd
+2019-10-10 14:38:06,329 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmp_99opan1
+2019-10-10 14:38:06,329 [INFO] zips: enter unzip
+2019-10-10 14:38:06,332 [INFO] zips: exit unzip
+2019-10-10 14:38:06,363 [INFO] jsons: Read JSONLD successful: Ocn-MadangLagoonPapuaNewGuinea.Kuhnert.2001.jsonld
+2019-10-10 14:38:06,363 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:06,364 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:06,364 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:06,365 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:06,365 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:06,365 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:06,365 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:06,366 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:06,366 [INFO] directory: enter list_files
+2019-10-10 14:38:06,366 [INFO] directory: exit list_files
+2019-10-10 14:38:06,366 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,366 [INFO] csvs: open file: Ocn-MadangLagoonPapuaNewGuinea.Kuhnert.2001.paleo1measurement1.csv
+2019-10-10 14:38:06,367 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,368 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:06,368 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,369 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,369 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,369 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:06,369 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:06,370 [INFO] csvs: enter get_csv_from_section: Ocn-MadangLagoonPapuaNewGuinea.Kuhnert.2001.paleo
+2019-10-10 14:38:06,371 [INFO] csvs: exit get_csv_from_section: Ocn-MadangLagoonPapuaNewGuinea.Kuhnert.2001.paleo
+2019-10-10 14:38:06,371 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:06,372 [INFO] LiPD: lipd_read: record loaded: ../example_data/Ocn-MadangLagoonPapuaNewGuinea.Kuhnert.2001.lpd
+2019-10-10 14:38:06,372 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmpnpjrz3u2
+2019-10-10 14:38:06,372 [INFO] zips: enter unzip
+2019-10-10 14:38:06,375 [INFO] zips: exit unzip
+2019-10-10 14:38:06,412 [INFO] jsons: Read JSONLD successful: Asi-Dasuopu.Thompson.2000.jsonld
+2019-10-10 14:38:06,412 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:06,413 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:06,413 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:06,413 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:06,414 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:06,414 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:06,414 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:06,415 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:06,415 [INFO] directory: enter list_files
+2019-10-10 14:38:06,415 [INFO] directory: exit list_files
+2019-10-10 14:38:06,416 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,416 [INFO] csvs: open file: Asi-Dasuopu.Thompson.2000.paleo1measurement1.csv
+2019-10-10 14:38:06,418 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,418 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:06,419 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,423 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,423 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,423 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:06,424 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:06,427 [INFO] csvs: enter get_csv_from_section: Asi-Dasuopu.Thompson.2000.paleo
+2019-10-10 14:38:06,427 [INFO] csvs: exit get_csv_from_section: Asi-Dasuopu.Thompson.2000.paleo
+2019-10-10 14:38:06,427 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:06,428 [INFO] LiPD: lipd_read: record loaded: ../example_data/Asi-Dasuopu.Thompson.2000.lpd
+2019-10-10 14:38:06,429 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmp3p5vu68d
+2019-10-10 14:38:06,429 [INFO] zips: enter unzip
+2019-10-10 14:38:06,432 [INFO] zips: exit unzip
+2019-10-10 14:38:06,458 [INFO] jsons: Read JSONLD successful: Asi-TH001.Buckley.2010.jsonld
+2019-10-10 14:38:06,458 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:06,458 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:06,459 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:06,459 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:06,459 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:06,459 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:06,459 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:06,460 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:06,460 [INFO] directory: enter list_files
+2019-10-10 14:38:06,460 [INFO] directory: exit list_files
+2019-10-10 14:38:06,461 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,461 [INFO] csvs: open file: Asi-TH001.Buckley.2010.paleo1measurement1.csv
+2019-10-10 14:38:06,462 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,462 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:06,462 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,463 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,464 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,464 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:06,464 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:06,465 [INFO] csvs: enter get_csv_from_section: Asi-TH001.Buckley.2010.paleo
+2019-10-10 14:38:06,465 [INFO] csvs: exit get_csv_from_section: Asi-TH001.Buckley.2010.paleo
+2019-10-10 14:38:06,465 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:06,466 [INFO] LiPD: lipd_read: record loaded: ../example_data/Asi-TH001.Buckley.2010.lpd
+2019-10-10 14:38:06,467 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmps83nlw5r
+2019-10-10 14:38:06,467 [INFO] zips: enter unzip
+2019-10-10 14:38:06,469 [INFO] zips: exit unzip
+2019-10-10 14:38:06,519 [INFO] jsons: Read JSONLD successful: Ocn-SantaBarbaraBasin.Zhao.2000.jsonld
+2019-10-10 14:38:06,519 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:06,520 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:06,520 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:06,520 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:06,521 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:06,521 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:06,521 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:06,521 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:06,522 [INFO] directory: enter list_files
+2019-10-10 14:38:06,522 [INFO] directory: exit list_files
+2019-10-10 14:38:06,522 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,522 [INFO] csvs: open file: Ocn-SantaBarbaraBasin.Zhao.2000.paleo2measurement1.csv
+2019-10-10 14:38:06,523 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,523 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,524 [INFO] csvs: open file: Ocn-SantaBarbaraBasin.Zhao.2000.paleo1measurement1.csv
+2019-10-10 14:38:06,525 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,525 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:06,526 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,528 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: core
+2019-10-10 14:38:06,528 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,529 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,529 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,530 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:06,530 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:06,532 [INFO] csvs: enter get_csv_from_section: Ocn-SantaBarbaraBasin.Zhao.2000.paleo
+2019-10-10 14:38:06,532 [INFO] csvs: exit get_csv_from_section: Ocn-SantaBarbaraBasin.Zhao.2000.paleo
+2019-10-10 14:38:06,533 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:06,533 [INFO] LiPD: lipd_read: record loaded: ../example_data/Ocn-SantaBarbaraBasin.Zhao.2000.lpd
+2019-10-10 14:38:06,534 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmp1g5pkr5a
+2019-10-10 14:38:06,534 [INFO] zips: enter unzip
+2019-10-10 14:38:06,537 [INFO] zips: exit unzip
+2019-10-10 14:38:06,573 [INFO] jsons: Read JSONLD successful: Ant-JamesRossIsland.Mulvaney.2013.jsonld
+2019-10-10 14:38:06,573 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:06,574 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:06,574 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:06,574 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:06,575 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:06,575 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:06,575 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:06,575 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:06,576 [INFO] directory: enter list_files
+2019-10-10 14:38:06,576 [INFO] directory: exit list_files
+2019-10-10 14:38:06,576 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,576 [INFO] csvs: open file: Ant-JamesRossIsland.Mulvaney.2013.paleo1measurement1.csv
+2019-10-10 14:38:06,579 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,579 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:06,580 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,582 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,582 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,582 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:06,582 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:06,585 [INFO] csvs: enter get_csv_from_section: Ant-JamesRossIsland.Mulvaney.2013.paleo
+2019-10-10 14:38:06,585 [INFO] csvs: exit get_csv_from_section: Ant-JamesRossIsland.Mulvaney.2013.paleo
+2019-10-10 14:38:06,586 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:06,587 [INFO] LiPD: lipd_read: record loaded: ../example_data/Ant-JamesRossIsland.Mulvaney.2013.lpd
+2019-10-10 14:38:06,587 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmptmj0esm8
+2019-10-10 14:38:06,587 [INFO] zips: enter unzip
+2019-10-10 14:38:06,590 [INFO] zips: exit unzip
+2019-10-10 14:38:06,674 [INFO] jsons: Read JSONLD successful: MD98-2170.Stott.2004.jsonld
+2019-10-10 14:38:06,675 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:06,677 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:06,677 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:06,677 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:06,677 [INFO] jsons: enter import_data: chron
+2019-10-10 14:38:06,678 [INFO] jsons: exit import_data: chron
+2019-10-10 14:38:06,678 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:06,678 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:06,678 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:06,679 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:06,679 [INFO] directory: enter list_files
+2019-10-10 14:38:06,680 [INFO] directory: exit list_files
+2019-10-10 14:38:06,680 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,680 [INFO] csvs: open file: MD98-2170.Stott.2004.Paleo1.measurementTable1.csv
+2019-10-10 14:38:06,681 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,681 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,681 [INFO] csvs: open file: MD98-2170.Stott.2004.Chron1.measurementTable1.csv
+2019-10-10 14:38:06,682 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,682 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:06,682 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,685 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,685 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,685 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,686 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: labcode
+2019-10-10 14:38:06,687 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,687 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,687 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:06,688 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:06,689 [INFO] csvs: enter get_csv_from_section: MD98-2170.Stott.2004.paleo
+2019-10-10 14:38:06,690 [INFO] csvs: exit get_csv_from_section: MD98-2170.Stott.2004.paleo
+2019-10-10 14:38:06,690 [INFO] csvs: enter get_csv_from_section: MD98-2170.Stott.2004.chron
+2019-10-10 14:38:06,690 [INFO] csvs: exit get_csv_from_section: MD98-2170.Stott.2004.chron
+2019-10-10 14:38:06,690 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:06,692 [INFO] LiPD: lipd_read: record loaded: ../example_data/MD98-2170.Stott.2004.lpd
+2019-10-10 14:38:06,693 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmp654h9_19
+2019-10-10 14:38:06,693 [INFO] zips: enter unzip
+2019-10-10 14:38:06,697 [INFO] zips: exit unzip
+2019-10-10 14:38:06,813 [INFO] jsons: Read JSONLD successful: MD01-2378.Xu.2008.jsonld
+2019-10-10 14:38:06,813 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:06,815 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:06,815 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:06,815 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:06,815 [INFO] jsons: enter import_data: chron
+2019-10-10 14:38:06,816 [INFO] jsons: exit import_data: chron
+2019-10-10 14:38:06,816 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:06,816 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:06,816 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:06,817 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:06,818 [INFO] directory: enter list_files
+2019-10-10 14:38:06,818 [INFO] directory: exit list_files
+2019-10-10 14:38:06,818 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,818 [INFO] csvs: open file: MD012378.Xu.2008.chron1measurement1.csv
+2019-10-10 14:38:06,819 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,819 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,819 [INFO] csvs: open file: MD012378.Xu.2008.paleo1measurement1.csv
+2019-10-10 14:38:06,821 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,821 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:06,821 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,827 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,827 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,827 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,828 [INFO] inferred_data: get_inferred_data_table: Not calculating inferred data for variableName: lab label
+2019-10-10 14:38:06,829 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,829 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,830 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:06,830 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:06,833 [INFO] csvs: enter get_csv_from_section: MD01-2378.Xu.2008.paleo
+2019-10-10 14:38:06,833 [INFO] csvs: exit get_csv_from_section: MD01-2378.Xu.2008.paleo
+2019-10-10 14:38:06,833 [INFO] csvs: enter get_csv_from_section: MD01-2378.Xu.2008.chron
+2019-10-10 14:38:06,833 [INFO] csvs: exit get_csv_from_section: MD01-2378.Xu.2008.chron
+2019-10-10 14:38:06,834 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:06,835 [INFO] LiPD: lipd_read: record loaded: ../example_data/MD01-2378.Xu.2008.lpd
+2019-10-10 14:38:06,836 [INFO] directory: temp directory: /var/folders/xj/p7h9764x7cx0by8547l04rrr0000gn/T/tmpeqo0pdnp
+2019-10-10 14:38:06,836 [INFO] zips: enter unzip
+2019-10-10 14:38:06,839 [INFO] zips: exit unzip
+2019-10-10 14:38:06,871 [INFO] jsons: Read JSONLD successful: Ocn-TongueoftheOcean.Rosenheim.2005.jsonld
+2019-10-10 14:38:06,871 [INFO] jsons: exit read_json_from_file
+2019-10-10 14:38:06,872 [INFO] jsons: enter idx_num_to_name
+2019-10-10 14:38:06,872 [INFO] jsons: enter import_data: paleo
+2019-10-10 14:38:06,872 [INFO] jsons: exit import_data: paleo
+2019-10-10 14:38:06,873 [INFO] jsons: exit idx_num_to_name
+2019-10-10 14:38:06,873 [INFO] misc: enter remove_empty_doi
+2019-10-10 14:38:06,873 [INFO] misc: exit remove_empty_doi
+2019-10-10 14:38:06,874 [INFO] csvs: enter read_csvs
+2019-10-10 14:38:06,874 [INFO] directory: enter list_files
+2019-10-10 14:38:06,874 [INFO] directory: exit list_files
+2019-10-10 14:38:06,874 [INFO] csvs: enter read_csv_from_file
+2019-10-10 14:38:06,875 [INFO] csvs: open file: Ocn-TongueoftheOcean.Rosenheim.2005.paleo1measurement1.csv
+2019-10-10 14:38:06,875 [INFO] csvs: exit read_csv_from_file
+2019-10-10 14:38:06,875 [INFO] csvs: enter merge_csv_metadata
+2019-10-10 14:38:06,876 [INFO] csvs: enter merge_csv_section
+2019-10-10 14:38:06,877 [ERROR] inferred_data: fix_numeric_types: must be real number, not str
+2019-10-10 14:38:06,877 [INFO] csvs: exit merge_csv_section
+2019-10-10 14:38:06,877 [INFO] csvs: exit merge_csv_metadata
+2019-10-10 14:38:06,877 [INFO] csvs: enter get_csv_from_metadata
+2019-10-10 14:38:06,878 [INFO] csvs: enter get_csv_from_section: Ocn-TongueoftheOcean.Rosenheim.2005.paleo
+2019-10-10 14:38:06,878 [INFO] csvs: exit get_csv_from_section: Ocn-TongueoftheOcean.Rosenheim.2005.paleo
+2019-10-10 14:38:06,878 [INFO] csvs: exit get_csv_from_metadata
+2019-10-10 14:38:06,879 [INFO] LiPD: lipd_read: record loaded: ../example_data/Ocn-TongueoftheOcean.Rosenheim.2005.lpd
+2019-10-10 14:38:06,880 [INFO] benchmarks: Benchmark - Function: readLipd , Time: 6.78 seconds
