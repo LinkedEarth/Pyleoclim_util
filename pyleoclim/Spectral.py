@@ -94,7 +94,7 @@ class WaveletAnalysis(object):
 
         return g
 
-    def preprocess(self, ys, ts, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
+    def preprocess(self, ys, ts, detrend='none', params=["default", 4, 0, 1], gaussianize=False, standardize=True):
         ''' Return the processed time series using detrend and standardization.
 
         Args:
@@ -118,7 +118,7 @@ class WaveletAnalysis(object):
 
         '''
 
-        if detrend is True:
+        if detrend is not 'none':
             ys_d = Timeseries.detrend(ys, ts, method=detrend, params=params)
         else:
             ys_d = ys
