@@ -136,9 +136,7 @@ def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None
         interp_values1, interp_values2 -  the interpolated y-values
         """
     
-    #make sure the method is correct
-    method_list = ['interpolation', 'bin',None]
-    assert method in method_list, 'Invalid method.'
+    
     
     # make sure that x1, y1, x2, y2 are numpy arrays
     x1 = np.array(x1, dtype='float64')
@@ -177,7 +175,9 @@ def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None
         xi2 = x2[min_idx2:max_idx2+1]
         interp_values1 = y1[min_idx1:max_idx1+1]
         interp_values2 = y2[min_idx1:max_idx1+1]
-
+    
+    else:
+        raise KeyError('Not a valid interpolation method')
 
     return xi1, xi2, interp_values1, interp_values2
 

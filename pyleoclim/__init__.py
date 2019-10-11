@@ -1870,7 +1870,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
     ys,ts = Timeseries.clean_ts(ys,ts)
 
     # Truncate the timeseries if asked
-    if lim is not None:
+    if lim != None:
         idx_low = np.where(ts>=lim[0])[0][0]
         idx_high = np.where(ts<=lim[1])[0][-1]
         ts = ts[idx_low:idx_high]
@@ -2115,9 +2115,16 @@ def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None,
     """Cross Wavelet transform of two timeseries
     
     Args:
-        timeseries1 (dict): a LiPD timeseries object (Optional, will prompt for one)
-        timeseries2 (dict): a LiPD timeseries object (Optional, will prompt for one)
+        timeseries1, timseries2 (dict): a LiPD timeseries object (Optional, will prompt for one)
         lim (list): Truncate the timeseries between min/max time (e.g., [0,10000])
+        x-axis (str): The representation against which to express the
+                paleo-data. Options are "age", "year", and "depth".
+                Default is to let the system choose if only one available
+                or prompt the user.
+        autocorrect (bool): If applicable, convert age to year automatically.
+                If set to False, timeseries objects should have converted time
+                axis and updated units label in the dictionary
+        autocorrect_param (float): Reference for age/year conversion.
         xwt_default: If True, will use the followinf default parameters
             
             xwt_default = {'tau': None,
@@ -2133,6 +2140,50 @@ def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None,
                            'method':'Kirchner_f2py'}
             Modify the values for specific keys to change the default behavior.
             See Spectral.xwt for details
+        fig (bool): If True, plots the figure 
+        xwcplot_default: If True, will use the following default parameters:
+            
+            wwaplot_default={'pt':0.5,
+                                 'levels':None,
+                                 'tick_range':None,
+                                 'basey':2,
+                                 'yticks': None,
+                                 'ylime':None,
+                                 'xticks':None,
+                                 'xlabels':None,
+                                 'figsize':[20,8],
+                                 'clr_map':'OrRd',
+                                 'skip_x':5,
+                                 'skip_y':5,
+                                 'scale':30,
+                                 'width':0.004,
+                                 'cbar_drawedges':False
+                                 'cone_alpha':0.5,
+                                 'plot_signif':False,
+                                 'signif_style':'contour'
+                                 'title':None,
+                                 'plot_cone':True,
+                                 'ax':None,
+                                 'xlabel':Age representation,
+                                 'ylabel': "Period (year)",
+                                 'cbar_orientation':'vertical',
+                                 'cbar_pad':0.05,
+                                 'cbar_frac':0.15,
+                                 'cbar_labelsize':None
+                                 }
+        saveFig (bool): default is to not save the figure
+        dir (str): the full path of the directory in which to save the figure.
+            If not provided, creates a default folder called 'figures' in the
+            LiPD working directory (lipd.path).
+        format (str): One of the file extensions supported by the active
+            backend. Default is "eps". Most backend support png, pdf, ps, eps,
+            and svg.
+        
+        Returns:
+            res (dict): contains the cross wavelet coherence, cross-wavelet phase,
+            vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
+            
+            fig
     """
     #Get timeseries
     if not timeseries1:
@@ -2144,13 +2195,75 @@ def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None,
             fetchTs()
         timeseries2 = LipdUtils.getTs(ts_list)
     
-    # Make sure that everything checks out with the time axis
-    x_axis1 = LipdUtils.checkTimeAxis(timeseries1)
-    x_axis2 = LipdUtils.checkTimeAxis(timeseries2)
+    # Get the first time and paleoData values
+    y1 = np.array(timeseries1['paleoData_values'], dtype = 'float64')
+    x1, label1 = LipdUtils.checkTimeAxis(timeseries1, x_axis=x_axis)
+
+    # Get the second one
+    y2 = np.array(timeseries2['paleoData_values'], dtype = 'float64')
+    x2, label2 = LipdUtils.checkTimeAxis(timeseries2, x_axis=x_axis)
+        
+    #Make sure that the label is the same
+    if label1 != label2:
+        if autocorrect == True:
+            print("Converting year to age...")
+            if label1 == 'year':
+                x1 = autocorrect_param-x1
+                units1 = 'yr BP'
+                units2 = timeseries2[label2+'Units']
+                label1 = 'year B.P.'
+            elif label2 == 'year':
+                x2 = autocorrect_param-x2
+                units2 = 'yr BP'
+                units1 = timeseries1[label1+'Units']
+        else:
+            sys.exit("The two timeseries share a different time representation")
+    else: 
+        units2 = timeseries2[label2+'Units']
+        units1 = timeseries1[label1+'Units']
+   
+    # Tranform the units if necessary
     
-    assert x_axis1 == x_axis2, 'Timeseries should be using the same age representation'
+    if units1 != units2:
+        units1_group = LipdUtils.timeUnitsCheck(units1)
+        units2_group = LipdUtils.timeUnitsCheck(units2)
+        assert units1_group != 'unknown', 'Units unknown, manual conversion needed'
+        assert units2_group != 'unknown', 'Units unknown, manual conversion needed'
+        if units1_group == 'undefined':
+            if label1 == 'year':
+                units1_group = 'year_units'
+            elif label1 == 'age':
+                units2_group = 'age_units'
+        if units2_group == 'undefined':
+            if label2 == 'year':
+                units2_group = 'year_units'
+            elif label2 == 'age':
+                units2_group = 'age_units'
+        #convert kyr to yr if needed
+        if units1_group != units2_group:
+            if units1_group == 'kage_units':
+                x1 = x1*1000
+                label1 = 'age'
+            if units2_group == 'kage_units':
+                x2 = x2*1000
+                label2 = 'age'
     
-    # Check the units
+    # Remove NaNs and ordered
+    y1,x1 = Timeseries.clean_ts(y1,x1)
+    y2,x2 = Timeseries.clean_ts(y2,x2)
+    
+    #Check that the timeseries are on a common axis
+    if lim == None:
+        xi1, xi2, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+                                                                       method=None)
+    else:
+        if type(lim) != list:
+            raise TypeError('The time series limits should be of type list') 
+        xi1, xi2, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+                                                                       start=lim[0],
+                                                                       end=lim[1])
+    
+    
         
 
 """
