@@ -1902,7 +1902,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                                  'psd_ar1_q95':psd_ar1_q95,
                                  'period_label':'Period ('+ageunits+')'}
            
-            if type(psdplot_default) is dict: #necessary since not same defaults
+            if type(psdplot_default) == dict: #necessary since not same defaults
                 if 'ar1_linewidth' not in psdplot_default.keys():
                     psdplot_default['ar1_linewidth'] =1
                 if 'plot_ar1' not in psdplot_default.keys():
@@ -2109,7 +2109,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
 
 ## Cross wavelet transform
 def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None, 
-          autocorrect = True, autocorrect_param =1950, xwt_default = True,
+          autocorrect = True, autocorrect_param =1950, xwc_default = True,
           fig = True, xwcplot_default = True,
           saveFig = False, dir = None, format = "eps"):
     """Cross Wavelet transform of two timeseries
@@ -2159,7 +2159,7 @@ def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None,
                                  'width':0.004,
                                  'cbar_drawedges':False
                                  'cone_alpha':0.5,
-                                 'plot_signif':False,
+                                 'plot_signif':True,
                                  'signif_style':'contour'
                                  'title':None,
                                  'plot_cone':True,
@@ -2244,9 +2244,11 @@ def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None,
             if units1_group == 'kage_units':
                 x1 = x1*1000
                 label1 = 'age'
+                units1 = 'yr  BP'
             if units2_group == 'kage_units':
                 x2 = x2*1000
                 label2 = 'age'
+                units2 = 'yr BP'
     
     # Remove NaNs and ordered
     y1,x1 = Timeseries.clean_ts(y1,x1)
@@ -2262,9 +2264,46 @@ def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None,
         xi1, xi2, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
                                                                        start=lim[0],
                                                                        end=lim[1])
+    #perform the cross-wavelet analysis
+    if xwc_default == True:
+        res = Spectral.xwc(interp_values1, xi1, interp_values2,xi2)
+    elif type(xwc_default) is dict:
+        res = Spectral.xwc(interp_values1, xi1, interp_values2,xi2, **xwc_default)
+    else:
+        raise TypeError('Options for the x-wavelet calculation must be passed as a dictionary')
     
     
+    # Figure if asked
+    if fig == True:
+        xwcplot_default={'plot_signif': True,
+                         'plot_cone':True,
+                         'xlabel': units1,
+                         'ylabel':'Period (years)'}
+        if type(xwcplot_default) == dict:
+            if 'plot_signif' not in xwcplot_default:
+                xwcplot_default['plot_signif']=True
+            if 'plot_cone' not in xwcplot_default:
+                xwcplot_default['plot_cone']=True
+            if 'xlabel' not in xwcplot_default:
+                xwcplot_default['xlabel']=units1
+            if 'ylabel' not in xwcplot_default:
+                xwcplot_default['ylabel']='Period (years)'
+        else:
+            raise TypeError('Options for the x-wavelet plot must be passed as a dictionary')
         
+        fig = Spectral.plot_coherence(res,**xwcplot_default)
+        
+        if saveFig is True:
+            LipdUtils.saveFigure(timeseries1['dataSetName']+'_'+\
+                                 timeseries2['dataSetName']+\
+                                 '_coherenceplot',format,dir)
+        else:
+            plt.show()
+        
+    else:
+        fig = None     
+                                                                           
+    return res, fig   
 
 """
 Age model

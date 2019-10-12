@@ -1816,7 +1816,7 @@ def xwt(ys1, ts1, ys2, ts2,
         c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
         Neff (int): effective number of points
         nproc (int): the number of processes for multiprocessing
-        detrend (str): 'no' - the original time series is assumed to have no trend;
+        detrend (str): None - the original time series is assumed to have no trend;
                        'linear' - a linear least-squares fit to `ys` is subtracted;
                        'constant' - the mean of `ys` is subtracted
                        'savitzy-golay' - ys is filtered using the Savitzky-Golay
