@@ -16,8 +16,156 @@ from scipy import special
 import sys
 from scipy import signal
 from pyhht import EMD
+from scipy.stats.mstats import mquantiles
+from tqdm import tqdm
 
 from pyleoclim import Spectral
+from pyleoclim import Stats
+
+class Causality(object):
+
+    def liang_causality(self, y1, y2, npt=1):
+        '''
+        Estimate the Liang information transfer from series y2 to series y1
+
+        Args:
+            y1, y2 (array) - vectors of (real) numbers with identical length, no NaNs allowed
+            npt (int >=1 ) -  time advance in performing Euler forward differencing,
+                              e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
+                              npt=1 should be used.
+
+        Returns:
+            T21 - info flow from y2 to y1	(Note: not y1 -> y2!)
+            tau21 - the standardized info flow fro y2 to y1
+            Z - the total info
+
+        References:
+            - Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and
+                Applications. Entropy, 15, 327-360, doi:10.3390/e15010327
+            - Liang, X.S. (2014) Unraveling the cause-efect relation between timeseries.
+                Physical review, E 90, 052150
+            - Liang, X.S. (2015) Normalizing the causality between time series.
+                Physical review, E 92, 022126
+            - Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio.
+                Physical review, E 94, 052201
+        '''
+        dt = 1
+        nm = np.size(y1)
+
+        grad1 = (y1[0+npt:] - y1[0:-npt]) / (npt*dt)
+        grad2 = (y2[0+npt:] - y2[0:-npt]) / (npt*dt)
+
+        y1 = y1[:-npt]
+        y2 = y2[:-npt]
+
+        N = nm - npt
+        C = np.cov(y1, y2)
+        detC = np.linalg.det(C)
+
+        dC = np.ndarray((2, 2))
+        dC[0, 0] = np.sum((y1-np.mean(y1))*(grad1-np.mean(grad1)))
+        dC[0, 1] = np.sum((y1-np.mean(y1))*(grad2-np.mean(grad2)))
+        dC[1, 0] = np.sum((y2-np.mean(y2))*(grad1-np.mean(grad1)))
+        dC[1, 1] = np.sum((y2-np.mean(y2))*(grad2-np.mean(grad2)))
+
+        dC /= N-1
+
+        a11 = C[1, 1]*dC[0, 0] - C[0, 1]*dC[1, 0]
+        a12 = -C[0, 1]*dC[0, 0] + C[0, 0]*dC[1, 0]
+
+        a11 /= detC
+        a12 /= detC
+
+        f1 = np.mean(grad1) - a11*np.mean(y1) - a12*np.mean(y2)
+        R1 = grad1 - (f1 + a11*y1 + a12*y2)
+        Q1 = np.sum(R1*R1)
+        b1 = np.sqrt(Q1*dt/N)
+
+        NI = np.ndarray((4, 4))
+        NI[0, 0] = N*dt/b1**2
+        NI[1, 1] = dt/b1**2*np.sum(y1*y1)
+        NI[2, 2] = dt/b1**2*np.sum(y2*y2)
+        NI[3, 3] = 3*dt/b1**4*np.sum(R1*R1) - N/b1**2
+        NI[0, 1] = dt/b1**2*np.sum(y1)
+        NI[0, 2] = dt/b1**2*np.sum(y2)
+        NI[0, 3] = 2*dt/b1**3*np.sum(R1)
+        NI[1, 2] = dt/b1**2*np.sum(y1*y2)
+        NI[1, 3] = 2*dt/b1**3*np.sum(R1*y1)
+        NI[2, 3] = 2*dt/b1**3*np.sum(R1*y2)
+
+        NI[1, 0] = NI[0, 1]
+        NI[2, 0] = NI[0, 2]
+        NI[2, 1] = NI[1, 2]
+        NI[3, 0] = NI[0, 3]
+        NI[3, 1] = NI[1, 3]
+        NI[3, 2] = NI[2, 3]
+
+        invNI = np.linalg.pinv(NI)
+        var_a12 = invNI[2, 2]
+        T21 = C[0, 1]/C[0, 0] * (-C[1, 0]*dC[0, 0] + C[0, 0]*dC[1, 0]) / detC
+        var_T21 = (C[0, 1]/C[0, 0])**2 * var_a12
+
+        dH1_star= a11
+        dH1_noise = b1**2 / (2*C[0, 0])
+
+        Z = np.abs(T21) + np.abs(dH1_star) + np.abs(dH1_noise)
+
+        tau21 = T21 / Z
+        dH1_star = dH1_star / Z
+        dH1_noise = dH1_noise / Z
+
+        res_dict = {
+            'T21': T21,
+            'tau21': tau21,
+            'Z': Z,
+            'dH1_star': dH1_star,
+            'dH1_noise': dH1_noise,
+        }
+
+        return res_dict
+
+def calsality_est(y1, y2, method='liang', nsim=1000, qs=[0.9, 0.95, 0.99], **kwargs):
+    '''
+        Estimate the information transfer from series y2 to series y1
+
+        Args:
+            y1, y2 (array) - vectors of (real) numbers with identical length, no NaNs allowed
+            method (str) - only "liang" for now
+            nsim (int) - the number of AR(1) surrogates for significance test
+            kwargs, includes:
+                npt - the number of time advance in performing Euler forward differencing in "liang" method
+    '''
+    ca = Causality()
+    if method == 'liang':
+        npt = kwargs['npt'] if 'npt' in kwargs else 1
+        res_dict = ca.liang_causality(y1, y2, npt=npt)
+        tau21 = res_dict['tau21']
+
+        # significance test with AR(1)
+        stat = Stats.Correlation()
+        g1 = stat.ar1_fit(y1)
+        g2 = stat.ar1_fit(y2)
+        sig1 = np.std(y1)
+        sig2 = np.std(y2)
+        n = np.size(y1)
+        noise1 = stat.ar1_sim(n, nsim, g1, sig1)
+        noise2 = stat.ar1_sim(n, nsim, g2, sig2)
+        tau21_noise = []
+        for i in tqdm(range(nsim), desc='Generating AR(1) surrogates'):
+            res_noise = ca.liang_causality(noise1[:, i], noise2[:, i], npt=npt)
+            tau21_noise.append(res_noise['tau21'])
+        tau21_noise = np.array(tau21_noise)
+        tau21_noise_qs = mquantiles(tau21_noise, qs)
+
+        res_dict = {
+            'tau21': tau21,
+            'signif_qs': qs,
+            'tau21_noise': tau21_noise_qs,
+        }
+    else:
+        raise KeyError(f'{method} is not a valid method')
+
+    return res_dict
 
 
 def binvalues(x, y, bin_size=None, start=None, end=None):
@@ -71,6 +219,7 @@ def binvalues(x, y, bin_size=None, start=None, end=None):
             error.append(np.nanstd(y[idx]))
 
     return bins, binned_values, n, error
+
 
 def interp(x,y,interp_step=None,start=None,end=None):
     """ Linear interpolation onto a new x-axis
