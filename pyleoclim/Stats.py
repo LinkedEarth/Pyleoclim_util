@@ -219,7 +219,7 @@ class Correlation(object):
         '''
 
 
-        ar1_mod = sm.tsa.AR(ts, missing='drop').fit(maxlag=1, trend='nc')
+        ar1_mod = sm.tsa.AR(ts, missing='drop').fit(maxlag=1)
         g = ar1_mod.params[1]
 
         return g
