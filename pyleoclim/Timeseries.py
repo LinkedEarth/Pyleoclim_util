@@ -124,7 +124,7 @@ class Causality(object):
 
         return res_dict
 
-def calsality_est(y1, y2, method='liang', nsim=1000, qs=[0.9, 0.95, 0.99], **kwargs):
+def causality_est(y1, y2, method='liang', nsim=1000, qs=[0.9, 0.95, 0.99], **kwargs):
     '''
         Estimate the information transfer from series y2 to series y1
 
@@ -132,8 +132,13 @@ def calsality_est(y1, y2, method='liang', nsim=1000, qs=[0.9, 0.95, 0.99], **kwa
             y1, y2 (array) - vectors of (real) numbers with identical length, no NaNs allowed
             method (str) - only "liang" for now
             nsim (int) - the number of AR(1) surrogates for significance test
+            qs (list) - the quantiles for significance test
             kwargs, includes:
                 npt - the number of time advance in performing Euler forward differencing in "liang" method
+        Returns:
+            tau21 (float) - the info flow from y2 to y1
+            qs (list of floats) - the significance test quantile levels
+            tau21_noise (list of floats) - the quantiles of the info flow from noise2 to noise1 for significance test
     '''
     ca = Causality()
     if method == 'liang':
