@@ -275,7 +275,7 @@ def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None
         x2 (array): x-axis values of the second timeseries
         y2 (array): y-axis values of the second timeseries
         method (str): Which method to use to get the timeseries on the same x axis.
-            Valid entries: 'interpolation' (default), 'bin', 'None'. 'None' only 
+            Valid entries: 'interpolation' (default), 'bin', 'None'. 'None' only
             cuts the timeseries to the common period but does not attempt
             to generate a common time axis
         step (float): The interpolation step. Default is mean resolution
@@ -289,9 +289,9 @@ def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None
         xi1, xi2 -  the interpolated x-axis \n
         interp_values1, interp_values2 -  the interpolated y-values
         """
-    
-    
-    
+
+
+
     # make sure that x1, y1, x2, y2 are numpy arrays
     x1 = np.array(x1, dtype='float64')
     y1 = np.array(y1, dtype='float64')
@@ -324,12 +324,12 @@ def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None
         min_idx2 = np.where(x2>=start)[0][0]
         max_idx1 = np.where(x1<=end)[0][-1]
         max_idx2 = np.where(x2<=end)[0][-1]
-        
+
         xi1 = x1[min_idx1:max_idx1+1]
         xi2 = x2[min_idx2:max_idx2+1]
         interp_values1 = y1[min_idx1:max_idx1+1]
-        interp_values2 = y2[min_idx1:max_idx1+1]
-    
+        interp_values2 = y2[min_idx2:max_idx2+1]
+
     else:
         raise KeyError('Not a valid interpolation method')
 
