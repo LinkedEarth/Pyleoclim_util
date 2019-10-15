@@ -124,7 +124,7 @@ class Causality(object):
 
         return res_dict
 
-def causality_est(y1, y2, method='liang', nsim=1000, qs=[0.9, 0.95, 0.99], **kwargs):
+def causality_est(y1, y2, method='liang', nsim=1000, qs=[0.01, 0.05, 0.1, 0.9, 0.95, 0.99], **kwargs):
     '''
         Estimate the information transfer from series y2 to series y1
 
@@ -315,9 +315,9 @@ def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None
         xi2, interp_values2 = interp(x2, y2, interp_step=step, start=start,
                                 end=end)
     elif method == 'bin':
-        xi1, interp_values1 = binvalues(x1, y1, bin_size=step, start=start,
+        xi1, interp_values1, n, error = binvalues(x1, y1, bin_size=step, start=start,
                                 end=end)
-        xi2, interp_values2 = binvalues(x2, y2, bin_size=step, start=start,
+        xi2, interp_values2, n, error = binvalues(x2, y2, bin_size=step, start=start,
                                 end=end)
     elif method == None:
         min_idx1 = np.where(x1>=start)[0][0]
@@ -554,6 +554,10 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1]):
     Returns:
         ys (array) - the detrended timeseries.
     """
+    y = np.array(y)
+
+    if x is not None:
+        x = np.array(x)
 
     if method == "linear":
         ys = signal.detrend(y,type='linear')
