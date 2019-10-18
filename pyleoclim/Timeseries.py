@@ -18,6 +18,7 @@ from scipy import signal
 from pyhht import EMD
 from scipy.stats.mstats import mquantiles
 from tqdm import tqdm
+from scipy.stats.mstats import gmean
 
 from pyleoclim import Spectral
 from pyleoclim import Stats
@@ -127,7 +128,7 @@ class Causality(object):
     def signif_isopersist(self, y1, y2, method='liang',
                           nsim=1000, qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995],
                           **kwargs):
-        ''' significance test with AR(1)
+        ''' significance test with AR(1) with same persistence
 
         Args:
             y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
@@ -154,10 +155,57 @@ class Causality(object):
         noise2 = stat.ar1_sim(n, nsim, g2, sig2)
 
         if method == 'liang':
+            npt = kwargs['npt'] if 'npt' in kwargs else 1
             T21_noise = []
             tau21_noise = []
-            for i in tqdm(range(nsim), desc='Generating AR(1) surrogates'):
-                res_noise = ca.liang_causality(noise1[:, i], noise2[:, i], npt=npt)
+            for i in tqdm(range(nsim), desc='Calculating causality between surrogates'):
+                res_noise = self.liang_causality(noise1[:, i], noise2[:, i], npt=npt)
+                tau21_noise.append(res_noise['tau21'])
+                T21_noise.append(res_noise['T21'])
+            tau21_noise = np.array(tau21_noise)
+            T21_noise = np.array(T21_noise)
+            tau21_noise_qs = mquantiles(tau21_noise, qs)
+            T21_noise_qs = mquantiles(T21_noise, qs)
+
+            res_dict = {
+                'tau21_noise_qs': tau21_noise_qs,
+                'T21_noise_qs': T21_noise_qs,
+            }
+        else:
+            raise KeyError(f'{method} is not a valid method')
+
+        return res_dict
+
+    def signif_isospec(self, y1, y2, method='liang',
+                       nsim=1000, qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995],
+                       **kwargs):
+        ''' significance test with surrogates with randomized phases
+
+        Args:
+            y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
+            method (str): only "liang" for now
+            npt (int >=1 ):  time advance in performing Euler forward differencing,
+                             e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
+                             npt=1 should be used.
+            nsim (int): the number of surrogates for significance test
+            qs (list): the quantiles for significance test
+
+        Returns:
+            res_dict (dict): A dictionary with the following information:
+                T21_noise_qs (list) - the quantiles of the information flow from noise2 to noise1 for significance testing
+                tau21_noise_qs (list) - the quantiles of the standardized information flow from noise2 to noise1 for significance testing
+
+        '''
+        stat = Stats.Correlation()
+        noise1 = stat.phaseran(y1, nsim)
+        noise2 = stat.phaseran(y2, nsim)
+
+        if method == 'liang':
+            npt = kwargs['npt'] if 'npt' in kwargs else 1
+            T21_noise = []
+            tau21_noise = []
+            for i in tqdm(range(nsim), desc='Calculating causality between surrogates'):
+                res_noise = self.liang_causality(noise1[:, i], noise2[:, i], npt=npt)
                 tau21_noise.append(res_noise['tau21'])
                 T21_noise.append(res_noise['T21'])
             tau21_noise = np.array(tau21_noise)
@@ -207,15 +255,15 @@ def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
         T21 = res_dict['T21']
         Z = res_dict['Z']
 
-        if signif_test == 'isopersist':
-            signif_dict = ca.signif_isopersist(y1, y2, nsim=nsim, qs=qs, npt=npt)
-            T21_noise_qs = signif_dict['T21_noise_qs']
-            tau21_noise_qs = signif_dict['tau21_noise_qs']
-        elif signif_test == 'isospec':
-            #TODO
-        else:
-            raise KeyError(f'{signif_test} is not a valid method for significance test')
+        signif_test_func = {
+            'isopersist': ca.signif_isopersist,
+            'isospec': ca.signif_isospec,
+        }
 
+        signif_dict = signif_test_func[signif_test](y1, y2, nsim=nsim, qs=qs, npt=npt)
+
+        T21_noise_qs = signif_dict['T21_noise_qs']
+        tau21_noise_qs = signif_dict['tau21_noise_qs']
         res_dict = {
             'T21': T21,
             'tau21': tau21,
