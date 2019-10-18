@@ -29,15 +29,15 @@ class Causality(object):
         Estimate the Liang information transfer from series y2 to series y1
 
         Args:
-            y1, y2 (array) - vectors of (real) numbers with identical length, no NaNs allowed
-            npt (int >=1 ) -  time advance in performing Euler forward differencing,
-                              e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
-                              npt=1 should be used.
+            y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
+            npt (int >=1 ): time advance in performing Euler forward differencing,
+                            e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
+                            npt=1 should be used.
 
         Returns:
-            T21 - info flow from y2 to y1	(Note: not y1 -> y2!)
-            tau21 - the standardized info flow fro y2 to y1
-            Z - the total info
+            T21: info flow from y2 to y1	(Note: not y1 -> y2!)
+            tau21: the standardized info flow fro y2 to y1
+            Z: the total info
 
         References:
             - Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and
@@ -124,22 +124,74 @@ class Causality(object):
 
         return res_dict
 
-def causality_est(y1, y2, method='liang', nsim=1000,\
+    def signif_isopersist(self, y1, y2, method='liang',
+                          nsim=1000, qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995],
+                          **kwargs):
+        ''' significance test with AR(1)
+
+        Args:
+            y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
+            method (str): only "liang" for now
+            npt (int >=1 ):  time advance in performing Euler forward differencing,
+                             e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
+                             npt=1 should be used.
+            nsim (int): the number of AR(1) surrogates for significance test
+            qs (list): the quantiles for significance test
+
+        Returns:
+            res_dict (dict): A dictionary with the following information:
+                T21_noise_qs (list) - the quantiles of the information flow from noise2 to noise1 for significance testing
+                tau21_noise_qs (list) - the quantiles of the standardized information flow from noise2 to noise1 for significance testing
+
+        '''
+        stat = Stats.Correlation()
+        g1 = stat.ar1_fit(y1)
+        g2 = stat.ar1_fit(y2)
+        sig1 = np.std(y1)
+        sig2 = np.std(y2)
+        n = np.size(y1)
+        noise1 = stat.ar1_sim(n, nsim, g1, sig1)
+        noise2 = stat.ar1_sim(n, nsim, g2, sig2)
+
+        if method == 'liang':
+            T21_noise = []
+            tau21_noise = []
+            for i in tqdm(range(nsim), desc='Generating AR(1) surrogates'):
+                res_noise = ca.liang_causality(noise1[:, i], noise2[:, i], npt=npt)
+                tau21_noise.append(res_noise['tau21'])
+                T21_noise.append(res_noise['T21'])
+            tau21_noise = np.array(tau21_noise)
+            T21_noise = np.array(T21_noise)
+            tau21_noise_qs = mquantiles(tau21_noise, qs)
+            T21_noise_qs = mquantiles(T21_noise, qs)
+
+            res_dict = {
+                'tau21_noise_qs': tau21_noise_qs,
+                'T21_noise_qs': T21_noise_qs,
+            }
+        else:
+            raise KeyError(f'{method} is not a valid method')
+
+        return res_dict
+
+
+def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
                   qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995], **kwargs):
-    '''Information flow 
-    
+    '''Information flow
+
         Estimate the information transfer from series y2 to series y1
 
         Args:
             y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
             method (str): only "liang" for now
+            signif_test (str): the method for significance test
             nsim (int): the number of AR(1) surrogates for significance test
             qs (list): the quantiles for significance test
             kwargs, includes:
                 npt: the number of time advance in performing Euler forward differencing in "liang" method
-        
+
         Returns:
-            res-dict (dict): A dictionary with the following information:
+            res_dict (dict): A dictionary with the following information:
                 T21 (float) - The infor flow from y2 to y1
                 tau21 (float) - the standardized info flow from y2 to y1, tau21 = T21/Z
                 Z (float) - The total information flow
@@ -154,30 +206,18 @@ def causality_est(y1, y2, method='liang', nsim=1000,\
         tau21 = res_dict['tau21']
         T21 = res_dict['T21']
         Z = res_dict['Z']
-        
 
-        # significance test with AR(1)
-        stat = Stats.Correlation()
-        g1 = stat.ar1_fit(y1)
-        g2 = stat.ar1_fit(y2)
-        sig1 = np.std(y1)
-        sig2 = np.std(y2)
-        n = np.size(y1)
-        noise1 = stat.ar1_sim(n, nsim, g1, sig1)
-        noise2 = stat.ar1_sim(n, nsim, g2, sig2)
-        T21_noise = []
-        tau21_noise = []
-        for i in tqdm(range(nsim), desc='Generating AR(1) surrogates'):
-            res_noise = ca.liang_causality(noise1[:, i], noise2[:, i], npt=npt)
-            tau21_noise.append(res_noise['tau21'])
-            T21_noise.append(res_noise['T21'])
-        tau21_noise = np.array(tau21_noise)
-        T21_noise = np.array(T21_noise)
-        tau21_noise_qs = mquantiles(tau21_noise, qs)
-        T21_noise_qs = mquantiles(T21_noise, qs)
+        if signif_test == 'isopersist':
+            signif_dict = ca.signif_isopersist(y1, y2, nsim=nsim, qs=qs, npt=npt)
+            T21_noise_qs = signif_dict['T21_noise_qs']
+            tau21_noise_qs = signif_dict['tau21_noise_qs']
+        elif signif_test == 'isospec':
+            #TODO
+        else:
+            raise KeyError(f'{signif_test} is not a valid method for significance test')
 
         res_dict = {
-            'T21': T21,    
+            'T21': T21,
             'tau21': tau21,
             'Z': Z,
             'signif_qs': qs,
