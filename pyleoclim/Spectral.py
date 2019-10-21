@@ -39,6 +39,23 @@ if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
 Core functions below, focusing on algorithms
 '''
 
+class SpectralAnalysis(object):
+    def fft():
+        #TODO
+        return
+
+    def welch():
+        #TODO
+        return
+
+    def mtm():
+        #TODO
+        return
+
+    def lomb_scargle():
+        #TODO
+        return
+
 
 class WaveletAnalysis(object):
     '''Performing wavelet analysis @author: fzhu
@@ -1373,6 +1390,10 @@ class WaveletAnalysis(object):
         rec_ts = self.preprocess(rec_ts, t, detrend=False, gaussianize=False, standardize=True)
 
         return rec_ts, t
+
+    def wavelet_evenly():
+        #TODO
+        return
 
 
 class AliasFilter(object):

@@ -223,6 +223,13 @@ class Causality(object):
         return res_dict
 
 
+
+class PCA(object):
+    def pca():
+        #TODO
+        return
+
+
 def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
                   qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995], **kwargs):
     '''Information flow
