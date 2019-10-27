@@ -55,6 +55,74 @@ class SpectralAnalysis(object):
     def lomb_scargle():
         #TODO
         return
+    def periodogram(self, ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
+        ''' Call periodogram from scipy
+
+        Args:
+            ys (array): a time series
+            ts (array): time axis of the time series
+            ana_args (dict): the arguments for spectral analysis with periodogram, including
+                - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
+                - nfft (int): length of the FFT used. If None the length of x will be used.
+                - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
+                - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
+                see https://docs.scipy.org/doc/scipy-0.13.0/reference/generated/scipy.signal.periodogram.html for the details
+            interp_method (str, {'interp', 'bin'}): perform interpolation or binning
+            interp_args (dict): the arguments for the interpolation or binning methods,
+                                for the details, check Timeseries.interp() and Timeseries.binvalues()
+
+            prep_args (dict): the arguments for preprocess, including
+                - detrend (str): 'none' - the original time series is assumed to have no trend;
+                                 'linear' - a linear least-squares fit to `ys` is subtracted;
+                                 'constant' - the mean of `ys` is subtracted
+                                 'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                                     filters and the resulting filtered series is subtracted from y.
+                                 'hht' - detrending with Hilbert-Huang Transform
+                - params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                                 corresponds to the window size (default it set to half of the data)
+                                 while the second parameter correspond to the order of the filter
+                                 (default is 4). The third parameter is the order of the derivative
+                                 (the default is zero, which means only smoothing.)
+                - gaussianize (bool): If True, gaussianizes the timeseries
+                - standardize (bool): If True, standardizes the timeseries
+
+        Returns:
+            res_dict (dict): the result dictionary, including
+                - freqs (array): the frequency vector
+                - psd (array): the spectral density vector
+
+        '''
+        # preprocessing
+        wa = WaveletAnalysis()
+        ys, ts = Timeseries.clean_ts(ys, ts)
+        ys = wa.preprocess(ys, ts, **prep_args)
+
+        # interpolation if not evenly-spaced
+        if not wa.is_evenly_spaced(ts):
+            interp_func = {
+                'interp': Timeseries.interp,
+                'bin': Timeseries.binvalues,
+            }
+            ts, ys = interp_func[interp_method](ts, ys, **interp_args)
+
+        # calculate sampling frequency
+        dt = np.median(np.diff(ts))
+        fs = 1 / dt
+
+        # spectral analysis
+        freqs, psd = signal.periodogram(ys, fs, **ana_args)
+
+        # fix the zero frequency point
+        if freqs[0] == 0:
+            psd[0] = np.nan
+
+        # output result
+        res_dict = {
+            'freqs': freqs,
+            'psd': psd,
+        }
+
+        return res_dict
 
 
 class WaveletAnalysis(object):
@@ -232,7 +300,7 @@ class WaveletAnalysis(object):
     def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, params=['default', 4, 0, 1],
                   gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
-        
+
         Original method from Foster. Not multiprocessing.
 
         Args:
