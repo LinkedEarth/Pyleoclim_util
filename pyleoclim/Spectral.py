@@ -2848,8 +2848,10 @@ def spectral(ys, ts, method='mtm', nMC=0, qs=0.95, kwargs={}):
     Args:
         ys (array): a time series
         ts (array): time axis of the time series
+        method (str, {'mtm', 'periodogram', 'welch', 'lombscargle'}): the available methods
         nMC (int): the number of surrogates of AR(1) process for significance test; 0 means no test
         qs (float): the quantile used for significance test
+        kwargs (dict): the dictionary for arguments, for the details please see the methods under class SpectralAnalysis()
 
     Returns:
         res_dict (dict): the result dictionary, including
@@ -2876,7 +2878,7 @@ def spectral(ys, ts, method='mtm', nMC=0, qs=0.95, kwargs={}):
         psd_ar1 = np.ndarray(shape=(nMC, nf))
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             ar1_noise = ar1_sim(ys, np.size(ts), 1, ts=ts)
-            res_red = spec_func[method](ar1_noise, ts, **args)
+            res_red = spec_func[method](ar1_noise, ts, **kwargs)
             psd_ar1[i, :] = res_red['psd']
 
         psd_ar1_q95 = mquantiles(psd_ar1, qs, axis=0)[0]
