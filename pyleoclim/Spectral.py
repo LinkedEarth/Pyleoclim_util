@@ -44,17 +44,114 @@ class SpectralAnalysis(object):
         #TODO
         return
 
-    def welch():
-        #TODO
-        return
+    def welch(self,ys,ts,ana_args={},prep_args={},interp_method='interp',interp_args={}):
+        '''
+        ys (array): a time series
+            ts (array): time axis of the time series
+            ana_args (dict): the arguments for spectral analysis with periodogram, including
+                - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
+                - nfft (int): length of the FFT used. If None the length of x will be used.
+                - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
+                - nperseg (int): Length of each segment. Defaults to None, but if window is str or tuple, is set to 256, and if window is array_like, is set to the length of the window.
+                - noverlap (int): Number of points to overlap between segments. If None, noverlap = nperseg // 2. Defaults to None.
+                - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
+                - axis (int):     Axis along which the periodogram is computed; the default is over the last axis (i.e. axis=-1).
+                - average : { ‘mean’, ‘median’ }, optional
+                see https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.signal.welch.html for details
+            interp_method (str, {'interp', 'bin'}): perform interpolation or binning
+            interp_args (dict): the arguments for the interpolation or binning methods,
+                                for the details, check Timeseries.interp() and Timeseries.binvalues()
+            prep_args (dict): the arguments for preprocess, including
+                - detrend (str): 'none' - the original time series is assumed to have no trend;
+                                 'linear' - a linear least-squares fit to `ys` is subtracted;
+                                 'constant' - the mean of `ys` is subtracted
+                                 'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                                     filters and the resulting filtered series is subtracted from y.
+                                 'hht' - detrending with Hilbert-Huang Transform
+                - params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                                 corresponds to the window size (default it set to half of the data)
+                                 while the second parameter correspond to the order of the filter
+                                 (default is 4). The third parameter is the order of the derivative
+                                 (the default is zero, which means only smoothing.)
+                - gaussianize (bool): If True, gaussianizes the timeseries
+                - standardize (bool): If True, standardizes the timeseries
+        Returns:
+            res_dict (dict): the result dictionary, including3
+                - freqs (array): the frequency vector
+                - psd (array): the spectral density vector
+        '''
+        #preprocessing
+        wa=WaveletAnalysis()
+        ys,ts=Timeseries.clean_ts(ys,ts)
+        ys=wa.preprocess(ys,ts,**prep_args)
+        
+        #if data is not evenly spaced, interpolate
+        if not wa.is_evenly_spaced(ts):
+            interp_func={
+                    'interp': Timeseries.interp,
+                    'bin': Timeseries.binvalues
+                    }
+            ts,ys= interp_func(ts,ys,**interp_args)
+        
+        #calculate sampling frequency fs
+        dt=np.median(np.diff(ts))
+        fs=1/dt
+        
+        #spectral analysis with scipy welch
+        freqs,psd=signal.welch(ys,fs,**ana_args)
+        
+        #fix zero frequency point
+        if freqs[0]==0:
+            psd[0]=np.nan
+        
+        #output result
+        res_dict={
+                'freqs': freqs,
+                'psd' : psd
+                }
+        return res_dict
 
     def mtm():
         #TODO
         return
 
-    def lomb_scargle():
-        #TODO
-        return
+    def lomb_scargle(ys, ts, freqs=None, detrend=False, gaussianize=False,standardize=True, params=['default', 4, 0, 1], args={"precenter" : False, "normalize" : False, "make_freq_method" : "nfft"}):
+        """ Return the computed periodogram using lomb-scargle algorithm
+        Lombscargle algorithm
+        Args:
+            ys (array): a time series
+            ts (array): time axis of the time series
+            freqs (array): vector of frequency
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussianize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
+            args (dict): Extra argumemnts which may be needed such as
+                precenter (bool): Pre-center amplitudes by subtracting the mean
+                normalize (bool): Compute normalized periodogram
+                make_freq_method (str) : Method to be used to make the time series. Default is nfft
+        Returns:
+            res : the lombscargle periodogram
+            freqs : vector of frequency
+        """
+        ys, ts = Timeseries.clean_ts(ys,ts)
+        wavelet_analyser = WaveletAnalysis()
+        pd_ys = wavelet_analyser.preprocess(ys,ts,detrend=detrend, gaussianize=gaussianize, standardize=standardize, params=params)
+        if freqs is None:
+            freqs = wavelet_analyser.make_freq_vector(ts, method=args["make_freq_method"])
+            freqs_copy = freqs[1:]
+            freqs_angular = 2 * np.pi * freqs_copy
+        res = signal.lombscargle(ts, pd_ys,freqs_angular,precenter=args["precenter"],normalize=args["normalize"])
+        return np.insert(res,0,np.nan), freqs
+
     def periodogram(self, ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
         ''' Call periodogram from scipy
 
@@ -1804,6 +1901,8 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
 
     return res
 
+def lomb_scargle(ys, ts, freqs=None, detrend=False, gaussianize=False,standardize=True, params=['default', 4, 0, 1], args={"precenter" : False, "normalize" : False, "make_freq_method" : "nfft"}):
+    return SpectralAnalysis.lombs_cargle(ys, ts, freqs=freqs, detrend=detrend, gaussianize=gaussianize, standardize=standardize, params=params, args=args)
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             detrend=False, params=["default", 4, 0, 1], gaussianize=False, 
