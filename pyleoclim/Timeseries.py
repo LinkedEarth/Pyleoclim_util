@@ -224,11 +224,26 @@ class Causality(object):
 
 
 
-class PCA(object):
+class Decomposition(object):
     def pca():
         #TODO
         return
+    
+    def ssa():
+        #TODO
+        return
+    
+    def mssa():
+        #TODO
+        return
+     
+def ssa():
+    #TODO
+    return
 
+def mssa():
+    #TODO
+    return
 
 def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
                   qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995], **kwargs):
