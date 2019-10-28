@@ -115,7 +115,7 @@ class SpectralAnalysis(object):
         #TODO
         return
 
-    def lomb_scargle(ys, ts, freqs=None, detrend=False, gaussianize=False,standardize=True, params=['default', 4, 0, 1], args={"precenter" : False, "normalize" : False, "make_freq_method" : "nfft"}):
+    def lomb_scargle(self,ys, ts, freqs=None, detrend=False, gaussianize=False,standardize=True, params=['default', 4, 0, 1], args={"precenter" : False, "normalize" : False, "make_freq_method" : "nfft"}):
         """ Return the computed periodogram using lomb-scargle algorithm
         Lombscargle algorithm
         Args:
@@ -147,10 +147,27 @@ class SpectralAnalysis(object):
         pd_ys = wavelet_analyser.preprocess(ys,ts,detrend=detrend, gaussianize=gaussianize, standardize=standardize, params=params)
         if freqs is None:
             freqs = wavelet_analyser.make_freq_vector(ts, method=args["make_freq_method"])
+
+        freqs_angular = 2 * np.pi * freqs
+
+        # fix the zero frequency point
+        if freqs[0] == 0:
             freqs_copy = freqs[1:]
             freqs_angular = 2 * np.pi * freqs_copy
-        res = signal.lombscargle(ts, pd_ys,freqs_angular,precenter=args["precenter"],normalize=args["normalize"])
-        return np.insert(res,0,np.nan), freqs
+
+        psd = signal.lombscargle(ts, pd_ys,freqs_angular,precenter=args["precenter"],normalize=args["normalize"])
+
+        if freqs[0] == 0:
+            psd = np.insert(psd,0,np.nan)
+
+        # output result
+        res_dict = {
+            'freqs': freqs,
+            'psd': psd,
+        }
+
+        return res_dict
+
 
     def periodogram(self, ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
         ''' Call periodogram from scipy
