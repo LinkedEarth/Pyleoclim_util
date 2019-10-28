@@ -2725,3 +2725,30 @@ def calc_plot_psd(ys, ts, ntau=501, dcon=1e-3, standardize=False,
 wa = WaveletAnalysis()
 beta_estimation = wa.beta_estimation
 tau_estimation = wa.tau_estimation
+
+def spectral(ys, ts, method='mtm', nMC=0, args={}):
+    # spectral analysis
+    sa = SpectralAnalysis()
+    spec_func = {
+        'mtm': sa.mtm,
+        'periodogram': sa.periodogram,
+        'welch': sa.welch,
+        'lombscargle': sa.lombscargle,
+    }
+
+    res_dict = spec_func[method](ys, ts, **args)
+
+    # significance test
+    if nMC >= 1:
+        nf = np.size(res_dict['freqs'])
+        psd_ar1 = np.ndarray(shape=(nMC, nf))
+        for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
+            ar1_noise = ar1_sim(ys, np.size(ts), 1, ts=ts)
+            res_red = spec_func[method](ar1_noise, ts, **args)
+            psd_ar1[i, :] = res_red['psd']
+
+        psd_ar1_q95 = mquantiles(psd_ar1, 0.95, axis=0)[0]
+        res_dict['psd_ar1_q95'] = psd_ar1_q95
+
+    return res_dict
+
