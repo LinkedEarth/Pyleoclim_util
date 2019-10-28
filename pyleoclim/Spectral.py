@@ -52,9 +52,43 @@ class SpectralAnalysis(object):
         #TODO
         return
 
-    def lomb_scargle():
-        #TODO
-        return
+    def lomb_scargle(ys, ts, freqs=None, detrend=False, gaussianize=False,standardize=True, params=['default', 4, 0, 1], args={"precenter" : False, "normalize" : False, "make_freq_method" : "nfft"}):
+        """ Return the computed periodogram using lomb-scargle algorithm
+        Lombscargle algorithm
+        Args:
+            ys (array): a time series
+            ts (array): time axis of the time series
+            freqs (array): vector of frequency
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
+                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussianize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
+            args (dict): Extra argumemnts which may be needed such as
+                precenter (bool): Pre-center amplitudes by subtracting the mean
+                normalize (bool): Compute normalized periodogram
+                make_freq_method (str) : Method to be used to make the time series. Default is nfft
+        Returns:
+            res : the lombscargle periodogram
+            freqs : vector of frequency
+        """
+        ys, ts = Timeseries.clean_ts(ys,ts)
+        wavelet_analyser = WaveletAnalysis()
+        pd_ys = wavelet_analyser.preprocess(ys,ts,detrend=detrend, gaussianize=gaussianize, standardize=standardize, params=params)
+        if freqs is None:
+            freqs = wavelet_analyser.make_freq_vector(ts, method=args["make_freq_method"])
+            freqs_copy = freqs[1:]
+            freqs_angular = 2 * np.pi * freqs_copy
+        res = signal.lombscargle(ts, pd_ys,freqs_angular,precenter=args["precenter"],normalize=args["normalize"])
+        return np.insert(res,0,np.nan), freqs
+
     def periodogram(self, ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
         ''' Call periodogram from scipy
 
@@ -1804,6 +1838,8 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
 
     return res
 
+def lomb_scargle(ys, ts, freqs=None, detrend=False, gaussianize=False,standardize=True, params=['default', 4, 0, 1], args={"precenter" : False, "normalize" : False, "make_freq_method" : "nfft"}):
+    return SpectralAnalysis.lombs_cargle(ys, ts, freqs=freqs, detrend=detrend, gaussianize=gaussianize, standardize=standardize, params=params, args=args)
 
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             detrend=False, params=["default", 4, 0, 1], gaussianize=False, 
