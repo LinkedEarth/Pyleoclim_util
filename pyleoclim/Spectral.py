@@ -2842,7 +2842,23 @@ wa = WaveletAnalysis()
 beta_estimation = wa.beta_estimation
 tau_estimation = wa.tau_estimation
 
-def spectral(ys, ts, method='mtm', nMC=0, args={}):
+def spectral(ys, ts, method='mtm', nMC=0, qs=0.95, kwargs={}):
+    ''' Call periodogram from scipy
+
+    Args:
+        ys (array): a time series
+        ts (array): time axis of the time series
+        nMC (int): the number of surrogates of AR(1) process for significance test; 0 means no test
+        qs (float): the quantile used for significance test
+
+    Returns:
+        res_dict (dict): the result dictionary, including
+            - freqs (array): the frequency vector
+            - psd (array): the spectral density vector
+            - psd_ar1_q95 (array): the spectral density vector
+
+    '''
+
     # spectral analysis
     sa = SpectralAnalysis()
     spec_func = {
@@ -2852,9 +2868,9 @@ def spectral(ys, ts, method='mtm', nMC=0, args={}):
         'lombscargle': sa.lombscargle,
     }
 
-    res_dict = spec_func[method](ys, ts, **args)
+    res_dict = spec_func[method](ys, ts, **kwargs)
 
-    # significance test
+    # significance test with AR(1)
     if nMC >= 1:
         nf = np.size(res_dict['freqs'])
         psd_ar1 = np.ndarray(shape=(nMC, nf))
@@ -2863,7 +2879,7 @@ def spectral(ys, ts, method='mtm', nMC=0, args={}):
             res_red = spec_func[method](ar1_noise, ts, **args)
             psd_ar1[i, :] = res_red['psd']
 
-        psd_ar1_q95 = mquantiles(psd_ar1, 0.95, axis=0)[0]
+        psd_ar1_q95 = mquantiles(psd_ar1, qs, axis=0)[0]
         res_dict['psd_ar1_q95'] = psd_ar1_q95
 
     return res_dict
