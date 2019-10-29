@@ -40,11 +40,7 @@ Core functions below, focusing on algorithms
 '''
 
 class SpectralAnalysis(object):
-    def fft():
-        #TODO
-        return
-
-    def welch(self,ys,ts,ana_args={},prep_args={},interp_method='interp',interp_args={}):
+    def welch(self, ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
         '''
         ys (array): a time series
             ts (array): time axis of the time series
@@ -80,42 +76,45 @@ class SpectralAnalysis(object):
                 - freqs (array): the frequency vector
                 - psd (array): the spectral density vector
         '''
-        #preprocessing
-        wa=WaveletAnalysis()
-        ys,ts=Timeseries.clean_ts(ys,ts)
-        ys=wa.preprocess(ys,ts,**prep_args)
-        
-        #if data is not evenly spaced, interpolate
+        # preprocessing
+        wa = WaveletAnalysis()
+        ys, ts = Timeseries.clean_ts(ys, ts)
+        ys = wa.preprocess(ys, ts, **prep_args)
+
+        # if data is not evenly spaced, interpolate
         if not wa.is_evenly_spaced(ts):
-            interp_func={
-                    'interp': Timeseries.interp,
-                    'bin': Timeseries.binvalues
-                    }
-            ts,ys= interp_func(ts,ys,**interp_args)
-        
-        #calculate sampling frequency fs
-        dt=np.median(np.diff(ts))
-        fs=1/dt
-        
-        #spectral analysis with scipy welch
-        freqs,psd=signal.welch(ys,fs,**ana_args)
-        
-        #fix zero frequency point
-        if freqs[0]==0:
-            psd[0]=np.nan
-        
-        #output result
-        res_dict={
-                'freqs': freqs,
-                'psd' : psd
-                }
+            interp_func = {
+                'interp': Timeseries.interp,
+                'bin': Timeseries.binvalues
+            }
+            ts, ys = interp_func(ts, ys, **interp_args)
+
+        # calculate sampling frequency fs
+        dt = np.median(np.diff(ts))
+        fs = 1 / dt
+
+        # spectral analysis with scipy welch
+        freqs, psd = signal.welch(ys, fs, **ana_args)
+
+        # fix zero frequency point
+        if freqs[0] == 0:
+            psd[0] = np.nan
+
+        # output result
+        res_dict = {
+            'freqs': freqs,
+            'psd' : psd
+        }
+
         return res_dict
+
 
     def mtm():
         #TODO
         return
 
-    def lomb_scargle(self,ys, ts, freqs=None, detrend=False, gaussianize=False,standardize=True, params=['default', 4, 0, 1], args={"precenter" : False, "normalize" : False, "make_freq_method" : "nfft"}):
+
+    def lomb_scargle(self, ys, ts, freqs=None, prep_args={}, ana_args={'precenter': False, 'normalize': False, 'make_freq_method' : 'nfft'}):
         """ Return the computed periodogram using lomb-scargle algorithm
         Lombscargle algorithm
         Args:
@@ -142,11 +141,12 @@ class SpectralAnalysis(object):
             res : the lombscargle periodogram
             freqs : vector of frequency
         """
-        ys, ts = Timeseries.clean_ts(ys,ts)
-        wavelet_analyser = WaveletAnalysis()
-        pd_ys = wavelet_analyser.preprocess(ys,ts,detrend=detrend, gaussianize=gaussianize, standardize=standardize, params=params)
+        ys, ts = Timeseries.clean_ts(ys, ts)
+        wa = WaveletAnalysis()
+        ys = wa.preprocess(ys, ts, **prep_args)
+
         if freqs is None:
-            freqs = wavelet_analyser.make_freq_vector(ts, method=args["make_freq_method"])
+            freqs = wavelet_analyser.make_freq_vector(ts, method=ana_args['make_freq_method'])
 
         freqs_angular = 2 * np.pi * freqs
 
@@ -155,10 +155,10 @@ class SpectralAnalysis(object):
             freqs_copy = freqs[1:]
             freqs_angular = 2 * np.pi * freqs_copy
 
-        psd = signal.lombscargle(ts, pd_ys,freqs_angular,precenter=args["precenter"],normalize=args["normalize"])
+        psd = signal.lombscargle(ts, ys, freqs_angular, precenter=ana_args['precenter'], normalize=ana_args['normalize'])
 
         if freqs[0] == 0:
-            psd = np.insert(psd,0,np.nan)
+            psd = np.insert(psd, 0, np.nan)
 
         # output result
         res_dict = {
@@ -211,7 +211,7 @@ class SpectralAnalysis(object):
         ys, ts = Timeseries.clean_ts(ys, ts)
         ys = wa.preprocess(ys, ts, **prep_args)
 
-        # interpolation if not evenly-spaced
+        # interpolate if not evenly-spaced
         if not wa.is_evenly_spaced(ts):
             interp_func = {
                 'interp': Timeseries.interp,
