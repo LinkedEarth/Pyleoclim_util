@@ -236,14 +236,7 @@ class Decomposition(object):
     def mssa():
         #TODO
         return
-     
-def ssa():
-    #TODO
-    return
 
-def mssa():
-    #TODO
-    return
 
 def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
                   qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995], **kwargs):
@@ -657,7 +650,7 @@ def gaussianize_single(X_single):
     return Xn_single
 
 
-def detrend(y, x = None, method = "hht", params = ["default",4,0,1]):
+def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_threshold=0.2):
     """Detrend a timeseries according to three methods
 
     Detrending methods include, "linear", "constant", and using a low-pass
@@ -724,9 +717,38 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1]):
         y_filt_x = np.interp(x,x_interp,y_filt)
         ys = y-y_filt_x
     elif method == "hht":
-        decomposer = EMD(y)
-        imfs = decomposer.decompose()
-        trend = imfs[-1]
+        def get_trend(y, SNR_threshold=0.2):
+            # here a trend is defined as the lowest frequency component that has
+            # significantly larger energy than other higher frequency components
+            decomposer = EMD(y)
+            imfs = decomposer.decompose()
+            nimf = np.shape(imfs)[0]
+            if nimf == 1:
+                print('No trend is detected')
+                trend = np.zeros(np.size(y))
+            else:
+                imf_vars = []
+                for imf in imfs:
+                    imf_vars.append(np.var(imf))
+                sorted_vars = sorted(set(imf_vars))
+                max_var = sorted_vars[-1]
+                second_max_var = sorted_vars[-2]
+
+                # treat second_max_var as signal and max_var as noise
+                SNR = second_max_var / max_var
+                if SNR <= SNR_threshold:
+                    # when SNR is too low, we think the mode with largest
+                    # variance is disturbing and should be removed
+                    imax = np.argmax(max_var)
+                    trend = np.sum(imfs[imax:], axis=0)
+                else:
+                    print('No trend is detected')
+                    trend = np.zeros(np.size(y))
+
+            return trend
+
+        trend = get_trend(y, factor=factor)
+
         ys = y-trend
     else:
         raise KeyError('Not a valid detrending method')
