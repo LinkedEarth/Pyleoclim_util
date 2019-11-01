@@ -32,6 +32,8 @@ import collections
 
 from math import factorial
 
+import spectrum
+
 if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
     from . import f2py_wwz as f2py
 
@@ -109,18 +111,86 @@ class SpectralAnalysis(object):
         return res_dict
 
 
-    def mtm():
-        #TODO
-        return
+    def mtm(self, ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
+        ''' Call MTM from the package [spectrum](https://github.com/cokelaer/spectrum)
+
+        Args:
+            ys (array): a time series
+            ts (array): time axis of the time series
+            ana_args (dict): the arguments for spectral analysis with periodogram, including
+                - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
+                - nfft (int): length of the FFT used. If None the length of x will be used.
+                - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
+                - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
+                see https://docs.scipy.org/doc/scipy-0.13.0/reference/generated/scipy.signal.periodogram.html for the details
+            interp_method (str, {'interp', 'bin'}): perform interpolation or binning
+            interp_args (dict): the arguments for the interpolation or binning methods,
+                                for the details, check Timeseries.interp() and Timeseries.binvalues()
+
+            prep_args (dict): the arguments for preprocess, including
+                - detrend (str): 'none' - the original time series is assumed to have no trend;
+                                 'linear' - a linear least-squares fit to `ys` is subtracted;
+                                 'constant' - the mean of `ys` is subtracted
+                                 'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                                     filters and the resulting filtered series is subtracted from y.
+                                 'hht' - detrending with Hilbert-Huang Transform
+                - params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                                 corresponds to the window size (default it set to half of the data)
+                                 while the second parameter correspond to the order of the filter
+                                 (default is 4). The third parameter is the order of the derivative
+                                 (the default is zero, which means only smoothing.)
+                - gaussianize (bool): If True, gaussianizes the timeseries
+                - standardize (bool): If True, standardizes the timeseries
+
+        Returns:
+            res_dict (dict): the result dictionary, including
+                - freqs (array): the frequency vector
+                - psd (array): the spectral density vector
+
+        '''
+        # preprocessing
+        wa = WaveletAnalysis()
+        ys, ts = Timeseries.clean_ts(ys, ts)
+        ys = wa.preprocess(ys, ts, **prep_args)
+
+        # interpolate if not evenly-spaced
+        if not wa.is_evenly_spaced(ts):
+            interp_func = {
+                'interp': Timeseries.interp,
+                'bin': Timeseries.binvalues,
+            }
+            ts, ys = interp_func[interp_method](ts, ys, **interp_args)
+
+        # calculate sampling frequency
+        dt = np.median(np.diff(ts))
+        fs = 1 / dt
+
+        # spectral analysis
+        res = spectrum.MultiTapering(ys, sampling=fs, NW=NW, **ana_args)
+        freqs = res.frequencies()
+        psd = res.psd
+
+        # fix the zero frequency point
+        if freqs[0] == 0:
+            psd[0] = np.nan
+
+        # output result
+        res_dict = {
+            'freqs': freqs,
+            'psd': psd,
+        }
+
+        return res_dict
 
 
-    def lomb_scargle(self, ys, ts, freqs=None, prep_args={}, ana_args={'precenter': False, 'normalize': False, 'make_freq_method' : 'nfft'}):
+    def lomb_scargle(self, ys, ts, freqs=None, make_freq_method='nfft', prep_args={}, ana_args={}):
         """ Return the computed periodogram using lomb-scargle algorithm
         Lombscargle algorithm
         Args:
             ys (array): a time series
             ts (array): time axis of the time series
             freqs (array): vector of frequency
+            make_freq_method (str) : Method to be used to make the time series. Default is nfft
             detrend (str): 'no' - the original time series is assumed to have no trend;
                            'linear' - a linear least-squares fit to `ys` is subtracted;
                            'constant' - the mean of `ys` is subtracted
@@ -136,7 +206,6 @@ class SpectralAnalysis(object):
             args (dict): Extra argumemnts which may be needed such as
                 precenter (bool): Pre-center amplitudes by subtracting the mean
                 normalize (bool): Compute normalized periodogram
-                make_freq_method (str) : Method to be used to make the time series. Default is nfft
         Returns:
             res : the lombscargle periodogram
             freqs : vector of frequency
@@ -146,7 +215,7 @@ class SpectralAnalysis(object):
         ys = wa.preprocess(ys, ts, **prep_args)
 
         if freqs is None:
-            freqs = wavelet_analyser.make_freq_vector(ts, method=ana_args['make_freq_method'])
+            freqs = wavelet_analyser.make_freq_vector(ts, method=make_freq_method)
 
         freqs_angular = 2 * np.pi * freqs
 
@@ -155,7 +224,7 @@ class SpectralAnalysis(object):
             freqs_copy = freqs[1:]
             freqs_angular = 2 * np.pi * freqs_copy
 
-        psd = signal.lombscargle(ts, ys, freqs_angular, precenter=ana_args['precenter'], normalize=ana_args['normalize'])
+        psd = signal.lombscargle(ts, ys, freqs_angular, **ana_args)
 
         if freqs[0] == 0:
             psd = np.insert(psd, 0, np.nan)
