@@ -718,7 +718,10 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
         ys = y-y_filt_x
     elif method == "hht":
         imfs = EMD(y).decompose()
-        trend = imfs[-1]
+        if np.shape(imfs)[0] == 1:
+            trend = np.zeros(np.size(y))
+        else:
+            trend = imfs[-1]
         ys = y - trend
     else:
         raise KeyError('Not a valid detrending method')
