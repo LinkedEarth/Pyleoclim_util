@@ -215,7 +215,7 @@ class SpectralAnalysis(object):
         ys = wa.preprocess(ys, ts, **prep_args)
 
         if freqs is None:
-            freqs = wavelet_analyser.make_freq_vector(ts, method=make_freq_method)
+            freqs = wa.make_freq_vector(ts, method=make_freq_method)
 
         freqs_angular = 2 * np.pi * freqs
 
