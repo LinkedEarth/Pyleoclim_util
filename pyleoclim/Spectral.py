@@ -215,7 +215,7 @@ class SpectralAnalysis(object):
         ys = wa.preprocess(ys, ts, **prep_args)
 
         if freqs is None:
-            freqs = wavelet_analyser.make_freq_vector(ts, method=make_freq_method)
+            freqs = wa.make_freq_vector(ts, method=make_freq_method)
 
         freqs_angular = 2 * np.pi * freqs
 
@@ -1811,6 +1811,105 @@ class Filter(object):
         y = np.concatenate((firstvals, y, lastvals))
 
         return np.convolve(m[::-1], y, mode='valid')
+    
+    @classmethod
+    def tsPad(ys,ts,params=(2,1,2),padFrac=0.1,diag=False):
+        """ tsPad: pad a timeseries based on timeseries model predictions
+        
+        Args:
+            x (numpy array): Evenly-spaced timeseries
+            t (numpy array): Time axis
+            params (tuple): ARIMA model order parameters (p,d,q)
+            padFrac (float): padding fraction (scalar) such that padLength = padFrac*length(series)
+            diag (bool): if True, outputs diagnostics of the fitted ARIMA model
+        
+        Returns:
+            yp - padded timeseries
+            tp - augmented axis
+            
+        Author: 
+            Julien Emile-Geay
+        """
+        padLength =  np.round(len(ts)*padFrac).astype(np.int64)
+    
+        if not (np.std(np.diff(ts)) == 0):
+            raise ValueError("ts needs to be composed of even increments")
+        else:
+            dt = np.diff(ts)[0] # computp time interval
+    
+        # fit ARIMA model
+        fwd_mod = sm.tsa.ARIMA(ys,params).fit()  # model with time going forward
+        bwd_mod = sm.tsa.ARIMA(np.flip(ys,0),params).fit()  # model with time going backwards
+    
+        # predict forward & backward
+        fwd_pred  = fwd_mod.forecast(padLength); yf = fwd_pred[0]
+        bwd_pred  = bwd_mod.forecast(padLength); yb = np.flip(bwd_pred[0],0)
+    
+        # define extra time axes
+        tf = np.linspace(max(ts)+dt, max(ts)+padLength*dt,padLength)
+        tb = np.linspace(min(ts)-padLength*dt, min(ts)-1, padLength)
+    
+        # extend time series
+        tp = np.arange(ts[0]-padLength*dt,ts[-1]+padLength*dt+1,dt)
+        yp = np.empty(len(tp))
+        yp[np.isin(tp,ts)] =ys
+        yp[np.isin(tp,tb)]=yb
+        yp[np.isin(tp,tf)]=yf
+    
+        return yp, tp
+    
+    @staticmethod
+    def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
+                    reflect_type='odd',params=(2,1,2),padFrac=0.1):
+        '''Applies a Butterworth filter with frequency fc, with padding
+        
+        Args:
+            ys (numpy array): Timeseries 
+            fc (float or list): cutoff frequency. If scalar, it is interpreted as a low-frequency cutoff (lowpass)
+                     If fc is a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass)
+            fs (float): sampling frequency
+            filter_order (int): order n of Butterworth filter
+            pad (str): Indicates if padding is needed.
+                - 'reflect': Reflects the timeseries
+                - 'ARIMA': Uses an ARIMA model for the padding
+                - None: No padding. 
+            params (tuple): model parameters for ARIMA model (if pad = True)
+            padFrac (float): fraction of the series to be padded
+        
+        Returns:
+            yf - filtered array
+        
+        Author: 
+            Julien Emile-Geay
+        '''
+        nyq = 0.5 * fs
+    
+        if isinstance(fc, list) and len(fc) == 2:
+            fl = fc[0] / nyq
+            fh = fc[1] / nyq
+            b, a = signal.butter(filter_order, [fl, fh], btype='bandpass')
+        else:
+            fl = fc / nyq
+            b, a = signal.butter(filter_order, fl , btype='lowpass')
+    
+        t = np.arange(len(ys)) # define time axis
+        padLength =  np.round(len(ys)*padFrac).astype(np.int64)
+    
+        if pad=='ARIMA':
+            yp,tp = Filter.tsPad(ys,t,params=params)
+        elif pad=='reflect':
+            # extend time series
+            yp = np.pad(ys,(padLength,padLength),mode='reflect',reflect_type=reflect_type)
+            tp = np.arange(t[0]-padLength,t[-1]+padLength+1,1)
+        elif pad is None:
+            yp = ys; tp = t
+        else:
+            raise ValueError('Not a valid argument. Enter "ARIMA", "reflect" or None') 
+    
+        ypf = signal.filtfilt(b, a, yp)
+        yf  = ypf[np.isin(tp,t)]
+    
+        return yf
 
 '''
 Interface for the users below, more checks about the input will be performed here
