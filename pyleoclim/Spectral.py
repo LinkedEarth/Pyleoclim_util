@@ -34,8 +34,8 @@ from math import factorial
 
 import spectrum
 
-if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
-    from . import f2py_wwz as f2py
+#if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
+#    from . import f2py_wwz as f2py
 
 '''
 Core functions below, focusing on algorithms
@@ -215,7 +215,7 @@ class SpectralAnalysis(object):
         ys = wa.preprocess(ys, ts, **prep_args)
 
         if freqs is None:
-            freqs = wavelet_analyser.make_freq_vector(ts, method=make_freq_method)
+            freqs = wa.make_freq_vector(ts, method=make_freq_method)
 
         freqs_angular = 2 * np.pi * freqs
 

@@ -230,7 +230,7 @@ class Decomposition(object):
         #TODO
         return
 
-    def ssa(self, ys, ts, M, MC=1000, f=0.3, method='SSA', prep_args={}:
+    def ssa(self, ys, ts, M, MC=1000, f=0.3, method='SSA', prep_args={}):
         '''
         Args:
             ys: time series
