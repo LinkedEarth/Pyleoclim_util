@@ -18,7 +18,7 @@ from scipy import signal
 from pyhht import EMD
 from scipy.stats.mstats import mquantiles
 from tqdm import tqdm
-from scipy.stats.mstats import gmean
+#from scipy.stats.mstats import gmean
 
 from pyleoclim import Spectral
 from pyleoclim import Stats
@@ -230,7 +230,7 @@ class Decomposition(object):
         #TODO
         return
 
-    def ssa(self, ys, ts, M, MC=1000, f=0.3, method='SSA', prep_args={}:
+    def ssa(self, ys, ts, M, MC=1000, f=0.3, method='SSA', prep_args={}):
         '''
         Args:
             ys: time series
