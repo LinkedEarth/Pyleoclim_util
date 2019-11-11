@@ -1812,23 +1812,26 @@ class Filter(object):
 
         return np.convolve(m[::-1], y, mode='valid')
     
-    @classmethod
-    def tsPad(ys,ts,params=(2,1,2),padFrac=0.1,diag=False):
+    @staticmethod
+    def tsPad(ys,ts,method = 'reflect', params=(2,1,2), reflect_type = 'odd',padFrac=0.1):
         """ tsPad: pad a timeseries based on timeseries model predictions
         
         Args:
             x (numpy array): Evenly-spaced timeseries
             t (numpy array): Time axis
+            method (str): The method to use to pad the series
+                - ARIMA: uses a fitted ARIMA model
+                - reflect (default): Reflects the time series
             params (tuple): ARIMA model order parameters (p,d,q)
+            reflect_type (str): 
             padFrac (float): padding fraction (scalar) such that padLength = padFrac*length(series)
-            diag (bool): if True, outputs diagnostics of the fitted ARIMA model
         
         Returns:
             yp - padded timeseries
             tp - augmented axis
             
         Author: 
-            Julien Emile-Geay
+            Julien Emile-Geay, Deborah Khider
         """
         padLength =  np.round(len(ts)*padFrac).astype(np.int64)
     
@@ -1836,25 +1839,33 @@ class Filter(object):
             raise ValueError("ts needs to be composed of even increments")
         else:
             dt = np.diff(ts)[0] # computp time interval
-    
-        # fit ARIMA model
-        fwd_mod = sm.tsa.ARIMA(ys,params).fit()  # model with time going forward
-        bwd_mod = sm.tsa.ARIMA(np.flip(ys,0),params).fit()  # model with time going backwards
-    
-        # predict forward & backward
-        fwd_pred  = fwd_mod.forecast(padLength); yf = fwd_pred[0]
-        bwd_pred  = bwd_mod.forecast(padLength); yb = np.flip(bwd_pred[0],0)
-    
-        # define extra time axes
-        tf = np.linspace(max(ts)+dt, max(ts)+padLength*dt,padLength)
-        tb = np.linspace(min(ts)-padLength*dt, min(ts)-1, padLength)
-    
-        # extend time series
-        tp = np.arange(ts[0]-padLength*dt,ts[-1]+padLength*dt+1,dt)
-        yp = np.empty(len(tp))
-        yp[np.isin(tp,ts)] =ys
-        yp[np.isin(tp,tb)]=yb
-        yp[np.isin(tp,tf)]=yf
+        
+        if method == 'ARIMA':
+            # fit ARIMA model
+            fwd_mod = sm.tsa.ARIMA(ys,params).fit()  # model with time going forward
+            bwd_mod = sm.tsa.ARIMA(np.flip(ys,0),params).fit()  # model with time going backwards
+        
+            # predict forward & backward
+            fwd_pred  = fwd_mod.forecast(padLength); yf = fwd_pred[0]
+            bwd_pred  = bwd_mod.forecast(padLength); yb = np.flip(bwd_pred[0],0)
+        
+            # define extra time axes
+            tf = np.linspace(max(ts)+dt, max(ts)+padLength*dt,padLength)
+            tb = np.linspace(min(ts)-padLength*dt, min(ts)-1, padLength)
+        
+            # extend time series
+            tp = np.arange(ts[0]-padLength*dt,ts[-1]+padLength*dt+1,dt)
+            yp = np.empty(len(tp))
+            yp[np.isin(tp,ts)] =ys
+            yp[np.isin(tp,tb)]=yb
+            yp[np.isin(tp,tf)]=yf
+       
+        elif method == 'reflect':
+            yp = np.pad(ys,(padLength,padLength),mode='reflect',reflect_type=reflect_type)
+            tp = np.arange(ts[0]-padLength,ts[-1]+padLength+1,1)
+        
+        else:
+            raise ValueError('Not a valid argument. Enter "ARIMA" or "reflect"')
     
         return yp, tp
     
@@ -1892,22 +1903,19 @@ class Filter(object):
             fl = fc / nyq
             b, a = signal.butter(filter_order, fl , btype='lowpass')
     
-        t = np.arange(len(ys)) # define time axis
-        padLength =  np.round(len(ys)*padFrac).astype(np.int64)
-    
+        ts = np.arange(len(ys)) # define time axis
+        
         if pad=='ARIMA':
-            yp,tp = Filter.tsPad(ys,t,params=params)
+            yp,tp = Filter.tsPad(ys,ts,method = 'ARIMA', params=params, padFrac=padFrac)
         elif pad=='reflect':
-            # extend time series
-            yp = np.pad(ys,(padLength,padLength),mode='reflect',reflect_type=reflect_type)
-            tp = np.arange(t[0]-padLength,t[-1]+padLength+1,1)
+            yp,tp = Filter.tsPad(ys,ts,method = 'reflect', reflect_type=reflect_type, padFrac=padFrac)
         elif pad is None:
-            yp = ys; tp = t
+            yp = ys; tp = ts
         else:
             raise ValueError('Not a valid argument. Enter "ARIMA", "reflect" or None') 
     
         ypf = signal.filtfilt(b, a, yp)
-        yf  = ypf[np.isin(tp,t)]
+        yf  = ypf[np.isin(tp,ts)]
     
         return yf
 
