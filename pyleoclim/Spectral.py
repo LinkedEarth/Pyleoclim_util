@@ -34,8 +34,8 @@ from math import factorial
 
 import spectrum
 
-#if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
-#    from . import f2py_wwz as f2py
+if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
+    from . import f2py_wwz as f2py
 
 '''
 Core functions below, focusing on algorithms
