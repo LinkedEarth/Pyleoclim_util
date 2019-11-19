@@ -34,8 +34,8 @@ from math import factorial
 
 import spectrum
 
-if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
-    from . import f2py_wwz as f2py
+#if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
+#    from . import f2py_wwz as f2py
 
 '''
 Core functions below, focusing on algorithms
@@ -78,6 +78,10 @@ class SpectralAnalysis(object):
                 - freqs (array): the frequency vector
                 - psd (array): the spectral density vector
         '''
+        #make default nperseg len(ts)//3
+        if not ana_args or not ana_args.get('nperseg'):
+            ana_args['nperseg']=len(ts)//3
+        
         # preprocessing
         wa = WaveletAnalysis()
         ys, ts = Timeseries.clean_ts(ys, ts)
