@@ -582,7 +582,7 @@ def binvalues(x, y, bin_size=None, start=None, end=None):
     return bins, binned_values, n, error
 
 
-def interp(x,y,interp_step=None,start=None,end=None):
+def interp(x,y, interp_type='linear', time_end_spline=None, interp_step=None,start=None,end=None):
     """ Linear interpolation onto a new x-axis
 
     Args:
@@ -596,30 +596,35 @@ def interp(x,y,interp_step=None,start=None,end=None):
         xi - the interpolated x-axis \n
         interp_values - the interpolated values
         """
+    if (interp_type == 'linear'):
+        #Make sure x and y are numpy arrays
+        x = np.array(x,dtype='float64')
+        y = np.array(y,dtype='float64')
 
-    #Make sure x and y are numpy arrays
-    x = np.array(x,dtype='float64')
-    y = np.array(y,dtype='float64')
+        # get the interpolation step if not available
+        if interp_step is None:
+            interp_step = np.nanmean(np.diff(x))
 
-    # get the interpolation step if not available
-    if interp_step is None:
-        interp_step = np.nanmean(np.diff(x))
+        # Get the start and end point if not given
+        if start is None:
+            start = np.nanmin(np.asarray(x))
+        if end is None:
+            end = np.nanmax(np.asarray(x))
 
-    # Get the start and end point if not given
-    if start is None:
-        start = np.nanmin(np.asarray(x))
-    if end is None:
-        end = np.nanmax(np.asarray(x))
+        # Get the interpolated x-axis.
+        xi = np.arange(start,end,interp_step)
 
-    # Get the interpolated x-axis.
-    xi = np.arange(start,end,interp_step)
+        #Make sure the data is increasing
+        data = pd.DataFrame({"x-axis": x, "y-axis": y}).sort_values('x-axis')
 
-    #Make sure the data is increasing
-    data = pd.DataFrame({"x-axis": x, "y-axis": y}).sort_values('x-axis')
+        interp_values = np.interp(xi,data['x-axis'],data['y-axis'])
 
-    interp_values = np.interp(xi,data['x-axis'],data['y-axis'])
+        return xi, interp_values
 
-    return xi, interp_values
+    elif (interp_type == 'spline'):
+        cs_interp_values = CubicSpline(x, y)
+        xs = np.arange(0, time_end_spline)
+        return xs, cs_interp_values
 
 
 def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None, end=None):
