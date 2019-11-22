@@ -34,8 +34,8 @@ from math import factorial
 
 import spectrum
 
-#if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
-#    from . import f2py_wwz as f2py
+if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
+    from . import f2py_wwz as f2py
 
 '''
 Core functions below, focusing on algorithms
@@ -1180,7 +1180,7 @@ class WaveletAnalysis(object):
 
         return freqs
 
-    def beta_estimation(self, psd, freqs, fmin, fmax):
+    def beta_estimation(self, psd, freqs, fmin=None, fmax=None):
         ''' Estimate the power slope of a 1/f^beta process.
 
         Args:
@@ -1195,6 +1195,11 @@ class WaveletAnalysis(object):
             Y_reg (array): prediction based on linear regression
 
         '''
+        if fmin is None:
+            fmin = np.min(freqs)
+        if fmax is None:
+            fmax = np.max(freqs)
+
         # drop the PSD at frequency zero
         if freqs[0] == 0:
             psd = psd[1:]
