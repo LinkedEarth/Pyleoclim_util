@@ -34,8 +34,8 @@ from math import factorial
 
 import spectrum
 
-#if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
-#    from . import f2py_wwz as f2py
+if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
+    from . import f2py_wwz as f2py
 
 '''
 Core functions below, focusing on algorithms
@@ -1180,7 +1180,7 @@ class WaveletAnalysis(object):
 
         return freqs
 
-    def beta_estimation(self, psd, freqs, fmin, fmax):
+    def beta_estimation(self, psd, freqs, fmin=None, fmax=None):
         ''' Estimate the power slope of a 1/f^beta process.
 
         Args:
@@ -1195,6 +1195,11 @@ class WaveletAnalysis(object):
             Y_reg (array): prediction based on linear regression
 
         '''
+        if fmin is None:
+            fmin = np.min(freqs)
+        if fmax is None:
+            fmax = np.max(freqs)
+
         # drop the PSD at frequency zero
         if freqs[0] == 0:
             psd = psd[1:]
@@ -2416,7 +2421,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
 def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
              yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, 
              figsize=[20, 8], clr_map='OrRd',cbar_drawedges=False, cone_alpha=0.5, 
-             plot_signif=False, signif_style='contour', title=None,
+             plot_signif=False, signif_style='contour', title=None, font_scale=1.5,
              plot_cbar=True, plot_cone=False, ax=None, xlabel='Year CE', 
              ylabel='Period (years)', cbar_orientation='vertical',
              cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
@@ -2453,7 +2458,7 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
         fig (figure): the 2-D plot of wavelet analysis
 
     """
-    sns.set(style="ticks", font_scale=2)
+    sns.set(style="ticks", font_scale=font_scale)
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
 
@@ -2544,7 +2549,7 @@ def plot_coherence(res_xwc, pt=0.5,
                    cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, 
                    signif_style='contour', title=None,
                    plot_cone=False, ax=None, xlabel='Year', ylabel='Period',
-                   cbar_orientation='vertical',
+                   cbar_orientation='vertical', font_scale=1.5,
                    cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
     """ Plot the wavelet coherence
 
@@ -2591,7 +2596,7 @@ def plot_coherence(res_xwc, pt=0.5,
     AR1_q = res_xwc.AR1_q
     coi = res_xwc.coi
 
-    sns.set(style="ticks", font_scale=2)
+    sns.set(style="ticks", font_scale=font_scale)
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
 
@@ -2660,7 +2665,7 @@ def plot_coherence(res_xwc, pt=0.5,
     return ax
 
 
-def plot_wwadist(wwa, ylim=None):
+def plot_wwadist(wwa, ylim=None, font_scale=1.5):
     ''' Plot the distribution of wwa with the 95% quantile line.
 
     Args:
@@ -2671,7 +2676,7 @@ def plot_wwadist(wwa, ylim=None):
         fig (figure): the 2-D plot of wavelet analysis
 
     '''
-    sns.set(style="darkgrid", font_scale=2)
+    sns.set(style="darkgrid", font_scale=font_scale)
     plt.subplots(figsize=[20, 4])
     q95 = mquantiles(wwa, 0.95)
     fig = sns.distplot(np.nan_to_num(wwa.flat))
@@ -2688,7 +2693,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
              ar1_linewidth=None, period_ticks=None, period_tickslabel=None, 
              psd_lim=None, period_lim=None, alpha=1,
              figsize=[20, 8], label='PSD', plot_ar1=False, 
-             psd_ar1_q95=None, title=None, legend=True,
+             psd_ar1_q95=None, title=None, legend=True, font_scale=1.5,
              psd_ar1_color=sns.xkcd_rgb["pale red"], 
              ax=None, vertical=False, plot_gridlines=True,
              period_label='Period (years)', psd_label='Spectral Density', 
@@ -2731,9 +2736,9 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
         ax (figure): the 2-D plot of wavelet analysis
 
     """
-    sns.set(style="ticks", font_scale=2)
+    sns.set(style="ticks", font_scale=font_scale)
 
-    if not ax:
+    if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
 
     if title is not None:
@@ -2894,7 +2899,6 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
     plt.tick_params(axis='x', which='both', bottom='off', top='off', labelbottom='off')
 
     # plot wwa
-    sns.set(style="ticks", font_scale=1.5)
     ax2 = plt.subplot(gs[1:5, :-3])
 
     #  wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = \
@@ -2917,7 +2921,6 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
                  )
 
     # plot psd
-    sns.set(style="ticks", font_scale=1.5)
     ax3 = plt.subplot(gs[1:4, 9:])
     res_psd = wwz_psd(ys, ts, freqs=None, tau=tau, c=c2, nproc=nproc, nMC=nMC, method=method,
                       detrend=detrend, gaussianize=gaussianize, standardize=standardize,
@@ -2950,7 +2953,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
 def calc_plot_psd(ys, ts, ntau=501, dcon=1e-3, standardize=False,
                   anti_alias=False, plot_fig=True, method='Kirchner_f2py', nproc=8,
                   period_ticks=[0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000], color=None,
-                  figsize=[10, 6], font_scale=2, lw=3, label='PSD', zorder=None,
+                  figsize=[10, 6], font_scale=1.5, lw=3, label='PSD', zorder=None,
                   xlim=None, ylim=None, loc='upper right', bbox_to_anchor=None):
     """ Calculate the PSD and plot the result
 
