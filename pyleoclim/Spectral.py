@@ -2733,7 +2733,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
     """
     sns.set(style="ticks", font_scale=2)
 
-    if not ax:
+    if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
 
     if title is not None:
