@@ -1195,18 +1195,22 @@ class WaveletAnalysis(object):
             Y_reg (array): prediction based on linear regression
 
         '''
-        if fmin is None:
-            fmin = np.min(freqs)
-        if fmax is None:
-            fmax = np.max(freqs)
-
         # drop the PSD at frequency zero
         if freqs[0] == 0:
             psd = psd[1:]
             freqs = freqs[1:]
 
+        if fmin is None or fmin == 0:
+            fmin = np.min(freqs)
+
+        if fmax is None:
+            fmax = np.max(freqs)
+
         Results = collections.namedtuple('Results', ['beta', 'f_binned', 'psd_binned', 'Y_reg', 'std_err'])
         if np.max(freqs) < fmax or np.min(freqs) > fmin:
+            print(fmin, fmax)
+            print(np.min(freqs), np.max(freqs))
+            print('WRONG')
             res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
             return res
 

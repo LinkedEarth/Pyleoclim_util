@@ -71,9 +71,8 @@ def verifyCalCurves(CalCurves):
     for idx, item in enumerate(CalCurves):
         if item != 'intcal13' and item != 'shcal13' and item != 'marine13' \
         and item!= 'normal':
-            print(item + " is not a valid selection in the list.")
-            new_answer = input('Enter either "intcal13", "shcal13", '+
-                   '"marine13", or "normal": ')
+            print(item, " is not a valid selection in the list.")
+            new_answer = input('Enter either "intcal13", "shcal13", "marine13", or "normal": ')
             while new_answer != 'intcal13' and new_answer != 'shcal13' \
             and new_answer != 'marine13' and new_answer != 'normal':
                 new_answer = input('Enter either "intcal13", "shcal13", '+
