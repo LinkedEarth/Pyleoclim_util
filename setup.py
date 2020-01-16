@@ -69,6 +69,7 @@ setup(
         "rpy2>=3.0.5",
         "tftb",
         "pyhht",
+        "spectrum"
     ],
     python_requires=">=3.6.0"
 )
