@@ -468,7 +468,7 @@ and svg.</p>
 <dt>Returns:</dt><dd><p>the mean, median, min, max, standard deviation and the
 inter-quartile range (IQR) of a timeseries.</p>
 </dd>
-<dt>Examples:</dt><dd><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mean</span><span class="p">,</span> <span class="n">median</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">IQR</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">statsTs</span><span class="p">(</span><span class="n">timeseries</span><span class="p">)</span>
+<dt>Examples:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mean</span><span class="p">,</span> <span class="n">median</span><span class="p">,</span> <span class="n">min_</span><span class="p">,</span> <span class="n">max_</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">IQR</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">statsTs</span><span class="p">(</span><span class="n">timeseries</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd>
@@ -792,12 +792,12 @@ and svg.</p>
 sampled time series. The Astronomical Journal, 112(4), 1709-1729.</p>
 </dd>
 <dt>Examples:</dt><dd><p>To run both wwz and psd:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">wwz</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">wwz</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Note: This will return a single figure with wwa and psd</p>
 <p>To change a default behavior:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">psd_default</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nMC&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">})</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dict_out</span><span class="p">,</span> <span class="n">fig</span> <span class="o">=</span> <span class="n">pyleoclim</span><span class="o">.</span><span class="n">wwzTs</span><span class="p">(</span><span class="n">psd_default</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nMC&#39;</span><span class="p">:</span><span class="mi">1000</span><span class="p">})</span>
 </pre></div>
 </div>
 </dd>
@@ -811,7 +811,7 @@ sampled time series. The Astronomical Journal, 112(4), 1709-1729.</p>
 <h3>Age modelling<a class="headerlink" href="#age-modelling" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="pyleoclim.Bchron">
-<code class="sig-prename descclassname">pyleoclim.</code><code class="sig-name descname">Bchron</code><span class="sig-paren">(</span><em class="sig-param">lipd, modelNum=None, objectName=None, rejectAges=None, calCurves=None, reservoirAgeCorr=None, predictPositions='paleo', positionsThickness=None, outlierProbs=None, iterations=1000, burn=2000, thin=8, extractDate=-69, maxExtrap=500, thetaMhSd=0.5, muMhSd=0.1, psiMhSd=0.1, ageScaleVal=1000, positionScaleVal=100, saveLipd=True, plot=True, figsize=[4, 8], flipCoor=False, xlabel=None, ylabel=None, xlim=None, ylim=None, violinColor='#8B008B', medianLineColor='black', medianLineWidth=2.0, CIFillColor='Silver', samplePaths=True, samplePathNumber=10, alpha=0.5, saveFig=False, dir=None, format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Bchron" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.</code><code class="sig-name descname">Bchron</code><span class="sig-paren">(</span><em class="sig-param">lipd, modelNum=None, objectName=None, rejectAges=None, calCurves=None, reservoirAgeCorr=None, predictPositions='paleo', positionsThickness=None, outlierProbs=None, iterations=1000, burn=2000, thin=8, extractDate=-70, maxExtrap=500, thetaMhSd=0.5, muMhSd=0.1, psiMhSd=0.1, ageScaleVal=1000, positionScaleVal=100, saveLipd=True, plot=True, figsize=[4, 8], flipCoor=False, xlabel=None, ylabel=None, xlim=None, ylim=None, violinColor='#8B008B', medianLineColor='black', medianLineWidth=2.0, CIFillColor='Silver', samplePaths=True, samplePathNumber=10, alpha=0.5, saveFig=False, dir=None, format='eps'</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Bchron" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs Bchron and plot if asked</p>
 <p>Fits a non-parametric chronology model to age/position data according to
 the Compound Poisson-Gamma model defined by Haslett and Parnell (2008).
@@ -1002,7 +1002,7 @@ contains some functions to extract information about a timeseries object.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.
     </div>
   </body>
 </html>

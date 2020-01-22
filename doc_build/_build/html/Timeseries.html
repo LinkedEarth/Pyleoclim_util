@@ -89,7 +89,7 @@ end (float): When/where to stop binning. Defulat is the maximum</p>
 
 <dl class="function">
 <dt id="pyleoclim.Timeseries.interp">
-<code class="sig-prename descclassname">pyleoclim.Timeseries.</code><code class="sig-name descname">interp</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">interp_step=None</em>, <em class="sig-param">start=None</em>, <em class="sig-param">end=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.interp" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Timeseries.</code><code class="sig-name descname">interp</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em>, <em class="sig-param">interp_type='linear'</em>, <em class="sig-param">time_end_spline=None</em>, <em class="sig-param">interp_step=None</em>, <em class="sig-param">start=None</em>, <em class="sig-param">end=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.interp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Linear interpolation onto a new x-axis</p>
 <dl>
 <dt>Args:</dt><dd><p>x (array): the x-axis
@@ -115,7 +115,9 @@ x2 (array): x-axis values of the second timeseries
 y2 (array): y-axis values of the second timeseries
 method (str): Which method to use to get the timeseries on the same x axis.</p>
 <blockquote>
-<div><p>Valid entries: ‘interpolation’ (default), ‘bin’</p>
+<div><p>Valid entries: ‘interpolation’ (default), ‘bin’, ‘None’. ‘None’ only
+cuts the timeseries to the common period but does not attempt
+to generate a common time axis</p>
 </div></blockquote>
 <p>step (float): The interpolation step. Default is mean resolution
 of lowest resolution series
@@ -124,9 +126,8 @@ the two timeseries
 end (float): Where/when to end. Default is the minimum of the maxima of
 the two timeseries</p>
 </dd>
-<dt>Returns:</dt><dd><p>xi -  the interpolated x-axis</p>
-<p>interp_values1 -  the interpolated y-values for the first timeseries
-interp_values2 - the intespolated y-values for the second timeseries</p>
+<dt>Returns:</dt><dd><p>xi1, xi2 -  the interpolated x-axis</p>
+<p>interp_values1, interp_values2 -  the interpolated y-values</p>
 </dd>
 </dl>
 </dd></dl>
@@ -220,10 +221,10 @@ year_int (array): the time axis of the annualized time series</p>
 
 <dl class="function">
 <dt id="pyleoclim.Timeseries.detrend">
-<code class="sig-prename descclassname">pyleoclim.Timeseries.</code><code class="sig-name descname">detrend</code><span class="sig-paren">(</span><em class="sig-param">y, x=None, method='linear', params=['default', 4, 0, 1]</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.detrend" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Timeseries.</code><code class="sig-name descname">detrend</code><span class="sig-paren">(</span><em class="sig-param">y, x=None, method='hht', params=['default', 4, 0, 1], SNR_threshold=0.4, extreme_pts_threshold=3, verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Timeseries.detrend" title="Permalink to this definition">¶</a></dt>
 <dd><p>Detrend a timeseries according to three methods</p>
 <dl>
-<dt>Detrending methods include, “linear” (default), “constant”, and using a low-pass</dt><dd><p>Savitzky-Golay filters.</p>
+<dt>Detrending methods include, “linear”, “constant”, and using a low-pass</dt><dd><p>Savitzky-Golay filters (default).</p>
 </dd>
 <dt>Args:</dt><dd><p>y (array): The series to be detrended.
 x (array): The time axis for the timeseries. Necessary for use with</p>
@@ -273,7 +274,7 @@ while the second parameter correspond to the order of the filter
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.
     </div>
   </body>
 </html>

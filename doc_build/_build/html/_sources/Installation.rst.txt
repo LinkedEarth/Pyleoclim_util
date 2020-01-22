@@ -16,6 +16,7 @@ To create a new environment using Python 3.6 via command line:
 
   conda create -n pyleoenv python=3.6
 
+
 To view a list of available environment:
 
   conda env list

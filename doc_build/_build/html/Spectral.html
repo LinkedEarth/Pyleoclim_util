@@ -235,7 +235,7 @@ freqs (array): vector of frequency
 c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
 Neff (int): effective number of points
 nproc (int): the number of processes for multiprocessing
-detrend (str): ‘no’ - the original time series is assumed to have no trend;</p>
+detrend (str): None - the original time series is assumed to have no trend;</p>
 <blockquote>
 <div><p>‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;
 ‘constant’ - the mean of <cite>ys</cite> is subtracted
@@ -316,7 +316,7 @@ method (str): ‘Foster’ - the original WWZ method;</p>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_wwa">
-<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_wwa</code><span class="sig-paren">(</span><em class="sig-param">wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None, yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, plot_cbar=True, plot_cone=False, ax=None, xlabel='Year CE', ylabel='Period (years)', cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_wwa</code><span class="sig-paren">(</span><em class="sig-param">wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None, yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, font_scale=1.5, plot_cbar=True, plot_cone=False, ax=None, xlabel='Year CE', ylabel='Period (years)', cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwa" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the wavelet amplitude</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>wwa (array): the weighted wavelet amplitude.
@@ -352,7 +352,7 @@ cbar_labelsize (float): the font size of the colorbar label</p>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_coherence">
-<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_coherence</code><span class="sig-paren">(</span><em class="sig-param">res_xwc, pt=0.5, levels=None, tick_range=None, basey=2, yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', skip_x=5, skip_y=5, scale=30, width=0.004, cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical', cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_coherence" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_coherence</code><span class="sig-paren">(</span><em class="sig-param">res_xwc, pt=0.5, levels=None, tick_range=None, basey=2, yticks=None, ylim=None, xticks=None, xlabels=None, figsize=[20, 8], clr_map='OrRd', skip_x=5, skip_y=5, scale=30, width=0.004, cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, signif_style='contour', title=None, plot_cone=False, ax=None, xlabel='Year', ylabel='Period', cbar_orientation='vertical', font_scale=1.5, cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_coherence" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the wavelet coherence</p>
 <dl>
 <dt>Args:</dt><dd><dl class="simple">
@@ -394,7 +394,7 @@ cbar_labelsize (float): the font size of the colorbar label</p>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_wwadist">
-<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_wwadist</code><span class="sig-paren">(</span><em class="sig-param">wwa</em>, <em class="sig-param">ylim=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwadist" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_wwadist</code><span class="sig-paren">(</span><em class="sig-param">wwa</em>, <em class="sig-param">ylim=None</em>, <em class="sig-param">font_scale=1.5</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_wwadist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the distribution of wwa with the 95% quantile line.</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>wwa (array): the weighted wavelet amplitude.
@@ -407,7 +407,7 @@ ylim (list): limitations for y-axis</p>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.plot_psd">
-<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_psd</code><span class="sig-paren">(</span><em class="sig-param">psd, freqs, lmstyle='-', linewidth=None, color='#3b5b92', ar1_lmstyle='-', ar1_linewidth=None, period_ticks=None, period_tickslabel=None, psd_lim=None, period_lim=None, alpha=1, figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None, legend=True, psd_ar1_color='#d9544d', ax=None, vertical=False, plot_gridlines=True, period_label='Period (years)', psd_label='Spectral Density', zorder=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_psd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">plot_psd</code><span class="sig-paren">(</span><em class="sig-param">psd, freqs, lmstyle='-', linewidth=None, color='#3b5b92', ar1_lmstyle='-', ar1_linewidth=None, period_ticks=None, period_tickslabel=None, psd_lim=None, period_lim=None, alpha=1, figsize=[20, 8], label='PSD', plot_ar1=False, psd_ar1_q95=None, title=None, legend=True, font_scale=1.5, psd_ar1_color='#d9544d', ax=None, vertical=False, plot_gridlines=True, period_label='Period (years)', psd_label='Spectral Density', zorder=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.plot_psd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot power spectral density</p>
 <dl class="simple">
 <dt>Args:</dt><dd><p>psd (array): power spectral density
@@ -498,7 +498,7 @@ period_S_str, period_L_str (str): String for beta estimation</p>
 
 <dl class="function">
 <dt id="pyleoclim.Spectral.calc_plot_psd">
-<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">calc_plot_psd</code><span class="sig-paren">(</span><em class="sig-param">ys, ts, ntau=501, dcon=0.001, standardize=False, anti_alias=False, plot_fig=True, method='Kirchner_f2py', nproc=8, period_ticks=[0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000], color=None, figsize=[10, 6], font_scale=2, lw=3, label='PSD', zorder=None, xlim=None, ylim=None, loc='upper right', bbox_to_anchor=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.calc_plot_psd" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.Spectral.</code><code class="sig-name descname">calc_plot_psd</code><span class="sig-paren">(</span><em class="sig-param">ys, ts, ntau=501, dcon=0.001, standardize=False, anti_alias=False, plot_fig=True, method='Kirchner_f2py', nproc=8, period_ticks=[0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000], color=None, figsize=[10, 6], font_scale=1.5, lw=3, label='PSD', zorder=None, xlim=None, ylim=None, loc='upper right', bbox_to_anchor=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.Spectral.calc_plot_psd" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the PSD and plot the result</p>
 <dl>
 <dt>Args:</dt><dd><p>ys (array): a time series
@@ -563,7 +563,7 @@ freqs (array): the frequency vector</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.3.1.
     </div>
   </body>
 </html>
