@@ -33,6 +33,7 @@ import collections
 from math import factorial
 
 import spectrum
+import pandas as pd
 
 if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
     from . import f2py_wwz as f2py
@@ -2704,40 +2705,101 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
              zorder=None):
     """ Plot power spectral density
 
-    Args:
-        psd (array): power spectral density
-        freqs (array): vector of frequency
-        period_ticks (list): ticks for period
-        period_tickslabel (list): Labels for the period ticks
-        psd_lim (list): limits for spectral density axis
-        label (str): the label for the PSD
-        plot_ar1 (bool): plot the ar1 curve
-        psd_ar1_q95 (array): the 95% quantile of the AR1 PSD
-        psd_ar1_color (str): the color for the 95% quantile of the AR1 PSD
-        title (str): the title for the figure
-        period_lim (list): limits for period axis
-        figsize (list): the size for the figure
-        ax (axis): Return as axis instead of figure (useful to integrate plot into a subplot)
-        vertical (bool): plot in vertical layout or not
-        legend (bool): plot legend
-        lmstyle (str): the line style
-        linewidth (float): the line width
-        color (str): Color of the line
-        ar1_lmstyle (str): line style for the AR1 ensemble
-        ar1_linewidth (int): line width for AR1 ensemble
-        period_label (str): the label for period
-        psd_label (str): the label for psd
-        zorder (int): the order of the layer
-        period_tickslabel (str): Label for the period tick. 
-        alpha (float): set transparency
-        label (str): Label for the figure
-        plot_gridlines (bool): Plot gridlines
-        period_label (str): Label for the period axis
-        psd_label (str): label for the PSD axis      
-                
+    Args
+    ----
 
-    Returns:
-        ax (figure): the 2-D plot of wavelet analysis
+    psd : array
+        power spectral density
+    freqs : array
+        vector of frequency
+    period_ticks : list
+        ticks for period
+    period_tickslabel : list
+        Labels for the period ticks
+    psd_lim : list
+        limits for spectral density axis
+    label : str
+        the label for the PSD
+    plot_ar1 : bool
+        plot the ar1 curve
+    psd_ar1_q95 : array
+        the 95% quantile of the AR1 PSD
+    psd_ar1_color : str
+        the color for the 95% quantile of the AR1 PSD
+    title : str
+        the title for the figure
+    period_lim : list
+        limits for period axis
+    figsize : list
+        the size for the figure
+    ax : axis
+        Return as axis instead of figure (useful to integrate plot into a subplot)
+    vertical : bool
+        plot in vertical layout or not
+    legend : bool
+        plot legend
+    lmstyle : str
+        the line style
+    linewidth : float
+        the line width
+    color : str
+        Color of the line
+    ar1_lmstyle : str
+        line style for the AR1 ensemble
+    ar1_linewidth : int
+        line width for AR1 ensemble
+    period_label : str
+        the label for period
+    psd_label : str
+        the label for psd
+    zorder : int
+        the order of the layer
+    period_tickslabel : str
+        label for the period tick
+    alpha : float
+        set transparency
+    label : str
+        label for the figure
+    plot_gridlines : bool
+        Plot gridlines
+    period_label : str
+        label for the period axis
+    psd_label : str
+        label for the PSD axis
+
+    Returns
+    -------
+
+    ax : figure
+        the 2-D plot of wavelet analysis
+
+    Examples
+    --------
+
+    Perform WWZ and plot the PSD:
+
+    .. plot::
+        :context: close-figs
+
+        >>> from pyleoclim import Spectral
+        >>> from pyleoclim import Timeseries
+        >>> from pyleoclim import Examples
+        >>> import matplotlib.pyplot as plt
+        >>> import numpy as np
+        >>> # make up a sine wave
+        >>> time = np.arange(2001)
+        >>> f = 1/50
+        >>> signal = np.cos(2*np.pi*f*time)
+        >>> # WWZ
+        >>> tau = np.linspace(np.min(time), np.max(time), 51)
+        >>> res_wwz = Spectral.wwz_psd(signal, time, tau=tau, c=1e-3, standardize=False, nMC=0)
+        >>> # plot
+        >>> fig = Spectral.plot_psd(
+        ...           res_wwz.psd,
+        ...           res_wwz.freqs,
+        ...           period_ticks=[2, 5, 10, 20, 50, 100],
+        ...           figsize=[10, 8],
+        ...       )
 
     """
     sns.set(style="ticks", font_scale=font_scale)

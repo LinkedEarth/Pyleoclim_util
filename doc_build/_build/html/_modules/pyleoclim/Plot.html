@@ -1,43 +1,163 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>pyleoclim.Plot &#8212; Pyleoclim 0.3.0 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.3.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyleoclim.Plot &mdash; Pyleoclim 0.4.10 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
    
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
 
-  </head>
-  <body>
-  
+          
+            <a href="../../index.html" class="icon icon-home"> Pyleoclim
+          
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.10
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Introduction.html">Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Main.html">Main Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Map.html">Mapping Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Plot.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Stats.html">Statistics Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Timeseries.html">Timeseries Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LIPDutils.html">LiPD Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SummaryPlots.html">Summary Plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Spectral.html">Spectral Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RBchron.html">RBchron</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../pyleoclim.html">pyleoclim</a> &raquo;</li>
+        
+      <li>pyleoclim.Plot</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for pyleoclim.Plot</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
@@ -100,6 +220,67 @@
     
     <span class="k">return</span> <span class="n">ax</span></div>
     
+<span class="k">def</span> <span class="nf">plotEns</span><span class="p">(</span><span class="n">ageEns</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ens</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.005</span><span class="p">,</span> <span class="n">x_label</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>\
+            <span class="n">y_label</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="n">ax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Plot Ensemble Values</span>
+<span class="sd">    </span>
+<span class="sd">    This function allows to plot all or a subset of ensemble members of a </span>
+<span class="sd">    timeseries</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        ageEns (numpy array): Age ensemble data. Iterations should be stored in columns</span>
+<span class="sd">        y (numpy array): Ordinate values</span>
+<span class="sd">        ens (int): Number of ensemble to plots. If None, will choose either the number</span>
+<span class="sd">            of ensembles stored in the ensemble matrix or 500, whichever is lower</span>
+<span class="sd">        color (str): Linecolor (default is red)</span>
+<span class="sd">        alpha (float): Transparency setting for each line (default is 0.005)</span>
+<span class="sd">        x_label (str): Label for the x-axis</span>
+<span class="sd">        y_label (str): Label for the y-axis</span>
+<span class="sd">        title (str): Title for the figure</span>
+<span class="sd">        figsize (list): Size of the figure. Default is [10,4]</span>
+<span class="sd">        ax: Return as axis instead of figure</span>
+<span class="sd">    </span>
+<span class="sd">    Return:</span>
+<span class="sd">        The figure</span>
+<span class="sd">    </span>
+<span class="sd">    TODO:</span>
+<span class="sd">        Enable paleoEnsemble       </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#Make sure that the ensemble and paleo values are numpy arrays</span>
+    <span class="n">ageEns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ageEns</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    
+    <span class="c1"># Make sure that the length of y is the same as the number of rows in ensemble array</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ageEns</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;The length of the paleoData is different than number of rows in ensemble table!&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Figure out the number of ensembles to plot</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ens</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ageEns</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">&lt;</span><span class="mi">500</span><span class="p">:</span>
+            <span class="n">ens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ageEns</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ens</span> <span class="o">=</span> <span class="mi">500</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting 500 ensemble members&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">ens</span> <span class="o">&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ageEns</span><span class="p">)[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">ens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ageEns</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting all available ensemble members&quot;</span><span class="p">)</span> 
+        
+    <span class="c1"># Figure setting</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">ax</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="n">figsize</span><span class="p">)</span>
+        
+    <span class="c1"># Finally make the plot</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;ggplot&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">ens</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ageEns</span><span class="p">[:,</span><span class="n">i</span><span class="p">],</span><span class="n">y</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">x_label</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">y_label</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ax</span>    
+
 <div class="viewcode-block" id="plot_hist"><a class="viewcode-back" href="../../Plot.html#pyleoclim.Plot.plot_hist">[docs]</a><span class="k">def</span> <span class="nf">plot_hist</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">hist</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> \
               <span class="n">kde</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">rug</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">fit</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">hist_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span><span class="s2">&quot;Histogram&quot;</span><span class="p">},</span>\
               <span class="n">kde_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span><span class="s2">&quot;KDE fit&quot;</span><span class="p">},</span> <span class="n">rug_kws</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;label&quot;</span><span class="p">:</span><span class="s2">&quot;rug&quot;</span><span class="p">},</span> \
@@ -178,69 +359,43 @@
             
 </pre></div>
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">Pyleoclim</a></h1>
+
+    </section>
+
+  </div>
+  
 
 
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
 
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../Introduction.html">Pyleoclim</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Main.html">Main Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Map.html">Mapping Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Plot.html">Plotting Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Stats.html">Statistics Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Timeseries.html">Timeseries Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../LipdUtils.html">LiPD Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../SummaryPlots.html">Summary Plots</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Spectral.html">Spectral Functions</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  <li><a href="../pyleoclim.html">pyleoclim</a><ul>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-    </div>
-
+  
+  
     
+   
 
-    
-  </body>
+</body>
 </html>

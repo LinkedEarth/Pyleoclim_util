@@ -1,46 +1,166 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>pyleoclim.LipdUtils &#8212; Pyleoclim 0.3.0 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.3.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyleoclim.LipdUtils &mdash; Pyleoclim 0.4.10 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
    
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
 
-  </head>
-  <body>
-  
+          
+            <a href="../../index.html" class="icon icon-home"> Pyleoclim
+          
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.10
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Introduction.html">Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Main.html">Main Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Map.html">Mapping Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Plot.html">Plotting Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Stats.html">Statistics Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Timeseries.html">Timeseries Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../LIPDutils.html">LiPD Utilities</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../SummaryPlots.html">Summary Plots</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Spectral.html">Spectral Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../RBchron.html">RBchron</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../pyleoclim.html">pyleoclim</a> &raquo;</li>
+        
+      <li>pyleoclim.LipdUtils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <h1>Source code for pyleoclim.LipdUtils</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span></span> <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Created on Mon Nov 21 13:07:07 2016</span>
 
@@ -58,12 +178,11 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">The following functions handle creating new directories and saving figures and logs</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="createDir"><a class="viewcode-back" href="../../LipdUtils.html#pyleoclim.LipdUtils.createDir">[docs]</a><span class="k">def</span> <span class="nf">createDir</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">foldername</span><span class="p">):</span>
+<div class="viewcode-block" id="createDir"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.createDir">[docs]</a><span class="k">def</span> <span class="nf">createDir</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">foldername</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a new folder in a working directory</span>
 <span class="sd">    </span>
 <span class="sd">    Create a new folder in a working directory to save outputs from Pyleoclim.</span>
@@ -84,7 +203,7 @@
 
     <span class="k">return</span> <span class="n">newdir</span> </div>
 
-<div class="viewcode-block" id="saveFigure"><a class="viewcode-back" href="../../LipdUtils.html#pyleoclim.LipdUtils.saveFigure">[docs]</a><span class="k">def</span> <span class="nf">saveFigure</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;eps&quot;</span><span class="p">,</span><span class="nb">dir</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="saveFigure"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.saveFigure">[docs]</a><span class="k">def</span> <span class="nf">saveFigure</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;eps&quot;</span><span class="p">,</span><span class="nb">dir</span><span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Save a figure</span>
 <span class="sd">    </span>
 <span class="sd">    Save the figure in the directory. If not given, creates a folder in the </span>
@@ -111,7 +230,7 @@
 <span class="sd">The following functions handle the LiPD files</span>
 <span class="sd">&quot;&quot;&quot;</span>
     
-<div class="viewcode-block" id="enumerateLipds"><a class="viewcode-back" href="../../LipdUtils.html#pyleoclim.LipdUtils.enumerateLipds">[docs]</a><span class="k">def</span> <span class="nf">enumerateLipds</span><span class="p">(</span><span class="n">lipds</span><span class="p">):</span>
+<div class="viewcode-block" id="enumerateLipds"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.enumerateLipds">[docs]</a><span class="k">def</span> <span class="nf">enumerateLipds</span><span class="p">(</span><span class="n">lipds</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Enumerate the LiPD files loaded in the workspace</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
@@ -120,10 +239,11 @@
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Below are the available records&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lipds</span><span class="p">):</span>
+    <span class="n">lipds_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">lipds</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lipds_list</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="s1">&#39;: &#39;</span><span class="p">,</span><span class="n">val</span><span class="p">)</span>   </div>
 
-<div class="viewcode-block" id="promptForLipd"><a class="viewcode-back" href="../../LipdUtils.html#pyleoclim.LipdUtils.promptForLipd">[docs]</a><span class="k">def</span> <span class="nf">promptForLipd</span><span class="p">(</span><span class="n">lipds</span><span class="p">):</span>
+<div class="viewcode-block" id="getLipd"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.getLipd">[docs]</a><span class="k">def</span> <span class="nf">getLipd</span><span class="p">(</span><span class="n">lipds</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Prompt for a LiPD file</span>
 <span class="sd">    </span>
 <span class="sd">    Ask the user to select a LiPD file from a list</span>
@@ -137,14 +257,20 @@
 <span class="sd">        The index of the LiPD file</span>
 <span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">select_lipd</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter the number of the file you wish to analyze: &quot;</span><span class="p">))</span>
+    <span class="n">enumerateLipds</span><span class="p">(</span><span class="n">lipds</span><span class="p">)</span>
+    <span class="n">lipds_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">lipds</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+    <span class="n">choice</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter the number of the file: &quot;</span><span class="p">))</span>
+    <span class="n">lipd_name</span> <span class="o">=</span> <span class="n">lipds_list</span><span class="p">[</span><span class="n">choice</span><span class="p">]</span>
+    <span class="n">select_lipd</span> <span class="o">=</span> <span class="n">lipds</span><span class="p">[</span><span class="n">lipd_name</span><span class="p">]</span>
+    
     <span class="k">return</span> <span class="n">select_lipd</span> </div>
+   
                                    
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">The following functions work at the variables level</span>
 <span class="sd">&quot;&quot;&quot;</span>
         
-<div class="viewcode-block" id="promptForVariable"><a class="viewcode-back" href="../../LipdUtils.html#pyleoclim.LipdUtils.promptForVariable">[docs]</a><span class="k">def</span> <span class="nf">promptForVariable</span><span class="p">():</span>
+<div class="viewcode-block" id="promptForVariable"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.promptForVariable">[docs]</a><span class="k">def</span> <span class="nf">promptForVariable</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Prompt for a specific variable</span>
 <span class="sd">    </span>
 <span class="sd">    Ask the user to select the variable they are interested in.</span>
@@ -157,7 +283,7 @@
     <span class="n">select_var</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter the number of the variable you wish to use: &quot;</span><span class="p">))</span> 
     <span class="k">return</span> <span class="n">select_var</span></div>
                          
-<div class="viewcode-block" id="xAxisTs"><a class="viewcode-back" href="../../LipdUtils.html#pyleoclim.LipdUtils.xAxisTs">[docs]</a><span class="k">def</span> <span class="nf">xAxisTs</span><span class="p">(</span><span class="n">timeseries</span><span class="p">):</span>
+<div class="viewcode-block" id="xAxisTs"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.xAxisTs">[docs]</a><span class="k">def</span> <span class="nf">xAxisTs</span><span class="p">(</span><span class="n">timeseries</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Prompt the user to choose a x-axis representation for the timeseries.</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
@@ -209,7 +335,7 @@
         
     <span class="k">return</span> <span class="n">x_axis</span><span class="p">,</span> <span class="n">label</span>  </div>
 
-<div class="viewcode-block" id="checkXaxis"><a class="viewcode-back" href="../../LipdUtils.html#pyleoclim.LipdUtils.checkXaxis">[docs]</a><span class="k">def</span> <span class="nf">checkXaxis</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="n">x_axis</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="checkXaxis"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.checkXaxis">[docs]</a><span class="k">def</span> <span class="nf">checkXaxis</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="n">x_axis</span><span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check that a x-axis is present for the timeseries</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
@@ -221,7 +347,7 @@
 <span class="sd">        label - returns either &quot;age&quot;, &quot;year&quot;, or &quot;depth&quot;    </span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">x_axis</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">x_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="n">xAxisTs</span><span class="p">(</span><span class="n">timeseries</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float64&#39;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">x_axis</span> <span class="o">==</span> <span class="s2">&quot;depth&quot;</span><span class="p">:</span>
@@ -246,11 +372,226 @@
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;enter either &#39;depth&#39;,&#39;age&#39;,or &#39;year&#39;&quot;</span><span class="p">)</span> 
   
     <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">label</span></div>
+
+<div class="viewcode-block" id="checkTimeAxis"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.checkTimeAxis">[docs]</a><span class="k">def</span> <span class="nf">checkTimeAxis</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="n">x_axis</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; This function makes sure that time is available for the timeseries</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        timeseries (dict): A LiPD timeseries object</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        x: the time values for the timeseries</span>
+<span class="sd">        label: the time representation for the timeseries</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">x_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;age&#39;</span> <span class="ow">in</span> <span class="n">timeseries</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="s1">&#39;year&#39;</span> <span class="ow">in</span> <span class="n">timeseries</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;No time information available&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s1">&#39;age&#39;</span> <span class="ow">in</span> <span class="n">timeseries</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="s1">&#39;year&#39;</span> <span class="ow">in</span> <span class="n">timeseries</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Both age and year information are available.&quot;</span><span class="p">)</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Which one would you like to use? &quot;</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">label</span> <span class="o">!=</span> <span class="s2">&quot;year&quot;</span> <span class="ow">and</span> <span class="n">label</span> <span class="o">!=</span> <span class="s2">&quot;age&quot;</span><span class="p">:</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Only enter year or age: &quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s1">&#39;age&#39;</span> <span class="ow">in</span> <span class="n">timeseries</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;age&#39;</span>
+        <span class="k">elif</span> <span class="s1">&#39;year&#39;</span> <span class="ow">in</span> <span class="n">timeseries</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;year&#39;</span>
+    <span class="k">elif</span> <span class="n">x_axis</span> <span class="o">==</span> <span class="s1">&#39;age&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;age&#39;</span> <span class="ow">in</span> <span class="n">timeseries</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Age is not available for this record&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;age&#39;</span>
+    <span class="k">elif</span> <span class="n">x_axis</span> <span class="o">==</span> <span class="s1">&#39;year&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="s1">&#39;year&#39;</span> <span class="ow">in</span> <span class="n">timeseries</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Year is not available for this record&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;year&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Only None, year and age are valid entries for x_axis parameter&#39;</span><span class="p">)</span>
+    
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">timeseries</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">label</span></div>
+
+<div class="viewcode-block" id="searchVar"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.searchVar">[docs]</a><span class="k">def</span> <span class="nf">searchVar</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">exact</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">override</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; This function search for key words (exact match) for a variable</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        timeseries_list (list): A list of available series</span>
+<span class="sd">        key (list): A list of keys to search</span>
+<span class="sd">        exact (bool): if True, looks for an exact match.</span>
+<span class="sd">        override (bool): if True, override the exact match if no match is found</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        match (list)- A list of keys for the timeseries that match the selection</span>
+<span class="sd">            criteria.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Make sure thaat the keys are contained in a list</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">list</span><span class="p">:</span>
+       <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+           <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span><span class="p">]</span>
+       <span class="k">else</span><span class="p">:</span>
+           <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Key terms should be entered as a list&quot;</span><span class="p">)</span>
+    
+    <span class="n">match</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">if</span> <span class="n">exact</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+    <span class="c1">#Search for exact match with the key    </span>
+        <span class="k">for</span> <span class="n">keyVal</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">timeseries_list</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">ts_temp</span> <span class="o">=</span> <span class="n">timeseries_list</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;variableName&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;variableName&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;paleoData_variableName&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;paleoData_variableName&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;chronData_variableName&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;chronData_variableName&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>        
+                <span class="k">elif</span> <span class="s2">&quot;ProxyObservationType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;ProxyObservationType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;paleoData_proxyObservationType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;paleoData_proxyObservationType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> 
+                <span class="k">elif</span> <span class="s2">&quot;chronData_proxyObservationType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;chronData_proxyObservationType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;InferredVariableType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;InferredVariableType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;paleoData_inferredVariableType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;paleoData_inferredVariableType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> 
+                <span class="k">elif</span> <span class="s2">&quot;chronData_inferredVariableType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;chronData_inferredVariableType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>          
+    <span class="k">else</span><span class="p">:</span>    
+    <span class="c1"># Search for the word in the ley</span>
+        <span class="k">for</span> <span class="n">keyVal</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">timeseries_list</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">ts_temp</span> <span class="o">=</span> <span class="n">timeseries_list</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;variableName&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;variableName&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;paleoData_variableName&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;paleoData_variableName&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;chronData_variableName&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;chronData_variableName&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>        
+                <span class="k">elif</span> <span class="s2">&quot;ProxyObservationType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;ProxyObservationType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;paleoData_proxyObservationType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;paleoData_proxyObservationType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> 
+                <span class="k">elif</span> <span class="s2">&quot;chronData_proxyObservationType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;chronData_proxyObservationType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;InferredVariableType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;InferredVariableType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;paleoData_inferredVariableType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;paleoData_inferredVariableType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> 
+                <span class="k">elif</span> <span class="s2">&quot;chronData_inferredVariableType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;chronData_inferredVariableType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    
+    <span class="c1"># Expand the search if asked                    </span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span> <span class="ow">and</span> <span class="n">exact</span> <span class="o">==</span> <span class="kc">True</span> <span class="ow">and</span> <span class="n">override</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No match found on exact search, running partial match&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">keyVal</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">timeseries_list</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">ts_temp</span> <span class="o">=</span> <span class="n">timeseries_list</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;variableName&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;variableName&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;paleoData_variableName&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;paleoData_variableName&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;chronData_variableName&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;chronData_variableName&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>        
+                <span class="k">elif</span> <span class="s2">&quot;ProxyObservationType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;ProxyObservationType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;paleoData_proxyObservationType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;paleoData_proxyObservationType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> 
+                <span class="k">elif</span> <span class="s2">&quot;chronData_proxyObservationType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;chronData_proxyObservationType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;InferredVariableType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;InferredVariableType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;paleoData_inferredVariableType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;paleoData_inferredVariableType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> 
+                <span class="k">elif</span> <span class="s2">&quot;chronData_inferredVariableType&quot;</span> <span class="ow">in</span> <span class="n">ts_temp</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">ts_temp</span><span class="p">[</span><span class="s2">&quot;chronData_inferredVariableType&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">keyVal</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="n">match</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>  
+    
+    <span class="c1"># Get the unique entries</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">match</span><span class="p">))</span>
+    
+    <span class="c1"># Narrow down if more than one match is found by asking the user</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">match</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;More than one series match your search criteria&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">choice</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter the number for the variable: &quot;</span><span class="p">))</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">choice</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No match found.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Here are the available variables: &quot;</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">timeseries_list</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="s2">&quot;: &quot;</span><span class="p">,</span><span class="n">val</span><span class="p">)</span>
+        <span class="n">choice</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Please select the variable you&#39;d like to use or enter to continue: &quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">choice</span><span class="p">:</span>
+            <span class="n">match</span> <span class="o">=</span><span class="s2">&quot;&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">choice</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">choice</span><span class="p">)</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">choice</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>        
+        
+    <span class="k">return</span> <span class="n">match</span></div>
     
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">The following functions handle the time series objects</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<div class="viewcode-block" id="enumerateTs"><a class="viewcode-back" href="../../LipdUtils.html#pyleoclim.LipdUtils.enumerateTs">[docs]</a><span class="k">def</span> <span class="nf">enumerateTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">):</span>
+<div class="viewcode-block" id="enumerateTs"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.enumerateTs">[docs]</a><span class="k">def</span> <span class="nf">enumerateTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Enumerate the available time series objects</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
@@ -265,34 +606,40 @@
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">val</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="s1">&#39;dataSetName&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
                 <span class="n">dataSetName</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-            <span class="k">if</span> <span class="s1">&#39;variableName&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;Data_variableName&#39;</span> <span class="ow">in</span> <span class="n">key</span><span class="p">:</span>
                 <span class="n">available_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
              
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">available_y</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="s1">&#39;: &#39;</span><span class="p">,</span><span class="n">dataSetName</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>     </div>
 
-<div class="viewcode-block" id="getTs"><a class="viewcode-back" href="../../LipdUtils.html#pyleoclim.LipdUtils.getTs">[docs]</a><span class="k">def</span> <span class="nf">getTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">):</span>
+<div class="viewcode-block" id="getTs"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.getTs">[docs]</a><span class="k">def</span> <span class="nf">getTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">,</span> <span class="n">option</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get a specific timeseries object from a dictionary of timeseries</span>
 <span class="sd">    </span>
 <span class="sd">    Args:</span>
 <span class="sd">        timeseries_list: a  list of available timeseries objects. </span>
 <span class="sd">            To use the timeseries loaded upon initiation of the </span>
 <span class="sd">            pyleoclim package, use pyleo.time_series.</span>
+<span class="sd">        option: An expression to filter the datasets. Uses lipd.filterTs()    </span>
 <span class="sd">            </span>
 <span class="sd">    Returns:</span>
-<span class="sd">        A single timeseries object </span>
+<span class="sd">        A single timeseries object if not optional filter selected or a filtered</span>
+<span class="sd">        list if optional arguments given</span>
 <span class="sd">        </span>
-<span class="sd">    &quot;&quot;&quot;</span>        
-    <span class="n">enumerateTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">)</span>
-    <span class="n">select_TSO</span> <span class="o">=</span> <span class="n">promptForVariable</span><span class="p">()</span>
-    <span class="n">timeseries</span> <span class="o">=</span> <span class="n">timeseries_list</span><span class="p">[</span><span class="n">select_TSO</span><span class="p">]</span>
+<span class="sd">    &quot;&quot;&quot;</span>     
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">option</span><span class="p">:</span>
+        <span class="n">enumerateTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">)</span>
+        <span class="n">select_TSO</span> <span class="o">=</span> <span class="n">promptForVariable</span><span class="p">()</span>
+        <span class="n">timeseries</span> <span class="o">=</span> <span class="n">timeseries_list</span><span class="p">[</span><span class="n">select_TSO</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">timeseries</span> <span class="o">=</span> <span class="n">lpd</span><span class="o">.</span><span class="n">filterTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">timeseries</span>   </div>
 
 <span class="sd">&quot;&quot;&quot; </span>
-<span class="sd">Handle mapping to LinkedEarth Ontology if needed</span>
+<span class="sd">Functions to handle data on the wiki</span>
 <span class="sd">&quot;&quot;&quot;</span>    
-<div class="viewcode-block" id="LipdToOntology"><a class="viewcode-back" href="../../LipdUtils.html#pyleoclim.LipdUtils.LipdToOntology">[docs]</a><span class="k">def</span> <span class="nf">LipdToOntology</span><span class="p">(</span><span class="n">archiveType</span><span class="p">):</span>
+<div class="viewcode-block" id="LipdToOntology"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.LipdToOntology">[docs]</a><span class="k">def</span> <span class="nf">LipdToOntology</span><span class="p">(</span><span class="n">archiveType</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; standardize archiveType</span>
 <span class="sd">    </span>
 <span class="sd">    Transform the archiveType from their LiPD name to their ontology counterpart</span>
@@ -315,71 +662,296 @@
         <span class="n">archiveType</span> <span class="o">=</span> <span class="s1">&#39;molluskshells&#39;</span>
     
     <span class="k">return</span> <span class="n">archiveType</span></div>
+
+<div class="viewcode-block" id="timeUnitsCheck"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.timeUnitsCheck">[docs]</a><span class="k">def</span> <span class="nf">timeUnitsCheck</span><span class="p">(</span><span class="n">units</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; This function attempts to make sense of the time units by checking for equivalence</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        units (str): The units string for the timeseries</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        unit_group (str): Whether the units belongs to age_units, kage_units, year_units, or undefined</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">age_units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;year B.P.&#39;</span><span class="p">,</span><span class="s1">&#39;yr B.P.&#39;</span><span class="p">,</span><span class="s1">&#39;yr BP&#39;</span><span class="p">,</span><span class="s1">&#39;BP&#39;</span><span class="p">,</span><span class="s1">&#39;yrs BP&#39;</span><span class="p">,</span><span class="s1">&#39;years B.P.&#39;</span><span class="p">,</span>\
+                 <span class="s1">&#39;yr. BP&#39;</span><span class="p">,</span><span class="s1">&#39;yr. B.P.&#39;</span><span class="p">,</span> <span class="s1">&#39;cal. BP&#39;</span><span class="p">,</span> <span class="s1">&#39;cal B.P.&#39;</span><span class="p">,</span> \
+                 <span class="s1">&#39;year BP&#39;</span><span class="p">,</span><span class="s1">&#39;years BP&#39;</span><span class="p">]</span>
+    <span class="n">kage_units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;kyr BP&#39;</span><span class="p">,</span><span class="s1">&#39;kaBP&#39;</span><span class="p">,</span><span class="s1">&#39;ka BP&#39;</span><span class="p">,</span><span class="s1">&#39;ky&#39;</span><span class="p">,</span><span class="s1">&#39;kyr&#39;</span><span class="p">,</span><span class="s1">&#39;kyr B.P.&#39;</span><span class="p">,</span> <span class="s1">&#39;ka B.P.&#39;</span><span class="p">]</span>
+    <span class="n">year_units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AD&#39;</span><span class="p">,</span><span class="s1">&#39;CE&#39;</span><span class="p">,</span><span class="s1">&#39;year C.E.&#39;</span><span class="p">,</span><span class="s1">&#39;year A.D.&#39;</span><span class="p">,</span> <span class="s1">&#39;year CE&#39;</span><span class="p">,</span><span class="s1">&#39;year AD&#39;</span><span class="p">,</span>\
+                  <span class="s1">&#39;years C.E.&#39;</span><span class="p">,</span><span class="s1">&#39;years A.D.&#39;</span><span class="p">,</span><span class="s1">&#39;yr CE&#39;</span><span class="p">,</span><span class="s1">&#39;yr AD&#39;</span><span class="p">,</span><span class="s1">&#39;yr C.E.&#39;</span>\
+                  <span class="s1">&#39;yr A.D.&#39;</span><span class="p">,</span> <span class="s1">&#39;yrs C.E.&#39;</span><span class="p">,</span> <span class="s1">&#39;yrs A.D.&#39;</span><span class="p">,</span> <span class="s1">&#39;yrs CE&#39;</span><span class="p">,</span> <span class="s1">&#39;yrs AD&#39;</span><span class="p">]</span>
+    <span class="n">undefined</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;years&#39;</span><span class="p">,</span> <span class="s1">&#39;yr&#39;</span><span class="p">,</span><span class="s1">&#39;year&#39;</span><span class="p">,</span><span class="s1">&#39;yrs&#39;</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="n">units</span> <span class="ow">in</span> <span class="n">age_units</span><span class="p">:</span>
+        <span class="n">unit_group</span> <span class="o">=</span> <span class="s1">&#39;age_units&#39;</span>
+    <span class="k">elif</span> <span class="n">units</span> <span class="ow">in</span> <span class="n">kage_units</span><span class="p">:</span>
+        <span class="n">unit_group</span> <span class="o">=</span> <span class="s1">&#39;kage_units&#39;</span>
+    <span class="k">elif</span> <span class="n">units</span> <span class="ow">in</span> <span class="n">year_units</span><span class="p">:</span>
+        <span class="n">unit_group</span> <span class="o">=</span> <span class="s1">&#39;year_units&#39;</span>
+    <span class="k">elif</span> <span class="n">units</span> <span class="ow">in</span> <span class="n">undefined</span><span class="p">:</span>
+        <span class="n">unit_group</span> <span class="o">=</span> <span class="s1">&#39;undefined&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">unit_group</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
+    
+    <span class="k">return</span> <span class="n">unit_group</span></div>
+    
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Deal with models</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="isModel"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.isModel">[docs]</a><span class="k">def</span> <span class="nf">isModel</span><span class="p">(</span><span class="n">csvName</span><span class="p">,</span> <span class="n">lipd</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check for the presence of a model in the same object than the measurement table</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        csvName (str): The name of the csv file corresponding to the measurement table</span>
+<span class="sd">        lipd (dict): A LiPD object</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        model (list): List of models already available\n</span>
+<span class="sd">        dataObject (str): The name of the paleoData or ChronData</span>
+<span class="sd">            object in which the model(s) are stored</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">csvNameSplit</span> <span class="o">=</span> <span class="n">csvName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">csvNameSplit</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;chron&quot;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">or</span> <span class="s2">&quot;paleo&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+            <span class="n">tableName</span> <span class="o">=</span> <span class="n">val</span>
+    
+    <span class="k">if</span> <span class="n">tableName</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
+        <span class="n">objectName</span> <span class="o">=</span> <span class="s1">&#39;chron&#39;</span><span class="o">+</span><span class="n">tableName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;chron&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dataObject</span> <span class="o">=</span> <span class="n">lipd</span><span class="p">[</span><span class="s2">&quot;chronData&quot;</span><span class="p">][</span><span class="n">objectName</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">tableName</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+        <span class="n">objectName</span> <span class="o">=</span> <span class="s1">&#39;paleo&#39;</span><span class="o">+</span><span class="n">tableName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;paleo&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dataObject</span> <span class="o">=</span> <span class="n">lipd</span><span class="p">[</span><span class="s2">&quot;paleoData&quot;</span><span class="p">][</span><span class="n">objectName</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Key name should only include &#39;chron&#39; or &#39;paleo&#39;&quot;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="s2">&quot;model&quot;</span> <span class="ow">in</span> <span class="n">dataObject</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">model_list</span> <span class="o">=</span> <span class="n">dataObject</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">model_list</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">model</span><span class="o">=</span><span class="p">[]</span>
+    
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">objectName</span></div>
+
+<div class="viewcode-block" id="modelNumber"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.modelNumber">[docs]</a><span class="k">def</span> <span class="nf">modelNumber</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Assign a new or existing model number</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        model (list): List of possible model number. Obtained from isModel</span>
+<span class="sd">        </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        modelNum (int): The number of the model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">model</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There is &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; model(s) already available.&quot;</span><span class="p">)</span>
+        <span class="n">choice</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Do you want to create (c) another or override (o) one? &quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">choice</span> <span class="o">!=</span><span class="s2">&quot;c&quot;</span> <span class="ow">and</span> <span class="n">choice</span><span class="o">!=</span> <span class="s2">&quot;o&quot;</span><span class="p">:</span>
+               <span class="n">choice</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter either c or o: &quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">choice</span> <span class="o">==</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span>
+            <span class="n">modelNum</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">choice</span> <span class="o">==</span> <span class="s2">&quot;o&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">modelNum</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There is more than one model available.&quot;</span><span class="p">)</span>
+                <span class="n">modelNum</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter the number of the model you wish to override: &quot;</span><span class="p">))</span>        
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No previous model available. Creating model...&quot;</span><span class="p">)</span>
+        <span class="n">modelNum</span> <span class="o">=</span> <span class="mi">0</span>
+    
+    <span class="k">return</span> <span class="n">modelNum</span>    </div>
+    
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Get entire tables</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="isMeasurement"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.isMeasurement">[docs]</a><span class="k">def</span> <span class="nf">isMeasurement</span><span class="p">(</span><span class="n">csv_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Check whether measurement tables are available</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        csv_dict (dict): Dictionary of available csv</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        paleoMeasurementTables - List of available paleoMeasurementTables</span>
+<span class="sd">        chronMeasurementTables - List of available chronMeasurementTables</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">chronMeasurementTables</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">paleoMeasurementTables</span> <span class="o">=</span><span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">csv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s2">&quot;measurement&quot;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">and</span> <span class="s2">&quot;chron&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+            <span class="n">chronMeasurementTables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;measurement&quot;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">and</span> <span class="s2">&quot;paleo&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+            <span class="n">paleoMeasurementTables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            
+    <span class="k">return</span> <span class="n">chronMeasurementTables</span><span class="p">,</span> <span class="n">paleoMeasurementTables</span></div>
+
+<div class="viewcode-block" id="whichMeasurement"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.whichMeasurement">[docs]</a><span class="k">def</span> <span class="nf">whichMeasurement</span><span class="p">(</span><span class="n">measurementTableList</span><span class="p">,</span> <span class="n">csv_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Select a measurement table from a list</span>
+<span class="sd">    </span>
+<span class="sd">    Use in conjunction with the function isMeasurement</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        measurementTableList (list): List of measurement tables contained in the</span>
+<span class="sd">            LiPD file. Output from the isMeasurement function</span>
+<span class="sd">        csv_list (list): Dictionary of available csv     </span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        csvName (str) - the name of the csv file</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">measurementTableList</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;More than one table is available.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">measurementTableList</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="s2">&quot;: &quot;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="n">csvName</span> <span class="o">=</span> <span class="n">measurementTableList</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Which one would you like to use? &quot;</span><span class="p">))]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">csvName</span> <span class="o">=</span> <span class="n">measurementTableList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>       
+
+    <span class="k">return</span> <span class="n">csvName</span>       </div>
+
+<div class="viewcode-block" id="getMeasurement"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.getMeasurement">[docs]</a><span class="k">def</span> <span class="nf">getMeasurement</span><span class="p">(</span><span class="n">csvName</span><span class="p">,</span> <span class="n">lipd</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extract the dictionary corresponding to the measurement table</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        csvName (str): The name of the csv file</span>
+<span class="sd">        lipd (dict): The LiPD object from which to extract the data</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        ts_list - A dictionary containing data and metadata for each column in the</span>
+<span class="sd">            csv file.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">csvNameSplit</span> <span class="o">=</span> <span class="n">csvName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">csvNameSplit</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;chron&quot;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">or</span> <span class="s2">&quot;paleo&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+            <span class="n">tableName</span> <span class="o">=</span> <span class="n">val</span>
+    
+    <span class="k">if</span> <span class="n">tableName</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
+        <span class="n">objectName</span> <span class="o">=</span> <span class="s1">&#39;chron&#39;</span><span class="o">+</span><span class="n">tableName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;chron&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ts_list</span> <span class="o">=</span> <span class="n">lipd</span><span class="p">[</span><span class="s2">&quot;chronData&quot;</span><span class="p">][</span><span class="n">objectName</span><span class="p">][</span><span class="s2">&quot;measurementTable&quot;</span><span class="p">][</span><span class="n">tableName</span><span class="p">][</span><span class="s2">&quot;columns&quot;</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">tableName</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+        <span class="n">objectName</span> <span class="o">=</span> <span class="s1">&#39;paleo&#39;</span><span class="o">+</span><span class="n">tableName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;paleo&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ts_list</span> <span class="o">=</span> <span class="n">lipd</span><span class="p">[</span><span class="s2">&quot;paleoData&quot;</span><span class="p">][</span><span class="n">objectName</span><span class="p">][</span><span class="s2">&quot;measurementTable&quot;</span><span class="p">][</span><span class="n">tableName</span><span class="p">][</span><span class="s2">&quot;columns&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Key name should only include &#39;chron&#39; or &#39;paleo&#39;&quot;</span><span class="p">)</span>
+                
+    <span class="k">return</span> <span class="n">ts_list</span>    </div>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Deal with ensembles</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="isEnsemble"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.isEnsemble">[docs]</a><span class="k">def</span> <span class="nf">isEnsemble</span><span class="p">(</span><span class="n">csv_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Check whether ensembles are available</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        csv_dict (dict): Dictionary of available csv</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        paleoEnsembleTables - List of available paleoEnsembleTables \n</span>
+<span class="sd">        chronEnsembleTables - List of availale chronEnsemble Tables</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>     
+    <span class="n">chronEnsembleTables</span> <span class="o">=</span><span class="p">[]</span>
+    <span class="n">paleoEnsembleTables</span> <span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">csv_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s2">&quot;ensemble&quot;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">and</span> <span class="s2">&quot;chron&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+            <span class="n">chronEnsembleTables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;ensemble&quot;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">and</span> <span class="s2">&quot;paleo&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+            <span class="n">paleoEnsembleTables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            
+    <span class="k">return</span> <span class="n">chronEnsembleTables</span><span class="p">,</span> <span class="n">paleoEnsembleTables</span></div>
+
+<span class="k">def</span> <span class="nf">getEnsembleValues</span><span class="p">(</span><span class="n">ensemble_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Grabs the ensemble values and depth vector from the dictionary and</span>
+<span class="sd">    return them into two numpy arrays.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        ensemble_dict (dict): dictionary containing the ensemble information    </span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        depth (array): Vector of depth \n</span>
+<span class="sd">        ensembleValues (array): The matrix of Ensemble values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">ensemble_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">number</span> <span class="o">=</span> <span class="n">ensemble_dict</span><span class="p">[</span><span class="n">val</span><span class="p">][</span><span class="s2">&quot;number&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">number</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="n">ensemble_dict</span><span class="p">[</span><span class="n">val</span><span class="p">][</span><span class="s2">&quot;values&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ensembleValues</span> <span class="o">=</span> <span class="n">ensemble_dict</span><span class="p">[</span><span class="n">val</span><span class="p">][</span><span class="s2">&quot;values&quot;</span><span class="p">]</span>
+            <span class="n">ensembleValues</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ensembleValues</span><span class="p">))</span>
+            
+    <span class="k">return</span> <span class="n">depth</span><span class="p">,</span> <span class="n">ensembleValues</span>       
+
+<div class="viewcode-block" id="mapAgeEnsembleToPaleoData"><a class="viewcode-back" href="../../LIPDutils.html#pyleoclim.LipdUtils.mapAgeEnsembleToPaleoData">[docs]</a><span class="k">def</span> <span class="nf">mapAgeEnsembleToPaleoData</span><span class="p">(</span><span class="n">ensembleValues</span><span class="p">,</span> <span class="n">depthEnsemble</span><span class="p">,</span> <span class="n">depthPaleo</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Map the depth for the ensemble age values to the paleo depth</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        ensembleValues (array): A matrix of possible age models. Realizations</span>
+<span class="sd">            should be stored in columns</span>
+<span class="sd">        depthEnsemble (array): A vector of depth. The vector should have the same</span>
+<span class="sd">            length as the number of rows in the ensembleValues</span>
+<span class="sd">        depthPaleo (array): A vector corresponding to the depth at which there</span>
+<span class="sd">            are paleodata information</span>
+<span class="sd">            </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        ensembleValuesToPaleo - A matrix of age ensemble on the PaleoData scale \n        </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">depthEnsemble</span><span class="p">)</span><span class="o">!=</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ensembleValues</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;Depth and age need to have the same length&quot;</span><span class="p">)</span>
+    
+    <span class="c1">#Make sure that numpy arrays were given</span>
+    <span class="n">ensembleValues</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ensembleValues</span><span class="p">)</span>
+    <span class="n">depthEnsemble</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">depthEnsemble</span><span class="p">)</span>
+    <span class="n">depthPaleo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">depthPaleo</span><span class="p">)</span>
+
+    <span class="c1">#Interpolate</span>
+    <span class="n">ensembleValuesToPaleo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">depthPaleo</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ensembleValues</span><span class="p">)[</span><span class="mi">1</span><span class="p">]))</span> <span class="c1">#placeholder</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ensembleValues</span><span class="p">)[</span><span class="mi">1</span><span class="p">]):</span>
+        <span class="n">ensembleValuesToPaleo</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">depthPaleo</span><span class="p">,</span><span class="n">depthEnsemble</span><span class="p">,</span><span class="n">ensembleValues</span><span class="p">[:,</span><span class="n">i</span><span class="p">])</span>
+        
+    <span class="k">return</span> <span class="n">ensembleValuesToPaleo</span>    </div>
 </pre></div>
 
+           </div>
+           
           </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../../index.html">Pyleoclim</a></h1>
+
+    </section>
+
+  </div>
+  
 
 
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
 
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../Introduction.html">Pyleoclim</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Main.html">Main Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Map.html">Mapping Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Plot.html">Plotting Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Stats.html">Statistics Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Timeseries.html">Timeseries Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../LipdUtils.html">LiPD Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../SummaryPlots.html">Summary Plots</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../Spectral.html">Spectral Functions</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  <li><a href="../pyleoclim.html">pyleoclim</a><ul>
-  </ul></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Deborah Khider, Julien Emile-Geay, Feng Zhu.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-    </div>
-
+  
+  
     
+   
 
-    
-  </body>
+</body>
 </html>
