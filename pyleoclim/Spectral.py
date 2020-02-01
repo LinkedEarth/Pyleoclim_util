@@ -37,9 +37,6 @@ import pandas as pd
 
 import numba as nb
 
-if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
-    from . import f2py_wwz as f2py
-
 '''
 Core functions below, focusing on algorithms
 '''
@@ -795,6 +792,124 @@ class WaveletAnalysis(object):
         coeff = (a0, a1, a2)
 
         return wwa, phase, Neffs, coeff
+    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, params=['default', 4, 0, 1],
+                       gaussianize=False, standardize=True):
+        ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
+
+        Method modified by kirchner. Supports multiprocessing.
+
+        Args:
+            ys (array): a time series
+            ts (array): time axis of the time series
+            freqs (array): vector of frequency
+            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+            c (float): the decay constant
+            Neff (int): the threshold of the number of effective degree of freedom
+            nproc (int): the number of processes for multiprocessing
+            detrend (str): 'no' - the original time series is assumed to have no trend;
+                           'linear' - a linear least-squares fit to `ys` is subtracted;
+                           'constant' - the mean of `ys` is subtracted
+            'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                               filters and the resulting filtered series is subtracted from y.
+            params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                corresponds to the window size (default it set to half of the data)
+                while the second parameter correspond to the order of the filter
+                (default is 4). The third parameter is the order of the derivative
+                (the default is zero, which means only smoothing.)
+            gaussianize (bool): If True, gaussianizes the timeseries
+            standardize (bool): If True, standardizes the timeseries
+
+        Returns:
+            wwa (array): the weighted wavelet amplitude
+            phase (array): the weighted wavelet phase
+            Neffs (array): the matrix of effective number of points in the time-scale coordinates
+            coeff (array): the wavelet transform coefficients (a0, a1, a2)
+
+        '''
+        assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
+        self.assertPositiveInt(Neff)
+
+        nt = np.size(tau)
+        nts = np.size(ts)
+        nf = np.size(freqs)
+
+        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
+
+        omega = self.make_omega(ts, freqs)
+
+        Neffs = np.ndarray(shape=(nt, nf))
+        a0 = np.ndarray(shape=(nt, nf))
+        a1 = np.ndarray(shape=(nt, nf))
+        a2 = np.ndarray(shape=(nt, nf))
+
+        def wwa_1g(tau, omega):
+            dz = omega * (ts - tau)
+            weights = np.exp(-c*dz**2)
+
+            sum_w = np.sum(weights)
+            Neff_loc = sum_w**2 / np.sum(weights**2)
+
+            if Neff_loc <= Neff:
+                a0_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                a1_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                a2_1g = np.nan
+            else:
+                def w_prod(xs, ys):
+                    return np.sum(weights*xs*ys) / sum_w
+
+                sin_basis = np.sin(omega*ts)
+                cos_basis = np.cos(omega*ts)
+                one_v = np.ones(nts)
+
+                sin_one = w_prod(sin_basis, one_v)
+                cos_one = w_prod(cos_basis, one_v)
+                sin_cos = w_prod(sin_basis, cos_basis)
+                sin_sin = w_prod(sin_basis, sin_basis)
+                cos_cos = w_prod(cos_basis, cos_basis)
+
+                numerator = 2*(sin_cos - sin_one*cos_one)
+                denominator = (cos_cos - cos_one**2) - (sin_sin - sin_one**2)
+                time_shift = np.arctan2(numerator, denominator) / (2*omega)  # Eq. (S5)
+
+                sin_shift = np.sin(omega*(ts - time_shift))
+                cos_shift = np.cos(omega*(ts - time_shift))
+                sin_tau_center = np.sin(omega*(time_shift - tau))
+                cos_tau_center = np.cos(omega*(time_shift - tau))
+
+                ys_cos_shift = w_prod(pd_ys, cos_shift)
+                ys_sin_shift = w_prod(pd_ys, sin_shift)
+                ys_one = w_prod(pd_ys, one_v)
+                cos_shift_one = w_prod(cos_shift, one_v)
+                sin_shift_one = w_prod(sin_shift, one_v)
+
+                A = 2*(ys_cos_shift - ys_one*cos_shift_one)
+                B = 2*(ys_sin_shift - ys_one*sin_shift_one)
+
+                a0_1g = ys_one
+                a1_1g = cos_tau_center*A - sin_tau_center*B  # Eq. (S6)
+                a2_1g = sin_tau_center*A + cos_tau_center*B  # Eq. (S7)
+
+            return Neff_loc, a0_1g, a1_1g, a2_1g
+
+        tf_mesh = np.meshgrid(tau, omega)
+        list_of_grids = list(zip(*(grid.flat for grid in tf_mesh)))
+        tau_grids, omega_grids = zip(*list_of_grids)
+
+        with Pool(nproc) as pool:
+            res = pool.map(wwa_1g, tau_grids, omega_grids)
+            res_array = np.asarray(res)
+            Neffs = res_array[:, 0].reshape((np.size(omega), np.size(tau))).T
+            a0 = res_array[:, 1].reshape((np.size(omega), np.size(tau))).T
+            a1 = res_array[:, 2].reshape((np.size(omega), np.size(tau))).T
+            a2 = res_array[:, 3].reshape((np.size(omega), np.size(tau))).T
+
+        wwa = np.sqrt(a1**2 + a2**2)
+        phase = np.arctan2(a2, a1)
+        #  coeff = a1 + a2*1j
+        coeff = (a0, a1, a2)
+
+        return wwa, phase, Neffs, coeff
+
     def kirchner_numba(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, params=["default", 4, 0, 1],
                        gaussianize=False, standardize=True, nproc=1):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
@@ -914,125 +1029,6 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-
-    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, params=['default', 4, 0, 1],
-                       gaussianize=False, standardize=True):
-        ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
-
-        Method modified by kirchner. Supports multiprocessing.
-
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-            c (float): the decay constant
-            Neff (int): the threshold of the number of effective degree of freedom
-            nproc (int): the number of processes for multiprocessing
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-            'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
-
-        Returns:
-            wwa (array): the weighted wavelet amplitude
-            phase (array): the weighted wavelet phase
-            Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients (a0, a1, a2)
-
-        '''
-        assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
-        self.assertPositiveInt(Neff)
-
-        nt = np.size(tau)
-        nts = np.size(ts)
-        nf = np.size(freqs)
-
-        pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
-
-        omega = self.make_omega(ts, freqs)
-
-        Neffs = np.ndarray(shape=(nt, nf))
-        a0 = np.ndarray(shape=(nt, nf))
-        a1 = np.ndarray(shape=(nt, nf))
-        a2 = np.ndarray(shape=(nt, nf))
-
-        def wwa_1g(tau, omega):
-            dz = omega * (ts - tau)
-            weights = np.exp(-c*dz**2)
-
-            sum_w = np.sum(weights)
-            Neff_loc = sum_w**2 / np.sum(weights**2)
-
-            if Neff_loc <= Neff:
-                a0_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
-                a1_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
-                a2_1g = np.nan
-            else:
-                def w_prod(xs, ys):
-                    return np.sum(weights*xs*ys) / sum_w
-
-                sin_basis = np.sin(omega*ts)
-                cos_basis = np.cos(omega*ts)
-                one_v = np.ones(nts)
-
-                sin_one = w_prod(sin_basis, one_v)
-                cos_one = w_prod(cos_basis, one_v)
-                sin_cos = w_prod(sin_basis, cos_basis)
-                sin_sin = w_prod(sin_basis, sin_basis)
-                cos_cos = w_prod(cos_basis, cos_basis)
-
-                numerator = 2*(sin_cos - sin_one*cos_one)
-                denominator = (cos_cos - cos_one**2) - (sin_sin - sin_one**2)
-                time_shift = np.arctan2(numerator, denominator) / (2*omega)  # Eq. (S5)
-
-                sin_shift = np.sin(omega*(ts - time_shift))
-                cos_shift = np.cos(omega*(ts - time_shift))
-                sin_tau_center = np.sin(omega*(time_shift - tau))
-                cos_tau_center = np.cos(omega*(time_shift - tau))
-
-                ys_cos_shift = w_prod(pd_ys, cos_shift)
-                ys_sin_shift = w_prod(pd_ys, sin_shift)
-                ys_one = w_prod(pd_ys, one_v)
-                cos_shift_one = w_prod(cos_shift, one_v)
-                sin_shift_one = w_prod(sin_shift, one_v)
-
-                A = 2*(ys_cos_shift - ys_one*cos_shift_one)
-                B = 2*(ys_sin_shift - ys_one*sin_shift_one)
-
-                a0_1g = ys_one
-                a1_1g = cos_tau_center*A - sin_tau_center*B  # Eq. (S6)
-                a2_1g = sin_tau_center*A + cos_tau_center*B  # Eq. (S7)
-
-            return Neff_loc, a0_1g, a1_1g, a2_1g
-
-        tf_mesh = np.meshgrid(tau, omega)
-        list_of_grids = list(zip(*(grid.flat for grid in tf_mesh)))
-        tau_grids, omega_grids = zip(*list_of_grids)
-
-        with Pool(nproc) as pool:
-            res = pool.map(wwa_1g, tau_grids, omega_grids)
-            res_array = np.asarray(res)
-            Neffs = res_array[:, 0].reshape((np.size(omega), np.size(tau))).T
-            a0 = res_array[:, 1].reshape((np.size(omega), np.size(tau))).T
-            a1 = res_array[:, 2].reshape((np.size(omega), np.size(tau))).T
-            a2 = res_array[:, 3].reshape((np.size(omega), np.size(tau))).T
-
-        wwa = np.sqrt(a1**2 + a2**2)
-        phase = np.arctan2(a2, a1)
-        #  coeff = a1 + a2*1j
-        coeff = (a0, a1, a2)
-
-        return wwa, phase, Neffs, coeff
-
     def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, params=['default', 4, 0, 1],
                       gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
@@ -1067,6 +1063,7 @@ class WaveletAnalysis(object):
             coeff (array): the wavelet transform coefficients (a0, a1, a2)
 
         '''
+        from . import f2py_wwz as f2py
         self.assertPositiveInt(Neff, nproc)
 
         nt = np.size(tau)
@@ -1530,12 +1527,11 @@ class WaveletAnalysis(object):
                 wwz_func = wa.kirchner_basic
             else:
                 wwz_func = wa.kirchner_nproc
-        elif method == 'Kirchner_numba':
-            wwz_func = wa.kirchner_numba
         elif method == 'Kirchner_f2py':
             wwz_func = wa.kirchner_f2py
         else:
-            raise ValueError('WRONG `method`! Choose among {"Kirchner", "Kirchner_numba", "Kirchner_f2py", "Foster"}.')
+            # default method; Kirchner's algorithm with Numba support for acceleration
+            wwz_func = wa.kirchner_numba
 
         return wwz_func
 
@@ -2148,7 +2144,7 @@ def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
 
 def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
         nMC=200, nproc=8, detrend=False, params=['default', 4, 0, 1],\
-        gaussianize=False, standardize=True, method='Kirchner_f2py', len_bd=0,\
+        gaussianize=False, standardize=True, method='default', len_bd=0,\
         bc_mode='reflect', reflect_type='odd'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coefficients
 
@@ -2188,11 +2184,6 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
         coeff (array): the wavelet transform coefficents
 
     '''
-    #  if method == 'Kirchner_f2py':
-    #      if not sys.platform.startswith('darwin'):
-    #          warnings.warn("WWZ method: the f2py version is only supported on macOS right now; will use python version instead.")
-    #          method = 'Kirchner'
-
     wa = WaveletAnalysis()
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
 
@@ -2242,7 +2233,7 @@ def lomb_scargle(ys, ts, freqs=None, detrend=False, gaussianize=False,standardiz
 def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             detrend=False, params=["default", 4, 0, 1], gaussianize=False,
             standardize=True, Neff=3, anti_alias=False, avgs=2,
-            method='Kirchner_f2py'):
+            method='default'):
     ''' Return the psd of a timeseries directly using wwz method.
 
     Args:
@@ -2268,6 +2259,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         method (str): 'Foster' - the original WWZ method;
                       'Kirchner' - the method Kirchner adapted from Foster;
                       'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+                      'default' - the Numba version of the Kirchner algorithm will be called
         Neff (int):
         anti_alias (bool): If True, uses anti-aliasing
         avgs (int): 
@@ -2328,7 +2320,7 @@ def xwt(ys1, ts1, ys2, ts2,
         tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nproc=8,
         detrend=False, params=['default', 4, 0, 1],
         gaussianize=False, standardize=True,
-        method='Kirchner_f2py'):
+        method='default'):
     ''' Return the cross-wavelet transform of two time series.
 
     Args:
@@ -2417,7 +2409,7 @@ def xwt(ys1, ts1, ys2, ts2,
 def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False,
         nMC=200, params=['default', 4, 0, 1],
-        gaussianize=False, standardize=True, method='Kirchner_f2py'):
+        gaussianize=False, standardize=True, method='default'):
     ''' Return the cross-wavelet coherence of two time series.
 
     Args:
@@ -2450,10 +2442,6 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
             vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
 
     '''
-    if (not sys.platform.startswith('darwin')) and (not sys.platform.startswith('linux')) and method == 'Kirchner_f2py':
-        warnings.warn("The f2py version of WWZ is only supported on macOS & Linux right now; will use the python version instead.")
-        method = 'Kirchner'
-
     wa = WaveletAnalysis()
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
@@ -3013,9 +3001,9 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
     return ax
 
 
-def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3, 
+def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
                  nMC=200, nproc=1, detrend=False, params=["default", 4, 0, 1],
-                 gaussianize=False, standardize=True, levels=None, method='Kirchner_f2py',
+                 gaussianize=False, standardize=True, levels=None, method='default',
                  anti_alias=False, period_ticks=None, ts_color=None, ts_style='-o',
                  title=None, ts_ylabel=None, wwa_xlabel=None, wwa_ylabel=None,
                  psd_lmstyle='-', psd_lim=None, font_scale=1.5,
@@ -3073,7 +3061,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
 
     gs = gridspec.GridSpec(6, 12)
     gs.update(wspace=0, hspace=0)
-    
+
     fig = plt.figure(figsize=(15, 15))
 
     # plot the time series
@@ -3145,7 +3133,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
 
 
 def calc_plot_psd(ys, ts, ntau=501, dcon=1e-3, standardize=False,
-                  anti_alias=False, plot_fig=True, method='Kirchner_f2py', nproc=8,
+                  anti_alias=False, plot_fig=True, method='default', nproc=8,
                   period_ticks=[0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000], color=None,
                   figsize=[10, 6], font_scale=1.5, lw=3, label='PSD', zorder=None,
                   xlim=None, ylim=None, loc='upper right', bbox_to_anchor=None):

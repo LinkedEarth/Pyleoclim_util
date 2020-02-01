@@ -30,14 +30,6 @@ elif sys.argv[-1] == 'publishtest':
 
     sys.exit()
 
-f2py_wwz = Extension(
-    name='pyleoclim.f2py_wwz',
-    extra_compile_args=['-O3'],
-    extra_f90_compile_args=['-fopenmp', '-O3'],  # compiling with gfortran
-    #  extra_f90_compile_args=['-qopenmp', '-O3', '-mkl=parallel'],  # compiling with ifort
-    sources=['pyleoclim/src/f2py_wwz.f90']
-)
-
 setup(
     name='pyleoclim',
     packages=find_packages(),
@@ -54,7 +46,6 @@ setup(
     download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/'+version,
     keywords=['Paleoclimate, Data Analysis'],
     classifiers=[],
-    ext_modules=[f2py_wwz],
     install_requires=[
         "LiPD>=0.2.7",
         "pandas>=0.25.0",
@@ -66,10 +57,11 @@ setup(
         "scikit-learn>=0.21.3",
         "pathos>=0.2.4",
         "tqdm>=4.33.0",
-        "rpy2>=3.0.5",
         "tftb",
         "pyhht",
-        "spectrum"
+        "spectrum",
+        "numba",
+        "nitime",
     ],
     python_requires=">=3.6.0"
 )

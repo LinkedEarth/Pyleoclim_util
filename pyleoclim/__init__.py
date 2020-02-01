@@ -34,6 +34,7 @@ from pyleoclim import Stats
 from pyleoclim import Timeseries
 from pyleoclim import RBchron
 from pyleoclim import Examples
+from pyleoclim import api
 
 
 """

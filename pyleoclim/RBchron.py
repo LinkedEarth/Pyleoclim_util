@@ -12,9 +12,7 @@ Pyleoclim Bchron Module
 import numpy as np
 import pandas as pd
 import datetime
-import rpy2.robjects as robjects
 from itertools import chain
-from rpy2.robjects.packages import importr
 import matplotlib.pyplot as plt
 from scipy.stats.mstats import mquantiles
 import matplotlib.patches as mpatches
@@ -155,7 +153,7 @@ def runBchron(ages, agesStd, positions, rejectAges = None,\
            extractDate = 1950-datetime.datetime.now().year,\
            maxExtrap = 500, thetaMhSd = 0.5, muMhSd = 0.1, psiMhSd = 0.1, \
            ageScaleVal = 1000, positionScaleVal = 100):
-    
+
     """ Age model for Tie-Point chronologies
     
     Fits a non-parametric chronology model to age/position data according to
@@ -246,23 +244,24 @@ def runBchron(ages, agesStd, positions, rejectAges = None,\
                 27(19-20), 1872-1885. DOI:10.1016/j.quascirev.2008.07.009     
     
     """
-       
-    #r = robjects.r 
-    
+    import rpy2.robjects as robjects
+    from rpy2.robjects.packages import importr
+    #r = robjects.r
+
     # Install necessary R packages
     utils = importr("utils")
     #Choose a CRAN Mirror for download in necessary
     utils.chooseCRANmirror(ind=1)
     # Install the various packages if needed
     try:
-        #Import BChron 
+        #Import BChron
         Bchron = importr('Bchron')
     except:
         packnames = ('Bchron', 'stats', 'graphics')
         utils.install_packages(robjects.vectors.StrVector(packnames))
         #Import Bchron
-        Bchron = importr('Bchron')  
-    
+        Bchron = importr('Bchron')
+
     ages = np.array(ages, dtype='float64')
     agesStd = np.array(agesStd, dtype='float64')
     positions = np.array(positions, dtype='float64')
