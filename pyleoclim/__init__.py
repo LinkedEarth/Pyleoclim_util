@@ -25,15 +25,15 @@ import cartopy.feature as cfeature
 
 
 # Import internal modules to pyleoclim
-from pyleoclim import Map
-from pyleoclim import LipdUtils
-from pyleoclim import SummaryPlots
-from pyleoclim import Plot
-from pyleoclim import Spectral
-from pyleoclim import Stats
-from pyleoclim import Timeseries
-from pyleoclim import RBchron
-from pyleoclim import Examples
+from pyleoclim import map
+from pyleoclim import lipdutils
+from pyleoclim import summaryplots
+from pyleoclim import plot
+from pyleoclim import spectral
+from pyleoclim import stats
+from pyleoclim import timeseries
+from pyleoclim import rbchron
+from pyleoclim import examples
 from pyleoclim import api
 
 
