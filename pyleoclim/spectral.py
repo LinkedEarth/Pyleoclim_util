@@ -27,7 +27,6 @@ from tqdm import tqdm
 import warnings
 
 from pyleoclim import Timeseries
-import sys
 import collections
 
 from math import factorial
@@ -1928,10 +1927,10 @@ class Filter(object):
                 Cambridge University Press ISBN-13: 9780521880688
             - SciPy Cookbook: shttps://github.com/scipy/scipy-cookbook/blob/master/ipython/SavitzkyGolay.ipynb
         """
-        if type(window_size)is not int:
-            sys.exit("window_size should be of type int")
+        if type(window_size) is not int:
+            raise TypeError("window_size should be of type int")
         if type(order) is not int:
-            sys.exit("order should be of type int")
+            raise TypeError("order should be of type int")
         # Check window size and order
         if window_size % 2 != 1 or window_size < 1:
             raise TypeError("window_size size must be a positive odd number")

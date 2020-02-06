@@ -11,7 +11,6 @@ Mapping functions.
 import random
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
@@ -36,7 +35,7 @@ def setProj(projection='Robinson', proj_default = True):
         proj - the Cartopy projection object
     """
     if proj_default is not True and type(proj_default) is not dict:
-        sys.exit('The default for the projections should either be provided'+
+        raise TypeError('The default for the projections should either be provided'+
                  ' as a dictionary or set to True')
     
     # Set the projection
@@ -181,7 +180,7 @@ def setProj(projection='Robinson', proj_default = True):
             proj = ccrs.SouthPolarStereo() 
         else: proj = ccrs.SouthPolarStereo(**proj_default)
     else:
-        sys.exit('Invalid projection type')
+        raise ValueError('Invalid projection type')
         
     return proj
 
@@ -232,12 +231,12 @@ def mapAll(lat, lon, criteria, projection = 'Robinson', proj_default = True,\
     """
     #Check that the lists have the same length and convert to numpy arrays
     if len(lat)!=len(lon) or len(lat)!=len(criteria) or len(lon)!=len(criteria):
-        sys.exit("Latitude, Longitude, and criteria list must be the same" +\
+        raise ValueError("Latitude, Longitude, and criteria list must be the same" +\
                  "length")
         
     # Check that the default is set to True or in dictionary format
     if proj_default is not True and type(proj_default) is not dict:
-        sys.exit('The default for the projections should either be provided'+
+        raise TypeError('The default for the projections should either be provided'+
                  ' as a dictionary or set to True')
         
     # If palette is not given, then make a random one.

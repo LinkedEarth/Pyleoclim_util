@@ -13,7 +13,6 @@ See the LiPD documentation for more information on timeseries objects (TSO)
 import lipd as lpd
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
 import os
 
 """
@@ -147,7 +146,7 @@ def xAxisTs(timeseries):
                     x_axis = timeseries["year"]
                     label = "year"
                 else:
-                    sys.exit("Enter 0 or 1")
+                    raise ValueError("Enter 0 or 1")
             elif "age" in timeseries.keys():
                 x_axis = timeseries["age"]
                 label = "age"
@@ -158,7 +157,7 @@ def xAxisTs(timeseries):
             x_axis = timeseries["depth"]
             label = "depth"
         else: 
-            sys.exit("Enter 0 or 1")
+            raise ValueError("Enter 0 or 1")
     elif "depth" in timeseries.keys():
         x_axis =  timeseries["depth"]
         label = "depth"
@@ -169,7 +168,7 @@ def xAxisTs(timeseries):
         x_axis = timeseries["year"]
         label = "year" 
     else: 
-        sys.exist("No age or depth information available")
+        raise KeyError("No age or depth information available")
         
     return x_axis, label  
 
@@ -190,24 +189,24 @@ def checkXaxis(timeseries, x_axis= None):
         x = np.array(x, dtype = 'float64')
     elif x_axis == "depth":
         if not "depth" in timeseries.keys():
-            sys.exit("Depth not available for this record")
+            raise ValueError("Depth not available for this record")
         else:
             x = np.array(timeseries['depth'], dtype = 'float64')
             label = "depth"
     elif x_axis == "age":
         if not "age" in timeseries.keys():
-            sys.exit("Age not available for this record")
+            raise ValueError("Age not available for this record")
         else:
             x = np.array(timeseries['age'], dtype = 'float64')
             label = "age"        
     elif x_axis == "year":
         if not "year" in timeseries.keys():
-            sys.exit("Year not available for this record")
+            raise ValueError("Year not available for this record")
         else:
             x = np.array(timeseries['year'], dtype = 'float64')
             label = "year"  
     else:
-        sys.exit("enter either 'depth','age',or 'year'") 
+        raise KeyError("enter either 'depth','age',or 'year'") 
   
     return x, label
 
@@ -223,7 +222,7 @@ def checkTimeAxis(timeseries, x_axis = None):
     """
     if x_axis is None:
         if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
-            sys.exit("No time information available")
+            raise KeyError("No time information available")
         elif 'age' in timeseries.keys() and 'year' in timeseries.keys():
             print("Both age and year information are available.")
             label = input("Which one would you like to use? ")
@@ -235,16 +234,16 @@ def checkTimeAxis(timeseries, x_axis = None):
             label = 'year'
     elif x_axis == 'age':
         if not 'age' in timeseries.keys():
-            sys.exit('Age is not available for this record')
+            raise KeyError('Age is not available for this record')
         else:
             label = 'age'
     elif x_axis == 'year':
         if not 'year' in timeseries.keys():
-            sys.exit('Year is not available for this record')
+            raise KeyError('Year is not available for this record')
         else:
             label='year'
     else:
-        sys.exit('Only None, year and age are valid entries for x_axis parameter')
+        raise KeyError('Only None, year and age are valid entries for x_axis parameter')
     
     x = np.array(timeseries[label], dtype = 'float64')
     
@@ -269,7 +268,7 @@ def searchVar(timeseries_list, key, exact = True, override = True):
        if type(key) is str:
            key = [key]
        else:
-           sys.exit("Key terms should be entered as a list")
+           raise TypeError("Key terms should be entered as a list")
     
     match = []
     
@@ -560,7 +559,7 @@ def isModel(csvName, lipd):
         objectName = 'paleo'+tableName.split('paleo')[1][0]
         dataObject = lipd["paleoData"][objectName]
     else:
-        sys.exit("Key name should only include 'chron' or 'paleo'")
+        raise KeyError("Key name should only include 'chron' or 'paleo'")
     
     if "model" in dataObject.keys():
         model_list = dataObject["model"]
@@ -671,7 +670,7 @@ def getMeasurement(csvName, lipd):
         objectName = 'paleo'+tableName.split('paleo')[1][0]
         ts_list = lipd["paleoData"][objectName]["measurementTable"][tableName]["columns"]
     else:
-        sys.exit("Key name should only include 'chron' or 'paleo'")
+        raise KeyError("Key name should only include 'chron' or 'paleo'")
                 
     return ts_list    
 
@@ -738,7 +737,7 @@ def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo):
     
     """
     if len(depthEnsemble)!=np.shape(ensembleValues)[0]:
-        sys.exit("Depth and age need to have the same length")
+        raise ValueError("Depth and age need to have the same length")
     
     #Make sure that numpy arrays were given
     ensembleValues=np.array(ensembleValues)

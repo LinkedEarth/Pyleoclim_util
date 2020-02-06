@@ -16,7 +16,6 @@ from itertools import chain
 import matplotlib.pyplot as plt
 from scipy.stats.mstats import mquantiles
 import matplotlib.patches as mpatches
-import sys
 
 
 def chooseCalCurves():
@@ -445,9 +444,9 @@ def plotBchron(depth, chron, positions, ageDist, flipCoor= False,\
     
     # Make a few assertion
     if len(depth)!=np.shape(chron)[0]:
-        sys.exit("The number of rows in chron should match the length of depth")
+        raise ValueError("The number of rows in chron should match the length of depth")
     if len(positions)!=np.shape(ageDist)[1]:
-        sys.exit("The number of columns in ageDist should match the length of positions")    
+        raise ValueError("The number of columns in ageDist should match the length of positions")    
     
     # Get the various quantiles for the plot
     chron_Q = mquantiles(chron, prob=[0.025, 0.5, 0.975], axis=1)

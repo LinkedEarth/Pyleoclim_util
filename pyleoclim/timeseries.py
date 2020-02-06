@@ -13,7 +13,6 @@ import pandas as pd
 import warnings
 import copy
 from scipy import special
-import sys
 from scipy import signal
 from pyhht import EMD
 from scipy.stats.mstats import mquantiles
@@ -927,7 +926,8 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
     elif method == "savitzy-golay":
         # Check that the timeseries is uneven and interpolate if needed
         if x is None:
-            sys.exit("A time axis is needed for use with the Savitzky-Golay filters method")
+            raise ValueError("A time axis is needed for use with the Savitzky-Golay filters method")
+            
         # Check whether the timeseries is unvenly-spaced and interpolate if needed
         if len(np.unique(np.diff(x)))>1:
             warnings.warn("Timeseries is not evenly-spaced, interpolating...")

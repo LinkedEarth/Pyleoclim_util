@@ -11,7 +11,6 @@ LiPD file
 """
 
 import numpy as np
-import sys
 
 # Internal packages
 import pyleoclim.LipdUtils as LipdUtils
@@ -241,9 +240,9 @@ def agemodelData(timeseries):
 
     """
     if not "age" in timeseries.keys() and not "year" in timeseries.keys():
-        sys.exit("No time information")
+        raise KeyError("No time information")
     elif not "depth" in timeseries.keys():
-        sys.exit("No depth information")
+        raise KeyError("No depth information")
     else:
         if "age" in timeseries.keys() and "year" in timeseries.keys():
             print("Do you want to use age or year?")
@@ -263,7 +262,7 @@ def agemodelData(timeseries):
                 else:
                     age_label = "Year"
             else:
-                sys.exit("Enter 0 or 1")
+                raise ValueError("Enter 0 or 1")
 
         if "age" in timeseries.keys():
             age = timeseries['age']
