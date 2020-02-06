@@ -28,17 +28,33 @@ def simpleStats(y, axis=None):
     """ Computes simple statistics
 
     Computes the mean, median, min, max, standard deviation, and interquartile
-    range of a numpy array y.
+    range of a numpy array y, ignoring NaNs.
 
-    Args:
-        y (array): A Numpy array
-        axis (int, typle of ints): Optional. Axis or Axes along which the means
-            are computed, the default is to compute the mean of the flattened
-            array. If a tuple of ints, performed over multiple axes
+    Args
+    ----
+    
+    y: array
+        A Numpy array
+    axis : int, tuple of ints
+        Optional. Axis or Axes along which the means
+        are computed, the default is to compute the mean of the flattened
+        array. If a tuple of ints, performed over multiple axes
 
-    Returns:
-        The mean, median, min, max, standard deviation and IQR by columns
-
+    Returns
+    -------
+    
+    mean :  float
+        mean of y, ignoring NaNs
+    median : float
+        median of y, ignoring NaNs
+    min_ : float
+        mininum value in y, ignoring NaNs
+    max_ : float
+        max value in y, ignoring NaNs
+    std : float
+        standard deviation of y, ignoring NaNs
+    IQR : float
+        Interquartile range of y along specified axis, ignoring NaNs
     """
     # make sure that y is an array
     y = np.array(y, dtype='float64')
@@ -69,17 +85,30 @@ class Correlation(object):
         The T-test is parametric test, hence cheap but usually wrong except in idyllic circumstances.
         The others are non-parametric, but their computational requirements scales with nsim.
 
-        Args:
-            y1, y2 (array)- vector of (real) numbers of identical length, no NaNs allowed
-            nsim (int)- the number of simulations [1000]
-            method (str)- methods 1-3 above ['isospectral']
-            alpha (float)- significance level for critical value estimation [0.05]
+        Args
+        ----
+    
+        y1 : array
+            vector of (real) numbers of same length as y2, no NaNs allowed
+        y2 : array
+            vector of (real) numbers of same length as y1, no NaNs allowed
+        nsim : int
+            the number of simulations [default: 1000]
+        method : string
+            methods 1-3 above [default: 'isospectral']
+        alpha : float
+            significance level for critical value estimation [default: 0.05]
 
-        Returns:
-             r (real): correlation between x and y \n
-             signif (boolean): true (1) if significant; false (0) otherwise \n
-             p (real): Fraction of time series with higher correlation coefficents than observed (approximates the p-value). \n
-                Note that signif = True if and only if p <= alpha.
+        Returns
+        -------
+        
+         r : float 
+             correlation between x and y 
+         signif : bool
+             true (1) if significant; false (0) otherwise 
+         p : float
+             Fraction of time series with higher correlation coefficents than observed (approximates the p-value). 
+             Note that signif = True if and only if p <= alpha.
         """
         y1 = np.array(y1, dtype=float)
         y2 = np.array(y2, dtype=float)
@@ -101,14 +130,25 @@ class Correlation(object):
         This function creates 'nsim' random time series that have the same power
         spectrum as the original time series but with random phases.
 
-        Args:
-            y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
-            alpha (real): significance level for critical value estimation [default: 0.05]
+        Args
+        ----
+        
+        y1 : array
+            vectors of (real) numbers with identical length, no NaNs allowed
+        y2 : array
+            vectors of (real) numbers with identical length, no NaNs allowed
+        alpha : float
+            significance level for critical value estimation [default: 0.05]
 
-        Returns:
-            r (real)- correlation between x and y \n
-            signif (boolean)- true (1) if significant; false (0) otherwise \n
-            pval (real)- test p-value (the probability of the test statstic exceeding the observed one by chance alone)
+        Returns
+        -------
+    
+        r : float
+             correlation between x and y 
+        signif : bool
+            true (1) if significant; false (0) otherwise 
+        pval : float 
+            test p-value (the probability of the test statstic exceeding the observed one by chance alone)
         """
         r = pearsonr(y1, y2)[0]
 
@@ -137,24 +177,40 @@ class Correlation(object):
         The latter is gauged via a non-parametric (Monte Carlo) simulation of
         correlations with nsim AR(1) processes with identical persistence
         properties as x and y ; the measure of which is the lag-1 autocorrelation (g).
+        
 
-        Args:
-            y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
-            alpha (real): significance level for critical value estimation [default: 0.05]
-            nsim (int): number of simulations [default: 1000]
 
-        Returns:
-            r (real) - correlation between x and y \n
-            signif (boolean) - true (1) if significant; false (0) otherwise \n
-            pval (real) - test p-value (the probability of the test statstic exceeding the observed one by chance alone)
+        Args
+        ----
+        
+        y1 : array
+            vectors of (real) numbers with identical length, no NaNs allowed
+        y2 : array
+            vectors of (real) numbers with identical length, no NaNs allowed
+        alpha : float
+            significance level for critical value estimation [default: 0.05]
+        nsim : int
+            number of simulations [default: 1000]
 
-        Remarks:
-            The probability of obtaining a test statistic at least as extreme as the one actually observed,
-            assuming that the null hypothesis is true. \n
-            The test is 1 tailed on |r|: Ho = { |r| = 0 }, Ha = { |r| > 0 } \n
-            The test is rejected (signif = 1) if pval <= alpha, otherwise signif=0; \n
-            (Some Rights Reserved) Hepta Technologies, 2009 \n
-            v1.0 USC, Aug 10 2012, based on corr_signif.m
+        Returns
+        -------
+        
+        r : float 
+            correlation between x and y 
+        signif : bool
+            true (1) if significant; false (0) otherwise 
+        pval : float
+            test p-value (the probability of the test statstic exceeding the observed one by chance alone)
+        
+        Notes
+        -----
+        
+        The probability of obtaining a test statistic at least as extreme as the one actually observed,
+        assuming that the null hypothesis is true. \n
+        The test is 1 tailed on |r|: Ho = { |r| = 0 }, Ha = { |r| > 0 } \n
+        The test is rejected (signif = 1) if pval <= alpha, otherwise signif=0; \n
+        (Some Rights Reserved) Hepta Technologies, 2009 \n
+        v1.0 USC, Aug 10 2012, based on corr_signif.
         '''
 
         r = pearsonr(y1, y2)[0]
@@ -187,17 +243,28 @@ class Correlation(object):
     def isopersistent_rn(self, X, p):
         ''' Generates p realization of a red noise [i.e. AR(1)] process
         with same persistence properties as X (Mean and variance are also preserved).
+        
+        Args
+        ----
+        
+        X : array
+            vector of (real) numbers as a time series, no NaNs allowed
+        p : int 
+            number of simulations
 
-        Args:
-            X (array): vector of (real) numbers as a time series, no NaNs allowed
-            p (int): number of simulations
+        Returns
+        -------
+        
+        red : numpy array
+            n rows by p columns matrix of an AR1 process, where n is the size of X 
+        g :float 
+            lag-1 autocorrelation coefficient
+    
+        Notes
+        -----
+        
+        (Some Rights Reserved) Hepta Technologies, 2008
 
-        Returns:
-            red (matrix) - n rows by p columns matrix of an AR1 process, where n is the size of X \n
-            g (real) - lag-1 autocorrelation coefficient
-
-        Remarks:
-            (Some Rights Reserved) Hepta Technologies, 2008
         '''
         n = np.size(X)
         sig = np.std(X, ddof=1)
@@ -211,11 +278,17 @@ class Correlation(object):
     def ar1_fit(self, ts):
         ''' Return the lag-1 autocorrelation from ar1 fit.
 
-        Args:
-            ts (array): vector of (real) numbers as a time series
+        Args
+        ----
+        
+        ts : array
+            vector of (real) numbers as a time series
 
-        Returns:
-            g (real): lag-1 autocorrelation coefficient
+        Returns
+        -------
+        
+        g :float
+            lag-1 autocorrelation coefficient
         '''
 
 
@@ -227,13 +300,24 @@ class Correlation(object):
     def ar1_sim(self, n, p, g, sig):
         ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g
 
-        Args:
-            n, p (int): dimensions as n rows by p columns
-            g (real): lag-1 autocorrelation coefficient
-            sig (real): the standard deviation of the original time series
+        Args
+        ----
+        
+        n : int
+            row dimensions
+        p : int
+            column dimensions
+            
+        g : float
+            lag-1 autocorrelation coefficient
+        sig : float
+            the standard deviation of the original time series
 
-        Returns:
-            red (matrix): n rows by p columns matrix of an AR1 process
+        Returns
+        -------
+        
+        red : numpy matrix
+            n rows by p columns matrix of an AR1 process
         '''
         # specify model parameters (statsmodel wants lag0 coefficents as unity)
         ar = np.r_[1, -g]  # AR model parameter
@@ -251,16 +335,28 @@ class Correlation(object):
     def red_noise(self, N, M, g):
         ''' Produce M realizations of an AR1 process of length N with lag-1 autocorrelation g
 
-        Args:
-            N, M (int): dimensions as N rows by M columns
-            g (real): lag-1 autocorrelation coefficient
 
-        Returns:
-            red (matrix): N rows by M columns matrix of an AR1 process
+        Args
+        ----
+        
+        N : int
+            row dimensions
+        M : int 
+            column dimensions
+        g : float
+            lag-1 autocorrelation coefficient
 
-        Remarks:
-            (Some Rights Reserved) Hepta Technologies, 2008
-            J.E.G., GaTech, Oct 20th 2008
+        Returns
+        -------
+        
+        red : numpy array
+            N rows by M columns matrix of an AR1 process
+                
+        Notes
+        -----
+    
+        (Some Rights Reserved) Hepta Technologies, 2008
+        J.E.G., GaTech, Oct 20th 2008
         '''
         red = np.zeros(shape=(N, M))
         red[0, :] = np.random.randn(1, M)
@@ -277,24 +373,38 @@ class Correlation(object):
         This function creates 'nsim' random time series that have the same power
         spectrum as the original time series but random phases.
 
-        Args:
-            y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
-            alpha (real): significance level for critical value estimation [default: 0.05]
-            nsim (int): number of simulations [default: 1000]
+        Args
+        ----
+        
+        y1 : array 
+            vectors of (real) numbers with identical length, no NaNs allowed
+        y2 : array
+            vectors of (real) numbers with identical length, no NaNs allowed
+        alpha : float 
+            significance level for critical value estimation [default: 0.05]
+        nsim : int
+            number of simulations [default: 1000]
 
-        Returns:
-            r (real): correlation between y1 and y2 \n
-            signif (boolean): true (1) if significant; false (0) otherwise \n
-            F : Fraction of time series with higher correlation coefficents than observed (approximates the p-value).
+        Returns
+        -------
+        
+        r : float
+            correlation between y1 and y2 
+        signif : bool
+            true (1) if significant; false (0) otherwise 
+        F : float
+            Fraction of time series with higher correlation coefficents than observed (approximates the p-value).
 
-        References:
-            - Ebisuzaki, W, 1997: A method to estimate the statistical
-            significance of a correlation when the data are serially correlated.
-            J. of Climate, 10, 2147-2153.
-            - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series
-            with Several Simultaneously Measured Variables (1994)
-            Physical Review Letters, Vol 73, Number 7
-            (Some Rights Reserved) USC Climate Dynamics Lab, 2012.
+        Reference
+        ---------
+        
+        - Ebisuzaki, W, 1997: A method to estimate the statistical
+        significance of a correlation when the data are serially correlated.
+        J. of Climate, 10, 2147-2153.
+        - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series
+        with Several Simultaneously Measured Variables (1994)
+        Physical Review Letters, Vol 73, Number 7
+        (Some Rights Reserved) USC Climate Dynamics Lab, 2012.
         '''
         r = pearsonr(y1, y2)[0]
 
@@ -323,19 +433,28 @@ class Correlation(object):
 
         http://www.mathworks.nl/matlabcentral/fileexchange/32621-phase-randomization/content/phaseran.m
 
-        Args:
-            recblk (2D array): Row: time sample. Column: recording.
-                An odd number of time samples (height) is expected.
-                If that is not the case, recblock is reduced by 1 sample before the surrogate data is created.
-                The class must be double and it must be nonsparse.
-            nsurr (int): is the number of image block surrogates that you want to generate.
+        Args
+        ----
+        
+        recblk : numpy array
+            2D array , Row: time sample. Column: recording.
+            An odd number of time samples (height) is expected.
+            If that is not the case, recblock is reduced by 1 sample before the surrogate data is created.
+            The class must be double and it must be nonsparse.
+        nsurr : int
+            is the number of image block surrogates that you want to generate.
 
-        Returns:
-            surrblk: 3D multidimensional array image block with the surrogate datasets along the third dimension
+        Returns
+        -------
+        
+        surrblk : numpy array
+            3D multidimensional array image block with the surrogate datasets along the third dimension
 
-        Reference:
-            Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994)
-            Physical Review Letters, Vol 73, Number 7
+        Reference
+        ---------
+        
+        Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994)
+        Physical Review Letters, Vol 73, Number 7
         '''
         # Get parameters
         nfrms = recblk.shape[0]
@@ -381,17 +500,30 @@ def corrsig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
         The T-test is parametric test, hence cheap but usually wrong except in idyllic circumstances.
         The others are non-parametric, but their computational requirements scales with nsim.
 
-    Args:
-        y1, y2 (array)- vector of (real) numbers of identical length, no NaNs allowed
-        nsim (int)- the number of simulations [1000]
-        method (str)- methods 1-3 above ['isospectral']
-        alpha (float)- significance level for critical value estimation [0.05]
+    Args
+    ----
+    
+    y1 : array
+        vector of (real) numbers of identical length, no NaNs allowed
+    y2 : array 
+        vector of (real) numbers of identical length, no NaNs allowed
+    nsim : int
+        the number of simulations [default: 1000]
+    method : string
+        methods 1-3 above [default: 'isospectral']
+    alpha : float
+        ignificance level for critical value estimation [default: 0.05]
 
-    Returns:
-         r (real): correlation between x and y \n
-         signif (int): true  if significant; false otherwise \n
-         p (real): Fraction of time series with higher correlation coefficents than observed (approximates the p-value). \n
-            Note that signif = True if and only if p <= alpha.
+    Returns
+    -------
+    
+     r : float
+         correlation between x and y 
+     signif : int
+         true  if significant; false otherwise 
+     p : float
+         Fraction of time series with higher correlation coefficents than observed (approximates the p-value). 
+         Note that signif = True if and only if p <= alpha.
 """
     corr = Correlation()
     r, signif, p = corr.corr_sig(y1,y2, nsim = nsim, method = method,
