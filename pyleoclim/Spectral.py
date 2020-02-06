@@ -108,8 +108,8 @@ class SpectralAnalysis(object):
 
         # output result
         res_dict = {
-            'freqs': freqs,
-            'psd' : psd
+            'freqs': np.asarray(freqs),
+            'psd' : np.asarray(psd),
         }
 
         return res_dict
@@ -180,8 +180,8 @@ class SpectralAnalysis(object):
 
         # output result
         res_dict = {
-            'freqs': freqs,
-            'psd': psd,
+            'freqs': np.asarray(freqs),
+            'psd': np.asarray(psd),
         }
 
         return res_dict
@@ -235,8 +235,8 @@ class SpectralAnalysis(object):
 
         # output result
         res_dict = {
-            'freqs': freqs,
-            'psd': psd,
+            'freqs': np.asarray(freqs),
+            'psd': np.asarray(psd),
         }
 
         return res_dict
@@ -305,8 +305,8 @@ class SpectralAnalysis(object):
 
         # output result
         res_dict = {
-            'freqs': freqs,
-            'psd': psd,
+            'freqs': np.asarray(freqs),
+            'psd': np.asarray(psd),
         }
 
         return res_dict
