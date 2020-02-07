@@ -32,7 +32,6 @@ import collections
 from math import factorial
 
 import spectrum
-import pandas as pd
 
 import numba as nb
 
@@ -43,43 +42,54 @@ Core functions below, focusing on algorithms
 class SpectralAnalysis(object):
     def welch(self, ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
         '''
-        ys (array): a time series
-            ts (array): time axis of the time series
-            ana_args (dict): the arguments for spectral analysis with periodogram, including
-                - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
-                - nfft (int): length of the FFT used. If None the length of x will be used.
-                - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
-                - nperseg (int): Length of each segment. Defaults to None, but if window is str or tuple, is set to 256, and if window is array_like, is set to the length of the window.
-                - noverlap (int): Number of points to overlap between segments. If None, noverlap = nperseg // 2. Defaults to None.
-                - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
-                - axis (int):     Axis along which the periodogram is computed; the default is over the last axis (i.e. axis=-1).
-                - average : { ‘mean’, ‘median’ }, optional
-                see https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.signal.welch.html for details
-            interp_method (str, {'interp', 'bin'}): perform interpolation or binning
-            interp_args (dict): the arguments for the interpolation or binning methods,
-                                for the details, check Timeseries.interp() and Timeseries.binvalues()
-            prep_args (dict): the arguments for preprocess, including
-                - detrend (str): 'none' - the original time series is assumed to have no trend;
-                                 'linear' - a linear least-squares fit to `ys` is subtracted;
-                                 'constant' - the mean of `ys` is subtracted
-                                 'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                                     filters and the resulting filtered series is subtracted from y.
-                                 'hht' - detrending with Hilbert-Huang Transform
-                - params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                                 corresponds to the window size (default it set to half of the data)
-                                 while the second parameter correspond to the order of the filter
-                                 (default is 4). The third parameter is the order of the derivative
-                                 (the default is zero, which means only smoothing.)
-                - gaussianize (bool): If True, gaussianizes the timeseries
-                - standardize (bool): If True, standardizes the timeseries
-        Returns:
-            res_dict (dict): the result dictionary, including3
-                - freqs (array): the frequency vector
-                - psd (array): the spectral density vector
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts  array
+            time axis of the time series
+        ana_args : dict
+            the arguments for spectral analysis with periodogram, including
+            - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
+            - nfft (int): length of the FFT used. If None the length of x will be used.
+            - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
+            - nperseg (int): Length of each segment. Defaults to None, but if window is str or tuple, is set to 256, and if window is array_like, is set to the length of the window.
+            - noverlap (int): Number of points to overlap between segments. If None, noverlap = nperseg // 2. Defaults to None.
+            - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
+            - axis (int):     Axis along which the periodogram is computed; the default is over the last axis (i.e. axis=-1).
+            - average : { ‘mean’, ‘median’ }, optional
+            see https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.signal.welch.html for details
+        interp_method : string 
+            {'interp', 'bin'}): perform interpolation or binning
+        interp_args : dict 
+            the arguments for the interpolation or binning methods, for the details, check Timeseries.interp() and Timeseries.binvalues()
+        prep_args : dict
+            the arguments for preprocess, including
+            - detrend (str): 'none' - the original time series is assumed to have no trend;
+                             'linear' - a linear least-squares fit to `ys` is subtracted;
+                             'constant' - the mean of `ys` is subtracted
+                             'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                                 filters and the resulting filtered series is subtracted from y.
+                             'hht' - detrending with Hilbert-Huang Transform
+            - params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                             corresponds to the window size (default it set to half of the data)
+                             while the second parameter correspond to the order of the filter
+                             (default is 4). The third parameter is the order of the derivative
+                             (the default is zero, which means only smoothing.)
+            - gaussianize (bool): If True, gaussianizes the timeseries
+            - standardize (bool): If True, standardizes the timeseries
+        
+        Returns
+        -------
+        res_dict : dict
+            the result dictionary, including
+            - freqs (array): the frequency vector
+            - psd (array): the spectral density vector
         '''
         #make default nperseg len(ts)//3
         if not ana_args or not ana_args.get('nperseg'):
-            ana_args['nperseg']=len(ts)//3
+            ana_args['nperseg']=len(ts)
         
         # preprocessing
         wa = WaveletAnalysis()
@@ -117,38 +127,47 @@ class SpectralAnalysis(object):
     def mtm(self, ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
         ''' Call MTM from the package [spectrum](https://github.com/cokelaer/spectrum)
 
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            ana_args (dict): the arguments for spectral analysis with periodogram, including
-                - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
-                - nfft (int): length of the FFT used. If None the length of x will be used.
-                - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
-                - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
-                see https://docs.scipy.org/doc/scipy-0.13.0/reference/generated/scipy.signal.periodogram.html for the details
-            interp_method (str, {'interp', 'bin'}): perform interpolation or binning
-            interp_args (dict): the arguments for the interpolation or binning methods,
-                                for the details, check Timeseries.interp() and Timeseries.binvalues()
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array
+            time axis of the time series
+        ana_args : dict
+            the arguments for spectral analysis with periodogram, including
+            - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
+            - nfft (int): length of the FFT used. If None the length of x will be used.
+            - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
+            - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
+            see https://docs.scipy.org/doc/scipy-0.13.0/reference/generated/scipy.signal.periodogram.html for the details
+        interp_method : string
+            {'interp', 'bin'}): perform interpolation or binning
+        interp_args :dict
+            the arguments for the interpolation or binning methods, for the details, check Timeseries.interp() and Timeseries.binvalues()
+        prep_args : dict
+            the arguments for preprocess, including
+            - detrend (str): 'none' - the original time series is assumed to have no trend;
+                             'linear' - a linear least-squares fit to `ys` is subtracted;
+                             'constant' - the mean of `ys` is subtracted
+                             'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                                 filters and the resulting filtered series is subtracted from y.
+                             'hht' - detrending with Hilbert-Huang Transform
+            - params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                             corresponds to the window size (default it set to half of the data)
+                             while the second parameter correspond to the order of the filter
+                             (default is 4). The third parameter is the order of the derivative
+                             (the default is zero, which means only smoothing.)
+            - gaussianize (bool): If True, gaussianizes the timeseries
+            - standardize (bool): If True, standardizes the timeseries
 
-            prep_args (dict): the arguments for preprocess, including
-                - detrend (str): 'none' - the original time series is assumed to have no trend;
-                                 'linear' - a linear least-squares fit to `ys` is subtracted;
-                                 'constant' - the mean of `ys` is subtracted
-                                 'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                                     filters and the resulting filtered series is subtracted from y.
-                                 'hht' - detrending with Hilbert-Huang Transform
-                - params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                                 corresponds to the window size (default it set to half of the data)
-                                 while the second parameter correspond to the order of the filter
-                                 (default is 4). The third parameter is the order of the derivative
-                                 (the default is zero, which means only smoothing.)
-                - gaussianize (bool): If True, gaussianizes the timeseries
-                - standardize (bool): If True, standardizes the timeseries
-
-        Returns:
-            res_dict (dict): the result dictionary, including
-                - freqs (array): the frequency vector
-                - psd (array): the spectral density vector
+        Returns
+        -------
+        
+        res_dict : dict
+            the result dictionary, including
+            - freqs (array): the frequency vector
+            - psd (array): the spectral density vector
 
         '''
         # preprocessing
@@ -189,29 +208,45 @@ class SpectralAnalysis(object):
     def lomb_scargle(self, ys, ts, freqs=None, make_freq_method='nfft', prep_args={}, ana_args={}):
         """ Return the computed periodogram using lomb-scargle algorithm
         Lombscargle algorithm
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
-            make_freq_method (str) : Method to be used to make the time series. Default is nfft
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
-            args (dict): Extra argumemnts which may be needed such as
-                precenter (bool): Pre-center amplitudes by subtracting the mean
-                normalize (bool): Compute normalized periodogram
-        Returns:
-            res : the lombscargle periodogram
-            freqs : vector of frequency
+        
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array 
+            time axis of the time series
+        freqs : array
+            vector of frequency
+        make_freq_method : string
+            Method to be used to make the time series. Default is nfft
+        prep_args : dict
+                    the arguments for preprocess, including
+                    - detrend (str): 'none' - the original time series is assumed to have no trend;
+                                     'linear' - a linear least-squares fit to `ys` is subtracted;
+                                     'constant' - the mean of `ys` is subtracted
+                                     'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                                         filters and the resulting filtered series is subtracted from y.
+                                     'hht' - detrending with Hilbert-Huang Transform
+                    - params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                                     corresponds to the window size (default it set to half of the data)
+                                     while the second parameter correspond to the order of the filter
+                                     (default is 4). The third parameter is the order of the derivative
+                                     (the default is zero, which means only smoothing.)
+                    - gaussianize (bool): If True, gaussianizes the timeseries
+                    - standardize (bool): If True, standardizes the timeseries
+        ana_args : dict
+            Extra argumemnts which may be needed such as
+            - precenter (bool): Pre-center amplitudes by subtracting the mean
+            - normalize (bool): Compute normalized periodogram
+            
+        Returns
+        -------
+
+        res_dict : dict
+            the result dictionary, including
+            - freqs (array): the frequency vector
+            - psd (array): the spectral density vector
         """
         ys, ts = Timeseries.clean_ts(ys, ts)
         wa = WaveletAnalysis()
@@ -244,38 +279,47 @@ class SpectralAnalysis(object):
     def periodogram(self, ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
         ''' Call periodogram from scipy
 
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            ana_args (dict): the arguments for spectral analysis with periodogram, including
-                - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
-                - nfft (int): length of the FFT used. If None the length of x will be used.
-                - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
-                - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
-                see https://docs.scipy.org/doc/scipy-0.13.0/reference/generated/scipy.signal.periodogram.html for the details
-            interp_method (str, {'interp', 'bin'}): perform interpolation or binning
-            interp_args (dict): the arguments for the interpolation or binning methods,
-                                for the details, check Timeseries.interp() and Timeseries.binvalues()
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array
+            time axis of the time series
+        ana_args : dict
+            the arguments for spectral analysis with periodogram, including
+            - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
+            - nfft (int): length of the FFT used. If None the length of x will be used.
+            - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
+            - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
+            see https://docs.scipy.org/doc/scipy-0.13.0/reference/generated/scipy.signal.periodogram.html for the details
+        interp_method : string
+            {'interp', 'bin'}): perform interpolation or binning
+        interp_args : dict
+            the arguments for the interpolation or binning methods, for the details, check Timeseries.interp() and Timeseries.binvalues()
+        prep_args : dict)
+            the arguments for preprocess, including
+            - detrend (str): 'none' - the original time series is assumed to have no trend;
+                             'linear' - a linear least-squares fit to `ys` is subtracted;
+                             'constant' - the mean of `ys` is subtracted
+                             'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                                 filters and the resulting filtered series is subtracted from y.
+                             'hht' - detrending with Hilbert-Huang Transform
+            - params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                             corresponds to the window size (default it set to half of the data)
+                             while the second parameter correspond to the order of the filter
+                             (default is 4). The third parameter is the order of the derivative
+                             (the default is zero, which means only smoothing.)
+            - gaussianize (bool): If True, gaussianizes the timeseries
+            - standardize (bool): If True, standardizes the timeseries
 
-            prep_args (dict): the arguments for preprocess, including
-                - detrend (str): 'none' - the original time series is assumed to have no trend;
-                                 'linear' - a linear least-squares fit to `ys` is subtracted;
-                                 'constant' - the mean of `ys` is subtracted
-                                 'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                                     filters and the resulting filtered series is subtracted from y.
-                                 'hht' - detrending with Hilbert-Huang Transform
-                - params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                                 corresponds to the window size (default it set to half of the data)
-                                 while the second parameter correspond to the order of the filter
-                                 (default is 4). The third parameter is the order of the derivative
-                                 (the default is zero, which means only smoothing.)
-                - gaussianize (bool): If True, gaussianizes the timeseries
-                - standardize (bool): If True, standardizes the timeseries
-
-        Returns:
-            res_dict (dict): the result dictionary, including
-                - freqs (array): the frequency vector
-                - psd (array): the spectral density vector
+        Returns
+        -------
+        
+        res_dict : dict 
+            the result dictionary, including
+            - freqs (array): the frequency vector
+            - psd (array): the spectral density vector
 
         '''
         # preprocessing
@@ -317,11 +361,17 @@ class WaveletAnalysis(object):
     def is_evenly_spaced(self, ts):
         ''' Check if a time axis is evenly spaced.
 
-        Args:
-            ts (array): the time axis of a time series
+        Args
+        ----
+        
+        ts : array
+            the time axis of a time series
 
-        Returns:
-            check (bool): True - evenly spaced; False - unevenly spaced.
+        Returns
+        -------
+        
+        check : bool
+            True - evenly spaced; False - unevenly spaced.
 
         '''
         if ts is None:
@@ -339,24 +389,33 @@ class WaveletAnalysis(object):
     def ar1_fit_evenly(self, ys, ts, detrend=False, params=["default", 4, 0, 1], gaussianize=False):
         ''' Returns the lag-1 autocorrelation from ar1 fit.
 
-        Args:
-            ys (array): vector of (float) numbers as a time series
-            ts (array): The time axis for the timeseries. Necessary for use with
-                the Savitzky-Golay filters method since the series should be evenly spaced.
-            detrend (str): 'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
+        Args
+        ----
+        
+        ys : array
+            vector of (float) numbers as a time series
+        ts : array
+            The time axis for the timeseries. Necessary for use with the Savitzky-Golay filters method since the series should be evenly spaced.
+        detrend : string
+            'linear' - a linear least-squares fit to `ys` is subtracted;
+            'constant' - the mean of `ys` is subtracted
+            'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        params : list
+            The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussianize : bool
+            If True, gaussianizes the timeseries
+        standardize : bool
+            If True, standardizes the timeseries
 
-        Returns:
-            g (float): lag-1 autocorrelation coefficient
+        Returns
+        -------
+        
+        g : float
+            lag-1 autocorrelation coefficient
 
         '''
         pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize)
@@ -368,29 +427,39 @@ class WaveletAnalysis(object):
     def preprocess(self, ys, ts, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
         ''' Return the processed time series using detrend and standardization.
 
-        Args:
-            ys (array): a time series
-            ts (array): The time axis for the timeseries. Necessary for use with
-                the Savitzky-Golay filters method since the series should be evenly spaced.
-            detrend (str): 'none'/False/None - no detrending will be applied;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array
+            The time axis for the timeseries. Necessary for use with
+            the Savitzky-Golay filters method since the series should be evenly spaced.
+        detrend : string
+            'none'/False/None - no detrending will be applied;
+            'linear' - a linear least-squares fit to `ys` is subtracted;
+            'constant' - the mean of `ys` is subtracted
+            'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        params : list
+            The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussianize : bool
+            If True, gaussianizes the timeseries
+        standardize : bool
+            If True, standardizes the timeseries
 
-        Returns:
-            res (array): the processed time series
+        Returns
+        -------
+        
+        res : array
+            the processed time series
 
         '''
 
-        if detrend is 'none' or detrend is False or detrend is None:
+        if detrend == 'none' or detrend is False or detrend is None:
             ys_d = ys
         else:
             ys_d = Timeseries.detrend(ys, ts, method=detrend, params=params)
@@ -408,27 +477,39 @@ class WaveletAnalysis(object):
     def tau_estimation(self, ys, ts, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
         ''' Return the estimated persistence of a givenevenly/unevenly spaced time series.
 
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            detrend (str): 'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array
+            time axis of the time series
+        detrend : string
+            'linear' - a linear least-squares fit to `ys` is subtracted;
+            'constant' - the mean of `ys` is subtracted
+            'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        params : list
+            The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussianize : bool
+            If True, gaussianizes the timeseries
+        standardize : bool
+            If True, standardizes the timeseries
 
-        Returns:
-            tau_est (float): the estimated persistence
+        Returns
+        -------
+        
+        tau_est : float
+            the estimated persistence
 
-        References:
-            Mudelsee, M. TAUEST: A Computer Program for Estimating Persistence in Unevenly Spaced Weather/Climate Time Series.
-                Comput. Geosci. 28, 69–72 (2002).
+        References
+        ----------
+        
+        Mudelsee, M. TAUEST: A Computer Program for Estimating Persistence in Unevenly Spaced Weather/Climate Time Series.
+            Comput. Geosci. 28, 69–72 (2002).
 
         '''
         pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
@@ -454,17 +535,27 @@ class WaveletAnalysis(object):
     def ar1_model(self, ts, tau, n=None):
         ''' Return a time series with the AR1 process
 
-        Args:
-            ts (array): time axis of the time series
-            tau (float): the averaged persistence
-            n (int): the length of the AR1 process
+        Args
+        ----
+        
+        ts : array
+            time axis of the time series
+        tau : float
+            the averaged persistence
+        n : int  
+            the length of the AR1 process
 
-        Returns:
-            r (array): the AR1 time series
+        Returns
+        -------
+        
+        r : array
+            the AR1 time series
 
-        References:
-            Schulz, M. & Mudelsee, M. REDFIT: estimating red-noise spectra directly from unevenly spaced
-                paleoclimatic time series. Computers & Geosciences 28, 421–426 (2002).
+        References
+        ----------
+        
+        Schulz, M. & Mudelsee, M. REDFIT: estimating red-noise spectra directly from unevenly spaced
+            paleoclimatic time series. Computers & Geosciences 28, 421–426 (2002).
 
         '''
         if n is None:
@@ -489,37 +580,57 @@ class WaveletAnalysis(object):
 
         Original method from Foster. Not multiprocessing.
 
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-            c (float): the decay constant
-            Neff (int): the threshold of the number of effective degree of freedom
-            nproc (int): fake argument, just for convenience
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array
+            time axis of the time series
+        freqs : array
+            vector of frequency
+        tau : array
+            the evenly-spaced time points, namely the time shift for wavelet analysis
+        c : float
+            the decay constant
+        Neff : int
+            the threshold of the number of effective degree of freedom
+        nproc :int
+            fake argument, just for convenience
+        detrend : string
+            None - the original time series is assumed to have no trend;
+            'linear' - a linear least-squares fit to `ys` is subtracted;
+            'constant' - the mean of `ys` is subtracted
+            'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        params : list
+            The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussianize : bool
+            If True, gaussianizes the timeseries
+        standardize : bool 
+            If True, standardizes the timeseries
 
-        Returns:
-            wwa (array): the weighted wavelet amplitude
-            phase (array): the weighted wavelet phase
-            Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients (a0, a1, a2)
+        Returns
+        -------
+        
+        wwa : array 
+            the weighted wavelet amplitude
+        phase : array
+            the weighted wavelet phase
+        Neffs : array
+            the matrix of effective number of points in the time-scale coordinates
+        coeff : array
+            the wavelet transform coefficients (a0, a1, a2)
 
-        References:
-            Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
-            Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
-                Nonlinear Processes in Geophysics 12, 345–352 (2005).
+        References
+        ----------
+        
+        Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+        Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
+            Nonlinear Processes in Geophysics 12, 345–352 (2005).
 
         '''
         assert nproc == 1, "wwz_basic() only supports nproc=1"
@@ -585,32 +696,50 @@ class WaveletAnalysis(object):
         
         Original method from Foster. Supports multiprocessing. 
 
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-            c (float): the decay constant
-            Neff (int): the threshold of the number of effective degree of freedom
-            nproc (int): the number of processes for multiprocessing
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array
+            time axis of the time series
+        freqs : array
+            vector of frequency
+        tau : array
+            the evenly-spaced time points, namely the time shift for wavelet analysis
+        c : float
+            the decay constant
+        Neff : int
+            the threshold of the number of effective degree of freedom
+        nproc : int
+            the number of processes for multiprocessing
+        detrend : string
+            None - the original time series is assumed to have no trend;
+            'linear' - a linear least-squares fit to `ys` is subtracted;
+            'constant' - the mean of `ys` is subtracted
+            'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        params : list
+            The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussianize : bool
+            If True, gaussianizes the timeseries
+        standardize : bool
+            If True, standardizes the timeseries
 
-        Returns:
-            wwa (array): the weighted wavelet amplitude
-            phase (array): the weighted wavelet phase
-            Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients (a0, a1, a2)
+        Returns
+        -------
+        
+        wwa : array
+            the weighted wavelet amplitude
+        phase : array
+            the weighted wavelet phase
+        Neffs : array
+            the matrix of effective number of points in the time-scale coordinates
+        coeff : array
+            the wavelet transform coefficients (a0, a1, a2)
 
         '''
         assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -688,37 +817,57 @@ class WaveletAnalysis(object):
 
         Method modified by Kirchner. No multiprocessing.
         
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-            c (float): the decay constant
-            Neff (int): the threshold of the number of effective degree of freedom
-            nproc (int): fake argument, just for convenience
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array
+            time axis of the time series
+        freqs : array
+            vector of frequency
+        tau : array
+            the evenly-spaced time points, namely the time shift for wavelet analysis
+        c : float
+            the decay constant
+        Neff : int
+            the threshold of the number of effective degree of freedom
+        nproc : int
+            fake argument for convenience, for parameter consistency between functions, does not need to be specified
+        detrend : string
+            None - the original time series is assumed to have no trend;
+            'linear' - a linear least-squares fit to `ys` is subtracted;
+            'constant' - the mean of `ys` is subtracted
+            'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        params : list
+            The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussianize : bool
+            If True, gaussianizes the timeseries
+        standardize : bool
+            If True, standardizes the timeseries
 
-        Returns:
-            wwa (array): the weighted wavelet amplitude
-            phase (array): the weighted wavelet phase
-            Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients (a0, a1, a2)
+        Returns
+        -------
+        
+        wwa : array
+            the weighted wavelet amplitude
+        phase : array
+            the weighted wavelet phase
+        Neffs : array
+            the matrix of effective number of points in the time-scale coordinates
+        coeff : array
+            the wavelet transform coefficients (a0, a1, a2)
 
-        References:
-            Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
-            Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
-                Nonlinear Processes in Geophysics 12, 345–352 (2005).
+        References
+        ----------
+        
+        Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+        Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
+        Nonlinear Processes in Geophysics 12, 345–352 (2005).
 
         '''
         assert nproc == 1, "wwz_basic() only supports nproc=1"
@@ -797,32 +946,46 @@ class WaveletAnalysis(object):
 
         Method modified by kirchner. Supports multiprocessing.
 
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-            c (float): the decay constant
-            Neff (int): the threshold of the number of effective degree of freedom
-            nproc (int): the number of processes for multiprocessing
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-            'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array
+            time axis of the time series
+        freqs : array
+            vector of frequency
+        tau : array
+            the evenly-spaced time points, namely the time shift for wavelet analysis
+        c : float
+            the decay constant
+        Neff : int
+            the threshold of the number of effective degree of freedom
+        nproc : int 
+            the number of processes for multiprocessing
+        detrend : string
+            None - the original time series is assumed to have no trend;
+            'linear' - a linear least-squares fit to `ys` is subtracted;
+            'constant' - the mean of `ys` is subtracted
+            'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        params : list
+            The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussianize : bool 
+            If True, gaussianizes the timeseries
+        standardize : bool
+            If True, standardizes the timeseries
 
-        Returns:
-            wwa (array): the weighted wavelet amplitude
-            phase (array): the weighted wavelet phase
-            Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients (a0, a1, a2)
+        Returns
+        -------
+        
+        wwa (array): the weighted wavelet amplitude
+        phase (array): the weighted wavelet phase
+        Neffs (array): the matrix of effective number of points in the time-scale coordinates
+        coeff (array): the wavelet transform coefficients (a0, a1, a2)
 
         '''
         assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -915,37 +1078,57 @@ class WaveletAnalysis(object):
 
         Using numba.
 
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-            c (float): the decay constant
-            Neff (int): the threshold of the number of effective degree of freedom
-            nproc (int): fake argument, just for convenience
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array
+            time axis of the time series
+        freqs : array
+            vector of frequency
+        tau : array
+            the evenly-spaced time points, namely the time shift for wavelet analysis
+        c : float
+            the decay constant
+        Neff : int
+            the threshold of the number of effective degree of freedom
+        nproc : int
+            fake argument, just for convenience
+        detrend : string
+            None - the original time series is assumed to have no trend;
+            'linear' - a linear least-squares fit to `ys` is subtracted;
+            'constant' - the mean of `ys` is subtracted
+            'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        params : list
+            The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussianize : bool
+            If True, gaussianizes the timeseries
+        standardize : bool
+            If True, standardizes the timeseries
 
-        Returns:
-            wwa (array): the weighted wavelet amplitude
-            phase (array): the weighted wavelet phase
-            Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients (a0, a1, a2)
+        Returns
+        -------
+        
+        wwa : array
+            the weighted wavelet amplitude
+        phase : array
+            the weighted wavelet phase
+        Neffs : array
+            the matrix of effective number of points in the time-scale coordinates
+        coeff : array
+            the wavelet transform coefficients (a0, a1, a2)
 
-        References:
-            Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
-            Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
-                Nonlinear Processes in Geophysics 12, 345–352 (2005).
+        References
+        ----------
+        
+        Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+        Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
+            Nonlinear Processes in Geophysics 12, 345–352 (2005).
 
         '''
         self.assertPositiveInt(Neff)
@@ -1034,32 +1217,50 @@ class WaveletAnalysis(object):
 
         Fastest method. Calls Fortran libraries.
         
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-            c (float): the decay constant
-            Neff (int): the threshold of the number of effective degree of freedom
-            nproc (int): fake argument, just for convenience
-            detrend (str): 'no' - the original time series is assumed to have no trend;
-                           'linear' - a linear least-squares fit to `ys` is subtracted;
-                           'constant' - the mean of `ys` is subtracted
-                           'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
-            gaussianize (bool): If True, gaussianizes the timeseries
-            standardize (bool): If True, standardizes the timeseries
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array 
+            time axis of the time series
+        freqs : array
+            vector of frequency
+        tau : array
+            the evenly-spaced time points, namely the time shift for wavelet analysis
+        c : float
+            the decay constant
+        Neff : int
+            the threshold of the number of effective degree of freedom
+        nproc : int
+            fake argument, just for convenience
+        detrend : string
+            None - the original time series is assumed to have no trend;
+            'linear' - a linear least-squares fit to `ys` is subtracted;
+            'constant' - the mean of `ys` is subtracted
+            'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        params : list
+            The paramters for the Savitzky-Golay filters. The first parameter
+            corresponds to the window size (default it set to half of the data)
+            while the second parameter correspond to the order of the filter
+            (default is 4). The third parameter is the order of the derivative
+            (the default is zero, which means only smoothing.)
+        gaussianize : bool
+            If True, gaussianizes the timeseries
+        standardize : bool
+            If True, standardizes the timeseries
 
-        Returns:
-            wwa (array): the weighted wavelet amplitude
-            phase (array): the weighted wavelet phase
-            Neffs (array): the matrix of effective number of points in the time-scale coordinates
-            coeff (array): the wavelet transform coefficients (a0, a1, a2)
+        Returns
+        -------
+        
+        wwa : array
+            the weighted wavelet amplitude
+        phase : array
+            the weighted wavelet phase
+        Neffs : array
+            the matrix of effective number of points in the time-scale coordinates
+        coeff : array
+            the wavelet transform coefficients (a0, a1, a2)
 
         '''
         from . import f2py_wwz as f2py
@@ -1090,15 +1291,24 @@ class WaveletAnalysis(object):
     def make_coi(self, tau, Neff=3):
         ''' Return the cone of influence.
 
-        Args:
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-            Neff (int): the threshold of the number of effective samples
+        Args
+        ----
+        
+        tau : array
+            the evenly-spaced time points, namely the time shift for wavelet analysis
+        Neff : int
+            the threshold of the number of effective samples
 
-        Returns:
-            coi (array): cone of influence
+        Returns
+        -------
+        
+            coi : array
+                cone of influence
 
-        References:
-            wave_signif() in http://paos.colorado.edu/research/wavelets/wave_python/waveletFunctions.py
+        References
+        ----------
+        
+        wave_signif() in http://paos.colorado.edu/research/wavelets/wave_python/waveletFunctions.py
 
         '''
         assert isinstance(Neff, int) and Neff >= 1
@@ -1125,13 +1335,22 @@ class WaveletAnalysis(object):
     def make_omega(self, ts, freqs):
         ''' Return the angular frequency based on the time axis and given frequency vector
 
-        Args:
-            ys (array): a time series
-            ts (array): time axis of the time series
-            freqs (array): vector of frequency
+        Args
+        ----
+        
+        ys : array
+            a time series
+        ts : array
+            time axis of the time series
+        freqs : array
+            vector of frequency
 
-        Returns:
-            omega (array): the angular frequency vector
+        Returns
+        -------
+        
+            
+        omega : array
+            the angular frequency vector
 
         '''
         # for the frequency band larger than f_Nyquist, the wwa will be marked as NaNs
@@ -1145,21 +1364,34 @@ class WaveletAnalysis(object):
     def wwa2psd(self, wwa, ts, Neffs, freqs=None, Neff=3, anti_alias=False, avgs=2):
         """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
-        Args:
-            wwa (array): the weighted wavelet amplitude.
-            ts (array): the time points, should be pre-truncated so that the span is exactly what is used for wwz
-            Neffs (array):  the matrix of effective number of points in the time-scale coordinates obtained from wwz from wwz
-            freqs (array): vector of frequency from wwz
-            Neff (int): the threshold of the number of effective samples
-            anti_alias (bool): whether to apply anti-alias filter
-            avgs (int): flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
-                        OR from measurements averaged over each sampling interval (avgs==1)
+        Args
+        ----
+        
+        wwa : array
+            the weighted wavelet amplitude.
+        ts : array
+            the time points, should be pre-truncated so that the span is exactly what is used for wwz
+        Neffs : array
+            the matrix of effective number of points in the time-scale coordinates obtained from wwz from wwz
+        freqs : array
+            vector of frequency from wwz
+        Neff : int
+            the threshold of the number of effective samples
+        anti_alias : bool
+            whether to apply anti-alias filter
+        avgs : int
+            flag for whether spectrum is derived from instantaneous point measurements (avgs<>1) OR from measurements averaged over each sampling interval (avgs==1)
 
-        Returns:
-            psd (array): power spectral density
+        Returns
+        -------
+        
+        psd : array
+            power spectral density
 
-        References:
-            Kirchner's C code for weighted psd calculation
+        References
+        ----------
+            
+        Kirchner's C code for weighted psd calculation
 
         """
         af = AliasFilter()
@@ -1192,20 +1424,29 @@ class WaveletAnalysis(object):
     def freq_vector_lomb_scargle(self, ts, nf=None, ofac=4, hifac=1):
         ''' Return the frequency vector based on the Lomb-Scargle algorithm.
 
-        Args:
-            ts (array): time axis of the time series
-            ofac (float): Oversampling rate that influences the resolution of the frequency axis,
-                         when equals to 1, it means no oversamling (should be >= 1).
-                         The default value 4 is usaually a good value.
+        Args
+        ----
+    
+        ts : array
+            time axis of the time series
+        ofac : float
+            Oversampling rate that influences the resolution of the frequency axis,
+                     when equals to 1, it means no oversamling (should be >= 1).
+                     The default value 4 is usaually a good value.
+        hifac : float
+            fhi/fnyq (should be >= 1), where fhi is the highest frequency that
+            can be analyzed by the Lomb-Scargle algorithm and fnyq is the Nyquist frequency.
 
-            hifac (float): fhi/fnyq (should be >= 1), where fhi is the highest frequency that
-                          can be analyzed by the Lomb-Scargle algorithm and fnyq is the Nyquist frequency.
+        Returns
+        -------
+        
+        freqs : array
+            the frequency vector
 
-        Returns:
-            freqs (array): the frequency vector
-
-        References:
-            Trauth, M. H. MATLAB® Recipes for Earth Sciences. (Springer, 2015). pp 181.
+        References
+        ----------
+            
+        Trauth, M. H. MATLAB® Recipes for Earth Sciences. (Springer, 2015). pp 181.
 
         '''
         assert ofac >= 1 and hifac <= 1, "`ofac` should be >= 1, and `hifac` should be <= 1"
@@ -1225,14 +1466,22 @@ class WaveletAnalysis(object):
     def freq_vector_welch(self, ts):
         ''' Return the frequency vector based on the Welch's method.
 
-        Args:
-            ts (array): time axis of the time series
+        Args
+        ----
+        
+        ts : array
+            time axis of the time series
 
-        Returns:
-            freqs (array): the frequency vector
+        Returns
+        -------
+        
+        freqs : array
+            the frequency vector
 
-        References:
-            https://github.com/scipy/scipy/blob/v0.14.0/scipy/signal/spectral.py
+        References
+        ----------
+        
+        https://github.com/scipy/scipy/blob/v0.14.0/scipy/signal/spectral.py
 
         '''
         nt = np.size(ts)
@@ -1250,11 +1499,17 @@ class WaveletAnalysis(object):
     def freq_vector_nfft(self, ts):
         ''' Return the frequency vector based on NFFT
 
-        Args:
-            ts (array): time axis of the time series
+        Args
+        ----
+        
+        ts : array
+            time axis of the time series
 
-        Returns:
-            freqs (array): the frequency vector
+        Returns
+        -------
+        
+        freqs : array
+            the frequency vector
 
         '''
         nt = np.size(ts)
@@ -1272,25 +1527,32 @@ class WaveletAnalysis(object):
         This function selects among various methods to obtain the frequency 
         vector. 
 
-        Args:
-            ts (array): time axis of the time series
-            method (str): The method to use. Options are 'nfft' (default), 'Lomb-Scargle', 'Welch'
-                For Lomb_Scargle, additional parameters may be passed:
-                    nf (int): number of frequency points
-                    ofac (float): Oversampling rate that influences the resolution of the frequency axis,
-                         when equals to 1, it means no oversamling (should be >= 1).
-                         The default value 4 is usaually a good value.
-                    hifac (float): fhi/fnyq (should be >= 1), where fhi is the highest frequency that
-                          can be analyzed by the Lomb-Scargle algorithm and fnyq is the Nyquist frequency.
+        Args
+        ----
         
-        Returns:
-            freqs (array): the frequency vector
+        ts : array): time axis of the time series
+        method : string
+            The method to use. Options are 'nfft' (default), 'Lomb-Scargle', 'Welch'
+        kwargs : dict, optional
+                For Lomb_Scargle, additional parameters may be passed:
+                - nf (int): number of frequency points
+                - ofac (float): Oversampling rate that influences the resolution of the frequency axis,
+                     when equals to 1, it means no oversamling (should be >= 1).
+                     The default value 4 is usaually a good value.
+                - hifac (float): fhi/fnyq (should be >= 1), where fhi is the highest frequency that
+                      can be analyzed by the Lomb-Scargle algorithm and fnyq is the Nyquist frequency.
+        
+        Returns
+        -------
+        
+        freqs : array
+            the frequency vector
 
         '''
         
-        if method is 'Lomb-Scargle':
+        if method == 'Lomb-Scargle':
             freqs = self.freq_vector_lomb_scargle(ts,**kwargs)
-        elif method is 'Welch':
+        elif method == 'Welch':
             freqs = self.freq_vector_welch(ts)        
         else:
             freqs = self.freq_vector_nfft(ts)
@@ -1301,16 +1563,29 @@ class WaveletAnalysis(object):
     def beta_estimation(self, psd, freqs, fmin=None, fmax=None):
         ''' Estimate the power slope of a 1/f^beta process.
 
-        Args:
-            psd (array): the power spectral density
-            freqs (array): the frequency vector
-            fmin, fmax (float): the frequency range for beta estimation
+        Args
+        ----
+        
+        psd : array
+            the power spectral density
+        freqs : array
+            the frequency vector
+        fmin : float
+            the min of frequency range for beta estimation
+        fmax : float
+            the max of frequency range for beta estimation
 
-        Returns:
-            beta (float): the estimated slope
-            f_binned (array): binned frequency vector
-            psd_binned (array): binned power spectral density
-            Y_reg (array): prediction based on linear regression
+        Returns
+        -------
+        
+        beta : float
+            the estimated slope
+        f_binned : array
+            binned frequency vector
+        psd_binned : array
+            binned power spectral density
+        Y_reg : array
+            prediction based on linear regression
 
         '''
         # drop the PSD at frequency zero
@@ -1388,14 +1663,22 @@ class WaveletAnalysis(object):
     def beta2HurstIndex(self, beta):
         ''' Translate psd slope to Hurst index
 
-        Args:
-            beta (float): the estimated slope of a power spectral density curve
+        Args
+        ----
+        
+        beta : float
+            the estimated slope of a power spectral density curve
 
-        Returns:
-            H (float): Hurst index, should be in (0, 1)
+        Returns
+        -------
+        
+        H : float
+            Hurst index, should be in (0, 1)
 
-        References:
-            Equation 2 in http://www.bearcave.com/misl/misl_tech/wavelets/hurst/
+        References
+        ----------
+        
+        Equation 2 in http://www.bearcave.com/misl/misl_tech/wavelets/hurst/
 
         '''
         H = (beta-1)/2
@@ -1405,14 +1688,23 @@ class WaveletAnalysis(object):
     def psd_ar(self, var_noise, freqs, ar_params, f_sampling):
         ''' Return the theoretical power spectral density (PSD) of an autoregressive model
 
-        Args:
-            var_noise (float): the variance of the noise of the AR process
-            freqs (array): vector of frequency
-            ar_params (array): autoregressive coefficients, not including zero-lag
-            f_sampling (float): sampling frequency
+        Args
+        ----
+    
+        var_noise : float
+            the variance of the noise of the AR process
+        freqs : array
+            vector of frequency
+        ar_params : array
+            autoregressive coefficients, not including zero-lag
+        f_sampling : float
+            sampling frequency
 
-        Returns:
-            psd (array): power spectral density
+        Returns
+        -------
+        
+        psd : array
+            power spectral density
 
         '''
         p = np.size(ar_params)
@@ -1428,17 +1720,26 @@ class WaveletAnalysis(object):
     def fBMsim(self, N=128, H=0.25):
         '''Simple method to generate fractional Brownian Motion
 
-        Args:
-            N (int): the length of the simulated time series
-            H (float): Hurst index, should be in (0, 1). The relationship between H and the scaling exponent beta is
-                H = (beta-1) / 2
+        Args
+        ----
+        
+        N : int
+            the length of the simulated time series
+        H : float
+            Hurst index, should be in (0, 1). The relationship between H and the scaling exponent beta is
+            H = (beta-1) / 2
 
-        Returns:
-            xfBm (array): the simulated fractional Brownian Motion time series
+        Returns
+        -------
+        
+        xfBm : array
+            the simulated fractional Brownian Motion time series
 
-        References:
-            1. http://cours-physique.lps.ens.fr/index.php/TD11_Correlated_Noise_2011
-            2. https://www.wikiwand.com/en/Fractional_Brownian_motion
+        References
+        ----------
+        
+        1. http://cours-physique.lps.ens.fr/index.php/TD11_Correlated_Noise_2011
+        2. https://www.wikiwand.com/en/Fractional_Brownian_motion
 
         @authors: jeg, fzhu
         '''
@@ -1475,17 +1776,27 @@ class WaveletAnalysis(object):
     def psd_fBM(self, freqs, ts, H):
         ''' Return the theoretical psd of a fBM
 
-        Args:
-            freqs (array): vector of frequency
-            ts (array): the time axis of the time series
-            H (float): Hurst index, should be in (0, 1)
+        Args
+        ----
+        
+        freqs : array
+            vector of frequency
+        ts : array
+            the time axis of the time series
+        H : float
+            Hurst index, should be in (0, 1)
 
-        Returns:
-            psd (array): power spectral density
+        Returns
+        --------
+        
+        psd : array
+            power spectral density
 
-        References:
-            Flandrin, P. On the spectrum of fractional Brownian motions.
-                IEEE Transactions on Information Theory 35, 197–199 (1989).
+        References
+        ----------
+    
+        Flandrin, P. On the spectrum of fractional Brownian motions.
+            IEEE Transactions on Information Theory 35, 197–199 (1989).
 
         '''
         nf = np.size(freqs)
@@ -1503,13 +1814,21 @@ class WaveletAnalysis(object):
     def get_wwz_func(self, nproc, method):
         ''' Return the wwz function to use.
 
-        Args:
-            nproc (int): the number of processes for multiprocessing
-            method (str): 'Foster' - the original WWZ method;
-                          'Kirchner' - the method Kirchner adapted from Foster;
-                          'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py (default)
-        Returns:
-            wwz_func (function): the wwz function to use
+        Args
+        ----
+        
+        nproc : int
+            the number of processes for multiprocessing
+        method : string
+            'Foster' - the original WWZ method;
+            'Kirchner' - the method Kirchner adapted from Foster;
+            'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py (default)
+            
+        Returns
+        -------
+        
+        wwz_func : function
+            the wwz function to use
 
         '''
         wa = WaveletAnalysis()
@@ -1537,22 +1856,41 @@ class WaveletAnalysis(object):
     def prepare_wwz(self, ys, ts, freqs=None, tau=None, len_bd=0, bc_mode='reflect', reflect_type='odd', **kwargs):
         ''' Return the truncated time series with NaNs deleted and estimate frequency vector and tau
 
-        Args:
-            ys (array): a time series, NaNs will be deleted automatically
-            ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
-            freqs (array): vector of frequency. If None, use the nfft method.If using Lomb-Scargle, additional parameters
-                may be set. See make_freq_vector
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-                if the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so
-            len_bd (int): the number of the ghost grids want to create on each boundary
-            bc_mode (str): see np.lib.pad()
-            reflect_type (str): see np.lib.pad()
+        Args
+        ----
+    
+        ys : array
+            a time series, NaNs will be deleted automatically
+        ts : array
+            the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
+        freqs : array
+            vector of frequency. If None, use the nfft method.If using Lomb-Scargle, additional parameters
+            may be set. See make_freq_vector
+        tau : array
+            the evenly-spaced time points, namely the time shift for wavelet analysis
+            if the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so
+        len_bd : int
+            the number of the ghost grids want to create on each boundary
+        bc_mode : string
+            {'constant', 'edge', 'linear_ramp', 'maximum', 'mean', 'median', 'minimum', 'reflect' , 'symmetric', 'wrap'}
+            For more details, see np.lib.pad()
+        reflect_type : string
+             {‘even’, ‘odd’}, optional
+             Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
+             For the ‘odd’ style, the extented part of the array is created by subtracting the reflected values from two times the edge value.
+             For more details, see np.lib.pad()
 
-        Returns:
-            ys_cut (array): the truncated time series with NaNs deleted
-            ts_cut (array): the truncated time axis of the original time series with NaNs deleted
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+        Returns
+        -------
+        
+        ys_cut : array
+            the truncated time series with NaNs deleted
+        ts_cut : array
+            the truncated time axis of the original time series with NaNs deleted
+        freqs : array
+            vector of frequency
+        tau : array
+            the evenly-spaced time points, namely the time shift for wavelet analysis
 
         '''
         ys, ts = Timeseries.clean_ts(ys, ts)
@@ -1616,18 +1954,31 @@ class WaveletAnalysis(object):
     def cross_wt(self, coeff1, coeff2):
         ''' Return the cross wavelet transform.
 
-        Args:
-            coeff1, coeff2 (array): the two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
-            freqs (array): vector of frequency
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+        Args
+        ----
+        
+        coeff1 : array
+            the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
+        coeff2 : array
+            the second of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
+        freqs : array
+            vector of frequency
+        tau : array'
+            the evenly-spaced time points, namely the time shift for wavelet analysis
 
-        Returns:
-            xw_amplitude (array): the cross wavelet amplitude
-            xw_phase (array): the cross wavelet phase
+        Returns
+        -------
+        
+        xw_amplitude : array 
+            the cross wavelet amplitude
+        xw_phase : array
+            the cross wavelet phase
 
-        References:
-            1.Grinsted, A., Moore, J. C. & Jevrejeva, S. Application of the cross wavelet transform and
-                wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004).
+        References
+        ----------
+        
+        1.Grinsted, A., Moore, J. C. & Jevrejeva, S. Application of the cross wavelet transform and
+            wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004).
 
         '''
         xwt = coeff1 * np.conj(coeff2)
@@ -1639,19 +1990,31 @@ class WaveletAnalysis(object):
     def wavelet_coherence(self, coeff1, coeff2, freqs, tau, smooth_factor=0.25):
         ''' Return the cross wavelet coherence.
 
-        Args:
-            coeff1, coeff2 (array): the two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
-            freqs (array): vector of frequency.
-            tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
+        Args
+        ----
+        
+        coeff1 : array
+            the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
+        coeff2 : array
+            the second of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
+        freqs : array
+            vector of frequency
+        tau : array'
+            the evenly-spaced time points, namely the time shift for wavelet analysis
 
-        Returns:
-            xw_coherence (array): the cross wavelet coherence
+        Returns
+        -------
+        
+        xw_coherence : array
+            the cross wavelet coherence
 
-        References:
-            1. Grinsted, A., Moore, J. C. & Jevrejeva, S. Application of the cross wavelet transform and
-                wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004).
-            2. Matlab code by Grinsted (https://github.com/grinsted/wavelet-coherence)
-            3. Python code by Sebastian Krieger (https://github.com/regeirk/pycwt)
+        References
+        ----------
+        
+        1. Grinsted, A., Moore, J. C. & Jevrejeva, S. Application of the cross wavelet transform and
+            wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004).
+        2. Matlab code by Grinsted (https://github.com/grinsted/wavelet-coherence)
+        3. Python code by Sebastian Krieger (https://github.com/regeirk/pycwt)
 
         '''
         def rect(length, normalize=False):
@@ -1677,13 +2040,21 @@ class WaveletAnalysis(object):
         def Smoothing(coeff, snorm, dj, smooth_factor=smooth_factor):
             """ Soothing function adapted from https://github.com/regeirk/pycwt/blob/master/pycwt/helpers.py
 
-            Args:
-                coeff (array): the wavelet coefficients get from wavlet transform **in the form of a1 + a2*1j**
-                snorm (array): normalized scales
-                dj (float): it satisfies the equation [ Sj = S0 * 2**(j*dj) ]
-
-            Returns:
-                rect (array): the (normalized) rectangular function
+            Args
+            ----
+            
+            coeff : array
+                the wavelet coefficients get from wavlet transform **in the form of a1 + a2*1j**
+            snorm : array
+                normalized scales
+            dj : float
+                it satisfies the equation [ Sj = S0 * 2**(j*dj) ]
+s
+            Returns
+            -------
+            
+            rect : array
+                the (normalized) rectangular function
 
             """
             def fft_kwargs(signal, **kwargs):
@@ -1740,16 +2111,27 @@ class WaveletAnalysis(object):
     def reconstruct_ts(self, coeff, freqs, tau, t, len_bd=0):
         ''' Reconstruct the normalized time series from the wavelet coefficients.
         
-        Args:
-            coeff (array): the coefficients of the corresponding basis functions (a0, a1, a2)
-            freqs (array): vector of frequency of the basis functions
-            tau (array): the evenly-spaced time points of the basis functions
-            t (array): the specified evenly-spaced time points of the reconstructed time series
-            len_bd (int): the number of the ghost grids want to creat on each boundary
+        Args
+        ----
+        
+        coeff : array
+            the coefficients of the corresponding basis functions (a0, a1, a2)
+        freqs : array
+            vector of frequency of the basis functions
+        tau : array
+            the evenly-spaced time points of the basis functions
+        t : array
+            the specified evenly-spaced time points of the reconstructed time series
+        len_bd : int
+            the number of the ghost grids want to creat on each boundary
 
-        Returns:
-            rec_ts (array): the reconstructed normalized time series
-            t (array): the evenly-spaced time points of the reconstructed time series
+        Returns
+        -------
+        
+        rec_ts : array
+            the reconstructed normalized time series
+        t : array
+            the evenly-spaced time points of the reconstructed time series
         '''
         omega = 2*np.pi*freqs
         nf = np.size(freqs)
@@ -1791,24 +2173,40 @@ class AliasFilter(object):
     def alias_filter(self, freq, pwr, fs, fc, f_limit, avgs):
         ''' anti_alias filter
         
-        Args:
-            freq (array): vector of frequencies in power spectrum
-            pwr (array): vector of spectral power corresponding to frequencies "freq"
-            fs (float): sampling frequency
-            fc (float): corner frequency for 1/f^2 steepening of power spectrum
-            f_limit (float): lower frequency limit for estimating misfit of model-plus-alias spectrum vs. measured power
-            avgs (int): flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
-                        OR from measurements averaged over each sampling interval (avgs==1)
+        Args
+        ----
+        
+        freq : array
+            vector of frequencies in power spectrum
+        pwr : array
+            vector of spectral power corresponding to frequencies "freq"
+        fs : float
+            sampling frequency
+        fc : float
+            corner frequency for 1/f^2 steepening of power spectrum
+        f_limit : float
+            lower frequency limit for estimating misfit of model-plus-alias spectrum vs. measured power
+        avgs : int
+            flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
+            OR from measurements averaged over each sampling interval (avgs==1)
 
-        Returns:
-            alpha (float): best-fit exponent of power-law model
-            filtered_pwr (array): vector of alias-filtered spectral power
-            model_pwr (array): vector of modeled spectral power
-            aliased_pwr (array): vector of modeled spectral power, plus aliases
+        Returns
+        -------
+        
+        alpha : float
+            best-fit exponent of power-law model
+        filtered_pwr : array
+            vector of alias-filtered spectral power
+        model_pwr : array
+            vector of modeled spectral power
+        aliased_pwr : array
+            vector of modeled spectral power, plus aliases
 
-        References:
-            1. Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
-                    Phys Rev E Stat Nonlin Soft Matter Phys 71, 66110 (2005).
+        References
+        ----------
+        
+        1. Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
+                Phys Rev E Stat Nonlin Soft Matter Phys 71, 66110 (2005).
 
         '''
         log_pwr = np.log(pwr)
@@ -1907,25 +2305,34 @@ class Filter(object):
         polynomial of high order over a odd-sized window centered at
         the point.
 
-        Args:
-            y (array): the values of the time history of the signal.
-            window_size (int) : the length of the window. Must be an odd integer number.
-            order (int) : the order of the polynomial used in the filtering. Must be less then `window_size` - 1.
-            deriv (int): the order of the derivative to compute (default = 0 means only smoothing)
+        Args
+        ----
+        
+        y : array
+            the values of the time history of the signal.
+        window_size : int
+            the length of the window. Must be an odd integer number.
+        order : int
+            the order of the polynomial used in the filtering. Must be less then `window_size` - 1.
+        deriv : int
+            the order of the derivative to compute (default = 0 means only smoothing)
 
-        Returns:
+        Returns
+        -------
+        
+        ys : array
+            ndarray of shape (N), the smoothed signal (or it's n-th derivative).
 
-            ys - ndarray of shape (N), the smoothed signal (or it's n-th derivative).
-
-        Reference:
-
-            - A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of
-                Data by Simplified Least Squares Procedures. Analytical
-                Chemistry, 1964, 36 (8), pp 1627-1639.
-            - Numerical Recipes 3rd Edition: The Art of Scientific Computing
-                W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
-                Cambridge University Press ISBN-13: 9780521880688
-            - SciPy Cookbook: shttps://github.com/scipy/scipy-cookbook/blob/master/ipython/SavitzkyGolay.ipynb
+        Reference
+        ---------
+        
+        - A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of
+            Data by Simplified Least Squares Procedures. Analytical
+            Chemistry, 1964, 36 (8), pp 1627-1639.
+        - Numerical Recipes 3rd Edition: The Art of Scientific Computing
+            W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
+            Cambridge University Press ISBN-13: 9780521880688
+        - SciPy Cookbook: shttps://github.com/scipy/scipy-cookbook/blob/master/ipython/SavitzkyGolay.ipynb
         """
         if type(window_size) is not int:
             raise TypeError("window_size should be of type int")
@@ -1953,22 +2360,38 @@ class Filter(object):
     def tsPad(ys,ts,method = 'reflect', params=(2,1,2), reflect_type = 'odd',padFrac=0.1):
         """ tsPad: pad a timeseries based on timeseries model predictions
         
-        Args:
-            x (numpy array): Evenly-spaced timeseries
-            t (numpy array): Time axis
-            method (str): The method to use to pad the series
-                - ARIMA: uses a fitted ARIMA model
-                - reflect (default): Reflects the time series
-            params (tuple): ARIMA model order parameters (p,d,q)
-            reflect_type (str): 
-            padFrac (float): padding fraction (scalar) such that padLength = padFrac*length(series)
+        Args
+        ----
         
-        Returns:
-            yp - padded timeseries
-            tp - augmented axis
+        x : numpy array
+            Evenly-spaced timeseries
+        t : numpy array
+            Time axis
+        method : string
+            The method to use to pad the series
+            - ARIMA: uses a fitted ARIMA model
+            - reflect (default): Reflects the time series
+        params : tuple ARIMA model order parameters (p,d,q)
+        reflect_type : string
+             {‘even’, ‘odd’}, optional
+             Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
+             For the ‘odd’ style, the extented part of the array is created by subtracting the reflected values from two times the edge value.
+             For more details, see np.lib.pad()
+        padFrac : float
+            padding fraction (scalar) such that padLength = padFrac*length(series)
+        
+        Returns
+        -------
+        
+        yp : array 
+            padded timeseries
+        tp : array
+            augmented axis
             
-        Author: 
-            Julien Emile-Geay, Deborah Khider
+        Author
+        ------
+        
+        Julien Emile-Geay, Deborah Khider
         """
         padLength =  np.round(len(ts)*padFrac).astype(np.int64)
     
@@ -2011,24 +2434,38 @@ class Filter(object):
                     reflect_type='odd',params=(2,1,2),padFrac=0.1):
         '''Applies a Butterworth filter with frequency fc, with padding
         
-        Args:
-            ys (numpy array): Timeseries 
-            fc (float or list): cutoff frequency. If scalar, it is interpreted as a low-frequency cutoff (lowpass)
-                     If fc is a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass)
-            fs (float): sampling frequency
-            filter_order (int): order n of Butterworth filter
-            pad (str): Indicates if padding is needed.
-                - 'reflect': Reflects the timeseries
-                - 'ARIMA': Uses an ARIMA model for the padding
-                - None: No padding. 
-            params (tuple): model parameters for ARIMA model (if pad = True)
-            padFrac (float): fraction of the series to be padded
+        Args
+        ----
         
-        Returns:
-            yf - filtered array
+        ys : numpy array
+            Timeseries 
+        fc : float or list
+            cutoff frequency. If scalar, it is interpreted as a low-frequency cutoff (lowpass)
+            If fc is a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass)
+        fs : float
+            sampling frequency
+        filter_order : int
+            order n of Butterworth filter
+        pad : string
+            Indicates if padding is needed.
+            - 'reflect': Reflects the timeseries
+            - 'ARIMA': Uses an ARIMA model for the padding
+            - None: No padding. 
+        params : tuple
+            model parameters for ARIMA model (if pad = True)
+        padFrac : float
+            fraction of the series to be padded
         
-        Author: 
-            Julien Emile-Geay
+        Returns
+        -------
+        
+        yf : array
+            filtered array
+        
+        Author
+        ------
+        
+        Julien Emile-Geay
         '''
         nyq = 0.5 * fs
     
@@ -2064,21 +2501,29 @@ Interface for the users below, more checks about the input will be performed her
 def ar1_fit(ys, ts=None, detrend= None, params=["default", 4, 0, 1]):
     ''' Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
 
-    Args:
-        ys (array): the time series
-        ts (array): the time axis of that series
-        detrend (str): 'linear' - a linear least-squares fit to `ys` is subtracted;
-                       'constant' - the mean of `ys` is subtracted
-                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-            params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                corresponds to the window size (default it set to half of the data)
-                while the second parameter correspond to the order of the filter
-                (default is 4). The third parameter is the order of the derivative
-                (the default is zero, which means only smoothing.)
+    Args
+    ----
+    
+    ys : array
+        the time series
+    ts : array
+        the time axis of that series
+    detrend : string
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
 
-    Returns:
-        g (float): lag-1 autocorrelation coefficient (for evenly-spaced time series)
+    Returns
+    -------
+    
+    g : float
+        lag-1 autocorrelation coefficient (for evenly-spaced time series)
         OR estimated persistence (for unevenly-spaced time series)
     '''
 
@@ -2095,23 +2540,34 @@ def ar1_fit(ys, ts=None, detrend= None, params=["default", 4, 0, 1]):
 def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
     ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from `ys` and `ts`
 
-    Args:
-        ys (array): a time series
-        n, p (int): dimensions as n rows by p columns
-        ts (array): the time axis of that series
-        detrend (str): 'no' - the original time series is assumed to have no trend;
-                       'linear' - a linear least-squares fit to `ys` is subtracted;
-                       'constant' - the mean of `ys` is subtracted
-                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-        params (list): The paramters for the Savitzky-Golay filters. The first parameter
-            corresponds to the window size (default it set to half of the data)
-            while the second parameter correspond to the order of the filter
-            (default is 4). The third parameter is the order of the derivative
-            (the default is zero, which means only smoothing.)
+    Args
+    ----
+    
+    ys : array
+        a time series
+    n : int 
+        row dimensions
+    p : int
+        column dimensions
+    ts : array
+        the time axis of that series
+    detrend : string
+        None - the original time series is assumed to have no trend;
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
 
-    Returns:
-        red (matrix): n rows by p columns matrix of an AR1 process
+    Returns
+    -------
+    
+    red : array
+        n rows by p columns matrix of an AR1 process
 
     '''
     red = np.empty(shape=(n, p))  # declare array
@@ -2147,40 +2603,69 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
         bc_mode='reflect', reflect_type='odd'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coefficients
 
-    Args:
-        ys (array): a time series, NaNs will be deleted automatically
-        ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
-        tau (array): the evenly-spaced time points
-        freqs (array): vector of frequency
-        c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
-        Neff (int): effective number of points
-        nMC (int): the number of Monte-Carlo simulations
-        nproc (int): the number of processes for multiprocessing
-        detrend (str): 'no' - the original time series is assumed to have no trend;
-                       'linear' - a linear least-squares fit to `ys` is subtracted;
-                       'constant' - the mean of `ys` is subtracted
-                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-        params (list): The paramters for the Savitzky-Golay filters. The first parameter
-            corresponds to the window size (default it set to half of the data)
-            while the second parameter correspond to the order of the filter
-            (default is 4). The third parameter is the order of the derivative
-            (the default is zero, which means only smoothing.)
-        method (str): 'Foster' - the original WWZ method;
-                      'Kirchner' - the method Kirchner adapted from Foster;
-                      'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
-        len_bd (int): the number of the ghost grids want to creat on each boundary
-        bc_mode (str): see np.lib.pad()
-        reflect_type (str): see np.lib.pad()
+    Args
+    ----
+    
+    ys : array
+        a time series, NaNs will be deleted automatically
+    ts : array
+        the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
+    tau : array
+        the evenly-spaced time points
+    freqs : array
+        vector of frequency
+    c : float
+        the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+    Neff : int
+        effective number of points
+    nMC : int
+        the number of Monte-Carlo simulations
+    nproc : int
+        the number of processes for multiprocessing
+    detrend : str
+        None - the original time series is assumed to have no trend;
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay
+               filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+    method : string
+        'Foster' - the original WWZ method;
+        'Kirchner' - the method Kirchner adapted from Foster;
+        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+    len_bd : int
+        the number of the ghost grids want to creat on each boundary
+    bc_mode : string 
+        {'constant', 'edge', 'linear_ramp', 'maximum', 'mean', 'median', 'minimum', 'reflect' , 'symmetric', 'wrap'}
+        For more details, see np.lib.pad()
+    reflect_type : string
+         {‘even’, ‘odd’}, optional
+         Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
+         For the ‘odd’ style, the extented part of the array is created by subtracting the reflected values from two times the edge value.
+         For more details, see np.lib.pad()
 
-    Returns:
-        wwa (array): the weighted wavelet amplitude.
-        AR1_q (array): AR1 simulations
-        coi (array): cone of influence
-        freqs (array): vector of frequency
-        tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-        Neffs (array): the matrix of effective number of points in the time-scale coordinates
-        coeff (array): the wavelet transform coefficents
+    Returns
+    -------
+    
+    wwa : array
+        the weighted wavelet amplitude.
+    AR1_q : array
+        AR1 simulations
+    coi : array
+        cone of influence
+    freqs : array
+        vector of frequency
+    tau : array
+        the evenly-spaced time points, namely the time shift for wavelet analysis
+    Neffs : array
+        the matrix of effective number of points in the time-scale coordinates
+    coeff : array
+        the wavelet transform coefficents
 
     '''
     wa = WaveletAnalysis()
@@ -2235,39 +2720,62 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
             method='default'):
     ''' Return the psd of a timeseries directly using wwz method.
 
-    Args:
-        ys (array): a time series, NaNs will be deleted automatically
-        ts (array): the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
-        freqs (array): vector of frequency
-        tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-        c (float): the decay constant, the default value 1e-3 is good for most of the cases
-        nproc (int): the number of processes for multiprocessing
-        nMC (int): the number of Monte-Carlo simulations
-        detrend (str): 'no' - the original time series is assumed to have no trend;
-                       'linear' - a linear least-squares fit to `ys` is subtracted;
-                       'constant' - the mean of `ys` is subtracted
-                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-        params (list): The paramters for the Savitzky-Golay filters. The first parameter
-            corresponds to the window size (default it set to half of the data)
-            while the second parameter correspond to the order of the filter
-            (default is 4). The third parameter is the order of the derivative
-            (the default is zero, which means only smoothing.)
-        gaussianize (bool): If True, gaussianizes the timeseries
-        standardize (bool): If True, standardizes the timeseries
-        method (str): 'Foster' - the original WWZ method;
-                      'Kirchner' - the method Kirchner adapted from Foster;
-                      'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
-                      'default' - the Numba version of the Kirchner algorithm will be called
-        Neff (int):
-        anti_alias (bool): If True, uses anti-aliasing
-        avgs (int): 
+    Args
+    ----
+    
+    ys : array
+        a time series, NaNs will be deleted automatically
+    ts : array
+        the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
+    freqs : array
+        vector of frequency
+    tau : array
+        the evenly-spaced time points, namely the time shift for wavelet analysis
+    c : float
+        the decay constant, the default value 1e-3 is good for most of the cases
+    nproc : int
+        the number of processes for multiprocessing
+    nMC : int
+        the number of Monte-Carlo simulations
+    detrend : str
+        None - the original time series is assumed to have no trend;
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay
+               filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+    gaussianize : bool
+        If True, gaussianizes the timeseries
+    standardize : bool
+        If True, standardizes the timeseries
+    method : string
+        'Foster' - the original WWZ method;
+        'Kirchner' - the method Kirchner adapted from Foster;
+        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+        'default' - the Numba version of the Kirchner algorithm will be called
+    Neff : int
+        effective number of points
+    anti_alias : bool): If True, uses anti-aliasing
+    avgs : int 
+        flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
+        OR from measurements averaged over each sampling interval (avgs==1)
 
-    Returns:
-        psd (array): power spectral density
-        freqs (array): vector of frequency
-        psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes
-        psd_ar1 (array): the psds of AR1 processes
+    Returns
+    -------
+    
+    psd : array
+        power spectral density
+    freqs : array
+        vector of frequency
+    psd_ar1_q95 : array
+        the 95% quantile of the psds of AR1 processes
+    psd_ar1 : array
+        the psds of AR1 processes
 
     '''
     wa = WaveletAnalysis()
@@ -2322,37 +2830,63 @@ def xwt(ys1, ts1, ys2, ts2,
         method='default'):
     ''' Return the cross-wavelet transform of two time series.
 
-    Args:
-        ys1, ys2 (array): the two time series
-        ts1, ts2 (array): the time axis of the two time series
-        tau (array): the evenly-spaced time points
-        freqs (array): vector of frequency
-        c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
-        Neff (int): effective number of points
-        nproc (int): the number of processes for multiprocessing
-        detrend (str): None - the original time series is assumed to have no trend;
-                       'linear' - a linear least-squares fit to `ys` is subtracted;
-                       'constant' - the mean of `ys` is subtracted
-                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-        params (list): The paramters for the Savitzky-Golay filters. The first parameter
-            corresponds to the window size (default it set to half of the data)
-            while the second parameter correspond to the order of the filter
-            (default is 4). The third parameter is the order of the derivative
-            (the default is zero, which means only smoothing.)
-        gaussianize (bool): If True, gaussianizes the timeseries
-        standardize (bool): If True, standardizes the timeseries
-        method (str): 'Foster' - the original WWZ method;
-                      'Kirchner' - the method Kirchner adapted from Foster;
-                      'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+    Args
+    ----
+    
+    ys1 : array
+        first of two time series
+    ys2 : array
+        second of the two time series
+    ts1 : array
+        time axis of first time series
+    ts2 : array
+        time axis of the second time series
+    tau : array
+        the evenly-spaced time points
+    freqs : array
+        vector of frequency
+    c : float
+        the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+    Neff : int
+        effective number of points
+    nproc : int
+        the number of processes for multiprocessing
+    detrend : str
+        None - the original time series is assumed to have no trend;
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay
+               filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+    gaussianize : bool
+        If True, gaussianizes the timeseries
+    standardize : bool
+        If True, standardizes the timeseries
+    method : string
+        'Foster' - the original WWZ method;
+        'Kirchner' - the method Kirchner adapted from Foster;
+        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
 
-    Returns:
-        xw_amplitude (array): the cross wavelet amplitude
-        xw_phase (array): the cross wavelet phase
-        freqs (array): vector of frequency
-        tau (array): the evenly-spaced time points
-        AR1_q (array): AR1 simulations
-        coi (array): cone of influence
+    Returns
+    -------
+    
+    xw_amplitude : array
+        the cross wavelet amplitude
+    xw_phase : array
+        the cross wavelet phase
+    freqs : array
+        vector of frequency
+    tau : array 
+        the evenly-spaced time points
+    AR1_q : array
+        AR1 simulations
+    coi : array
+        cone of influence
 
     '''
     wa = WaveletAnalysis()
@@ -2411,34 +2945,56 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         gaussianize=False, standardize=True, method='default'):
     ''' Return the cross-wavelet coherence of two time series.
 
-    Args:
-        ys1, ys2 (array): the two time series
-        ts1, ts2 (array): the time axis of the two time series
-        tau (array): the evenly-spaced time points
-        freqs (array): vector of frequency
-        c (float): the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
-        Neff (int): effective number of points
-        nproc (int): the number of processes for multiprocessing
-        nMC (int): the number of Monte-Carlo simulations
-        detrend (str): 'no' - the original time series is assumed to have no trend;
-                       'linear' - a linear least-squares fit to `ys` is subtracted;
-                       'constant' - the mean of `ys` is subtracted
-                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-        params (list): The paramters for the Savitzky-Golay filters. The first parameter
-            corresponds to the window size (default it set to half of the data)
-            while the second parameter correspond to the order of the filter
-            (default is 4). The third parameter is the order of the derivative
-            (the default is zero, which means only smoothing.)
-        gaussianize (bool): If True, gaussianizes the timeseries
-        standardize (bool): If True, standardizes the timeseries
-        method (str): 'Foster' - the original WWZ method;
-                      'Kirchner' - the method Kirchner adapted from Foster;
-                      'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+    Args
+    ----
+    
+    ys1 : array
+        first of two time series
+    ys2 : array
+        second of the two time series
+    ts1 : array
+        time axis of first time series
+    ts2 : array
+        time axis of the second time series
+    tau : array
+        the evenly-spaced time points
+    freqs : array
+        vector of frequency
+    c : float
+        the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+    Neff : int
+        effective number of points
+    nproc : int 
+        the number of processes for multiprocessing
+    nMC : int
+        the number of Monte-Carlo simulations
+    detrend : string
+        None - the original time series is assumed to have no trend;
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay
+               filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+    gaussianize : bool
+        If True, gaussianizes the timeseries
+    standardize : bool
+        If True, standardizes the timeseries
+    method : string 
+        'Foster' - the original WWZ method;
+        'Kirchner' - the method Kirchner adapted from Foster;
+        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
 
-    Returns:
-        res (dict): contains the cross wavelet coherence, cross-wavelet phase,
-            vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
+    Returns
+    -------
+    
+    res : dict
+        contains the cross wavelet coherence, cross-wavelet phase,
+        vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
 
     '''
     wa = WaveletAnalysis()
@@ -2547,35 +3103,65 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
              cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
     """ Plot the wavelet amplitude
 
-    Args:
-        wwa (array): the weighted wavelet amplitude.
-        freqs (array): vector of frequency
-        tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-        AR1_q (array): AR1 simulations
-        coi (array): cone of influence
-        levels (array): levels of values to plot
-        tick_range (array): levels of ticks to show on the colorbar
-        yticks (list): ticks on y-axis
-        ylim (list): limitations for y-axis
-        xticks (list): ticks on x-axis
-        figsize (list): the size for the figure
-        clr_map (str): the name of the colormap
-        cbar_drawedges (bool): whether to draw edges on the colorbar or not
-        cone_alpha (float): the alpha value for the area covered by cone of influence
-        plot_signif (bool): plot 95% significant area or not
-        signif_style (str): plot 95% significant area with `contour` or `shade`
-        title (str): Title for the plot
-        plot_cbar (bool): Plot the color scale bar
-        plot_cone (bool): plot cone of influence
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot)
-        xlabel (str): The x-axis label
-        ylabel (str): The y-axis label
-        cbar_pad (float): the pad for the colorbar
-        cbar_frac (float): the frac for the colorbar
-        cbar_labelsize (float): the font size of the colorbar label
+    Args
+    ----
+    
+    wwa : array
+        the weighted wavelet amplitude.
+    freqs : array
+        vector of frequency
+    tau : array
+        the evenly-spaced time points, namely the time shift for wavelet analysis
+    AR1_q : array
+        AR1 simulations
+    coi : array
+        cone of influence
+    levels : array
+        levels of values to plot
+    tick_range : array
+        levels of ticks to show on the colorbar
+    yticks : list
+        ticks on y-axis
+    ylim : list
+        limitations for y-axis
+    xticks : list
+        ticks on x-axis
+    figsize : list
+        the size for the figure
+    clr_map : string
+        the name of the colormap
+    cbar_drawedges : bool
+        whether to draw edges on the colorbar or not
+    cone_alpha : float
+        the alpha value for the area covered by cone of influence
+    plot_signif : bool
+        plot 95% significant area or not
+    signif_style : string
+        plot 95% significant area with `contour` or `shade`
+    title : string
+        Title for the plot
+    plot_cbar : bool
+        Plot the color scale bar
+    plot_cone : bool
+        plot cone of influence
+    ax : axis, optional
+        Return as axis instead of figure (useful to integrate plot into a subplot)
+    xlabel : string
+        The x-axis label
+    ylabel : string
+        The y-axis label
+    cbar_pad : float
+        the pad for the colorbar
+    cbar_frac : float
+        the frac for the colorbar
+    cbar_labelsize : float
+        the font size of the colorbar label
 
-    Returns:
-        fig (figure): the 2-D plot of wavelet analysis
+    Returns
+    -------
+    
+    fig : figure
+        the 2-D plot of wavelet analysis
 
     """
     sns.set(style="ticks", font_scale=font_scale)
@@ -2673,40 +3259,74 @@ def plot_coherence(res_xwc, pt=0.5,
                    cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
     """ Plot the wavelet coherence
 
-    Args:
-        res_xwc (dict): contains the cross wavelet coherence, cross-wavelet phase,
-            vector of frequency, evenly-spaced time points, AR1 sims, 
-            cone of influence. See xwc
-        pt (float): plot arrows above pt value
-        levels (array): levels of values to plot
-        tick_range (array): levels of ticks to show on the colorbar
-        basey (int): log base for y. Default is 2. 
-        yticks (list): ticks on y-axis
-        ylim (list): limitations for y-axis
-        xticks (list): ticks on x-axis
-        xlabels (list): List of labels for the x-axis ticks
-        figsize (list): the size for the figure
-        clr_map (str): the name of the colormap
-        skip_x, skip_y (float): plot every x,y points
-        scale (int): Scale factor for arrows
-        width (float):  Width of the arrows  
-        cbar_drawedges (bool): whether to draw edges on the colorbar or not
-        cone_alpha (float): the alpha value for the area covered by cone of influence
-        plot_signif (bool): plot 95% significant area
-        signif_style (str): plot 95% significant area with `contour` or `shade`
-        title (str): Add a title to the plot
-        plot_cone (bool): plot cone of influence
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot)
-        xlabel (str): The x-axis label
-        ylabel (str): The y-axis label
-        cbar_orientation (str): the orientation of the colorbar. Default is vertical
-        cbar_pad (float): the pad for the colorbar
-        cbar_frac (float): the frac for the colorbar
-        cbar_labelsize (float): the font size of the colorbar label
+    Args
+    ----
+    
+    res_xwc : dict
+        contains the cross wavelet coherence, cross-wavelet phase,
+        vector of frequency, evenly-spaced time points, AR1 sims, 
+        cone of influence. See xwc
+    pt : float
+        plot arrows above pt value
+    levels : array
+        levels of values to plot
+    tick_range : array
+        levels of ticks to show on the colorbar
+    basey : int
+        log base for y. Default is 2. 
+    yticks : list
+        ticks on y-axis
+    ylim : list
+        limitations for y-axis
+    xticks : list
+        ticks on x-axis
+    xlabels : list
+        List of labels for the x-axis ticks
+    figsize : list
+        the size for the figure
+    clr_map : string
+        the name of the colormap
+    skip_x : float
+        plot every x points
+    skip_y : float 
+        plot every y points
+    scale : int
+        Scale factor for arrows
+    width : float
+        Width of the arrows  
+    cbar_drawedges : bool
+        whether to draw edges on the colorbar or not
+    cone_alpha : float
+        the alpha value for the area covered by cone of influence
+    plot_signif : bool
+        plot 95% significant area
+    signif_style : string
+        plot 95% significant area with `contour` or `shade`
+    title : string
+        Add a title to the plot
+    plot_cone : bool
+        plot cone of influence
+    ax : axis, optional
+        Return as axis instead of figure (useful to integrate plot into a subplot)
+    xlabel : string
+        The x-axis label
+    ylabel : string
+        The y-axis label
+    cbar_orientation : string
+        the orientation of the colorbar. Default is vertical
+    cbar_pad : float
+        the pad for the colorbar
+    cbar_frac : float
+        the frac for the colorbar
+    cbar_labelsize : float
+        the font size of the colorbar label
         
         
-    Returns:
-        fig (figure): the 2-D plot of wavelet analysis
+    Returns
+    -------
+    
+    fig : figure
+        the 2-D plot of wavelet analysis
 
     """
     xw_coherence = res_xwc.xw_coherence
@@ -2788,12 +3408,19 @@ def plot_coherence(res_xwc, pt=0.5,
 def plot_wwadist(wwa, ylim=None, font_scale=1.5):
     ''' Plot the distribution of wwa with the 95% quantile line.
 
-    Args:
-        wwa (array): the weighted wavelet amplitude.
-        ylim (list): limitations for y-axis
+    Args
+    ----
+    
+    wwa : array
+        the weighted wavelet amplitude.
+    ylim :list
+        limitations for y-axis
 
-    Returns:
-        fig (figure): the 2-D plot of wavelet analysis
+    Returns
+    -------
+    
+    fig : figure
+        the 2-D plot of wavelet analysis
 
     '''
     sns.set(style="darkgrid", font_scale=font_scale)
@@ -3010,44 +3637,80 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
                  period_L_str='beta_D', period_L=[1/200, 1/20]):
     """ Plot the time series with the wavelet analysis and psd
 
-    Args:
-        ys (array): a time series
-        ts (array): time axis of the time series
-        freqs (array): vector of frequency
-        tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
-        c1 (float): the decay constant (wwz method)
-        c2 (float): the decay constant (wwz_psd method)
-        nMC(int): Number of Monte-Carlo simulations
-        nproc (int): fake argument, just for convenience
-        detrend (str): 'linear' - a linear least-squares fit to `ys` is subtracted;
-                       'constant' - the mean of `ys` is subtracted
-                       'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                               filters and the resulting filtered series is subtracted from y.
-        params (list): The paramters for the Savitzky-Golay filters. The first parameter
-            corresponds to the window size (default it set to half of the data)
-            while the second parameter correspond to the order of the filter
-            (default is 4). The third parameter is the order of the derivative
-            (the default is zero, which means only smoothing.)
-        gaussianize (bool): If True, gaussianizes the timeseries
-        standardize (bool): If True, standardizes the timeseries
-        levels (array): levels of values to plot
-        method (str): method for the WWZ transform. Default is Kirchner_f2py
-        anti_alias (bool): If True, uses anti-aliasing
-        period_ticks (list): ticks for period
-        ts_color (str): the color for the time series curve
-        ts_style (str): Style for the line
-        title (str): the title for the time series plot
-        ts_ylabel (str): label for y-axis in the time series plot
-        wwa_xlabel (str): label for x-axis in the wwa plot
-        wwa_ylabel (str): label for y-axis in the wwa plot
-        psd_lmstyle (str): the line style in the psd plot
-        psd_lim (list): the limits for psd
-        font_scale (float): Scaling factor for the font on the plot
-        period_S, period_L (list): the ranges for beta estimation
-        period_S_str, period_L_str (str): String for beta estimation
+    Args
+    ----
+    
+    ys : array
+        a time series
+    ts : array
+        time axis of the time series
+    freqs : array
+        vector of frequency
+    tau : array 
+        the evenly-spaced time points, namely the time shift for wavelet analysis
+    c1 : float
+        the decay constant (wwz method)
+    c2 : float
+        the decay constant (wwz_psd method)
+    nMC : int
+        Number of Monte-Carlo simulations
+    nproc : int
+        fake argument, just for convenience
+    detrend : string
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay
+               filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+    gaussianize : bool
+        If True, gaussianizes the timeseries
+    standardize : bool
+        If True, standardizes the timeseries
+    levels : array 
+        levels of values to plot
+    method : string
+        method for the WWZ transform. Default is Kirchner_f2py
+    anti_alias : bool
+        If True, uses anti-aliasing
+    period_ticks : list
+        ticks for period
+    ts_color : string
+        the color for the time series curve
+    ts_style : string
+        Style for the line
+    title : string
+        the title for the time series plot
+    ts_ylabel : string
+        label for y-axis in the time series plot
+    wwa_xlabel : string
+        label for x-axis in the wwa plot
+    wwa_ylabel : string
+        label for y-axis in the wwa plot
+    psd_lmstyle : string
+        the line style in the psd plot
+    psd_lim : list
+        the limits for psd
+    font_scale : float
+        Scaling factor for the font on the plot
+    period_S : list
+        the ranges for beta estimation
+    period_L : list
+        the ranges for beta estimation
+    period_S_str : string
+        String for beta estimation
+    period_L_str : string
+        String for beta estimation
 
-    Returns:
-        fig (figure): the summary plot
+    Returns
+    --------
+    
+    fig : figure
+        the summary plot
 
     """
     title_font = {'fontname': 'Arial', 'size': '24', 'color': 'black', 'weight': 'normal', 'verticalalignment': 'bottom'}
@@ -3138,37 +3801,64 @@ def calc_plot_psd(ys, ts, ntau=501, dcon=1e-3, standardize=False,
                   xlim=None, ylim=None, loc='upper right', bbox_to_anchor=None):
     """ Calculate the PSD and plot the result
 
-    Args:
-        ys (array): a time series
-        ts (array): time axis of the time series
-        natu (int): the length of tau, the evenly-spaced time points, 
-            namely the time shift for wavelet analysis
-        dcon (float): the decay constant
-        standardize(bool): perform standardization or not
-        anti_alias(bool): perform anti-alising procedure or not
-        plot_fig (bool): plot the result or not
-        method (str): the WWZ method to use
-        nproc (int): the number of threads
-        period_ticks (list): List of period ticks
-        color (str): set color
-        figsize (list): Size of the figure
-        font_scale(float): Scale of the font
-        lw (float): For plotting purposes
-        label (str): Labeld for the y-axis
-        zorder (int): the order of the layer
-        xlim (list): x-axis limits
-        ylim (list): y-axis limits
-        loc (str): location for the legend
-        bbox_to_anchor (list): gives a great degree of control for manual 
-            legend placement. For example, if you want your axes legend
-            located at the figure’s top right-hand corner instead of the axes’
-            corner, simply specify the corner’s location, and the coordinate 
-            system of that location
+    Args
+    ----
+    
+    ys : array
+        a time series
+    ts : array
+        time axis of the time series
+    natu : int
+        the length of tau, the evenly-spaced time points, 
+        namely the time shift for wavelet analysis
+    dcon : float
+        the decay constant
+    standardize : bool
+        perform standardization or not
+    anti_alias : bool
+        perform anti-alising procedure or not
+    plot_fig : bool
+        plot the result or not
+    method : string
+        the WWZ method to use
+    nproc : int
+        the number of threads
+    period_ticks : list
+        List of period ticks
+    color : string
+        set color
+    figsize : list
+        Size of the figure
+    font_scale : float
+        Scale of the font
+    lw : float
+        For plotting purposes
+    label : string
+        Labeld for the y-axis
+    zorder : int
+        the order of the layer
+    xlim : list
+        x-axis limits
+    ylim : list
+        y-axis limits
+    loc : string
+        location for the legend
+    bbox_to_anchor : list
+        gives a great degree of control for manual 
+        legend placement. For example, if you want your axes legend
+        located at the figure’s top right-hand corner instead of the axes’
+        corner, simply specify the corner’s location, and the coordinate 
+        system of that location
 
-    Returns:
-        fig (figure): the summary plot
-        psd (array): the spectral density
-        freqs (array): the frequency vector
+    Returns
+    -------
+    
+    fig : figure
+        the summary plot
+    psd : array
+        the spectral density
+    freqs : array
+        the frequency vector
 
     """
     if color is None:
@@ -3209,19 +3899,30 @@ tau_estimation = wa.tau_estimation
 def spectral(ys, ts, method='mtm', nMC=0, qs=0.95, kwargs={}):
     ''' Call periodogram from scipy
 
-    Args:
-        ys (array): a time series
-        ts (array): time axis of the time series
-        method (str, {'mtm', 'periodogram', 'welch', 'lombscargle'}): the available methods
-        nMC (int): the number of surrogates of AR(1) process for significance test; 0 means no test
-        qs (float): the quantile used for significance test
-        kwargs (dict): the dictionary for arguments, for the details please see the methods under class SpectralAnalysis()
+    Args
+    ----
+    
+    ys : array
+        a time series
+    ts : array
+        time axis of the time series
+    method : string
+        {'mtm', 'periodogram', 'welch', 'lombscargle'}): the available methods
+    nMC : int
+        the number of surrogates of AR(1) process for significance test; 0 means no test
+    qs : float
+        the quantile used for significance test
+    kwargs : dict
+        the dictionary for arguments, for the details please see the methods under class SpectralAnalysis()
 
-    Returns:
-        res_dict (dict): the result dictionary, including
-            - freqs (array): the frequency vector
-            - psd (array): the spectral density vector
-            - psd_ar1_q95 (array): the spectral density vector
+    Returns
+    -------
+    
+    res_dict : dict
+        the result dictionary, including
+        - freqs (array): the frequency vector
+        - psd (array): the spectral density vector
+        - psd_ar1_q95 (array): the spectral density vector
 
     '''
 
