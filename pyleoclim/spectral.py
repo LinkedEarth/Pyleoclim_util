@@ -26,7 +26,7 @@ from tqdm import tqdm
 
 import warnings
 
-from pyleoclim import Timeseries
+from . import timeseries
 import collections
 
 from math import factorial
@@ -57,7 +57,7 @@ class SpectralAnalysis(object):
                 see https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.signal.welch.html for details
             interp_method (str, {'interp', 'bin'}): perform interpolation or binning
             interp_args (dict): the arguments for the interpolation or binning methods,
-                                for the details, check Timeseries.interp() and Timeseries.binvalues()
+                                for the details, check timeseries.interp() and timeseries.binvalues()
             prep_args (dict): the arguments for preprocess, including
                 - detrend (str): 'none' - the original time series is assumed to have no trend;
                                  'linear' - a linear least-squares fit to `ys` is subtracted;
@@ -83,14 +83,14 @@ class SpectralAnalysis(object):
         
         # preprocessing
         wa = WaveletAnalysis()
-        ys, ts = Timeseries.clean_ts(ys, ts)
+        ys, ts = timeseries.clean_ts(ys, ts)
         ys = wa.preprocess(ys, ts, **prep_args)
 
         # if data is not evenly spaced, interpolate
         if not wa.is_evenly_spaced(ts):
             interp_func = {
-                'interp': Timeseries.interp,
-                'bin': Timeseries.binvalues,
+                'interp': timeseries.interp,
+                'bin': timeseries.binvalues,
             }
             ts, ys = interp_func[interp_method](ts, ys, **interp_args)
 
@@ -128,7 +128,7 @@ class SpectralAnalysis(object):
                 see https://docs.scipy.org/doc/scipy-0.13.0/reference/generated/scipy.signal.periodogram.html for the details
             interp_method (str, {'interp', 'bin'}): perform interpolation or binning
             interp_args (dict): the arguments for the interpolation or binning methods,
-                                for the details, check Timeseries.interp() and Timeseries.binvalues()
+                                for the details, check timeseries.interp() and timeseries.binvalues()
 
             prep_args (dict): the arguments for preprocess, including
                 - detrend (str): 'none' - the original time series is assumed to have no trend;
@@ -153,14 +153,14 @@ class SpectralAnalysis(object):
         '''
         # preprocessing
         wa = WaveletAnalysis()
-        ys, ts = Timeseries.clean_ts(ys, ts)
+        ys, ts = timeseries.clean_ts(ys, ts)
         ys = wa.preprocess(ys, ts, **prep_args)
 
         # interpolate if not evenly-spaced
         if not wa.is_evenly_spaced(ts):
             interp_func = {
-                'interp': Timeseries.interp,
-                'bin': Timeseries.binvalues,
+                'interp': timeseries.interp,
+                'bin': timeseries.binvalues,
             }
             ts, ys = interp_func[interp_method](ts, ys, **interp_args)
 
@@ -213,7 +213,7 @@ class SpectralAnalysis(object):
             res : the lombscargle periodogram
             freqs : vector of frequency
         """
-        ys, ts = Timeseries.clean_ts(ys, ts)
+        ys, ts = timeseries.clean_ts(ys, ts)
         wa = WaveletAnalysis()
         ys = wa.preprocess(ys, ts, **prep_args)
 
@@ -255,7 +255,7 @@ class SpectralAnalysis(object):
                 see https://docs.scipy.org/doc/scipy-0.13.0/reference/generated/scipy.signal.periodogram.html for the details
             interp_method (str, {'interp', 'bin'}): perform interpolation or binning
             interp_args (dict): the arguments for the interpolation or binning methods,
-                                for the details, check Timeseries.interp() and Timeseries.binvalues()
+                                for the details, check timeseries.interp() and timeseries.binvalues()
 
             prep_args (dict): the arguments for preprocess, including
                 - detrend (str): 'none' - the original time series is assumed to have no trend;
@@ -280,14 +280,14 @@ class SpectralAnalysis(object):
         '''
         # preprocessing
         wa = WaveletAnalysis()
-        ys, ts = Timeseries.clean_ts(ys, ts)
+        ys, ts = timeseries.clean_ts(ys, ts)
         ys = wa.preprocess(ys, ts, **prep_args)
 
         # interpolate if not evenly-spaced
         if not wa.is_evenly_spaced(ts):
             interp_func = {
-                'interp': Timeseries.interp,
-                'bin': Timeseries.binvalues,
+                'interp': timeseries.interp,
+                'bin': timeseries.binvalues,
             }
             ts, ys = interp_func[interp_method](ts, ys, **interp_args)
 
@@ -393,15 +393,15 @@ class WaveletAnalysis(object):
         if detrend is 'none' or detrend is False or detrend is None:
             ys_d = ys
         else:
-            ys_d = Timeseries.detrend(ys, ts, method=detrend, params=params)
+            ys_d = timeseries.detrend(ys, ts, method=detrend, params=params)
 
         if standardize:
-            res, _, _ = Timeseries.standardize(ys_d)
+            res, _, _ = timeseries.standardize(ys_d)
         else:
             res = ys_d
 
         if gaussianize:
-            res = Timeseries.gaussianize(res)
+            res = timeseries.gaussianize(res)
 
         return res
 
@@ -1555,7 +1555,7 @@ class WaveletAnalysis(object):
             tau (array): the evenly-spaced time points, namely the time shift for wavelet analysis
 
         '''
-        ys, ts = Timeseries.clean_ts(ys, ts)
+        ys, ts = timeseries.clean_ts(ys, ts)
 
         if tau is None:
             med_res = np.size(ts) // np.median(np.diff(ts))
@@ -2896,9 +2896,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
     .. plot::
         :context: close-figs
 
-        >>> from pyleoclim import Spectral
-        >>> from pyleoclim import Timeseries
-        >>> from pyleoclim import Examples
+        >>> from pyleoclim import spectral
         >>> import matplotlib.pyplot as plt
         >>> import numpy as np
         >>> # make up a sine wave
@@ -2907,9 +2905,9 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
         >>> signal = np.cos(2*np.pi*f*time)
         >>> # WWZ
         >>> tau = np.linspace(np.min(time), np.max(time), 51)
-        >>> res_wwz = Spectral.wwz_psd(signal, time, tau=tau, c=1e-3, standardize=False, nMC=0)
+        >>> res_wwz = spectral.wwz_psd(signal, time, tau=tau, c=1e-3, standardize=False, nMC=0)
         >>> # plot
-        >>> fig = Spectral.plot_psd(
+        >>> fig = spectral.plot_psd(
         ...           res_wwz.psd,
         ...           res_wwz.freqs,
         ...           period_ticks=[2, 5, 10, 20, 50, 100],
