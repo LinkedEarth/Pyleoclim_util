@@ -13,7 +13,7 @@ LiPD file
 import numpy as np
 
 # Internal packages
-import pyleoclim.LipdUtils as LipdUtils
+from . import lipdutils
 
 #Methods
 

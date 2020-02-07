@@ -19,8 +19,8 @@ from scipy.stats.mstats import mquantiles
 from tqdm import tqdm
 #from scipy.stats.mstats import gmean
 
-from pyleoclim import spectral
-from pyleoclim import stats
+from . import spectral
+from . import stats
 from nitime import algorithms as alg
 
 class Causality(object):

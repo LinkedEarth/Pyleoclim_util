@@ -4,8 +4,8 @@
 
 Created on Jan 31, 2020
 '''
-from . import Spectral
-from . import Timeseries
+from . import spectral
+from . import timeseries
 from textwrap import dedent
 
 import seaborn as sns

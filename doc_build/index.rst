@@ -11,17 +11,17 @@ Contents:
 .. toctree::
    :maxdepth: 3
 
-   Introduction
-   Installation
-   Main
-   Map
-   Plot
-   Stats
-   Timeseries
-   LIPDutils
-   SummaryPlots
-   Spectral
-   RBchron
+   introduction
+   installation
+   main
+   map
+   plot
+   stats
+   timeseries
+   lipdutils
+   summaryplots
+   spectral
+   rbchron
 
 
 Indices and tables
