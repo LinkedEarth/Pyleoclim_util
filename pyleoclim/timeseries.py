@@ -30,27 +30,31 @@ class Causality(object):
         '''
         Estimate the Liang information transfer from series y2 to series y1
 
-       
+
         Args
         ----
-        
-       y1, y2 : array
-               vectors of (real) numbers with identical length, no NaNs allowed
-        
+
+        y1, y2 : array
+            vectors of (real) numbers with identical length, no NaNs allowed
+
         npt : int  >=1
-             time advance in performing Euler forward differencing,
-             e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
-             npt=1 should be used.
+            time advance in performing Euler forward differencing,
+            e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
+            npt=1 should be used.
+
         Returns
         -------
-        
-        T21 : info flow from y2 to y1 (Note: not y1 -> y2!)
-        tau21 : the standardized info flow fro y2 to y1
-        Z : the total info
-        
+
+        T21 : float
+            info flow from y2 to y1 (Note: not y1 -> y2!)
+        tau21 : float
+            the standardized info flow fro y2 to y1
+        Z : float
+            the total info
+
         References
         ----------
-             
+
         - Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and
                 Applications. Entropy, 15, 327-360, doi:10.3390/e15010327
         - Liang, X.S. (2014) Unraveling the cause-efect relation between timeseries.
@@ -58,9 +62,8 @@ class Causality(object):
         - Liang, X.S. (2015) Normalizing the causality between time series.
             Physical review, E 92, 022126
         - Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio.
-            Physical review, E 94, 052201    
-                
-            
+            Physical review, E 94, 052201
+
         '''
         dt = 1
         nm = np.size(y1)
@@ -144,28 +147,29 @@ class Causality(object):
 
         Args
         ----
+
         y1, y2 : array
-                 vectors of (real) numbers with identical length, no NaNs allowed
+            vectors of (real) numbers with identical length, no NaNs allowed
         method : str
-                only "liang" for now
-        npt  : int>=1
-               time advance in performing Euler forward differencing,
-               e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
-               npt=1 should be used.
-        nsim (int) : int
-                    the number of AR(1) surrogates for significance test
-        
-        qs (list) : list
-                   the quantiles for significance test
+            only "liang" for now
+        npt : int>=1
+            time advance in performing Euler forward differencing,
+            e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
+            npt=1 should be used.
+        nsim : int
+            the number of AR(1) surrogates for significance test
+        qs : list
+            the quantiles for significance test
 
         Returns
         -------
+
         res_dict : dict
-                  A dictionary with the following information:
-                    T21_noise_qs : list
-                                  the quantiles of the information flow from noise2 to noise1 for significance testing
-                    tau21_noise_qs : list
-                                    the quantiles of the standardized information flow from noise2 to noise1 for significance testing
+            A dictionary with the following information:
+              T21_noise_qs : list
+                the quantiles of the information flow from noise2 to noise1 for significance testing
+              tau21_noise_qs : list
+                the quantiles of the standardized information flow from noise2 to noise1 for significance testing
 
         '''
         stat = Stats.Correlation()
@@ -206,6 +210,7 @@ class Causality(object):
 
         Args
         ----
+
         y1, y2 : array
                 vectors of (real) numbers with identical length, no NaNs allowed
         method : str
@@ -221,12 +226,13 @@ class Causality(object):
 
         Returns
         -------
+
         res_dict : dict
-                  A dictionary with the following information:
-                    T21_noise_qs : list
-                                  the quantiles of the information flow from noise2 to noise1 for significance testing
-                    tau21_noise_qs : list
-                                    the quantiles of the standardized information flow from noise2 to noise1 for significance testing
+            A dictionary with the following information:
+              T21_noise_qs : list
+                            the quantiles of the information flow from noise2 to noise1 for significance testing
+              tau21_noise_qs : list
+                              the quantiles of the standardized information flow from noise2 to noise1 for significance testing
         '''
         stat = Stats.Correlation()
         noise1 = stat.phaseran(y1, nsim)
@@ -265,7 +271,7 @@ class Decomposition(object):
         '''
         Args
         ----
-        
+
         ys : array
             time series
         ts: array
@@ -301,7 +307,7 @@ class Decomposition(object):
 
         Returns
         -------
-        
+
         res_dict : dictionary
                   the result dictionary, including
                      deval : array
@@ -354,10 +360,10 @@ class Decomposition(object):
         '''Multi-channel SSA analysis
         (applicable for data including missing values)
         and test the significance by Monte-Carlo method
-        
+
         Args
         ----
-        
+
         data : array
               multiple time series (dimension: length of time series x total number of time series)
         M : int
@@ -366,10 +372,10 @@ class Decomposition(object):
            Number of iteration in the Monte-Carlo process
         f : float
            fraction (0<f<=1) of good data points for identifying significant PCs [f = 0.3]
-        
+
         Returns
         -------
-        
+
         deval : array
                eigenvalue spectrum
         q05 : float
@@ -458,11 +464,11 @@ class Decomposition(object):
         '''SSA analysis for a time series
         (applicable for data including missing values)
         and test the significance by Monte-Carlo method
-        
+
         Args
         ----
-        
-        data : array 
+
+        data : array
               time series
         M : int
            window size
@@ -470,10 +476,10 @@ class Decomposition(object):
             Number of iteration in the Monte-Carlo process
         f : fraction
            fraction (0<f<=1) of good data points for identifying significant PCs [f = 0.3]
-     
+
         Returns
         -------
-        
+
         deval : array
                eigenvalue spectrum
         q05 : float
@@ -558,45 +564,43 @@ class Decomposition(object):
 
 def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
                   qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995], **kwargs):
-    '''Information flow
+    '''Information flow, estimate the information transfer from series y2 to series y1
 
-        Estimate the information transfer from series y2 to series y1
+    Args
+    ----
 
-        Args
-        ----
-            y1, y2 : array
-                    vectors of (real) numbers with identical length, no NaNs allowed
-            method : array
-                    only "liang" for now
-            signif_test : str
-                         the method for significance test
-            nsim : int
-                  the number of AR(1) surrogates for significance test
-            qs : list 
-                the quantiles for significance test
-            kwargs : includes
-                        npt : int
-                             the number of time advance in performing Euler forward differencing in "liang" method
+    y1, y2 : array
+        vectors of (real) numbers with identical length, no NaNs allowed
+    method : array
+        only "liang" for now
+    signif_test : str
+        the method for significance test
+    nsim : int
+        the number of AR(1) surrogates for significance test
+    qs : list
+        the quantiles for significance test
+    kwargs : includes
+        npt : int
+            the number of time advance in performing Euler forward differencing in "liang" method
 
-        Returns
-        -------
-            
-        res_dict : dictionary
-                  The result of the dictionary including
-            
-                T21 : float
-                     The information flow from y2 to y1
-                tau21 : float
-                       The standardized info flow from y2 to y1, tau21 = T21/Z
-                Z : float
-                   The total information flow
-                qs  : list
-                     significance test  of quantile levels
-                t21_noise : list
-                           The quantiles of the information flow from noise2 to noise1 for significance testing
-                tau21_noise : list
-                             The quantiles of the standardized information flow from noise2 to noise1 for significance testing
-       '''
+    Returns
+    -------
+
+    res_dict : dictionary
+        The result of the dictionary including
+    T21 : float
+        The information flow from y2 to y1
+    tau21 : float
+        The standardized info flow from y2 to y1, tau21 = T21/Z
+    Z : float
+       The total information flow
+    qs  : list
+        significance test  of quantile levels
+    t21_noise : list
+        The quantiles of the information flow from noise2 to noise1 for significance testing
+    tau21_noise : list
+        The quantiles of the standardized information flow from noise2 to noise1 for significance testing
+    '''
     ca = Causality()
     if method == 'liang':
         npt = kwargs['npt'] if 'npt' in kwargs else 1
@@ -633,28 +637,29 @@ def binvalues(x, y, bin_size=None, start=None, end=None):
 
     Args
     ----
-    
-    x : array
-       The x-axis series.
-    y : array
-       The y-axis series.
-    bin_size : float 
-              The size of the bins. Default is the average resolution
-    start : float
-           Where/when to start binning. Default is the minimum
-    end : float
-         When/where to stop binning. Defulat is the maximum
 
-    Returns:
+    x : array
+        The x-axis series.
+    y : array
+        The y-axis series.
+    bin_size : float
+        The size of the bins. Default is the average resolution
+    start : float
+        Where/when to start binning. Default is the minimum
+    end : float
+        When/where to stop binning. Defulat is the maximum
+
+    Returns
     -------
+
     binned_values : array
-                    The binned values
+        The binned values
     bins : array
-          The bins (centered on the median, i.e., the 100-200 bin is 150) \n
+        The bins (centered on the median, i.e., the 100-200 bin is 150)
     n : array
-       number of data points in each bin 
+        number of data points in each bin
     error : array
-           the standard error on the mean in each bin
+        the standard error on the mean in each bin
 
     """
 
@@ -698,7 +703,8 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None):
 
     Args
     ----
-    x : array 
+
+    x : array
        The x-axis
     y : array
        The y-axis
@@ -706,18 +712,18 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None):
                  The interpolation step. Default is mean resolution.
     start : float
            where/when to start the interpolation. Default is min..
-    end : float 
+    end : float
          where/when to stop the interpolation. Default is max.
 
     Returns
     -------
-    
+
     xi : array
-        The interpolated x-axis 
+        The interpolated x-axis
     interp_values : array
-                   The interpolated values
+        The interpolated values
     """
-    
+
         #Make sure x and y are numpy arrays
     x = np.array(x,dtype='float64')
     y = np.array(y,dtype='float64')
@@ -746,7 +752,7 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None):
 def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None, end=None):
     """Places two timeseries on a common axis
 
-    Args :
+    Args
     ----
     x1 : array
         x-axis values of the first timeseries
@@ -757,30 +763,28 @@ def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None
     y2 : array
         y-axis values of the second timeseries
     method : str
-            Which method to use to get the timeseries on the same x axis.
-            Valid entries: 'interpolation' (default), 'bin', 'None'. 'None' only
-            cuts the timeseries to the common period but does not attempt
-            to generate a common time axis
+        Which method to use to get the timeseries on the same x axis.
+        Valid entries: 'interpolation' (default), 'bin', 'None'. 'None' only
+        cuts the timeseries to the common period but does not attempt
+        to generate a common time axis
     step : float
-          The interpolation step. Default is mean resolution
-          of lowest resolution series
+        The interpolation step. Default is mean resolution
+        of lowest resolution series
     start : float
-           where/when to start. Default is the maximum of the minima of
-           the two timeseries
+        where/when to start. Default is the maximum of the minima of
+        the two timeseries
     end : float
-         Where/when to end. Default is the minimum of the maxima of
-         the two timeseries
+        Where/when to end. Default is the minimum of the maxima of
+        the two timeseries
 
     Returns
     -------
+
     xi1, xi2 : array
-              The interpolated x-axis
+        The interpolated x-axis
     interp_values1, interp_values2 : array
-                                    the interpolated y-values
+        the interpolated y-values
     """
-
-
-
     # make sure that x1, y1, x2, y2 are numpy arrays
     x1 = np.array(x1, dtype='float64')
     y1 = np.array(y1, dtype='float64')
@@ -830,31 +834,33 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
 
     Args
     ----
-        x  : array
-            vector of (real) numbers as a time series, NaNs allowed
-        scale : real
-               A scale factor used to scale a record to a match a given variance
-        axis : int or None
-              axis along which to operate, if None, compute over the whole array
-        
-        ddof : int
-              degress of freedom correction in the calculation of the standard deviation
-        eps : real
-             a threshold to determine if the standard deviation is too close to zero
+
+    x : array
+        vector of (real) numbers as a time series, NaNs allowed
+    scale : real
+        A scale factor used to scale a record to a match a given variance
+    axis : int or None
+        axis along which to operate, if None, compute over the whole array
+    ddof : int
+        degress of freedom correction in the calculation of the standard deviation
+    eps : real
+        a threshold to determine if the standard deviation is too close to zero
 
     Returns
     -------
-        z : array
-           The standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed
-        mu : real
-            The mean of the original time series, E[X]
-        sig : real
-             The standard deviation of the original time series, std[X]
+
+    z : array
+       The standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed
+    mu : real
+        The mean of the original time series, E[X]
+    sig : real
+         The standard deviation of the original time series, std[X]
 
     References
     ----------
-        1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
-        2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
+
+    1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
+    2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
 
     @author: fzhu
     """
@@ -893,16 +899,23 @@ def ts2segments(ys, ts, factor=10):
 
     Args
     ----
-       ys : array 
-           A time series, NaNs allowed
-       ts : array
-           The time points
-       factor (float): the factor that adjusts the threshold for gap detection
 
-    Returns:
-        seg_ys (list): a list of several segments with potentially different lengths
-        seg_ts (list): a list of the time axis of the several segments
-        n_segs (int): the number of segments
+    ys : array
+        A time series, NaNs allowed
+    ts : array
+        The time points
+    factor : float
+        the factor that adjusts the threshold for gap detection
+
+    Returns
+    -------
+
+    seg_ys : list
+        a list of several segments with potentially different lengths
+    seg_ts : list
+        a list of the time axis of the several segments
+    n_segs : int
+        the number of segments
 
     @author: fzhu
     '''
@@ -1054,26 +1067,28 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
 
     Args
     ----
+
     y : array
        The series to be detrended.
     x : array
        The time axis for the timeseries. Necessary for use with
        the Savitzky-Golay filters method since the series should be evenly spaced.
     method : str
-            The type of detrending. If linear (default), the result of
-            a linear least-squares fit to y is subtracted from y. If constant,
-            only the mean of data is subtrated. If "savitzy-golay", y is filtered
-            using the Savitzky-Golay filters and the resulting filtered series
-            is subtracted from y.
+        The type of detrending. If linear (default), the result of
+        a linear least-squares fit to y is subtracted from y. If constant,
+        only the mean of data is subtrated. If "savitzy-golay", y is filtered
+        using the Savitzky-Golay filters and the resulting filtered series
+        is subtracted from y.
     params : list
-            The paramters for the Savitzky-Golay filters. The first parameter
-            corresponds to the window size (default it set to half of the data)
-            while the second parameter correspond to the order of the filter
-           (default is 4). The third parameter is the order of the derivative
-           (the default is zero, which means only smoothing.)
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
 
     Returns
     -------
+
     ys : array
         The detrended timeseries.
     """
