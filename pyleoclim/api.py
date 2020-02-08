@@ -15,9 +15,7 @@ import pandas as pd
 from tabulate import tabulate
 
 class Series:
-    def __init__(self, time, value,
-                 time_name=None, time_unit=None,
-                 value_name=None, value_unit=None):
+    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None):
         self.time = np.array(time)
         self.value = np.array(value)
         self.time_name = time_name
@@ -49,7 +47,6 @@ class Series:
         return time_header, value_header
 
     def __str__(self):
-
         time_label, value_label = self.make_labels()
 
         table = {
@@ -76,26 +73,49 @@ class Series:
 
         return fig, ax
 
-
-    def wwz(self, wwz_args={}):
-        wwz_res = Spectral.wwz_psd(self.value, self.time, **wwz_args)
-        psd = PSD(freq=wwz_res.freqs, amplitude=wwz_res.psd)
+    def spectral(self, method='wwz', args={}):
+        ''' Perform spectral analysis on the timeseries
+        '''
+        spec_func = {
+            'wwz': spectral.wwz_psd,
+        }
+        spec_res = spec_func[method](self.value, self.time, **args)
+        psd = PSD(freq=spec_res.freqs, amplitude=spec_res.psd)
         return psd
 
-    def wavelet_ana(self):
+    def wavelet(self, method='wwz', args={}):
+        ''' Perform wavelet analysis on the timeseries
+        '''
+        wave_func = {
+            'wwz': spectral.wwz,
+        }
+        wave_res = wave_func[method](self.value, self.time, **args)
+        scal = Scalogram(freq=wave_res.freq, time=wave_res.time, amplitude=wave_res.amplitude)
+
+        return scal
+    def corr_with(self, target_series):
+        ''' Perform correlation analysis with the target timeseries
+        '''
         pass
 
-    def corr_with(self, another_series):
-        pass
+    def wavelet_coherence(self, target_series, method='wwz', args={}):
+        ''' Perform wavelet coherence analysis with the target timeseries
+        '''
+        xwc_func = {
+            'wwz': spectral.xwc,
+        }
+        xwc_res = xwc_func[method](self.value, self.time, target_series.value, target_series.time, **args)
+
+        coh = Coherence()
+
+        return coh
 
 
 class PSD:
     def __init__(self, freq, amplitude):
         self.freq = np.array(freq)
         self.amplitude = np.array(amplitude)
-
     def __str__(self):
-
         table = {
             'Frequency': self.freq,
             'Amplitude': self.amplitude,
@@ -115,6 +135,59 @@ class PSD:
             ax.loglog(self.freq, self.amplitude)
         else:
             ax.plot(self.freq, self.amplitude)
+
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        return fig, ax
+
+class Scalogram:
+    def __init__(self, freq, time, amplitude):
+        self.freq = np.array(freq)
+        self.time = np.array(time)
+        self.amplitude = np.array(amplitude)
+
+    def __str__(self):
+        table = {
+            'Frequency': self.freq,
+            'Time': self.time,
+            'Amplitude': self.amplitude,
+        }
+
+        msg = print(tabulate(table, headers='keys'))
+        return f'Dimension: {np.size(self.freq)} x {np.size(self.time)}'
+
+    def plot(self, xlabel='Time', ylabel='Period',
+             sns_args={}, contourf_args={},  figsize=[5, 5]):
+
+        if sns_args == {}:
+            sns_args = {'style': 'ticks', 'font_scale': 1.5}
+
+        if contourf_args == {}:
+            contourf_args = {'cmap': 'OrRd', 'origin': 'lower', 'levels': 21}
+
+        sns.set(**sns_args)
+        fig, ax = plt.subplots(figsize=figsize)
+
+        ax.contourf(self.time, 1/self.freq, self.amplitude.T, **contourf_args)
+
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+
+        return fig, ax
+
+
+class Coherence:
+    def __init__(self, coherence, phase, freqs, tau, AR1_q, coi):
+        self.freq = np.array(freq)
+        self.time = np.array(time)
+        self.amplitude = np.array(amplitude)
+
+    def plot(self, xlabel='Time', ylabel='Frequency', sns_args={}, figsize=[10, 4]):
+        if sns_args == {}:
+            sns_args={'style': 'darkgrid', 'font_scale': 1.5}
+
+        sns.set(**sns_args)
+        fig, ax = plt.subplots(figsize=figsize)
 
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
