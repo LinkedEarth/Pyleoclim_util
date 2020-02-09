@@ -29,12 +29,19 @@ def createDir(path, foldername):
 
     Create a new folder in a working directory to save outputs from Pyleoclim.
 
-    Args:
-        path(str): the path to the new folder.
-        foldername(str): the name of the folder to be created
+    Args
+    ----
+    
+    path : string
+        the path to the new folder.
+    foldername : string 
+        the name of the folder to be created
 
-    Returns:
-        newdir - the full path to the new directory
+    Returns
+    -------
+    
+    newdir : string
+        the full path to the new directory
 
     """
 
@@ -51,13 +58,18 @@ def saveFigure(name, format="eps",dir= None):
     Save the figure in the directory. If not given, creates a folder in the
     current working directory.
 
-    Args:
-        name (str): name of the file
-        format (str): One of the file extensions supported by the active
-            backend. Default is "eps". Most backend support png, pdf, ps, eps,
-            and svg.
-        dir (str): the name of the folder in the LiPD working directory.
-            If not provided, creates a default folder called 'figures'.
+    Args
+    ----
+    
+    name : string
+        name of the file
+    format : string 
+        One of the file extensions supported by the active
+        backend. Default is "eps". Most backend support png, pdf, ps, eps,
+        and svg.
+    dir : str
+        the name of the folder in the LiPD working directory.
+        If not provided, creates a default folder called 'figures'.
 
     """
     if not dir:
@@ -75,9 +87,12 @@ The following functions handle the LiPD files
 def enumerateLipds(lipds):
     """Enumerate the LiPD files loaded in the workspace
 
-    Args:
-        lipds (dict): A dictionary of LiPD files. Can be obtained from
-            pyleoclim.readLipd()
+    Args
+    ----
+    
+    lipds : dict
+        A dictionary of LiPD files. Can be obtained from
+        pyleoclim.readLipd()
 
     """
     print("Below are the available records")
@@ -91,11 +106,17 @@ def getLipd(lipds):
     Ask the user to select a LiPD file from a list
     Use this function in conjunction with enumerateLipds()
 
-    Args:
-        lipds (dict): A dictionary of LiPD files. Can be obtained from
-            pyleoclim.readLipd()
+    Args
+    ----
+    
+    lipds : dict
+        A dictionary of LiPD files. Can be obtained from
+        pyleoclim.readLipd()
 
-    Returns:
+    Returns
+    -------
+    
+    select_lipd : int
         The index of the LiPD file
 
     """
@@ -118,7 +139,10 @@ def promptForVariable():
     Ask the user to select the variable they are interested in.
     Use this function in conjunction with readHeaders() or getTSO()
 
-    Returns:
+    Returns
+    -------
+    
+    select_var : int
         The index of the variable
 
     """
@@ -128,12 +152,19 @@ def promptForVariable():
 def xAxisTs(timeseries):
     """ Prompt the user to choose a x-axis representation for the timeseries.
 
-    Args:
-        timeseries: a timeseries object
+    Args
+    ----
+    
+    timeseries : dict
+        a timeseries object
 
-    Returns:
-        x_axis - the values for the x-axis representation, \n
-        label - returns either "age", "year", or "depth"
+    Returns
+    -------
+    
+    x_axis : array
+        the values for the x-axis representation
+    label : string
+        returns either "age", "year", or "depth"
 
     """
     if "depth" in timeseries.keys() and "age" in timeseries.keys() or\
@@ -180,13 +211,21 @@ def xAxisTs(timeseries):
 def checkXaxis(timeseries, x_axis= None):
     """Check that a x-axis is present for the timeseries
 
-    Args:
-        timeseries : a timeseries
-        x_axis (str) : the x-axis representation, either depth, age or year
+    Args
+    ----
+    
+    timeseries : dict
+        a timeseries
+    x_axis : string
+        the x-axis representation, either depth, age or year
 
-    Returns:
-        x - the values for the x-axis representation, \n
-        label - returns either "age", "year", or "depth"
+    Returns
+    -------
+    
+    x : array
+        the values for the x-axis representation, 
+    label : string
+        returns either "age", "year", or "depth"
 
     """
     if x_axis is None:
@@ -218,12 +257,19 @@ def checkXaxis(timeseries, x_axis= None):
 def checkTimeAxis(timeseries, x_axis = None):
     """ This function makes sure that time is available for the timeseries
 
-    Args:
-        timeseries (dict): A LiPD timeseries object
+    Args
+    ----
+    
+    timeseries : dict
+        A LiPD timeseries object
 
-    Returns:
-        x: the time values for the timeseries
-        label: the time representation for the timeseries
+    Returns
+    -------
+    
+    x : array
+        the time values for the timeseries
+    label : string
+        the time representation for the timeseries
     """
     if x_axis is None:
         if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
@@ -257,15 +303,24 @@ def checkTimeAxis(timeseries, x_axis = None):
 def searchVar(timeseries_list, key, exact = True, override = True):
     """ This function search for key words (exact match) for a variable
 
-    Args:
-        timeseries_list (list): A list of available series
-        key (list): A list of keys to search
-        exact (bool): if True, looks for an exact match.
-        override (bool): if True, override the exact match if no match is found
+    Args
+    ----
 
-    Returns:
-        match (list)- A list of keys for the timeseries that match the selection
-            criteria.
+    timeseries_list : list
+        A list of available series
+    key : list
+        A list of keys to search
+    exact : bool
+        if True, looks for an exact match.
+    override : bool
+        if True, override the exact match if no match is found
+
+    Returns
+    -------
+    
+    match : list
+        A list of keys for the timeseries that match the selection
+        criteria.
     """
 
     # Make sure thaat the keys are contained in a list
@@ -436,10 +491,13 @@ The following functions handle the time series objects
 def enumerateTs(timeseries_list):
     """Enumerate the available time series objects
 
-    Args:
-        timeseries_list: a  list of available timeseries objects.
-            To use the timeseries loaded upon initiation of the
-            pyleoclim package, use pyleo.time_series.
+    Args
+    ----
+    
+    timeseries_list : list
+        a  list of available timeseries objects.
+        To use the timeseries loaded upon initiation of the
+        pyleoclim package, use pyleo.time_series.
 
     """
     available_y = []
@@ -458,13 +516,20 @@ def enumerateTs(timeseries_list):
 def getTs(timeseries_list, option = None):
     """Get a specific timeseries object from a dictionary of timeseries
 
-    Args:
-        timeseries_list: a  list of available timeseries objects.
-            To use the timeseries loaded upon initiation of the
-            pyleoclim package, use pyleo.time_series.
-        option: An expression to filter the datasets. Uses lipd.filterTs()
+    Args
+    ----
+    
+    timeseries_list : list
+        a  list of available timeseries objects.
+        To use the timeseries loaded upon initiation of the
+        pyleoclim package, use pyleo.time_series.
+    option : string
+        An expression to filter the datasets. Uses lipd.filterTs()
 
-    Returns:
+    Returns
+    -------
+        
+    timeseries : single timeseries object or list of timeseries 
         A single timeseries object if not optional filter selected or a filtered
         list if optional arguments given
 
@@ -486,10 +551,16 @@ def LipdToOntology(archiveType):
 
     Transform the archiveType from their LiPD name to their ontology counterpart
 
-    Args:
-        archiveType (STR): name of the archiveType from the LiPD file
+    Args
+    ----
+    
+    archiveType : string
+        name of the archiveType from the LiPD file
 
-    Returns:
+    Returns
+    -------
+    
+    archiveType : string
         archiveType according to the ontology
 
     """
@@ -508,11 +579,17 @@ def LipdToOntology(archiveType):
 def timeUnitsCheck(units):
     """ This function attempts to make sense of the time units by checking for equivalence
 
-    Args:
-        units (str): The units string for the timeseries
+    Args
+    ----
+    
+    units : string
+        The units string for the timeseries
 
-    Returns:
-        unit_group (str): Whether the units belongs to age_units, kage_units, year_units, or undefined
+    Returns
+    -------
+    
+    unit_group : string
+        Whether the units belongs to age_units, kage_units, year_units, or undefined
     """
 
     age_units = ['year B.P.','yr B.P.','yr BP','BP','yrs BP','years B.P.',\
@@ -739,54 +816,55 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
     Args
     ----
 
-        archiveType : list of strings
-            The type of archive (enter all query terms, separated by a comma)
-        proxyObsType : list of strings
-            The type of proxy observation (enter all query terms, separated by a comma)
-        infVarType : list of strings
-            The type of inferred variable (enter all query terms, separated by a comma)
-        sensorGenus : list of strings
-            The Genus of the sensor (enter all query terms, separated by a comma)
-        sensorSpecies : list of strings
-            The Species of the sensor (enter all query terms, separated by a comma)
-        interpName : list of strings
-            The name of the interpretation (enter all query terms, separated by a comma)
-        interpDetail : list of strings
-            The detail of the interpretation (enter all query terms, separated by a comma)
-        ageUnits : list of strings
-            The units of in which the age (year) is expressed in.
-            Warning: Separate each query if need to run across multiple age queries (i.e., yr B.P. vs kyr B.P.). If the units are different but the meaning is the same (e.g., yr B.P. vs yr BP, enter all search terms separated by a comma).
-        ageBound : list of floats
-            Enter the minimum and maximum age value to search for.
-            Warning: You MUST enter a minimum AND maximum value. If you wish to perform a query such as "all ages before 2000 A.D.", enter a minimum value of -99999 to cover all bases.
-        ageBoundType : list of strings
-            The type of querying to perform. Possible values include: "any", "entire", and "entirely".
-            any: Overlap any portions of matching datasets (default)
-            entirely: are entirely overlapped by matching datasets
-            entire: overlap entire matching datasets but dataset can be shorter than the bounds
-        recordLength : list of floats
-            The minimum length the record needs to have while matching the ageBound criteria. For instance, "look for all records between 3000 and 6000 year BP with a record length of at least 1500 year".
-        resolution : list of floats
-            The maximum resolution of the resord. Resolution has the same units as age/year. For instance, "look for all records with a resolution of at least 100 years".
-            Warning: Resolution applies to specific variables rather than an entire dataset. Imagine the case where some measurements are made every cm while others are made every 5cm. If you require a specific variable to have the needed resolution, make sure that either the proxyObservationType, inferredVariableType, and/or Interpretation fields are completed.
-        lat : list of floats
-            The minimum and maximum latitude. South is expressed with negative numbers.
-            Warning: You MUST enter a minimum AND maximum value. If you wish to perform a query looking for records from the Northern Hemisphere, enter [0,90].
-        lon : list of floats
-            The minimum and maximum longitude. West is expressed with negative numbers.
-            Warning: You MUST enter a minimum AND a maximum value. If you wish to perform a query looking for records from the Western Hemisphere, enter [-180,0].
-        alt : list of floats
-            The minimum and maximum altitude. Depth below sea level is expressed as negative numbers.
-            Warning: You MUST enter a minimum AND a maximum value. If you wish to perform a query looking for records below a certain depth (e.g., 500), enter [-99999,-500].
-        print_response : bool
-            If True, prints the URLs to the matching LiPD files
-        download_lip : bool
-            If True, download the matching LiPD files
-        download_folder : string
-            Location to download the LiPD files. If "default", will download in the current directory.
+    archiveType : list of strings
+        The type of archive (enter all query terms, separated by a comma)
+    proxyObsType : list of strings
+        The type of proxy observation (enter all query terms, separated by a comma)
+    infVarType : list of strings
+        The type of inferred variable (enter all query terms, separated by a comma)
+    sensorGenus : list of strings
+        The Genus of the sensor (enter all query terms, separated by a comma)
+    sensorSpecies : list of strings
+        The Species of the sensor (enter all query terms, separated by a comma)
+    interpName : list of strings
+        The name of the interpretation (enter all query terms, separated by a comma)
+    interpDetail : list of strings
+        The detail of the interpretation (enter all query terms, separated by a comma)
+    ageUnits : list of strings
+        The units of in which the age (year) is expressed in.
+        Warning: Separate each query if need to run across multiple age queries (i.e., yr B.P. vs kyr B.P.). If the units are different but the meaning is the same (e.g., yr B.P. vs yr BP, enter all search terms separated by a comma).
+    ageBound : list of floats
+        Enter the minimum and maximum age value to search for.
+        Warning: You MUST enter a minimum AND maximum value. If you wish to perform a query such as "all ages before 2000 A.D.", enter a minimum value of -99999 to cover all bases.
+    ageBoundType : list of strings
+        The type of querying to perform. Possible values include: "any", "entire", and "entirely".
+        any: Overlap any portions of matching datasets (default)
+        entirely: are entirely overlapped by matching datasets
+        entire: overlap entire matching datasets but dataset can be shorter than the bounds
+    recordLength : list of floats
+        The minimum length the record needs to have while matching the ageBound criteria. For instance, "look for all records between 3000 and 6000 year BP with a record length of at least 1500 year".
+    resolution : list of floats
+        The maximum resolution of the resord. Resolution has the same units as age/year. For instance, "look for all records with a resolution of at least 100 years".
+        Warning: Resolution applies to specific variables rather than an entire dataset. Imagine the case where some measurements are made every cm while others are made every 5cm. If you require a specific variable to have the needed resolution, make sure that either the proxyObservationType, inferredVariableType, and/or Interpretation fields are completed.
+    lat : list of floats
+        The minimum and maximum latitude. South is expressed with negative numbers.
+        Warning: You MUST enter a minimum AND maximum value. If you wish to perform a query looking for records from the Northern Hemisphere, enter [0,90].
+    lon : list of floats
+        The minimum and maximum longitude. West is expressed with negative numbers.
+        Warning: You MUST enter a minimum AND a maximum value. If you wish to perform a query looking for records from the Western Hemisphere, enter [-180,0].
+    alt : list of floats
+        The minimum and maximum altitude. Depth below sea level is expressed as negative numbers.
+        Warning: You MUST enter a minimum AND a maximum value. If you wish to perform a query looking for records below a certain depth (e.g., 500), enter [-99999,-500].
+    print_response : bool
+        If True, prints the URLs to the matching LiPD files
+    download_lip : bool
+        If True, download the matching LiPD files
+    download_folder : string
+        Location to download the LiPD files. If "default", will download in the current directory.
 
-    Returns:
-
+    Returns
+    -------
+    
     res : the response to the query
     """
     # Perform a lot of checks
@@ -1125,14 +1203,22 @@ Deal with models
 def isModel(csvName, lipd):
     """Check for the presence of a model in the same object than the measurement table
 
-    Args:
-        csvName (str): The name of the csv file corresponding to the measurement table
-        lipd (dict): A LiPD object
+    Args
+    ----
+    
+    csvName : string
+        The name of the csv file corresponding to the measurement table
+    lipd : dict
+        A LiPD object
 
-    Returns:
-        model (list): List of models already available\n
-        dataObject (str): The name of the paleoData or ChronData
-            object in which the model(s) are stored
+    Returns
+    -------
+    
+    model : list
+        List of models already available
+    dataObject : string
+        The name of the paleoData or ChronData
+        object in which the model(s) are stored
     """
     csvNameSplit = csvName.split('.')
     for val in csvNameSplit:
@@ -1159,11 +1245,17 @@ def isModel(csvName, lipd):
 def modelNumber(model):
     """Assign a new or existing model number
 
-    Args:
-        model (list): List of possible model number. Obtained from isModel
+    Args
+    ----
+    
+    model : list
+        List of possible model number. Obtained from isModel
 
-    Returns:
-        modelNum (int): The number of the model
+    Returns
+    -------
+    
+    modelNum : int
+        The number of the model
     """
     if model:
         print("There is " + str(len(model)) + " model(s) already available.")
@@ -1191,12 +1283,19 @@ Get entire tables
 def isMeasurement(csv_dict):
     """ Check whether measurement tables are available
 
-    Args:
-        csv_dict (dict): Dictionary of available csv
+    Args
+    ----
+    
+    csv_dict : dict
+        Dictionary of available csv
 
-    Returns:
-        paleoMeasurementTables - List of available paleoMeasurementTables
-        chronMeasurementTables - List of available chronMeasurementTables
+    Returns
+    -------
+    
+    paleoMeasurementTables : list
+        List of available paleoMeasurementTables
+    chronMeasurementTables : list
+        List of available chronMeasurementTables
     """
     chronMeasurementTables = []
     paleoMeasurementTables =[]
@@ -1214,13 +1313,19 @@ def whichMeasurement(measurementTableList, csv_dict):
 
     Use in conjunction with the function isMeasurement
 
-    Args:
-        measurementTableList (list): List of measurement tables contained in the
-            LiPD file. Output from the isMeasurement function
-        csv_list (list): Dictionary of available csv
+    Args
+    ----
 
-    Returns:
-        csvName (str) - the name of the csv file
+    measurementTableList : list
+        List of measurement tables contained in the LiPD file. Output from the isMeasurement function
+    csv_list : list
+        Dictionary of available csv
+
+    Returns
+    -------
+    
+    csvName : string
+        the name of the csv file
 
     """
     if len(measurementTableList)>1:
@@ -1236,13 +1341,20 @@ def whichMeasurement(measurementTableList, csv_dict):
 def getMeasurement(csvName, lipd):
     """Extract the dictionary corresponding to the measurement table
 
-    Args:
-        csvName (str): The name of the csv file
-        lipd (dict): The LiPD object from which to extract the data
+    Args
+    ----
+    
+    csvName : string
+        The name of the csv file
+    lipd : dict
+        The LiPD object from which to extract the data
 
-    Returns:
-        ts_list - A dictionary containing data and metadata for each column in the
-            csv file.
+    Returns
+    -------
+    
+    ts_list : dict
+        A dictionary containing data and metadata for each column in the
+        csv file.
 
     """
     csvNameSplit = csvName.split('.')
@@ -1268,12 +1380,19 @@ Deal with ensembles
 def isEnsemble(csv_dict):
     """ Check whether ensembles are available
 
-    Args:
-        csv_dict (dict): Dictionary of available csv
+    Args
+    ----
+    
+    csv_dict : dict
+        Dictionary of available csv
 
-    Returns:
-        paleoEnsembleTables - List of available paleoEnsembleTables \n
-        chronEnsembleTables - List of availale chronEnsemble Tables
+    Returns
+    -------
+    
+    paleoEnsembleTables : list
+        List of available paleoEnsembleTables 
+    chronEnsembleTables : list
+        List of availale chronEnsemble Tables
 
     """
     chronEnsembleTables =[]
@@ -1290,12 +1409,19 @@ def getEnsembleValues(ensemble_dict):
     """ Grabs the ensemble values and depth vector from the dictionary and
     return them into two numpy arrays.
 
-    Args:
-        ensemble_dict (dict): dictionary containing the ensemble information
+    Args
+    ----
+    
+    ensemble_dict : dict
+        dictionary containing the ensemble information
 
-    Returns:
-        depth (array): Vector of depth \n
-        ensembleValues (array): The matrix of Ensemble values
+    Returns
+    -------
+    
+    depth : array
+        Vector of depth \n
+    ensembleValues : array
+        The matrix of Ensemble values
     """
 
     for val in ensemble_dict.keys():
@@ -1311,16 +1437,24 @@ def getEnsembleValues(ensemble_dict):
 def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo):
     """ Map the depth for the ensemble age values to the paleo depth
 
-    Args:
-        ensembleValues (array): A matrix of possible age models. Realizations
-            should be stored in columns
-        depthEnsemble (array): A vector of depth. The vector should have the same
-            length as the number of rows in the ensembleValues
-        depthPaleo (array): A vector corresponding to the depth at which there
-            are paleodata information
+    Args
+    ----
 
-    Returns:
-        ensembleValuesToPaleo - A matrix of age ensemble on the PaleoData scale \n
+    ensembleValues : array
+        A matrix of possible age models. Realizations
+        should be stored in columns
+    depthEnsemble : array
+        A vector of depth. The vector should have the same
+        length as the number of rows in the ensembleValues
+    depthPaleo : array
+        A vector corresponding to the depth at which there
+        are paleodata information
+
+    Returns
+    -------
+    
+    ensembleValuesToPaleo : array
+        A matrix of age ensemble on the PaleoData scale 
 
     """
     if len(depthEnsemble)!=np.shape(ensembleValues)[0]:
