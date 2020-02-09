@@ -17,22 +17,28 @@ import cartopy.feature as cfeature
 def setProj(projection='Robinson', proj_default = True): 
     """ Set the projection for Cartopy.
     
-    Args:
-        projection (string): the map projection. Available projections:
-            'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
-            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
-            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic',
-            'Sinusoidal','Stereographic','TransverseMercator','UTM',
-            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
-            'Geostationary','NearsidePerspective','EckertI','EckertII',
-            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
-            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-        proj_default (bool): If True, uses the standard projection attributes.
-            Enter new attributes in a dictionary to change them. Lists of attributes
-            can be found in the Cartopy documentation: 
-                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
-    Returns:
-        proj - the Cartopy projection object
+    Args
+    ----
+    
+    projection : string
+        the map projection. Available projections:
+        'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
+        'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+        'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic',
+        'Sinusoidal','Stereographic','TransverseMercator','UTM',
+        'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+        'Geostationary','NearsidePerspective','EckertI','EckertII',
+        'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+        'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+    proj_default : bool
+        If True, uses the standard projection attributes.
+        Enter new attributes in a dictionary to change them. Lists of attributes
+        can be found in the Cartopy documentation: 
+            https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+    
+    Returns
+    -------
+        proj : the Cartopy projection object
     """
     if proj_default is not True and type(proj_default) is not dict:
         raise TypeError('The default for the projections should either be provided'+
@@ -193,41 +199,58 @@ def mapAll(lat, lon, criteria, projection = 'Robinson', proj_default = True,\
     plotting color/marker is passed through palette according to unique 
     criteria (e.g., record name, archive type, proxy observation type).
     
-    Args:
-        lat (list): a list of latitude.
-        lon (list): a list of longitude.
-        criteria (list): a list of criteria for plotting purposes. For instance,
-            a map by the types of archive present in the dataset or proxy
-            observations.
-        projection (string): the map projection. Available projections:
-            'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
-            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
-            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic',
-            'Sinusoidal','Stereographic','TransverseMercator','UTM',
-            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
-            'Geostationary','NearsidePerspective','EckertI','EckertII',
-            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
-            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-        proj_default (bool): If True, uses the standard projection attributes.
-            Enter new attributes in a dictionary to change them. Lists of attributes
-            can be found in the Cartopy documentation: 
-                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
-        background (bool): If True, uses a shaded relief background (only one 
-            available in Cartopy)
-        borders (bool): Draws the countries border. Defaults is off (False). 
-        rivers (bool): Draws major rivers. Default is off (False).
-        lakes (bool): Draws major lakes. 
-            Default is off (False).
-        palette (dict): A dictionary of plotting color/marker by criteria. The
-            keys should correspond to ***unique*** criteria with a list of 
-            associated values. The list should be in the format 
-            ['color', 'marker'].
-        markersize (int): The size of the marker.
-        figsize (list): the size for the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot) 
+    Args
+    ----
+    
+    lat : list
+        a list of latitude.
+    lon : list
+        a list of longitude.
+    criteria : list
+        a list of criteria for plotting purposes. For instance,
+        a map by the types of archive present in the dataset or proxy
+        observations.
+    projection : string
+        the map projection. Available projections:
+        'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
+        'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+        'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic',
+        'Sinusoidal','Stereographic','TransverseMercator','UTM',
+        'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+        'Geostationary','NearsidePerspective','EckertI','EckertII',
+        'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+        'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+    proj_default : bool
+        If True, uses the standard projection attributes.
+        Enter new attributes in a dictionary to change them. Lists of attributes
+        can be found in the Cartopy documentation: 
+            https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+    background : bool
+        If True, uses a shaded relief background (only one 
+        available in Cartopy)
+    borders : bool
+        Draws the countries border. Defaults is off (False). 
+    rivers : bool
+        Draws major rivers. Default is off (False).
+    lakes : bool
+        Draws major lakes. 
+        Default is off (False).
+    palette : dict
+        A dictionary of plotting color/marker by criteria. The
+        keys should correspond to ***unique*** criteria with a list of 
+        associated values. The list should be in the format 
+        ['color', 'marker'].
+    markersize : int
+        The size of the marker.
+    figsize : list
+        the size for the figure
+    ax: axis,optional
+        Return as axis instead of figure (useful to integrate plot into a subplot) 
         
-    Returns:
-        The figure       
+    Returns
+    -------
+    
+    ax: The figure, or axis if ax specified      
     """
     #Check that the lists have the same length and convert to numpy arrays
     if len(lat)!=len(lon) or len(lat)!=len(criteria) or len(lon)!=len(criteria):
@@ -296,33 +319,53 @@ def mapOne(lat, lon, projection = 'Orthographic', proj_default = True, label = N
            ax = None):
     """ Map one location on the globe
     
-    Args:
-        lat (float): a float number representing latitude
-        lon (float): a float number representing longitude
-        projection (string): the map projection. Available projections:
-            'Robinson', 'PlateCarree', 'AlbertsEqualArea',
-            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
-            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
-            'Sinusoidal','Stereographic','TransverseMercator','UTM',
-            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
-            'Geostationary','NearsidePerspective','EckertI','EckertII',
-            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
-            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-        proj_default (bool): If True, uses the standard projection attributes, including centering.
-            Enter new attributes in a dictionary to change them. Lists of attributes
-            can be found in the Cartopy documentation: 
-                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
-        background (bool): If True, uses a shaded relief background (only one 
-            available in Cartopy)
-        label (str): label for the point. Default is None. 
-        borders (bool): Draws the countries border. Defaults is off (False). 
-        rivers (bool): Draws major rivers. Default is off (False).
-        lakes (bool): Draws major lakes. 
-            Default is off (False).
-        markersize (int): The size of the marker.
-        marker (str or list): color and type of marker. 
-        figsize (list): the size for the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot) 
+    Args
+    ----
+    
+    lat : float
+        a float number representing latitude
+    lon : float
+        a float number representing longitude
+    projection : string
+        the map projection. Available projections:
+        'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+        'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+        'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+        'Sinusoidal','Stereographic','TransverseMercator','UTM',
+        'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+        'Geostationary','NearsidePerspective','EckertI','EckertII',
+        'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+        'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+    proj_default : bool
+        If True, uses the standard projection attributes, including centering.
+        Enter new attributes in a dictionary to change them. Lists of attributes
+        can be found in the Cartopy documentation: 
+            https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+    background : bool
+        If True, uses a shaded relief background (only one 
+        available in Cartopy)
+    label : string
+        label for the point. Default is None. 
+    borders : bool
+        Draws the countries border. Defaults is off (False). 
+    rivers : bool
+        Draws major rivers. Default is off (False).
+    lakes : bool
+        Draws major lakes. 
+        Default is off (False).
+    markersize : int
+        The size of the marker.
+    marker : string or list
+        color and type of marker. 
+    figsize : list
+        the size for the figure
+    ax : optional, axis
+        Return as axis instead of figure (useful to integrate plot into a subplot) 
+    
+    Returns
+    -------
+    
+    ax: The figure, or axis if ax specified
     
     """
     # get the projection:
