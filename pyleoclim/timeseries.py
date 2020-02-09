@@ -13,14 +13,15 @@ import pandas as pd
 import warnings
 import copy
 from scipy import special
+import sys
 from scipy import signal
 from pyhht import EMD
 from scipy.stats.mstats import mquantiles
 from tqdm import tqdm
 #from scipy.stats.mstats import gmean
 
-from . import spectral
-from . import stats
+from pyleoclim import spectral
+from pyleoclim import stats
 from nitime import algorithms as alg
 
 class Causality(object):
@@ -29,26 +30,40 @@ class Causality(object):
         '''
         Estimate the Liang information transfer from series y2 to series y1
 
-        Args:
-            y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
-            npt (int >=1 ): time advance in performing Euler forward differencing,
-                            e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
-                            npt=1 should be used.
 
-        Returns:
-            T21: info flow from y2 to y1	(Note: not y1 -> y2!)
-            tau21: the standardized info flow fro y2 to y1
-            Z: the total info
+        Args
+        ----
 
-        References:
-            - Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and
+        y1, y2 : array
+            vectors of (real) numbers with identical length, no NaNs allowed
+
+        npt : int  >=1
+            time advance in performing Euler forward differencing,
+            e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
+            npt=1 should be used.
+
+        Returns
+        -------
+
+        T21 : float
+            info flow from y2 to y1 (Note: not y1 -> y2!)
+        tau21 : float
+            the standardized info flow fro y2 to y1
+        Z : float
+            the total info
+
+        References
+        ----------
+
+        - Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and
                 Applications. Entropy, 15, 327-360, doi:10.3390/e15010327
-            - Liang, X.S. (2014) Unraveling the cause-efect relation between timeseries.
-                Physical review, E 90, 052150
-            - Liang, X.S. (2015) Normalizing the causality between time series.
-                Physical review, E 92, 022126
-            - Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio.
-                Physical review, E 94, 052201
+        - Liang, X.S. (2014) Unraveling the cause-efect relation between timeseries.
+            Physical review, E 90, 052150
+        - Liang, X.S. (2015) Normalizing the causality between time series.
+            Physical review, E 92, 022126
+        - Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio.
+            Physical review, E 94, 052201
+
         '''
         dt = 1
         nm = np.size(y1)
@@ -130,19 +145,31 @@ class Causality(object):
                           **kwargs):
         ''' significance test with AR(1) with same persistence
 
-        Args:
-            y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
-            method (str): only "liang" for now
-            npt (int >=1 ):  time advance in performing Euler forward differencing,
-                             e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
-                             npt=1 should be used.
-            nsim (int): the number of AR(1) surrogates for significance test
-            qs (list): the quantiles for significance test
+        Args
+        ----
 
-        Returns:
-            res_dict (dict): A dictionary with the following information:
-                T21_noise_qs (list) - the quantiles of the information flow from noise2 to noise1 for significance testing
-                tau21_noise_qs (list) - the quantiles of the standardized information flow from noise2 to noise1 for significance testing
+        y1, y2 : array
+            vectors of (real) numbers with identical length, no NaNs allowed
+        method : str
+            only "liang" for now
+        npt : int>=1
+            time advance in performing Euler forward differencing,
+            e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
+            npt=1 should be used.
+        nsim : int
+            the number of AR(1) surrogates for significance test
+        qs : list
+            the quantiles for significance test
+
+        Returns
+        -------
+
+        res_dict : dict
+            A dictionary with the following information:
+              T21_noise_qs : list
+                the quantiles of the information flow from noise2 to noise1 for significance testing
+              tau21_noise_qs : list
+                the quantiles of the standardized information flow from noise2 to noise1 for significance testing
 
         '''
         stat = Stats.Correlation()
@@ -181,20 +208,31 @@ class Causality(object):
                        **kwargs):
         ''' significance test with surrogates with randomized phases
 
-        Args:
-            y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
-            method (str): only "liang" for now
-            npt (int >=1 ):  time advance in performing Euler forward differencing,
-                             e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
-                             npt=1 should be used.
-            nsim (int): the number of surrogates for significance test
-            qs (list): the quantiles for significance test
+        Args
+        ----
 
-        Returns:
-            res_dict (dict): A dictionary with the following information:
-                T21_noise_qs (list) - the quantiles of the information flow from noise2 to noise1 for significance testing
-                tau21_noise_qs (list) - the quantiles of the standardized information flow from noise2 to noise1 for significance testing
+        y1, y2 : array
+                vectors of (real) numbers with identical length, no NaNs allowed
+        method : str
+                only "liang" for now
+        npt : int>=1
+             time advance in performing Euler forward differencing,
+             e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
+             npt=1 should be used.
+        nsim : int
+              the number of surrogates for significance test
+        qs : list
+            the quantiles for significance test
 
+        Returns
+        -------
+
+        res_dict : dict
+            A dictionary with the following information:
+              T21_noise_qs : list
+                            the quantiles of the information flow from noise2 to noise1 for significance testing
+              tau21_noise_qs : list
+                              the quantiles of the standardized information flow from noise2 to noise1 for significance testing
         '''
         stat = Stats.Correlation()
         noise1 = stat.phaseran(y1, nsim)
@@ -231,37 +269,59 @@ class Decomposition(object):
 
     def ssa(self, ys, ts, M, MC=1000, f=0.3, method='SSA', prep_args={}):
         '''
-        Args:
-            ys: time series
-            ts: time axis
-            M: window size
-            MC: Number of iteration in the Monte-Carlo process
-            f: fraction (0<f<=1) of good data points for identifying
-            method (str, {'SSA', 'MSSA'}): perform SSA or MSSA
+        Args
+        ----
 
-            prep_args (dict): the arguments for preprocess, including
-                - detrend (str): 'none' - the original time series is assumed to have no trend;
-                                 'linear' - a linear least-squares fit to `ys` is subtracted;
-                                 'constant' - the mean of `ys` is subtracted
-                                 'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                                     filters and the resulting filtered series is subtracted from y.
-                                 'hht' - detrending with Hilbert-Huang Transform
-                - params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                                 corresponds to the window size (default it set to half of the data)
-                                 while the second parameter correspond to the order of the filter
-                                 (default is 4). The third parameter is the order of the derivative
-                                 (the default is zero, which means only smoothing.)
-                - gaussianize (bool): If True, gaussianizes the timeseries
-                - standardize (bool): If True, standardizes the timeseries
+        ys : array
+            time series
+        ts: array
+           time axis
+        M : int
+           window size
+        MC : int
+            Number of iteration in the Monte-Carlo process
+        f : float
+           fraction (0<f<=1) of good data points for identifying
+        method (str, {'SSA', 'MSSA'}) : str({'SSA','MSSA'})
+                                       perform SSA or MSSA
 
-        Returns:
-            res_dict (dict): the result dictionary, including
-                - deval : eigenvalue spectrum
-                - eig_vec : eigenvalue vector
-                - q05: The 5% percentile of eigenvalues
-                - q95: The 95% percentile of eigenvalues
-                - pc: matrix of principal components
-                - rc: matrix of RCs (nrec,N,nrec*M) (only if K>0)
+        prep_args : dict
+                  the arguments for preprocess, including
+                    detrend : str
+                             'none' - the original time series is assumed to have no trend;
+                             'linear' - a linear least-squares fit to `ys` is subtracted;
+                             'constant' - the mean of `ys` is subtracted
+                             'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                                                 filters and the resulting filtered series is subtracted from y.
+                              'hht' - detrending with Hilbert-Huang Transform
+                    params  : list
+                               The paramters for the Savitzky-Golay filters. The first parameter
+                               corresponds to the window size (default it set to half of the data)
+                               while the second parameter correspond to the order of the filter
+                              (default is 4). The third parameter is the order of the derivative
+                              (the default is zero, which means only smoothing.)
+                    gaussianize : bool
+                                 If True, gaussianizes the timeseries
+                    standardize : bool
+                                 If True, standardizes the timeseries
+
+        Returns
+        -------
+
+        res_dict : dictionary
+                  the result dictionary, including
+                     deval : array
+                            eigenvalue spectrum
+                     eig_vec : array
+                              eigenvalue vector
+                     q05 : float
+                          The 5% percentile of eigenvalues
+                     q95 : float
+                          The 95% percentile of eigenvalues
+                     pc: 2D array
+                        matrix of principal components
+                     rc: 2D array
+                        matrix of RCs (nrec,N,nrec*M) (only if K>0)
         '''
 
         wa = WaveletAnalysis()
@@ -300,18 +360,33 @@ class Decomposition(object):
         '''Multi-channel SSA analysis
         (applicable for data including missing values)
         and test the significance by Monte-Carlo method
-        Input:
-        data: multiple time series (dimension: length of time series x total number of time series)
-        M: window size
-        MC: Number of iteration in the Monte-Carlo process
-        f: fraction (0<f<=1) of good data points for identifying
-        significant PCs [f = 0.3]
-        Output:
-        deval : eigenvalue spectrum
-        q05: The 5% percentile of eigenvalues
-        q95: The 95% percentile of eigenvalues
-        PC      : matrix of principal components
-        RC      : matrix of RCs (nrec,N,nrec*M) (only if K>0)
+
+        Args
+        ----
+
+        data : array
+              multiple time series (dimension: length of time series x total number of time series)
+        M : int
+           window size
+        MC : int
+           Number of iteration in the Monte-Carlo process
+        f : float
+           fraction (0<f<=1) of good data points for identifying significant PCs [f = 0.3]
+
+        Returns
+        -------
+
+        deval : array
+               eigenvalue spectrum
+        q05 : float
+             The 5% percentile of eigenvalues
+        q95 : float
+             The 95% percentile of eigenvalues
+        PC : 2D array
+             matrix of principal components
+        RC : 2D array
+            matrix of RCs (nrec,N,nrec*M) (only if K>0)
+            
         '''
         N = len(data[:, 0])
         nrec = len(data[0, :])
@@ -389,18 +464,32 @@ class Decomposition(object):
         '''SSA analysis for a time series
         (applicable for data including missing values)
         and test the significance by Monte-Carlo method
-        Input:
-        data: time series
-        M: window size
-        MC: Number of iteration in the Monte-Carlo process
-        f: fraction (0<f<=1) of good data points for identifying
-        significant PCs [f = 0.3]
-        Output:
-        deval : eigenvalue spectrum
-        q05: The 5% percentile of eigenvalues
-        q95: The 95% percentile of eigenvalues
-        PC      : matrix of principal components
-        RC      : matrix of RCs (N*M, nmode) (only if K>0)
+
+        Args
+        ----
+
+        data : array
+              time series
+        M : int
+           window size
+        MC : int
+            Number of iteration in the Monte-Carlo process
+        f : fraction
+           fraction (0<f<=1) of good data points for identifying significant PCs [f = 0.3]
+
+        Returns
+        -------
+
+        deval : array
+               eigenvalue spectrum
+        q05 : float
+             The 5% percentile of eigenvalues
+        q95 : float
+             The 95% percentile of eigenvalues
+        PC : 2D array
+            matrix of principal components
+        RC : 2D array
+            matrix of RCs (N*M, nmode) (only if K>0)
         '''
 
 
@@ -475,27 +564,42 @@ class Decomposition(object):
 
 def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
                   qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995], **kwargs):
-    '''Information flow
+    '''Information flow, estimate the information transfer from series y2 to series y1
 
-        Estimate the information transfer from series y2 to series y1
+    Args
+    ----
 
-        Args:
-            y1, y2 (array): vectors of (real) numbers with identical length, no NaNs allowed
-            method (str): only "liang" for now
-            signif_test (str): the method for significance test
-            nsim (int): the number of AR(1) surrogates for significance test
-            qs (list): the quantiles for significance test
-            kwargs, includes:
-                npt: the number of time advance in performing Euler forward differencing in "liang" method
+    y1, y2 : array
+        vectors of (real) numbers with identical length, no NaNs allowed
+    method : array
+        only "liang" for now
+    signif_test : str
+        the method for significance test
+    nsim : int
+        the number of AR(1) surrogates for significance test
+    qs : list
+        the quantiles for significance test
+    kwargs : includes
+        npt : int
+            the number of time advance in performing Euler forward differencing in "liang" method
 
-        Returns:
-            res_dict (dict): A dictionary with the following information:
-                T21 (float) - The infor flow from y2 to y1
-                tau21 (float) - the standardized info flow from y2 to y1, tau21 = T21/Z
-                Z (float) - The total information flow
-                qs (list) - the significance test quantile levels
-                t21_noise (list) - the quantiles of the information flow from noise2 to noise1 for significance testing
-                tau21_noise (list) - the quantiles of the standardized information flow from noise2 to noise1 for significance testing
+    Returns
+    -------
+
+    res_dict : dictionary
+        The result of the dictionary including
+    T21 : float
+        The information flow from y2 to y1
+    tau21 : float
+        The standardized info flow from y2 to y1, tau21 = T21/Z
+    Z : float
+       The total information flow
+    qs  : list
+        significance test  of quantile levels
+    t21_noise : list
+        The quantiles of the information flow from noise2 to noise1 for significance testing
+    tau21_noise : list
+        The quantiles of the standardized information flow from noise2 to noise1 for significance testing
     '''
     ca = Causality()
     if method == 'liang':
@@ -531,18 +635,31 @@ def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
 def binvalues(x, y, bin_size=None, start=None, end=None):
     """ Bin the values
 
-    Args:
-        x (array): the x-axis series.
-        y (array): the y-axis series.
-        bin_size (float): The size of the bins. Default is the average resolution
-        start (float): Where/when to start binning. Default is the minimum
-        end (float): When/where to stop binning. Defulat is the maximum
+    Args
+    ----
 
-    Returns:
-        binned_values - the binned output \n
-        bins - the bins (centered on the median, i.e., the 100-200 bin is 150) \n
-        n - number of data points in each bin \n
-        error -  the standard error on the mean in each bin
+    x : array
+        The x-axis series.
+    y : array
+        The y-axis series.
+    bin_size : float
+        The size of the bins. Default is the average resolution
+    start : float
+        Where/when to start binning. Default is the minimum
+    end : float
+        When/where to stop binning. Defulat is the maximum
+
+    Returns
+    -------
+
+    binned_values : array
+        The binned values
+    bins : array
+        The bins (centered on the median, i.e., the 100-200 bin is 150)
+    n : array
+        number of data points in each bin
+    error : array
+        the standard error on the mean in each bin
 
     """
 
@@ -581,77 +698,93 @@ def binvalues(x, y, bin_size=None, start=None, end=None):
     return bins, binned_values, n, error
 
 
-def interp(x,y, interp_type='linear', time_end_spline=None, interp_step=None,start=None,end=None):
+def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None):
     """ Linear interpolation onto a new x-axis
 
-    Args:
-        x (array): the x-axis
-        y (array): the y-axis
-        interp_step (float): the interpolation step. Default is mean resolution.
-        start (float): where/when to start the interpolation. Default is min..
-        end (float): where/when to stop the interpolation. Default is max.
+    Args
+    ----
 
-    Returns:
-        xi - the interpolated x-axis \n
-        interp_values - the interpolated values
-        """
-    if (interp_type == 'linear'):
+    x : array
+       The x-axis
+    y : array
+       The y-axis
+    interp_step : float
+                 The interpolation step. Default is mean resolution.
+    start : float
+           where/when to start the interpolation. Default is min..
+    end : float
+         where/when to stop the interpolation. Default is max.
+
+    Returns
+    -------
+
+    xi : array
+        The interpolated x-axis
+    interp_values : array
+        The interpolated values
+    """
+
         #Make sure x and y are numpy arrays
-        x = np.array(x,dtype='float64')
-        y = np.array(y,dtype='float64')
+    x = np.array(x,dtype='float64')
+    y = np.array(y,dtype='float64')
 
         # get the interpolation step if not available
-        if interp_step is None:
-            interp_step = np.nanmean(np.diff(x))
+    if interp_step is None:
+        interp_step = np.nanmean(np.diff(x))
 
         # Get the start and end point if not given
-        if start is None:
-            start = np.nanmin(np.asarray(x))
-        if end is None:
-            end = np.nanmax(np.asarray(x))
+    if start is None:
+        start = np.nanmin(np.asarray(x))
+    if end is None:
+        end = np.nanmax(np.asarray(x))
 
-        # Get the interpolated x-axis.
-        xi = np.arange(start,end,interp_step)
+    # Get the interpolated x-axis.
+    xi = np.arange(start,end,interp_step)
 
-        #Make sure the data is increasing
-        data = pd.DataFrame({"x-axis": x, "y-axis": y}).sort_values('x-axis')
+    #Make sure the data is increasing
+    data = pd.DataFrame({"x-axis": x, "y-axis": y}).sort_values('x-axis')
 
-        interp_values = np.interp(xi,data['x-axis'],data['y-axis'])
+    interp_values = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type)(xi)
 
-        return xi, interp_values
-
-    elif (interp_type == 'spline'):
-        cs_interp_values = CubicSpline(x, y)
-        xs = np.arange(0, time_end_spline)
-        return xs, cs_interp_values
+    return xi, interp_values
 
 
 def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None, end=None):
     """Places two timeseries on a common axis
 
-    Args:
-        x1 (array): x-axis values of the first timeseries
-        y1 (array): y-axis values of the first timeseries
-        x2 (array): x-axis values of the second timeseries
-        y2 (array): y-axis values of the second timeseries
-        method (str): Which method to use to get the timeseries on the same x axis.
-            Valid entries: 'interpolation' (default), 'bin', 'None'. 'None' only
-            cuts the timeseries to the common period but does not attempt
-            to generate a common time axis
-        step (float): The interpolation step. Default is mean resolution
+    Args
+    ----
+    x1 : array
+        x-axis values of the first timeseries
+    y1 : array
+        y-axis values of the first timeseries
+    x2 : array
+        x-axis values of the second timeseries
+    y2 : array
+        y-axis values of the second timeseries
+    method : str
+        Which method to use to get the timeseries on the same x axis.
+        Valid entries: 'interpolation' (default), 'bin', 'None'. 'None' only
+        cuts the timeseries to the common period but does not attempt
+        to generate a common time axis
+    step : float
+        The interpolation step. Default is mean resolution
         of lowest resolution series
-        start (float): where/when to start. Default is the maximum of the minima of
+    start : float
+        where/when to start. Default is the maximum of the minima of
         the two timeseries
-        end (float): Where/when to end. Default is the minimum of the maxima of
+    end : float
+        Where/when to end. Default is the minimum of the maxima of
         the two timeseries
 
-    Returns:
-        xi1, xi2 -  the interpolated x-axis \n
-        interp_values1, interp_values2 -  the interpolated y-values
-        """
+    Returns
+    -------
 
-
-
+    xi1, xi2 : array
+        The interpolated x-axis
+    interp_values1, interp_values2 : array
+        the interpolated y-values
+    """
     # make sure that x1, y1, x2, y2 are numpy arrays
     x1 = np.array(x1, dtype='float64')
     y1 = np.array(y1, dtype='float64')
@@ -699,21 +832,35 @@ def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None
 def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     """ Centers and normalizes a given time series. Constant or nearly constant time series not rescaled.
 
-    Args:
-        x (array): vector of (real) numbers as a time series, NaNs allowed
-        scale (real): a scale factor used to scale a record to a match a given variance
-        axis (int or None): axis along which to operate, if None, compute over the whole array
-        ddof (int): degress of freedom correction in the calculation of the standard deviation
-        eps (real): a threshold to determine if the standard deviation is too close to zero
+    Args
+    ----
 
-    Returns:
-        z (array): the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed
-        mu (real): the mean of the original time series, E[X]
-        sig (real): the standard deviation of the original time series, std[X]
+    x : array
+        vector of (real) numbers as a time series, NaNs allowed
+    scale : real
+        A scale factor used to scale a record to a match a given variance
+    axis : int or None
+        axis along which to operate, if None, compute over the whole array
+    ddof : int
+        degress of freedom correction in the calculation of the standard deviation
+    eps : real
+        a threshold to determine if the standard deviation is too close to zero
 
-    References:
-        1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
-        2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
+    Returns
+    -------
+
+    z : array
+       The standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed
+    mu : real
+        The mean of the original time series, E[X]
+    sig : real
+         The standard deviation of the original time series, std[X]
+
+    References
+    ----------
+
+    1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
+    2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
 
     @author: fzhu
     """
@@ -750,15 +897,25 @@ def ts2segments(ys, ts, factor=10):
         we think that the change of dts (or the gradient) is too large, and we regard it as a breaking point
         and chop the time series into two segments here
 
-    Args:
-        ys (array): a time series, NaNs allowed
-        ts (array): the time points
-        factor (float): the factor that adjusts the threshold for gap detection
+    Args
+    ----
 
-    Returns:
-        seg_ys (list): a list of several segments with potentially different lengths
-        seg_ts (list): a list of the time axis of the several segments
-        n_segs (int): the number of segments
+    ys : array
+        A time series, NaNs allowed
+    ts : array
+        The time points
+    factor : float
+        the factor that adjusts the threshold for gap detection
+
+    Returns
+    -------
+
+    seg_ys : list
+        a list of several segments with potentially different lengths
+    seg_ts : list
+        a list of the time axis of the several segments
+    n_segs : int
+        the number of segments
 
     @author: fzhu
     '''
@@ -789,13 +946,19 @@ def ts2segments(ys, ts, factor=10):
 def clean_ts(ys, ts):
     ''' Delete the NaNs in the time series and sort it with time axis ascending
 
-    Args:
-        ys (array): a time series, NaNs allowed
-        ts (array): the time axis of the time series, NaNs allowed
+    Args
+    ----
+    ys : array
+        A time series, NaNs allowed
+    ts : array
+        The time axis of the time series, NaNs allowed
 
-    Returns:
-        ys (array): the time series without nans
-        ts (array): the time axis of the time series without nans
+    Returns
+    -------
+    ys : array
+        The time series without nans
+    ts : array 
+        The time axis of the time series without nans
 
     '''
     # delete NaNs if there is any
@@ -821,13 +984,19 @@ def clean_ts(ys, ts):
 def annualize(ys, ts):
     ''' Annualize a time series whose time resolution is finer than 1 year
 
-    Args:
-        ys (array): a time series, NaNs allowed
-        ts (array): the time axis of the time series, NaNs allowed
+    Args
+    ----
+    ys : array
+        A time series, NaNs allowed
+    ts : array
+        The time axis of the time series, NaNs allowed
 
-    Returns:
-        ys_ann (array): the annualized time series
-        year_int (array): the time axis of the annualized time series
+    Returns
+    -------
+    ys_ann : array
+            the annualized time series
+    year_int : array
+              The time axis of the annualized time series
 
     '''
     year_int = list(set(np.floor(ts)))
@@ -896,23 +1065,32 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
     Detrending methods include, "linear", "constant", and using a low-pass
         Savitzky-Golay filters (default).
 
-    Args:
-        y (array): The series to be detrended.
-        x (array): The time axis for the timeseries. Necessary for use with
-            the Savitzky-Golay filters method since the series should be evenly spaced.
-        method (str): The type of detrending. If linear (default), the result of
-            a linear least-squares fit to y is subtracted from y. If constant,
-            only the mean of data is subtrated. If "savitzy-golay", y is filtered
-            using the Savitzky-Golay filters and the resulting filtered series
-            is subtracted from y.
-        params (list): The paramters for the Savitzky-Golay filters. The first parameter
-            corresponds to the window size (default it set to half of the data)
-            while the second parameter correspond to the order of the filter
-            (default is 4). The third parameter is the order of the derivative
-            (the default is zero, which means only smoothing.)
+    Args
+    ----
 
-    Returns:
-        ys (array) - the detrended timeseries.
+    y : array
+       The series to be detrended.
+    x : array
+       The time axis for the timeseries. Necessary for use with
+       the Savitzky-Golay filters method since the series should be evenly spaced.
+    method : str
+        The type of detrending. If linear (default), the result of
+        a linear least-squares fit to y is subtracted from y. If constant,
+        only the mean of data is subtrated. If "savitzy-golay", y is filtered
+        using the Savitzky-Golay filters and the resulting filtered series
+        is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+
+    Returns
+    -------
+
+    ys : array
+        The detrended timeseries.
     """
     y = np.array(y)
 
@@ -926,8 +1104,7 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
     elif method == "savitzy-golay":
         # Check that the timeseries is uneven and interpolate if needed
         if x is None:
-            raise ValueError("A time axis is needed for use with the Savitzky-Golay filters method")
-            
+            sys.exit("A time axis is needed for use with the Savitzky-Golay filters method")
         # Check whether the timeseries is unvenly-spaced and interpolate if needed
         if len(np.unique(np.diff(x)))>1:
             warnings.warn("Timeseries is not evenly-spaced, interpolating...")

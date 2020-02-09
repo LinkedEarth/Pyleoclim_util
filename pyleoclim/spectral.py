@@ -2709,8 +2709,8 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
     # calculate the cone of influence
     coi = wa.make_coi(tau, Neff=Neff_coi)
 
-    Results = collections.namedtuple('Results', ['wwa', 'phase', 'AR1_q', 'coi', 'freqs', 'tau', 'Neffs', 'coeff'])
-    res = Results(wwa=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freqs=freqs, tau=tau, Neffs=Neffs, coeff=coeff)
+    Results = collections.namedtuple('Results', ['amplitude', 'phase', 'AR1_q', 'coi', 'freq', 'time', 'Neffs', 'coeff'])
+    res = Results(amplitude=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freq=freqs, time=tau, Neffs=Neffs, coeff=coeff)
 
     return res
 
