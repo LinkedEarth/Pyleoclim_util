@@ -13,7 +13,6 @@ import pandas as pd
 import warnings
 import copy
 from scipy import special
-import sys
 from scipy import signal
 from pyhht import EMD
 from scipy.stats.mstats import mquantiles
@@ -22,6 +21,7 @@ from tqdm import tqdm
 
 from pyleoclim import spectral
 from pyleoclim import stats
+from pyleoclim import timeseries
 from nitime import algorithms as alg
 
 class Causality(object):
@@ -172,7 +172,7 @@ class Causality(object):
                 the quantiles of the standardized information flow from noise2 to noise1 for significance testing
 
         '''
-        stat = Stats.Correlation()
+        stat = stats.Correlation()
         g1 = stat.ar1_fit(y1)
         g2 = stat.ar1_fit(y2)
         sig1 = np.std(y1)
@@ -234,7 +234,7 @@ class Causality(object):
               tau21_noise_qs : list
                               the quantiles of the standardized information flow from noise2 to noise1 for significance testing
         '''
-        stat = Stats.Correlation()
+        stat = stats.Correlation()
         noise1 = stat.phaseran(y1, nsim)
         noise2 = stat.phaseran(y2, nsim)
 
@@ -324,8 +324,8 @@ class Decomposition(object):
                         matrix of RCs (nrec,N,nrec*M) (only if K>0)
         '''
 
-        wa = WaveletAnalysis()
-        ys, ts = Timeseries.clean_ts(ys, ts)
+        wa = spectral.WaveletAnalysis()
+        ys, ts = timeseries.clean_ts(ys, ts)
         ys = wa.preprocess(ys, ts, **prep_args)
 
         ssa_func = {
@@ -1104,7 +1104,7 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
     elif method == "savitzy-golay":
         # Check that the timeseries is uneven and interpolate if needed
         if x is None:
-            sys.exit("A time axis is needed for use with the Savitzky-Golay filters method")
+            raise ValueError("A time axis is needed for use with the Savitzky-Golay filters method")
         # Check whether the timeseries is unvenly-spaced and interpolate if needed
         if len(np.unique(np.diff(x)))>1:
             warnings.warn("Timeseries is not evenly-spaced, interpolating...")
