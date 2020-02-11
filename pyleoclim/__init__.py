@@ -14,7 +14,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 import seaborn as sns
-import sys
 from itertools import chain
 from scipy.stats.mstats import mquantiles
 import datetime
@@ -610,7 +609,7 @@ def mapNearRecords(ts = None, lipds = None, n = 5, radius = None, \
     # Filter to remove the reference record from the list
     idx_zero = np.flatnonzero(np.array(dist))
     if len(idx_zero)==0:
-        sys.exit("No matching records found. Change your search criteria!")
+        raise ValueError("No matching records found. Change your search criteria!")
     lat, lon, archiveType, dataSetName, dist = newfilter.filterList(lat,lon,
                                                                     archiveType,
                                                                     dist,
@@ -621,7 +620,7 @@ def mapNearRecords(ts = None, lipds = None, n = 5, radius = None, \
     if radius:
        idx_radius = newfilter.withinDistance(dist, radius)
        if len(idx_radius)==0:
-           sys.exit("No matching records found. Change your search criteria!")
+           raise ValueError("No matching records found. Change your search criteria!")
        lat, lon, archiveType, dataSetName, dist = newfilter.filterList(lat,lon,
                                                                     archiveType,
                                                                     dist,
@@ -632,7 +631,7 @@ def mapNearRecords(ts = None, lipds = None, n = 5, radius = None, \
     if sameArchive == True:
         idx_archive = newfilter.filterByArchive(archiveType,ts["archiveType"])
         if len(idx_archive)==0:
-            sys.exit("No matching records found. Change your search criteria!")
+            raise ValueError("No matching records found. Change your search criteria!")
         lat, lon, archiveType, dataSetName, dist = newfilter.filterList(lat,lon,
                                                                     archiveType,
                                                                     dist,
@@ -854,7 +853,7 @@ def plotTs(ts = None, x_axis = None, markersize = 50,\
             y_label = ts["paleoData_variableName"]
 
     # make the plot
-    fig = Plot.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
+    fig = plot.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
               y_label=y_label, title=title, figsize = figsize, ax=None)
 
     #Save the figure if asked
@@ -915,7 +914,7 @@ def plotEnsTs(ts = None, lipd = None, ensTableName = None, ens = None, \
             fetchTs()
         ts = lipdutils.getTs(ts_list)
     elif lipd is None and type(ts) is dict:
-        sys.exit("LiPD file should be provided when timeseries is set.")
+        raise ValueError("LiPD file should be provided when timeseries is set.")
 
     # Get the csv files
     if lipd is None:
@@ -974,7 +973,7 @@ def plotEnsTs(ts = None, lipd = None, ensTableName = None, ens = None, \
 
     # Check the number of Chron Tables
     if len(chronEnsembleTables) == 0:
-        sys.exit("No chronEnsembleTable available")
+        raise ValueError("No chronEnsembleTable available")
     elif len(chronEnsembleTables) > 1:
         print("More than one ensemble table available.")
         for idx, val in enumerate(chronEnsembleTables):
@@ -1399,7 +1398,7 @@ def statsTs(ts=None):
     # get the values
     y = np.array(ts['paleoData_values'], dtype = 'float64')
 
-    mean, median, min_, max_, std, IQR = Stats.simpleStats(y)
+    mean, median, min_, max_, std, IQR = stats.simpleStats(y)
 
     return mean, median, min_, max_, std, IQR
 
@@ -1499,7 +1498,7 @@ def corrSigTs(ts1 = None, ts2 = None, x_axis = None, \
                 units2 = 'yr BP'
                 units1 = ts1[label1+'Units']
         else:
-            sys.exit("The two timeseries share a different time representation")
+            raise ValueError("The two timeseries share a different time representation")
     else: 
         units2 = ts2[label2+'Units']
         units1 = ts1[label1+'Units']
@@ -1554,9 +1553,9 @@ def corrSigTs(ts1 = None, ts2 = None, x_axis = None, \
 
     #Make sure that these vectors are not empty, otherwise return an error
     if np.size(interp_values1) == 0 or np.size(interp_values2) == 0:
-        sys.exit("No common time period between the two time series.")
+        raise ValueError("No common time period between the two time series.")
 
-    r, sig, p = Stats.corrsig(interp_values1,interp_values2,nsim=nsim,
+    r, sig, p = stats.corrsig(interp_values1,interp_values2,nsim=nsim,
                                  method=method,alpha=alpha)
 
     return r, sig, p
@@ -1716,10 +1715,10 @@ def binTs(timeseries = None, x_axis = None, bin_size = None, \
     x, label = lipdutils.checkXaxis(timeseries, x_axis=x_axis)
 
     #remove nans
-    y,x = Timeseries.clean_ts(y,x)
+    y,x = timeseries.clean_ts(y,x)
 
     #Bin the timeseries:
-    bins, binned_values, n, error = Timeseries.binvalues(x,y, bin_size = bin_size,\
+    bins, binned_values, n, error = timeseries.binvalues(x,y, bin_size = bin_size,\
                                                    start = start, end = end)
 
     return bins, binned_values, n, error
@@ -1763,10 +1762,10 @@ def interpTs(timeseries = None, x_axis = None, interp_step = None,\
     x, label = lipdutils.checkXaxis(timeseries, x_axis=x_axis)
 
     #remove nans
-    y,x = Timeseries.clean_ts(y,x)
+    y,x = timeseries.clean_ts(y,x)
 
     #Interpolate the timeseries
-    interp_age, interp_values = Timeseries.interp(x,y,interp_step = interp_step,\
+    interp_age, interp_values = timeseries.interp(x,y,interp_step = interp_step,\
                                                   start= start, end=end)
 
     return interp_age, interp_values
@@ -1819,7 +1818,7 @@ def standardizeTs(timeseries = None, scale = 1, ddof = 0, eps = 1e-3):
     y = y[~np.isnan(y_temp)]
 
     #Standardize
-    z, mu, sig = Timeseries.standardize(y,scale=1,axis=None,ddof=0,eps=1e-3)
+    z, mu, sig = timeseries.standardize(y,scale=1,axis=None,ddof=0,eps=1e-3)
 
     return z, mu, sig
 
@@ -1860,7 +1859,7 @@ def segmentTs(timeseries = None, factor = 2):
     # Get the values
     # Raise an error if age or year not in the keys
     if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
-        sys.exit("No time information available")
+        raise ValueError("No time information available")
     elif 'age' in timeseries.keys() and 'year' in timeseries.keys():
         print("Both age and year information are available.")
         x_axis = input("Which one would you like to use? ")
@@ -1876,10 +1875,10 @@ def segmentTs(timeseries = None, factor = 2):
     ts, label = lipdutils.checkXaxis(timeseries, x_axis=x_axis)
 
     # remove NaNs
-    ys,ts = Timeseries.clean_ts(ys,ts)
+    ys,ts = timeseries.clean_ts(ys,ts)
 
     #segment the timeseries
-    seg_y, seg_t, n_segs = Timeseries.ts2segments(ys, ts, factor)
+    seg_y, seg_t, n_segs = timeseries.ts2segments(ys, ts, factor)
 
     return seg_y, seg_t, n_segs
 
@@ -2079,7 +2078,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
 
     # Make sure there is something to compute
     if wwz is False and psd is False:
-        sys.error("Set 'wwz' and/or 'psd' to True")
+        raise ValueError("Set 'wwz' and/or 'psd' to True")
 
     # Get a timeseries
     if not timeseries:
@@ -2093,23 +2092,23 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
     # Set the defaults
     #Make sure the default have the proper type
     if psd_default is not True and type(psd_default) is not dict:
-        sys.exit('The default for the psd calculation should either be provided'+
+        raise TypeError('The default for the psd calculation should either be provided'+
                  ' as a dictionary or set to True')
     if psdplot_default is not True and type(psdplot_default) is not dict:
-        sys.exit('The default for the psd figure should either be provided'+
+        raise TypeError('The default for the psd figure should either be provided'+
                  ' as a dictionary or  set to True')
     if wwz_default is not True and type(wwz_default) is not dict:
-        sys.exit('The default for the wwz calculation should either be provided'+
+        raise TypeError('The default for the wwz calculation should either be provided'+
                  ' as a dictionary or  set to True')
     if wwaplot_default is not True and type(wwaplot_default) is not dict:
-        sys.exit('The default for the wwa figure should either be provided'+
+        raise TypeError('The default for the wwa figure should either be provided'+
                  ' as a dictionary or set to True')
 
     # Get the values
     ys = np.array(timeseries['paleoData_values'], dtype = 'float64')
 
     # remove NaNs
-    ys,ts = Timeseries.clean_ts(ys,ts)
+    ys,ts = timeseries.clean_ts(ys,ts)
 
     # Truncate the timeseries if asked
     if lim != None:
@@ -2129,7 +2128,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
         elif type(psd_default) is dict:
             psd, freqs, psd_ar1_q95, psd_ar1 = spectral.wwz_psd(ys, ts, **psd_default)
         else:
-            sys.exit('Options for psd calculation must be passed as a dictionary')
+            raise TypeError('Options for psd calculation must be passed as a dictionary')
         # Wrap up the output dictionary
         dict_out = {'psd':psd,
                'freqs':freqs,
@@ -2155,7 +2154,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                     psdplot_default['period_label'] = 'Period ('+ageunits+')'
                 
             else:
-                sys.exit('Options for psd plot must be passed as a dictionary')
+                raise TypeError('Options for psd plot must be passed as a dictionary')
             
             fig = spectral.plot_psd(psd,freqs,**psdplot_default)
 
@@ -2178,7 +2177,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
             wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = spectral.wwz(ys,ts, **wwz_default)
 
         else:
-            sys.exit('Options for wwz calculation must be passed as a dictionary')
+            raise TypeError('Options for wwz calculation must be passed as a dictionary')
         
         #Wrap up the output dictionary
         dict_out = {'wwa':wwa,
@@ -2214,7 +2213,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                     wwaplot_default['ylabel'] = 'Period ('+ageunits+')'
                 
             else:
-                sys.exit('Options for wwz plot must be passed as a dictionary')
+                raise TypeError('Options for wwz plot must be passed as a dictionary')
 
             fig = spectral.plot_wwa(wwa, freqs, tau, **wwaplot_default)
 
@@ -2233,7 +2232,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
         elif type(psd_default) is dict:
             psd, freqs, psd_ar1_q95, psd_ar1 = spectral.wwz_psd(ys, ts, **psd_default)
         else:
-            sys.exit('Options for psd calculation must be passed as a dictionary')
+            raise TypeError('Options for psd calculation must be passed as a dictionary')
         
         #WWZ calculations
         if wwz_default == True:
@@ -2245,7 +2244,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
             wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = spectral.wwz(ys,ts, **wwz_default)
 
         else:
-            sys.exit('Options for wwz calculation must be passed as a dictionary')
+            raise TypeError('Options for wwz calculation must be passed as a dictionary')
         
         #Wrap up the output dictionary
         dict_out = {'wwa':wwa,
@@ -2309,7 +2308,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                     wwaplot_default['ax'] = ax1
                 
             else:
-                sys.exit('Options for wwz plot must be passed as a dictionary')
+                raise TypeError('Options for wwz plot must be passed as a dictionary')
 
 
             spectral.plot_wwa(wwa, freqs, tau, **wwaplot_default)
@@ -2336,7 +2335,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                     psdplot_default['ax'] = ax2
                 
             else:
-                sys.exit('Options for psd plot must be passed as a dictionary')
+                raise TypeError('Options for psd plot must be passed as a dictionary')
             
             spectral.plot_psd(psd,freqs,**psdplot_default)
 
@@ -2476,7 +2475,7 @@ def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None,
                 units2 = 'yr BP'
                 units1 = timeseries1[label1+'Units']
         else:
-            sys.exit("The two timeseries share a different time representation")
+            raise ValueError("The two timeseries share a different time representation")
     else: 
         units2 = timeseries2[label2+'Units']
         units1 = timeseries1[label1+'Units']
@@ -2510,17 +2509,17 @@ def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None,
                 units2 = 'yr BP'
     
     # Remove NaNs and ordered
-    y1,x1 = Timeseries.clean_ts(y1,x1)
-    y2,x2 = Timeseries.clean_ts(y2,x2)
+    y1,x1 = timeseries.clean_ts(y1,x1)
+    y2,x2 = timeseries.clean_ts(y2,x2)
     
     #Check that the timeseries are on a common axis
     if lim == None:
-        xi1, xi2, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+        xi1, xi2, interp_values1, interp_values2 = timeseries.onCommonAxis(x1,y1,x2,y2,
                                                                        method=None)
     else:
         if type(lim) != list:
             raise TypeError('The time series limits should be of type list') 
-        xi1, xi2, interp_values1, interp_values2 = Timeseries.onCommonAxis(x1,y1,x2,y2,
+        xi1, xi2, interp_values1, interp_values2 = timeseries.onCommonAxis(x1,y1,x2,y2,
                                                                        start=lim[0],
                                                                        end=lim[1])
     #perform the cross-wavelet analysis
@@ -2761,7 +2760,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
     chronMeasurementTables, paleoMeasurementTables = lipdutils.isMeasurement(csv_dict)
     #Check that there is a measurement table or exit
     if not chronMeasurementTables:
-        sys.exit("No ChronMeasurementTables available to run BChron!")
+        raise ValueError("No ChronMeasurementTables available to run BChron!")
     # Selct measurement table
     csvName = lipdutils.whichMeasurement(chronMeasurementTables, csv_dict)
     # Get the ts-like object from selected measurement table
@@ -2771,13 +2770,13 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
         model, objectName = lipdutils.isModel(csvName, lipd)
         modelNum = lipdutils.modelNumber(model)
     elif modelNum and not objectName:
-        sys.exit("You must provide a dataObject when specifying a model.")
+        raise ValueError("You must provide a dataObject when specifying a model.")
     ## look for the inputs for Bchron
     # Find an age column
     print("Looking for age data...")
     match = lipdutils.searchVar(ts_list,["radiocarbon","age14C"])
     if not match:
-        sys.exit("No age data available")
+        raise ValueError("No age data available")
     ages = ts_list[match]['values']
     ages = np.array(ages,dtype='float64')
     # Remove NaNs (can happen in mixed chronologies)
@@ -2793,7 +2792,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
     print("Looking for a depth/position column...")
     match = lipdutils.searchVar(ts_list,["depth"])
     if not match:
-        sys.exit("No age data available")
+        raise ValueError("No age data available")
     positions = ts_list[match]['values']
     positions = np.array(positions,dtype='float64')
     positions = positions[idx]
@@ -2807,7 +2806,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
     print("Looking for age uncertainty...")
     match = lipdutils.searchVar(ts_list,["uncertainty"],exact=False)
     if not match:
-        sys.exit("No uncertainty data available")
+        raise ValueError("No uncertainty data available")
     agesStd = ts_list[match]['values']
     agesStd = np.array(agesStd,dtype='float64')
     agesStd = agesStd[idx]
@@ -2831,19 +2830,19 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
         print("Looking for calibration curves...")
         match = lipdutils.searchVar(ts_list,["calCurves"], exact=False)
         if not match:
-            calCurves = rbchon.chooseCalCurves()
-            calCurves = rbchon.verifyCalCurves(calCurves)
+            calCurves = rbchron.chooseCalCurves()
+            calCurves = rbchron.verifyCalCurves(calCurves)
             if len(calCurves) == 1 and len(positions)!=1:
                 calCurves = list(chain(*[[i]*len(positions) for i in calCurves]))
         else:
             calCurves = ts_list[match]['values']
-            calCurves = rbchon.verifyCalCurves(calCurves)
+            calCurves = rbchron.verifyCalCurves(calCurves)
     elif len(calCurves)==1 and len(positions)!=1:
-        calCurves = rbchon.verifyCalCurves(calCurves)
+        calCurves = rbchron.verifyCalCurves(calCurves)
         calCurves = list(chain(*[[i]*len(positions) for i in calCurves]))
     else:
         assert len(calCurves) == len(positions)
-        calCurves = rbchon.verifyCalCurves(calCurves)
+        calCurves = rbchron.verifyCalCurves(calCurves)
     print("Calibration curves found.")
 
     #Check for a reservoir age
@@ -2870,12 +2869,12 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
 
         else:
             print("No match found.")
-            ageCorr, ageCorrStd = rbchon.reservoirAgeCorrection()
+            ageCorr, ageCorrStd = rbchron.reservoirAgeCorrection()
         reservoirAgeCorr = np.column_stack((ageCorr,ageCorrStd))
         reservoirAgeCorr = reservoirAgeCorr.flatten()
 
     elif reservoirAgeCorr == True:
-        ageCorr, ageCorrStd = rbchon.reservoirAgeCorrection()
+        ageCorr, ageCorrStd = rbchron.reservoirAgeCorrection()
         reservoirAgeCorr = np.column_stack((ageCorr,ageCorrStd))
         reservoirAgeCorr = reservoirAgeCorr.flatten()
     else:
@@ -2883,7 +2882,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
             if type(reservoirAgeCorr) == list:
                 reservoirAgeCorr = np.array(reservoirAgeCorr)
             else:
-                sys.exit("The reservoir age correction should be either None, True or an array.")
+                raise TypeError("The reservoir age correction should be either None, True or an array.")
 
     #Predict positions
     if predictPositions == "paleo":
@@ -2914,13 +2913,13 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
                                  " Enter 1 if the units are in fact the same but"+\
                                  " written differently (e.g., m vs meter): "))
             if not factor:
-                sys.exit("No correction factor entered.")
+                raise ValueError("No correction factor entered.")
             else:
                 positions = positions*factor
 
     # Run Bchron
     print("Running Bchron. This could take a few minutes...")
-    depth, chron, ageDist, run = rbchon.runBchron(ages, agesStd,positions,\
+    depth, chron, ageDist, run = rbchron.runBchron(ages, agesStd,positions,\
                                                     rejectAges = rejectAges,\
                                                     calCurves = calCurves,\
                                                     reservoirAgeCorr = reservoirAgeCorr,\
@@ -3106,7 +3105,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
                     ylabel = "Age ("+str(agesUnit)+")"
                 else:
                     ylabel = "Age"
-        fig = rbchon.plotBchron(depth,chron,positions,ageDist, flipCoor=flipCoor,\
+        fig = rbchron.plotBchron(depth,chron,positions,ageDist, flipCoor=flipCoor,\
                                  xlabel =xlabel, ylabel=ylabel,\
                                  xlim = xlim, ylim = ylim,\
                                  violinColor = violinColor,\
