@@ -48,11 +48,17 @@ def openLipd(usr_path=None):
     Sets the dictionary as global variable so that it doesn't have to be provided
     as an argument for every function.
 
-    Args:
-        usr_path (str): The path to a directory or a single file. (Optional argument)
+    Args
+    ----
+    
+    usr_path : str
+              The path to a directory or a single file. (Optional argument)
 
-    Returns:
-        lipd_dict - a dictionary containing the LiPD library
+    Returns 
+    -------
+    
+    lipd_dict : dict
+               a dictionary containing the LiPD library
 
     """
     global lipd_dict
@@ -66,12 +72,18 @@ def fetchTs(lipds=None):
     Set the dictionary as a global variable so that it doesn't have to be
     provided as an argument for every function.
 
-    Args:
-        lipds (dict): A dictionary of LiPD files obtained through the
-        readLipd function
+    Args
+    ----
+    
+    lipds (dict) : dict
+                  A dictionary of LiPD files obtained through the
+                 readLipd function
 
-    Returns:
-        ts_list - A list of timeseries object
+    Returns
+    -------
+    
+    ts_list : array
+             A list of timeseries object
 
     """
     global ts_list
@@ -119,39 +131,54 @@ def mapAllArchive(lipds = None, markersize = 50, projection = 'Robinson',\
     Map of all the records into the workspace by archiveType.
         Uses the default color palette. Enter pyleoclim.plot_default for detail.
 
-    Args:
-        lipds (dict): A list of LiPD files. (Optional)
-        markersize (int): The size of the markers. Default is 50
-        projection (string): the map projection. Available projections:
-            'Robinson', 'PlateCarree', 'AlbertsEqualArea',
-            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
-            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
-            'Sinusoidal','Stereographic','TransverseMercator','UTM',
-            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
-            'Geostationary','NearsidePerspective','EckertI','EckertII',
-            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
-            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-        proj_default (bool): If True, uses the standard projection attributes, including centering.
-            Enter new attributes in a dictionary to change them. Lists of attributes
-            can be found in the Cartopy documentation: 
-                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
-        background (bool): If True, uses a shaded relief background (only one 
-            available in Cartopy)
-        borders (bool): Draws the countries border. Defaults is off (False). 
-        rivers (bool): Draws major rivers. Default is off (False).
-        lakes (bool): Draws major lakes. 
-            Default is off (False).
-        figsize (list): the size for the figure
-        saveFig (bool): Default is to not save the figure
-        dir (str): The absolute path of the directory in which to save the
-            figure. If not provided, creates a default folder called 'figures'
-            in the LiPD working directory (lipd.path).
-        format (str): One of the file extensions supported by the active
+    Args 
+    ----
+    
+    lipds : dict
+           A list of LiPD files. (Optional)
+    markersize : int
+                The size of the markers. Default is 50
+    projection : str
+                the map projection. Available projections:
+                'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+                'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+                'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+                'Sinusoidal','Stereographic','TransverseMercator','UTM',
+                'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+                'Geostationary','NearsidePerspective','EckertI','EckertII',
+                'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+                'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+    proj_default : bool
+                  If True, uses the standard projection attributes, including centering.
+                  Enter new attributes in a dictionary to change them. Lists of attributes
+                  can be found in the Cartopy documentation: 
+                  https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+    background : bool 
+                If True, uses a shaded relief background (only one available in Cartopy)
+                                                                    
+    borders : bool
+             Draws the countries border. Defaults is off (False). 
+    rivers : bool
+            Draws major rivers. Default is off (False).
+    lakes : bool
+           Draws major lakes. Default is off (False).
+         
+    figsize : list
+             the size for the figure
+    saveFig : bool
+             Default is to not save the figure
+    dir : str
+         The absolute path of the directory in which to save the
+         figure. If not provided, creates a default folder called 'figures'
+         in the LiPD working directory (lipd.path).
+    format : str
+            One of the file extensions supported by the active
             backend. Default is "eps". Most backend support png, pdf, ps, eps,
             and svg.
 
-    Returns:
-        The figure
+    Returns
+    ------
+    "The figure"
     """
 
     # Get the dictionary of LiPD files
@@ -203,44 +230,60 @@ def mapLipd(timeseries=None, projection = 'Orthographic', proj_default = True,\
 
     Orthographic projection map of a single record.
 
-    Args:
-        timeseries: a LiPD timeseries object. Will prompt for one if not given
-        projection (string): the map projection. Available projections:
-            'Robinson', 'PlateCarree', 'AlbertsEqualArea',
-            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
-            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
-            'Sinusoidal','Stereographic','TransverseMercator','UTM',
-            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
-            'Geostationary','NearsidePerspective','EckertI','EckertII',
-            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
-            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-        proj_default (bool): If True, uses the standard projection attributes, including centering.
-            Enter new attributes in a dictionary to change them. Lists of attributes
-            can be found in the Cartopy documentation: 
-                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
-        background (bool): If True, uses a shaded relief background (only one 
-            available in Cartopy)
-        label (str): label for archive marker. Default is to use the name of the 
-            physical sample. If no archive name is available, default to
-            None. None returns no label. 
-        borders (bool): Draws the countries border. Defaults is off (False). 
-        rivers (bool): Draws major rivers. Default is off (False).
-        lakes (bool): Draws major lakes. 
-            Default is off (False).
-        markersize (int): The size of the marker.
-        marker (str or list): color and type of marker. Default will use the
-        default color palette for archives
-        figsize (list): the size for the figure
-        saveFig (bool): default is to not save the figure
-        dir (str): the full path of the directory in which to save the figure.
-            If not provided, creates a default folder called 'figures' in the
-            LiPD working directory (lipd.path).
-        format (str): One of the file extensions supported by the active
+    Args
+    ----
+    
+    timeseries : object
+                a LiPD timeseries object. Will prompt for one if not given
+    projection : string
+                the map projection. Available projections:
+                'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+                'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+                'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+                'Sinusoidal','Stereographic','TransverseMercator','UTM',
+                'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+                'Geostationary','NearsidePerspective','EckertI','EckertII',
+                'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+                'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+    proj_default : bool
+                  If True, uses the standard projection attributes, including centering.
+                  Enter new attributes in a dictionary to change them. Lists of attributes
+        can be found in the Cartopy documentation: 
+            https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+    background : bool
+                If True, uses a shaded relief background (only one 
+                available in Cartopy)
+    label : str
+           label for archive marker. Default is to use the name of the 
+           physical sample. If no archive name is available, default to
+           None. None returns no label. 
+    borders : bool
+             Draws the countries border. Defaults is off (False). 
+    rivers : bool
+            Draws major rivers. Default is off (False).
+    lakes : bool
+           Draws major lakes. Default is off (False).           
+    markersize : int
+                The size of the marker.
+    marker : str or list
+            color and type of marker. Default will use the
+            default color palette for archives
+    figsize : list
+             the size for the figure
+    saveFig : bool
+             default is to not save the figure
+    dir : str 
+         the full path of the directory in which to save the figure.
+         If not provided, creates a default folder called 'figures' in the
+         LiPD working directory (lipd.path).
+    format : str
+            One of the file extensions supported by the active
             backend. Default is "eps". Most backend support png, pdf, ps, eps,
             and svg.
 
-    Returns:
-        The figure
+    Returns
+    -------
+    The figure
 
     """
     # Make sure there are LiPD files to plot
@@ -318,14 +361,20 @@ class MapFilters():
     def distSphere(self, lat1,lon1,lat2,lon2):
         """Uses the harversine formula to calculate distance on a sphere
 
-        Args:
-            lat1: Latitude of the first point, in radians
-            lon1: Longitude of the first point, in radians
-            lat2: Latitude of the second point, in radians
-            lon2: Longitude of the second point, in radians
+        Args
+        ----
+        
+        lat1 : float
+              Latitude of the first point, in radians
+        lon1 : float
+              Longitude of the first point, in radians
+        lat2 : float
+              Latitude of the second point, in radians
+        lon2: Longitude of the second point, in radians
 
-        Returns:
-            The distance between the two point in km
+        Returns
+        -------
+        The distance between the two point in km
 
         """
         R = 6371  #km. Earth's radius
@@ -342,14 +391,23 @@ class MapFilters():
         """ Computes the distance in (km) between a reference point and an array
         of other coordinates.
 
-        Args:
-            lat_r (float): The reference latitude, in deg
-            lon_r (float): The reference longitude, in deg
-            lat_c (list): An list of latitudes for the comparison points, in deg
-            lon_c (list): An list of longitudes for the comparison points, in deg
+        Args
+        ----
+        
+        lat_r : float
+               The reference latitude, in deg
+        lon_r : float
+               The reference longitude, in deg
+        lat_c : list
+               An list of latitudes for the comparison points, in deg
+        lon_c list : list
+                    A list of longitudes for the comparison points, in deg
 
-        Returns:
-            dist - a list of distances in km.
+        Returns
+        -------
+        
+        dist : list
+              a list of distances in km.
         """
         dist = []
 
@@ -365,12 +423,16 @@ class MapFilters():
     def filterByArchive(self,archiveType,option):
         """Returns the indexes of the records with the matching archiveType
 
-        Args:
-            archiveType (list): A list of ArchiveType
-            option: the matching string
+        Args
+        ----
+        
+        archiveType : A list of ArchiveType
+                     option: the matching string
 
-        Returns:
-            idx (list): The indices matching the query
+        Returns
+        -------
+        idx : list
+             The indices matching the query
         """
         idx = [idx for idx,val in enumerate(archiveType) if val==option]
         if not idx:
@@ -381,12 +443,18 @@ class MapFilters():
     def withinDistance(self, distance, radius):
         """ Returns the index of the records that are within a certain distance
 
-        Args:
-            distance (list): A list containing the distance
-            radius (float): the radius to be considered
+        Args
+        ----
+    
+        distance : list
+                  A list containing the distance
+        radius : float
+                the radius to be considered
 
-        Returns:
-            idx (list): a list of index
+        Returns
+        -------
+        idx : list
+             a list of index
         """
         idx = [idx for idx,val in enumerate(distance) if val <= radius]
 
@@ -395,17 +463,22 @@ class MapFilters():
     def filterList(self, lat, lon, archiveType, dist, dataSetName, idx):
         """Filters the list by the given indexes
 
-        Args:
-            lat (array): Array of latitudes
-            lon (array): Array of longitudes
-            archiveType (array): Array of ArchiveTypes
-            dist (array): Array of distances
-            dataSetName (array): Array of dataset names
-            idx (array): An array of indices used for the filtering
+        Args
+        ----
+        
+        lat : array
+             Array of latitudes
+        lon : array
+             Array of longitudes
+        archiveType : array
+                     Array of ArchiveTypes
+        dist (array): Array of distances
+        dataSetName (array): Array of dataset names
+        idx (array): An array of indices used for the filtering
 
-        Returns:
-            The previous arrays filtered by indexes
-
+        Returns
+        -------
+        The previous arrays filtered by indexes.
         """
 
         lat =  np.array(lat)[idx]
@@ -429,60 +502,87 @@ def mapNearRecords(ts = None, lipds = None, n = 5, radius = None, \
 
     """ Map the nearest records from the record of interest
 
-    Args:
-        ts (dict): A timeseries object. If none given, will prompt for one
-        lipds (list): A list of LiPD files. (Optional)
-        n (int): the number of records to match
-        radius (float): The distance (in km) to search for nearby records.
-            Default is to search the entire globe
-        sameArchive (bool): Returns only records with the same archiveType.
-            Default is not to do so.
-        projection (string): the map projection. Available projections:
-            'Robinson', 'PlateCarree', 'AlbertsEqualArea',
-            'AzimuthalEquidistant','EquidistantConic','LambertConformal',
-            'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
-            'Sinusoidal','Stereographic','TransverseMercator','UTM',
-            'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
-            'Geostationary','NearsidePerspective','EckertI','EckertII',
-            'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
-            'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-        proj_default (bool): If True, uses the standard projection attributes, including centering.
-            Enter new attributes in a dictionary to change them. Lists of attributes
-            can be found in the Cartopy documentation: 
-                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
-        background (bool): If True, uses a shaded relief background (only one 
-            available in Cartopy)
-        borders (bool): Draws the countries border. Defaults is off (False). 
-        rivers (bool): Draws major rivers. Default is off (False).
-        lakes (bool): Draws major lakes. 
-            Default is off (False).
-        markersize (int): the size of the marker
-        markersize_adjust (bool): If True, will proportionaly adjust the size of
-            the marker according to distance.
-        marker_r (list or str): The color and shape of the marker for the
-            reference record.
-        marker_c (list or str): The color and shape of the marker for the other
-            records. Default is to use the color palette by archiveType. If set
-            to None then the color of the marker will represent the distance from
-            the reference records.
-        cmap (str): The colormap to use to represent the distance from the
-            reference record if no marker is selected.
-        colorbar (bool): Create a colorbar. Default is True
-        location (str): Location of the colorbar
-        label (str): Label for the colorbar.
-        figsize (list): the size for the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot)
-        saveFig (bool): default is to not save the figure
-        dir (str): the full path of the directory in which to save the figure.
-            If not provided, creates a default folder called 'figures' in the
-            LiPD working directory (lipd.path).
-        format (str): One of the file extensions supported by the active
+    Args
+    ----
+    
+    ts : dict
+        A timeseries object. If none given, will prompt for one
+    lipds : list
+           A list of LiPD files. (Optional)
+    n : int
+       the number of records to match
+    radius : float
+            The distance (in km) to search for nearby records. Default is to search the entire globe    
+    sameArchive : bool
+                 Returns only records with the same archiveType. Default is not to do so.
+        
+    projection : string
+                the map projection. Available projections:
+               'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+               'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+               'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+               'Sinusoidal','Stereographic','TransverseMercator','UTM',
+               'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+               'Geostationary','NearsidePerspective','EckertI','EckertII',
+               'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+               'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+    proj_default : bool
+                  If True, uses the standard projection attributes, including centering.
+                  Enter new attributes in a dictionary to change them. Lists of attributes
+                  can be found in the Cartopy documentation: 
+                  https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+    background : bool
+                If True, uses a shaded relief background (only one 
+                available in Cartopy)
+    borders : bool
+             Draws the countries border. Defaults is off (False). 
+    rivers : bool
+            Draws major rivers. Default is off (False).
+    lakes : bool
+           Draws major lakes. Default is off (False)
+       
+    markersize : int
+                the size of the marker
+    markersize_adjust : bool
+                       If True, will proportionaly adjust the size of
+                       the marker according to distance.
+    marker_r : list or str
+              The color and shape of the marker for the
+              reference record.
+    marker_c : list or str
+              The color and shape of the marker for the other
+              records. Default is to use the color palette by archiveType. If set
+              to None then the color of the marker will represent the distance from
+              the reference records.
+    cmap : str
+          The colormap to use to represent the distance from the
+          reference record if no marker is selected.
+    colorbar : bool
+              Create a colorbar. Default is True
+    location : str
+              Location of the colorbar
+    label : str
+           Label for the colorbar.
+    figsize : list
+             the size for the figure
+    ax : ax
+        Return as axis instead of figure (useful to integrate plot into a subplot)
+    saveFig : bool
+             default is to not save the figure
+    dir : str
+         the full path of the directory in which to save the figure.
+         If not provided, creates a default folder called 'figures' in the
+         LiPD working directory (lipd.path).
+    format : str
+            One of the file extensions supported by the active
             backend. Default is "eps". Most backend support png, pdf, ps, eps,
             and svg.
 
 
-    Returns:
-        ax - The figure
+    Returns
+    -------
+    ax : axis
+        The figure
 
     """
 
@@ -661,26 +761,38 @@ def plotTs(ts = None, x_axis = None, markersize = 50,\
             format="eps"):
     """Plot a single time series.
 
-    Args:
-        ts: By default, will prompt the user for one.
-        x_axis (str): The representation against which to plot the paleo-data.
+    Args
+    ----
+    
+    ts : array
+        By default, will prompt the user for one.
+    x_axis : str
+            The representation against which to plot the paleo-data.
             Options are "age", "year", and "depth". Default is to let the
             system choose if only one available or prompt the user.
-        markersize (int): default is 50.
-        marker (str): a string (or list) containing the color and shape of the
+    markersize : int
+                default is 50.
+    marker : str
+            a string (or list) containing the color and shape of the
             marker. Default is by archiveType. Type pyleo.plot_default to see
             the default palette.
-        figsize (list): the size for the figure
-        saveFig (bool): default is to not save the figure
-        dir (str): the full path of the directory in which to save the figure.
-            If not provided, creates a default folder called 'figures' in the
-            LiPD working directory (lipd.path).
-        format (str): One of the file extensions supported by the active
+    figsize : list
+             the size for the figure
+    saveFig : bool
+             default is to not save the figure
+    dir : str
+         the full path of the directory in which to save the figure.
+         If not provided, creates a default folder called 'figures' in the
+         LiPD working directory (lipd.path).
+    format : str
+            One of the file extensions supported by the active
             backend. Default is "eps". Most backend support png, pdf, ps, eps,
             and svg.
 
-    Returns:
-        The figure.
+    Returns
+    -------
+    
+    The figure.
 
     """
     if ts is None:
@@ -762,26 +874,40 @@ def plotEnsTs(ts = None, lipd = None, ensTableName = None, ens = None, \
               format="eps"):
     """ Plot timeseries on various ensemble ages
 
-    Args:
-        ts (dict): LiPD timeseries object. By default, will prompt for one
-        lipd (dict): The LiPD dictionary. MUST be provided if timeseries is set.
-        ensTableName (str): The name of the ensemble table, if known.
-        ens (int): Number of ensembles to plot. By default, will plot either the
-            number of ensembles stored in the chronensembleTable or 500 of them,
-            whichever is lower
-        color (str): The line color. If None, uses the default color palette
-        alpha (float): Transparency setting for each line. Default is 0.005.
-        figsize (list): the size for the figure
-        saveFig (bool): default is to not save the figure
-        dir (str): the full path of the directory in which to save the figure.
-            If not provided, creates a default folder called 'figures' in the
-            LiPD working directory (lipd.path).
-        format (str): One of the file extensions supported by the active
+    Args
+    ----
+    
+    ts : dict
+        LiPD timeseries object. By default, will prompt for one
+    lipd : dict
+          The LiPD dictionary. MUST be provided if timeseries is set.
+    ensTableName : str
+                  The name of the ensemble table, if known.
+    ens : int
+         Number of ensembles to plot. By default, will plot either the
+         number of ensembles stored in the chronensembleTable or 500 of them,
+         whichever is lower
+    color : str
+           The line color. If None, uses the default color palette
+    alpha : float
+           Transparency setting for each line. Default is 0.005.
+    figsize : list
+             the size for the figure
+    saveFig : bool
+             default is to not save the figure
+    dir : str 
+         the full path of the directory in which to save the figure.
+         If not provided, creates a default folder called 'figures' in the
+         LiPD working directory (lipd.path).
+    format : str
+            One of the file extensions supported by the active
             backend. Default is "eps". Most backend support png, pdf, ps, eps,
             and svg.
 
-    Returns:
-        The figure
+    Returns
+    -------
+    
+    The figure
 
     """
     if ts is None:
@@ -943,37 +1069,54 @@ def histTs(ts = None, bins = None, hist = True, \
     seaborn kdeplot() and rugplot() functions. It can also fit
     scipy.stats distributions and plot the estimated PDF over the data.
 
-    Args:
-        ts: A timeseries. By default, will prompt the user for one.
-        bins (int): Specification of hist bins following matplotlib(hist),
-            or None to use Freedman-Diaconis rule
-        hist (bool): Whether to plot a (normed) histogram
-        kde (bool): Whether to plot a gaussian kernel density estimate
-        rug (bool): Whether to draw a rugplot on the support axis
-        fit: Random variable object. An object with fit method, returning
-            a tuple that can be passed to a pdf method of positional
-            arguments following a grid of values to evaluate the pdf on.
-        {hist, kde, rug, fit}_kws: Dictionaries. Keyword arguments for
-            underlying plotting functions. If modifying the dictionary, make
-            sure the labels "hist", "kde", "rug" and "fit" are still passed.
-        color (str): matplotlib color. Color to plot everything but the
-            fitted curve in. Default is to use the default paletter for each
-            archive type.
-        vertical (bool): if True, oberved values are on y-axis.
-        norm_hist (bool): If True (default), the histrogram height shows
-            a density rather than a count. This is implied if a KDE or
-            fitted density is plotted
-        figsize (list): the size for the figure
-        saveFig (bool): default is to not save the figure
-        dir (str): the full path of the directory in which to save the figure.
-            If not provided, creates a default folder called 'figures' in the
-            LiPD working directory (lipd.path).
-        format (str): One of the file extensions supported by the active
+    Args
+    ----
+    ts : array
+        A timeseries. By default, will prompt the user for one.
+    bins : int
+          Specification of hist bins following matplotlib(hist),
+          or None to use Freedman-Diaconis rule
+    hist : bool
+          Whether to plot a (normed) histogram
+    kde : bool
+         Whether to plot a gaussian kernel density estimate
+    rug : bool
+         Whether to draw a rugplot on the support axis
+    fit : object
+         Random variable object. An object with fit method, returning
+         a tuple that can be passed to a pdf method of positional
+         arguments following a grid of values to evaluate the pdf on.
+    {hist, kde, rug, fit}_kws : Dictionaries 
+                               Keyword arguments for underlying plotting functions. 
+                               If modifying the dictionary, make
+                               sure the labels "hist", "kde", "rug" and "fit" are still passed.
+    color : str 
+           matplotlib color. Color to plot everything but the
+           fitted curve in. Default is to use the default paletter for each
+           archive type.
+    vertical : bool
+              if True, oberved values are on y-axis.
+    norm_hist : bool
+               If True (default), the histrogram height shows
+               a density rather than a count. This is implied if a KDE or
+               fitted density is plotted
+    figsize : list
+             the size for the figure
+    saveFig : bool
+             default is to not save the figure
+    dir : bool
+        the full path of the directory in which to save the figure.
+        If not provided, creates a default folder called 'figures' in the
+        LiPD working directory (lipd.path).
+    format : str
+            One of the file extensions supported by the active
             backend. Default is "eps". Most backend support png, pdf, ps, eps,
             and svg.
 
     Returns
-        fig - The figure
+    -------
+    
+        fig : The figure
 
     """
     if ts is None:
@@ -1056,21 +1199,30 @@ def summaryTs(ts = None, x_axis = None, saveFig = False, dir = None,
     the PaleoData_values, location map, spectral density using the wwz
     method, and metadata about the record.
 
-    Args:
-        ts: a timeseries object. By default, will prompt for one
-        x_axis (str): The representation against which to plot the paleo-data.
+    Args
+    ----
+    
+    ts : object
+        a timeseries object. By default, will prompt for one
+    x_axis : str
+            The representation against which to plot the paleo-data.
             Options are "age", "year", and "depth". Default is to let the
             system choose if only one available or prompt the user.
-        saveFig (bool): default is to not save the figure
-        dir (str): the full path of the directory in which to save the figure.
-            If not provided, creates a default folder called 'figures' in the
-            LiPD working directory (lipd.path).
-        format (str): One of the file extensions supported by the active
+    saveFig : bool
+             default is to not save the figure
+    dir : str
+         the full path of the directory in which to save the figure.
+         If not provided, creates a default folder called 'figures' in the
+         LiPD working directory (lipd.path).
+    format : str
+            One of the file extensions supported by the active
             backend. Default is "eps". Most backend support png, pdf, ps, eps,
             and svg.
 
-    Returns:
-        The figure
+    Returns
+    -------
+    
+    The figure
 
     """
 
@@ -1222,15 +1374,21 @@ Statistics
 def statsTs(ts=None):
     """ Calculate simple statistics of a timeseries
 
-    Args:
-        ts: sytem will prompt for one if not given
+    Args
+    ----
+    
+    ts : object
+        system will prompt for one if not given
 
-    Returns:
-        the mean, median, min, max, standard deviation and the
-        inter-quartile range (IQR) of a timeseries.
+    Returns
+    -------
+    
+    the mean, median, min, max, standard deviation and the
+    inter-quartile range (IQR) of a timeseries.
 
-    Examples:
-        >>> mean, median, min_, max_, std, IQR = pyleo.statsTs(timeseries)
+    Examples
+    --------
+     mean, median, min_, max_, std, IQR = pyleo.statsTs(timeseries)
 
     """
     if ts is None:
@@ -1250,44 +1408,62 @@ def corrSigTs(ts1 = None, ts2 = None, x_axis = None, \
                  interp_step = None, start = None, end = None, nsim = 1000, \
                  method = 'isospectral', alpha = 0.05):
     """ Estimates the significance of correlations between non IID timeseries.
-
-
-        Args:
-            timeseries1, timeseries2: timeseries object. Default is blank.
-            x-axis (str): The representation against which to express the
+        Args
+        ----
+        
+        timeseries1 : object
+                     timeseries object. Default is blank.
+         timeseries2 : object
+                     timeseries object. Default is blank.
+     
+        x-axis : str
+                The representation against which to express the
                 paleo-data. Options are "age", "year", and "depth".
                 Default is to let the system choose if only one available
                 or prompt the user.
-            interp_method (str): If the timeseries are not on the same axis, which
-                interpolation method to use. Valid entries are 'interpolation'
-                (default) and 'bin'. 
-            autocorrect (bool): If applicable, convert age to year automatically.
-                If set to False, timeseries objects should have converted time
-                axis and updated units label in the dictionary
-            autocorrect_param (float): Reference for age/year conversion.
-            interp_step (float): the step size. By default, will prompt the user.
-            start (float): Start time/age/depth. Default is the maximum of
-                the minima of the two timeseries
-            end (float): End time/age/depth. Default is the minimum of the
-                maxima of the two timeseries
-            nsim (int): the number of simulations. Default is 1000
-            method (str): method use to estimate the correlation and significance.
+        interp_method : str
+                       If the timeseries are not on the same axis, which
+                       interpolation method to use. Valid entries are 'interpolation'
+                       (default) and 'bin'. 
+        autocorrect : bool
+                     If applicable, convert age to year automatically.
+                     If set to False, timeseries objects should have converted time
+                     axis and updated units label in the dictionary
+        autocorrect_param : float
+                           Reference for age/year conversion.
+        interp_step : float
+                     the step size. By default, will prompt the user.
+        start : float
+               Start time/age/depth. Default is the maximum of
+               the minima of the two timeseries
+        end : float
+             End time/age/depth. Default is the minimum of the
+             maxima of the two timeseries
+        nsim : int
+              the number of simulations. Default is 1000
+        method : str
+                method used to estimate the correlation and significance.
                 Available methods include:
-                    - 'ttest': T-test where the degrees of freedom are corrected for
-                    the effect of serial correlation \n
-                    - 'isopersistant': AR(1) modeling of the two timeseries \n
-                    - 'isospectral' (default): phase randomization of original
-                    inputs.
+                - 'ttest': T-test where the degrees of freedom are corrected for
+                the effect of serial correlation \n
+                - 'isopersistant': AR(1) modeling of the two timeseries \n
+                - 'isospectral' (default): phase randomization of original
+                inputs.
                 The T-test is parametric test, hence cheap but usually wrong
                 except in idyllic circumstances.
                 The others are non-parametric, but their computational
                 requirements scales with nsim.
-            alpha (float): significance level for critical value estimation. Default is 0.05
+        alpha : float
+               significance level for critical value estimation. Default is 0.05
 
-        Returns:
-            r (float) - correlation between the two timeseries \n
-            sig (bool) -  Returns True if significant, False otherwise \n
-            p (real) - the p-value
+        Returns
+        -------
+            r : float
+               correlation between the two timeseries \n
+            sig : bool
+                 Returns True if significant, False otherwise \n
+            p : real
+               the p-value
 
     """
     if not ts1:
@@ -1503,21 +1679,31 @@ def binTs(timeseries = None, x_axis = None, bin_size = None, \
           start = None, end = None):
     """Bin the paleoData values of the timeseries
 
-    Args:
-        timeseries. By default, will prompt the user for one.
-        x-axis (str): The representation against which to plot the paleo-data.
-            Options are "age", "year", and "depth". Default is to let the
-            system  choose if only one available or prompt the user.
-        bin_size (float): the size of the bins to be used. By default,
-            will prompt for one
+    Args
+    ----
+        timeseries : str
+                    By default, will prompt the user for one.
+        x-axis : str
+                The representation against which to plot the paleo-data.
+                Options are "age", "year", and "depth". Default is to let the
+                system  choose if only one available or prompt the user.
+        bin_size : float
+                  the size of the bins to be used. By default,
+                  will prompt for one
         start (float): Start time/age/depth. Default is the minimum
         end (float): End time/age/depth. Default is the maximum
 
-    Returns:
-        binned_values- the binned output,\n
-        bins-  the bins (centered on the median, i.e. the 100-200 bin is 150),\n
-        n-  number of data points in each bin,\n
-        error- the standard error on the mean in each bin\n
+    Returns
+    -------
+    
+    binned_values : list
+                   the binned output
+    bins : list
+          the bins (centered on the median, i.e. the 100-200 bin is 150),\n
+    n : list
+       number of data points in each bin
+    error : float
+           the standard error on the mean in each bin\n
 
     """
     if not timeseries:
@@ -1544,19 +1730,27 @@ def interpTs(timeseries = None, x_axis = None, interp_step = None,\
 
     Simple linear interpolation of the data using the numpy.interp method
 
-    Args:
-        timeseries. Default is blank, will prompt for it
-        x-axis (str): The representation against which to plot the paleo-data.
+    Args
+    ----
+    timeseries : object
+                Default is blank, will prompt for it
+    x-axis : str
+            The representation against which to plot the paleo-data.
             Options are "age", "year", and "depth". Default is to let the
             system choose if only one available or prompt the user.
-        interp_step (float): the step size. By default, will prompt the user.
-        start (float): Start year/age/depth. Default is the minimum
-        end (float): End year/age/depth. Default is the maximum
-
-    Returns:
-        interp_age - the interpolated age/year/depth according to the end/start
-        and time step, \n
-        interp_values - the interpolated values
+    interp_step : float
+                 the step size. By default, will prompt the user.
+    start : float
+           Start year/age/depth. Default is the minimum
+    end : float
+         End year/age/depth. Default is the maximum
+    Returns
+    -------
+    interp_age : list
+                the interpolated age/year/depth according to the end/start
+                and time step, \n
+    interp_values : list
+                   the interpolated values
 
     """
     if not timeseries:
@@ -1582,20 +1776,33 @@ def standardizeTs(timeseries = None, scale = 1, ddof = 0, eps = 1e-3):
 
     Constant or nearly constant time series not rescaled.
 
-    Args:
-        timeseries (array): A LiPD timeseries object 
-        scale (real): a scale factor used to scale a record to a match a given variance
-        ddof (int): degress of freedom correction in the calculation of the standard deviation
-        eps (real): a threshold to determine if the standard deviation is too close to zero
+    Args
+    ----
+    
+    timeseries : array
+                A LiPD timeseries object 
+    scale : real
+           a scale factor used to scale a record to a match a given variance
+    ddof : int
+          degress of freedom correction in the calculation of the standard deviation
+    eps : real
+         a threshold to determine if the standard deviation is too close to zero
 
-    Returns:
-        z (array): the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed \n
-        mu (real): the mean of the original time series, E[X] \n
-        sig (real): the standard deviation of the original time series, std[X] \n
+    Returns
+    -------
+    
+    z : array
+       the standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed \n
+    mu : real
+        the mean of the original time series, E[X] \n
+    sig : real
+         the standard deviation of the original time series, std[X] \n
 
-    References:
-        1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
-        2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
+    References
+    
+    
+    1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
+    2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
 
     @author: fzhu
     """
@@ -1623,15 +1830,24 @@ def segmentTs(timeseries = None, factor = 2):
     larger than some factor times the mean resolution of the timeseries, then
     a brak point is applied and the timseries is divided.
 
-    Args:
-        timeseries: a LiPD timeseries object
-        factor (float): factor to adjust the threshold. threshold = factor*dt_mean.
+    Args
+    ----
+    
+    timeseries : object
+                a LiPD timeseries object
+    factor : float
+            factor to adjust the threshold. threshold = factor*dt_mean.
             Default is 2.
 
-    Returns:
-        seg_y (list) - a list of several segments with potentially different length
-        seg_t (list) - A list of the time values for each y segment.
-        n_segs (int) - the number of segments
+    Returns
+    -------
+    
+    seg_y : list
+           a list of several segments with potentially different length
+    seg_t : list
+           A list of the time values for each y segment.
+    n_segs : int
+            the number of segments
 
 
     """
@@ -1678,162 +1894,186 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
 
     Wavelet analysis for unevenly spaced data adapted from Foster et al. (1996)
 
-    Args:
-        timeseries (dict): A LiPD timeseries object (Optional, will prompt for one.)
-        lim (list): Truncate the timeseries between min/max time (e.g., [0,10000])
-        wwz (bool): If True, will perform wavelet analysis
-        psd (bool): If True, will inform the power spectral density of the timeseries
-        wwz_default: If True, will use the following default parameters:
+    Args
+    ----
+    timeseries : dict
+                A LiPD timeseries object (Optional, will prompt for one.)
+    lim : list
+         Truncate the timeseries between min/max time (e.g., [0,10000])
+    wwz : bool
+         If True, will perform wavelet analysis
+    psd : bool
+         If True, will inform the power spectral density of the timeseries
+    wwz_default : bool
+                 If True, will use the following default parameters:
+                 wwz_default = {'tau':None,
+                               'freqs':None,
+                               'c':1/(8*np.pi**2),
+                               'Neff':3,
+                               'Neff_coi':3,
+                               'nMC':200,
+                               'nproc':8,
+                               'detrend':False,
+                               'params' : ["default",4,0,1],
+                               'gaussianize': False,
+                               'standardize':True,
+                               'method':'Kirchner_f2py',
+                               'bc_mode':'reflect',
+                               'reflect_type':'odd',
+                               'len_bd':0}
+                 Modify the values for specific keys to change the default behavior.
+                 See spectral.wwz for details
 
-            wwz_default = {'tau':None,
-                           'freqs':None,
-                           'c':1/(8*np.pi**2),
-                           'Neff':3,
-                           'Neff_coi':3,
-                           'nMC':200,
+    psd_default : bool
+                If True, will use the following default parameters:
+                psd_default = {'tau':None,
+                           'freqs': None,
+                           'c':1e-3,
                            'nproc':8,
+                           'nMC':200,
                            'detrend':False,
                            'params' : ["default",4,0,1],
                            'gaussianize': False,
                            'standardize':True,
+                           'Neff':3,
+                           'anti_alias':False,
+                           'avgs':2,
                            'method':'Kirchner_f2py',
-                           'bc_mode':'reflect',
-                           'reflect_type':'odd',
-                           'len_bd':0}
+                           }
 
-            Modify the values for specific keys to change the default behavior.
-            See spectral.wwz for details
+                Modify the values for specific keys to change the default behavior.
+                See spectral.wwz_psd for details 
+        fig : bool
+             If True, plots the figure    
+        wwaplot_default : bool
+                         If True, will use the following default parameters:
+                         wwaplot_default={'AR1_q':AR1_q,
+                                          'coi':coi,
+                                          'levels':None,
+                                          'tick_range':None,
+                                          'yticks':None,
+                                          'yticks_label': None,
+                                          'ylim':None,
+                                          'xticks':None,
+                                          'xlabels':None,
+                                          'figsize':[20,8],
+                                          'clr_map':'OrRd',
+                                          'cbar_drawedges':False,
+                                          'cone_alpha':0.5,
+                                          'plot_signif':True,
+                                          'signif_style':'contour',
+                                          'plot_cone':True,
+                                          'title':None,
+                                          'ax':None,
+                                          'xlabel': the chondata label,
+                                          'ylabel': 'Period (units from ChronData)',
+                                          'plot_cbar':'True',
+                                          'cbar_orientation':'vertical',
+                                          'cbar_pad':0.05,
+                                          'cbar_frac':0.15,
+                                          'cbar_labelsize':None}
 
-        psd_default: If True, will use the following default parameters:
+                         Modify the values for specific keys to change the default behavior.
+        psdplot_default : bool
+                         If True, will use the following default parameters:
+                           psdplot_default={'lmstyle':'-',
+                                            'linewidth':None,
+                                             'color': sns.xkcd_rgb["denim blue"],
+                                             'ar1_lmstyle':'-',
+                                             'ar1_linewidth':1,
+                                             'period_ticks':None,
+                                             'period_tickslabel':None,
+                                             'psd_lim':None,
+                                             'period_lim':None,
+                                             'alpha':1,
+                                             'figsize':[20,8],
+                                             'label':'PSD',
+                                             'plot_ar1':True,
+                                             'psd_ar1_q95':95% quantile from psd,
+                                             'title': None,
+                                             'legend': 'True'
+                                             'psd_ar1_color':sns.xkcd_rgb["pale red"],
+                                             'ax':None,
+                                             'vertical':False,
+                                             'plot_gridlines':True,
+                                             'period_label':'Period (units of age)',
+                                             'psd_label':'Spectral Density',
+                                             'zorder' : None}
 
-            psd_default = {'tau':None,
-                       'freqs': None,
-                       'c':1e-3,
-                       'nproc':8,
-                       'nMC':200,
-                       'detrend':False,
-                       'params' : ["default",4,0,1],
-                       'gaussianize': False,
-                       'standardize':True,
-                       'Neff':3,
-                       'anti_alias':False,
-                       'avgs':2,
-                       'method':'Kirchner_f2py',
-                       }
+                             Modify the values for specific keys to change the default behavior.
 
-            Modify the values for specific keys to change the default behavior.
-            See spectral.wwz_psd for detail.s 
-        fig (bool): If True, plots the figure    
-        wwaplot_default: If True, will use the following default parameters:
+        saveFig : bool
+                 default is to not save the figure
+        dir : str
+             the full path of the directory in which to save the figure.
+             If not provided, creates a default folder called 'figures' in the
+             LiPD working directory (lipd.path).
+        format : str
+                One of the file extensions supported by the active
+                backend. Default is "eps". Most backend support png, pdf, ps, eps,
+                and svg.
 
-            wwaplot_default={'AR1_q':AR1_q,
-                                 'coi':coi,
-                                 'levels':None,
-                                 'tick_range':None,
-                                 'yticks':None,
-                                 'yticks_label': None,
-                                 'ylim':None,
-                                 'xticks':None,
-                                 'xlabels':None,
-                                 'figsize':[20,8],
-                                 'clr_map':'OrRd',
-                                 'cbar_drawedges':False,
-                                 'cone_alpha':0.5,
-                                 'plot_signif':True,
-                                 'signif_style':'contour',
-                                 'plot_cone':True,
-                                 'title':None,
-                                 'ax':None,
-                                 'xlabel': the chondata label,
-                                 'ylabel': 'Period (units from ChronData)',
-                                 'plot_cbar':'True',
-                                 'cbar_orientation':'vertical',
-                                 'cbar_pad':0.05,
-                                 'cbar_frac':0.15,
-                                 'cbar_labelsize':None}
+    Returns
+    -------
+       
+       
+    dict_out : dict
+              A dictionary of outputs.
 
-            Modify the values for specific keys to change the default behavior.
-        psdplot_default: If True, will use the following default parameters:
+    For wwz:
 
-            psdplot_default={'lmstyle':'-',
-                                 'linewidth':None,
-                                 'color': sns.xkcd_rgb["denim blue"],
-                                 'ar1_lmstyle':'-',
-                                 'ar1_linewidth':1,
-                                 'period_ticks':None,
-                                 'period_tickslabel':None,
-                                 'psd_lim':None,
-                                 'period_lim':None,
-                                 'alpha':1,
-                                 'figsize':[20,8],
-                                 'label':'PSD',
-                                 'plot_ar1':True,
-                                 'psd_ar1_q95':95% quantile from psd,
-                                 'title': None,
-                                 'legend': 'True'
-                                 'psd_ar1_color':sns.xkcd_rgb["pale red"],
-                                 'ax':None,
-                                 'vertical':False,
-                                 'plot_gridlines':True,
-                                 'period_label':'Period (units of age)',
-                                 'psd_label':'Spectral Density',
-                                 'zorder' : None}
+    - wwa : array
+           The weights wavelet amplitude
 
-            Modify the values for specific keys to change the default behavior.
+    - AR1_q : array
+             AR1 simulations
 
-        saveFig (bool): default is to not save the figure
-        dir (str): the full path of the directory in which to save the figure.
-            If not provided, creates a default folder called 'figures' in the
-            LiPD working directory (lipd.path).
-        format (str): One of the file extensions supported by the active
-            backend. Default is "eps". Most backend support png, pdf, ps, eps,
-            and svg.
+    - coi : array
+           cone of influence
 
-    Returns:
-        dict_out (dict): A dictionary of outputs.
+    - freqs : array
+             vector for frequencies
 
-            For wwz:
+    - tau : array
+           the evenly-spaced time points, namely the time
+           shift for wavelet analysis.
 
-            - wwa (array): The weights wavelet amplitude
+    - Neffs : array
+             The matrix of effective number of points in the
+             time-scale coordinates.
 
-            - AR1_q (array): AR1 simulations
+    - coeff : array
+             The wavelet transform coefficients
 
-            - coi (array): cone of influence
+    For psd :
 
-            - freqs (array): vector for frequencies
+    - psd : array
+           power spectral density
 
-            - tau (array): the evenly-spaced time points, namely the time
-            shift for wavelet analysis.
+    - freqs : array
+             vector of frequency
 
-            - Neffs (array): The matrix of effective number of points in the
-            time-scale coordinates.
+    - psd_ar1_q95 : array
+                   the 95% quantile of the psds of AR1 processes
 
-            - coeff (array): The wavelet transform coefficients
+    fig : The figure
 
-            For psd:
+    References
+    ----------
+    Foster, G. (1996). Wavelets for period analysis of unevenly
+    sampled time series. The Astronomical Journal, 112(4), 1709-1729.
 
-            - psd (array): power spectral density
+    Examples
+    --------
+    To run both wwz and psd:
 
-            - freqs (array): vector of frequency
+    >>> dict_out, fig = pyleoclim.wwzTs(wwz=True)
 
-            - psd_ar1_q95 (array): the 95% quantile of the psds of AR1 processes
+    Note: This will return a single figure with wwa and psd
 
-        fig: The figure
+    To change a default behavior:
 
-        References:
-            Foster, G. (1996). Wavelets for period analysis of unevenly
-            sampled time series. The Astronomical Journal, 112(4), 1709-1729.
-
-        Examples:
-            To run both wwz and psd: \n
-
-            >>> dict_out, fig = pyleoclim.wwzTs(wwz=True)
-
-            Note: This will return a single figure with wwa and psd \n
-
-            To change a default behavior:\n
-
-            >>> dict_out, fig = pyleoclim.wwzTs(psd_default = {'nMC':1000})
+    >>> dict_out, fig = pyleoclim.wwzTs(psd_default = {'nMC':1000})
 
     """
 
@@ -2116,76 +2356,93 @@ def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None,
           saveFig = False, dir = None, format = "eps"):
     """Cross Wavelet transform of two timeseries
     
-    Args:
-        timeseries1, timseries2 (dict): a LiPD timeseries object (Optional, will prompt for one)
-        lim (list): Truncate the timeseries between min/max time (e.g., [0,10000])
-        x-axis (str): The representation against which to express the
-                paleo-data. Options are "age", "year", and "depth".
-                Default is to let the system choose if only one available
-                or prompt the user.
-        autocorrect (bool): If applicable, convert age to year automatically.
-                If set to False, timeseries objects should have converted time
-                axis and updated units label in the dictionary
-        autocorrect_param (float): Reference for age/year conversion.
-        xwt_default: If True, will use the followinf default parameters
-            
-            xwt_default = {'tau': None,
-                           'feqs': None,
-                           'c': 1/(8*np.pi**2),
-                           'Neff': 3,
-                           'Neff_coi': 6,
-                           'nproc': 8,
-                           'detrend': False,
-                           'params': ['default', 4, 0, 1],
-                           'gaussianize': False,
-                           'standardize':True,
-                           'method':'Kirchner_f2py'}
-            Modify the values for specific keys to change the default behavior.
-            See spectral.xwt for details
-        fig (bool): If True, plots the figure 
-        xwcplot_default: If True, will use the following default parameters:
-            
-            wwaplot_default={'pt':0.5,
-                                 'levels':None,
-                                 'tick_range':None,
-                                 'basey':2,
-                                 'yticks': None,
-                                 'ylime':None,
-                                 'xticks':None,
-                                 'xlabels':None,
-                                 'figsize':[20,8],
-                                 'clr_map':'OrRd',
-                                 'skip_x':5,
-                                 'skip_y':5,
-                                 'scale':30,
-                                 'width':0.004,
-                                 'cbar_drawedges':False
-                                 'cone_alpha':0.5,
-                                 'plot_signif':True,
-                                 'signif_style':'contour'
-                                 'title':None,
-                                 'plot_cone':True,
-                                 'ax':None,
-                                 'xlabel':Age representation,
-                                 'ylabel': "Period (year)",
-                                 'cbar_orientation':'vertical',
-                                 'cbar_pad':0.05,
-                                 'cbar_frac':0.15,
-                                 'cbar_labelsize':None
-                                 }
-        saveFig (bool): default is to not save the figure
-        dir (str): the full path of the directory in which to save the figure.
-            If not provided, creates a default folder called 'figures' in the
-            LiPD working directory (lipd.path).
-        format (str): One of the file extensions supported by the active
+    Args
+    ----
+    
+    timeseries1 : dict
+                 a LiPD timeseries object (Optional, will prompt for one)
+    timseries2 : dict
+                 a LiPD timeseries object (Optional, will prompt for one)
+    lim : list
+         Truncate the timeseries between min/max time (e.g., [0,10000])
+    x-axis : str
+            The representation against which to express the
+            paleo-data. Options are "age", "year", and "depth".
+            Default is to let the system choose if only one available
+            or prompt the user.
+    autocorrect : bool
+                 If applicable, convert age to year automatically.
+                 If set to False, timeseries objects should have converted time
+                 axis and updated units label in the dictionary
+    autocorrect_param : float
+                       Reference for age/year conversion.
+    xwt_default : bool
+                 If True, will use the following default parameters
+                 xwt_default = {'tau': None,
+                                'feqs': None,
+                                'c': 1/(8*np.pi**2),
+                                'Neff': 3,
+                                'Neff_coi': 6,
+                                'nproc': 8,
+                                'detrend': False,
+                                'params': ['default', 4, 0, 1],
+                                'gaussianize': False,
+                                'standardize':True,
+                                'method':'Kirchner_f2py'}
+                 Modify the values for specific keys to change the default behavior.
+                 See spectral.xwt for details
+    fig : bool
+         If True, plots the figure 
+    xwcplot_default : bool
+                     If True, will use the following default parameters:
+        
+                     wwaplot_default={'pt':0.5,
+                                      'levels':None,
+                                      'tick_range':None,
+                                      'basey':2,
+                                      'yticks': None,
+                                      'ylime':None,
+                                      'xticks':None,
+                                      'xlabels':None,
+                                      'figsize':[20,8],
+                                      'clr_map':'OrRd',
+                                      'skip_x':5,
+                                      'skip_y':5,
+                                      'scale':30,
+                                      'width':0.004,
+                                      'cbar_drawedges':False
+                                      'cone_alpha':0.5,
+                                      'plot_signif':True,
+                                      'signif_style':'contour'
+                                      'title':None,
+                                      'plot_cone':True,
+                                      'ax':None,
+                                      'xlabel':Age representation,
+                                      'ylabel': "Period (year)",
+                                      'cbar_orientation':'vertical',
+                                      'cbar_pad':0.05,
+                                      'cbar_frac':0.15,
+                                      'cbar_labelsize':None
+                                      }
+    saveFig (bool) : bool
+                    default is to not save the figure
+    dir : str
+         the full path of the directory in which to save the figure.
+         If not provided, creates a default folder called 'figures' in the
+         LiPD working directory (lipd.path).
+    format : str
+            One of the file extensions supported by the active
             backend. Default is "eps". Most backend support png, pdf, ps, eps,
             and svg.
         
-        Returns:
-            res (dict): contains the cross wavelet coherence, cross-wavelet phase,
-            vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
+    Returns
+    -------
+    res : dict
+         contains the cross wavelet coherence, cross-wavelet phase,
+         vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
             
-            fig
+    fig : Figure        
+    
     """
     #Get timeseries
     if not timeseries1:
@@ -2341,115 +2598,161 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
 
     Finally allows to make a plot.
 
-    Args:
-        lipd (dict): A dictionary containing the entry of a LiPD file. Can be
-            obtained from lipd.readLipd() or pyleoclim.openLipd(). Please note
-            that the Bchron function currently only allows for a single LiPD file
-            (i.e., not the entire directory).
-        modelNum (int): The model number in which to place the Bchron output.
-            If unknown, the function will try to make a guess and/or prompt
-            based on the number of already available models.
-        objectName (str): The name of the chron object in which to store the new
-            model (e.g. "chron0")
-        rejectAges (vector): A vector of 1/0 where 1 include the dates to be rejected.
-            Default it None.
-        calCurves (list): (Optional) A vector of values containing either 'intcal13',
-            'marine13', 'shcal13', or 'normal'. If none is provided, will
-            prompt the user. Should be either of length =1 if using the same
-            calibration for each age or the same length as the vector of ages.
-        reservoirAgeCorr (array): (Optional) A list (matrix) of two floats that correspond to the
-            DeltaR and DeltaR uncertainty. If already added to the ages and
-            ages standard deviation, then enter [0,0] to bypass the prompt.
-            Will only be applied if CalCurves is set to 'marine13'. Otherwise,
-            leave to none.
-        predictPositions (array): (Optional) a vector of positions
-            (e.g. depths) at which predicted age values are required.
-            Defaults to a sequence of length 100 from the top position to the
-            bottom position.
-        positionsThickness (array): (Optional) Thickness values for each of the positions.
-            The thickness values should be the full thickness value of the
-            slice. By default set to zero.
-        outlierProbs (array): (Optional) A vector of prior outlier probabilities,
-            one for each age. Defaults to 0.01
-        iterations (int): (Optional) The number of iterations to start the procedure.
-            Default and minimum should be 10000.
-        burn (int): (Optional) The number of starting iterations to discard.
-            Default is 200
-        thin (int): (Optional) The step size for every iteration to keep beyond
-            the burnin. Default is 8.
-        extractDate (float): (Optional) The top age of the core. Used for
-            extrapolation purposes so that no extrapolated ages go beyond the
-            top age of the core. Defaults to the current year.
-        maxExtrap (int): (Optional) The maximum number of extrapolations to
-            perform before giving up and setting the predicted ages to NA.
-            Useful for when large amounts of extrapolation are required, i.e.
-            some of the predictPositions are a long way from the dated
-            positions. Defaults to 500.
-        thetaMhSd (float):  (Optional)  The Metropolis-Hastings standard
-            deviation for the age parameters. Defaults to 0.5.
-        muMhSd (float): (Optional)  The Metropolis-Hastings standard deviation
+    Args
+    ----
+    
+    lipd : dict
+          A dictionary containing the entry of a LiPD file. Can be
+          obtained from lipd.readLipd() or pyleoclim.openLipd(). Please note
+          that the Bchron function currently only allows for a single LiPD file
+          (i.e., not the entire directory).
+    modelNum : int
+              The model number in which to place the Bchron output.
+              If unknown, the function will try to make a guess and/or prompt
+              based on the number of already available models.
+    objectName : str
+                The name of the chron object in which to store the new
+                model (e.g. "chron0")
+    rejectAges : vector
+                A vector of 1/0 where 1 include the dates to be rejected.
+                Default it None.
+    calCurves : list(Optional)
+               A vector of values containing either 'intcal13',
+              'marine13', 'shcal13', or 'normal'. If none is provided, will
+               prompt the user. Should be either of length =1 if using the same
+               calibration for each age or the same length as the vector of ages.
+               reservoirAgeCorr (array): (Optional) A list (matrix) of two floats that correspond to the
+               DeltaR and DeltaR uncertainty. If already added to the ages and
+               ages standard deviation, then enter [0,0] to bypass the prompt.
+               Will only be applied if CalCurves is set to 'marine13'. Otherwise,
+               leave to none.
+    predictPositions : vector(optional)
+                      a vector of positions
+                     (e.g. depths) at which predicted age values are required.
+                     Defaults to a sequence of length 100 from the top position to the
+                     bottom position.
+    positionsThicknes : array(Optional)
+                       Thickness values for each of the positions.
+                       The thickness values should be the full thickness value of the
+                       slice. By default set to zero.
+    outlierProbs : array
+                  A vector of prior outlier probabilities,
+                  one for each age. Defaults to 0.01
+    iterations : int(Optional)
+                The number of iterations to start the procedure.
+        Default and minimum should be 10000.
+    burn : int(Optional)
+          The number of starting iterations to discard.
+          Default is 200
+    thin : int(Optional)
+          The step size for every iteration to keep beyond
+          the burnin. Default is 8.
+    extractDate : float(Optional) 
+                 The top age of the core. Used for
+                 extrapolation purposes so that no extrapolated ages go beyond the
+                 top age of the core. Defaults to the current year.
+    maxExtrap : int(Optional)
+               The maximum number of extrapolations to
+               perform before giving up and setting the predicted ages to NA.
+               Useful for when large amounts of extrapolation are required, i.e.
+               some of the predictPositions are a long way from the dated
+               positions. Defaults to 500.
+    thetaMhSd : float(Optional)  
+               The Metropolis-Hastings standard
+               deviation for the age parameters. Defaults to 0.5.
+    muMhSd : float(Optional) 
+            The Metropolis-Hastings standard deviation
             for the compound Poisson-Gamma Scale. Defaults to 0.1
-        psiMhSd (float): (Optional) The Metropolis-Hastings standard deviation
-            for the Compound Poisson-Gamma Scale.
-        ageScaleVal (int): (Optional) A scale value for the ages.
-            Bchronology works best when the ages are scaled to be
-            approximately between 0 and 100.
-            The default value is thus 1000 for ages given in years.
-        positionScaleVal (int):  (Optional) A scale value for the positions.
-            Bchronology works best when the positions are scaled to be
-            approximately between 0 and 100. The default value is thus
-            100 for positions given in cm.
-        saveLipd (bool): If True, saves the ensemble, distribution, and probability
-            tables along with the parameters used to run the model in the LiPD
-            file.
-        plot_age (bool): If True, makes a plot for the chronology
-        figsize (list): The figure size. Default is [4,8]
-        flipCoor (bool): If True, plots depth on the y-axis.
-        xlabel (str): The label for the x-axis
-        ylabel (str): The label for the y-axis
-        xlim (list): Limits for the x-axis. Default corresponds to the min/max
-            of the depth vector.
-        ylim (list): Limits for the y-axis. Default set by matplotlib
-        violinColor (str): The color for the violins. Default is purple
-        medianLineColor (str): The color for the median line. Default is black.
-        medianLineWidth (float): The width for the median line
-        CIFillColor (str): Fill color in between the 95% confidence interval.
-            Default is silver.
-        samplePaths (bool): If True, draws sample paths from the distribution.
-            Use the same color as the violins.
-        samplePathNumber (int): The number of sample paths to draw. Default is 10.
-            Note: samplePaths need to be set to True.
-        alpha (float): The violins' transparency. Number between 0 and 1
-        saveFig (bool): default is to not save the figure
-        dir (str): the full path of the directory in which to save the figure.
-            If not provided, creates a default folder called 'figures' in the
-            LiPD working directory (lipd.path).
-        format (str): One of the file extensions supported by the active
+    psiMhSd : float(Optional)
+             The Metropolis-Hastings standard deviation
+             for the Compound Poisson-Gamma Scale.
+    ageScaleVal : int(Optional)
+                 A scale value for the ages.
+                 Bchronology works best when the ages are scaled to be
+                 approximately between 0 and 100.
+                 The default value is thus 1000 for ages given in years.
+    positionScaleVal : int(Optional)
+                      A scale value for the positions.
+                      Bchronology works best when the positions are scaled to be
+                      approximately between 0 and 100. The default value is thus
+                      100 for positions given in cm.
+    saveLipd : bool
+              If True, saves the ensemble, distribution, and probability
+              tables along with the parameters used to run the model in the LiPD
+              file.
+    plot_age : bool
+              If True, makes a plot for the chronology
+    figsize : list
+             The figure size. Default is [4,8]
+    flipCoor : bool
+              If True, plots depth on the y-axis.
+    xlabel : str
+            The label for the x-axis
+    ylabel : str
+            The label for the y-axis
+    xlim : list
+          Limits for the x-axis. Default corresponds to the min/max
+          of the depth vector.
+    ylim : list
+          Limits for the y-axis. Default set by matplotlib
+    violinColor : str
+                 The color for the violins. Default is purple
+    medianLineColor : str
+                     The color for the median line. Default is black.
+    medianLineWidth : float
+                     The width for the median line
+    CIFillColor : str
+                 Fill color in between the 95% confidence interval.
+                 Default is silver.
+    samplePaths : bool
+                 If True, draws sample paths from the distribution.
+                 Use the same color as the violins.
+    samplePathNumber : int
+                      The number of sample paths to draw. Default is 10.
+                      Note: samplePaths need to be set to True.
+    alpha : float
+           The violins' transparency. Number between 0 and 1
+    saveFig : bool
+             default is to not save the figure
+    dir : str
+         the full path of the directory in which to save the figure.
+         If not provided, creates a default folder called 'figures' in the
+         LiPD working directory (lipd.path).
+    format : str
+            One of the file extensions supported by the active
             backend. Default is "eps". Most backend support png, pdf, ps, eps,
             and svg.
 
-    Returns:
-        depth - the predicted positions (either same as the user or the default) \n
-        chron -  a numpy array of possible chronologies in each column.
-            The number of rows is the same as the length of depth
-        ageDist - the distribution of ages around each dates.
-        fig - the figure
-        run - the full R object containing the outputs of the Bchron run
+    Returns
+    -------
+    depth : float
+           the predicted positions (either same as the user or the default) 
+    chron : array 
+           a numpy array of possible chronologies in each column.
+           The number of rows is the same as the length of depth
+    ageDist : list
+             the distribution of ages around each dates.
+    fig : the figure
+    run : object
+         the full R object containing the outputs of the Bchron run
 
-    Warnings:
-        This function requires R and the Bchron package and all its
-            dependencies to be installed on the same machine.
+    Warnings
+    --------
+    - This function requires R and the Bchron package and all its
+      dependencies to be installed on the same machine.
 
-    Reference:
-        - Haslett, J., and Parnell, A. C. (2008). A simple monotone
-            process with application to radiocarbon-dated depth
-            chronologies. Journal of the Royal Statistical Society,
-            Series C, 57, 399-418. DOI:10.1111/j.1467-9876.2008.00623.x
-        - Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E.,
-            and Huntley, B. (2008). A flexible approach to assessing
-            synchroneity of past events using Bayesian reconstructions
-            of sedimentation history. Quaternary Science Reviews,
-            27(19-20), 1872-1885. DOI:10.1016/j.quascirev.2008.07.009
+    References
+    ----------
+    - Haslett, J., and Parnell, A. C. (2008). A simple monotone
+    process with application to radiocarbon-dated depth
+    chronologies. Journal of the Royal Statistical Society,
+    Series C, 57, 399-418. DOI:10.1111/j.1467-9876.2008.00623.x
+    - Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E.,
+    and Huntley, B. (2008). A flexible approach to assessing
+    synchroneity of past events using Bayesian reconstructions
+    of sedimentation history. Quaternary Science Reviews,
+    27(19-20), 1872-1885. DOI:10.1016/j.quascirev.2008.07.009
+    
     """
 
     # Get the csv_list
