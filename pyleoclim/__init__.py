@@ -177,6 +177,7 @@ def mapAllArchive(lipds = None, markersize = 50, projection = 'Robinson',\
 
     Returns
     ------
+    
     "The figure"
     """
 
