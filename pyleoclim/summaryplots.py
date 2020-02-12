@@ -21,21 +21,26 @@ def getMetadata(timeseries):
     
     """ Get the necessary metadata to be printed out automatically
     
-    Args:
-        timeseries: a specific timeseries object. 
+    Args
+    ----
         
-    Returns:
-        A dictionary containing the following metadata:\n
-        archiveType \n
-        Authors (if more than 2, replace by et al. \n
-        PublicationYear \n
-        Publication DOI \n
-        Variable Name \n
-        Units \n
-        Climate Interpretation \n
-        Calibration Equation \n
-        Calibration References \n
-        Calibration Notes \n
+    timeseries : object
+                a specific timeseries object. 
+        
+    Returns
+    -------
+    dict_out : dict
+              A dictionary containing the following metadata:
+                archiveType
+                Authors (if more than 2, replace by et al)
+                PublicationYear 
+                Publication DOI 
+                Variable Name
+                Units
+                Climate Interpretation
+                Calibration Equation 
+                Calibration References
+                Calibration Notes
         
     """
     
@@ -227,16 +232,26 @@ def TsData(timeseries, x_axis=""):
 def agemodelData(timeseries):
     """Get the necessary information for the agemodel plot
 
-    Args:
-        timeseries: a single timeseries object. By default, will
-            prompt the user
+    Args
+    ----
+    
+    timeseries : object
+                a single timeseries object. By default, will
+                prompt the user
 
-    Returns:
-        depth - the depth values \n
-        age - the age values \n
-        x_label - the label for the x-axis \n
-        y_label - the label for the y-axis \n
-        archiveType - the archiveType (for default plot settings)
+    Returns
+    -------
+    
+        depth : float
+               the depth values
+        age : float
+             the age values
+        x_label : str
+                 the label for the x-axis 
+        y_label : str
+                 the label for the y-axis \n
+        archiveType : str
+                     the archiveType (for default plot settings)
 
     """
     if not "age" in timeseries.keys() and not "year" in timeseries.keys():
