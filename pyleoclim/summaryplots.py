@@ -29,6 +29,7 @@ def getMetadata(timeseries):
         
     Returns
     -------
+    
     dict_out : dict
               A dictionary containing the following metadata:
                 archiveType
@@ -174,20 +175,33 @@ def TsData(timeseries, x_axis=""):
     Get the necessary information for the TS plots/necessary to allow for
     axes specification
     
-    Args:
-        timeseries: a single timeseries object. 
-            By default, will prompt the user
-        x-axis (str): The representation against which to plot the 
+    Args
+    ----
+    
+    timeseries : object
+                a single timeseries object. 
+                By default, will prompt the user
+    x-axis : str
+            The representation against which to plot the 
             paleo-data. Options are "age", "year", and "depth". 
             Default is to let the system choose if only one available 
             or prompt the user.
-    Returns:
-        x - the x-valus \n
-        y - the y-values \n
-        archiveType - the archiveType (for plot settings) \n
-        x_label - the label for the x-axis \n
-        y_label - the label for the y-axis \n
-        label - the results of the x-axis query. Either depth, year, or age
+    
+    Returns
+    -------
+    
+        x : list
+           the x-values
+        y : list
+           the y-values 
+        archiveType : str
+                     the archiveType (for plot settings) \n
+        x_label : str
+                 the label for the x-axis \n
+        y_label : str
+                 the label for the y-axis \n
+        label : str
+               the results of the x-axis query. Either depth, year, or age
         
     """
     # Grab the x and y values
