@@ -2790,7 +2790,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
               detrend=detrend, params=params,
               gaussianize=gaussianize, standardize=standardize, method=method)
 
-    psd = wa.wwa2psd(res_wwz.wwa, ts_cut, res_wwz.Neffs, freqs=res_wwz.freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+    psd = wa.wwa2psd(res_wwz.amplitude, ts_cut, res_wwz.Neffs, freqs=res_wwz.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
     #  psd[1/freqs > np.max(coi)] = np.nan  # cut off the unreliable part out of the coi
     #  psd = psd[1/freqs <= np.max(coi)] # cut off the unreliable part out of the coi
     #  freqs = freqs[1/freqs <= np.max(coi)]
@@ -2820,8 +2820,8 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     else:
         psd_ar1_q95 = None
 
-    Results = collections.namedtuple('Results', ['psd', 'freqs', 'psd_ar1_q95', 'psd_ar1'])
-    res = Results(psd=psd, freqs=freqs, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
+    Results = collections.namedtuple('Results', ['psd', 'freq', 'psd_ar1_q95', 'psd_ar1'])
+    res = Results(psd=psd, freq=freqs, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
 
     return res
 
@@ -3090,9 +3090,9 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         AR1_q = None
 
     coi = wa.make_coi(tau, Neff=Neff)
-    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xwt', 'freqs', 'tau', 'AR1_q', 'coi'])
+    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xwt', 'freq', 'time', 'AR1_q', 'coi'])
     res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase, xwt=xwt,
-                  freqs=freqs, tau=tau, AR1_q=AR1_q, coi=coi)
+                  freq=freqs, time=tau, AR1_q=AR1_q, coi=coi)
 
     return res
 
@@ -3538,8 +3538,8 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
         >>> res_wwz = spectral.wwz_psd(signal, time, tau=tau, c=1e-3, standardize=False, nMC=0)
         >>> # plot
         >>> fig = spectral.plot_psd(
-        ...           res_wwz.psd,
-        ...           res_wwz.freqs,
+        ...           res_wwz.amplitude,
+        ...           res_wwz.freq,
         ...           period_ticks=[2, 5, 10, 20, 50, 100],
         ...           figsize=[10, 8],
         ...       )
@@ -3751,14 +3751,14 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
                   gaussianize=gaussianize, standardize=standardize)
 
     if wwa_xlabel is not None and wwa_ylabel is not None:
-        plot_wwa(res_wwz.wwa, res_wwz.freqs, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
+        plot_wwa(res_wwz.amplitude, res_wwz.freq, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
                  yticks=period_ticks, yticks_label=period_tickslabel,
                  ylim=[ylim_min, np.max(res_wwz.coi)],
                  plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2, levels=levels,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
                  )
     else:
-        plot_wwa(res_wwz.wwa, res_wwz.freqs, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
+        plot_wwa(res_wwz.amplitude, res_wwz.freq, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
                  yticks=period_ticks, yticks_label=period_tickslabel,
                  ylim=[ylim_min, np.max(res_wwz.coi)],
                  plot_cone=True, plot_signif=True, ax=ax2,
