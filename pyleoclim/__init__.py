@@ -1086,10 +1086,13 @@ def histTs(ts = None, bins = None, hist = True, \
          Random variable object. An object with fit method, returning
          a tuple that can be passed to a pdf method of positional
          arguments following a grid of values to evaluate the pdf on.
-    {hist, kde, rug, fit}_kws : Dictionaries 
-                               Keyword arguments for underlying plotting functions. 
-                               If modifying the dictionary, make
-                               sure the labels "hist", "kde", "rug" and "fit" are still passed.
+    hist _kws : Dictionary
+    kde_kws : Dictionary
+    rug_kws : Dictionary
+    fit_kws : Dictionary
+             Keyword arguments for underlying plotting functions.
+             If modifying the dictionary, make sure the labels "hist",
+             "kde","rug","fit" are stall passed.  
     color : str 
            matplotlib color. Color to plot everything but the
            fitted curve in. Default is to use the default paletter for each
@@ -1408,62 +1411,62 @@ def corrSigTs(ts1 = None, ts2 = None, x_axis = None, \
                  interp_step = None, start = None, end = None, nsim = 1000, \
                  method = 'isospectral', alpha = 0.05):
     """ Estimates the significance of correlations between non IID timeseries.
-        Args
-        ----
-        
-        timeseries1 : object
-                     timeseries object. Default is blank.
-         timeseries2 : object
-                     timeseries object. Default is blank.
-     
-        x-axis : str
-                The representation against which to express the
-                paleo-data. Options are "age", "year", and "depth".
-                Default is to let the system choose if only one available
-                or prompt the user.
-        interp_method : str
-                       If the timeseries are not on the same axis, which
-                       interpolation method to use. Valid entries are 'interpolation'
-                       (default) and 'bin'. 
-        autocorrect : bool
-                     If applicable, convert age to year automatically.
-                     If set to False, timeseries objects should have converted time
-                     axis and updated units label in the dictionary
-        autocorrect_param : float
-                           Reference for age/year conversion.
-        interp_step : float
-                     the step size. By default, will prompt the user.
-        start : float
-               Start time/age/depth. Default is the maximum of
-               the minima of the two timeseries
-        end : float
-             End time/age/depth. Default is the minimum of the
-             maxima of the two timeseries
-        nsim : int
-              the number of simulations. Default is 1000
-        method : str
-                method used to estimate the correlation and significance.
-                Available methods include:
-                - 'ttest': T-test where the degrees of freedom are corrected for
-                the effect of serial correlation \n
-                - 'isopersistant': AR(1) modeling of the two timeseries \n
-                - 'isospectral' (default): phase randomization of original
-                inputs.
-                The T-test is parametric test, hence cheap but usually wrong
-                except in idyllic circumstances.
-                The others are non-parametric, but their computational
-                requirements scales with nsim.
-        alpha : float
-               significance level for critical value estimation. Default is 0.05
+    Args
+    ----
 
-        Returns
-        -------
-            r : float
-               correlation between the two timeseries \n
-            sig : bool
-                 Returns True if significant, False otherwise \n
-            p : real
-               the p-value
+    timeseries1 : object
+                 timeseries object. Default is blank.
+    timeseries2 : object
+             timeseries object. Default is blank.
+
+    x-axis : str
+        The representation against which to express the
+        paleo-data. Options are "age", "year", and "depth".
+        Default is to let the system choose if only one available
+        or prompt the user.
+    interp_method : str
+               If the timeseries are not on the same axis, which
+               interpolation method to use. Valid entries are 'interpolation'
+               (default) and 'bin'. 
+    autocorrect : bool
+             If applicable, convert age to year automatically.
+             If set to False, timeseries objects should have converted time
+             axis and updated units label in the dictionary
+    autocorrect_param : float
+                   Reference for age/year conversion.
+    interp_step : float
+             the step size. By default, will prompt the user.
+    start : float
+       Start time/age/depth. Default is the maximum of
+       the minima of the two timeseries
+    end : float
+     End time/age/depth. Default is the minimum of the
+     maxima of the two timeseries
+    nsim : int
+      the number of simulations. Default is 1000
+    method : str
+        method used to estimate the correlation and significance.
+        Available methods include:
+        - 'ttest': T-test where the degrees of freedom are corrected for
+        the effect of serial correlation \n
+        - 'isopersistant': AR(1) modeling of the two timeseries \n
+        - 'isospectral' (default): phase randomization of original
+        inputs.
+        The T-test is parametric test, hence cheap but usually wrong
+        except in idyllic circumstances.
+        The others are non-parametric, but their computational
+        requirements scales with nsim.
+    alpha : float
+       significance level for critical value estimation. Default is 0.05
+
+    Returns
+    -------
+    r : float
+       correlation between the two timeseries \n
+    sig : bool
+         Returns True if significant, False otherwise \n
+    p : real
+       the p-value
 
     """
     if not ts1:
@@ -1698,7 +1701,7 @@ def binTs(timeseries = None, x_axis = None, bin_size = None, \
     
     binned_values : list
                    the binned output
-    bins : list
+    bins : int
           the bins (centered on the median, i.e. the 100-200 bin is 150),\n
     n : list
        number of data points in each bin
@@ -1943,39 +1946,39 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
 
                 Modify the values for specific keys to change the default behavior.
                 See spectral.wwz_psd for details 
-        fig : bool
-             If True, plots the figure    
-        wwaplot_default : bool
-                         If True, will use the following default parameters:
-                         wwaplot_default={'AR1_q':AR1_q,
-                                          'coi':coi,
-                                          'levels':None,
-                                          'tick_range':None,
-                                          'yticks':None,
-                                          'yticks_label': None,
-                                          'ylim':None,
-                                          'xticks':None,
-                                          'xlabels':None,
-                                          'figsize':[20,8],
-                                          'clr_map':'OrRd',
-                                          'cbar_drawedges':False,
-                                          'cone_alpha':0.5,
-                                          'plot_signif':True,
-                                          'signif_style':'contour',
-                                          'plot_cone':True,
-                                          'title':None,
-                                          'ax':None,
-                                          'xlabel': the chondata label,
-                                          'ylabel': 'Period (units from ChronData)',
-                                          'plot_cbar':'True',
-                                          'cbar_orientation':'vertical',
-                                          'cbar_pad':0.05,
-                                          'cbar_frac':0.15,
-                                          'cbar_labelsize':None}
+    fig : bool
+          If True, plots the figure    
+    wwaplot_default : bool
+                     If True, will use the following default parameters:
+                     wwaplot_default={'AR1_q':AR1_q,
+                                      'coi':coi,
+                                      'levels':None,
+                                      'tick_range':None,
+                                      'yticks':None,
+                                      'yticks_label': None,
+                                      'ylim':None,
+                                      'xticks':None,
+                                      'xlabels':None,
+                                      'figsize':[20,8],
+                                      'clr_map':'OrRd',
+                                      'cbar_drawedges':False,
+                                      'cone_alpha':0.5,
+                                      'plot_signif':True,
+                                      'signif_style':'contour',
+                                      'plot_cone':True,
+                                      'title':None,
+                                      'ax':None,
+                                      'xlabel': the chondata label,
+                                      'ylabel': 'Period (units from ChronData)',
+                                      'plot_cbar':'True',
+                                      'cbar_orientation':'vertical',
+                                      'cbar_pad':0.05,
+                                      'cbar_frac':0.15,
+                                      'cbar_labelsize':None}
 
-                         Modify the values for specific keys to change the default behavior.
-        psdplot_default : bool
-                         If True, will use the following default parameters:
+                     Modify the values for specific keys to change the default behavior.
+    psdplot_default : bool
+                     If True, will use the following default parameters:
                            psdplot_default={'lmstyle':'-',
                                             'linewidth':None,
                                              'color': sns.xkcd_rgb["denim blue"],
@@ -2000,18 +2003,18 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
                                              'psd_label':'Spectral Density',
                                              'zorder' : None}
 
-                             Modify the values for specific keys to change the default behavior.
+                     Modify the values for specific keys to change the default behavior.
 
-        saveFig : bool
-                 default is to not save the figure
-        dir : str
-             the full path of the directory in which to save the figure.
-             If not provided, creates a default folder called 'figures' in the
-             LiPD working directory (lipd.path).
-        format : str
-                One of the file extensions supported by the active
-                backend. Default is "eps". Most backend support png, pdf, ps, eps,
-                and svg.
+    saveFig : bool
+             default is to not save the figure
+    dir : str
+         the full path of the directory in which to save the figure.
+         If not provided, creates a default folder called 'figures' in the
+         LiPD working directory (lipd.path).
+    format : str
+            One of the file extensions supported by the active
+            backend. Default is "eps". Most backend support png, pdf, ps, eps,
+            and svg.
 
     Returns
     -------
