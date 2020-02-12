@@ -178,10 +178,13 @@ def plot_hist(y, bins = None, hist = True, label = "", \
          Random variable object. An object with fit method, returning 
          a tuple that can be passed to a pdf method of positional 
          arguments following a grid of values to evaluate the pdf on.
-    {hist, kde, rug, fit}_kws : Dictionaries
-                               Keyword arguments for underlying plotting functions.
-                               If modifying the dictionary, make sure the labels
-                               "hist", "kde", "rug" and "fit" are still passed.
+    hist _kws : Dictionary
+    kde_kws : Dictionary
+    rug_kws : Dictionary
+    fit_kws : Dictionary
+             Keyword arguments for underlying plotting functions.
+             If modifying the dictionary, make sure the labels "hist",
+             "kde","rug","fit" are stall passed.        
     color : str
            matplotlib color. Color to plot everything but the
            fitted curve in.
