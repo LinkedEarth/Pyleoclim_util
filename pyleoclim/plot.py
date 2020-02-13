@@ -16,19 +16,32 @@ def plot(x,y,markersize=50,marker='ro',x_label="",y_label="",\
          title ="", figsize =[10,4], ax = None):
     """ Make a 2-D plot
     
-    Args:
-        x (numpy array): a 1xn numpy array of values for the x-axis
-        y (numpy array): a 1xn numpy array for the y-axis
-        markersize (int): the size of the marker
-        marker (string or list): color and shape of the marker
-        x_axis_label (str): the label for the x-axis
-        y_axis_label (str): the label for the y-axis
-        title (str): the title for the plot
-        figsize (list): the size of the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot)
+    Args
+    ----
+    
+    x : numpy array
+       a 1xn numpy array of values for the x-axis
+    y : numpy array
+       a 1xn numpy array for the y-axis
+    markersize : int
+                the size of the marker
+    marker : string or list
+            color and shape of the marker
+    x_axis_label : str
+                  the label for the x-axis
+    y_axis_label : str
+                  the label for the y-axis
+    title : str
+           the title for the plot
+    figsize : list
+              the size of the figure
+    ax : object
+        Return as axis instead of figure (useful to integrate plot into a subplot)
             
-    Return:
-        The figure       
+    Returns
+    -------
+    
+    The figure       
     
     """
     # make sure x and y are numpy arrays
@@ -65,24 +78,38 @@ def plotEns(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = "",\
     This function allows to plot all or a subset of ensemble members of a 
     timeseries
     
-    Args:
-        ageEns (numpy array): Age ensemble data. Iterations should be stored in columns
-        y (numpy array): Ordinate values
-        ens (int): Number of ensemble to plots. If None, will choose either the number
-            of ensembles stored in the ensemble matrix or 500, whichever is lower
-        color (str): Linecolor (default is red)
-        alpha (float): Transparency setting for each line (default is 0.005)
-        x_label (str): Label for the x-axis
-        y_label (str): Label for the y-axis
-        title (str): Title for the figure
-        figsize (list): Size of the figure. Default is [10,4]
-        ax: Return as axis instead of figure
+    Args
+    ----
     
-    Return:
-        The figure
+    ageEns : numpy array
+            Age ensemble data. Iterations should be stored in columns
+    y : numpy array
+       Ordinate values
+    ens : int
+         Number of ensemble to plots. If None, will choose either the number
+         of ensembles stored in the ensemble matrix or 500, whichever is lower
+    color : str
+           Linecolor (default is red)
+    alpha : float
+           Transparency setting for each line (default is 0.005)
+    x_label : str
+             Label for the x-axis
+    y_label : str
+             Label for the y-axis
+    title : str
+           Title for the figure
+    figsize : list
+             Size of the figure. Default is [10,4]
+    ax : object
+        Return as axis instead of figure
     
-    TODO:
-        Enable paleoEnsemble       
+    Returns
+    -------
+    The figure
+    
+    TODO
+    ----
+    Enable paleoEnsemble       
     
     """
 
@@ -131,31 +158,51 @@ def plot_hist(y, bins = None, hist = True, label = "", \
     seaborn kdeplot() and rugplot() functions. It can also fit 
     scipy.stats distributions and plot the estimated PDF over the data.
         
-    Args:
-        y (array): nx1 numpy array. No missing values allowed 
-        bins (int): Specification of hist bins following matplotlib(hist), 
-            or None to use Freedman-Diaconis rule
-        hist (bool): Whether to plot a (normed) histogram 
-        label (str): The label for the axis
-        kde (bool): Whether to plot a gaussian kernel density estimate
-        rug (bool): Whether to draw a rugplot on the support axis
-        fit: Random variable object. An object with fit method, returning 
-            a tuple that can be passed to a pdf method of positional 
-            arguments following a grid of values to evaluate the pdf on.
-        {hist, kde, rug, fit}_kws: Dictionaries. Keyword arguments for 
-            underlying plotting functions. If modifying the dictionary, make
-            sure the labels "hist", "kde", "rug" and "fit" are still passed.
-        color (str): matplotlib color. Color to plot everything but the
-            fitted curve in.
-        vertical (bool): if True, oberved values are on y-axis.
-        norm_hist (bool): If True (default), the histrogram height shows
-            a density rather than a count. This is implied if a KDE or 
-            fitted density is plotted
-        figsize (list): the size of the figure
-        ax: Return as axis instead of figure (useful to integrate plot into a subplot)     
+    Args
+    ----
+    
+    y : array
+       nx1 numpy array. No missing values allowed 
+    bins : int
+          Specification of hist bins following matplotlib(hist), 
+          or None to use Freedman-Diaconis rule
+    hist : bool
+          Whether to plot a (normed) histogram 
+    label : str
+           The label for the axis
+    kde : bool
+         Whether to plot a gaussian kernel density estimate
+    rug : bool
+         Whether to draw a rugplot on the support axis
+    fit : object
+         Random variable object. An object with fit method, returning 
+         a tuple that can be passed to a pdf method of positional 
+         arguments following a grid of values to evaluate the pdf on.
+    hist _kws : Dictionary
+    kde_kws : Dictionary
+    rug_kws : Dictionary
+    fit_kws : Dictionary
+             Keyword arguments for underlying plotting functions.
+             If modifying the dictionary, make sure the labels "hist",
+             "kde","rug","fit" are stall passed.        
+    color : str
+           matplotlib color. Color to plot everything but the
+           fitted curve in.
+    vertical : bool
+              if True, oberved values are on y-axis.
+    norm_hist : bool
+               If True (default), the histrogram height shows
+               a density rather than a count. This is implied if a KDE or 
+               fitted density is plotted
+    figsize : list
+             the size of the figure
+    ax : object
+        Return as axis instead of figure (useful to integrate plot into a subplot)     
  
     Returns
-       fig - The figure
+    -------
+    
+    fig :  The figure
 """
 
     # make sure y is a numpy array

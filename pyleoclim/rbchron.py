@@ -26,8 +26,9 @@ def chooseCalCurves():
     be applied to each age or a list of names of different ages. To enter a list, 
     separate each name with a comma. No quotation marks needed. 
     
-    Returns:
-        A list of calibration curves to be applied  
+    Returns
+    -------
+    A list of calibration curves to be applied  
     
     """
     
@@ -54,12 +55,16 @@ def verifyCalCurves(CalCurves):
     curves are conformed to the names used by Bchron. Will prompt the user to
     replace the name if needed. 
     
-    Agrs:
-        CalCurves (list): A list of strings containing the name(s) of the
-            calibration curves to be used
+    Args
+    ----
+    CalCurves : list
+               A list of strings containing the name(s) of the
+               calibration curves to be used
     
-    Returns:
-        CalCurves - Checked list of calibration curves names        
+    Returns
+    -------
+    CalCurves : list
+               Checked list of calibration curves names        
     
     """
     
@@ -86,10 +91,13 @@ def reservoirAgeCorrection():
     If unknown, will direct the user to copy and paste the table available
     on the 14Chrono Marine Reservoir database: http://intcal.qub.ac.uk/marine/
     
-    Returns:
-        ageCorr -  the DeltaR for the site. \n
-        ageCorrStd - The error on DeltaR estimated as the standard error on the 
-        mean if using the 14Chrono Marine Reservoir database.
+    Returns
+    -------
+    ageCorr : float 
+             the DeltaR for the site. \n
+    ageCorrStd : float
+                The error on DeltaR estimated as the standard error on the 
+                mean if using the 14Chrono Marine Reservoir database.
     
     """
     print("The marine13 calibration curve includes the standard reservoir " +
@@ -167,80 +175,108 @@ def runBchron(ages, agesStd, positions, rejectAges = None,\
     gaps are Exponential. Radiocarbon and non-radiocarbon dates (including outliers)
     are updated within the fucntion also by MCMC.
     
-    Args:
-        ages (array): A vector of ages (most likely 14C)
-        ageSds (array): A vector of 1-sigma values for the ages given above
-        positions (array): Position values (e.g. depths) for each age
-        rejectAges (vector): A vector of 1/0 where 1 include the dates to be rejected. 
-            Default it None.
-        positionsThickness (array): (Optional) Thickness values for each of the positions.
-            The thickness values should be the full thickness value of the
-            slice. By default set to zero.
-        calCurves (list): (Optional) A vector of values containing either 'intcal13',
-            'marine13', 'shcal13', or 'normal'. If none is provided, will
-            prompt the user. Should be either of length =1 if using the same
-            calibration for each age or the same length as the vector of ages.
-        reservoirAgeCorr (array): (Optional) A list (matrix) of two floats that correspond to the
-            DeltaR and DeltaR uncertainty. If already added to the ages and
-            ages standard deviation, then enter [0,0] to bypass the prompt.
-            Will only be applied if CalCurves is set to 'marine13'. Otherwise,
-            leave to none.
-        outlierProbs (array): (Optional) A vector of prior outlier probabilities,
-            one for each age. Defaults to 0.01
-        predictPositions (array): (Optional) a vector of positions 
-            (e.g. depths) at which predicted age values are required. 
-            Defaults to a sequence of length 100 from the top position to the
-            bottom position.
-        iterations (int): (Optional) The number of iterations to start the procedure. 
-            Default and minimum should be 10000.
-        burn (int): (Optional) The number of starting iterations to discard.
-            Default is 200
-        thin (int): (Optional) The step size for every iteration to keep beyond
-            the burnin. Default is 8.
-        extractDate (float): (Optional) The top age of the core. Used for
-            extrapolation purposes so that no extrapolated ages go beyond the
-            top age of the core. Defaults to the current year.
-        maxExtrap (int): (Optional) The maximum number of extrapolations to
-            perform before giving up and setting the predicted ages to NA. 
-            Useful for when large amounts of extrapolation are required, i.e.
-            some of the predictPositions are a long way from the dated
-            positions. Defaults to 500. 
-        thetaMhSd (float):  (Optional)  The Metropolis-Hastings standard
-            deviation for the age parameters. Defaults to 0.5.
-        muMhSd (float): (Optional)  The Metropolis-Hastings standard deviation
-            for the compound Poisson-Gamma Scale. Defaults to 0.1
-        psiMhSd (float): (Optional) The Metropolis-Hastings standard deviation 
-            for the Compound Poisson-Gamma Scale.
-        ageScaleVal (int): (Optional) A scale value for the ages. 
-            Bchronology works best when the ages are scaled to be 
-            approximately between 0 and 100.
-            The default value is thus 1000 for ages given in years.
-        positionScaleVal (int):  (Optional) A scale value for the positions. 
-            Bchronology works best when the positions are scaled to be 
-            approximately between 0 and 100. The default value is thus
-            100 for positions given in cm.
+    Args
+    ----
     
-        Returns:
-            depth - the predicted positions (either same as the user or the default) \n
-            chron -  a numpy array of possible chronologies in each column.
-                The number of rows is the same as the length of depth
-            ageDist - the distribution of ages around each dates.
-            run - the full R object containing the outputs of the Bchron run
-        
-        Warnings:
-            This function requires R and the Bchron package and all its
-                dependencies to be installed on the same machine.
-                
-        Reference:
-            - Haslett, J., and Parnell, A. C. (2008). A simple monotone 
-                process with application to radiocarbon-dated depth 
-                chronologies. Journal of the Royal Statistical Society, 
-                Series C, 57, 399-418. DOI:10.1111/j.1467-9876.2008.00623.x
-            - Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E., 
-                and Huntley, B. (2008). A flexible approach to assessing 
-                synchroneity of past events using Bayesian reconstructions
-                of sedimentation history. Quaternary Science Reviews, 
-                27(19-20), 1872-1885. DOI:10.1016/j.quascirev.2008.07.009     
+    ages : array
+          A vector of ages (most likely 14C)
+    ageSds : array
+            A vector of 1-sigma values for the ages given above
+    positions : array
+               Position values (e.g. depths) for each age
+    rejectAges : vector
+                A vector of 1/0 where 1 include the dates to be rejected. 
+                Default is None.
+    positionsThickness : array(Optional)
+                        Thickness values for each of the positions.
+                        The thickness values should be the full thickness value of the
+                        slice. By default set to zero.
+    calCurves : list(Optional) 
+               A vector of values containing either 'intcal13',
+              'marine13', 'shcal13', or 'normal'. If none is provided, will
+               prompt the user. Should be either of length =1 if using the same
+               calibration for each age or the same length as the vector of ages.
+    reservoirAgeCorr : list(optional)
+                      A list (matrix) of two floats that correspond to the
+                      DeltaR and DeltaR uncertainty. If already added to the ages and
+                      ages standard deviation, then enter [0,0] to bypass the prompt.
+                      Will only be applied if CalCurves is set to 'marine13'. Otherwise,
+                      leave to none.
+    outlierProbs : array(optional)
+                  A vector of prior outlier probabilities,
+                  one for each age. Defaults to 0.01
+    predictPositions : array(optional)
+                      a vector of positions 
+                     (e.g. depths) at which predicted age values are required. 
+                     Defaults to a sequence of length 100 from the top position to the
+                     bottom position.
+    iterations : int(optional)
+                The number of iterations to start the procedure. 
+                Default and minimum should be 10000.
+    burn : int(optional)
+          The number of starting iterations to discard.
+          Default is 200
+    thin : int(Optional)
+          The step size for every iteration to keep beyond
+          the burnin. Default is 8.
+    extractDate : float(Optional)
+                 The top age of the core. Used for
+                 extrapolation purposes so that no extrapolated ages go beyond the
+                 top age of the core. Defaults to the current year.
+    maxExtrap : int(optional) 
+               The maximum number of extrapolations to
+               perform before giving up and setting the predicted ages to NA. 
+               Useful for when large amounts of extrapolation are required, i.e.
+               some of the predictPositions are a long way from the dated
+               positions. Defaults to 500. 
+    thetaMhSd : float(optional)  
+               The Metropolis-Hastings standard
+        deviation for the age parameters. Defaults to 0.5.
+    muMhSd : float(optional)
+            The Metropolis-Hastings standard deviation
+            for the compound Poisson-Gamma Scale. Defaults to 0.1
+    psiMhSd : float (Optional) 
+             The Metropolis-Hastings standard deviation 
+             for the Compound Poisson-Gamma Scale.
+    ageScaleVal : int (Optional) 
+                 A scale value for the ages. 
+                 Bchronology works best when the ages are scaled to be 
+                 approximately between 0 and 100.
+                 The default value is thus 1000 for ages given in years.
+    positionScaleVal : int (Optional) 
+                      A scale value for the positions. 
+                      Bchronology works best when the positions are scaled to be 
+                      approximately between 0 and 100. The default value is thus
+                      100 for positions given in cm.
+    
+    Returns
+    -------
+    depth : vector
+           the predicted positions (either same as the user or the default) 
+    chron  : array
+            a numpy array of possible chronologies in each column.
+            The number of rows is the same as the length of depth
+    ageDist : array
+             the distribution of ages around each dates.
+    run : object
+         the full R object containing the outputs of the Bchron run
+
+    Warnings
+    --------
+    This function requires R and the Bchron package and all its
+    dependencies to be installed on the same machine.
+            
+    Reference
+    ---------
+    - Haslett, J., and Parnell, A. C. (2008). A simple monotone 
+        process with application to radiocarbon-dated depth 
+        chronologies. Journal of the Royal Statistical Society, 
+        Series C, 57, 399-418. DOI:10.1111/j.1467-9876.2008.00623.x
+    - Parnell, A. C., Haslett, J., Allen, J. R. M., Buck, C. E., 
+        and Huntley, B. (2008). A flexible approach to assessing 
+        synchroneity of past events using Bayesian reconstructions
+        of sedimentation history. Quaternary Science Reviews, 
+        27(19-20), 1872-1885. DOI:10.1016/j.quascirev.2008.07.009     
     
     """
     import rpy2.robjects as robjects
@@ -401,38 +437,60 @@ def plotBchron(depth, chron, positions, ageDist, flipCoor= False,\
     associated 95% confidence interval as error bars, the 95% ensemble from
     the produced age model as well as randomly drawn members of the ensemble.
     
-    Args:
-        depth (array): the positions in the archive (often referred to as
-            depth) where the age model was interpolated to. Should be a vector
-        chron (array): The possible age models returned by BChron. The number
-            of rows should be the same length as the depth vector, with each
-            possible realization stored in the columns.
-        positions (array): The depth on the archive at which chronological
-            measurements have been made. Should be a vector 
-        agesDist (array): The distribution of ages for each chronological tie
-            points. The number of columns should correspond to the number of
-            chronological tie points available.
-        flipCoor (bool): If True, plots depth on the y-axis.     
-        xlabel (str): The label for the x-axis
-        ylabel (str): The label for the y-axis
-        xlim (list): Limits for the x-axis. Default corresponds to the min/max
-            of the depth vector.
-        ylim (list): Limits for the y-axis. Default set by matplotlib
-        violinColor (str): The color for the violins. Default is purple
-        medianLineColor (str): The color for the median line. Default is black.
-        medianLineWidth (float): The width for the median line
-        CIFillColor (str): Fill color in between the 95% confidence interval.
-            Default is silver.
-        samplePaths (bool): If True, draws sample paths from the distribution.
-            Use the same color as the violins. 
-        samplePathNumber (int): The number of sample paths to draw. Default is 10.
-            Note: samplePaths need to be set to True. 
-        alpha (float): The violins' transparency. Number between 0 and 1
-        figsize (list): The figure size. Default is [4,8]
-        ax: Default is None. Useful to set for subplots. 
-            
-    Returns:
-        - fig: the figure.      
+    Args
+    ----
+    
+    depth : array
+           the positions in the archive (often referred to as
+           depth) where the age model was interpolated to. Should be a vector
+    chron : array
+           The possible age models returned by BChron. The number
+           of rows should be the same length as the depth vector, with each
+           possible realization stored in the columns.
+    positions : array
+               The depth on the archive at which chronological
+               measurements have been made. Should be a vector 
+    agesDist : array
+              The distribution of ages for each chronological tie
+              points. The number of columns should correspond to the number of
+              chronological tie points available.
+    flipCoor : bool
+              If True, plots depth on the y-axis.     
+    xlabel : str
+            The label for the x-axis
+    ylabel : str
+            The label for the y-axis
+    xlim : list
+          Limits for the x-axis. Default corresponds to the min/max
+          of the depth vector.
+    ylim : list
+          Limits for the y-axis. Default set by matplotlib
+    violinColor : str
+                 The color for the violins. Default is purple
+    medianLineColor : str
+                     The color for the median line. Default is black.
+    medianLineWidth : float
+                     The width for the median line
+    CIFillColor : str
+                 Fill color in between the 95% confidence interval.
+                 Default is silver.
+    samplePaths : bool
+                 If True, draws sample paths from the distribution.
+                 Use the same color as the violins. 
+    samplePathNumber : int
+                      The number of sample paths to draw. Default is 10.
+                      Note: samplePaths need to be set to True. 
+    alpha : float
+           The violins' transparency. Number between 0 and 1
+    figsize : list
+             The figure size. Default is [4,8]
+    ax : object
+        Default is None. Useful to set for subplots. 
+        
+    Returns
+    -------
+    
+    fig: the figure.      
           
     """
     

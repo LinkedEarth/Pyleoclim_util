@@ -4,3 +4,5 @@ pyleoclim.egg-info
 .ropeproject/
 .DS_Store
 __pycache__
+
+./example_notebooks/debug.log

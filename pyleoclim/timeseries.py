@@ -482,7 +482,7 @@ class Decomposition(object):
              matrix of principal components
         RC : 2D array
             matrix of RCs (nrec,N,nrec*M) (only if K>0)
-            
+
         '''
         N = len(data[:, 0])
         nrec = len(data[0, :])
@@ -656,6 +656,229 @@ class Decomposition(object):
                 RC[n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
 
         return deval, eig_vec, q05, q95, PC, RC
+
+
+
+class FDR:
+    ''' The FDR procedures translated from fdr.R by Dr. Chris Paciorek (https://www.stat.berkeley.edu/~paciorek/research/code/code.html)
+    '''
+    def fdr_basic(self, pvals,qlevel=0.05):
+        ''' The basic FDR of Benjamini & Hochberg (1995).
+
+        Args
+        ----
+
+        pvals : list or array
+            A vector of p-values on which to conduct the multiple testing.
+
+        qlevel : float
+            The proportion of false positives desired.
+
+        Returns
+        -------
+
+        fdr_res : array or None
+            A vector of the indices of the significant tests; None if no significant tests
+
+        '''
+
+        n = len(pvals)
+        sorted_pvals = np.sort(pvals)
+        sort_index = np.argsort(pvals)
+        indices = np.arange(1, n+1)*(sorted_pvals <= qlevel*np.arange(1, n+1)/n)
+        num_reject = np.max(indices)
+
+        if num_reject:
+            indices = np.arange(num_reject)
+            fdr_res =  np.sort(sort_index[indices])
+        else:
+            fdr_res = None
+
+        return fdr_res
+
+    def fdr_master(self, pvals, qlevel=0.05, method='original'):
+        ''' Perform various versions of the FDR procedure, but without the modification
+
+        Args
+        ----
+
+        pvals : list or array
+            A vector of p-values on which to conduct the multiple testing.
+
+        qlevel : float
+            The proportion of false positives desired.
+
+        method : {'original', 'general'}
+            Method for performing the testing.
+            - 'original' follows Benjamini & Hochberg (1995);
+            - 'general' is much more conservative, requiring no assumptions on the p-values (see Benjamini & Yekutieli (2001)).
+            We recommend using 'original', and if desired, using 'adj_method="mean"' to increase power.
+
+        Returns
+        -------
+
+        fdr_res : array or None
+            A vector of the indices of the significant tests; None if no significant tests
+
+        '''
+        if method == 'general':
+            n = len(pvals)
+            qlevel = qlevel / np.sum(1/np.arange(1, n+1))
+
+        fdr_res = self.fdr_basic(pvals, qlevel)
+        return fdr_res
+
+    def storey(self, edf_quantile, pvals):
+        ''' The basic Storey (2002) estimator of a, the proportion of alternative hypotheses.
+
+        Args
+        ----
+
+        edf_quantile : float
+            The quantile of the empirical distribution function at which to estimate a.
+
+        pvals : list or array
+            A vector of p-values on which to estimate a
+
+        Returns
+        -------
+
+        a : int
+            estimate of a, the number of alternative hypotheses
+
+        '''
+        if edf_quantile >= 1 or edf_quantile <= 0:
+            raise ValueError(f'Wrong edf_quantile: {edf_quantile}; must be within (0, 1)!')
+
+        pvals = np.array(pvals)
+        a = (np.mean(pvals<=edf_quantile) - edf_quantile) / (1 - edf_quantile)
+        a = np.max(a, 0)  # set to 0 if a is negative
+        return a
+
+    def prop_alt(self, pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 20}):
+        ''' Calculate an estimate of a, the proportion of alternative hypotheses, using one of several methods
+
+        Args
+        ----
+
+        pvals : list or array
+            A vector of p-values on which to estimate a
+
+
+        adj_method: {'mean', 'storey', 'two-stage'}
+            Method for increasing the power of the procedure by estimating the proportion of alternative p-values.
+            - 'mean', the modified Storey estimator that we suggest in Ventura et al. (2004)
+            - 'storey', the method of Storey (2002)
+            - 'two-stage', the iterative approach of Benjamini et al. (2001)
+
+        adj_args : dict
+            - for "mean", specify "edf_lower", the smallest quantile at which to estimate a, and "num_steps", the number of quantiles to use
+              the approach uses the average of the Storey (2002) estimator for the num_steps quantiles starting at "edf_lower" and finishing just less than 1
+            - for "storey", specify "edf_quantile", the quantile at which to calculate the estimator
+            - for "two-stage", the method uses a standard FDR approach to estimate which p-values are significant
+              this number is the estimate of a; therefore the method requires specification of qlevel,
+              the proportion of false positives and "fdr_method" ('original' or 'general'), the FDR method to be used.
+              We do not recommend 'general' as this is very conservative and will underestimate a.
+
+        Returns
+        -------
+
+        a : int
+            estimate of a, the number of alternative hypotheses
+
+        '''
+        n = len(pvals)
+        if adj_method == 'two-stage':
+            fdr_res = self.fdr_master(pvals, adj_method['qlevel'], adj_args['fdr_method'])
+            a = len(fdr_res)/n
+            return a
+
+        elif adj_method == 'storey':
+            if 'edf_quantile' not in adj_args:
+                raise ValueError('`edf_quantile` must be specified in `adj_args`!')
+
+            a = self.storey(adj_args['edf_quantile'], pvals)
+            return a
+
+        elif adj_method == 'mean':
+            if adj_args['edf_lower']>=1 or adj_args['edf_lower']<=0:
+                raise ValueError(f'Wrong edf_lower: {adj_args["edf_lower"]}; must be within (0, 1)!')
+
+            if adj_args['num_steps']<1 or type(adj_args['num_steps']) is not int:
+                raise ValueError(f'Wrong num_steps: {adj_args["num_steps"]}; must be an integer >= 1')
+
+            stepsize = (1 - adj_args['edf_lower']) / adj_args['num_steps']
+
+            edf_quantiles = np.linspace(adj_args['edf_lower'], adj_args['edf_lower']+stepsize*(adj_args['num_steps']-1), adj_args['num_steps'])
+            a_vec = [self.storey(edf_q, pvals) for edf_q in edf_quantiles]
+            a = np.mean(a_vec)
+            return a
+
+        else:
+            raise ValueError(f'Wrong method: {method}!')
+
+    def fdr(self, pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
+        ''' Determine significance based on the FDR approach
+
+        Args
+        ----
+
+        pvals : list or array
+            A vector of p-values on which to conduct the multiple testing.
+
+        qlevel : float
+            The proportion of false positives desired.
+
+        method : {'original', 'general'}
+            Method for performing the testing.
+            - 'original' follows Benjamini & Hochberg (1995);
+            - 'general' is much more conservative, requiring no assumptions on the p-values (see Benjamini & Yekutieli (2001)).
+            We recommend using 'original', and if desired, using 'adj_method="mean"' to increase power.
+
+        adj_method: {'mean', 'storey', 'two-stage'}
+            Method for increasing the power of the procedure by estimating the proportion of alternative p-values.
+            - 'mean', the modified Storey estimator that we suggest in Ventura et al. (2004)
+            - 'storey', the method of Storey (2002)
+            - 'two-stage', the iterative approach of Benjamini et al. (2001)
+
+        adj_args : dict
+            Arguments for adj_method; see prop_alt() for description,
+            but note that for "two-stage", qlevel and fdr_method are taken from the qlevel and method arguments for fdr()
+
+        Returns
+        -------
+
+        fdr_res : array or None
+            A vector of the indices of the significant tests; None if no significant tests
+
+        '''
+        n = len(pvals)
+
+        a = 0
+        if adj_method is not None:
+            if adj_method == 'two-stage':
+                qlevel = qlevel / (1+qlevel)  # see Benjamini et al. (2001) for proof that this controls the FDR at level qlevel
+                adj_args['qlevel'] = qlevel
+                adj_args['fdr_method'] = method
+                print(f'Adjusting cutoff using two-stage method, with method: {adj_args["fdr_method"]}; qlevel: {adj_args["qlevel"]}')
+
+            elif adj_method == 'mean':
+                if adj_args == {}:
+                     # default arguments for "mean" method of Ventura et al. (2004)
+                    adj_args['edf_lower'] = 0.8
+                    adj_args['num_steps'] = 20
+                print(f'Adjusting cutoff using mean method, with edf_lower: {adj_args["edf_lower"]}; num_steps: {adj_args["num_steps"]}')
+
+            a = self.prop_alt(pvals, adj_method, adj_args)
+
+        if a == 1:
+            # all hypotheses are estimated to be alternatives
+            fdr_res = np.arange(n)
+        else:
+            qlevel = qlevel / (1-a)  # adjust for estimate of a; default is 0
+            fdr_res = self.fdr_master(pvals, qlevel, method)
+
+        return fdr_res
 
 
 def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
@@ -1053,7 +1276,7 @@ def clean_ts(ys, ts):
     -------
     ys : array
         The time series without nans
-    ts : array 
+    ts : array
         The time axis of the time series without nans
 
     '''
@@ -1155,7 +1378,7 @@ def gaussianize_single(X_single):
     return Xn_single
 
 
-def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_threshold=0.4, extreme_pts_threshold=3, verbose=False):
+def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
     """Detrend a timeseries according to three methods
 
     Detrending methods include, "linear", "constant", and using a low-pass
@@ -1170,11 +1393,11 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
        The time axis for the timeseries. Necessary for use with
        the Savitzky-Golay filters method since the series should be evenly spaced.
     method : str
-        The type of detrending. If linear (default), the result of
-        a linear least-squares fit to y is subtracted from y. If constant,
-        only the mean of data is subtrated. If "savitzy-golay", y is filtered
-        using the Savitzky-Golay filters and the resulting filtered series
-        is subtracted from y.
+        The type of detrending:
+        - linear: the result of a linear least-squares fit to y is subtracted from y.
+        - constant: only the mean of data is subtrated.
+        - "savitzy-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        - "emd" (default): Empiracal mode decomposition
     params : list
         The paramters for the Savitzky-Golay filters. The first parameter
         corresponds to the window size (default it set to half of the data)
@@ -1230,7 +1453,7 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
         # Put it all back on the original x axis
         y_filt_x = np.interp(x,x_interp,y_filt)
         ys = y-y_filt_x
-    elif method == "hht":
+    elif method == "emd":
         imfs = EMD(y).decompose()
         if np.shape(imfs)[0] == 1:
             trend = np.zeros(np.size(y))
@@ -1241,4 +1464,3 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
         raise KeyError('Not a valid detrending method')
 
     return ys
-
