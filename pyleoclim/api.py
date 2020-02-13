@@ -6,6 +6,7 @@ Created on Jan 31, 2020
 '''
 from . import spectral
 from . import timeseries
+from . import stats
 from textwrap import dedent
 
 import seaborn as sns
@@ -58,6 +59,8 @@ class Series:
         return f'Length: {np.size(self.time)}'
 
     def plot(self, figsize=[10, 4], title=None):
+        ''' Plot the timeseries
+        '''
         fig, ax = plt.subplots(figsize=figsize)
         ax.plot(self.time, self.value)
 
@@ -70,6 +73,15 @@ class Series:
             ax.set_title(title)
 
         return fig, ax
+
+    def clean(self):
+        ''' Clean up the timeseries by removing NaNs and sort with increasing time points
+        '''
+        y = self.value
+        t = self.time
+        y_cleaned, t_cleaned = timeseries.clean_ts(y, t)
+        self.time = t_cleaned
+        self.value = y_cleaned
 
     def spectral(self, method='wwz', args={}):
         ''' Perform spectral analysis on the timeseries
@@ -91,10 +103,6 @@ class Series:
         scal = Scalogram(freq=wave_res.freq, time=wave_res.time, amplitude=wave_res.amplitude, coi=wave_res.coi)
 
         return scal
-    def corr_with(self, target_series):
-        ''' Perform correlation analysis with the target timeseries
-        '''
-        pass
 
     def wavelet_coherence(self, target_series, method='wwz', args={}):
         ''' Perform wavelet coherence analysis with the target timeseries
@@ -107,6 +115,23 @@ class Series:
         coh = Coherence(freq=xwc_res.freq, time=xwc_res.time, coherence=xwc_res.xw_coherence, phase=xwc_res.xw_phase, coi=xwc_res.coi)
 
         return coh
+
+    def correlation(self, target_series, args={}):
+        ''' Perform correlation analysis with the target timeseries
+        '''
+        r, signif, p = stats.corrsig(self.value, target_series.value, **args)
+        corr_res = {
+            'r': r,
+            'signif': signif,
+            'pvalue': p,
+        }
+        return corr_res
+
+    def causality(self, target_series, args={}):
+        ''' Perform causality analysis with the target timeseries
+        '''
+        causal_res = timeseries.causality_est(self.value, target_series.value, **args)
+        return causal_res
 
 
 class PSD:
@@ -124,6 +149,8 @@ class PSD:
 
     def plot(self, in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude',
              xlim=None, ylim=None, figsize=[10, 4]):
+        ''' Plot the power sepctral density (PSD)
+        '''
 
         fig, ax = plt.subplots(figsize=figsize)
 
@@ -171,8 +198,9 @@ class Scalogram:
         return f'Dimension: {np.size(self.freq)} x {np.size(self.time)}'
 
     def plot(self, xlabel='Time', ylabel='Period',
-             contourf_args={}, cbar_args={}, figsize=[8, 8], ylim=None, xlim=None):
-
+             contourf_args={}, cbar_args={}, figsize=[10, 8], ylim=None, xlim=None):
+        ''' Plot the scalogram from wavelet analysis
+        '''
         if contourf_args == {}:
             contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
 
@@ -214,7 +242,8 @@ class Coherence:
 
     def plot(self, xlabel='Time', ylabel='Period', figsize=[10, 8], contourf_args={}, ylim=None, xlim=None,
              phase_args={}, cbar_args={}):
-
+        ''' Plot the wavelet coherence result
+        '''
         if contourf_args == {}:
             contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
 

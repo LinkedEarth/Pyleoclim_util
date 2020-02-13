@@ -34,6 +34,10 @@ from math import factorial
 import spectrum
 
 import numba as nb
+import warnings
+from numba.errors import NumbaPerformanceWarning
+
+warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
 '''
 Core functions below, focusing on algorithms
