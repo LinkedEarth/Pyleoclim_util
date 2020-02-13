@@ -1757,7 +1757,7 @@ def segmentTs(timeseries = None, factor = 2):
     elif 'age' in timeseries.keys() and 'year' in timeseries.keys():
         print("Both age and year information are available.")
         x_axis = input("Which one would you like to use? ")
-        while x_axis != "year" and x_axis != "age":
+        if x_axis.lower() != "year" and x_axis.lower() != "age":
             x_axis = input("Only enter year or age: ")
     elif 'age' in timeseries.keys():
         x_axis = 'age'
