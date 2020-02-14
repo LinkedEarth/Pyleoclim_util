@@ -180,7 +180,7 @@ class PSD:
         return f'Length: {np.size(self.freq)}'
 
     def plot(self, in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude',
-             xlim=None, ylim=None, figsize=[10, 4], savefig_settigns={}):
+             xlim=None, ylim=None, figsize=[10, 4], savefig_settings={}):
         ''' Plot the power sepctral density (PSD)
 
         Args
@@ -397,6 +397,12 @@ class Coherence:
 class Lipd:
     def __init__(self, lipd_list):
         self.lipd_list = lipd_list
+    
+    #def mapallarchive(self,markersize = 50, projection = 'Robinson',\
+                  #proj_default = True, background = True,borders = False,\
+                  #rivers = False, lakes = False, figsize = [10,4],\
+                  #saveFig = False, dir=None, format='eps'):
+        
         
     
 
