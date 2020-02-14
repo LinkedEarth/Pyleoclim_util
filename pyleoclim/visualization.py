@@ -966,4 +966,4 @@ def savefig(fig, settings={}):
         path = pathlib.Path(f'{path_str}.{fmt}')
 
     fig.savefig(str(path), **savefig_args)
-    print(f'Saving figure to: {str(path)} ...')
+    print(f'Figure saved at: {str(path)}')
