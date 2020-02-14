@@ -13,6 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
+import pathlib
 
 def setProj(projection='Robinson', proj_default = True): 
     """ Set the projection for Cartopy.
@@ -626,14 +627,6 @@ def plot_hist(y, bins = None, hist = True, label = "", \
             
     return ax 
                 
-                           
-                       
-
-                         
-                                     
-            
-            
-            
 def getMetadata(timeseries):
     
     """ Get the necessary metadata to be printed out automatically
@@ -936,3 +929,41 @@ def agemodelData(timeseries):
     archiveType = LipdUtils.LipdToOntology(timeseries["archiveType"])
 
     return depth, age, depth_label, age_label, archiveType
+
+
+# utilities
+def savefig(fig, settings={}):
+    ''' Save a figure to a path
+
+    Args
+    ----
+
+    fig : figure
+        the figure to save
+    settings : dict
+        the dictionary of arguments for plt.savefig(); some notes below:
+        - "path" must be specified; it can be any existed or non-existed path,
+          with or without a suffix; if the suffix is not given in "path", it will follow "format"
+        - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+    '''
+    if 'path' not in settings:
+        raise ValueError('"path" must be specified in `settings`!')
+
+    savefig_args = {'format': 'pdf', 'bbox_inches': 'tight'}
+    savefig_args.update(settings)
+
+    path = pathlib.Path(savefig_args['path'])
+    savefig_args.pop('path')
+
+    dirpath = path.parent
+    if not dirpath.exists():
+        dirpath.mkdir(parents=True, exist_ok=True)
+
+    if path.suffix not in ['.eps', '.pdf', '.png', '.ps']:
+        path_str = str(path)
+        fmt = savefig_args['format']
+        path = pathlib.Path(f'{path_str}.{fmt}')
+
+    fig.savefig(str(path), **savefig_args)
+    print(f'Saving figure to: {str(path)} ...')

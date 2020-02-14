@@ -27,7 +27,7 @@ import cartopy.feature as cfeature
 from . import lipdutils
 from . import visualization
 from . import analysis
-from . import rbchron
+from . import agemodel
 from . import examples
 from . import api
 
@@ -2719,19 +2719,19 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
         print("Looking for calibration curves...")
         match = lipdutils.searchVar(ts_list,["calCurves"], exact=False)
         if not match:
-            calCurves = rbchron.chooseCalCurves()
-            calCurves = rbchron.verifyCalCurves(calCurves)
+            calCurves = agemodel.chooseCalCurves()
+            calCurves = agemodel.verifyCalCurves(calCurves)
             if len(calCurves) == 1 and len(positions)!=1:
                 calCurves = list(chain(*[[i]*len(positions) for i in calCurves]))
         else:
             calCurves = ts_list[match]['values']
-            calCurves = rbchron.verifyCalCurves(calCurves)
+            calCurves = agemodel.verifyCalCurves(calCurves)
     elif len(calCurves)==1 and len(positions)!=1:
-        calCurves = rbchron.verifyCalCurves(calCurves)
+        calCurves = agemodel.verifyCalCurves(calCurves)
         calCurves = list(chain(*[[i]*len(positions) for i in calCurves]))
     else:
         assert len(calCurves) == len(positions)
-        calCurves = rbchron.verifyCalCurves(calCurves)
+        calCurves = agemodel.verifyCalCurves(calCurves)
     print("Calibration curves found.")
 
     #Check for a reservoir age
@@ -2758,12 +2758,12 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
 
         else:
             print("No match found.")
-            ageCorr, ageCorrStd = rbchron.reservoirAgeCorrection()
+            ageCorr, ageCorrStd = agemodel.reservoirAgeCorrection()
         reservoirAgeCorr = np.column_stack((ageCorr,ageCorrStd))
         reservoirAgeCorr = reservoirAgeCorr.flatten()
 
     elif reservoirAgeCorr == True:
-        ageCorr, ageCorrStd = rbchron.reservoirAgeCorrection()
+        ageCorr, ageCorrStd = agemodel.reservoirAgeCorrection()
         reservoirAgeCorr = np.column_stack((ageCorr,ageCorrStd))
         reservoirAgeCorr = reservoirAgeCorr.flatten()
     else:
@@ -2808,7 +2808,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
 
     # Run Bchron
     print("Running Bchron. This could take a few minutes...")
-    depth, chron, ageDist, run = rbchron.runBchron(ages, agesStd,positions,\
+    depth, chron, ageDist, run = agemodel.runBchron(ages, agesStd,positions,\
                                                     rejectAges = rejectAges,\
                                                     calCurves = calCurves,\
                                                     reservoirAgeCorr = reservoirAgeCorr,\
@@ -2994,7 +2994,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
                     ylabel = "Age ("+str(agesUnit)+")"
                 else:
                     ylabel = "Age"
-        fig = rbchron.plotBchron(depth,chron,positions,ageDist, flipCoor=flipCoor,\
+        fig = agemodel.plotBchron(depth,chron,positions,ageDist, flipCoor=flipCoor,\
                                  xlabel =xlabel, ylabel=ylabel,\
                                  xlim = xlim, ylim = ylim,\
                                  violinColor = violinColor,\

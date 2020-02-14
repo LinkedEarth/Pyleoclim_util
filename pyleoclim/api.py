@@ -59,8 +59,23 @@ class Series:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.time)}'
 
-    def plot(self, figsize=[10, 4], title=None):
+    def plot(self, figsize=[10, 4], title=None, savefig_settings={}):
         ''' Plot the timeseries
+
+        Args
+        ----
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
         fig, ax = plt.subplots(figsize=figsize)
         ax.plot(self.time, self.value)
@@ -73,6 +88,12 @@ class Series:
         if title is not None:
             ax.set_title(title)
 
+        if 'path' in savefig_settings:
+            visualization.savefig(fig, savefig_settings)
+            plt.close()
+        else:
+            plt.show()
+
         return fig, ax
 
     def clean(self):
@@ -84,42 +105,50 @@ class Series:
         self.time = t_cleaned
         self.value = y_cleaned
 
-    def spectral(self, method='wwz', args={}):
+    def spectral(self, method='wwz', settings={}):
         ''' Perform spectral analysis on the timeseries
         '''
         spec_func = {
             'wwz': analysis.wwz_psd,
         }
+        args = {}
+        args.update(settings)
         spec_res = spec_func[method](self.value, self.time, **args)
         psd = PSD(freq=spec_res.freq, amplitude=spec_res.psd)
         return psd
 
-    def wavelet(self, method='wwz', args={}):
+    def wavelet(self, method='wwz', settings={}):
         ''' Perform wavelet analysis on the timeseries
         '''
         wave_func = {
             'wwz': analysis.wwz,
         }
+        args = {}
+        args.update(settings)
         wave_res = wave_func[method](self.value, self.time, **args)
         scal = Scalogram(freq=wave_res.freq, time=wave_res.time, amplitude=wave_res.amplitude, coi=wave_res.coi)
 
         return scal
 
-    def wavelet_coherence(self, target_series, method='wwz', args={}):
+    def wavelet_coherence(self, target_series, method='wwz', settings={}):
         ''' Perform wavelet coherence analysis with the target timeseries
         '''
         xwc_func = {
             'wwz': analysis.xwc,
         }
+        args = {}
+        args.update(settings)
         xwc_res = xwc_func[method](self.value, self.time, target_series.value, target_series.time, **args)
 
         coh = Coherence(freq=xwc_res.freq, time=xwc_res.time, coherence=xwc_res.xw_coherence, phase=xwc_res.xw_phase, coi=xwc_res.coi)
 
         return coh
 
-    def correlation(self, target_series, args={}):
+    def correlation(self, target_series, settings={}):
         ''' Perform correlation analysis with the target timeseries
         '''
+        args = {}
+        args.update(settings)
         r, signif, p = analysis.corrsig(self.value, target_series.value, **args)
         corr_res = {
             'r': r,
@@ -128,9 +157,11 @@ class Series:
         }
         return corr_res
 
-    def causality(self, target_series, args={}):
+    def causality(self, target_series, settings={}):
         ''' Perform causality analysis with the target timeseries
         '''
+        args = {}
+        args.update(settings)
         causal_res = analysis.causality_est(self.value, target_series.value, **args)
         return causal_res
 
@@ -149,8 +180,23 @@ class PSD:
         return f'Length: {np.size(self.freq)}'
 
     def plot(self, in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude',
-             xlim=None, ylim=None, figsize=[10, 4]):
+             xlim=None, ylim=None, figsize=[10, 4], savefig_settigns={}):
         ''' Plot the power sepctral density (PSD)
+
+        Args
+        ----
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
 
         fig, ax = plt.subplots(figsize=figsize)
@@ -179,6 +225,12 @@ class PSD:
 
             ax.set_xlim(xlim)
 
+        if 'path' in savefig_settings:
+            visualization.savefig(fig, savefig_settings)
+            plt.close()
+        else:
+            plt.show()
+
         return fig, ax
 
 class Scalogram:
@@ -198,19 +250,35 @@ class Scalogram:
         msg = print(tabulate(table, headers='keys'))
         return f'Dimension: {np.size(self.freq)} x {np.size(self.time)}'
 
-    def plot(self, xlabel='Time', ylabel='Period',
-             contourf_args={}, cbar_args={}, figsize=[10, 8], ylim=None, xlim=None):
+    def plot(self, xlabel='Time', ylabel='Period', ylim=None, xlim=None, figsize=[10, 8],
+             contourf_style={}, cbar_style={}, savefig_settings={}):
         ''' Plot the scalogram from wavelet analysis
+
+        Args
+        ----
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
-        if contourf_args == {}:
-            contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
+        contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
+        contourf_args.update(contourf_style)
 
         fig, ax = plt.subplots(figsize=figsize)
 
         cont = ax.contourf(self.time, 1/self.freq, self.amplitude.T, **contourf_args)
+
         # plot colorbar
-        if cbar_args == {}:
-            cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
+        cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
+        cbar_args.update(cbar_style)
 
         cb = plt.colorbar(cont, **cbar_args)
 
@@ -230,6 +298,12 @@ class Scalogram:
         ax.set_ylabel(ylabel)
         ax.set_yscale('log', nonposy='clip')
 
+        if 'path' in savefig_settings:
+            visualization.savefig(fig, savefig_settings)
+            plt.close()
+        else:
+            plt.show()
+
         return fig, ax
 
 
@@ -241,12 +315,27 @@ class Coherence:
         self.coi = np.array(coi)
         self.phase = np.array(phase)
 
-    def plot(self, xlabel='Time', ylabel='Period', figsize=[10, 8], contourf_args={}, ylim=None, xlim=None,
-             phase_args={}, cbar_args={}):
+    def plot(self, xlabel='Time', ylabel='Period', figsize=[10, 8], ylim=None, xlim=None,
+             contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}):
         ''' Plot the wavelet coherence result
+
+        Args
+        ----
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
-        if contourf_args == {}:
-            contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
+        contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
+        contourf_args.update(contourf_style)
 
         fig, ax = plt.subplots(figsize=figsize)
 
@@ -254,8 +343,8 @@ class Coherence:
         cont = ax.contourf(self.time, 1/self.freq, self.coherence.T, **contourf_args)
 
         # plot colorbar
-        if cbar_args == {}:
-            cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
+        cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
+        cbar_args.update(cbar_style)
 
         cb = plt.colorbar(cont, **cbar_args)
 
@@ -278,8 +367,8 @@ class Coherence:
         ax.set_yscale('log', nonposy='clip')
 
         # plot phase
-        if phase_args == {}:
-            phase_args = {'pt': 0.5, 'skip_x': 5, 'skip_y': 5, 'scale': 30, 'width': 0.004}
+        phase_args = {'pt': 0.5, 'skip_x': 5, 'skip_y': 5, 'scale': 30, 'width': 0.004}
+        phase_args.update(phase_style)
 
         pt = phase_args['pt']
         skip_x = phase_args['skip_x']
@@ -296,6 +385,12 @@ class Coherence:
         ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
                   U[::skip_y, ::skip_x], V[::skip_y, ::skip_x],
                   scale=scale, width=width)
+
+        if 'path' in savefig_settings:
+            visualization.savefig(fig, savefig_settings)
+            plt.close()
+        else:
+            plt.show()
 
         return fig, ax
 
@@ -322,17 +417,17 @@ class LipdSeries:
                 'peat' : ['#2F4F4F','*'],
                 'other':['k','o']}
     
-    def mapone(self,projection = 'Orthographic', proj_default = True,\
-           background = True, label = 'default', borders = False, \
-           rivers = False, lakes = False,markersize = 50, marker = "default",\
-           figsize = [4,4], savefig = False, dir = None, format="eps"):
+    def mapone(self, projection='Orthographic', proj_default=True,
+               background=True, label='default', borders=False,
+               rivers=False, lakes=False, markersize=50, marker="default",
+               figsize=[4,4], savefig_settings={}):
         """ Create a Map for a single record
 
         Orthographic projection map of a single record.
-    
+
         Args
         ----
-    
+
         timeseries : object
                     a LiPD timeseries object. Will prompt for one if not given
         projection : string
@@ -370,35 +465,31 @@ class LipdSeries:
                 default color palette for archives
         figsize : list
                  the size for the figure
-        savefig : bool
-                 default is to not save the figure
-        dir : str
-             the full path of the directory in which to save the figure.
-             If not provided, creates a default folder called 'figures' in the
-             LiPD working directory (lipd.path).
-        format : str
-                One of the file extensions supported by the active
-                backend. Default is "eps". Most backend support png, pdf, ps, eps,
-                and svg.
-    
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+
         Returns
         -------
         The figure
-    
+
         """
-        
+
         # Get latitude/longitude
-    
+
         lat = self.ts['geo_meanLat']
         lon = self.ts['geo_meanLon']
-    
+
         # Make sure it's in the palette
         if marker == 'default':
             archiveType = lipdutils.LipdToOntology(self.ts['archiveType']).lower()
             if archiveType not in self.plot_default.keys():
                 archiveType = 'other'
             marker = self.plot_default[archiveType]
-    
+
         # Get the label
         if label == 'default':
             for i in self.ts.keys():
@@ -412,19 +503,16 @@ class LipdSeries:
             label = None
         else:
             assert type(label) is str, 'the argument label should be of type str'
-    
-        fig = visualization.mapOne(lat, lon, projection = projection, proj_default = proj_default,\
-               background = background, label = label, borders = borders, \
-               rivers = rivers, lakes = lakes,\
-               markersize = markersize, marker = marker, figsize = figsize, \
-               ax = None)
-    
-        # Save the figure if asked
-        if savefig == True:
-            lipdutils.saveFigure(self.ts['dataSetName']+'_map', format, dir)
+
+        fig = visualization.mapOne(lat, lon, projection = projection, proj_default = proj_default,
+               background = background, label = label, borders = borders, rivers = rivers, lakes = lakes,
+               markersize = markersize, marker = marker, figsize = figsize, ax = None)
+
+        # Save the figure if "path" is specified in savefig_settings
+        if 'path' in savefig_settings:
+            visualization.savefig(fig, savefig_settings)
+            plt.close()
         else:
             plt.show()
-    
+
         return fig
-    
-        
