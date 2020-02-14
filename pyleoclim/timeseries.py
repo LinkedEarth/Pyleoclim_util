@@ -23,12 +23,10 @@ from pyleoclim import spectral
 from pyleoclim import stats
 from pyleoclim import timeseries
 from nitime import algorithms as alg
-<<<<<<< HEAD
+
 from sklearn.cluster import DBSCAN
 from spectral import detrend
-=======
 from statsmodels.tsa.stattools import grangercausalitytests
->>>>>>> d0f3822166977fe31de9a250d0eb0cb9892ed317
 
 class Causality(object):
     def granger_causality(self,y1, y2, maxlag=1,addconst=True,verbose=True):
@@ -1470,35 +1468,40 @@ def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
 
     return ys
 
-    
-def detect_outliers(ts,ys):
+
+def detect_outliers(ts, ys, args={}):
     ''' Function to detect outliers in the given timeseries
     Args
     ----
-    
+
     ts : array
          time axis of time series
     ys : array
          y values of time series
-    
+    args : dict
+         arguments for the DBSCAN function from sklearn,
+         for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
+
     Returns
     -------
-    
+
     is_outlier : array
                 a list of boolean values indicating whether the point is an outlier or not
     '''
-    
-    outlier_detection = DBSCAN(eps = 0.2, metric="euclidean")
+
+    if args == {}:
+        args = {'eps': 0.2, 'metric': 'euclidean'}
+
+    outlier_detection = DBSCAN(**args)
+
     clusters = outlier_detection.fit_predict(ys.values.reshape(-1,1)))
     is_outlier = []
+
     for value in clusters:
         if value == -1:
-            res.append(True)
+            is_outlier.append(True)
         else:
-            res.append(False)
+            is_outlier.append(False)
+
     return is_outlier
-        
-    
-    
-    
 
