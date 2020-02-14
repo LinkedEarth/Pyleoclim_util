@@ -23,6 +23,8 @@ from pyleoclim import spectral
 from pyleoclim import stats
 from pyleoclim import timeseries
 from nitime import algorithms as alg
+from sklearn.cluster import DBSCAN
+from spectral import detrend
 
 class Causality(object):
 
@@ -1368,4 +1370,35 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
         raise KeyError('Not a valid detrending method')
 
     return ys
+    
+def detect_outliers(ts,ys):
+    ''' Function to detect outliers in the given timeseries
+    Args
+    ----
+    
+    ts : array
+         time axis of time series
+    ys : array
+         y values of time series
+    
+    Returns
+    -------
+    
+    is_outlier : array
+                a list of boolean values indicating whether the point is an outlier or not
+    '''
+    
+    outlier_detection = DBSCAN(eps = 0.2, metric="euclidean")
+    clusters = outlier_detection.fit_predict(ys.values.reshape(-1,1)))
+    is_outlier = []
+    for value in clusters:
+        if value == -1:
+            res.append(True)
+        else:
+            res.append(False)
+    return is_outlier
+        
+    
+    
+    
 
