@@ -34,6 +34,9 @@ from math import factorial
 import spectrum
 
 import numba as nb
+from numba.errors import NumbaPerformanceWarning
+
+warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
 '''
 Core functions below, focusing on algorithms
@@ -44,7 +47,7 @@ class SpectralAnalysis(object):
         '''
         Args
         ----
-        
+
         ys : array
             a time series
         ts  array
@@ -60,9 +63,9 @@ class SpectralAnalysis(object):
             - axis (int):     Axis along which the periodogram is computed; the default is over the last axis (i.e. axis=-1).
             - average : { ‘mean’, ‘median’ }, optional
             see https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.signal.welch.html for details
-        interp_method : string 
+        interp_method : string
             {'interp', 'bin'}): perform interpolation or binning
-        interp_args : dict 
+        interp_args : dict
             the arguments for the interpolation or binning methods, for the details, check timeseries.interp() and timeseries.binvalues()
         prep_args : dict
             the arguments for preprocess, including
@@ -79,7 +82,7 @@ class SpectralAnalysis(object):
                              (the default is zero, which means only smoothing.)
             - gaussianize (bool): If True, gaussianizes the timeseries
             - standardize (bool): If True, standardizes the timeseries
-        
+
         Returns
         -------
         res_dict : dict
@@ -91,7 +94,7 @@ class SpectralAnalysis(object):
         #make default nperseg len(ts)//3
         if not ana_args or not ana_args.get('nperseg'):
             ana_args['nperseg']=len(ts)
-        
+
         # preprocessing
         wa = WaveletAnalysis()
         ys, ts = timeseries.clean_ts(ys, ts)
@@ -130,7 +133,7 @@ class SpectralAnalysis(object):
 
         Args
         ----
-        
+
         ys : array
             a time series
         ts : array
@@ -164,7 +167,7 @@ class SpectralAnalysis(object):
 
         Returns
         -------
-        
+
         res_dict : dict
             the result dictionary, including
             - freqs (array): the frequency vector
@@ -210,13 +213,13 @@ class SpectralAnalysis(object):
     def lomb_scargle(self, ys, ts, freqs=None, make_freq_method='nfft', prep_args={}, ana_args={}):
         """ Return the computed periodogram using lomb-scargle algorithm
         Lombscargle algorithm
-        
+
         Args
         ----
-        
+
         ys : array
             a time series
-        ts : array 
+        ts : array
             time axis of the time series
         freqs : array
             vector of frequency
@@ -241,7 +244,7 @@ class SpectralAnalysis(object):
             Extra argumemnts which may be needed such as
             - precenter (bool): Pre-center amplitudes by subtracting the mean
             - normalize (bool): Compute normalized periodogram
-            
+
         Returns
         -------
 
@@ -283,7 +286,7 @@ class SpectralAnalysis(object):
 
         Args
         ----
-        
+
         ys : array
             a time series
         ts : array
@@ -317,8 +320,8 @@ class SpectralAnalysis(object):
 
         Returns
         -------
-        
-        res_dict : dict 
+
+        res_dict : dict
             the result dictionary, including
             - freqs (array): the frequency vector
             - psd (array): the spectral density vector
@@ -366,13 +369,13 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         ts : array
             the time axis of a time series
 
         Returns
         -------
-        
+
         check : bool
             True - evenly spaced; False - unevenly spaced.
 
@@ -394,7 +397,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         ys : array
             vector of (float) numbers as a time series
         ts : array
@@ -416,7 +419,7 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         g : float
             lag-1 autocorrelation coefficient
 
@@ -432,7 +435,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         ys : array
             a time series
         ts : array
@@ -456,7 +459,7 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         res : array
             the processed time series
 
@@ -482,7 +485,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         ys : array
             a time series
         ts : array
@@ -504,13 +507,13 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         tau_est : float
             the estimated persistence
 
         References
         ----------
-        
+
         Mudelsee, M. TAUEST: A Computer Program for Estimating Persistence in Unevenly Spaced Weather/Climate Time Series.
             Comput. Geosci. 28, 69–72 (2002).
 
@@ -540,23 +543,23 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         ts : array
             time axis of the time series
         tau : float
             the averaged persistence
-        n : int  
+        n : int
             the length of the AR1 process
 
         Returns
         -------
-        
+
         r : array
             the AR1 time series
 
         References
         ----------
-        
+
         Schulz, M. & Mudelsee, M. REDFIT: estimating red-noise spectra directly from unevenly spaced
             paleoclimatic time series. Computers & Geosciences 28, 421–426 (2002).
 
@@ -585,7 +588,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         ys : array
             a time series
         ts : array
@@ -613,13 +616,13 @@ class WaveletAnalysis(object):
             (the default is zero, which means only smoothing.)
         gaussianize : bool
             If True, gaussianizes the timeseries
-        standardize : bool 
+        standardize : bool
             If True, standardizes the timeseries
 
         Returns
         -------
-        
-        wwa : array 
+
+        wwa : array
             the weighted wavelet amplitude
         phase : array
             the weighted wavelet phase
@@ -630,7 +633,7 @@ class WaveletAnalysis(object):
 
         References
         ----------
-        
+
         Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
         Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
             Nonlinear Processes in Geophysics 12, 345–352 (2005).
@@ -696,12 +699,12 @@ class WaveletAnalysis(object):
     def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=False, params=['default', 4, 0, 1],
                   gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
-        
-        Original method from Foster. Supports multiprocessing. 
+
+        Original method from Foster. Supports multiprocessing.
 
         Args
         ----
-        
+
         ys : array
             a time series
         ts : array
@@ -734,7 +737,7 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         wwa : array
             the weighted wavelet amplitude
         phase : array
@@ -819,10 +822,10 @@ class WaveletAnalysis(object):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Method modified by Kirchner. No multiprocessing.
-        
+
         Args
         ----
-        
+
         ys : array
             a time series
         ts : array
@@ -855,7 +858,7 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         wwa : array
             the weighted wavelet amplitude
         phase : array
@@ -867,7 +870,7 @@ class WaveletAnalysis(object):
 
         References
         ----------
-        
+
         Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
         Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
         Nonlinear Processes in Geophysics 12, 345–352 (2005).
@@ -951,7 +954,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         ys : array
             a time series
         ts : array
@@ -964,7 +967,7 @@ class WaveletAnalysis(object):
             the decay constant
         Neff : int
             the threshold of the number of effective degree of freedom
-        nproc : int 
+        nproc : int
             the number of processes for multiprocessing
         detrend : string
             None - the original time series is assumed to have no trend;
@@ -977,14 +980,14 @@ class WaveletAnalysis(object):
             while the second parameter correspond to the order of the filter
             (default is 4). The third parameter is the order of the derivative
             (the default is zero, which means only smoothing.)
-        gaussianize : bool 
+        gaussianize : bool
             If True, gaussianizes the timeseries
         standardize : bool
             If True, standardizes the timeseries
 
         Returns
         -------
-        
+
         wwa (array): the weighted wavelet amplitude
         phase (array): the weighted wavelet phase
         Neffs (array): the matrix of effective number of points in the time-scale coordinates
@@ -1083,7 +1086,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         ys : array
             a time series
         ts : array
@@ -1116,7 +1119,7 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         wwa : array
             the weighted wavelet amplitude
         phase : array
@@ -1128,7 +1131,7 @@ class WaveletAnalysis(object):
 
         References
         ----------
-        
+
         Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
         Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
             Nonlinear Processes in Geophysics 12, 345–352 (2005).
@@ -1219,13 +1222,13 @@ class WaveletAnalysis(object):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
         Fastest method. Calls Fortran libraries.
-        
+
         Args
         ----
-        
+
         ys : array
             a time series
-        ts : array 
+        ts : array
             time axis of the time series
         freqs : array
             vector of frequency
@@ -1255,7 +1258,7 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         wwa : array
             the weighted wavelet amplitude
         phase : array
@@ -1296,7 +1299,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         tau : array
             the evenly-spaced time points, namely the time shift for wavelet analysis
         Neff : int
@@ -1304,13 +1307,13 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
             coi : array
                 cone of influence
 
         References
         ----------
-        
+
         wave_signif() in http://paos.colorado.edu/research/wavelets/wave_python/waveletFunctions.py
 
         '''
@@ -1340,7 +1343,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         ys : array
             a time series
         ts : array
@@ -1350,8 +1353,8 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
-            
+
+
         omega : array
             the angular frequency vector
 
@@ -1369,7 +1372,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         wwa : array
             the weighted wavelet amplitude.
         ts : array
@@ -1387,13 +1390,13 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         psd : array
             power spectral density
 
         References
         ----------
-            
+
         Kirchner's C code for weighted psd calculation
 
         """
@@ -1429,7 +1432,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-    
+
         ts : array
             time axis of the time series
         ofac : float
@@ -1442,13 +1445,13 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         freqs : array
             the frequency vector
 
         References
         ----------
-            
+
         Trauth, M. H. MATLAB® Recipes for Earth Sciences. (Springer, 2015). pp 181.
 
         '''
@@ -1471,19 +1474,19 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         ts : array
             time axis of the time series
 
         Returns
         -------
-        
+
         freqs : array
             the frequency vector
 
         References
         ----------
-        
+
         https://github.com/scipy/scipy/blob/v0.14.0/scipy/signal/spectral.py
 
         '''
@@ -1504,13 +1507,13 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         ts : array
             time axis of the time series
 
         Returns
         -------
-        
+
         freqs : array
             the frequency vector
 
@@ -1526,13 +1529,13 @@ class WaveletAnalysis(object):
 
     def make_freq_vector(self, ts, method = 'nfft', **kwargs):
         ''' Make frequency vector- Selector function.
-        
-        This function selects among various methods to obtain the frequency 
-        vector. 
+
+        This function selects among various methods to obtain the frequency
+        vector.
 
         Args
         ----
-        
+
         ts : array): time axis of the time series
         method : string
             The method to use. Options are 'nfft' (default), 'Lomb-Scargle', 'Welch'
@@ -1544,19 +1547,19 @@ class WaveletAnalysis(object):
                      The default value 4 is usaually a good value.
                 - hifac (float): fhi/fnyq (should be >= 1), where fhi is the highest frequency that
                       can be analyzed by the Lomb-Scargle algorithm and fnyq is the Nyquist frequency.
-        
+
         Returns
         -------
-        
+
         freqs : array
             the frequency vector
 
         '''
-        
+
         if method == 'Lomb-Scargle':
             freqs = self.freq_vector_lomb_scargle(ts,**kwargs)
         elif method == 'Welch':
-            freqs = self.freq_vector_welch(ts)        
+            freqs = self.freq_vector_welch(ts)
         else:
             freqs = self.freq_vector_nfft(ts)
         #  freqs = freqs[1:]  # discard the first element 0
@@ -1568,7 +1571,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         psd : array
             the power spectral density
         freqs : array
@@ -1580,7 +1583,7 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         beta : float
             the estimated slope
         f_binned : array
@@ -1668,19 +1671,19 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         beta : float
             the estimated slope of a power spectral density curve
 
         Returns
         -------
-        
+
         H : float
             Hurst index, should be in (0, 1)
 
         References
         ----------
-        
+
         Equation 2 in http://www.bearcave.com/misl/misl_tech/wavelets/hurst/
 
         '''
@@ -1693,7 +1696,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-    
+
         var_noise : float
             the variance of the noise of the AR process
         freqs : array
@@ -1705,7 +1708,7 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         psd : array
             power spectral density
 
@@ -1725,7 +1728,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         N : int
             the length of the simulated time series
         H : float
@@ -1734,13 +1737,13 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         xfBm : array
             the simulated fractional Brownian Motion time series
 
         References
         ----------
-        
+
         1. http://cours-physique.lps.ens.fr/index.php/TD11_Correlated_Noise_2011
         2. https://www.wikiwand.com/en/Fractional_Brownian_motion
 
@@ -1781,7 +1784,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         freqs : array
             vector of frequency
         ts : array
@@ -1791,13 +1794,13 @@ class WaveletAnalysis(object):
 
         Returns
         --------
-        
+
         psd : array
             power spectral density
 
         References
         ----------
-    
+
         Flandrin, P. On the spectrum of fractional Brownian motions.
             IEEE Transactions on Information Theory 35, 197–199 (1989).
 
@@ -1819,17 +1822,17 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         nproc : int
             the number of processes for multiprocessing
         method : string
             'Foster' - the original WWZ method;
             'Kirchner' - the method Kirchner adapted from Foster;
             'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py (default)
-            
+
         Returns
         -------
-        
+
         wwz_func : function
             the wwz function to use
 
@@ -1861,7 +1864,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-    
+
         ys : array
             a time series, NaNs will be deleted automatically
         ts : array
@@ -1885,7 +1888,7 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         ys_cut : array
             the truncated time series with NaNs deleted
         ts_cut : array
@@ -1959,7 +1962,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         coeff1 : array
             the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
         coeff2 : array
@@ -1971,15 +1974,15 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
-        xw_amplitude : array 
+
+        xw_amplitude : array
             the cross wavelet amplitude
         xw_phase : array
             the cross wavelet phase
 
         References
         ----------
-        
+
         1.Grinsted, A., Moore, J. C. & Jevrejeva, S. Application of the cross wavelet transform and
             wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004).
 
@@ -1995,7 +1998,7 @@ class WaveletAnalysis(object):
 
         Args
         ----
-        
+
         coeff1 : array
             the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
         coeff2 : array
@@ -2007,13 +2010,13 @@ class WaveletAnalysis(object):
 
         Returns
         -------
-        
+
         xw_coherence : array
             the cross wavelet coherence
 
         References
         ----------
-        
+
         1. Grinsted, A., Moore, J. C. & Jevrejeva, S. Application of the cross wavelet transform and
             wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004).
         2. Matlab code by Grinsted (https://github.com/grinsted/wavelet-coherence)
@@ -2045,7 +2048,7 @@ class WaveletAnalysis(object):
 
             Args
             ----
-            
+
             coeff : array
                 the wavelet coefficients get from wavlet transform **in the form of a1 + a2*1j**
             snorm : array
@@ -2055,7 +2058,7 @@ class WaveletAnalysis(object):
 s
             Returns
             -------
-            
+
             rect : array
                 the (normalized) rectangular function
 
@@ -2113,10 +2116,10 @@ s
 
     def reconstruct_ts(self, coeff, freqs, tau, t, len_bd=0):
         ''' Reconstruct the normalized time series from the wavelet coefficients.
-        
+
         Args
         ----
-        
+
         coeff : array
             the coefficients of the corresponding basis functions (a0, a1, a2)
         freqs : array
@@ -2130,7 +2133,7 @@ s
 
         Returns
         -------
-        
+
         rec_ts : array
             the reconstructed normalized time series
         t : array
@@ -2175,10 +2178,10 @@ class AliasFilter(object):
 
     def alias_filter(self, freq, pwr, fs, fc, f_limit, avgs):
         ''' anti_alias filter
-        
+
         Args
         ----
-        
+
         freq : array
             vector of frequencies in power spectrum
         pwr : array
@@ -2195,7 +2198,7 @@ class AliasFilter(object):
 
         Returns
         -------
-        
+
         alpha : float
             best-fit exponent of power-law model
         filtered_pwr : array
@@ -2207,7 +2210,7 @@ class AliasFilter(object):
 
         References
         ----------
-        
+
         1. Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
                 Phys Rev E Stat Nonlin Soft Matter Phys 71, 66110 (2005).
 
@@ -2310,7 +2313,7 @@ class Filter(object):
 
         Args
         ----
-        
+
         y : array
             the values of the time history of the signal.
         window_size : int
@@ -2322,13 +2325,13 @@ class Filter(object):
 
         Returns
         -------
-        
+
         ys : array
             ndarray of shape (N), the smoothed signal (or it's n-th derivative).
 
         Reference
         ---------
-        
+
         - A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of
             Data by Simplified Least Squares Procedures. Analytical
             Chemistry, 1964, 36 (8), pp 1627-1639.
@@ -2358,14 +2361,14 @@ class Filter(object):
         y = np.concatenate((firstvals, y, lastvals))
 
         return np.convolve(m[::-1], y, mode='valid')
-    
+
     @staticmethod
-    def tsPad(ys,ts,method = 'reflect', params=(2,1,2), reflect_type = 'odd',padFrac=0.1):
+    def tsPad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFrac=0.1):
         """ tsPad: pad a timeseries based on timeseries model predictions
-        
+
         Args
         ----
-        
+
         x : numpy array
             Evenly-spaced timeseries
         t : numpy array
@@ -2374,7 +2377,7 @@ class Filter(object):
             The method to use to pad the series
             - ARIMA: uses a fitted ARIMA model
             - reflect (default): Reflects the time series
-        params : tuple ARIMA model order parameters (p,d,q)
+        params : tuple ARIMA model order parameters (p,d,q), Default corresponds to an AR(1) model
         reflect_type : string
              {‘even’, ‘odd’}, optional
              Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
@@ -2382,66 +2385,66 @@ class Filter(object):
              For more details, see np.lib.pad()
         padFrac : float
             padding fraction (scalar) such that padLength = padFrac*length(series)
-        
+
         Returns
         -------
-        
-        yp : array 
+
+        yp : array
             padded timeseries
         tp : array
             augmented axis
-            
+
         Author
         ------
-        
+
         Julien Emile-Geay, Deborah Khider
         """
         padLength =  np.round(len(ts)*padFrac).astype(np.int64)
-    
+
         if not (np.std(np.diff(ts)) == 0):
             raise ValueError("ts needs to be composed of even increments")
         else:
             dt = np.diff(ts)[0] # computp time interval
-        
+
         if method == 'ARIMA':
             # fit ARIMA model
             fwd_mod = sm.tsa.ARIMA(ys,params).fit()  # model with time going forward
             bwd_mod = sm.tsa.ARIMA(np.flip(ys,0),params).fit()  # model with time going backwards
-        
+
             # predict forward & backward
             fwd_pred  = fwd_mod.forecast(padLength); yf = fwd_pred[0]
             bwd_pred  = bwd_mod.forecast(padLength); yb = np.flip(bwd_pred[0],0)
-        
+
             # define extra time axes
             tf = np.linspace(max(ts)+dt, max(ts)+padLength*dt,padLength)
             tb = np.linspace(min(ts)-padLength*dt, min(ts)-1, padLength)
-        
+
             # extend time series
             tp = np.arange(ts[0]-padLength*dt,ts[-1]+padLength*dt+1,dt)
             yp = np.empty(len(tp))
             yp[np.isin(tp,ts)] =ys
             yp[np.isin(tp,tb)]=yb
             yp[np.isin(tp,tf)]=yf
-       
+
         elif method == 'reflect':
             yp = np.pad(ys,(padLength,padLength),mode='reflect',reflect_type=reflect_type)
             tp = np.arange(ts[0]-padLength,ts[-1]+padLength+1,1)
-        
+
         else:
             raise ValueError('Not a valid argument. Enter "ARIMA" or "reflect"')
-    
+
         return yp, tp
-    
+
     @staticmethod
     def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
                     reflect_type='odd',params=(2,1,2),padFrac=0.1):
         '''Applies a Butterworth filter with frequency fc, with padding
-        
+
         Args
         ----
-        
+
         ys : numpy array
-            Timeseries 
+            Timeseries
         fc : float or list
             cutoff frequency. If scalar, it is interpreted as a low-frequency cutoff (lowpass)
             If fc is a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass)
@@ -2453,25 +2456,25 @@ class Filter(object):
             Indicates if padding is needed.
             - 'reflect': Reflects the timeseries
             - 'ARIMA': Uses an ARIMA model for the padding
-            - None: No padding. 
+            - None: No padding.
         params : tuple
             model parameters for ARIMA model (if pad = True)
         padFrac : float
             fraction of the series to be padded
-        
+
         Returns
         -------
-        
+
         yf : array
             filtered array
-        
+
         Author
         ------
-        
+
         Julien Emile-Geay
         '''
         nyq = 0.5 * fs
-    
+
         if isinstance(fc, list) and len(fc) == 2:
             fl = fc[0] / nyq
             fh = fc[1] / nyq
@@ -2479,9 +2482,9 @@ class Filter(object):
         else:
             fl = fc / nyq
             b, a = signal.butter(filter_order, fl , btype='lowpass')
-    
+
         ts = np.arange(len(ys)) # define time axis
-        
+
         if pad=='ARIMA':
             yp,tp = Filter.tsPad(ys,ts,method = 'ARIMA', params=params, padFrac=padFrac)
         elif pad=='reflect':
@@ -2489,11 +2492,11 @@ class Filter(object):
         elif pad is None:
             yp = ys; tp = ts
         else:
-            raise ValueError('Not a valid argument. Enter "ARIMA", "reflect" or None') 
-    
+            raise ValueError('Not a valid argument. Enter "ARIMA", "reflect" or None')
+
         ypf = signal.filtfilt(b, a, yp)
         yf  = ypf[np.isin(tp,ts)]
-    
+
         return yf
 
 '''
@@ -2506,7 +2509,7 @@ def ar1_fit(ys, ts=None, detrend= None, params=["default", 4, 0, 1]):
 
     Args
     ----
-    
+
     ys : array
         the time series
     ts : array
@@ -2524,7 +2527,7 @@ def ar1_fit(ys, ts=None, detrend= None, params=["default", 4, 0, 1]):
 
     Returns
     -------
-    
+
     g : float
         lag-1 autocorrelation coefficient (for evenly-spaced time series)
         OR estimated persistence (for unevenly-spaced time series)
@@ -2545,10 +2548,10 @@ def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
 
     Args
     ----
-    
+
     ys : array
         a time series
-    n : int 
+    n : int
         row dimensions
     p : int
         column dimensions
@@ -2568,7 +2571,7 @@ def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
 
     Returns
     -------
-    
+
     red : array
         n rows by p columns matrix of an AR1 process
 
@@ -2608,7 +2611,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
 
     Args
     ----
-    
+
     ys : array
         a time series, NaNs will be deleted automatically
     ts : array
@@ -2643,7 +2646,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
         'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
     len_bd : int
         the number of the ghost grids want to creat on each boundary
-    bc_mode : string 
+    bc_mode : string
         {'constant', 'edge', 'linear_ramp', 'maximum', 'mean', 'median', 'minimum', 'reflect' , 'symmetric', 'wrap'}
         For more details, see np.lib.pad()
     reflect_type : string
@@ -2654,7 +2657,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
 
     Returns
     -------
-    
+
     wwa : array
         the weighted wavelet amplitude.
     AR1_q : array
@@ -2725,7 +2728,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
 
     Args
     ----
-    
+
     ys : array
         a time series, NaNs will be deleted automatically
     ts : array
@@ -2764,13 +2767,13 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     Neff : int
         effective number of points
     anti_alias : bool): If True, uses anti-aliasing
-    avgs : int 
+    avgs : int
         flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
         OR from measurements averaged over each sampling interval (avgs==1)
 
     Returns
     -------
-    
+
     psd : array
         power spectral density
     freqs : array
@@ -2790,7 +2793,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
               detrend=detrend, params=params,
               gaussianize=gaussianize, standardize=standardize, method=method)
 
-    psd = wa.wwa2psd(res_wwz.wwa, ts_cut, res_wwz.Neffs, freqs=res_wwz.freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+    psd = wa.wwa2psd(res_wwz.amplitude, ts_cut, res_wwz.Neffs, freqs=res_wwz.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
     #  psd[1/freqs > np.max(coi)] = np.nan  # cut off the unreliable part out of the coi
     #  psd = psd[1/freqs <= np.max(coi)] # cut off the unreliable part out of the coi
     #  freqs = freqs[1/freqs <= np.max(coi)]
@@ -2820,8 +2823,8 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
     else:
         psd_ar1_q95 = None
 
-    Results = collections.namedtuple('Results', ['psd', 'freqs', 'psd_ar1_q95', 'psd_ar1'])
-    res = Results(psd=psd, freqs=freqs, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
+    Results = collections.namedtuple('Results', ['psd', 'freq', 'psd_ar1_q95', 'psd_ar1'])
+    res = Results(psd=psd, freq=freqs, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
 
     return res
 
@@ -2835,7 +2838,7 @@ def xwt(ys1, ts1, ys2, ts2,
 
     Args
     ----
-    
+
     ys1 : array
         first of two time series
     ys2 : array
@@ -2877,14 +2880,14 @@ def xwt(ys1, ts1, ys2, ts2,
 
     Returns
     -------
-    
+
     xw_amplitude : array
         the cross wavelet amplitude
     xw_phase : array
         the cross wavelet phase
     freqs : array
         vector of frequency
-    tau : array 
+    tau : array
         the evenly-spaced time points
     AR1_q : array
         AR1 simulations
@@ -2950,7 +2953,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
 
     Args
     ----
-    
+
     ys1 : array
         first of two time series
     ys2 : array
@@ -2967,7 +2970,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
     Neff : int
         effective number of points
-    nproc : int 
+    nproc : int
         the number of processes for multiprocessing
     nMC : int
         the number of Monte-Carlo simulations
@@ -2987,14 +2990,14 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         If True, gaussianizes the timeseries
     standardize : bool
         If True, standardizes the timeseries
-    method : string 
+    method : string
         'Foster' - the original WWZ method;
         'Kirchner' - the method Kirchner adapted from Foster;
         'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
 
     Returns
     -------
-    
+
     res : dict
         contains the cross wavelet coherence, cross-wavelet phase,
         vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
@@ -3090,25 +3093,25 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         AR1_q = None
 
     coi = wa.make_coi(tau, Neff=Neff)
-    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xwt', 'freqs', 'tau', 'AR1_q', 'coi'])
+    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xwt', 'freq', 'time', 'AR1_q', 'coi'])
     res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase, xwt=xwt,
-                  freqs=freqs, tau=tau, AR1_q=AR1_q, coi=coi)
+                  freq=freqs, time=tau, AR1_q=AR1_q, coi=coi)
 
     return res
 
 
 def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
-             yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None, 
-             figsize=[20, 8], clr_map='OrRd',cbar_drawedges=False, cone_alpha=0.5, 
+             yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None,
+             figsize=[20, 8], clr_map='OrRd',cbar_drawedges=False, cone_alpha=0.5,
              plot_signif=False, signif_style='contour', title=None, font_scale=1.5,
-             plot_cbar=True, plot_cone=False, ax=None, xlabel='Year CE', 
+             plot_cbar=True, plot_cone=False, ax=None, xlabel='Year CE',
              ylabel='Period (years)', cbar_orientation='vertical',
              cbar_pad=0.05, cbar_frac=0.15, cbar_labelsize=None):
     """ Plot the wavelet amplitude
 
     Args
     ----
-    
+
     wwa : array
         the weighted wavelet amplitude.
     freqs : array
@@ -3162,7 +3165,7 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
 
     Returns
     -------
-    
+
     fig : figure
         the 2-D plot of wavelet analysis
 
@@ -3252,10 +3255,10 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
 
 def plot_coherence(res_xwc, pt=0.5,
                    levels=None, tick_range=None, basey=2,
-                   yticks=None, ylim=None, xticks=None, xlabels=None, 
+                   yticks=None, ylim=None, xticks=None, xlabels=None,
                    figsize=[20, 8], clr_map='OrRd',
                    skip_x=5, skip_y=5, scale=30, width=0.004,
-                   cbar_drawedges=False, cone_alpha=0.5, plot_signif=False, 
+                   cbar_drawedges=False, cone_alpha=0.5, plot_signif=False,
                    signif_style='contour', title=None,
                    plot_cone=False, ax=None, xlabel='Year', ylabel='Period',
                    cbar_orientation='vertical', font_scale=1.5,
@@ -3264,10 +3267,10 @@ def plot_coherence(res_xwc, pt=0.5,
 
     Args
     ----
-    
+
     res_xwc : dict
         contains the cross wavelet coherence, cross-wavelet phase,
-        vector of frequency, evenly-spaced time points, AR1 sims, 
+        vector of frequency, evenly-spaced time points, AR1 sims,
         cone of influence. See xwc
     pt : float
         plot arrows above pt value
@@ -3276,7 +3279,7 @@ def plot_coherence(res_xwc, pt=0.5,
     tick_range : array
         levels of ticks to show on the colorbar
     basey : int
-        log base for y. Default is 2. 
+        log base for y. Default is 2.
     yticks : list
         ticks on y-axis
     ylim : list
@@ -3291,12 +3294,12 @@ def plot_coherence(res_xwc, pt=0.5,
         the name of the colormap
     skip_x : float
         plot every x points
-    skip_y : float 
+    skip_y : float
         plot every y points
     scale : int
         Scale factor for arrows
     width : float
-        Width of the arrows  
+        Width of the arrows
     cbar_drawedges : bool
         whether to draw edges on the colorbar or not
     cone_alpha : float
@@ -3323,11 +3326,11 @@ def plot_coherence(res_xwc, pt=0.5,
         the frac for the colorbar
     cbar_labelsize : float
         the font size of the colorbar label
-        
-        
+
+
     Returns
     -------
-    
+
     fig : figure
         the 2-D plot of wavelet analysis
 
@@ -3413,7 +3416,7 @@ def plot_wwadist(wwa, ylim=None, font_scale=1.5):
 
     Args
     ----
-    
+
     wwa : array
         the weighted wavelet amplitude.
     ylim :list
@@ -3421,7 +3424,7 @@ def plot_wwadist(wwa, ylim=None, font_scale=1.5):
 
     Returns
     -------
-    
+
     fig : figure
         the 2-D plot of wavelet analysis
 
@@ -3438,15 +3441,15 @@ def plot_wwadist(wwa, ylim=None, font_scale=1.5):
     return fig
 
 
-def plot_psd(psd, freqs, lmstyle='-', linewidth=None, 
-             color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-', 
-             ar1_linewidth=None, period_ticks=None, period_tickslabel=None, 
+def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
+             color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-',
+             ar1_linewidth=None, period_ticks=None, period_tickslabel=None,
              psd_lim=None, period_lim=None, alpha=1,
-             figsize=[20, 8], label='PSD', plot_ar1=False, 
+             figsize=[20, 8], label='PSD', plot_ar1=False,
              psd_ar1_q95=None, title=None, legend=True, font_scale=1.5,
-             psd_ar1_color=sns.xkcd_rgb["pale red"], 
+             psd_ar1_color=sns.xkcd_rgb["pale red"],
              ax=None, vertical=False, plot_gridlines=True,
-             period_label='Period (years)', psd_label='Spectral Density', 
+             period_label='Period (years)', psd_label='Spectral Density',
              zorder=None):
     """ Plot power spectral density
 
@@ -3538,8 +3541,8 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
         >>> res_wwz = spectral.wwz_psd(signal, time, tau=tau, c=1e-3, standardize=False, nMC=0)
         >>> # plot
         >>> fig = spectral.plot_psd(
-        ...           res_wwz.psd,
-        ...           res_wwz.freqs,
+        ...           res_wwz.amplitude,
+        ...           res_wwz.freq,
         ...           period_ticks=[2, 5, 10, 20, 50, 100],
         ...           figsize=[10, 8],
         ...       )
@@ -3640,14 +3643,14 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
 
     Args
     ----
-    
+
     ys : array
         a time series
     ts : array
         time axis of the time series
     freqs : array
         vector of frequency
-    tau : array 
+    tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
     c1 : float
         the decay constant (wwz method)
@@ -3672,7 +3675,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
         If True, gaussianizes the timeseries
     standardize : bool
         If True, standardizes the timeseries
-    levels : array 
+    levels : array
         levels of values to plot
     method : string
         method for the WWZ transform. Default is Kirchner_f2py
@@ -3709,7 +3712,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
 
     Returns
     --------
-    
+
     fig : figure
         the summary plot
 
@@ -3751,14 +3754,14 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
                   gaussianize=gaussianize, standardize=standardize)
 
     if wwa_xlabel is not None and wwa_ylabel is not None:
-        plot_wwa(res_wwz.wwa, res_wwz.freqs, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
+        plot_wwa(res_wwz.amplitude, res_wwz.freq, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
                  yticks=period_ticks, yticks_label=period_tickslabel,
                  ylim=[ylim_min, np.max(res_wwz.coi)],
                  plot_cone=True, plot_signif=True, xlabel=wwa_xlabel, ylabel=wwa_ylabel, ax=ax2, levels=levels,
                  cbar_orientation='horizontal', cbar_labelsize=15, cbar_pad=0.1, cbar_frac=0.15,
                  )
     else:
-        plot_wwa(res_wwz.wwa, res_wwz.freqs, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
+        plot_wwa(res_wwz.amplitude, res_wwz.freq, res_wwz.tau, coi=res_wwz.coi, AR1_q=res_wwz.AR1_q,
                  yticks=period_ticks, yticks_label=period_tickslabel,
                  ylim=[ylim_min, np.max(res_wwz.coi)],
                  plot_cone=True, plot_signif=True, ax=ax2,
@@ -3804,13 +3807,13 @@ def calc_plot_psd(ys, ts, ntau=501, dcon=1e-3, standardize=False,
 
     Args
     ----
-    
+
     ys : array
         a time series
     ts : array
         time axis of the time series
     natu : int
-        the length of tau, the evenly-spaced time points, 
+        the length of tau, the evenly-spaced time points,
         namely the time shift for wavelet analysis
     dcon : float
         the decay constant
@@ -3845,15 +3848,15 @@ def calc_plot_psd(ys, ts, ntau=501, dcon=1e-3, standardize=False,
     loc : string
         location for the legend
     bbox_to_anchor : list
-        gives a great degree of control for manual 
+        gives a great degree of control for manual
         legend placement. For example, if you want your axes legend
         located at the figure’s top right-hand corner instead of the axes’
-        corner, simply specify the corner’s location, and the coordinate 
+        corner, simply specify the corner’s location, and the coordinate
         system of that location
 
     Returns
     -------
-    
+
     fig : figure
         the summary plot
     psd : array
@@ -3902,7 +3905,7 @@ def spectral(ys, ts, method='mtm', nMC=0, qs=0.95, kwargs={}):
 
     Args
     ----
-    
+
     ys : array
         a time series
     ts : array
@@ -3918,7 +3921,7 @@ def spectral(ys, ts, method='mtm', nMC=0, qs=0.95, kwargs={}):
 
     Returns
     -------
-    
+
     res_dict : dict
         the result dictionary, including
         - freqs (array): the frequency vector
@@ -3951,4 +3954,3 @@ def spectral(ys, ts, method='mtm', nMC=0, qs=0.95, kwargs={}):
         res_dict['psd_ar1_q95'] = psd_ar1_q95
 
     return res_dict
-

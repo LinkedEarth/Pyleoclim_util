@@ -23,10 +23,48 @@ from pyleoclim import spectral
 from pyleoclim import stats
 from pyleoclim import timeseries
 from nitime import algorithms as alg
+<<<<<<< HEAD
 from sklearn.cluster import DBSCAN
 from spectral import detrend
+=======
+from statsmodels.tsa.stattools import grangercausalitytests
+>>>>>>> d0f3822166977fe31de9a250d0eb0cb9892ed317
 
 class Causality(object):
+    def granger_causality(self,y1, y2, maxlag=1,addconst=True,verbose=True):
+        '''
+        statsmodels granger causality tests
+        
+        Four tests for granger non causality of 2 time series.
+    
+        All four tests give similar results. params_ftest and ssr_ftest are equivalent based on F test which is identical to lmtest:grangertest in R.
+        
+        Args
+        ----
+        
+        x : array
+            The data for test whether the time series in the second column Granger causes the time series in the first column. Missing values are not supported.
+        maxlag : int or int iterable
+            If an integer, computes the test for all lags up to maxlag. If an iterable, computes the tests only for the lags in maxlag.
+        addconst : bool
+            Include a constant in the model.
+        verbose : bool
+            Print results
+            
+        Returns 
+        -------
+        
+        dict
+            All test results, dictionary keys are the number of lags. For each lag the values are a tuple, with the first element a dictionary with test statistic, 
+            pvalues, degrees of freedom, the second element are the OLS estimation results for the restricted model, the unrestricted model and the restriction (contrast) 
+            matrix for the parameter f_test.
+        '''
+    
+        if len(y1)!=len(y2):
+            raise ValueError('Timeseries must be of same length')
+    
+        x=np.matrix([y1,y2]).T
+        return grangercausalitytests(x,maxlag=maxlag,addconst=addconst,verbose=verbose)
 
     def liang_causality(self, y1, y2, npt=1):
         '''
@@ -42,7 +80,7 @@ class Causality(object):
         npt : int  >=1
             time advance in performing Euler forward differencing,
             e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
-            npt=1 should be used.
+            npt=1 should be used
 
         Returns
         -------
@@ -53,6 +91,7 @@ class Causality(object):
             the standardized info flow fro y2 to y1
         Z : float
             the total info
+            
 
         References
         ----------
@@ -67,11 +106,11 @@ class Causality(object):
             Physical review, E 94, 052201
 
         '''
-        dt = 1
+        dt=1
         nm = np.size(y1)
 
-        grad1 = (y1[0+npt:] - y1[0:-npt]) / (npt*dt)
-        grad2 = (y2[0+npt:] - y2[0:-npt]) / (npt*dt)
+        grad1 = (y1[0+npt:] - y1[0:-npt]) / (npt)
+        grad2 = (y2[0+npt:] - y2[0:-npt]) / (npt)
 
         y1 = y1[:-npt]
         y2 = y2[:-npt]
@@ -137,7 +176,7 @@ class Causality(object):
             'tau21': tau21,
             'Z': Z,
             'dH1_star': dH1_star,
-            'dH1_noise': dH1_noise,
+            'dH1_noise': dH1_noise
         }
 
         return res_dict
@@ -265,7 +304,67 @@ class Causality(object):
 
 
 class Decomposition(object):
-    def pca():
+    def pca(x,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,iterated_power='auto',random_state=None):
+        '''
+        scikit-learn PCA
+        
+        https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
+        
+        Args
+        ----
+        x : array
+            timeseries
+        n_components : int,None,or str
+             [default: None]
+            Number of components to keep. if n_components is not set all components are kept:
+            If n_components == 'mle' and svd_solver == 'full', Minka’s MLE is used to guess the dimension. Use of n_components == 'mle' will interpret svd_solver == 'auto' as svd_solver == 'full'.
+            If 0 < n_components < 1 and svd_solver == 'full', select the number of components such that the amount of variance that needs to be explained is greater than the percentage specified by n_components.
+            If svd_solver == 'arpack', the number of components must be strictly less than the minimum of n_features and n_samples.
+        copy : bool,optional
+            [default: True]
+            If False, data passed to fit are overwritten and running fit(X).transform(X) will not yield the expected results, use fit_transform(X) instead.
+        whiten : bool,optional
+            [default: False]
+            When True (False by default) the components_ vectors are multiplied by the square root of n_samples and then divided by the singular values to ensure uncorrelated outputs with unit component-wise variances.
+        svd_solver : str {‘auto’, ‘full’, ‘arpack’, ‘randomized’}
+            If auto :
+                The solver is selected by a default policy based on X.shape and n_components: if the input data is larger than 500x500 and the number of components to extract is lower than 80% of the smallest dimension of the data, then the more efficient ‘randomized’ method is enabled.
+                Otherwise the exact full SVD is computed and optionally truncated afterwards.
+            
+            If full :
+                run exact full SVD calling the standard LAPACK solver via scipy.linalg.svd and select the components by postprocessing
+            
+            If arpack :
+                run SVD truncated to n_components calling ARPACK solver via scipy.sparse.linalg.svds. It requires strictly 0 < n_components < min(X.shape)
+            
+            If randomized :
+                run randomized SVD by the method of Halko et al.
+        tol : float >= 0 ,optional
+            [default: 0]
+            Tolerance for singular values computed by svd_solver == ‘arpack’.
+        iterated_power : int >= 0, or string {'auto'}
+            [default: 'auto']
+            Number of iterations for the power method computed by svd_solver == ‘randomized’.
+        random_state : int, RandomState instance, or None, optional
+            [default: None]
+            If int, random_state is the seed used by the random number generator; If RandomState instance, random_state is the random number generator; 
+            If None, the random number generator is the RandomState instance used by np.random. 
+            Used when svd_solver == ‘arpack’ or ‘randomized’.
+    
+        Returns
+        -------
+        
+        res_dict : dict
+            components : array of shape (num_components, num_features)
+                Principal axes in feature space, representing the directions of maximum variance in the data. The components are sorted by explained_variance_.
+            explained_variance : array of shape (num_components,)
+                The amount of variance explained by each of the selected components.
+                Equal to n_components largest eigenvalues of the covariance matrix of X.
+            explained_variance_ratio : array of shape (num_components,)
+            
+        
+        '''
+        
         #TODO
         return
 
@@ -388,7 +487,7 @@ class Decomposition(object):
              matrix of principal components
         RC : 2D array
             matrix of RCs (nrec,N,nrec*M) (only if K>0)
-            
+
         '''
         N = len(data[:, 0])
         nrec = len(data[0, :])
@@ -570,22 +669,22 @@ class FDR:
     '''
     def fdr_basic(self, pvals,qlevel=0.05):
         ''' The basic FDR of Benjamini & Hochberg (1995).
-    
+
         Args
         ----
-    
+
         pvals : list or array
             A vector of p-values on which to conduct the multiple testing.
-    
+
         qlevel : float
             The proportion of false positives desired.
-    
+
         Returns
         -------
-    
+
         fdr_res : array or None
             A vector of the indices of the significant tests; None if no significant tests
-    
+
         '''
 
         n = len(pvals)
@@ -604,28 +703,28 @@ class FDR:
 
     def fdr_master(self, pvals, qlevel=0.05, method='original'):
         ''' Perform various versions of the FDR procedure, but without the modification
-    
+
         Args
         ----
-    
+
         pvals : list or array
             A vector of p-values on which to conduct the multiple testing.
-    
+
         qlevel : float
             The proportion of false positives desired.
-    
+
         method : {'original', 'general'}
             Method for performing the testing.
             - 'original' follows Benjamini & Hochberg (1995);
             - 'general' is much more conservative, requiring no assumptions on the p-values (see Benjamini & Yekutieli (2001)).
             We recommend using 'original', and if desired, using 'adj_method="mean"' to increase power.
-    
+
         Returns
         -------
-    
+
         fdr_res : array or None
             A vector of the indices of the significant tests; None if no significant tests
-    
+
         '''
         if method == 'general':
             n = len(pvals)
@@ -636,22 +735,22 @@ class FDR:
 
     def storey(self, edf_quantile, pvals):
         ''' The basic Storey (2002) estimator of a, the proportion of alternative hypotheses.
-    
+
         Args
         ----
-    
+
         edf_quantile : float
             The quantile of the empirical distribution function at which to estimate a.
-    
+
         pvals : list or array
             A vector of p-values on which to estimate a
-    
+
         Returns
         -------
-    
+
         a : int
             estimate of a, the number of alternative hypotheses
-    
+
         '''
         if edf_quantile >= 1 or edf_quantile <= 0:
             raise ValueError(f'Wrong edf_quantile: {edf_quantile}; must be within (0, 1)!')
@@ -663,20 +762,20 @@ class FDR:
 
     def prop_alt(self, pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 20}):
         ''' Calculate an estimate of a, the proportion of alternative hypotheses, using one of several methods
-    
+
         Args
         ----
-    
+
         pvals : list or array
             A vector of p-values on which to estimate a
-    
-    
+
+
         adj_method: {'mean', 'storey', 'two-stage'}
             Method for increasing the power of the procedure by estimating the proportion of alternative p-values.
             - 'mean', the modified Storey estimator that we suggest in Ventura et al. (2004)
             - 'storey', the method of Storey (2002)
             - 'two-stage', the iterative approach of Benjamini et al. (2001)
-    
+
         adj_args : dict
             - for "mean", specify "edf_lower", the smallest quantile at which to estimate a, and "num_steps", the number of quantiles to use
               the approach uses the average of the Storey (2002) estimator for the num_steps quantiles starting at "edf_lower" and finishing just less than 1
@@ -685,13 +784,13 @@ class FDR:
               this number is the estimate of a; therefore the method requires specification of qlevel,
               the proportion of false positives and "fdr_method" ('original' or 'general'), the FDR method to be used.
               We do not recommend 'general' as this is very conservative and will underestimate a.
-    
+
         Returns
         -------
-    
+
         a : int
             estimate of a, the number of alternative hypotheses
-    
+
         '''
         n = len(pvals)
         if adj_method == 'two-stage':
@@ -1182,7 +1281,7 @@ def clean_ts(ys, ts):
     -------
     ys : array
         The time series without nans
-    ts : array 
+    ts : array
         The time axis of the time series without nans
 
     '''
@@ -1284,7 +1383,7 @@ def gaussianize_single(X_single):
     return Xn_single
 
 
-def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_threshold=0.4, extreme_pts_threshold=3, verbose=False):
+def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
     """Detrend a timeseries according to three methods
 
     Detrending methods include, "linear", "constant", and using a low-pass
@@ -1299,11 +1398,11 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
        The time axis for the timeseries. Necessary for use with
        the Savitzky-Golay filters method since the series should be evenly spaced.
     method : str
-        The type of detrending. If linear (default), the result of
-        a linear least-squares fit to y is subtracted from y. If constant,
-        only the mean of data is subtrated. If "savitzy-golay", y is filtered
-        using the Savitzky-Golay filters and the resulting filtered series
-        is subtracted from y.
+        The type of detrending:
+        - linear: the result of a linear least-squares fit to y is subtracted from y.
+        - constant: only the mean of data is subtrated.
+        - "savitzy-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        - "emd" (default): Empiracal mode decomposition
     params : list
         The paramters for the Savitzky-Golay filters. The first parameter
         corresponds to the window size (default it set to half of the data)
@@ -1359,7 +1458,7 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
         # Put it all back on the original x axis
         y_filt_x = np.interp(x,x_interp,y_filt)
         ys = y-y_filt_x
-    elif method == "hht":
+    elif method == "emd":
         imfs = EMD(y).decompose()
         if np.shape(imfs)[0] == 1:
             trend = np.zeros(np.size(y))
@@ -1370,6 +1469,7 @@ def detrend(y, x = None, method = "hht", params = ["default",4,0,1], SNR_thresho
         raise KeyError('Not a valid detrending method')
 
     return ys
+
     
 def detect_outliers(ts,ys):
     ''' Function to detect outliers in the given timeseries
