@@ -31,15 +31,15 @@ def createDir(path, foldername):
 
     Args
     ----
-    
+
     path : string
         the path to the new folder.
-    foldername : string 
+    foldername : string
         the name of the folder to be created
 
     Returns
     -------
-    
+
     newdir : string
         the full path to the new directory
 
@@ -60,10 +60,10 @@ def saveFigure(name, format="eps",dir= None):
 
     Args
     ----
-    
+
     name : string
         name of the file
-    format : string 
+    format : string
         One of the file extensions supported by the active
         backend. Default is "eps". Most backend support png, pdf, ps, eps,
         and svg.
@@ -89,7 +89,7 @@ def enumerateLipds(lipds):
 
     Args
     ----
-    
+
     lipds : dict
         A dictionary of LiPD files. Can be obtained from
         pyleoclim.readLipd()
@@ -108,14 +108,14 @@ def getLipd(lipds):
 
     Args
     ----
-    
+
     lipds : dict
         A dictionary of LiPD files. Can be obtained from
         pyleoclim.readLipd()
 
     Returns
     -------
-    
+
     select_lipd : int
         The index of the LiPD file
 
@@ -141,7 +141,7 @@ def promptForVariable():
 
     Returns
     -------
-    
+
     select_var : int
         The index of the variable
 
@@ -149,71 +149,13 @@ def promptForVariable():
     select_var = int(input("Enter the number of the variable you wish to use: "))
     return select_var
 
-def xAxisTs(timeseries):
-    """ Prompt the user to choose a x-axis representation for the timeseries.
-
-    Args
-    ----
-    
-    timeseries : dict
-        a timeseries object
-
-    Returns
-    -------
-    
-    x_axis : array
-        the values for the x-axis representation
-    label : string
-        returns either "age", "year", or "depth"
-
-    """
-    if "depth" in timeseries.keys() and "age" in timeseries.keys() or\
-            "depth" in timeseries.keys() and "year" in timeseries.keys():
-        print("Do you want to use time or depth?")
-        choice = int(input("Enter 0 for time and 1 for depth: "))
-        if choice == 0:
-            if "age" in timeseries.keys() and "year" in timeseries.keys():
-                print("Do you want to use age or year?")
-                choice2 = int(input("Enter 0 for age and 1 for year: "))
-                if choice2 == 0:
-                    x_axis = timeseries["age"]
-                    label = "age"
-                elif choice2 == 1:
-                    x_axis = timeseries["year"]
-                    label = "year"
-                else:
-                    raise ValueError("Enter 0 or 1")
-            elif "age" in timeseries.keys():
-                x_axis = timeseries["age"]
-                label = "age"
-            elif "year" in timeseries.keys():
-                x_axis = timeseries["year"]
-                label = "year"
-        elif choice == 1:
-            x_axis = timeseries["depth"]
-            label = "depth"
-        else:
-            raise ValueError("Enter 0 or 1")
-    elif "depth" in timeseries.keys():
-        x_axis =  timeseries["depth"]
-        label = "depth"
-    elif "age" in timeseries.keys():
-        x_axis = timeseries["age"]
-        label = "age"
-    elif "year" in timeseries.keys():
-        x_axis = timeseries["year"]
-        label = "year"
-    else:
-        raise KeyError("No age or depth information available")
-
-    return x_axis, label
 
 def checkXaxis(timeseries, x_axis= None):
     """Check that a x-axis is present for the timeseries
 
     Args
     ----
-    
+
     timeseries : dict
         a timeseries
     x_axis : string
@@ -221,9 +163,9 @@ def checkXaxis(timeseries, x_axis= None):
 
     Returns
     -------
-    
+
     x : array
-        the values for the x-axis representation, 
+        the values for the x-axis representation,
     label : string
         returns either "age", "year", or "depth"
 
@@ -259,13 +201,13 @@ def checkTimeAxis(timeseries, x_axis = None):
 
     Args
     ----
-    
+
     timeseries : dict
         A LiPD timeseries object
 
     Returns
     -------
-    
+
     x : array
         the time values for the timeseries
     label : string
@@ -275,10 +217,8 @@ def checkTimeAxis(timeseries, x_axis = None):
         if not 'age' in timeseries.keys() and not 'year' in timeseries.keys():
             raise KeyError("No time information available")
         elif 'age' in timeseries.keys() and 'year' in timeseries.keys():
-            print("Both age and year information are available.")
-            label = input("Which one would you like to use? ")
-            while label != "year" and label != "age":
-                label = input("Only enter year or age: ")
+            print("Both age and year information are available, using age")
+            label = 'age'
         elif 'age' in timeseries.keys():
             label = 'age'
         elif 'year' in timeseries.keys():
@@ -317,7 +257,7 @@ def searchVar(timeseries_list, key, exact = True, override = True):
 
     Returns
     -------
-    
+
     match : list
         A list of keys for the timeseries that match the selection
         criteria.
@@ -493,7 +433,7 @@ def enumerateTs(timeseries_list):
 
     Args
     ----
-    
+
     timeseries_list : list
         a  list of available timeseries objects.
         To use the timeseries loaded upon initiation of the
@@ -518,7 +458,7 @@ def getTs(timeseries_list, option = None):
 
     Args
     ----
-    
+
     timeseries_list : list
         a  list of available timeseries objects.
         To use the timeseries loaded upon initiation of the
@@ -528,8 +468,8 @@ def getTs(timeseries_list, option = None):
 
     Returns
     -------
-        
-    timeseries : single timeseries object or list of timeseries 
+
+    timeseries : single timeseries object or list of timeseries
         A single timeseries object if not optional filter selected or a filtered
         list if optional arguments given
 
@@ -553,13 +493,13 @@ def LipdToOntology(archiveType):
 
     Args
     ----
-    
+
     archiveType : string
         name of the archiveType from the LiPD file
 
     Returns
     -------
-    
+
     archiveType : string
         archiveType according to the ontology
 
@@ -581,13 +521,13 @@ def timeUnitsCheck(units):
 
     Args
     ----
-    
+
     units : string
         The units string for the timeseries
 
     Returns
     -------
-    
+
     unit_group : string
         Whether the units belongs to age_units, kage_units, year_units, or undefined
     """
@@ -864,7 +804,7 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
 
     Returns
     -------
-    
+
     res : the response to the query
     """
     # Perform a lot of checks
@@ -1205,7 +1145,7 @@ def isModel(csvName, lipd):
 
     Args
     ----
-    
+
     csvName : string
         The name of the csv file corresponding to the measurement table
     lipd : dict
@@ -1213,7 +1153,7 @@ def isModel(csvName, lipd):
 
     Returns
     -------
-    
+
     model : list
         List of models already available
     dataObject : string
@@ -1247,13 +1187,13 @@ def modelNumber(model):
 
     Args
     ----
-    
+
     model : list
         List of possible model number. Obtained from isModel
 
     Returns
     -------
-    
+
     modelNum : int
         The number of the model
     """
@@ -1285,13 +1225,13 @@ def isMeasurement(csv_dict):
 
     Args
     ----
-    
+
     csv_dict : dict
         Dictionary of available csv
 
     Returns
     -------
-    
+
     paleoMeasurementTables : list
         List of available paleoMeasurementTables
     chronMeasurementTables : list
@@ -1323,7 +1263,7 @@ def whichMeasurement(measurementTableList, csv_dict):
 
     Returns
     -------
-    
+
     csvName : string
         the name of the csv file
 
@@ -1343,7 +1283,7 @@ def getMeasurement(csvName, lipd):
 
     Args
     ----
-    
+
     csvName : string
         The name of the csv file
     lipd : dict
@@ -1351,7 +1291,7 @@ def getMeasurement(csvName, lipd):
 
     Returns
     -------
-    
+
     ts_list : dict
         A dictionary containing data and metadata for each column in the
         csv file.
@@ -1382,15 +1322,15 @@ def isEnsemble(csv_dict):
 
     Args
     ----
-    
+
     csv_dict : dict
         Dictionary of available csv
 
     Returns
     -------
-    
+
     paleoEnsembleTables : list
-        List of available paleoEnsembleTables 
+        List of available paleoEnsembleTables
     chronEnsembleTables : list
         List of availale chronEnsemble Tables
 
@@ -1411,13 +1351,13 @@ def getEnsembleValues(ensemble_dict):
 
     Args
     ----
-    
+
     ensemble_dict : dict
         dictionary containing the ensemble information
 
     Returns
     -------
-    
+
     depth : array
         Vector of depth \n
     ensembleValues : array
@@ -1452,9 +1392,9 @@ def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo):
 
     Returns
     -------
-    
+
     ensembleValuesToPaleo : array
-        A matrix of age ensemble on the PaleoData scale 
+        A matrix of age ensemble on the PaleoData scale
 
     """
     if len(depthEnsemble)!=np.shape(ensembleValues)[0]:
