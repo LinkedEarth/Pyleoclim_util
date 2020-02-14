@@ -932,7 +932,7 @@ def agemodelData(timeseries):
 
 
 # utilities
-def savefig(fig, settings={}):
+def savefig(fig, settings={}, verbose=True):
     ''' Save a figure to a path
 
     Args
@@ -959,6 +959,8 @@ def savefig(fig, settings={}):
     dirpath = path.parent
     if not dirpath.exists():
         dirpath.mkdir(parents=True, exist_ok=True)
+        if verbose:
+            print(f'Directory created at: "{dirpath}"')
 
     if path.suffix not in ['.eps', '.pdf', '.png', '.ps']:
         path_str = str(path)
@@ -966,4 +968,6 @@ def savefig(fig, settings={}):
         path = pathlib.Path(f'{path_str}.{fmt}')
 
     fig.savefig(str(path), **savefig_args)
-    print(f'Figure saved at: {str(path)}')
+
+    if verbose:
+        print(f'Figure saved at: "{str(path)}"')
