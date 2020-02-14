@@ -24,13 +24,9 @@ import cartopy.feature as cfeature
 
 
 # Import internal modules to pyleoclim
-from . import map
 from . import lipdutils
-from . import summaryplots
-from . import plot
-from . import spectral
-from . import stats
-from . import timeseries
+from . import visualization
+from . import analysis
 from . import rbchron
 from . import examples
 from . import api
@@ -207,7 +203,7 @@ def mapAllArchive(lipds = None, markersize = 50, projection = 'Robinson',\
 
 
     # Make the map
-    fig = map.mapAll(lat,lon,archiveType,projection = projection, \
+    fig = visualization.mapAll(lat,lon,archiveType,projection = projection, \
                      proj_default = proj_default,background = background,\
                      borders = borders, rivers = rivers, lakes = lakes,\
                      figsize = figsize, ax = None, palette=plot_default,\
@@ -318,7 +314,7 @@ def mapLipd(timeseries=None, projection = 'Orthographic', proj_default = True,\
     else:
         assert type(label) is str, 'the argument label should be of type str'
 
-    fig = map.mapOne(lat, lon, projection = projection, proj_default = proj_default,\
+    fig = visualizationap.mapOne(lat, lon, projection = projection, proj_default = proj_default,\
            background = background, label = label, borders = borders, \
            rivers = rivers, lakes = lakes,\
            markersize = markersize, marker = marker, figsize = figsize, \
@@ -665,7 +661,7 @@ def mapNearRecords(ts = None, lipds = None, n = 5, radius = None, \
     # get the projection:
     if proj_default is True:
         proj_default = {'central_longitude':ts["geo_meanLon"]}
-    proj = map.setProj(projection=projection, proj_default=proj_default)
+    proj = visualization.setProj(projection=projection, proj_default=proj_default)
 
     if not ax:
         fig, ax = plt.subplots(figsize=figsize,subplot_kw=dict(projection=proj))
@@ -804,7 +800,7 @@ def plotTs(ts = None, x_axis = None, markersize = 50,\
     x, label = lipdutils.checkXaxis(ts, x_axis=x_axis)
 
     # remove nans and sort time axis
-    y,x = timeseries.clean_ts(y,x)
+    y,x = analysis.clean_ts(y,x)
 
     # get the markers
     if marker == 'default':
@@ -854,7 +850,7 @@ def plotTs(ts = None, x_axis = None, markersize = 50,\
             y_label = ts["paleoData_variableName"]
 
     # make the plot
-    fig = plot.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
+    fig = visualization.plot(x,y,markersize=markersize,marker=marker,x_label=x_label,\
               y_label=y_label, title=title, figsize = figsize, ax=None)
 
     #Save the figure if asked
@@ -1041,7 +1037,7 @@ def plotEnsTs(ts = None, lipd = None, ensTableName = None, ens = None, \
         color = plot_default[archiveType][0]
 
     # Make the plot
-    fig = plot.plotEns(ensembleValuestoPaleo, ys, ens = ens, color = color,\
+    fig = visualization.plotEns(ensembleValuestoPaleo, ys, ens = ens, color = color,\
                        alpha = alpha, x_label = x_label, y_label = y_label,\
                        title = title, figsize = figsize, ax = None)
 
@@ -1174,7 +1170,7 @@ def histTs(ts = None, bins = None, hist = True, \
         color = plot_default[archiveType][0]
 
     # Make this histogram
-    fig = plot.plot_hist(y, bins = bins, hist = hist, \
+    fig = visualization.plot_hist(y, bins = bins, hist = hist, \
         kde = kde, rug = rug, fit = fit, hist_kws = hist_kws,\
         kde_kws = kde_kws, rug_kws = rug_kws, \
         fit_kws = fit_kws, color = color, vertical = vertical, \
@@ -1235,14 +1231,13 @@ def summaryTs(ts = None, x_axis = None, saveFig = False, dir = None,
         ts = lipdutils.getTs(ts_list)
 
     # get the necessary metadata
-    metadata = summaryplots.getMetadata(ts)
+    metadata = visualization.getMetadata(ts)
 
     # get the information about the timeseries
-    x,y,archiveType,x_label,y_label = summaryplots.TsData(ts,
-                                                          x_axis=x_axis)
+    x,y,archiveType,x_label,y_label = visualization.TsData(ts, x_axis=x_axis)
 
     # Clean up
-    y,x = timeseries.clean_ts(y,x)
+    y,x = analysis.clean_ts(y,x)
 
     # Make the figure
     fig = plt.figure(figsize=(11,8))
@@ -1258,7 +1253,7 @@ def summaryTs(ts = None, x_axis = None, saveFig = False, dir = None,
     marker = plot_default[archiveType]
     markersize = 50
 
-    plot.plot(x,y,markersize=markersize, marker = marker, x_label=x_label,\
+    visualization.plot(x,y,markersize=markersize, marker = marker, x_label=x_label,\
               y_label=y_label, title = ts['dataSetName'], ax=ax1)
     axes = plt.gca()
     ymin, ymax = axes.get_ylim()
@@ -1278,7 +1273,7 @@ def summaryTs(ts = None, x_axis = None, saveFig = False, dir = None,
 
 
     proj_default = {'central_longitude':lon}
-    proj = map.setProj(projection='Orthographic', proj_default=proj_default)
+    proj = visualization.setProj(projection='Orthographic', proj_default=proj_default)
     ax3 = fig.add_subplot(gs[1,0], projection = proj)
     ax3.coastlines() # add coastlines
     ax3.stock_img() # add the relief
@@ -1309,7 +1304,7 @@ def summaryTs(ts = None, x_axis = None, saveFig = False, dir = None,
                 x_axis = 'year'
             y = np.array(ts['paleoData_values'], dtype = 'float64')
             x, label = lipdutils.checkXaxis(ts, x_axis=x_axis)
-            y,x = timeseries.clean_ts(y,x)
+            y,x = analysis.clean_ts(y,x)
 
     # Perform the analysis
         default = {'tau':None,
@@ -1402,7 +1397,7 @@ def statsTs(ts=None):
     # get the values
     y = np.array(ts['paleoData_values'], dtype = 'float64')
 
-    mean, median, min_, max_, std, IQR = stats.simpleStats(y)
+    mean, median, min_, max_, std, IQR = analysis.simpleStats(y)
 
     return mean, median, min_, max_, std, IQR
 
@@ -1532,20 +1527,20 @@ def corrSigTs(ts1 = None, ts2 = None, x_axis = None, \
                 x2 = x2*1000
 
     # Remove NaNs and ordered
-    y1,x1 = timeseries.clean_ts(y1,x1)
-    y2,x2 = timeseries.clean_ts(y2,x2)
+    y1,x1 = analysis.clean_ts(y1,x1)
+    y2,x2 = analysis.clean_ts(y2,x2)
 
     #Check that the two timeseries have the same lenght and if not interpolate
     if len(y1) != len(y2):
         print("The two series don't have the same length. Interpolating ...")
-        xi1, xi2, interp_values1, interp_values2 = timeseries.onCommonAxis(x1,y1,x2,y2,
+        xi1, xi2, interp_values1, interp_values2 = analysis.onCommonAxis(x1,y1,x2,y2,
                                                                      method = interp_method,
                                                                      step = interp_step,
                                                                      start =start,
                                                                      end=end)
     elif min(x1) != min(x2) and max(x1) != max(x2):
         print("The two series don't have the same length. Interpolating ...")
-        xi1, xi2, interp_values1, interp_values2 = timeseries.onCommonAxis(x1,y1,x2,y2,
+        xi1, xi2, interp_values1, interp_values2 = analysis.onCommonAxis(x1,y1,x2,y2,
                                                                      method = interp_method,
                                                                      step = interp_step,
                                                                      start =start,
@@ -1559,7 +1554,7 @@ def corrSigTs(ts1 = None, ts2 = None, x_axis = None, \
     if np.size(interp_values1) == 0 or np.size(interp_values2) == 0:
         raise ValueError("No common time period between the two time series.")
 
-    r, sig, p = stats.corrsig(interp_values1,interp_values2,nsim=nsim,
+    r, sig, p = analysis.corrsig(interp_values1,interp_values2,nsim=nsim,
                                  method=method,alpha=alpha)
 
     return r, sig, p
@@ -1609,10 +1604,10 @@ def binTs(timeseries = None, x_axis = None, bin_size = None, \
     x, label = lipdutils.checkXaxis(timeseries, x_axis=x_axis)
 
     #remove nans
-    y,x = timeseries.clean_ts(y,x)
+    y,x = analysis.clean_ts(y,x)
 
     #Bin the timeseries:
-    bins, binned_values, n, error = timeseries.binvalues(x,y, bin_size = bin_size,\
+    bins, binned_values, n, error = analysis.binvalues(x,y, bin_size = bin_size,\
                                                    start = start, end = end)
 
     return bins, binned_values, n, error
@@ -1656,10 +1651,10 @@ def interpTs(timeseries = None, x_axis = None, interp_step = None,\
     x, label = lipdutils.checkXaxis(timeseries, x_axis=x_axis)
 
     #remove nans
-    y,x = timeseries.clean_ts(y,x)
+    y,x = analysis.clean_ts(y,x)
 
     #Interpolate the timeseries
-    interp_age, interp_values = timeseries.interp(x,y,interp_step = interp_step,\
+    interp_age, interp_values = analysis.interp(x,y,interp_step = interp_step,\
                                                   start= start, end=end)
 
     return interp_age, interp_values
@@ -1712,7 +1707,7 @@ def standardizeTs(timeseries = None, scale = 1, ddof = 0, eps = 1e-3):
     y = y[~np.isnan(y_temp)]
 
     #Standardize
-    z, mu, sig = timeseries.standardize(y,scale=1,axis=None,ddof=0,eps=1e-3)
+    z, mu, sig = analysis.standardize(y,scale=1,axis=None,ddof=0,eps=1e-3)
 
     return z, mu, sig
 
@@ -1769,10 +1764,10 @@ def segmentTs(timeseries = None, factor = 2):
     ts, label = lipdutils.checkXaxis(timeseries, x_axis=x_axis)
 
     # remove NaNs
-    ys,ts = timeseries.clean_ts(ys,ts)
+    ys,ts = analysis.clean_ts(ys,ts)
 
     #segment the timeseries
-    seg_y, seg_t, n_segs = timeseries.ts2segments(ys, ts, factor)
+    seg_y, seg_t, n_segs = analysis.ts2segments(ys, ts, factor)
 
     return seg_y, seg_t, n_segs
 
@@ -2002,7 +1997,7 @@ def wwzTs(timeseries = None, lim = None, wwz = False, psd = True, wwz_default = 
     ys = np.array(timeseries['paleoData_values'], dtype = 'float64')
 
     # remove NaNs
-    ys,ts = timeseries.clean_ts(ys,ts)
+    ys,ts = analytis.clean_ts(ys,ts)
 
     # Truncate the timeseries if asked
     if lim != None:
@@ -2403,17 +2398,17 @@ def xwcTs(timeseries1 = None, timeseries2 = None, lim= None, x_axis = None,
                 units2 = 'yr BP'
 
     # Remove NaNs and ordered
-    y1,x1 = timeseries.clean_ts(y1,x1)
-    y2,x2 = timeseries.clean_ts(y2,x2)
+    y1,x1 = analysis.clean_ts(y1,x1)
+    y2,x2 = analysis.clean_ts(y2,x2)
 
     #Check that the timeseries are on a common axis
     if lim == None:
-        xi1, xi2, interp_values1, interp_values2 = timeseries.onCommonAxis(x1,y1,x2,y2,
+        xi1, xi2, interp_values1, interp_values2 = analysis.onCommonAxis(x1,y1,x2,y2,
                                                                        method=None)
     else:
         if type(lim) != list:
             raise TypeError('The time series limits should be of type list')
-        xi1, xi2, interp_values1, interp_values2 = timeseries.onCommonAxis(x1,y1,x2,y2,
+        xi1, xi2, interp_values1, interp_values2 = analysis.onCommonAxis(x1,y1,x2,y2,
                                                                        start=lim[0],
                                                                        end=lim[1])
     #perform the cross-wavelet analysis

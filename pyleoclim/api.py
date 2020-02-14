@@ -4,9 +4,7 @@
 
 Created on Jan 31, 2020
 '''
-from . import spectral
-from . import timeseries
-from . import stats
+from . import analysis
 from textwrap import dedent
 
 import seaborn as sns
@@ -79,7 +77,7 @@ class Series:
         '''
         y = self.value
         t = self.time
-        y_cleaned, t_cleaned = timeseries.clean_ts(y, t)
+        y_cleaned, t_cleaned = analysis.clean_ts(y, t)
         self.time = t_cleaned
         self.value = y_cleaned
 
@@ -87,7 +85,7 @@ class Series:
         ''' Perform spectral analysis on the timeseries
         '''
         spec_func = {
-            'wwz': spectral.wwz_psd,
+            'wwz': analysis.wwz_psd,
         }
         spec_res = spec_func[method](self.value, self.time, **args)
         psd = PSD(freq=spec_res.freq, amplitude=spec_res.psd)
@@ -97,7 +95,7 @@ class Series:
         ''' Perform wavelet analysis on the timeseries
         '''
         wave_func = {
-            'wwz': spectral.wwz,
+            'wwz': analysis.wwz,
         }
         wave_res = wave_func[method](self.value, self.time, **args)
         scal = Scalogram(freq=wave_res.freq, time=wave_res.time, amplitude=wave_res.amplitude, coi=wave_res.coi)
@@ -108,7 +106,7 @@ class Series:
         ''' Perform wavelet coherence analysis with the target timeseries
         '''
         xwc_func = {
-            'wwz': spectral.xwc,
+            'wwz': analysis.xwc,
         }
         xwc_res = xwc_func[method](self.value, self.time, target_series.value, target_series.time, **args)
 
@@ -119,7 +117,7 @@ class Series:
     def correlation(self, target_series, args={}):
         ''' Perform correlation analysis with the target timeseries
         '''
-        r, signif, p = stats.corrsig(self.value, target_series.value, **args)
+        r, signif, p = analysis.corrsig(self.value, target_series.value, **args)
         corr_res = {
             'r': r,
             'signif': signif,
@@ -130,7 +128,7 @@ class Series:
     def causality(self, target_series, args={}):
         ''' Perform causality analysis with the target timeseries
         '''
-        causal_res = timeseries.causality_est(self.value, target_series.value, **args)
+        causal_res = analysis.causality_est(self.value, target_series.value, **args)
         return causal_res
 
 
