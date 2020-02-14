@@ -5,6 +5,9 @@
 Created on Jan 31, 2020
 '''
 from . import analysis
+from . import visualization
+from . import lipdutils
+
 from textwrap import dedent
 
 import seaborn as sns
@@ -295,3 +298,133 @@ class Coherence:
                   scale=scale, width=width)
 
         return fig, ax
+
+class Lipd:
+    def __init__(self, lipd_list):
+        self.lipd_list = lipd_list
+        
+    
+
+class LipdSeries:
+    def __init__(self, ts):
+        self.ts = ts
+        self.plot_default = {'ice/rock': ['#FFD600','h'],
+                'coral': ['#FF8B00','o'],
+                'documents':['k','p'],
+                'glacier ice':['#86CDFA', 'd'],
+                'hybrid': ['#00BEFF','*'],
+                'lake sediment': ['#4169E0','s'],
+                'marine sediment': ['#8A4513', 's'],
+                'sclerosponge' : ['r','o'],
+                'speleothem' : ['#FF1492','d'],
+                'wood' : ['#32CC32','^'],
+                'molluskshells' : ['#FFD600','h'],
+                'peat' : ['#2F4F4F','*'],
+                'other':['k','o']}
+    
+    def mapone(self,projection = 'Orthographic', proj_default = True,\
+           background = True, label = 'default', borders = False, \
+           rivers = False, lakes = False,markersize = 50, marker = "default",\
+           figsize = [4,4], savefig = False, dir = None, format="eps"):
+        """ Create a Map for a single record
+
+        Orthographic projection map of a single record.
+    
+        Args
+        ----
+    
+        timeseries : object
+                    a LiPD timeseries object. Will prompt for one if not given
+        projection : string
+                    the map projection. Available projections:
+                    'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+                    'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+                    'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+                    'Sinusoidal','Stereographic','TransverseMercator','UTM',
+                    'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+                    'Geostationary','NearsidePerspective','EckertI','EckertII',
+                    'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+                    'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+        proj_default : bool
+                      If True, uses the standard projection attributes, including centering.
+                      Enter new attributes in a dictionary to change them. Lists of attributes
+            can be found in the Cartopy documentation:
+                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+        background : bool
+                    If True, uses a shaded relief background (only one
+                    available in Cartopy)
+        label : str
+               label for archive marker. Default is to use the name of the
+               physical sample. If no archive name is available, default to
+               None. None returns no label.
+        borders : bool
+                 Draws the countries border. Defaults is off (False).
+        rivers : bool
+                Draws major rivers. Default is off (False).
+        lakes : bool
+               Draws major lakes. Default is off (False).
+        markersize : int
+                    The size of the marker.
+        marker : str or list
+                color and type of marker. Default will use the
+                default color palette for archives
+        figsize : list
+                 the size for the figure
+        savefig : bool
+                 default is to not save the figure
+        dir : str
+             the full path of the directory in which to save the figure.
+             If not provided, creates a default folder called 'figures' in the
+             LiPD working directory (lipd.path).
+        format : str
+                One of the file extensions supported by the active
+                backend. Default is "eps". Most backend support png, pdf, ps, eps,
+                and svg.
+    
+        Returns
+        -------
+        The figure
+    
+        """
+        
+        # Get latitude/longitude
+    
+        lat = self.ts['geo_meanLat']
+        lon = self.ts['geo_meanLon']
+    
+        # Make sure it's in the palette
+        if marker == 'default':
+            archiveType = lipdutils.LipdToOntology(self.ts['archiveType']).lower()
+            if archiveType not in self.plot_default.keys():
+                archiveType = 'other'
+            marker = self.plot_default[archiveType]
+    
+        # Get the label
+        if label == 'default':
+            for i in self.ts.keys():
+                if 'physicalSample_name' in i:
+                    label = self.ts[i]
+                elif 'measuredOn_name' in i:
+                    label = self.ts[i]
+            if label == 'default':
+                label = None
+        elif label is None:
+            label = None
+        else:
+            assert type(label) is str, 'the argument label should be of type str'
+    
+        fig = visualization.mapOne(lat, lon, projection = projection, proj_default = proj_default,\
+               background = background, label = label, borders = borders, \
+               rivers = rivers, lakes = lakes,\
+               markersize = markersize, marker = marker, figsize = figsize, \
+               ax = None)
+    
+        # Save the figure if asked
+        if savefig == True:
+            lipdutils.saveFigure(self.ts['dataSetName']+'_map', format, dir)
+        else:
+            plt.show()
+    
+        return fig
+    
+        
