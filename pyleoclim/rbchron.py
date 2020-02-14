@@ -70,17 +70,12 @@ def verifyCalCurves(CalCurves):
     
     # Check for the right input
     print("Checking that list contains valid calibration curves ...")
+    p = ['intcal13','shcal13','marine13','normal']
     for idx, item in enumerate(CalCurves):
-        if item != 'intcal13' and item != 'shcal13' and item != 'marine13' \
-        and item!= 'normal':
-            print(item, " is not a valid selection in the list.")
-            new_answer = input('Enter either "intcal13", "shcal13", "marine13", or "normal": ')
-            while new_answer != 'intcal13' and new_answer != 'shcal13' \
-            and new_answer != 'marine13' and new_answer != 'normal':
-                new_answer = input('Enter either "intcal13", "shcal13", '+
-                   '"marine13", or "normal": ')
-            CalCurves[idx] = new_answer
-    print("Verification complete!") 
+        if item not in p:
+            print(item, " is not a valid selection for the calibration curve.")
+            raise ValueError('Calibration curve is not supported')
+    print("Calibration curve verification complete!") 
     
     return CalCurves               
             
@@ -107,47 +102,40 @@ def reservoirAgeCorrection():
          "reported ages, answer no to the question below to "+
          "skip this step")
     answer = input("Do you wish to add an additional correction [Y/N]: ")
-    while answer != "Y" and answer != "N":
-        answer = input("Enter either Y or N: ")
-    if answer == 'N':
+    p_pos = ['y','Y','yes','Yes']
+    p_neg = ['n','N','no','No']
+    if answer in p_pos:
+       prompt = input("Do you know the correction and associated "+
+                     "uncertainty? [Y/N]: ")
+       if prompt in p_pos:
+           ageCorr = float(input("Enter the reservoir age correction: "))
+           ageCorrStd = float(input("Enter the reservoir age "+
+                               "correction uncertainty: "))
+       elif prompt in p_neg:
+           print("We recommend using the 14Chrono Marine Reservoir "+
+                "Database: http://intcal.qub.ac.uk/marine/")
+           print("Enter the coordinate for your site and click 'Get Data'")
+           print("Copy the table (WITH ALL THE LINES AND COLUMNS, "+
+                                 "including headers)")
+           print("When ready, press Enter at the prompt. This will copy "+
+                "the table into Python and calculate the mean and "+
+                "standard deviation for you.")
+           input("Press Enter to continue...")
+          
+           data = pd.read_clipboard()
+          
+           # Calculate mean and std deviation  
+           ageCorr =  data.mean()['DeltaR']
+           ageCorrStd =  data.std()['DeltaR']
+
+       else:
+           raise ValueError("Answer should be 'yes' or 'no'")
+        
+    if answer in p_neg:
         ageCorr = 0 
         ageCorrStd = 0
     else:
-        prompt = input("Do you know the correction and associated "+
-                     "uncertainty? [Y/N]: ") 
-        while prompt != "Y" and prompt != "N":
-          prompt = input("Enter either Y or N: ")
-        if prompt == "Y":
-            ageCorr = float(input("Enter the reservoir age correction: "))
-            ageCorrStd = float(input("Enter the reservoir age "+
-                               "correction uncertainty: "))
-        else:
-            print("We recommend using the 14Chrono Marine Reservoir "+
-                "Database: http://intcal.qub.ac.uk/marine/")
-            print("Enter the coordinate for your site and click 'Get Data'")
-            print("Copy the table (WITH ALL THE LINES AND COLUMNS, "+
-                                 "including headers)")
-            print("When ready, press Enter at the prompt. This will copy "+
-                "the table into Python and calculate the mean and "+
-                "standard deviation for you.")
-            input("Press Enter to continue...")
-          
-            data = pd.read_clipboard()
-          
-            # Check the work
-            print(data)
-            correct = input("Is this correct? [Y/N]: ")
-            while correct != "Y":
-                print("Try again. Make sure to include all the columns, "+
-                    "including the blank cell next to MapNo.")
-                input("Press Enter to continue...")
-                data = pd.read_clipboard()
-                print(data)
-                correct = input("Is this correct? [Y/N]: ")
-              
-            # Calculate mean and std deviation  
-            ageCorr =  data.mean()['DeltaR']
-            ageCorrStd =  data.std()['DeltaR']
+        raise ValueError("Answer should be 'yes' or 'no'")
      
     return ageCorr, ageCorrStd                         
 

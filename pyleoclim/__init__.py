@@ -2496,11 +2496,11 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
           (i.e., not the entire directory).
     modelNum : int
               The model number in which to place the Bchron output.
-              If unknown, the function will try to make a guess and/or prompt
-              based on the number of already available models.
+              If None, the function will create a new model.
     objectName : str
                 The name of the chron object in which to store the new
-                model (e.g. "chron0")
+                model (e.g. "chron0"). If modelNum is selected, objectName
+                should be provided
     rejectAges : vector
                 A vector of 1/0 where 1 include the dates to be rejected.
                 Default it None.
@@ -2659,7 +2659,7 @@ def Bchron(lipd, modelNum = None, objectName = None, rejectAges = None,\
         model, objectName = lipdutils.isModel(csvName, lipd)
         modelNum = lipdutils.modelNumber(model)
     elif modelNum and not objectName:
-        raise ValueError("You must provide a dataObject when specifying a model.")
+        raise ValueError("You must provide a DataObject when specifying a model.")
     ## look for the inputs for Bchron
     # Find an age column
     print("Looking for age data...")

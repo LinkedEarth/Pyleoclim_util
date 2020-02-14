@@ -149,6 +149,46 @@ def promptForVariable():
     select_var = int(input("Enter the number of the variable you wish to use: "))
     return select_var
 
+def xAxisTs(timeseries):
+    """ Get the x-axis for the timeseries.
+    Args
+    ----
+    
+    timeseries : dict
+        a timeseries object
+    Returns
+    -------
+    
+    x_axis : array
+        the values for the x-axis representation
+    label : string
+        returns either "age", "year", or "depth"
+    """
+    if "depth" in timeseries.keys() and "age" in timeseries.keys() or\
+            "depth" in timeseries.keys() and "year" in timeseries.keys():
+        print("Both time and depth information available, selecting time")
+        if "age" in timeseries.keys() and "year" in timeseries.keys():
+            print("Both age and year representation available, selecting age")
+            x_axis = timeseries["age"]
+            label = "age"
+        elif "year" in timeseries.keys():
+            x_axis = timeseries["year"]
+            label = "year"
+        elif "age" in timeseries.keys():
+            x_axis = timeseries["age"]
+    elif "depth" in timeseries.keys():
+        x_axis =  timeseries["depth"]
+        label = "depth"
+    elif "age" in timeseries.keys():
+        x_axis = timeseries["age"]
+        label = "age"
+    elif "year" in timeseries.keys():
+        x_axis = timeseries["year"]
+        label = "year"
+    else:
+        raise KeyError("No age or depth information available")
+
+    return x_axis, label
 
 def checkXaxis(timeseries, x_axis= None):
     """Check that a x-axis is present for the timeseries
@@ -822,7 +862,7 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
 
     if len(ageBoundType)>1:
         raise ValueError("Only one search possible at a time.")
-        while ageBoundType!="any" and ageBoundType!="entirely" and ageBoundType!="entire":
+        if ageBoundType not in ["any","entirely","entire"]:
             raise ValueError("ageBoundType is not recognized")
 
     if recordLength and ageBound and recordLength[0] > (ageBound[1]-ageBound[0]):
@@ -1199,20 +1239,13 @@ def modelNumber(model):
     """
     if model:
         print("There is " + str(len(model)) + " model(s) already available.")
-        choice = input("Do you want to create (c) another or override (o) one? ")
-        while choice !="c" and choice!= "o":
-               choice = input("Enter either c or o: ")
-        if choice == "c":
-            modelNum = len(model)
-        elif choice == "o":
-            if len(model) == 1:
-                modelNum = 0
-            else:
-                print("There is more than one model available.")
-                modelNum = int(input("Enter the number of the model you wish to override: "))
+        print("creating a new model...")
+        modelNum = len(model)
+        print("Your new model number is "+ str(modelNum))
     else:
-        print("No previous model available. Creating model...")
+        print("No previous model available. Creating a new model...")
         modelNum = 0
+        print("Your model number is "+ str(modelNum))
 
     return modelNum
 
