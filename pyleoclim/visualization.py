@@ -932,6 +932,31 @@ def agemodelData(timeseries):
 
 
 # utilities
+def in_notebook():
+    ''' Check if the code is executed in a Jupyter notebook
+    '''
+    try:
+        from IPython import get_ipython
+        if 'IPKernelApp' not in get_ipython().config:  # pragma: no cover
+            return False
+    except ImportError:
+        return False
+    return True
+
+def showfig(fig):
+    if in_notebook:
+        try:
+            from IPython.display import display
+        except ImportError:
+            pass
+
+        plt.close()
+        display(fig)
+
+    else:
+        plt.show()
+
+
 def savefig(fig, settings={}, verbose=True):
     ''' Save a figure to a path
 
@@ -968,6 +993,7 @@ def savefig(fig, settings={}, verbose=True):
         path = pathlib.Path(f'{path_str}.{fmt}')
 
     fig.savefig(str(path), **savefig_args)
+    plt.close()
 
     if verbose:
         print(f'Figure saved at: "{str(path)}"')

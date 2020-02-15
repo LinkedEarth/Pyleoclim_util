@@ -15,6 +15,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from tabulate import tabulate
+from collections import namedtuple
+
+def dict2namedtuple(d):
+    tupletype = namedtuple('tupletype', sorted(d))
+    return tupletype(**d)
 
 class Series:
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None):
@@ -59,7 +64,7 @@ class Series:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.time)}'
 
-    def plot(self, figsize=[10, 4], title=None, savefig_settings={}):
+    def plot(self, figsize=[10, 4], title=None, savefig_settings={}, fig=None, ax=None, **plot_args):
         ''' Plot the timeseries
 
         Args
@@ -77,8 +82,13 @@ class Series:
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
-        fig, ax = plt.subplots(figsize=figsize)
-        ax.plot(self.time, self.value)
+        if ax is not None:
+            if fig is None:
+                raise ValueError('`fig` must be specified when `ax` is specified!')
+        else:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        ax.plot(self.time, self.value, **plot_args)
 
         xlabel, ylabel = self.make_labels()
 
@@ -90,9 +100,8 @@ class Series:
 
         if 'path' in savefig_settings:
             visualization.savefig(fig, savefig_settings)
-            plt.close()
         else:
-            plt.show()
+            visualization.showfig(fig)
 
         return fig, ax
 
@@ -108,12 +117,17 @@ class Series:
     def spectral(self, method='wwz', settings={}):
         ''' Perform spectral analysis on the timeseries
         '''
+        spec_class = analysis.SpectralAnalysis()
         spec_func = {
             'wwz': analysis.wwz_psd,
+            'mtm': spec_class.mtm,
         }
         args = {}
         args.update(settings)
         spec_res = spec_func[method](self.value, self.time, **args)
+        if type(spec_res) is dict:
+            spec_res = dict2namedtuple(spec_res)
+
         psd = PSD(freq=spec_res.freq, amplitude=spec_res.psd)
         return psd
 
@@ -180,7 +194,8 @@ class PSD:
         return f'Length: {np.size(self.freq)}'
 
     def plot(self, in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude',
-             xlim=None, ylim=None, figsize=[10, 4], savefig_settings={}):
+             xlim=None, ylim=None, figsize=[10, 4], savefig_settings={}, fig=None, ax=None,
+             plot_legend=True, lgd_settings={}, **plot_args):
         ''' Plot the power sepctral density (PSD)
 
         Args
@@ -199,7 +214,11 @@ class PSD:
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
 
-        fig, ax = plt.subplots(figsize=figsize)
+        if ax is not None:
+            if fig is None:
+                raise ValueError('`fig` must be specified when `ax` is specified!')
+        else:
+            fig, ax = plt.subplots(figsize=figsize)
 
         if in_period:
             x_axis = 1/self.freq
@@ -211,9 +230,9 @@ class PSD:
                 xlabel = 'Frequency'
 
         if in_loglog:
-            ax.loglog(x_axis, self.amplitude)
+            ax.loglog(x_axis, self.amplitude, **plot_args)
         else:
-            ax.plot(x_axis, self.amplitude)
+            ax.plot(x_axis, self.amplitude, **plot_args)
 
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
@@ -225,11 +244,15 @@ class PSD:
 
             ax.set_xlim(xlim)
 
+        if plot_legend:
+            lgd_args = {'frameon': False}
+            lgd_args.update(lgd_settings)
+            ax.legend(**lgd_args)
+
         if 'path' in savefig_settings:
             visualization.savefig(fig, savefig_settings)
-            plt.close()
         else:
-            plt.show()
+            visualization.showfig(fig)
 
         return fig, ax
 
@@ -251,7 +274,7 @@ class Scalogram:
         return f'Dimension: {np.size(self.freq)} x {np.size(self.time)}'
 
     def plot(self, xlabel='Time', ylabel='Period', ylim=None, xlim=None, figsize=[10, 8],
-             contourf_style={}, cbar_style={}, savefig_settings={}):
+             contourf_style={}, cbar_style={}, savefig_settings={}, fig=None, ax=None):
         ''' Plot the scalogram from wavelet analysis
 
         Args
@@ -272,7 +295,11 @@ class Scalogram:
         contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
 
-        fig, ax = plt.subplots(figsize=figsize)
+        if ax is not None:
+            if fig is None:
+                raise ValueError('`fig` must be specified when `ax` is specified!')
+        else:
+            fig, ax = plt.subplots(figsize=figsize)
 
         cont = ax.contourf(self.time, 1/self.freq, self.amplitude.T, **contourf_args)
 
@@ -300,9 +327,8 @@ class Scalogram:
 
         if 'path' in savefig_settings:
             visualization.savefig(fig, savefig_settings)
-            plt.close()
         else:
-            plt.show()
+            visualization.showfig(fig)
 
         return fig, ax
 
@@ -316,7 +342,7 @@ class Coherence:
         self.phase = np.array(phase)
 
     def plot(self, xlabel='Time', ylabel='Period', figsize=[10, 8], ylim=None, xlim=None,
-             contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}):
+             contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, fig=None, ax=None):
         ''' Plot the wavelet coherence result
 
         Args
@@ -337,7 +363,11 @@ class Coherence:
         contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
 
-        fig, ax = plt.subplots(figsize=figsize)
+        if ax is not None:
+            if fig is None:
+                raise ValueError('`fig` must be specified when `ax` is specified!')
+        else:
+            fig, ax = plt.subplots(figsize=figsize)
 
         # plot coherence amplitude
         cont = ax.contourf(self.time, 1/self.freq, self.coherence.T, **contourf_args)
@@ -388,23 +418,19 @@ class Coherence:
 
         if 'path' in savefig_settings:
             visualization.savefig(fig, savefig_settings)
-            plt.close()
         else:
-            plt.show()
+            visualization.showfig(fig)
 
         return fig, ax
 
 class Lipd:
     def __init__(self, lipd_list):
         self.lipd_list = lipd_list
-    
+
     #def mapallarchive(self,markersize = 50, projection = 'Robinson',\
                   #proj_default = True, background = True,borders = False,\
                   #rivers = False, lakes = False, figsize = [10,4],\
                   #saveFig = False, dir=None, format='eps'):
-        
-        
-    
 
 class LipdSeries:
     def __init__(self, ts):
@@ -517,8 +543,7 @@ class LipdSeries:
         # Save the figure if "path" is specified in savefig_settings
         if 'path' in savefig_settings:
             visualization.savefig(fig, savefig_settings)
-            plt.close()
         else:
-            plt.show()
+            visualization.showfig(fig)
 
         return fig
