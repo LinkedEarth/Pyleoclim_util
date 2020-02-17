@@ -17,6 +17,8 @@ import pandas as pd
 from tabulate import tabulate
 from collections import namedtuple
 
+from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
+
 def dict2namedtuple(d):
     tupletype = namedtuple('tupletype', sorted(d))
     return tupletype(**d)
@@ -193,9 +195,9 @@ class PSD:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.freq)}'
 
-    def plot(self, in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude',
+    def plot(self, in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings={}, fig=None, ax=None,
-             plot_legend=True, lgd_settings={}, **plot_args):
+             plot_legend=True, lgd_settings={}, xticks=None, **plot_args):
         ''' Plot the power sepctral density (PSD)
 
         Args
@@ -234,6 +236,11 @@ class PSD:
         else:
             ax.plot(x_axis, self.amplitude, **plot_args)
 
+        if xticks is not None:
+            ax.set_xticks(xticks)
+            ax.xaxis.set_major_formatter(ScalarFormatter())
+            ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
+
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
 
@@ -248,6 +255,9 @@ class PSD:
             lgd_args = {'frameon': False}
             lgd_args.update(lgd_settings)
             ax.legend(**lgd_args)
+
+        if title is not None:
+            ax.set_title(title)
 
         if 'path' in savefig_settings:
             visualization.savefig(fig, savefig_settings)
@@ -273,7 +283,7 @@ class Scalogram:
         msg = print(tabulate(table, headers='keys'))
         return f'Dimension: {np.size(self.freq)} x {np.size(self.time)}'
 
-    def plot(self, xlabel='Time', ylabel='Period', ylim=None, xlim=None, figsize=[10, 8],
+    def plot(self, xlabel='Time', ylabel='Period', title=None, ylim=None, xlim=None, figsize=[10, 8],
              contourf_style={}, cbar_style={}, savefig_settings={}, fig=None, ax=None):
         ''' Plot the scalogram from wavelet analysis
 
@@ -292,7 +302,7 @@ class Scalogram:
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
-        contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
+        contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
 
         if ax is not None:
@@ -319,6 +329,9 @@ class Scalogram:
         if xlim is not None:
             ax.set_xlim(xlim)
 
+        if title is not None:
+            ax.set_title(title)
+
         ax.fill_between(self.time, self.coi, ylim[1], color='white', alpha=0.5)
 
         ax.set_xlabel(xlabel)
@@ -341,7 +354,7 @@ class Coherence:
         self.coi = np.array(coi)
         self.phase = np.array(phase)
 
-    def plot(self, xlabel='Time', ylabel='Period', figsize=[10, 8], ylim=None, xlim=None,
+    def plot(self, xlabel='Time', ylabel='Period', title=None, figsize=[10, 8], ylim=None, xlim=None,
              contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, fig=None, ax=None):
         ''' Plot the wavelet coherence result
 
@@ -415,6 +428,9 @@ class Coherence:
         ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
                   U[::skip_y, ::skip_x], V[::skip_y, ::skip_x],
                   scale=scale, width=width)
+
+        if title is not None:
+            ax.set_title(title)
 
         if 'path' in savefig_settings:
             visualization.savefig(fig, savefig_settings)

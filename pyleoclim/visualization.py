@@ -10,6 +10,7 @@ Mapping functions.
 """
 import random
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
@@ -956,7 +957,6 @@ def showfig(fig):
     else:
         plt.show()
 
-
 def savefig(fig, settings={}, verbose=True):
     ''' Save a figure to a path
 
@@ -997,3 +997,98 @@ def savefig(fig, settings={}, verbose=True):
 
     if verbose:
         print(f'Figure saved at: "{str(path)}"')
+
+def set_style(style='default', font_scale=1):
+    ''' Modify the visualization style; inspired by [Seaborn](https://github.com/mwaskom/seaborn)
+    '''
+    mpl.rcParams.update(mpl.rcParamsDefault)
+
+    font_dict = {
+        'font.size': 12,
+        'axes.labelsize': 12,
+        'axes.titlesize': 12,
+        'xtick.labelsize': 11,
+        'ytick.labelsize': 11,
+        'legend.fontsize': 11,
+    }
+
+    style_dict = {}
+    if style == 'journal':
+        style_dict.update({
+            'axes.axisbelow': True,
+            'axes.facecolor': 'white',
+            'axes.edgecolor': 'black',
+            'axes.grid': True,
+            'grid.color': 'lightgrey',
+            'grid.linestyle': '--',
+            'xtick.direction': 'out',
+            'ytick.direction': 'out',
+            'font.sans-serif': ['Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', 'sans-serif'],
+
+            'axes.spines.left': True,
+            'axes.spines.bottom': True,
+            'axes.spines.right': False,
+            'axes.spines.top': False,
+
+            'legend.frameon': False,
+
+            'axes.linewidth': 1,
+            'grid.linewidth': 1,
+            'lines.linewidth': 2,
+            'lines.markersize': 6,
+            'patch.linewidth': 1,
+
+            'xtick.major.width': 1.25,
+            'ytick.major.width': 1.25,
+            'xtick.minor.width': 0,
+            'ytick.minor.width': 0,
+        })
+    elif style == 'web':
+        style_dict.update({
+            'figure.facecolor': 'white',
+
+            'axes.axisbelow': True,
+            'axes.facecolor': 'whitesmoke',
+            'axes.edgecolor': 'lightgrey',
+            'axes.grid': True,
+            'grid.color': 'white',
+            'grid.linestyle': '-',
+            'xtick.direction': 'out',
+            'ytick.direction': 'out',
+
+            'text.color': 'grey',
+            'axes.labelcolor': 'grey',
+            'xtick.color': 'grey',
+            'ytick.color': 'grey',
+
+            'font.sans-serif': ['Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', 'sans-serif'],
+
+            'axes.spines.left': False,
+            'axes.spines.bottom': False,
+            'axes.spines.right': False,
+            'axes.spines.top': False,
+
+            'legend.frameon': False,
+
+            'axes.linewidth': 1,
+            'grid.linewidth': 1,
+            'lines.linewidth': 2,
+            'lines.markersize': 6,
+            'patch.linewidth': 1,
+
+            'xtick.major.width': 1.25,
+            'ytick.major.width': 1.25,
+            'xtick.minor.width': 0,
+            'ytick.minor.width': 0,
+        })
+    elif style == 'default':
+        mpl.rcParams.update(mpl.rcParamsDefault)
+    else:
+        raise ValueError(f'Wrong style being set: {style}. Please choose among "journal", "web", and "default".')
+
+    # modify font size based on font scale
+    font_dict.update({k: v*font_scale for k, v in font_dict.items()})
+
+    for d in [style_dict, font_dict]:
+        mpl.rcParams.update(d)
+
