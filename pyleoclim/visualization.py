@@ -975,7 +975,7 @@ def savefig(fig, settings={}, verbose=True):
     if 'path' not in settings:
         raise ValueError('"path" must be specified in `settings`!')
 
-    savefig_args = {'format': 'pdf', 'bbox_inches': 'tight'}
+    savefig_args = {'bbox_inches': 'tight'}
     savefig_args.update(settings)
 
     path = pathlib.Path(savefig_args['path'])
@@ -987,12 +987,11 @@ def savefig(fig, settings={}, verbose=True):
         if verbose:
             print(f'Directory created at: "{dirpath}"')
 
+    path_str = str(path)
     if path.suffix not in ['.eps', '.pdf', '.png', '.ps']:
-        path_str = str(path)
-        fmt = savefig_args['format']
-        path = pathlib.Path(f'{path_str}.{fmt}')
+        path = pathlib.Path(f'{path_str}.pdf')
 
-    fig.savefig(str(path), **savefig_args)
+    fig.savefig(path_str, **savefig_args)
     plt.close()
 
     if verbose:
@@ -1013,7 +1012,7 @@ def set_style(style='default', font_scale=1):
     }
 
     style_dict = {}
-    if style == 'journal':
+    if 'journal' in style:
         style_dict.update({
             'axes.axisbelow': True,
             'axes.facecolor': 'white',
@@ -1043,7 +1042,7 @@ def set_style(style='default', font_scale=1):
             'xtick.minor.width': 0,
             'ytick.minor.width': 0,
         })
-    elif style == 'web':
+    elif 'web' in style:
         style_dict.update({
             'figure.facecolor': 'white',
 
@@ -1081,10 +1080,32 @@ def set_style(style='default', font_scale=1):
             'xtick.minor.width': 0,
             'ytick.minor.width': 0,
         })
-    elif style == 'default':
+    elif 'default' in style:
         mpl.rcParams.update(mpl.rcParamsDefault)
-    else:
-        raise ValueError(f'Wrong style being set: {style}. Please choose among "journal", "web", and "default".')
+
+    if '_spines' in style:
+        style_dict.update({
+            'axes.spines.left': True,
+            'axes.spines.bottom': True,
+            'axes.spines.right': True,
+            'axes.spines.top': True,
+        })
+    elif '_nospines' in style:
+        style_dict.update({
+            'axes.spines.left': False,
+            'axes.spines.bottom': False,
+            'axes.spines.right': False,
+            'axes.spines.top': False,
+        })
+
+    if '_grid' in style:
+        style_dict.update({
+            'axes.grid': True,
+        })
+    elif '_nogrid' in style:
+        style_dict.update({
+            'axes.grid': False,
+        })
 
     # modify font size based on font scale
     font_dict.update({k: v*font_scale for k, v in font_dict.items()})

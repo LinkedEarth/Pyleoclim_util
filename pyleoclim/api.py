@@ -66,7 +66,7 @@ class Series:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.time)}'
 
-    def plot(self, figsize=[10, 4], title=None, savefig_settings={}, fig=None, ax=None, **plot_args):
+    def plot(self, figsize=[10, 4], title=None, savefig_settings={}, ax=None, **plot_args):
         ''' Plot the timeseries
 
         Args
@@ -84,28 +84,67 @@ class Series:
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
-        if ax is not None:
-            if fig is None:
-                raise ValueError('`fig` must be specified when `ax` is specified!')
-        else:
+        if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
         ax.plot(self.time, self.value, **plot_args)
 
-        xlabel, ylabel = self.make_labels()
+        time_label, value_label = self.make_labels()
 
-        ax.set_xlabel(xlabel)
+        ax.set_xlabel(time_label)
+        ax.set_ylabel(value_label)
+
+        if title is not None:
+            ax.set_title(title)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                visualization.savefig(fig, savefig_settings)
+            else:
+                visualization.showfig(fig)
+            return fig, ax
+        else:
+            return ax
+
+    def distplot(self, figsize=[10, 4], title=None, savefig_settings={}, ax=None, ylabel='KDE', **plot_args):
+        ''' Plot the distribution of the timeseries values
+
+        Args
+        ----
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+        '''
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        ax = sns.distplot(self.value, ax=ax, **plot_args)
+
+        time_label, value_label = self.make_labels()
+
+        ax.set_xlabel(value_label)
         ax.set_ylabel(ylabel)
 
         if title is not None:
             ax.set_title(title)
 
-        if 'path' in savefig_settings:
-            visualization.savefig(fig, savefig_settings)
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                visualization.savefig(fig, savefig_settings)
+            else:
+                visualization.showfig(fig)
+            return fig, ax
         else:
-            visualization.showfig(fig)
-
-        return fig, ax
+            return ax
 
     def clean(self):
         ''' Clean up the timeseries by removing NaNs and sort with increasing time points
@@ -196,8 +235,8 @@ class PSD:
         return f'Length: {np.size(self.freq)}'
 
     def plot(self, in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
-             xlim=None, ylim=None, figsize=[10, 4], savefig_settings={}, fig=None, ax=None,
-             plot_legend=True, lgd_settings={}, xticks=None, **plot_args):
+             xlim=None, ylim=None, figsize=[10, 4], savefig_settings={}, ax=None,
+             plot_legend=True, lgd_settings={}, xticks=None, yticks=None, **plot_args):
         ''' Plot the power sepctral density (PSD)
 
         Args
@@ -216,40 +255,54 @@ class PSD:
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
 
-        if ax is not None:
-            if fig is None:
-                raise ValueError('`fig` must be specified when `ax` is specified!')
-        else:
+        if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
         if in_period:
-            x_axis = 1/self.freq
+            idx = np.argwhere(self.freq==0)
+            x_axis = 1/np.delete(self.freq, idx)
+            y_axis = np.delete(self.amplitude, idx)
             if xlabel is None:
                 xlabel = 'Period'
+
+            if xticks is None:
+                xticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                mask = (xticks_default >= np.nanmin(x_axis)) & (xticks_default <= np.nanmax(x_axis))
+                xticks = xticks_default[mask]
+
+            if xlim is None:
+                xlim = [np.max(xticks), np.min(xticks)]
+
         else:
-            x_axis = self.freq
+            idx = np.argwhere(self.freq==0)
+            x_axis = np.delete(self.freq, idx)
+            y_axis = np.delete(self.amplitude, idx)
             if xlabel is None:
                 xlabel = 'Frequency'
 
+            if xlim is None:
+                xlim = ax.get_xlim()
+                xlim = [np.min(xlim), np.max(xlim)]
+
+        ax.set_xlim(xlim)
+        ax.plot(x_axis, y_axis, **plot_args)
+
         if in_loglog:
-            ax.loglog(x_axis, self.amplitude, **plot_args)
-        else:
-            ax.plot(x_axis, self.amplitude, **plot_args)
+            ax.set_xscale('log', nonposx='clip')
+            ax.set_yscale('log', nonposy='clip')
 
         if xticks is not None:
             ax.set_xticks(xticks)
             ax.xaxis.set_major_formatter(ScalarFormatter())
             ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
 
+        if yticks is not None:
+            ax.set_yticks(yticks)
+            ax.yaxis.set_major_formatter(ScalarFormatter())
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
+
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-
-        if in_period:
-            if xlim is None:
-                xlim = ax.get_xlim()
-                xlim = [np.max(xlim), np.min(xlim)]
-
-            ax.set_xlim(xlim)
 
         if plot_legend:
             lgd_args = {'frameon': False}
@@ -259,12 +312,14 @@ class PSD:
         if title is not None:
             ax.set_title(title)
 
-        if 'path' in savefig_settings:
-            visualization.savefig(fig, savefig_settings)
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                visualization.savefig(fig, savefig_settings)
+            else:
+                visualization.showfig(fig)
+            return fig, ax
         else:
-            visualization.showfig(fig)
-
-        return fig, ax
+            return ax
 
 class Scalogram:
     def __init__(self, freq, time, amplitude, coi):
@@ -283,8 +338,9 @@ class Scalogram:
         msg = print(tabulate(table, headers='keys'))
         return f'Dimension: {np.size(self.freq)} x {np.size(self.time)}'
 
-    def plot(self, xlabel='Time', ylabel='Period', title=None, ylim=None, xlim=None, figsize=[10, 8],
-             contourf_style={}, cbar_style={}, savefig_settings={}, fig=None, ax=None):
+    def plot(self, in_period=True, xlabel='Time', ylabel=None, title=None,
+             ylim=None, xlim=None, yticks=None, figsize=[10, 8],
+             contourf_style={}, cbar_style={}, savefig_settings={}, ax=None):
         ''' Plot the scalogram from wavelet analysis
 
         Args
@@ -305,13 +361,25 @@ class Scalogram:
         contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
 
-        if ax is not None:
-            if fig is None:
-                raise ValueError('`fig` must be specified when `ax` is specified!')
-        else:
+        if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
-        cont = ax.contourf(self.time, 1/self.freq, self.amplitude.T, **contourf_args)
+        if in_period:
+            y_axis = 1/self.freq
+            if ylabel is None:
+                ylabel = 'Period'
+
+            if yticks is None:
+                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                mask = (yticks_default >= np.min(y_axis)) & (yticks_default <= np.max(y_axis))
+                yticks = yticks_default[mask]
+        else:
+            y_axis = self.freq
+            if ylabel is None:
+                ylabel = 'Frequency'
+
+        cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
+        ax.set_yscale('log', nonposy='clip')
 
         # plot colorbar
         cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
@@ -322,7 +390,15 @@ class Scalogram:
         # plot cone of influence
         ax.plot(self.time, self.coi, 'k--')
         if ylim is None:
-            ylim = [np.min(1/self.freq), np.max(1/self.freq)]
+            if in_period:
+                ylim = [np.min(1/self.freq), np.max(1/self.freq)]
+            else:
+                ylim = [np.min(1/self.freq), np.max(1/self.freq)]
+
+        if yticks is not None:
+            ax.set_yticks(yticks)
+            ax.yaxis.set_major_formatter(ScalarFormatter())
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 
         ax.set_ylim(ylim)
 
@@ -336,14 +412,15 @@ class Scalogram:
 
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        ax.set_yscale('log', nonposy='clip')
 
-        if 'path' in savefig_settings:
-            visualization.savefig(fig, savefig_settings)
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                visualization.savefig(fig, savefig_settings)
+            else:
+                visualization.showfig(fig)
+            return fig, ax
         else:
-            visualization.showfig(fig)
-
-        return fig, ax
+            return ax
 
 
 class Coherence:
@@ -355,7 +432,7 @@ class Coherence:
         self.phase = np.array(phase)
 
     def plot(self, xlabel='Time', ylabel='Period', title=None, figsize=[10, 8], ylim=None, xlim=None,
-             contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, fig=None, ax=None):
+             contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, ax=None):
         ''' Plot the wavelet coherence result
 
         Args
@@ -376,10 +453,7 @@ class Coherence:
         contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
 
-        if ax is not None:
-            if fig is None:
-                raise ValueError('`fig` must be specified when `ax` is specified!')
-        else:
+        if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
         # plot coherence amplitude
@@ -432,12 +506,14 @@ class Coherence:
         if title is not None:
             ax.set_title(title)
 
-        if 'path' in savefig_settings:
-            visualization.savefig(fig, savefig_settings)
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                visualization.savefig(fig, savefig_settings)
+            else:
+                visualization.showfig(fig)
+            return fig, ax
         else:
-            visualization.showfig(fig)
-
-        return fig, ax
+            return ax
 
 class Lipd:
     def __init__(self, lipd_list):
