@@ -18,6 +18,8 @@ from tabulate import tabulate
 from collections import namedtuple
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
+from matplotlib.colors import BoundaryNorm, Normalize
+from matplotlib import cm
 
 def dict2namedtuple(d):
     tupletype = namedtuple('tupletype', sorted(d))
@@ -172,26 +174,46 @@ class Series:
         psd = PSD(freq=spec_res.freq, amplitude=spec_res.psd)
         return psd
 
-    def wavelet(self, method='wwz', settings={}):
+    def wavelet(self, method='wwz', nv=12, settings={}):
         ''' Perform wavelet analysis on the timeseries
         '''
         wave_func = {
             'wwz': analysis.wwz,
         }
-        args = {}
+        # generate default freq
+        s0 = 2*np.median(np.diff(self.time))
+        a0 = 2**(1/nv)
+        noct = np.floor(np.log2(np.size(self.time)))-1
+        scale = s0*a0**(np.arange(noct*nv+1))
+        freq = 1/scale[::-1]
+
+        args = {'tau': self.time, 'freq': freq}
         args.update(settings)
         wave_res = wave_func[method](self.value, self.time, **args)
         scal = Scalogram(freq=wave_res.freq, time=wave_res.time, amplitude=wave_res.amplitude, coi=wave_res.coi)
 
         return scal
 
-    def wavelet_coherence(self, target_series, method='wwz', settings={}):
+    def wavelet_coherence(self, target_series, nv=12, method='wwz', settings={}):
         ''' Perform wavelet coherence analysis with the target timeseries
         '''
         xwc_func = {
             'wwz': analysis.xwc,
         }
-        args = {}
+        # generate default freq
+        s0 = 2*np.median(np.diff(self.time))
+        a0 = 2**(1/nv)
+        noct = np.floor(np.log2(np.size(self.time)))-1
+        scale = s0*a0**(np.arange(noct*nv+1))
+        freq = 1/scale[::-1]
+
+        t1 = np.copy(self.time)
+        t2 = np.copy(target_series.time)
+        dt1 = np.median(np.diff(t1))
+        dt2 = np.median(np.diff(t2))
+        overlap = np.arange(np.max([t1[0], t2[0]]), np.min([t1[-1], t2[-1]]), np.max([dt1, dt2]))
+
+        args = {'tau': overlap, 'freq': freq}
         args.update(settings)
         xwc_res = xwc_func[method](self.value, self.time, target_series.value, target_series.time, **args)
 
@@ -389,29 +411,27 @@ class Scalogram:
 
         # plot cone of influence
         ax.plot(self.time, self.coi, 'k--')
-        if ylim is None:
-            if in_period:
-                ylim = [np.min(1/self.freq), np.max(1/self.freq)]
-            else:
-                ylim = [np.min(1/self.freq), np.max(1/self.freq)]
 
         if yticks is not None:
             ax.set_yticks(yticks)
             ax.yaxis.set_major_formatter(ScalarFormatter())
             ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 
-        ax.set_ylim(ylim)
+        if title is not None:
+            ax.set_title(title)
+
+        if ylim is None:
+            ylim = [np.min(y_axis), np.min([np.max(y_axis), np.max(self.coi)])]
+
+        ax.fill_between(self.time, self.coi, np.max(self.coi), color='white', alpha=0.5)
+
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
 
         if xlim is not None:
             ax.set_xlim(xlim)
 
-        if title is not None:
-            ax.set_title(title)
-
-        ax.fill_between(self.time, self.coi, ylim[1], color='white', alpha=0.5)
-
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        ax.set_ylim(ylim)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
@@ -431,8 +451,10 @@ class Coherence:
         self.coi = np.array(coi)
         self.phase = np.array(phase)
 
-    def plot(self, xlabel='Time', ylabel='Period', title=None, figsize=[10, 8], ylim=None, xlim=None,
-             contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, ax=None):
+    def plot(self, xlabel='Time', ylabel='Period', title=None, figsize=[10, 8],
+             ylim=None, xlim=None, in_period=True, yticks=None,
+             contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, ax=None,
+             under_clr='ivory', over_clr='black', bad_clr='dimgray'):
         ''' Plot the wavelet coherence result
 
         Args
@@ -450,41 +472,71 @@ class Coherence:
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
-        contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
-        contourf_args.update(contourf_style)
-
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
+        if in_period:
+            y_axis = 1/self.freq
+            if ylabel is None:
+                ylabel = 'Period'
+
+            if yticks is None:
+                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                mask = (yticks_default >= np.min(y_axis)) & (yticks_default <= np.max(y_axis))
+                yticks = yticks_default[mask]
+        else:
+            y_axis = self.freq
+            if ylabel is None:
+                ylabel = 'Frequency'
+
         # plot coherence amplitude
-        cont = ax.contourf(self.time, 1/self.freq, self.coherence.T, **contourf_args)
+        contourf_args = {
+            'cmap': 'magma',
+            'origin': 'lower',
+            'levels': np.linspace(0, 1, 11),
+        }
+        contourf_args.update(contourf_style)
+
+        cmap = cm.get_cmap(contourf_args['cmap'])
+        cmap.set_under(under_clr)
+        cmap.set_over(over_clr)
+        cmap.set_bad(bad_clr)
+        contourf_args['cmap'] = cmap
+
+        cont = ax.contourf(self.time, y_axis, self.coherence.T, **contourf_args)
 
         # plot colorbar
-        cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
+        cbar_args = {
+            'drawedges': False,
+            'orientation': 'vertical',
+            'fraction': 0.15,
+            'pad': 0.05,
+            'ticks': np.linspace(0, 1, 11)
+        }
         cbar_args.update(cbar_style)
 
         cb = plt.colorbar(cont, **cbar_args)
 
         # plot cone of influence
+        ax.set_yscale('log', nonposy='clip')
         ax.plot(self.time, self.coi, 'k--')
 
-        # set xlim and ylim
         if ylim is None:
-            ylim = [np.min(1/self.freq), np.max(1/self.freq)]
+            ylim = [np.min(y_axis), np.min([np.max(y_axis), np.max(self.coi)])]
 
-        ax.set_ylim(ylim)
+        ax.fill_between(self.time, self.coi, np.max(self.coi), color='white', alpha=0.5)
 
-        if xlim is not None:
-            ax.set_xlim(xlim)
-
-        ax.fill_between(self.time, self.coi, ylim[1], color='white', alpha=0.5)
+        if yticks is not None:
+            ax.set_yticks(yticks)
+            ax.yaxis.set_major_formatter(ScalarFormatter())
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        ax.set_yscale('log', nonposy='clip')
 
         # plot phase
-        phase_args = {'pt': 0.5, 'skip_x': 5, 'skip_y': 5, 'scale': 30, 'width': 0.004}
+        dt = np.median(np.diff(self.time))
+        phase_args = {'pt': 0.5, 'skip_x': 10*dt, 'skip_y': 5*dt, 'scale': 30, 'width': 0.004}
         phase_args.update(phase_style)
 
         pt = phase_args['pt']
@@ -502,6 +554,12 @@ class Coherence:
         ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
                   U[::skip_y, ::skip_x], V[::skip_y, ::skip_x],
                   scale=scale, width=width)
+
+        ax.set_ylim(ylim)
+
+        if xlim is not None:
+            ax.set_xlim(xlim)
+
 
         if title is not None:
             ax.set_title(title)
