@@ -15,6 +15,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from tabulate import tabulate
+from collections import namedtuple
+
+from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
+from matplotlib.colors import BoundaryNorm, Normalize
+from matplotlib import cm
+
+def dict2namedtuple(d):
+    tupletype = namedtuple('tupletype', sorted(d))
+    return tupletype(**d)
 
 class Series:
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None):
@@ -59,21 +68,85 @@ class Series:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.time)}'
 
-    def plot(self, figsize=[10, 4], title=None):
+    def plot(self, figsize=[10, 4], title=None, savefig_settings={}, ax=None, **plot_args):
         ''' Plot the timeseries
+
+        Args
+        ----
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
-        fig, ax = plt.subplots(figsize=figsize)
-        ax.plot(self.time, self.value)
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
 
-        xlabel, ylabel = self.make_labels()
+        ax.plot(self.time, self.value, **plot_args)
 
-        ax.set_xlabel(xlabel)
+        time_label, value_label = self.make_labels()
+
+        ax.set_xlabel(time_label)
+        ax.set_ylabel(value_label)
+
+        if title is not None:
+            ax.set_title(title)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                visualization.savefig(fig, savefig_settings)
+            else:
+                visualization.showfig(fig)
+            return fig, ax
+        else:
+            return ax
+
+    def distplot(self, figsize=[10, 4], title=None, savefig_settings={}, ax=None, ylabel='KDE', **plot_args):
+        ''' Plot the distribution of the timeseries values
+
+        Args
+        ----
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+        '''
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        ax = sns.distplot(self.value, ax=ax, **plot_args)
+
+        time_label, value_label = self.make_labels()
+
+        ax.set_xlabel(value_label)
         ax.set_ylabel(ylabel)
 
         if title is not None:
             ax.set_title(title)
 
-        return fig, ax
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                visualization.savefig(fig, savefig_settings)
+            else:
+                visualization.showfig(fig)
+            return fig, ax
+        else:
+            return ax
 
     def clean(self):
         ''' Clean up the timeseries by removing NaNs and sort with increasing time points
@@ -84,42 +157,75 @@ class Series:
         self.time = t_cleaned
         self.value = y_cleaned
 
-    def spectral(self, method='wwz', args={}):
+    def spectral(self, method='wwz', settings={}):
         ''' Perform spectral analysis on the timeseries
         '''
+        spec_class = analysis.SpectralAnalysis()
         spec_func = {
             'wwz': analysis.wwz_psd,
+            'mtm': spec_class.mtm,
         }
+        args = {}
+        args.update(settings)
         spec_res = spec_func[method](self.value, self.time, **args)
+        if type(spec_res) is dict:
+            spec_res = dict2namedtuple(spec_res)
+
         psd = PSD(freq=spec_res.freq, amplitude=spec_res.psd)
         return psd
 
-    def wavelet(self, method='wwz', args={}):
+    def wavelet(self, method='wwz', nv=12, settings={}):
         ''' Perform wavelet analysis on the timeseries
         '''
         wave_func = {
             'wwz': analysis.wwz,
         }
+        # generate default freq
+        s0 = 2*np.median(np.diff(self.time))
+        a0 = 2**(1/nv)
+        noct = np.floor(np.log2(np.size(self.time)))-1
+        scale = s0*a0**(np.arange(noct*nv+1))
+        freq = 1/scale[::-1]
+
+        args = {'tau': self.time, 'freq': freq}
+        args.update(settings)
         wave_res = wave_func[method](self.value, self.time, **args)
         scal = Scalogram(freq=wave_res.freq, time=wave_res.time, amplitude=wave_res.amplitude, coi=wave_res.coi)
 
         return scal
 
-    def wavelet_coherence(self, target_series, method='wwz', args={}):
+    def wavelet_coherence(self, target_series, nv=12, method='wwz', settings={}):
         ''' Perform wavelet coherence analysis with the target timeseries
         '''
         xwc_func = {
             'wwz': analysis.xwc,
         }
+        # generate default freq
+        s0 = 2*np.median(np.diff(self.time))
+        a0 = 2**(1/nv)
+        noct = np.floor(np.log2(np.size(self.time)))-1
+        scale = s0*a0**(np.arange(noct*nv+1))
+        freq = 1/scale[::-1]
+
+        t1 = np.copy(self.time)
+        t2 = np.copy(target_series.time)
+        dt1 = np.median(np.diff(t1))
+        dt2 = np.median(np.diff(t2))
+        overlap = np.arange(np.max([t1[0], t2[0]]), np.min([t1[-1], t2[-1]]), np.max([dt1, dt2]))
+
+        args = {'tau': overlap, 'freq': freq}
+        args.update(settings)
         xwc_res = xwc_func[method](self.value, self.time, target_series.value, target_series.time, **args)
 
         coh = Coherence(freq=xwc_res.freq, time=xwc_res.time, coherence=xwc_res.xw_coherence, phase=xwc_res.xw_phase, coi=xwc_res.coi)
 
         return coh
 
-    def correlation(self, target_series, args={}):
+    def correlation(self, target_series, settings={}):
         ''' Perform correlation analysis with the target timeseries
         '''
+        args = {}
+        args.update(settings)
         r, signif, p = analysis.corrsig(self.value, target_series.value, **args)
         corr_res = {
             'r': r,
@@ -128,9 +234,11 @@ class Series:
         }
         return corr_res
 
-    def causality(self, target_series, args={}):
+    def causality(self, target_series, settings={}):
         ''' Perform causality analysis with the target timeseries
         '''
+        args = {}
+        args.update(settings)
         causal_res = analysis.causality_est(self.value, target_series.value, **args)
         return causal_res
 
@@ -148,38 +256,92 @@ class PSD:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.freq)}'
 
-    def plot(self, in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude',
-             xlim=None, ylim=None, figsize=[10, 4]):
+    def plot(self, in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
+             xlim=None, ylim=None, figsize=[10, 4], savefig_settings={}, ax=None,
+             plot_legend=True, lgd_settings={}, xticks=None, yticks=None, **plot_args):
         ''' Plot the power sepctral density (PSD)
+
+        Args
+        ----
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
 
-        fig, ax = plt.subplots(figsize=figsize)
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
 
         if in_period:
-            x_axis = 1/self.freq
+            idx = np.argwhere(self.freq==0)
+            x_axis = 1/np.delete(self.freq, idx)
+            y_axis = np.delete(self.amplitude, idx)
             if xlabel is None:
                 xlabel = 'Period'
+
+            if xticks is None:
+                xticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                mask = (xticks_default >= np.nanmin(x_axis)) & (xticks_default <= np.nanmax(x_axis))
+                xticks = xticks_default[mask]
+
+            if xlim is None:
+                xlim = [np.max(xticks), np.min(xticks)]
+
         else:
-            x_axis = self.freq
+            idx = np.argwhere(self.freq==0)
+            x_axis = np.delete(self.freq, idx)
+            y_axis = np.delete(self.amplitude, idx)
             if xlabel is None:
                 xlabel = 'Frequency'
 
+            if xlim is None:
+                xlim = ax.get_xlim()
+                xlim = [np.min(xlim), np.max(xlim)]
+
+        ax.set_xlim(xlim)
+        ax.plot(x_axis, y_axis, **plot_args)
+
         if in_loglog:
-            ax.loglog(x_axis, self.amplitude)
-        else:
-            ax.plot(x_axis, self.amplitude)
+            ax.set_xscale('log', nonposx='clip')
+            ax.set_yscale('log', nonposy='clip')
+
+        if xticks is not None:
+            ax.set_xticks(xticks)
+            ax.xaxis.set_major_formatter(ScalarFormatter())
+            ax.xaxis.set_major_formatter(FormatStrFormatter('%g'))
+
+        if yticks is not None:
+            ax.set_yticks(yticks)
+            ax.yaxis.set_major_formatter(ScalarFormatter())
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
 
-        if in_period:
-            if xlim is None:
-                xlim = ax.get_xlim()
-                xlim = [np.max(xlim), np.min(xlim)]
+        if plot_legend:
+            lgd_args = {'frameon': False}
+            lgd_args.update(lgd_settings)
+            ax.legend(**lgd_args)
 
-            ax.set_xlim(xlim)
+        if title is not None:
+            ax.set_title(title)
 
-        return fig, ax
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                visualization.savefig(fig, savefig_settings)
+            else:
+                visualization.showfig(fig)
+            return fig, ax
+        else:
+            return ax
 
 class Scalogram:
     def __init__(self, freq, time, amplitude, coi):
@@ -198,39 +360,87 @@ class Scalogram:
         msg = print(tabulate(table, headers='keys'))
         return f'Dimension: {np.size(self.freq)} x {np.size(self.time)}'
 
-    def plot(self, xlabel='Time', ylabel='Period',
-             contourf_args={}, cbar_args={}, figsize=[10, 8], ylim=None, xlim=None):
+    def plot(self, in_period=True, xlabel='Time', ylabel=None, title=None,
+             ylim=None, xlim=None, yticks=None, figsize=[10, 8],
+             contourf_style={}, cbar_style={}, savefig_settings={}, ax=None):
         ''' Plot the scalogram from wavelet analysis
+
+        Args
+        ----
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
-        if contourf_args == {}:
-            contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
+        contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
+        contourf_args.update(contourf_style)
 
-        fig, ax = plt.subplots(figsize=figsize)
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
 
-        cont = ax.contourf(self.time, 1/self.freq, self.amplitude.T, **contourf_args)
+        if in_period:
+            y_axis = 1/self.freq
+            if ylabel is None:
+                ylabel = 'Period'
+
+            if yticks is None:
+                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                mask = (yticks_default >= np.min(y_axis)) & (yticks_default <= np.max(y_axis))
+                yticks = yticks_default[mask]
+        else:
+            y_axis = self.freq
+            if ylabel is None:
+                ylabel = 'Frequency'
+
+        cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
+        ax.set_yscale('log', nonposy='clip')
+
         # plot colorbar
-        if cbar_args == {}:
-            cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
+        cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
+        cbar_args.update(cbar_style)
 
         cb = plt.colorbar(cont, **cbar_args)
 
         # plot cone of influence
         ax.plot(self.time, self.coi, 'k--')
-        if ylim is None:
-            ylim = [np.min(1/self.freq), np.max(1/self.freq)]
 
-        ax.set_ylim(ylim)
+        if yticks is not None:
+            ax.set_yticks(yticks)
+            ax.yaxis.set_major_formatter(ScalarFormatter())
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
+
+        if title is not None:
+            ax.set_title(title)
+
+        if ylim is None:
+            ylim = [np.min(y_axis), np.min([np.max(y_axis), np.max(self.coi)])]
+
+        ax.fill_between(self.time, self.coi, np.max(self.coi), color='white', alpha=0.5)
+
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
 
         if xlim is not None:
             ax.set_xlim(xlim)
 
-        ax.fill_between(self.time, self.coi, ylim[1], color='white', alpha=0.5)
+        ax.set_ylim(ylim)
 
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
-        ax.set_yscale('log', nonposy='clip')
-
-        return fig, ax
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                visualization.savefig(fig, savefig_settings)
+            else:
+                visualization.showfig(fig)
+            return fig, ax
+        else:
+            return ax
 
 
 class Coherence:
@@ -241,45 +451,93 @@ class Coherence:
         self.coi = np.array(coi)
         self.phase = np.array(phase)
 
-    def plot(self, xlabel='Time', ylabel='Period', figsize=[10, 8], contourf_args={}, ylim=None, xlim=None,
-             phase_args={}, cbar_args={}):
+    def plot(self, xlabel='Time', ylabel='Period', title=None, figsize=[10, 8],
+             ylim=None, xlim=None, in_period=True, yticks=None,
+             contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, ax=None,
+             under_clr='ivory', over_clr='black', bad_clr='dimgray'):
         ''' Plot the wavelet coherence result
-        '''
-        if contourf_args == {}:
-            contourf_args = {'cmap': 'RdBu_r', 'origin': 'lower', 'levels': 11}
 
-        fig, ax = plt.subplots(figsize=figsize)
+        Args
+        ----
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+        '''
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        if in_period:
+            y_axis = 1/self.freq
+            if ylabel is None:
+                ylabel = 'Period'
+
+            if yticks is None:
+                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                mask = (yticks_default >= np.min(y_axis)) & (yticks_default <= np.max(y_axis))
+                yticks = yticks_default[mask]
+        else:
+            y_axis = self.freq
+            if ylabel is None:
+                ylabel = 'Frequency'
 
         # plot coherence amplitude
-        cont = ax.contourf(self.time, 1/self.freq, self.coherence.T, **contourf_args)
+        contourf_args = {
+            'cmap': 'magma',
+            'origin': 'lower',
+            'levels': np.linspace(0, 1, 11),
+        }
+        contourf_args.update(contourf_style)
+
+        cmap = cm.get_cmap(contourf_args['cmap'])
+        cmap.set_under(under_clr)
+        cmap.set_over(over_clr)
+        cmap.set_bad(bad_clr)
+        contourf_args['cmap'] = cmap
+
+        cont = ax.contourf(self.time, y_axis, self.coherence.T, **contourf_args)
 
         # plot colorbar
-        if cbar_args == {}:
-            cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
+        cbar_args = {
+            'drawedges': False,
+            'orientation': 'vertical',
+            'fraction': 0.15,
+            'pad': 0.05,
+            'ticks': np.linspace(0, 1, 11)
+        }
+        cbar_args.update(cbar_style)
 
         cb = plt.colorbar(cont, **cbar_args)
 
         # plot cone of influence
+        ax.set_yscale('log', nonposy='clip')
         ax.plot(self.time, self.coi, 'k--')
 
-        # set xlim and ylim
         if ylim is None:
-            ylim = [np.min(1/self.freq), np.max(1/self.freq)]
+            ylim = [np.min(y_axis), np.min([np.max(y_axis), np.max(self.coi)])]
 
-        ax.set_ylim(ylim)
+        ax.fill_between(self.time, self.coi, np.max(self.coi), color='white', alpha=0.5)
 
-        if xlim is not None:
-            ax.set_xlim(xlim)
-
-        ax.fill_between(self.time, self.coi, ylim[1], color='white', alpha=0.5)
+        if yticks is not None:
+            ax.set_yticks(yticks)
+            ax.yaxis.set_major_formatter(ScalarFormatter())
+            ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
-        ax.set_yscale('log', nonposy='clip')
 
         # plot phase
-        if phase_args == {}:
-            phase_args = {'pt': 0.5, 'skip_x': 5, 'skip_y': 5, 'scale': 30, 'width': 0.004}
+        dt = np.median(np.diff(self.time))
+        phase_args = {'pt': 0.5, 'skip_x': 10*dt, 'skip_y': 5*dt, 'scale': 30, 'width': 0.004}
+        phase_args.update(phase_style)
 
         pt = phase_args['pt']
         skip_x = phase_args['skip_x']
@@ -297,19 +555,27 @@ class Coherence:
                   U[::skip_y, ::skip_x], V[::skip_y, ::skip_x],
                   scale=scale, width=width)
 
-        return fig, ax
+        ax.set_ylim(ylim)
+
+        if xlim is not None:
+            ax.set_xlim(xlim)
+
+
+        if title is not None:
+            ax.set_title(title)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                visualization.savefig(fig, savefig_settings)
+            else:
+                visualization.showfig(fig)
+            return fig, ax
+        else:
+            return ax
 
 class Lipd:
     def __init__(self, lipd_list):
         self.lipd_list = lipd_list
-    
-    #def mapallarchive(self,markersize = 50, projection = 'Robinson',\
-                  #proj_default = True, background = True,borders = False,\
-                  #rivers = False, lakes = False, figsize = [10,4],\
-                  #saveFig = False, dir=None, format='eps'):
-        
-        
-    
 
 class LipdSeries:
     def __init__(self, ts):
@@ -327,18 +593,18 @@ class LipdSeries:
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
                 'other':['k','o']}
-    
-    def mapone(self,projection = 'Orthographic', proj_default = True,\
-           background = True, label = 'default', borders = False, \
-           rivers = False, lakes = False,markersize = 50, marker = "default",\
-           figsize = [4,4], savefig = False, dir = None, format="eps"):
+
+    def mapone(self, projection='Orthographic', proj_default=True,
+               background=True, label='default', borders=False,
+               rivers=False, lakes=False, markersize=50, marker="default",
+               figsize=[4,4], savefig_settings={}):
         """ Create a Map for a single record
 
         Orthographic projection map of a single record.
-    
+
         Args
         ----
-    
+
         timeseries : object
                     a LiPD timeseries object. Will prompt for one if not given
         projection : string
@@ -376,35 +642,31 @@ class LipdSeries:
                 default color palette for archives
         figsize : list
                  the size for the figure
-        savefig : bool
-                 default is to not save the figure
-        dir : str
-             the full path of the directory in which to save the figure.
-             If not provided, creates a default folder called 'figures' in the
-             LiPD working directory (lipd.path).
-        format : str
-                One of the file extensions supported by the active
-                backend. Default is "eps". Most backend support png, pdf, ps, eps,
-                and svg.
-    
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+
         Returns
         -------
         The figure
-    
+
         """
-        
+
         # Get latitude/longitude
-    
+
         lat = self.ts['geo_meanLat']
         lon = self.ts['geo_meanLon']
-    
+
         # Make sure it's in the palette
         if marker == 'default':
             archiveType = lipdutils.LipdToOntology(self.ts['archiveType']).lower()
             if archiveType not in self.plot_default.keys():
                 archiveType = 'other'
             marker = self.plot_default[archiveType]
-    
+
         # Get the label
         if label == 'default':
             for i in self.ts.keys():
@@ -418,19 +680,15 @@ class LipdSeries:
             label = None
         else:
             assert type(label) is str, 'the argument label should be of type str'
-    
-        fig = visualization.mapOne(lat, lon, projection = projection, proj_default = proj_default,\
-               background = background, label = label, borders = borders, \
-               rivers = rivers, lakes = lakes,\
-               markersize = markersize, marker = marker, figsize = figsize, \
-               ax = None)
-    
-        # Save the figure if asked
-        if savefig == True:
-            lipdutils.saveFigure(self.ts['dataSetName']+'_map', format, dir)
+
+        fig = visualization.mapOne(lat, lon, projection = projection, proj_default = proj_default,
+               background = background, label = label, borders = borders, rivers = rivers, lakes = lakes,
+               markersize = markersize, marker = marker, figsize = figsize, ax = None)
+
+        # Save the figure if "path" is specified in savefig_settings
+        if 'path' in savefig_settings:
+            visualization.savefig(fig, savefig_settings)
         else:
-            plt.show()
-    
+            visualization.showfig(fig)
+
         return fig
-    
-        

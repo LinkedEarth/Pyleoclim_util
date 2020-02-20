@@ -8,9 +8,11 @@ Created on Fri Apr 28 14:23:06 2017
 Spectral module for pyleoclim
 """
 
+import pandas as pd
 import numpy as np
 import statsmodels.api as sm
 
+from scipy import interpolate
 from scipy import optimize
 from scipy import signal
 from scipy.stats.mstats import mquantiles
@@ -31,13 +33,14 @@ import collections
 
 from math import factorial
 
-import spectrum
+#  import spectrum
+import nitime.algorithms as nialg
 
 import numba as nb
 from numba.errors import NumbaPerformanceWarning
 
 from sklearn import preprocessing
-
+from sklearn.decomposition import PCA
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
 '''
@@ -89,7 +92,7 @@ class SpectralAnalysis(object):
         -------
         res_dict : dict
             the result dictionary, including
-            - freqs (array): the frequency vector
+            - freq (array): the frequency vector
             - psd (array): the spectral density vector
 
         '''
@@ -105,8 +108,8 @@ class SpectralAnalysis(object):
         # if data is not evenly spaced, interpolate
         if not wa.is_evenly_spaced(ts):
             interp_func = {
-                'interp': interp,
-                'bin': binvalues,
+                'interp': Timeseries.interp,
+                'bin': Timeseries.binvalues,
             }
             ts, ys = interp_func[interp_method](ts, ys, **interp_args)
 
@@ -115,15 +118,15 @@ class SpectralAnalysis(object):
         fs = 1 / dt
 
         # spectral analysis with scipy welch
-        freqs, psd = signal.welch(ys, fs, **ana_args)
+        freq, psd = signal.welch(ys, fs, **ana_args)
 
         # fix zero frequency point
-        if freqs[0] == 0:
+        if freq[0] == 0:
             psd[0] = np.nan
 
         # output result
         res_dict = {
-            'freqs': np.asarray(freqs),
+            'freq': np.asarray(freq),
             'psd' : np.asarray(psd),
         }
 
@@ -131,7 +134,8 @@ class SpectralAnalysis(object):
 
 
     def mtm(self, ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
-        ''' Call MTM from the package [spectrum](https://github.com/cokelaer/spectrum)
+        #  ''' Call MTM from the package [spectrum](https://github.com/cokelaer/spectrum)
+        ''' Call MTM from the package [nitime](http://nipy.org)
 
         Args
         ----
@@ -172,7 +176,7 @@ class SpectralAnalysis(object):
 
         res_dict : dict
             the result dictionary, including
-            - freqs (array): the frequency vector
+            - freq (array): the frequency vector
             - psd (array): the spectral density vector
 
 
@@ -185,8 +189,8 @@ class SpectralAnalysis(object):
         # interpolate if not evenly-spaced
         if not wa.is_evenly_spaced(ts):
             interp_func = {
-                'interp': interp,
-                'bin': binvalues,
+                'interp': Timeseries.interp,
+                'bin': Timeseries.binvalues,
             }
             ts, ys = interp_func[interp_method](ts, ys, **interp_args)
 
@@ -195,24 +199,25 @@ class SpectralAnalysis(object):
         fs = 1 / dt
 
         # spectral analysis
-        res = spectrum.MultiTapering(ys, sampling=fs, NW=NW, **ana_args)
-        freqs = res.frequencies()
-        psd = res.psd
+        #  res = spectrum.MultiTapering(ys, sampling=fs, NW=NW, **ana_args)
+        #  freq = res.frequencies()
+        #  psd = res.psd
+        freq, psd, nu = nialg.multi_taper_psd(ys, Fs=fs, NW=NW, **ana_args)  # call nitime func
 
         # fix the zero frequency point
-        if freqs[0] == 0:
+        if freq[0] == 0:
             psd[0] = np.nan
 
         # output result
         res_dict = {
-            'freqs': np.asarray(freqs),
+            'freq': np.asarray(freq),
             'psd': np.asarray(psd),
         }
 
         return res_dict
 
 
-    def lomb_scargle(self, ys, ts, freqs=None, make_freq_method='nfft', prep_args={}, ana_args={}):
+    def lomb_scargle(self, ys, ts, freq=None, make_freq_method='nfft', prep_args={}, ana_args={}):
         """ Return the computed periodogram using lomb-scargle algorithm
         Lombscargle algorithm
 
@@ -223,7 +228,7 @@ class SpectralAnalysis(object):
             a time series
         ts : array
             time axis of the time series
-        freqs : array
+        freq : array
             vector of frequency
         make_freq_method : string
             Method to be used to make the time series. Default is nfft
@@ -252,31 +257,31 @@ class SpectralAnalysis(object):
 
         res_dict : dict
             the result dictionary, including
-            - freqs (array): the frequency vector
+            - freq (array): the frequency vector
             - psd (array): the spectral density vector
         """
         ys, ts = Timeseries.clean_ts(ys, ts)
         wa = WaveletAnalysis()
         ys = wa.preprocess(ys, ts, **prep_args)
 
-        if freqs is None:
-            freqs = wa.make_freq_vector(ts, method=make_freq_method)
+        if freq is None:
+            freq = wa.make_freq_vector(ts, method=make_freq_method)
 
-        freqs_angular = 2 * np.pi * freqs
+        freq_angular = 2 * np.pi * freq
 
         # fix the zero frequency point
-        if freqs[0] == 0:
-            freqs_copy = freqs[1:]
-            freqs_angular = 2 * np.pi * freqs_copy
+        if freq[0] == 0:
+            freq_copy = freq[1:]
+            freq_angular = 2 * np.pi * freq_copy
 
-        psd = signal.lombscargle(ts, ys, freqs_angular, **ana_args)
+        psd = signal.lombscargle(ts, ys, freq_angular, **ana_args)
 
-        if freqs[0] == 0:
+        if freq[0] == 0:
             psd = np.insert(psd, 0, np.nan)
 
         # output result
         res_dict = {
-            'freqs': np.asarray(freqs),
+            'freq': np.asarray(freq),
             'psd': np.asarray(psd),
         }
 
@@ -325,7 +330,7 @@ class SpectralAnalysis(object):
 
         res_dict : dict
             the result dictionary, including
-            - freqs (array): the frequency vector
+            - freq (array): the frequency vector
             - psd (array): the spectral density vector
 
 
@@ -338,8 +343,8 @@ class SpectralAnalysis(object):
         # interpolate if not evenly-spaced
         if not wa.is_evenly_spaced(ts):
             interp_func = {
-                'interp': interp,
-                'bin': binvalues,
+                'interp': Timeseries.interp,
+                'bin': Timeseries.binvalues,
             }
             ts, ys = interp_func[interp_method](ts, ys, **interp_args)
 
@@ -348,15 +353,15 @@ class SpectralAnalysis(object):
         fs = 1 / dt
 
         # spectral analysis
-        freqs, psd = signal.periodogram(ys, fs, **ana_args)
+        freq, psd = signal.periodogram(ys, fs, **ana_args)
 
         # fix the zero frequency point
-        if freqs[0] == 0:
+        if freq[0] == 0:
             psd[0] = np.nan
 
         # output result
         res_dict = {
-            'freqs': np.asarray(freqs),
+            'freq': np.asarray(freq),
             'psd': np.asarray(psd),
         }
 
@@ -582,7 +587,7 @@ class WaveletAnalysis(object):
 
         return r
 
-    def wwz_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, params=['default', 4, 0, 1],
+    def wwz_basic(self, ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, params=['default', 4, 0, 1],
                   gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
 
@@ -595,7 +600,7 @@ class WaveletAnalysis(object):
             a time series
         ts : array
             time axis of the time series
-        freqs : array
+        freq : array
             vector of frequency
         tau : array
             the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -645,11 +650,11 @@ class WaveletAnalysis(object):
         self.assertPositiveInt(Neff)
 
         nt = np.size(tau)
-        nf = np.size(freqs)
+        nf = np.size(freq)
 
         pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
-        omega = self.make_omega(ts, freqs)
+        omega = self.make_omega(ts, freq)
 
         Neffs = np.ndarray(shape=(nt, nf))
         ywave_1 = np.ndarray(shape=(nt, nf))
@@ -698,7 +703,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def wwz_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=False, params=['default', 4, 0, 1],
+    def wwz_nproc(self, ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=False, params=['default', 4, 0, 1],
                   gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA).
 
@@ -711,7 +716,7 @@ class WaveletAnalysis(object):
             a time series
         ts : array
             time axis of the time series
-        freqs : array
+        freq : array
             vector of frequency
         tau : array
             the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -754,11 +759,11 @@ class WaveletAnalysis(object):
         self.assertPositiveInt(Neff)
 
         nt = np.size(tau)
-        nf = np.size(freqs)
+        nf = np.size(freq)
 
         pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
-        omega = self.make_omega(ts, freqs)
+        omega = self.make_omega(ts, freq)
 
         Neffs = np.ndarray(shape=(nt, nf))
         ywave_1 = np.ndarray(shape=(nt, nf))
@@ -819,7 +824,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_basic(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, params=["default", 4, 0, 1],
+    def kirchner_basic(self, ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, params=["default", 4, 0, 1],
                        gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -832,7 +837,7 @@ class WaveletAnalysis(object):
             a time series
         ts : array
             time axis of the time series
-        freqs : array
+        freq : array
             vector of frequency
         tau : array
             the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -883,11 +888,11 @@ class WaveletAnalysis(object):
 
         nt = np.size(tau)
         nts = np.size(ts)
-        nf = np.size(freqs)
+        nf = np.size(freq)
 
         pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
-        omega = self.make_omega(ts, freqs)
+        omega = self.make_omega(ts, freq)
 
         Neffs = np.ndarray(shape=(nt, nf))
         a0 = np.ndarray(shape=(nt, nf))
@@ -948,7 +953,7 @@ class WaveletAnalysis(object):
         coeff = (a0, a1, a2)
 
         return wwa, phase, Neffs, coeff
-    def kirchner_nproc(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, params=['default', 4, 0, 1],
+    def kirchner_nproc(self, ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, params=['default', 4, 0, 1],
                        gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -961,7 +966,7 @@ class WaveletAnalysis(object):
             a time series
         ts : array
             time axis of the time series
-        freqs : array
+        freq : array
             vector of frequency
         tau : array
             the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -1001,11 +1006,11 @@ class WaveletAnalysis(object):
 
         nt = np.size(tau)
         nts = np.size(ts)
-        nf = np.size(freqs)
+        nf = np.size(freq)
 
         pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
-        omega = self.make_omega(ts, freqs)
+        omega = self.make_omega(ts, freq)
 
         Neffs = np.ndarray(shape=(nt, nf))
         a0 = np.ndarray(shape=(nt, nf))
@@ -1080,7 +1085,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_numba(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, params=["default", 4, 0, 1],
+    def kirchner_numba(self, ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, params=["default", 4, 0, 1],
                        gaussianize=False, standardize=True, nproc=1):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -1093,7 +1098,7 @@ class WaveletAnalysis(object):
             a time series
         ts : array
             time axis of the time series
-        freqs : array
+        freq : array
             vector of frequency
         tau : array
             the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -1142,11 +1147,11 @@ class WaveletAnalysis(object):
         self.assertPositiveInt(Neff)
         nt = np.size(tau)
         nts = np.size(ts)
-        nf = np.size(freqs)
+        nf = np.size(freq)
 
         pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
-        omega = self.make_omega(ts, freqs)
+        omega = self.make_omega(ts, freq)
 
         Neffs = np.ndarray(shape=(nt, nf))
         a0 = np.ndarray(shape=(nt, nf))
@@ -1219,7 +1224,7 @@ class WaveletAnalysis(object):
 
         return wwa, phase, Neffs, coeff
 
-    def kirchner_f2py(self, ys, ts, freqs, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, params=['default', 4, 0, 1],
+    def kirchner_f2py(self, ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, params=['default', 4, 0, 1],
                       gaussianize=False, standardize=True):
         ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -1232,7 +1237,7 @@ class WaveletAnalysis(object):
             a time series
         ts : array
             time axis of the time series
-        freqs : array
+        freq : array
             vector of frequency
         tau : array
             the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -1276,11 +1281,11 @@ class WaveletAnalysis(object):
 
         nt = np.size(tau)
         nts = np.size(ts)
-        nf = np.size(freqs)
+        nf = np.size(freq)
 
         pd_ys = self.preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
 
-        omega = self.make_omega(ts, freqs)
+        omega = self.make_omega(ts, freq)
 
         Neffs, a0, a1, a2 = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
 
@@ -1340,7 +1345,7 @@ class WaveletAnalysis(object):
 
         return coi
 
-    def make_omega(self, ts, freqs):
+    def make_omega(self, ts, freq):
         ''' Return the angular frequency based on the time axis and given frequency vector
 
         Args
@@ -1350,7 +1355,7 @@ class WaveletAnalysis(object):
             a time series
         ts : array
             time axis of the time series
-        freqs : array
+        freq : array
             vector of frequency
 
         Returns
@@ -1363,13 +1368,13 @@ class WaveletAnalysis(object):
         '''
         # for the frequency band larger than f_Nyquist, the wwa will be marked as NaNs
         f_Nyquist = 0.5 / np.median(np.diff(ts))
-        freqs_with_nan = np.copy(freqs)
-        freqs_with_nan[freqs > f_Nyquist] = np.nan
-        omega = 2*np.pi*freqs_with_nan
+        freq_with_nan = np.copy(freq)
+        freq_with_nan[freq > f_Nyquist] = np.nan
+        omega = 2*np.pi*freq_with_nan
 
         return omega
 
-    def wwa2psd(self, wwa, ts, Neffs, freqs=None, Neff=3, anti_alias=False, avgs=2):
+    def wwa2psd(self, wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
         """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
         Args
@@ -1381,7 +1386,7 @@ class WaveletAnalysis(object):
             the time points, should be pre-truncated so that the span is exactly what is used for wwz
         Neffs : array
             the matrix of effective number of points in the time-scale coordinates obtained from wwz from wwz
-        freqs : array
+        freq : array
             vector of frequency from wwz
         Neff : int
             the threshold of the number of effective samples
@@ -1417,13 +1422,13 @@ class WaveletAnalysis(object):
         # weighted psd calculation end
 
         if anti_alias:
-            assert freqs is not None, "freqs is required for alias filter!"
+            assert freq is not None, "freq is required for alias filter!"
             dt = np.median(np.diff(ts))
             f_sampling = 1/dt
             psd_copy = psd[1:]
-            freqs_copy = freqs[1:]
+            freq_copy = freq[1:]
             alpha, filtered_pwr, model_pwer, aliased_pwr = af.alias_filter(
-                freqs_copy, psd_copy, f_sampling, f_sampling*1e3, np.min(freqs), avgs)
+                freq_copy, psd_copy, f_sampling, f_sampling*1e3, np.min(freq), avgs)
 
             psd[1:] = np.copy(filtered_pwr)
 
@@ -1448,7 +1453,7 @@ class WaveletAnalysis(object):
         Returns
         -------
 
-        freqs : array
+        freq : array
             the frequency vector
 
         References
@@ -1467,9 +1472,9 @@ class WaveletAnalysis(object):
             df = flo
             nf = (fhi - flo) / df + 1
 
-        freqs = np.linspace(flo, fhi, nf)
+        freq = np.linspace(flo, fhi, nf)
 
-        return freqs
+        return freq
 
     def freq_vector_welch(self, ts):
         ''' Return the frequency vector based on the Welch's method.
@@ -1483,7 +1488,7 @@ class WaveletAnalysis(object):
         Returns
         -------
 
-        freqs : array
+        freq : array
             the frequency vector
 
         References
@@ -1496,13 +1501,13 @@ class WaveletAnalysis(object):
         dt = np.median(np.diff(ts))
         fs = 1 / dt
         if nt % 2 == 0:
-            n_freqs = nt//2 + 1
+            n_freq = nt//2 + 1
         else:
-            n_freqs = (nt+1) // 2
+            n_freq = (nt+1) // 2
 
-        freqs = np.arange(n_freqs) * fs / nt
+        freq = np.arange(n_freq) * fs / nt
 
-        return freqs
+        return freq
 
     def freq_vector_nfft(self, ts):
         ''' Return the frequency vector based on NFFT
@@ -1516,18 +1521,18 @@ class WaveletAnalysis(object):
         Returns
         -------
 
-        freqs : array
+        freq : array
             the frequency vector
 
         '''
         nt = np.size(ts)
         dt = np.median(np.diff(ts))
         fs = 1 / dt
-        n_freqs = nt//2 + 1
+        n_freq = nt//2 + 1
 
-        freqs = np.linspace(0, fs/2, n_freqs)
+        freq = np.linspace(0, fs/2, n_freq)
 
-        return freqs
+        return freq
 
     def make_freq_vector(self, ts, method = 'nfft', **kwargs):
         ''' Make frequency vector- Selector function.
@@ -1553,22 +1558,22 @@ class WaveletAnalysis(object):
         Returns
         -------
 
-        freqs : array
+        freq : array
             the frequency vector
 
         '''
 
         if method == 'Lomb-Scargle':
-            freqs = self.freq_vector_lomb_scargle(ts,**kwargs)
+            freq = self.freq_vector_lomb_scargle(ts,**kwargs)
         elif method == 'Welch':
-            freqs = self.freq_vector_welch(ts)
+            freq = self.freq_vector_welch(ts)
         else:
-            freqs = self.freq_vector_nfft(ts)
-        #  freqs = freqs[1:]  # discard the first element 0
+            freq = self.freq_vector_nfft(ts)
+        #  freq = freq[1:]  # discard the first element 0
 
-        return freqs
+        return freq
 
-    def beta_estimation(self, psd, freqs, fmin=None, fmax=None):
+    def beta_estimation(self, psd, freq, fmin=None, fmax=None):
         ''' Estimate the power slope of a 1/f^beta process.
 
         Args
@@ -1576,7 +1581,7 @@ class WaveletAnalysis(object):
 
         psd : array
             the power spectral density
-        freqs : array
+        freq : array
             the frequency vector
         fmin : float
             the min of frequency range for beta estimation
@@ -1597,33 +1602,33 @@ class WaveletAnalysis(object):
 
         '''
         # drop the PSD at frequency zero
-        if freqs[0] == 0:
+        if freq[0] == 0:
             psd = psd[1:]
-            freqs = freqs[1:]
+            freq = freq[1:]
 
         if fmin is None or fmin == 0:
-            fmin = np.min(freqs)
+            fmin = np.min(freq)
 
         if fmax is None:
-            fmax = np.max(freqs)
+            fmax = np.max(freq)
 
         Results = collections.namedtuple('Results', ['beta', 'f_binned', 'psd_binned', 'Y_reg', 'std_err'])
-        if np.max(freqs) < fmax or np.min(freqs) > fmin:
+        if np.max(freq) < fmax or np.min(freq) > fmin:
             print(fmin, fmax)
-            print(np.min(freqs), np.max(freqs))
+            print(np.min(freq), np.max(freq))
             print('WRONG')
             res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
             return res
 
         # frequency binning start
-        fminindx = np.where(freqs >= fmin)[0][0]
-        fmaxindx = np.where(freqs <= fmax)[0][-1]
+        fminindx = np.where(freq >= fmin)[0][0]
+        fmaxindx = np.where(freq <= fmax)[0][-1]
 
         if fminindx >= fmaxindx:
             res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
             return res
 
-        logf = np.log(freqs)
+        logf = np.log(freq)
         logf_step = logf[fminindx+1] - logf[fminindx]
         logf_start = logf[fminindx]
         logf_end = logf[fmaxindx]
@@ -1693,7 +1698,7 @@ class WaveletAnalysis(object):
 
         return H
 
-    def psd_ar(self, var_noise, freqs, ar_params, f_sampling):
+    def psd_ar(self, var_noise, freq, ar_params, f_sampling):
         ''' Return the theoretical power spectral density (PSD) of an autoregressive model
 
         Args
@@ -1701,7 +1706,7 @@ class WaveletAnalysis(object):
 
         var_noise : float
             the variance of the noise of the AR process
-        freqs : array
+        freq : array
             vector of frequency
         ar_params : array
             autoregressive coefficients, not including zero-lag
@@ -1717,9 +1722,9 @@ class WaveletAnalysis(object):
         '''
         p = np.size(ar_params)
 
-        tmp = np.ndarray(shape=(p, np.size(freqs)), dtype=complex)
+        tmp = np.ndarray(shape=(p, np.size(freq)), dtype=complex)
         for k in range(p):
-            tmp[k, :] = np.exp(-1j*2*np.pi*(k+1)*freqs/f_sampling)
+            tmp[k, :] = np.exp(-1j*2*np.pi*(k+1)*freq/f_sampling)
 
         psd = var_noise / np.absolute(1-np.sum(ar_params*tmp, axis=0))**2
 
@@ -1781,13 +1786,13 @@ class WaveletAnalysis(object):
 
         return xfBm
 
-    def psd_fBM(self, freqs, ts, H):
+    def psd_fBM(self, freq, ts, H):
         ''' Return the theoretical psd of a fBM
 
         Args
         ----
 
-        freqs : array
+        freq : array
             vector of frequency
         ts : array
             the time axis of the time series
@@ -1807,11 +1812,11 @@ class WaveletAnalysis(object):
             IEEE Transactions on Information Theory 35, 197–199 (1989).
 
         '''
-        nf = np.size(freqs)
+        nf = np.size(freq)
         psd = np.ndarray(shape=(nf))
         T = np.max(ts) - np.min(ts)
 
-        omega = 2 * np.pi * freqs
+        omega = 2 * np.pi * freq
 
         for k in range(nf):
             tmp = 2 * omega[k] * T
@@ -1861,7 +1866,7 @@ class WaveletAnalysis(object):
 
         return wwz_func
 
-    def prepare_wwz(self, ys, ts, freqs=None, tau=None, len_bd=0, bc_mode='reflect', reflect_type='odd', **kwargs):
+    def prepare_wwz(self, ys, ts, freq=None, tau=None, len_bd=0, bc_mode='reflect', reflect_type='odd', **kwargs):
         ''' Return the truncated time series with NaNs deleted and estimate frequency vector and tau
 
         Args
@@ -1871,7 +1876,7 @@ class WaveletAnalysis(object):
             a time series, NaNs will be deleted automatically
         ts : array
             the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
-        freqs : array
+        freq : array
             vector of frequency. If None, use the nfft method.If using Lomb-Scargle, additional parameters
             may be set. See make_freq_vector
         tau : array
@@ -1895,7 +1900,7 @@ class WaveletAnalysis(object):
             the truncated time series with NaNs deleted
         ts_cut : array
             the truncated time axis of the original time series with NaNs deleted
-        freqs : array
+        freq : array
             vector of frequency
         tau : array
             the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -1951,13 +1956,13 @@ class WaveletAnalysis(object):
         ts_cut = ts[(np.min(tau) <= ts) & (ts <= np.max(tau))]
         ys_cut = ys[(np.min(tau) <= ts) & (ts <= np.max(tau))]
 
-        if freqs is None:
-            freqs = self.make_freq_vector(ts_cut, method='nfft')
+        if freq is None:
+            freq = self.make_freq_vector(ts_cut, method='nfft')
 
-        # remove 0 in freqs vector
-        freqs = freqs[freqs != 0]
+        # remove 0 in freq vector
+        freq = freq[freq != 0]
 
-        return ys_cut, ts_cut, freqs, tau
+        return ys_cut, ts_cut, freq, tau
 
     def cross_wt(self, coeff1, coeff2):
         ''' Return the cross wavelet transform.
@@ -1969,7 +1974,7 @@ class WaveletAnalysis(object):
             the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
         coeff2 : array
             the second of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
-        freqs : array
+        freq : array
             vector of frequency
         tau : array'
             the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -1995,7 +2000,7 @@ class WaveletAnalysis(object):
 
         return xwt, xw_amplitude, xw_phase
 
-    def wavelet_coherence(self, coeff1, coeff2, freqs, tau, smooth_factor=0.25):
+    def wavelet_coherence(self, coeff1, coeff2, freq, tau, smooth_factor=0.25):
         ''' Return the cross wavelet coherence.
 
         Args
@@ -2005,7 +2010,7 @@ class WaveletAnalysis(object):
             the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
         coeff2 : array
             the second of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
-        freqs : array
+        freq : array
             vector of frequency
         tau : array'
             the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -2097,7 +2102,7 @@ s
         power1 = np.abs(coeff1)**2
         power2 = np.abs(coeff2)**2
 
-        scales = 1/freqs  # `scales` here is the `Period` axis in the wavelet plot
+        scales = 1/freq  # `scales` here is the `Period` axis in the wavelet plot
         dt = np.median(np.diff(tau))
         snorm = scales / dt  # normalized scales
 
@@ -2116,7 +2121,7 @@ s
 
         return xw_coherence, xw_phase
 
-    def reconstruct_ts(self, coeff, freqs, tau, t, len_bd=0):
+    def reconstruct_ts(self, coeff, freq, tau, t, len_bd=0):
         ''' Reconstruct the normalized time series from the wavelet coefficients.
 
         Args
@@ -2124,7 +2129,7 @@ s
 
         coeff : array
             the coefficients of the corresponding basis functions (a0, a1, a2)
-        freqs : array
+        freq : array
             vector of frequency of the basis functions
         tau : array
             the evenly-spaced time points of the basis functions
@@ -2141,8 +2146,8 @@ s
         t : array
             the evenly-spaced time points of the reconstructed time series
         '''
-        omega = 2*np.pi*freqs
-        nf = np.size(freqs)
+        omega = 2*np.pi*freq
+        nf = np.size(freq)
 
         dt = np.median(np.diff(t))
         if len_bd > 0:
@@ -3236,19 +3241,15 @@ class Decomposition(object):
         Returns
         -------
 
-        res_dict : dict
-            components : array of shape (num_components, num_features)
-                Principal axes in feature space, representing the directions of maximum variance in the data. The components are sorted by explained_variance_.
-            explained_variance : array of shape (num_components,)
-                The amount of variance explained by each of the selected components.
-                Equal to n_components largest eigenvalues of the covariance matrix of X.
-            explained_variance_ratio : array of shape (num_components,)
+        dict
+            Sklearn PCA object dictionary of all attributes and values. 
 
 
         '''
-
-        #TODO
-        return
+        if np.any(np.isnan(x)):
+            raise ValueError('matrix may not have null values.')
+        pca=PCA(n_components=n_components,copy=copy,whiten=whiten,svd_solver=svd_solver,tol=tol,iterated_power=iterated_power,random_state=random_state)
+        return pca.fit(x).__dict__
 
     def ssa(self, ys, ts, M, MC=1000, f=0.3, method='SSA', prep_args={}):
         '''
@@ -4572,7 +4573,7 @@ def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
     return red
 
 
-def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
+def wwz(ys, ts, tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
         nMC=200, nproc=8, detrend=False, params=['default', 4, 0, 1],\
         gaussianize=False, standardize=True, method='default', len_bd=0,\
         bc_mode='reflect', reflect_type='odd'):
@@ -4587,7 +4588,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
         the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
     tau : array
         the evenly-spaced time points
-    freqs : array
+    freq : array
         vector of frequency
     c : float
         the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
@@ -4633,7 +4634,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
         AR1 simulations
     coi : array
         cone of influence
-    freqs : array
+    freq : array
         vector of frequency
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -4646,17 +4647,17 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
     wa = WaveletAnalysis()
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
 
-    ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau,
+    ys_cut, ts_cut, freq, tau = wa.prepare_wwz(ys, ts, freq=freq, tau=tau,
                                                 len_bd=len_bd, bc_mode=bc_mode, reflect_type=reflect_type)
 
     wwz_func = wa.get_wwz_func(nproc, method)
-    wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc,
+    wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freq, tau, Neff=Neff, c=c, nproc=nproc,
                                         detrend=detrend, params=params,
                                         gaussianize=gaussianize, standardize=standardize)
 
     # Monte-Carlo simulations of AR1 process
     nt = np.size(tau)
-    nf = np.size(freqs)
+    nf = np.size(freq)
 
     wwa_red = np.ndarray(shape=(nMC, nt, nf))
     AR1_q = np.ndarray(shape=(nt, nf))
@@ -4667,7 +4668,7 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             #  r = wa.ar1_model(ts_cut, tauest)
             r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
-            wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc,
+            wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freq, tau, c=c, Neff=Neff, nproc=nproc,
                                                  detrend=detrend, params=params,
                                                  gaussianize=gaussianize, standardize=standardize)
 
@@ -4682,14 +4683,14 @@ def wwz(ys, ts, tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,\
     coi = wa.make_coi(tau, Neff=Neff_coi)
 
     Results = collections.namedtuple('Results', ['amplitude', 'phase', 'AR1_q', 'coi', 'freq', 'time', 'Neffs', 'coeff'])
-    res = Results(amplitude=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freq=freqs, time=tau, Neffs=Neffs, coeff=coeff)
+    res = Results(amplitude=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
 
     return res
 
-def lomb_scargle(ys, ts, freqs=None, detrend=False, gaussianize=False,standardize=True, params=['default', 4, 0, 1], args={"precenter" : False, "normalize" : False, "make_freq_method" : "nfft"}):
-    return SpectralAnalysis.lombs_cargle(ys, ts, freqs=freqs, detrend=detrend, gaussianize=gaussianize, standardize=standardize, params=params, args=args)
+def lomb_scargle(ys, ts, freq=None, detrend=False, gaussianize=False,standardize=True, params=['default', 4, 0, 1], args={"precenter" : False, "normalize" : False, "make_freq_method" : "nfft"}):
+    return SpectralAnalysis.lombs_cargle(ys, ts, freq=freq, detrend=detrend, gaussianize=gaussianize, standardize=standardize, params=params, args=args)
 
-def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
+def wwz_psd(ys, ts, freq=None, tau=None, c=1e-3, nproc=8, nMC=200,
             detrend=False, params=["default", 4, 0, 1], gaussianize=False,
             standardize=True, Neff=3, anti_alias=False, avgs=2,
             method='default'):
@@ -4702,7 +4703,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         a time series, NaNs will be deleted automatically
     ts : array
         the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
-    freqs : array
+    freq : array
         vector of frequency
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -4745,7 +4746,7 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
 
     psd : array
         power spectral density
-    freqs : array
+    freq : array
         vector of frequency
     psd_ar1_q95 : array
         the 95% quantile of the psds of AR1 processes
@@ -4754,21 +4755,21 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
 
     '''
     wa = WaveletAnalysis()
-    ys_cut, ts_cut, freqs, tau = wa.prepare_wwz(ys, ts, freqs=freqs, tau=tau)
+    ys_cut, ts_cut, freq, tau = wa.prepare_wwz(ys, ts, freq=freq, tau=tau)
 
     # get wwa but AR1_q is not needed here so set nMC=0
-    #  wwa, _, _, coi, freqs, _, Neffs, _ = wwz(ys_cut, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
-    res_wwz = wwz(ys_cut, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
+    #  wwa, _, _, coi, freq, _, Neffs, _ = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
+    res_wwz = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
               detrend=detrend, params=params,
               gaussianize=gaussianize, standardize=standardize, method=method)
 
-    psd = wa.wwa2psd(res_wwz.amplitude, ts_cut, res_wwz.Neffs, freqs=res_wwz.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+    psd = wa.wwa2psd(res_wwz.amplitude, ts_cut, res_wwz.Neffs, freq=res_wwz.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
     #  psd[1/freqs > np.max(coi)] = np.nan  # cut off the unreliable part out of the coi
     #  psd = psd[1/freqs <= np.max(coi)] # cut off the unreliable part out of the coi
     #  freqs = freqs[1/freqs <= np.max(coi)]
 
     # Monte-Carlo simulations of AR1 process
-    nf = np.size(freqs)
+    nf = np.size(freq)
 
     psd_ar1 = np.ndarray(shape=(nMC, nf))
 
@@ -4778,12 +4779,12 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             #  r = wa.ar1_model(ts_cut, tauest)
             r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
-            res_red = wwz(r, ts_cut, freqs=freqs, tau=tau, c=c, nproc=nproc, nMC=0,
+            res_red = wwz(r, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
                                                                      detrend=detrend, params=params,
                                                                      gaussianize=gaussianize, standardize=standardize,
                                                                      method=method)
             psd_ar1[i, :] = wa.wwa2psd(res_red.wwa, ts_cut, res_red.Neffs,
-                                       freqs=res_red.freqs, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+                                       freq=res_red.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
             #  psd_ar1[i, 1/freqs_red > np.max(coi_red)] = np.nan  # cut off the unreliable part out of the coi
             #  psd_ar1 = psd_ar1[1/freqs_red <= np.max(coi_red)] # cut off the unreliable part out of the coi
 
@@ -4793,13 +4794,13 @@ def wwz_psd(ys, ts, freqs=None, tau=None, c=1e-3, nproc=8, nMC=200,
         psd_ar1_q95 = None
 
     Results = collections.namedtuple('Results', ['psd', 'freq', 'psd_ar1_q95', 'psd_ar1'])
-    res = Results(psd=psd, freq=freqs, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
+    res = Results(psd=psd, freq=freq, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
 
     return res
 
 
 def xwt(ys1, ts1, ys2, ts2,
-        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nproc=8,
+        tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=6, nproc=8,
         detrend=False, params=['default', 4, 0, 1],
         gaussianize=False, standardize=True,
         method='default'):
@@ -4818,7 +4819,7 @@ def xwt(ys1, ts1, ys2, ts2,
         time axis of the second time series
     tau : array
         the evenly-spaced time points
-    freqs : array
+    freq : array
         vector of frequency
     c : float
         the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
@@ -4854,7 +4855,7 @@ def xwt(ys1, ts1, ys2, ts2,
         the cross wavelet amplitude
     xw_phase : array
         the cross wavelet phase
-    freqs : array
+    freq : array
         vector of frequency
     tau : array
         the evenly-spaced time points
@@ -4868,12 +4869,12 @@ def xwt(ys1, ts1, ys2, ts2,
 
     wwz_func = wa.get_wwz_func(nproc, method)
 
-    ys1_cut, ts1_cut, freqs, tau = wa.prepare_wwz(ys1, ts1, freqs=freqs, tau=tau)
-    ys2_cut, ts2_cut, freqs, tau = wa.prepare_wwz(ys2, ts2, freqs=freqs, tau=tau)
+    ys1_cut, ts1_cut, freq, tau = wa.prepare_wwz(ys1, ts1, freq=freq, tau=tau)
+    ys2_cut, ts2_cut, freq, tau = wa.prepare_wwz(ys2, ts2, freq=freq, tau=tau)
 
-    _, _, _, coeff1 = wwz_func(ys1_cut, ts1_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
+    _, _, _, coeff1 = wwz_func(ys1_cut, ts1_cut, freq, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
                                params=params, gaussianize=gaussianize, standardize=standardize)
-    _, _, _, coeff2 = wwz_func(ys2_cut, ts2_cut, freqs, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
+    _, _, _, coeff2 = wwz_func(ys2_cut, ts2_cut, freq, tau, Neff=Neff, c=c, nproc=nproc, detrend=detrend,
                                params=params, gaussianize=gaussianize, standardize=standardize)
 
     tauest1 = wa.tau_estimation(ys1_cut, ts1_cut, detrend=detrend, params=params,
@@ -4885,22 +4886,22 @@ def xwt(ys1, ts1, ys2, ts2,
     #  r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
     #  r2 = ar1_sim(ys2_cut, np.size(ts2_cut), 1, ts=ts2_cut)
 
-    #  wwa_red1, _, Neffs_red1, _ = wwz_func(r1, ts1_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend,
+    #  wwa_red1, _, Neffs_red1, _ = wwz_func(r1, ts1_cut, freq, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend,
     #                                        gaussianize=gaussianize, standardize=standardize)
-    #  wwa_red2, _, Neffs_red2, _ = wwz_func(r2, ts2_cut, freqs, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend,
+    #  wwa_red2, _, Neffs_red2, _ = wwz_func(r2, ts2_cut, freq, tau, c=c, Neff=Neff, nproc=nproc, detrend=detrend,
     #                                        gaussianize=gaussianize, standardize=standardize)
-    #  psd1_ar1 = wa.wwa2psd(wwa_red1, ts1_cut, Neffs_red1, freqs=freqs, Neff=Neff, anti_alias=False, avgs=1)
-    #  psd2_ar1 = wa.wwa2psd(wwa_red2, ts2_cut, Neffs_red2, freqs=freqs, Neff=Neff, anti_alias=False, avgs=1)
+    #  psd1_ar1 = wa.wwa2psd(wwa_red1, ts1_cut, Neffs_red1, freq=freq, Neff=Neff, anti_alias=False, avgs=1)
+    #  psd2_ar1 = wa.wwa2psd(wwa_red2, ts2_cut, Neffs_red2, freq=freq, Neff=Neff, anti_alias=False, avgs=1)
     dt1 = np.median(np.diff(ts1))
     dt2 = np.median(np.diff(ts2))
     f_sampling_1 = 1/dt1
     f_sampling_2 = 1/dt2
-    psd1_ar1 = wa.psd_ar(np.var(r1), freqs, tauest1, f_sampling_1)
-    psd2_ar1 = wa.psd_ar(np.var(r2), freqs, tauest2, f_sampling_2)
+    psd1_ar1 = wa.psd_ar(np.var(r1), freq, tauest1, f_sampling_1)
+    psd2_ar1 = wa.psd_ar(np.var(r2), freq, tauest2, f_sampling_2)
 
     wt_coeff1 = coeff1[1] + coeff1[2]*1j
     wt_coeff2 = coeff2[1] + coeff2[2]*1j
-    xwt, xw_amplitude, xw_phase = wa.cross_wt(wt_coeff1, wt_coeff2, freqs, tau)
+    xwt, xw_amplitude, xw_phase = wa.cross_wt(wt_coeff1, wt_coeff2, freq, tau)
 
     sigma_1 = np.std(ys1_cut)
     sigma_2 = np.std(ys2_cut)
@@ -4911,11 +4912,11 @@ def xwt(ys1, ts1, ys2, ts2,
 
     coi = wa.make_coi(tau, Neff=Neff_coi)
 
-    return xwt, xw_amplitude, xw_phase, freqs, tau, AR1_q, coi
+    return xwt, xw_amplitude, xw_phase, freq, tau, AR1_q, coi
 
 
 def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
-        tau=None, freqs=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False,
+        tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False,
         nMC=200, params=['default', 4, 0, 1],
         gaussianize=False, standardize=True, method='default'):
     ''' Return the cross-wavelet coherence of two time series.
@@ -4933,7 +4934,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         time axis of the second time series
     tau : array
         the evenly-spaced time points
-    freqs : array
+    freq : array
         vector of frequency
     c : float
         the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
@@ -4985,17 +4986,17 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau = np.linspace(lb, ub, np.size(inside)//10)
         print(f'Setting tau={tau[:3]}...{tau[-3:]}, ntau={np.size(tau)}')
 
-    if freqs is None:
+    if freq is None:
         s0 = 2*np.median(np.diff(ts1))
         nv = 12
         a0 = 2**(1/nv)
         noct = np.floor(np.log2(np.size(ts1)))-1
         scale = s0*a0**(np.arange(noct*nv+1))
-        freqs = 1/scale[::-1]
-        print(f'Setting freqs={freqs[:3]}...{freqs[-3:]}, nfreqs={np.size(freqs)}')
+        freq = 1/scale[::-1]
+        print(f'Setting freq={freq[:3]}...{freq[-3:]}, nfreq={np.size(freq)}')
 
-    ys1_cut, ts1_cut, freqs1, tau1 = wa.prepare_wwz(ys1, ts1, freqs=freqs, tau=tau)
-    ys2_cut, ts2_cut, freqs2, tau2 = wa.prepare_wwz(ys2, ts2, freqs=freqs, tau=tau)
+    ys1_cut, ts1_cut, freq1, tau1 = wa.prepare_wwz(ys1, ts1, freq=freq, tau=tau)
+    ys2_cut, ts2_cut, freq2, tau2 = wa.prepare_wwz(ys2, ts2, freq=freq, tau=tau)
 
     if np.any(tau1 != tau2):
         print('inconsistent `tau`, recalculating...')
@@ -5006,34 +5007,34 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     else:
         tau = tau1
 
-    if np.any(freqs1 != freqs2):
-        print('inconsistent `freqs`, recalculating...')
-        freqs_min = np.min([np.min(freqs1), np.min(freqs2)])
-        freqs_max = np.max([np.max(freqs1), np.max(freqs2)])
-        nfreqs = np.max([np.size(freqs1), np.size(freqs2)])
-        freqs = np.linspace(freqs_min, freqs_max, nfreqs)
+    if np.any(freq1 != freq2):
+        print('inconsistent `freq`, recalculating...')
+        freq_min = np.min([np.min(freq1), np.min(freq2)])
+        freq_max = np.max([np.max(freq1), np.max(freq2)])
+        nfreq = np.max([np.size(freq1), np.size(freq2)])
+        freq = np.linspace(freq_min, freq_max, nfreq)
     else:
-        freqs = freqs1
+        freq = freq1
 
-    if freqs[0] == 0:
-        freqs = freqs[1:] # delete 0 frequency if present
+    if freq[0] == 0:
+        freq = freq[1:] # delete 0 frequency if present
 
-    res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
+    res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
                    nproc=nproc, detrend=detrend, params=params,
                    gaussianize=gaussianize, standardize=standardize, method=method)
-    res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0,
+    res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
                    nproc=nproc, detrend=detrend, params=params,
                    gaussianize=gaussianize, standardize=standardize, method=method)
 
     wt_coeff1 = res_wwz1.coeff[1] - res_wwz1.coeff[2]*1j
     wt_coeff2 = res_wwz2.coeff[1] - res_wwz2.coeff[2]*1j
 
-    xw_coherence, xw_phase = wa.wavelet_coherence(wt_coeff1, wt_coeff2, freqs, tau, smooth_factor=smooth_factor)
+    xw_coherence, xw_phase = wa.wavelet_coherence(wt_coeff1, wt_coeff2, freq, tau, smooth_factor=smooth_factor)
     xwt, xw_amplitude, _ = wa.cross_wt(wt_coeff1, wt_coeff2)
 
     # Monte-Carlo simulations of AR1 process
     nt = np.size(tau)
-    nf = np.size(freqs)
+    nf = np.size(freq)
 
     coherence_red = np.ndarray(shape=(nMC, nt, nf))
     AR1_q = np.ndarray(shape=(nt, nf))
@@ -5043,16 +5044,16 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
             r2 = ar1_sim(ys2_cut, np.size(ts2_cut), 1, ts=ts2_cut)
-            res_wwz_r1 = wwz(r1, ts1_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
+            res_wwz_r1 = wwz(r1, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
                                                      detrend=detrend, params=params,
                                                      gaussianize=gaussianize, standardize=standardize)
-            res_wwz_r2 = wwz(r2, ts2_cut, tau=tau, freqs=freqs, c=c, Neff=Neff, nMC=0, nproc=nproc,
+            res_wwz_r2 = wwz(r2, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
                                                      detrend=detrend, params=params,
                                                      gaussianize=gaussianize, standardize=standardize)
 
             wt_coeffr1 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
             wt_coeffr2 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
-            coherence_red[i, :, :], phase_red = wa.wavelet_coherence(wt_coeffr1, wt_coeffr2, freqs, tau, smooth_factor=smooth_factor)
+            coherence_red[i, :, :], phase_red = wa.wavelet_coherence(wt_coeffr1, wt_coeffr2, freq, tau, smooth_factor=smooth_factor)
 
         for j in range(nt):
             for k in range(nf):
@@ -5064,12 +5065,12 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     coi = wa.make_coi(tau, Neff=Neff)
     Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xwt', 'freq', 'time', 'AR1_q', 'coi'])
     res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase, xwt=xwt,
-                  freq=freqs, time=tau, AR1_q=AR1_q, coi=coi)
+                  freq=freq, time=tau, AR1_q=AR1_q, coi=coi)
 
     return res
 
 
-def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
+def plot_wwa(wwa, freq, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
              yticks=None, yticks_label=None, ylim=None, xticks=None, xlabels=None,
              figsize=[20, 8], clr_map='OrRd',cbar_drawedges=False, cone_alpha=0.5,
              plot_signif=False, signif_style='contour', title=None, font_scale=1.5,
@@ -5083,7 +5084,7 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
 
     wwa : array
         the weighted wavelet amplitude.
-    freqs : array
+    freq : array
         vector of frequency
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -5159,9 +5160,9 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
     origin = 'lower'
 
     if levels is not None:
-        plt.contourf(tau, 1/freqs, wwa.T, levels, cmap=clr_map, origin=origin)
+        plt.contourf(tau, 1/freq, wwa.T, levels, cmap=clr_map, origin=origin)
     else:
-        plt.contourf(tau, 1/freqs, wwa.T, cmap=clr_map, origin=origin)
+        plt.contourf(tau, 1/freq, wwa.T, cmap=clr_map, origin=origin)
 
     if plot_cbar:
         cb = plt.colorbar(drawedges=cbar_drawedges, orientation=cbar_orientation, fraction=cbar_frac, pad=cbar_pad,
@@ -5207,9 +5208,9 @@ def plot_wwa(wwa, freqs, tau, AR1_q=None, coi=None, levels=None, tick_range=None
         assert AR1_q is not None, "Please set values for `AR1_q`!"
         signif = wwa / AR1_q
         if signif_style == 'contour':
-            plt.contour(tau, 1/freqs, signif.T, [-99, 1], colors='k')
+            plt.contour(tau, 1/freq, signif.T, [-99, 1], colors='k')
         elif signif_style == 'shade':
-            plt.contourf(tau, 1/freqs, signif.T, [-99, 1], colors='k', alpha=0.1)  # significant if not shaded
+            plt.contourf(tau, 1/freq, signif.T, [-99, 1], colors='k', alpha=0.1)  # significant if not shaded
 
     if plot_cone:
         assert coi is not None, "Please set values for `coi`!"
@@ -5306,7 +5307,7 @@ def plot_coherence(res_xwc, pt=0.5,
     """
     xw_coherence = res_xwc.xw_coherence
     xw_phase = res_xwc.xw_phase
-    freqs = res_xwc.freqs
+    freq = res_xwc.freq
     tau = res_xwc.tau
     AR1_q = res_xwc.AR1_q
     coi = res_xwc.coi
@@ -5321,7 +5322,7 @@ def plot_coherence(res_xwc, pt=0.5,
 
     origin = 'lower'
 
-    plt.contourf(tau, 1/freqs, xw_coherence.T, levels, cmap=clr_map, origin=origin)
+    plt.contourf(tau, 1/freq, xw_coherence.T, levels, cmap=clr_map, origin=origin)
 
     cb = plt.colorbar(drawedges=cbar_drawedges, orientation=cbar_orientation, fraction=cbar_frac, pad=cbar_pad,
                       ticks=tick_range)
@@ -5352,9 +5353,9 @@ def plot_coherence(res_xwc, pt=0.5,
         assert AR1_q is not None, "Set values for `AR1_q`!"
         signif = xw_coherence / AR1_q
         if signif_style == 'contour':
-            plt.contour(tau, 1/freqs, signif.T, [-99, 1], colors='k')
+            plt.contour(tau, 1/freq, signif.T, [-99, 1], colors='k')
         elif signif_style == 'shade':
-            plt.contourf(tau, 1/freqs, signif.T, [-99, 1], colors='k', alpha=0.1)  # significant if not shaded
+            plt.contourf(tau, 1/freq, signif.T, [-99, 1], colors='k', alpha=0.1)  # significant if not shaded
 
     if plot_cone:
         assert coi is not None, "Please set values for `coi`!"
@@ -5370,7 +5371,7 @@ def plot_coherence(res_xwc, pt=0.5,
     phase = np.copy(xw_phase)
     phase[xw_coherence < pt] = np.nan
 
-    X, Y = np.meshgrid(tau, 1/freqs)
+    X, Y = np.meshgrid(tau, 1/freq)
     U, V = np.cos(phase).T, np.sin(phase).T
 
     ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
@@ -5410,7 +5411,7 @@ def plot_wwadist(wwa, ylim=None, font_scale=1.5):
     return fig
 
 
-def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
+def plot_psd(psd, freq, lmstyle='-', linewidth=None,
              color=sns.xkcd_rgb["denim blue"], ar1_lmstyle='-',
              ar1_linewidth=None, period_ticks=None, period_tickslabel=None,
              psd_lim=None, period_lim=None, alpha=1,
@@ -5427,7 +5428,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
 
     psd : array
         power spectral density
-    freqs : array
+    freq : array
         vector of frequency
     period_ticks : list
         ticks for period
@@ -5527,13 +5528,13 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
 
     if vertical:
         x_data = psd
-        y_data = 1 / freqs
+        y_data = 1 / freq
         x_data_ar1 = psd_ar1_q95
-        y_data_ar1 = 1 / freqs
+        y_data_ar1 = 1 / freq
     else:
-        x_data = 1 / freqs
+        x_data = 1 / freq
         y_data = psd
-        x_data_ar1 = 1 / freqs
+        x_data_ar1 = 1 / freq
         y_data_ar1 = psd_ar1_q95
 
     if zorder is not None:
@@ -5600,7 +5601,7 @@ def plot_psd(psd, freqs, lmstyle='-', linewidth=None,
     return ax
 
 
-def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
+def plot_summary(ys, ts, freq=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
                  nMC=200, nproc=1, detrend=False, params=["default", 4, 0, 1],
                  gaussianize=False, standardize=True, levels=None, method='default',
                  anti_alias=False, period_ticks=None, ts_color=None, ts_style='-o',
@@ -5617,7 +5618,7 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
         a time series
     ts : array
         time axis of the time series
-    freqs : array
+    freq : array
         vector of frequency
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -5718,8 +5719,8 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
     # plot wwa
     ax2 = plt.subplot(gs[1:5, :-3])
 
-    #  wwa, phase, AR1_q, coi, freqs, tau, Neffs, coeff = \
-    res_wwz = wwz(ys, ts, freqs=freqs, tau=tau, c=c1, nMC=nMC, nproc=nproc, detrend=detrend, method=method,
+    #  wwa, phase, AR1_q, coi, freq, tau, Neffs, coeff = \
+    res_wwz = wwz(ys, ts, freq=freq, tau=tau, c=c1, nMC=nMC, nproc=nproc, detrend=detrend, method=method,
                   gaussianize=gaussianize, standardize=standardize)
 
     if wwa_xlabel is not None and wwa_ylabel is not None:
@@ -5739,21 +5740,21 @@ def plot_summary(ys, ts, freqs=None, tau=None, c1=1/(8*np.pi**2), c2=1e-3,
 
     # plot psd
     ax3 = plt.subplot(gs[1:4, 9:])
-    res_psd = wwz_psd(ys, ts, freqs=None, tau=tau, c=c2, nproc=nproc, nMC=nMC, method=method,
+    res_psd = wwz_psd(ys, ts, freq=None, tau=tau, c=c2, nproc=nproc, nMC=nMC, method=method,
                       detrend=detrend, gaussianize=gaussianize, standardize=standardize,
                       anti_alias=anti_alias)
 
     # TODO: deal with period_ticks
-    plot_psd(res_psd.psd, res_psd.freqs, plot_ar1=True, psd_ar1_q95=res_psd.psd_ar1_q95,
+    plot_psd(res_psd.psd, res_psd.freq, plot_ar1=True, psd_ar1_q95=res_psd.psd_ar1_q95,
              period_ticks=period_ticks[period_ticks < np.max(res_wwz.coi)],
              period_lim=[np.min(period_ticks), np.max(res_wwz.coi)], psd_lim=psd_lim,
              lmstyle=psd_lmstyle, ax=ax3, period_label='', label='Estimated spectrum', vertical=True)
 
     if period_S is not None:
-        res_beta1 = beta_estimation(res_psd.psd, res_psd.freqs, period_S[0], period_S[1])
+        res_beta1 = beta_estimation(res_psd.psd, res_psd.freq, period_S[0], period_S[1])
 
         if period_L is not None:
-            res_beta2 = beta_estimation(res_psd.psd, res_psd.freqs, period_L[0], period_L[1])
+            res_beta2 = beta_estimation(res_psd.psd, res_psd.freq, period_L[0], period_L[1])
             ax3.plot(res_beta1.Y_reg, 1/res_beta1.f_binned, color='k',
                     label=r'$\{}$ = {:.2f}$\pm${:.2f}'.format(period_S_str, res_beta1.beta, res_beta1.std_err) + ', ' + r'$\{}$ = {:.2f}$\pm${:.2f}'.format(period_L_str, res_beta2.beta, res_beta2.std_err))
             ax3.plot(res_beta2.Y_reg, 1/res_beta2.f_binned, color='k')
@@ -5830,7 +5831,7 @@ def calc_plot_psd(ys, ts, ntau=501, dcon=1e-3, standardize=False,
         the summary plot
     psd : array
         the spectral density
-    freqs : array
+    freq : array
         the frequency vector
 
     """
@@ -5838,12 +5839,12 @@ def calc_plot_psd(ys, ts, ntau=501, dcon=1e-3, standardize=False,
         color = sns.xkcd_rgb['denim blue']
 
     tau = np.linspace(np.min(ts), np.max(ts), ntau)
-    res_psd = wwz_psd(ys, ts, freqs=None, tau=tau, c=dcon, standardize=standardize, nMC=0,
+    res_psd = wwz_psd(ys, ts, freq=None, tau=tau, c=dcon, standardize=standardize, nMC=0,
                       method=method, anti_alias=anti_alias, nproc=nproc)
     if plot_fig:
         sns.set(style='ticks', font_scale=font_scale)
         fig, ax = plt.subplots(figsize=figsize)
-        ax.loglog(1/res_psd.freqs, res_psd.psd, lw=lw, color=color, label=label,
+        ax.loglog(1/res_psd.freq, res_psd.psd, lw=lw, color=color, label=label,
                   zorder=zorder)
         ax.set_xticks(period_ticks)
         ax.get_xaxis().set_major_formatter(ScalarFormatter())
@@ -5859,9 +5860,9 @@ def calc_plot_psd(ys, ts, ntau=501, dcon=1e-3, standardize=False,
         if xlim:
             ax.set_xlim(xlim)
         ax.legend(bbox_to_anchor=bbox_to_anchor, loc=loc, frameon=False)
-        return fig, res_psd.psd, res_psd.freqs
+        return fig, res_psd.psd, res_psd.freq
     else:
-        return res_psd.psd, res_psd.freqs
+        return res_psd.psd, res_psd.freq
 
 
 # some alias
@@ -5893,7 +5894,7 @@ def spectral(ys, ts, method='mtm', nMC=0, qs=0.95, kwargs={}):
 
     res_dict : dict
         the result dictionary, including
-        - freqs (array): the frequency vector
+        - freq (array): the frequency vector
         - psd (array): the spectral density vector
         - psd_ar1_q95 (array): the spectral density vector
 
@@ -5912,7 +5913,7 @@ def spectral(ys, ts, method='mtm', nMC=0, qs=0.95, kwargs={}):
 
     # significance test with AR(1)
     if nMC >= 1:
-        nf = np.size(res_dict['freqs'])
+        nf = np.size(res_dict['freq'])
         psd_ar1 = np.ndarray(shape=(nMC, nf))
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             ar1_noise = ar1_sim(ys, np.size(ts), 1, ts=ts)

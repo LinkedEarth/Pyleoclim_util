@@ -10,9 +10,11 @@ Mapping functions.
 """
 import random
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
+import pathlib
 
 def setProj(projection='Robinson', proj_default = True): 
     """ Set the projection for Cartopy.
@@ -626,14 +628,6 @@ def plot_hist(y, bins = None, hist = True, label = "", \
             
     return ax 
                 
-                           
-                       
-
-                         
-                                     
-            
-            
-            
 def getMetadata(timeseries):
     
     """ Get the necessary metadata to be printed out automatically
@@ -936,3 +930,186 @@ def agemodelData(timeseries):
     archiveType = LipdUtils.LipdToOntology(timeseries["archiveType"])
 
     return depth, age, depth_label, age_label, archiveType
+
+
+# utilities
+def in_notebook():
+    ''' Check if the code is executed in a Jupyter notebook
+    '''
+    try:
+        from IPython import get_ipython
+        if 'IPKernelApp' not in get_ipython().config:  # pragma: no cover
+            return False
+    except ImportError:
+        return False
+    return True
+
+def showfig(fig):
+    if in_notebook:
+        try:
+            from IPython.display import display
+        except ImportError:
+            pass
+
+        plt.close()
+        display(fig)
+
+    else:
+        plt.show()
+
+def savefig(fig, settings={}, verbose=True):
+    ''' Save a figure to a path
+
+    Args
+    ----
+
+    fig : figure
+        the figure to save
+    settings : dict
+        the dictionary of arguments for plt.savefig(); some notes below:
+        - "path" must be specified; it can be any existed or non-existed path,
+          with or without a suffix; if the suffix is not given in "path", it will follow "format"
+        - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+    '''
+    if 'path' not in settings:
+        raise ValueError('"path" must be specified in `settings`!')
+
+    savefig_args = {'bbox_inches': 'tight'}
+    savefig_args.update(settings)
+
+    path = pathlib.Path(savefig_args['path'])
+    savefig_args.pop('path')
+
+    dirpath = path.parent
+    if not dirpath.exists():
+        dirpath.mkdir(parents=True, exist_ok=True)
+        if verbose:
+            print(f'Directory created at: "{dirpath}"')
+
+    path_str = str(path)
+    if path.suffix not in ['.eps', '.pdf', '.png', '.ps']:
+        path = pathlib.Path(f'{path_str}.pdf')
+
+    fig.savefig(path_str, **savefig_args)
+    plt.close()
+
+    if verbose:
+        print(f'Figure saved at: "{str(path)}"')
+
+def set_style(style='default', font_scale=1):
+    ''' Modify the visualization style; inspired by [Seaborn](https://github.com/mwaskom/seaborn)
+    '''
+    mpl.rcParams.update(mpl.rcParamsDefault)
+
+    font_dict = {
+        'font.size': 12,
+        'axes.labelsize': 12,
+        'axes.titlesize': 12,
+        'xtick.labelsize': 11,
+        'ytick.labelsize': 11,
+        'legend.fontsize': 11,
+    }
+
+    style_dict = {}
+    if 'journal' in style:
+        style_dict.update({
+            'axes.axisbelow': True,
+            'axes.facecolor': 'white',
+            'axes.edgecolor': 'black',
+            'axes.grid': True,
+            'grid.color': 'lightgrey',
+            'grid.linestyle': '--',
+            'xtick.direction': 'out',
+            'ytick.direction': 'out',
+            'font.sans-serif': ['Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', 'sans-serif'],
+
+            'axes.spines.left': True,
+            'axes.spines.bottom': True,
+            'axes.spines.right': False,
+            'axes.spines.top': False,
+
+            'legend.frameon': False,
+
+            'axes.linewidth': 1,
+            'grid.linewidth': 1,
+            'lines.linewidth': 2,
+            'lines.markersize': 6,
+            'patch.linewidth': 1,
+
+            'xtick.major.width': 1.25,
+            'ytick.major.width': 1.25,
+            'xtick.minor.width': 0,
+            'ytick.minor.width': 0,
+        })
+    elif 'web' in style:
+        style_dict.update({
+            'figure.facecolor': 'white',
+
+            'axes.axisbelow': True,
+            'axes.facecolor': 'whitesmoke',
+            'axes.edgecolor': 'lightgrey',
+            'axes.grid': True,
+            'grid.color': 'white',
+            'grid.linestyle': '-',
+            'xtick.direction': 'out',
+            'ytick.direction': 'out',
+
+            'text.color': 'grey',
+            'axes.labelcolor': 'grey',
+            'xtick.color': 'grey',
+            'ytick.color': 'grey',
+
+            'font.sans-serif': ['Arial', 'DejaVu Sans', 'Liberation Sans', 'Bitstream Vera Sans', 'sans-serif'],
+
+            'axes.spines.left': False,
+            'axes.spines.bottom': False,
+            'axes.spines.right': False,
+            'axes.spines.top': False,
+
+            'legend.frameon': False,
+
+            'axes.linewidth': 1,
+            'grid.linewidth': 1,
+            'lines.linewidth': 2,
+            'lines.markersize': 6,
+            'patch.linewidth': 1,
+
+            'xtick.major.width': 1.25,
+            'ytick.major.width': 1.25,
+            'xtick.minor.width': 0,
+            'ytick.minor.width': 0,
+        })
+    elif 'default' in style:
+        mpl.rcParams.update(mpl.rcParamsDefault)
+
+    if '_spines' in style:
+        style_dict.update({
+            'axes.spines.left': True,
+            'axes.spines.bottom': True,
+            'axes.spines.right': True,
+            'axes.spines.top': True,
+        })
+    elif '_nospines' in style:
+        style_dict.update({
+            'axes.spines.left': False,
+            'axes.spines.bottom': False,
+            'axes.spines.right': False,
+            'axes.spines.top': False,
+        })
+
+    if '_grid' in style:
+        style_dict.update({
+            'axes.grid': True,
+        })
+    elif '_nogrid' in style:
+        style_dict.update({
+            'axes.grid': False,
+        })
+
+    # modify font size based on font scale
+    font_dict.update({k: v*font_scale for k, v in font_dict.items()})
+
+    for d in [style_dict, font_dict]:
+        mpl.rcParams.update(d)
+

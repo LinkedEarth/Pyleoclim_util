@@ -59,7 +59,7 @@ setup(
         "tqdm>=4.33.0",
         "tftb",
         "pyhht",
-        "spectrum",
+        "wget",
         "numba",
         "nitime",
     ],
