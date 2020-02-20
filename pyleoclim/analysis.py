@@ -108,8 +108,8 @@ class SpectralAnalysis(object):
         # if data is not evenly spaced, interpolate
         if not wa.is_evenly_spaced(ts):
             interp_func = {
-                'interp': interp,
-                'bin': binvalues,
+                'interp': Timeseries.interp,
+                'bin': Timeseries.binvalues,
             }
             ts, ys = interp_func[interp_method](ts, ys, **interp_args)
 
