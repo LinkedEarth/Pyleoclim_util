@@ -40,7 +40,7 @@ import numba as nb
 from numba.errors import NumbaPerformanceWarning
 
 from sklearn import preprocessing
-
+from sklearn.decomposition import PCA
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
 '''
@@ -3241,19 +3241,15 @@ class Decomposition(object):
         Returns
         -------
 
-        res_dict : dict
-            components : array of shape (num_components, num_features)
-                Principal axes in feature space, representing the directions of maximum variance in the data. The components are sorted by explained_variance_.
-            explained_variance : array of shape (num_components,)
-                The amount of variance explained by each of the selected components.
-                Equal to n_components largest eigenvalues of the covariance matrix of X.
-            explained_variance_ratio : array of shape (num_components,)
+        dict
+            Sklearn PCA object dictionary of all attributes and values. 
 
 
         '''
-
-        #TODO
-        return
+        if np.any(np.isnan(x)):
+            raise ValueError('matrix may not have null values.')
+        pca=PCA(n_components=n_components,copy=copy,whiten=whiten,svd_solver=svd_solver,tol=tol,iterated_power=iterated_power,random_state=random_state)
+        return pca.fit(x).__dict__
 
     def ssa(self, ys, ts, M, MC=1000, f=0.3, method='SSA', prep_args={}):
         '''
