@@ -577,11 +577,6 @@ class Lipd:
     def __init__(self, lipd_list):
         self.lipd_list = lipd_list
 
-    #def mapallarchive(self,markersize = 50, projection = 'Robinson',\
-                  #proj_default = True, background = True,borders = False,\
-                  #rivers = False, lakes = False, figsize = [10,4],\
-                  #saveFig = False, dir=None, format='eps'):
-
 class LipdSeries:
     def __init__(self, ts):
         self.ts = ts
@@ -598,7 +593,7 @@ class LipdSeries:
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
                 'other':['k','o']}
-    
+
     def mapone(self, projection='Orthographic', proj_default=True,
                background=True, label='default', borders=False,
                rivers=False, lakes=False, markersize=50, marker="default",

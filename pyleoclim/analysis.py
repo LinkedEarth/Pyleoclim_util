@@ -2050,19 +2050,19 @@ class WaveletAnalysis(object):
 
             return rect
 
-        def Smoothing(coeff, snorm, dj, smooth_factor=smooth_factor):
+        def smoothing(coeff, snorm, dj, smooth_factor=smooth_factor):
             """ Soothing function adapted from https://github.com/regeirk/pycwt/blob/master/pycwt/helpers.py
 
             Args
             ----
 
             coeff : array
-                the wavelet coefficients get from wavlet transform **in the form of a1 + a2*1j**
+                the wavelet coefficients get from wavelet transform **in the form of a1 + a2*1j**
             snorm : array
                 normalized scales
             dj : float
                 it satisfies the equation [ Sj = S0 * 2**(j*dj) ]
-s
+
             Returns
             -------
 
@@ -2944,8 +2944,8 @@ class Causality(object):
         -------
 
         dict
-            All test results, dictionary keys are the number of lags. For each lag the values are a tuple, with the first element a dictionary with test statistic, 
-            pvalues, degrees of freedom, the second element are the OLS estimation results for the restricted model, the unrestricted model and the restriction (contrast) 
+            All test results, dictionary keys are the number of lags. For each lag the values are a tuple, with the first element a dictionary with test statistic,
+            pvalues, degrees of freedom, the second element are the OLS estimation results for the restricted model, the unrestricted model and the restriction (contrast)
             matrix for the parameter f_test.
         '''
 
@@ -3234,15 +3234,15 @@ class Decomposition(object):
             Number of iterations for the power method computed by svd_solver == ‘randomized’.
         random_state : int, RandomState instance, or None, optional
             [default: None]
-            If int, random_state is the seed used by the random number generator; If RandomState instance, random_state is the random number generator; 
-            If None, the random number generator is the RandomState instance used by np.random. 
+            If int, random_state is the seed used by the random number generator; If RandomState instance, random_state is the random number generator;
+            If None, the random number generator is the RandomState instance used by np.random.
             Used when svd_solver == ‘arpack’ or ‘randomized’.
 
         Returns
         -------
 
         dict
-            Sklearn PCA object dictionary of all attributes and values. 
+            Sklearn PCA object dictionary of all attributes and values.
 
 
         '''
@@ -3817,10 +3817,10 @@ class Timeseries:
 
     def binvalues(x, y, bin_size=None, start=None, end=None):
         """ Bin the values
-    
+
         Args
         ----
-    
+
         x : array
             The x-axis series.
         y : array
@@ -3831,10 +3831,10 @@ class Timeseries:
             Where/when to start binning. Default is the minimum
         end : float
             When/where to stop binning. Defulat is the maximum
-    
+
         Returns
         -------
-    
+
         binned_values : array
             The binned values
         bins : array
@@ -3843,26 +3843,26 @@ class Timeseries:
             number of data points in each bin
         error : array
             the standard error on the mean in each bin
-    
+
         """
-    
+
         # Make sure x and y are numpy arrays
         x = np.array(x, dtype='float64')
         y = np.array(y, dtype='float64')
-    
+
         # Get the bin_size if not available
         if bin_size is None:
             bin_size = np.nanmean(np.diff(x))
-    
+
         # Get the start/end if not given
         if start is None:
             start = np.nanmin(x)
         if end is None:
             end = np.nanmax(x)
-    
+
         # Set the bin medians
         bins = np.arange(start+bin_size/2, end + bin_size/2, bin_size)
-    
+
         # Perform the calculation
         binned_values = []
         n = []
@@ -3877,16 +3877,16 @@ class Timeseries:
                 binned_values.append(np.nanmean(y[idx]))
                 n.append(y[idx].size)
                 error.append(np.nanstd(y[idx]))
-    
+
         return bins, binned_values, n, error
-    
+
 
     def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None):
         """ Linear interpolation onto a new x-axis
-    
+
         Args
         ----
-    
+
         x : array
            The x-axis
         y : array
@@ -3897,44 +3897,44 @@ class Timeseries:
                where/when to start the interpolation. Default is min..
         end : float
              where/when to stop the interpolation. Default is max.
-    
+
         Returns
         -------
-    
+
         xi : array
             The interpolated x-axis
         interp_values : array
             The interpolated values
         """
-    
+
             #Make sure x and y are numpy arrays
         x = np.array(x,dtype='float64')
         y = np.array(y,dtype='float64')
-    
+
             # get the interpolation step if not available
         if interp_step is None:
             interp_step = np.nanmean(np.diff(x))
-    
+
             # Get the start and end point if not given
         if start is None:
             start = np.nanmin(np.asarray(x))
         if end is None:
             end = np.nanmax(np.asarray(x))
-    
+
         # Get the interpolated x-axis.
         xi = np.arange(start,end,interp_step)
-    
+
         #Make sure the data is increasing
         data = pd.DataFrame({"x-axis": x, "y-axis": y}).sort_values('x-axis')
-    
+
         interp_values = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type)(xi)
-    
+
         return xi, interp_values
-    
+
 
     def onCommonAxis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None, end=None):
         """Places two timeseries on a common axis
-    
+
         Args
         ----
         x1 : array
@@ -3959,10 +3959,10 @@ class Timeseries:
         end : float
             Where/when to end. Default is the minimum of the maxima of
             the two timeseries
-    
+
         Returns
         -------
-    
+
         xi1, xi2 : array
             The interpolated x-axis
         interp_values1, interp_values2 : array
@@ -3973,17 +3973,17 @@ class Timeseries:
         y1 = np.array(y1, dtype='float64')
         x2 = np.array(x2, dtype='float64')
         y2 = np.array(y2, dtype='float64')
-    
+
         # Find the mean/max x-axis is not provided
         if start is None:
             start = np.nanmax([np.nanmin(x1), np.nanmin(x2)])
         if end is None:
             end = np.nanmin([np.nanmax(x1), np.nanmax(x2)])
-    
+
         # Get the interp_step
         if step is None:
             step = np.nanmin([np.nanmean(np.diff(x1)), np.nanmean(np.diff(x2))])
-    
+
         if method == 'interpolation':
         # perform the interpolation
             xi1, interp_values1 = interp(x1, y1, interp_step=step, start=start,
@@ -4000,24 +4000,24 @@ class Timeseries:
             min_idx2 = np.where(x2>=start)[0][0]
             max_idx1 = np.where(x1<=end)[0][-1]
             max_idx2 = np.where(x2<=end)[0][-1]
-    
+
             xi1 = x1[min_idx1:max_idx1+1]
             xi2 = x2[min_idx2:max_idx2+1]
             interp_values1 = y1[min_idx1:max_idx1+1]
             interp_values2 = y2[min_idx2:max_idx2+1]
-    
+
         else:
             raise KeyError('Not a valid interpolation method')
-    
+
         return xi1, xi2, interp_values1, interp_values2
-    
+
 
     def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
         """ Centers and normalizes a given time series. Constant or nearly constant time series not rescaled.
-    
+
         Args
         ----
-    
+
         x : array
             vector of (real) numbers as a time series, NaNs allowed
         scale : real
@@ -4028,78 +4028,78 @@ class Timeseries:
             degress of freedom correction in the calculation of the standard deviation
         eps : real
             a threshold to determine if the standard deviation is too close to zero
-    
+
         Returns
         -------
-    
+
         z : array
            The standardized time series (z-score), Z = (X - E[X])/std(X)*scale, NaNs allowed
         mu : real
             The mean of the original time series, E[X]
         sig : real
              The standard deviation of the original time series, std[X]
-    
+
         References
         ----------
-    
+
         1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
         2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
-    
+
         @author: fzhu
         """
         x = np.asanyarray(x)
         assert x.ndim <= 2, 'The time series x should be a vector or 2-D array!'
-    
+
         mu = np.nanmean(x, axis=axis)  # the mean of the original time series
         sig = np.nanstd(x, axis=axis, ddof=ddof)  # the std of the original time series
-    
+
         mu2 = np.asarray(np.copy(mu))  # the mean used in the calculation of zscore
         sig2 = np.asarray(np.copy(sig) / scale)  # the std used in the calculation of zscore
-    
+
         if np.any(np.abs(sig) < eps):  # check if x contains (nearly) constant time series
             warnings.warn('Constant or nearly constant time series not rescaled.')
             where_const = np.abs(sig) < eps  # find out where we have (nearly) constant time series
-    
+
             # if a vector is (nearly) constant, keep it the same as original, i.e., substract by 0 and divide by 1.
             mu2[where_const] = 0
             sig2[where_const] = 1
-    
+
         if axis and mu.ndim < x.ndim:
             z = (x - np.expand_dims(mu2, axis=axis)) / np.expand_dims(sig2, axis=axis)
         else:
             z = (x - mu2) / sig2
-    
+
         return z, mu, sig
-    
+
 
     def ts2segments(ys, ts, factor=10):
         ''' Chop a time series into several segments based on gap detection.
-    
+
         The rule of gap detection is very simple:
             we define the intervals between time points as dts, then if dts[i] is larger than factor * dts[i-1],
             we think that the change of dts (or the gradient) is too large, and we regard it as a breaking point
             and chop the time series into two segments here
-    
+
         Args
         ----
-    
+
         ys : array
             A time series, NaNs allowed
         ts : array
             The time points
         factor : float
             the factor that adjusts the threshold for gap detection
-    
+
         Returns
         -------
-    
+
         seg_ys : list
             a list of several segments with potentially different lengths
         seg_ts : list
             a list of the time axis of the several segments
         n_segs : int
             the number of segments
-    
+
         @author: fzhu
         '''
 
@@ -4128,21 +4128,21 @@ class Timeseries:
 
     def clean_ts(ys, ts):
         ''' Delete the NaNs in the time series and sort it with time axis ascending
-    
+
         Args
         ----
         ys : array
             A time series, NaNs allowed
         ts : array
             The time axis of the time series, NaNs allowed
-    
+
         Returns
         -------
         ys : array
             The time series without nans
         ts : array
             The time axis of the time series without nans
-    
+
         '''
         # delete NaNs if there is any
         ys = np.asarray(ys, dtype=np.float)
@@ -4166,21 +4166,21 @@ class Timeseries:
 
     def annualize(ys, ts):
         ''' Annualize a time series whose time resolution is finer than 1 year
-    
+
         Args
         ----
         ys : array
             A time series, NaNs allowed
         ts : array
             The time axis of the time series, NaNs allowed
-    
+
         Returns
         -------
         ys_ann : array
                 the annualized time series
         year_int : array
                   The time axis of the annualized time series
-    
+
         '''
         year_int = list(set(np.floor(ts)))
         year_int = np.sort(list(map(int, year_int)))
@@ -4188,59 +4188,59 @@ class Timeseries:
         year_int_pad = list(year_int)
         year_int_pad.append(np.max(year_int)+1)
         ys_ann = np.zeros(n_year)
-    
+
         for i in range(n_year):
             t_start = year_int_pad[i]
             t_end = year_int_pad[i+1]
             t_range = (ts >= t_start) & (ts < t_end)
             ys_ann[i] = np.average(ys[t_range], axis=0)
-    
+
         return ys_ann, year_int
-    
+
 
     def gaussianize(X):
         """ Transforms a (proxy) timeseries to Gaussian distribution.
-    
+
         Originator: Michael Erb, Univ. of Southern California - April 2017
         """
-    
+
         # Give every record at least one dimensions, or else the code will crash.
         X = np.atleast_1d(X)
-    
+
         # Make a blank copy of the array, retaining the data type of the original data variable.
         Xn = copy.deepcopy(X)
         Xn[:] = np.NAN
-    
+
         if len(X.shape) == 1:
             Xn = gaussianize_single(X)
         else:
             for i in range(X.shape[1]):
                 Xn[:, i] = gaussianize_single(X[:, i])
-    
+
         return Xn
-    
+
 
     def gaussianize_single(X_single):
         """ Transforms a single (proxy) timeseries to Gaussian distribution.
-    
+
         Originator: Michael Erb, Univ. of Southern California - April 2017
         """
         # Count only elements with data.
-    
+
         n = X_single[~np.isnan(X_single)].shape[0]
-    
+
         # Create a blank copy of the array.
         Xn_single = copy.deepcopy(X_single)
         Xn_single[:] = np.NAN
-    
+
         nz = np.logical_not(np.isnan(X_single))
         index = np.argsort(X_single[nz])
         rank = np.argsort(index)
         CDF = 1.*(rank+1)/(1.*n) - 1./(2*n)
         Xn_single[nz] = np.sqrt(2)*special.erfinv(2*CDF - 1)
-    
+
         return Xn_single
-    
+
 
     def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
         """Detrend a timeseries according to three methods
@@ -4334,7 +4334,7 @@ class Timeseries:
         ''' Function to detect outliers in the given timeseries
         Args
         ----
-    
+
         ts : array
              time axis of time series
         ys : array
@@ -4342,28 +4342,28 @@ class Timeseries:
         args : dict
              arguments for the DBSCAN function from sklearn,
              for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
-    
+
         Returns
         -------
-    
+
         is_outlier : array
                     a list of boolean values indicating whether the point is an outlier or not
         '''
-    
+
         if args == {}:
             args = {'eps': 0.2, 'metric': 'euclidean'}
-    
+
         outlier_detection = DBSCAN(**args)
-    
+
         clusters = outlier_detection.fit_predict(ys.values.reshape(-1,1))
         is_outlier = []
-    
+
         for value in clusters:
             if value == -1:
                 is_outlier.append(True)
             else:
                 is_outlier.append(False)
-    
+
         return is_outlier
 
 def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
