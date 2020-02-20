@@ -535,7 +535,7 @@ class Coherence:
         ax.set_ylabel(ylabel)
 
         # plot phase
-        dt = np.median(np.diff(self.time))
+        dt = np.max([int(np.median(np.diff(self.time))), 1])
         phase_args = {'pt': 0.5, 'skip_x': 10*dt, 'skip_y': 5*dt, 'scale': 30, 'width': 0.004}
         phase_args.update(phase_style)
 

@@ -2051,7 +2051,7 @@ class WaveletAnalysis(object):
             return rect
 
         def smoothing(coeff, snorm, dj, smooth_factor=smooth_factor):
-            """ Soothing function adapted from https://github.com/regeirk/pycwt/blob/master/pycwt/helpers.py
+            """ Smoothing function adapted from https://github.com/regeirk/pycwt/blob/master/pycwt/helpers.py
 
             Args
             ----
@@ -2112,9 +2112,9 @@ class WaveletAnalysis(object):
         sN = scales[0]
         dj = np.log2(sN/s0) / N
 
-        S12 = Smoothing(xwt/scales, snorm, dj)
-        S1 = Smoothing(power1/scales, snorm, dj)
-        S2 = Smoothing(power2/scales, snorm, dj)
+        S12 = smoothing(xwt/scales, snorm, dj)
+        S1 = smoothing(power1/scales, snorm, dj)
+        S2 = smoothing(power2/scales, snorm, dj)
         xw_coherence = np.abs(S12)**2 / (S1*S2)
         wcs = S12 / (np.sqrt(S1)*np.sqrt(S2))
         xw_phase = np.angle(wcs)
@@ -2584,8 +2584,8 @@ class Correlation(object):
         """
         r = pearsonr(y1, y2)[0]
 
-        g1 = self.ar1_fit(y1)
-        g2 = self.ar1_fit(y2)
+        g1 = self.sm_ar1_fit(y1)
+        g2 = self.sm_ar1_fit(y2)
 
         N = np.size(y1)
 
@@ -2699,14 +2699,14 @@ class Correlation(object):
         n = np.size(X)
         sig = np.std(X, ddof=1)
 
-        g = self.ar1_fit(X)
+        g = self.sm_ar1_fit(X)
         #  red = red_noise(N, M, g)
-        red = self.ar1_sim(n, p, g, sig)
+        red = self.sm_ar1_sim(n, p, g, sig)
 
         return red, g
 
-    def ar1_fit(self, ts):
-        ''' Return the lag-1 autocorrelation from ar1 fit.
+    def sm_ar1_fit(self, ts):
+        ''' Return the lag-1 autocorrelation from ar1 fit using statsmodels.
 
         Args
         ----
@@ -2727,8 +2727,8 @@ class Correlation(object):
 
         return g
 
-    def ar1_sim(self, n, p, g, sig):
-        ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g
+    def sm_ar1_sim(self, n, p, g, sig):
+        ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g using statsmodels
 
         Args
         ----
@@ -3101,14 +3101,14 @@ class Causality(object):
                 the quantiles of the standardized information flow from noise2 to noise1 for significance testing
 
         '''
-        stat = stats.Correlation()
-        g1 = stat.ar1_fit(y1)
-        g2 = stat.ar1_fit(y2)
+        corr_obj = Correlation()
+        g1 = corr_obj.sm_ar1_fit(y1)
+        g2 = corr_obj.sm_ar1_fit(y2)
         sig1 = np.std(y1)
         sig2 = np.std(y2)
         n = np.size(y1)
-        noise1 = stat.ar1_sim(n, nsim, g1, sig1)
-        noise2 = stat.ar1_sim(n, nsim, g2, sig2)
+        noise1 = corr_obj.sm_ar1_sim(n, nsim, g1, sig1)
+        noise2 = corr_obj.sm_ar1_sim(n, nsim, g2, sig2)
 
         if method == 'liang':
             npt = kwargs['npt'] if 'npt' in kwargs else 1
@@ -4469,8 +4469,8 @@ def corrsig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
          Fraction of time series with higher correlation coefficents than observed (approximates the p-value).
          Note that signif = True if and only if p <= alpha.
 """
-    corr = Correlation()
-    r, signif, p = corr.corr_sig(y1,y2, nsim = nsim, method = method,
+    corr_obj = Correlation()
+    r, signif, p = corr_obj.corr_sig(y1,y2, nsim = nsim, method = method,
                                  alpha = alpha)
 
     return r, signif, p
