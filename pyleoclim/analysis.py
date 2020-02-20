@@ -1494,7 +1494,7 @@ class WaveletAnalysis(object):
         References
         ----------
 
-        https://github.com/scipy/scipy/blob/v0.14.0/scipy/signal/spectral.py
+        https://github.com/scipy/scipy/blob/v0.14.0/scipy/signal/Spectral.py
 
         '''
         nt = np.size(ts)
@@ -3308,7 +3308,7 @@ class Decomposition(object):
                         matrix of RCs (nrec,N,nrec*M) (only if K>0)
         '''
 
-        wa = spectral.WaveletAnalysis()
+        wa = WaveletAnalysis()
         ys, ts = Timeseries.clean_ts(ys, ts)
         ys = wa.preprocess(ys, ts, **prep_args)
 
@@ -4313,7 +4313,7 @@ class Timeseries:
                 d = int(params[2])
                 e = int(params[3])
             # Now filter
-            y_filt = Spectral.Filter.savitzky_golay(y_interp,l,o,d,e)
+            y_filt = Filter.savitzky_golay(y_interp,l,o,d,e)
             # Put it all back on the original x axis
             y_filt_x = np.interp(x,x_interp,y_filt)
             ys = y-y_filt_x
@@ -5149,7 +5149,7 @@ def plot_wwa(wwa, freq, tau, AR1_q=None, coi=None, levels=None, tick_range=None,
         if np.nanmax(wwa) > 2*q95:
             warnings.warn("There are outliers in the input amplitudes, " +
                           "and the `levels` have been set so that the outpliers will be ignored! " +
-                          "One might want to use `spectral.plot_wwadist(wwa)` to plot the distribution of " +
+                          "One might want to use `analysis.plot_wwadist(wwa)` to plot the distribution of " +
                           "the amplitudes with the 95% quantile line to check if the levels are appropriate.", stacklevel=2)
 
             max_level = np.round(2*q95, decimals=1)
@@ -5508,9 +5508,9 @@ def plot_psd(psd, freq, lmstyle='-', linewidth=None,
         >>> signal = np.cos(2*np.pi*f*time)
         >>> # WWZ
         >>> tau = np.linspace(np.min(time), np.max(time), 51)
-        >>> res_wwz = spectral.wwz_psd(signal, time, tau=tau, c=1e-3, standardize=False, nMC=0)
+        >>> res_wwz = analysis.wwz_psd(signal, time, tau=tau, c=1e-3, standardize=False, nMC=0)
         >>> # plot
-        >>> fig = spectral.plot_psd(
+        >>> fig = analysis.plot_psd(
         ...           res_wwz.amplitude,
         ...           res_wwz.freq,
         ...           period_ticks=[2, 5, 10, 20, 50, 100],
