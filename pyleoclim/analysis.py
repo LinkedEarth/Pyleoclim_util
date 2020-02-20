@@ -41,6 +41,7 @@ from numba.errors import NumbaPerformanceWarning
 
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
+from statsmodels.tsa.stattools import grangercausalitytests
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
 '''
