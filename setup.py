@@ -62,6 +62,7 @@ setup(
         "wget",
         "numba",
         "nitime",
+        "tabulate",
     ],
     python_requires=">=3.6.0"
 )

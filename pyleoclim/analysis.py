@@ -1910,8 +1910,8 @@ class WaveletAnalysis(object):
         ys, ts = Timeseries.clean_ts(ys, ts)
 
         if tau is None:
-            med_res = np.size(ts) // np.median(np.diff(ts))
-            tau = np.linspace(np.min(ts), np.max(ts), np.max([np.size(ts)//10, 50, med_res]))
+            med_res = int(np.size(ts) // np.median(np.diff(ts)))
+            tau = np.linspace(np.min(ts), np.max(ts), np.max([int(np.size(ts)//10), 50, med_res]))
 
         elif np.isnan(tau).any():
             warnings.warn("The input tau contains some NaNs." +
