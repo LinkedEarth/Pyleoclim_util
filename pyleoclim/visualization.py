@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import pathlib
+import seaborn as sns
 
 def setProj(projection='Robinson', proj_default = True): 
     """ Set the projection for Cartopy.
@@ -367,7 +368,8 @@ def mapOne(lat, lon, projection = 'Orthographic', proj_default = True, label = N
     Returns
     -------
     
-    ax: The figure, or axis if ax specified
+    ax : the axis
+    fig : the figure
     
     """
     # get the projection:
@@ -405,9 +407,10 @@ def mapOne(lat, lon, projection = 'Orthographic', proj_default = True, label = N
        assert type(label) is str, 'Label should be of type string'
        ax.annotate(label,(np.array(lon),np.array(lat)),fontweight='bold')
         
-    return ax
-def plot(x,y,markersize=50,marker='ro',x_label="",y_label="",\
-         title ="", figsize =[10,4], ax = None):
+    return fig, ax
+
+def plot(x,y,markersize=50,marker='ro',x_label=None ,y_label=None,\
+         title =None, figsize =[10,4], ax = None):
     """ Make a 2-D plot
     
     Args
@@ -430,12 +433,13 @@ def plot(x,y,markersize=50,marker='ro',x_label="",y_label="",\
     figsize : list
               the size of the figure
     ax : object
-        Return as axis instead of figure (useful to integrate plot into a subplot)
+        The axis to be specified (useful to integrate plot into a subplot)
             
     Returns
     -------
     
-    The figure       
+    ax : The axis 
+    fig : The figure
     
     """
     # make sure x and y are numpy arrays
@@ -444,7 +448,7 @@ def plot(x,y,markersize=50,marker='ro',x_label="",y_label="",\
     
     # Check that these are vectors and not matrices
     if len(np.shape(x)) >2 or len(np.shape(y))>2:
-        sys.exit("x and y should be vectors and not matrices") 
+        raise TypeError("x and y should be vectors and not matrices") 
 
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
@@ -458,15 +462,21 @@ def plot(x,y,markersize=50,marker='ro',x_label="",y_label="",\
     
     #Stylistic issues
     #plt.tight_layout()
+    if x_label == None:
+        x_label =''
+    if y_label == None:
+        y_label = ''
+    if title == None:
+        title = ''
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.title(title)
     plt.legend(loc=3,scatterpoints=1,fancybox=True,shadow=True,fontsize=10)
     
-    return ax
+    return fig, ax
     
-def plotEns(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = "",\
-            y_label = "", title = "", figsize = [10,4], ax = None):
+def plotEns(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = None,\
+            y_label = None, title = None, figsize = [10,4], ax = None):
     """Plot Ensemble Values
     
     This function allows to plot all or a subset of ensemble members of a 
@@ -499,7 +509,8 @@ def plotEns(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = "",\
     
     Returns
     -------
-    The figure
+    ax : Axis for the figure
+    fig : The figure
     
     TODO
     ----
@@ -513,7 +524,7 @@ def plotEns(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = "",\
     
     # Make sure that the length of y is the same as the number of rows in ensemble array
     if len(y) != np.shape(ageEns)[0]:
-        sys.exit("The length of the paleoData is different than number of rows in ensemble table!")
+        raise ValueError("The length of the paleoData is different than number of rows in ensemble table!")
 
     # Figure out the number of ensembles to plot
     if not ens:
@@ -534,13 +545,19 @@ def plotEns(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = "",\
     plt.style.use("ggplot")
     for i in np.arange(0,ens,1):
         plt.plot(ageEns[:,i],y,alpha=alpha,color=color)
+    if x_label == None:
+        x_label =''
+    if y_label == None:
+        y_label = ''
+    if title == None:
+        title = ''
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.title(title)
 
-    return ax    
+    return fig, ax    
 
-def plot_hist(y, bins = None, hist = True, label = "", \
+def plot_hist(y, bins = None, hist = True, label = None, \
               kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},\
               kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"rug"}, \
               fit_kws = {"label":"fit"}, color ='0.7' , vertical = False, \
@@ -596,6 +613,7 @@ def plot_hist(y, bins = None, hist = True, label = "", \
     Returns
     -------
     
+    ax : The axis to the figure
     fig :  The figure
 """
 
@@ -605,7 +623,7 @@ def plot_hist(y, bins = None, hist = True, label = "", \
     # Check that these are vectors and not matrices
     # Check that these are vectors and not matrices
     if len(np.shape(y))>2:
-        sys.exit("x and y should be vectors and not matrices") 
+        raise TypeError("x and y should be vectors and not matrices") 
      
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
@@ -619,6 +637,9 @@ def plot_hist(y, bins = None, hist = True, label = "", \
        
         
     # Add a label to the PDF axis
+    if label == None:
+        label = ''
+        
     if vertical == True:
         plt.xlabel('PDF')
         plt.ylabel(label)

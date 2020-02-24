@@ -576,6 +576,19 @@ class Coherence:
 class Lipd:
     def __init__(self, lipd_list):
         self.lipd_list = lipd_list
+        self.plot_default = {'ice/rock': ['#FFD600','h'],
+                'coral': ['#FF8B00','o'],
+                'documents':['k','p'],
+                'glacier ice':['#86CDFA', 'd'],
+                'hybrid': ['#00BEFF','*'],
+                'lake sediment': ['#4169E0','s'],
+                'marine sediment': ['#8A4513', 's'],
+                'sclerosponge' : ['r','o'],
+                'speleothem' : ['#FF1492','d'],
+                'wood' : ['#32CC32','^'],
+                'molluskshells' : ['#FFD600','h'],
+                'peat' : ['#2F4F4F','*'],
+                'other':['k','o']}
 
 class LipdSeries:
     def __init__(self, ts):
@@ -597,7 +610,7 @@ class LipdSeries:
     def mapone(self, projection='Orthographic', proj_default=True,
                background=True, label='default', borders=False,
                rivers=False, lakes=False, markersize=50, marker="default",
-               figsize=[4,4], savefig_settings={}):
+               figsize=[4,4], ax=None, savefig_settings={}):
         """ Create a Map for a single record
 
         Orthographic projection map of a single record.
@@ -660,6 +673,9 @@ class LipdSeries:
         lat = self.ts['geo_meanLat']
         lon = self.ts['geo_meanLon']
 
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+        
         # Make sure it's in the palette
         if marker == 'default':
             archiveType = lipdutils.LipdToOntology(self.ts['archiveType']).lower()
@@ -679,11 +695,11 @@ class LipdSeries:
         elif label is None:
             label = None
         else:
-            assert type(label) is str, 'the argument label should be of type str'
+            raise TypeError('the argument label should be of type str')
 
-        fig = visualization.mapOne(lat, lon, projection = projection, proj_default = proj_default,
+        fig, ax = visualization.mapOne(lat, lon, projection = projection, proj_default = proj_default,
                background = background, label = label, borders = borders, rivers = rivers, lakes = lakes,
-               markersize = markersize, marker = marker, figsize = figsize, ax = None)
+               markersize = markersize, marker = marker, figsize = figsize, ax = ax)
 
         # Save the figure if "path" is specified in savefig_settings
         if 'path' in savefig_settings:
