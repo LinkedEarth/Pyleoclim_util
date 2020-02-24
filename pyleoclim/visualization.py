@@ -17,6 +17,8 @@ import cartopy.feature as cfeature
 import pathlib
 import seaborn as sns
 
+from . import lipdutils
+
 def setProj(projection='Robinson', proj_default = True): 
     """ Set the projection for Cartopy.
     
@@ -193,8 +195,8 @@ def setProj(projection='Robinson', proj_default = True):
         
     return proj
 
-def mapAll(lat, lon, criteria, projection = 'Robinson', proj_default = True,\
-           background = True,borders = False, rivers = False, lakes = False,\
+def mapAll(lat, lon, criteria, projection = 'Robinson', proj_default = True,
+           background = True,borders = False, rivers = False, lakes = False,
            figsize = [10,4], ax = None, palette=None, markersize = 50):
     """ Map the location of all lat/lon according to some criteria
     
@@ -316,9 +318,9 @@ def mapAll(lat, lon, criteria, projection = 'Robinson', proj_default = True,\
     
     return ax    
         
-def mapOne(lat, lon, projection = 'Orthographic', proj_default = True, label = None,\
-           background = True,borders = False, rivers = False, lakes = False,\
-           markersize = 50, marker = "ro", figsize = [4,4], \
+def mapOne(lat, lon, projection = 'Orthographic', proj_default = True, label = None,
+           background = True,borders = False, rivers = False, lakes = False,
+           markersize = 50, marker = "ro", figsize = [4,4], 
            ax = None):
     """ Map one location on the globe
     
@@ -409,8 +411,8 @@ def mapOne(lat, lon, projection = 'Orthographic', proj_default = True, label = N
         
     return fig, ax
 
-def plot(x,y,markersize=50,marker='ro',x_label=None ,y_label=None,\
-         title =None, figsize =[10,4], ax = None):
+def plot(x,y,markersize=50,marker='ro',x_label=None ,y_label=None,
+         title =None, legend=True, figsize =[10,4], ax = None):
     """ Make a 2-D plot
     
     Args
@@ -455,10 +457,10 @@ def plot(x,y,markersize=50,marker='ro',x_label=None ,y_label=None,\
         
     plt.style.use("ggplot") # set the style
     # do a scatter plot of the original data
-    plt.scatter(x,y,s=markersize,facecolor='none',edgecolor=marker[0],
+    ax.scatter(x,y,s=markersize,facecolor='none',edgecolor=marker[0],
                 marker=marker[1],label='original')
     # plot a linear interpolation of the data
-    plt.plot(x,y,color=marker[0],linewidth=1,label='interpolated')
+    ax.plot(x,y,color=marker[0],linewidth=1,label='interpolated')
     
     #Stylistic issues
     #plt.tight_layout()
@@ -468,14 +470,15 @@ def plot(x,y,markersize=50,marker='ro',x_label=None ,y_label=None,\
         y_label = ''
     if title == None:
         title = ''
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    plt.title(title)
-    plt.legend(loc=3,scatterpoints=1,fancybox=True,shadow=True,fontsize=10)
+    ax.xlabel(x_label)
+    ax.ylabel(y_label)
+    ax.title(title)
+    if legend == True:
+        ax.legend(loc=3,scatterpoints=1,fancybox=True,shadow=True,fontsize=10)
     
     return fig, ax
     
-def plotEns(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = None,\
+def plotEns(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = None,
             y_label = None, title = None, figsize = [10,4], ax = None):
     """Plot Ensemble Values
     
@@ -557,10 +560,10 @@ def plotEns(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = None,\
 
     return fig, ax    
 
-def plot_hist(y, bins = None, hist = True, label = None, \
-              kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},\
-              kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"rug"}, \
-              fit_kws = {"label":"fit"}, color ='0.7' , vertical = False, \
+def plot_hist(y, bins = None, hist = True, label = None, 
+              kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},
+              kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"rug"},
+              fit_kws = {"label":"fit"}, color ='0.7' , vertical = False,
               norm_hist = True, figsize = [5,5], ax = None):
     """ Plot a univariate distribution of the PaleoData values
             
@@ -628,10 +631,10 @@ def plot_hist(y, bins = None, hist = True, label = None, \
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
 
-    sns.distplot(y,bins=bins, hist=hist, kde=kde, rug=rug,\
-                  fit=fit, hist_kws = hist_kws,\
-                  kde_kws = kde_kws,rug_kws = rug_kws,\
-                  axlabel = label, color = color, \
+    sns.distplot(y,bins=bins, hist=hist, kde=kde, rug=rug,
+                  fit=fit, hist_kws = hist_kws,
+                  kde_kws = kde_kws,rug_kws = rug_kws,
+                  axlabel = label, color = color,
                   vertical = vertical, norm_hist = norm_hist)         
                 
        
@@ -838,7 +841,7 @@ def TsData(timeseries, x_axis=""):
     """
     # Grab the x and y values
     y = np.array(timeseries['paleoData_values'], dtype = 'float64')   
-    x, label = LipdUtils.checkXaxis(timeseries, x_axis=x_axis)
+    x, label = lipdutils.checkXaxis(timeseries, x_axis=x_axis)
 
     # Remove NaNs
     y_temp = np.copy(y)
@@ -846,7 +849,7 @@ def TsData(timeseries, x_axis=""):
     x = x[~np.isnan(y_temp)]
 
     # Grab the archiveType
-    archiveType = LipdUtils.LipdToOntology(timeseries["archiveType"])
+    archiveType = lipdutils.LipdToOntology(timeseries["archiveType"])
 
     # x_label
     if label+"Units" in timeseries.keys():
