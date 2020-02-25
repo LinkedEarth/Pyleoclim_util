@@ -9,8 +9,8 @@ Contains all basic block functions for pyleoclim.
 Defaults set as per the original function
 """
 
-from .correlation import corr_sig, fdr
+from .plotting import set_style
 
 __all__ = [
-        'corr_sig',
-        'fdr']
+        'set_style'
+        ]

@@ -14,7 +14,81 @@ from tqdm import tqdm
 from .correlation import sm_ar1_fit, sm_ar1_sim, phaseran
 from scipy.stats.mstats import mquantiles
 
+#--------
+#Wrappers
+#_________
 
+def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
+                  qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995], **kwargs):
+    '''Information flow, estimate the information transfer from series y2 to series y1
+
+    Args
+    ----
+
+    y1, y2 : array
+        vectors of (real) numbers with identical length, no NaNs allowed
+    method : array
+        only "liang" for now
+    signif_test : str
+        the method for significance test
+    nsim : int
+        the number of AR(1) surrogates for significance test
+    qs : list
+        the quantiles for significance test
+    kwargs : includes
+        npt : int
+            the number of time advance in performing Euler forward differencing in "liang" method
+
+    Returns
+    -------
+
+    res_dict : dictionary
+        The result of the dictionary including
+    T21 : float
+        The information flow from y2 to y1
+    tau21 : float
+        The standardized info flow from y2 to y1, tau21 = T21/Z
+    Z : float
+       The total information flow
+    qs  : list
+        significance test  of quantile levels
+    t21_noise : list
+        The quantiles of the information flow from noise2 to noise1 for significance testing
+    tau21_noise : list
+        The quantiles of the standardized information flow from noise2 to noise1 for significance testing
+    '''
+    if method == 'liang':
+        npt = kwargs['npt'] if 'npt' in kwargs else 1
+        res_dict = liang_causality(y1, y2, npt=npt)
+        tau21 = res_dict['tau21']
+        T21 = res_dict['T21']
+        Z = res_dict['Z']
+
+        signif_test_func = {
+            'isopersist': signif_isopersist,
+            'isospec': signif_isospec,
+        }
+
+        signif_dict = signif_test_func[signif_test](y1, y2, nsim=nsim, qs=qs, npt=npt)
+
+        T21_noise_qs = signif_dict['T21_noise_qs']
+        tau21_noise_qs = signif_dict['tau21_noise_qs']
+        res_dict = {
+            'T21': T21,
+            'tau21': tau21,
+            'Z': Z,
+            'signif_qs': qs,
+            'T21_noise': T21_noise_qs,
+            'tau21_noise': tau21_noise_qs,
+        }
+    else:
+        raise KeyError(f'{method} is not a valid method')
+
+    return res_dict
+
+#-------
+#Main functions
+#--------
 def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
     '''
     statsmodels granger causality tests

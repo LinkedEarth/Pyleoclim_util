@@ -14,9 +14,9 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .plotting import savefig, showfig, set_style
+from .plotting import savefig, showfig 
 
-def setProj(projection='Robinson', proj_default = True): 
+def set_proj(projection='Robinson', proj_default = True): 
     """ Set the projection for Cartopy.
     
     Args
@@ -192,7 +192,7 @@ def setProj(projection='Robinson', proj_default = True):
     
     return proj
 
-def mapAll(lat, lon, criteria, projection = 'Robinson', proj_default = True,
+def map_all(lat, lon, criteria, projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
            figsize = [10,4], ax = None, palette=None, markersize = 50):
     """ Map the location of all lat/lon according to some criteria
@@ -315,7 +315,7 @@ def mapAll(lat, lon, criteria, projection = 'Robinson', proj_default = True,
     
     return ax    
         
-def mapOne(lat, lon, projection = 'Orthographic', proj_default = True, label = None,
+def map_one(lat, lon, projection = 'Orthographic', proj_default = True, label = None,
            background = True,borders = False, rivers = False, lakes = False,
            markersize = 50, marker = "ro", figsize = [4,4], 
            ax = None):

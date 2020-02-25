@@ -21,66 +21,6 @@ import wget
 
 
 """
-The following functions handle creating new directories and saving figures and logs
-"""
-
-def createDir(path, foldername):
-    """Create a new folder in a working directory
-
-    Create a new folder in a working directory to save outputs from Pyleoclim.
-
-    Args
-    ----
-
-    path : string
-        the path to the new folder.
-    foldername : string
-        the name of the folder to be created
-
-    Returns
-    -------
-
-    newdir : string
-        the full path to the new directory
-
-    """
-
-    if not os.path.exists(path+'/'+foldername):
-        os.makedirs(path+'/'+foldername)
-
-    newdir = path+'/'+foldername
-
-    return newdir
-
-def saveFigure(name, format="eps",dir= None):
-    """Save a figure
-
-    Save the figure in the directory. If not given, creates a folder in the
-    current working directory.
-
-    Args
-    ----
-
-    name : string
-        name of the file
-    format : string
-        One of the file extensions supported by the active
-        backend. Default is "eps". Most backend support png, pdf, ps, eps,
-        and svg.
-    dir : str
-        the name of the folder in the LiPD working directory.
-        If not provided, creates a default folder called 'figures'.
-
-    """
-    if not dir:
-        newdir = createDir(os.getcwd(),"figures")
-        plt.savefig(newdir+'/'+name+'.'+format,\
-                    bbox_inches='tight',pad_inches = 0.25)
-    else:
-        plt.savefig(dir+'/'+name+'.'+format,\
-                    bbox_inches='tight',pad_inches = 0.25)
-
-"""
 The following functions handle the LiPD files
 """
 

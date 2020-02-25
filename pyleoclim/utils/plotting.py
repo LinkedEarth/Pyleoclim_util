@@ -51,27 +51,27 @@ def plot(x,y,markersize=50,marker='ro',x_label=None ,y_label=None,
     if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
-        ax.plot(x, y, **plot_args)
+    ax.plot(x, y, **plot_args)
 
-        time_label, value_label = self.make_labels()
+    time_label, value_label = self.make_labels()
 
-        ax.set_xlabel(time_label)
-        ax.set_ylabel(value_label)
+    ax.set_xlabel(time_label)
+    ax.set_ylabel(value_label)
 
-        if title is not None:
-            ax.set_title(title)
+    if title is not None:
+        ax.set_title(title)
 
-        if 'fig' in locals():
-            if 'path' in savefig_settings:
-                visualization.savefig(fig, savefig_settings)
-            else:
-                visualization.showfig(fig)
-            return fig, ax
+    if 'fig' in locals():
+        if 'path' in savefig_settings:
+            savefig(fig, savefig_settings)
         else:
-            return ax
+            showfig(fig)
+        return fig, ax
+    else:
+        return ax
     
     
-def plotEns(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = None,
+def plot_ens(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = None,
             y_label = None, title = None, figsize = [10,4], ax = None):
     """Plot Ensemble Values
     
