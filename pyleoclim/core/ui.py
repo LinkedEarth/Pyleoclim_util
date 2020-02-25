@@ -70,8 +70,8 @@ class Series:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.time)}'
 
-    def plot(self, figsize=[10, 4], title=None, savefig_settings={}, ax=None,
-             **plot_args):
+    def plot(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None,
+             savefig_settings={}, ax=None, **plot_args):
         ''' Plot the timeseries
 
         Args
@@ -96,8 +96,14 @@ class Series:
 
         time_label, value_label = self.make_labels()
 
-        ax.set_xlabel(time_label)
-        ax.set_ylabel(value_label)
+        if xlabel is None:
+            xlabel = time_label
+
+        if ylabel is None:
+            ylabel = value_label
+
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
 
         if title is not None:
             ax.set_title(title)
