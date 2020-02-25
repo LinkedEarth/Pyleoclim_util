@@ -69,7 +69,7 @@ def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
             'isospec': signif_isospec,
         }
 
-        signif_dict = signif_test_func[signif_test](y1, y2, nsim=nsim, qs=qs, npt=npt)
+        signif_dict = signif_test_func[signif_test](y1, y2, method=method, nsim=nsim, qs=qs, npt=npt)
 
         T21_noise_qs = signif_dict['T21_noise_qs']
         tau21_noise_qs = signif_dict['tau21_noise_qs']

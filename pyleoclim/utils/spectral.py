@@ -11,8 +11,16 @@ Sectral analysis functions
 import numpy as np
 from scipy import signal
 import nitime.algorithms as nialg
+import collections
 
-from .wavelet import preprocess, is_evenly_spaced, make_freq_vector
+from .wavelet import (
+    preprocess,
+    is_evenly_spaced,
+    make_freq_vector,
+    prepare_wwz,
+    wwz,
+    wwa2psd,
+)
 from .tsutils import clean_ts, interp, bin_values
 
 #-----------
@@ -158,7 +166,6 @@ def mtm(ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', inter
 
     '''
     # preprocessing
-    
     ys, ts = clean_ts(ys, ts)
     ys = preprocess(ys, ts, **prep_args)
 
@@ -308,10 +315,8 @@ def periodogram(ys, ts, ana_args={}, prep_args={}, interp_method='interp', inter
         - freq (array): the frequency vector
         - psd (array): the spectral density vector
 
-
     '''
     # preprocessing
-    
     ys, ts = clean_ts(ys, ts)
     ys = preprocess(ys, ts, **prep_args)
 
@@ -341,3 +346,111 @@ def periodogram(ys, ts, ana_args={}, prep_args={}, interp_method='interp', inter
     }
 
     return res_dict
+
+
+def wwz_psd(ys, ts, freq=None, tau=None, c=1e-3, nproc=8, nMC=200,
+            detrend=False, params=["default", 4, 0, 1], gaussianize=False,
+            standardize=True, Neff=3, anti_alias=False, avgs=2,
+            method='default'):
+    ''' Return the psd of a timeseries directly using wwz method.
+
+    Args
+    ----
+
+    ys : array
+        a time series, NaNs will be deleted automatically
+    ts : array
+        the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
+    freq : array
+        vector of frequency
+    tau : array
+        the evenly-spaced time points, namely the time shift for wavelet analysis
+    c : float
+        the decay constant, the default value 1e-3 is good for most of the cases
+    nproc : int
+        the number of processes for multiprocessing
+    nMC : int
+        the number of Monte-Carlo simulations
+    detrend : str
+        None - the original time series is assumed to have no trend;
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay
+               filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+    gaussianize : bool
+        If True, gaussianizes the timeseries
+    standardize : bool
+        If True, standardizes the timeseries
+    method : string
+        'Foster' - the original WWZ method;
+        'Kirchner' - the method Kirchner adapted from Foster;
+        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+        'default' - the Numba version of the Kirchner algorithm will be called
+    Neff : int
+        effective number of points
+    anti_alias : bool): If True, uses anti-aliasing
+    avgs : int
+        flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
+        OR from measurements averaged over each sampling interval (avgs==1)
+
+    Returns
+    -------
+
+    psd : array
+        power spectral density
+    freq : array
+        vector of frequency
+    psd_ar1_q95 : array
+        the 95% quantile of the psds of AR1 processes
+    psd_ar1 : array
+        the psds of AR1 processes
+
+    '''
+    ys_cut, ts_cut, freq, tau = prepare_wwz(ys, ts, freq=freq, tau=tau)
+
+    # get wwa but AR1_q is not needed here so set nMC=0
+    #  wwa, _, _, coi, freq, _, Neffs, _ = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
+    res_wwz = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
+              detrend=detrend, params=params,
+              gaussianize=gaussianize, standardize=standardize, method=method)
+
+    psd = wwa2psd(res_wwz.amplitude, ts_cut, res_wwz.Neffs, freq=res_wwz.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+    #  psd[1/freqs > np.max(coi)] = np.nan  # cut off the unreliable part out of the coi
+    #  psd = psd[1/freqs <= np.max(coi)] # cut off the unreliable part out of the coi
+    #  freqs = freqs[1/freqs <= np.max(coi)]
+
+    # Monte-Carlo simulations of AR1 process
+    nf = np.size(freq)
+
+    psd_ar1 = np.ndarray(shape=(nMC, nf))
+
+    if nMC >= 1:
+        #  tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
+
+        for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
+            #  r = wa.ar1_model(ts_cut, tauest)
+            r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
+            res_red = wwz(r, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
+                                                                     detrend=detrend, params=params,
+                                                                     gaussianize=gaussianize, standardize=standardize,
+                                                                     method=method)
+            psd_ar1[i, :] = wa.wwa2psd(res_red.wwa, ts_cut, res_red.Neffs,
+                                       freq=res_red.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+            #  psd_ar1[i, 1/freqs_red > np.max(coi_red)] = np.nan  # cut off the unreliable part out of the coi
+            #  psd_ar1 = psd_ar1[1/freqs_red <= np.max(coi_red)] # cut off the unreliable part out of the coi
+
+        psd_ar1_q95 = mquantiles(psd_ar1, 0.95, axis=0)[0]
+
+    else:
+        psd_ar1_q95 = None
+
+    Results = collections.namedtuple('Results', ['psd', 'freq', 'psd_ar1_q95', 'psd_ar1'])
+    res = Results(psd=psd, freq=freq, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
+
+    return res

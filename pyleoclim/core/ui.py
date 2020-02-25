@@ -4,9 +4,11 @@
 
 Created on Jan 31, 2020
 '''
-from . import analysis
-from . import visualization
-from . import lipdutils
+from ..utils import tsutils, plotting, mapping, lipdutils
+from ..utils import wavelet as waveutils
+from ..utils import spectral as specutils
+from ..utils import correlation as corrutils
+from ..utils import causality as causalutils
 
 from textwrap import dedent
 
@@ -102,9 +104,9 @@ class Series:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                visualization.savefig(fig, savefig_settings)
+                plotting.savefig(fig, savefig_settings)
             else:
-                visualization.showfig(fig)
+                plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -142,9 +144,9 @@ class Series:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                visualization.savefig(fig, savefig_settings)
+                plotting.savefig(fig, savefig_settings)
             else:
-                visualization.showfig(fig)
+                plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -154,17 +156,16 @@ class Series:
         '''
         y = self.value
         t = self.time
-        y_cleaned, t_cleaned = analysis.clean_ts(y, t)
+        y_cleaned, t_cleaned = tsutils.clean_ts(y, t)
         self.time = t_cleaned
         self.value = y_cleaned
 
     def spectral(self, method='wwz', settings={}):
         ''' Perform spectral analysis on the timeseries
         '''
-        spec_class = analysis.SpectralAnalysis()
         spec_func = {
-            'wwz': analysis.wwz_psd,
-            'mtm': spec_class.mtm,
+            'wwz': specutils.wwz_psd,
+            'mtm': specutils.mtm,
         }
         args = {}
         args.update(settings)
@@ -179,7 +180,7 @@ class Series:
         ''' Perform wavelet analysis on the timeseries
         '''
         wave_func = {
-            'wwz': analysis.wwz,
+            'wwz': waveutils.wwz,
         }
         # generate default freq
         s0 = 2*np.median(np.diff(self.time))
@@ -199,7 +200,7 @@ class Series:
         ''' Perform wavelet coherence analysis with the target timeseries
         '''
         xwc_func = {
-            'wwz': analysis.xwc,
+            'wwz': waveutils.xwc,
         }
         # generate default freq
         s0 = 2*np.median(np.diff(self.time))
@@ -227,7 +228,7 @@ class Series:
         '''
         args = {}
         args.update(settings)
-        r, signif, p = analysis.corrsig(self.value, target_series.value, **args)
+        r, signif, p = corrutils.corr_sig(self.value, target_series.value, **args)
         corr_res = {
             'r': r,
             'signif': signif,
@@ -240,7 +241,7 @@ class Series:
         '''
         args = {}
         args.update(settings)
-        causal_res = analysis.causality_est(self.value, target_series.value, **args)
+        causal_res = causalutils.causality_est(self.value, target_series.value, **args)
         return causal_res
 
 
@@ -337,9 +338,9 @@ class PSD:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                visualization.savefig(fig, savefig_settings)
+                plotting.savefig(fig, savefig_settings)
             else:
-                visualization.showfig(fig)
+                plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -436,9 +437,9 @@ class Scalogram:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                visualization.savefig(fig, savefig_settings)
+                plotting.savefig(fig, savefig_settings)
             else:
-                visualization.showfig(fig)
+                plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -567,9 +568,9 @@ class Coherence:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                visualization.savefig(fig, savefig_settings)
+                plotting.savefig(fig, savefig_settings)
             else:
-                visualization.showfig(fig)
+                plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -699,7 +700,7 @@ class LipdSeries:
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
-        
+
         # Make sure it's in the palette
         if marker == 'default':
             archiveType = lipdutils.LipdToOntology(self.ts['archiveType']).lower()
@@ -721,14 +722,14 @@ class LipdSeries:
         else:
             raise TypeError('the argument label should be of type str')
 
-        fig, ax = visualization.mapOne(lat, lon, projection = projection, proj_default = proj_default,
+        fig, ax = mapping.mapOne(lat, lon, projection = projection, proj_default = proj_default,
                background = background, label = label, borders = borders, rivers = rivers, lakes = lakes,
                markersize = markersize, marker = marker, figsize = figsize, ax = ax)
 
         # Save the figure if "path" is specified in savefig_settings
         if 'path' in savefig_settings:
-            visualization.savefig(fig, savefig_settings)
+            plotting.savefig(fig, savefig_settings)
         else:
-            visualization.showfig(fig)
+            plooting.showfig(fig)
 
         return fig

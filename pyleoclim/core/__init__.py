@@ -9,9 +9,11 @@ Core concerns objects. The pyleoclim defaults (if different from original base
 function should be set in these files)
 """
 
-from .api_deprec import Series, Coherence, PSD, Scalogram
+from .ui import Series, Coherence, PSD, Scalogram
 
-__all__=['Series',
-         'Coherence',
-         'PSD',
-         'Scalogram']
+__all__=[
+    'Series',
+    'PSD',
+    'Scalogram',
+    'Coherence',
+]

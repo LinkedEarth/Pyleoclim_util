@@ -10,7 +10,9 @@ Defaults set as per the original function
 """
 
 from .plotting import set_style
+from .plotting import showfig
 
 __all__ = [
-        'set_style'
-        ]
+    'set_style',
+    'showfig',
+]

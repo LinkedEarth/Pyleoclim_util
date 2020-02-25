@@ -152,6 +152,141 @@ class AliasFilter(object):
         return spectr
 
 
+def ar1_model(ts, tau, n=None):
+    ''' Return a time series with the AR1 process
+
+    Args
+    ----
+
+    ts : array
+        time axis of the time series
+    tau : float
+        the averaged persistence
+    n : int
+        the length of the AR1 process
+
+    Returns
+    -------
+
+    r : array
+        the AR1 time series
+
+    References
+    ----------
+
+    Schulz, M. & Mudelsee, M. REDFIT: estimating red-noise spectra directly from unevenly spaced
+        paleoclimatic time series. Computers & Geosciences 28, 421–426 (2002).
+
+    '''
+    if n is None:
+        n = np.size(ts)
+    else:
+        assertPositiveInt(n)
+
+    r = np.zeros(n)
+
+    r[0] = 1
+    for i in range(1, n):
+        scaled_dt = (ts[i] - ts[i-1]) / tau
+        rho = np.exp(-scaled_dt)
+        err = np.random.normal(0, np.sqrt(1 - rho**2), 1)
+        r[i] = r[i-1]*rho + err
+
+    return r
+
+def ar1_fit(ys, ts=None, detrend= None, params=["default", 4, 0, 1]):
+    ''' Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
+
+    Args
+    ----
+
+    ys : array
+        the time series
+    ts : array
+        the time axis of that series
+    detrend : string
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+
+    Returns
+    -------
+
+    g : float
+        lag-1 autocorrelation coefficient (for evenly-spaced time series)
+        OR estimated persistence (for unevenly-spaced time series)
+    '''
+
+    if is_evenly_spaced(ts):
+        g = ar1_fit_evenly(ys, ts, detrend=detrend, params=params)
+    else:
+        g = tau_estimation(ys, ts, detrend=detrend, params=params)
+
+    return g
+
+def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
+    ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from `ys` and `ts`
+
+    Args
+    ----
+
+    ys : array
+        a time series
+    n : int
+        row dimensions
+    p : int
+        column dimensions
+    ts : array
+        the time axis of that series
+    detrend : string
+        None - the original time series is assumed to have no trend;
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+
+    Returns
+    -------
+
+    red : array
+        n rows by p columns matrix of an AR1 process
+
+    '''
+    red = np.empty(shape=(n, p))  # declare array
+
+    if is_evenly_spaced(ts):
+        g = ar1_fit(ys, ts=ts, detrend=detrend, params=params)
+        sig = np.std(ys)
+
+        # specify model parameters (statsmodel wants lag0 coefficents as unity)
+        ar = np.r_[1, -g]  # AR model parameter
+        ma = np.r_[1, 0.0]  # MA model parameters
+        sig_n = sig*np.sqrt(1-g**2)  # theoretical noise variance for red to achieve the same variance as ys
+
+        # simulate AR(1) model for each column
+        for i in np.arange(p):
+            red[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n)
+
+    else:
+        tau_est = ar1_fit(ys, ts=ts, detrend=detrend, params=params)
+        for i in np.arange(p):
+            red[:, i] = ar1_model(ts, tau_est, n=n)
+
+    if p == 1:
+        red = red[:, 0]
+
+    return red
 def is_evenly_spaced(ts):
     ''' Check if a time axis is evenly spaced.
 
@@ -219,57 +354,6 @@ def ar1_fit_evenly(ys, ts, detrend=False, params=["default", 4, 0, 1],
 
     return g
 
-def preprocess(ys, ts, detrend=False, params=["default", 4, 0, 1], 
-               gaussianize=False, standardize=True):
-    ''' Return the processed time series using detrend and standardization.
-
-    Args
-    ----
-
-    ys : array
-        a time series
-    ts : array
-        The time axis for the timeseries. Necessary for use with
-        the Savitzky-Golay filters method since the series should be evenly spaced.
-    detrend : string
-        'none'/False/None - no detrending will be applied;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
-    gaussianize : bool
-        If True, gaussianizes the timeseries
-    standardize : bool
-        If True, standardizes the timeseries
-
-    Returns
-    -------
-
-    res : array
-        the processed time series
-
-    '''
-
-    if detrend == 'none' or detrend is False or detrend is None:
-        ys_d = ys
-    else:
-        ys_d = detrend(ys, ts, method=detrend, params=params)
-
-    if standardize:
-        res, _, _ = std(ys_d)
-    else:
-        res = ys_d
-
-    if gaussianize:
-        res = gauss(res)
-
-    return res
-
 def tau_estimation(ys, ts, detrend=False, params=["default", 4, 0, 1], 
                    gaussianize=False, standardize=True):
     ''' Return the estimated persistence of a givenevenly/unevenly spaced time series.
@@ -323,53 +407,62 @@ def tau_estimation(ys, ts, detrend=False, params=["default", 4, 0, 1],
 
     return tau_est
 
+def preprocess(ys, ts, detrend=False, params=["default", 4, 0, 1], 
+               gaussianize=False, standardize=True):
+    ''' Return the processed time series using detrend and standardization.
+
+    Args
+    ----
+
+    ys : array
+        a time series
+    ts : array
+        The time axis for the timeseries. Necessary for use with
+        the Savitzky-Golay filters method since the series should be evenly spaced.
+    detrend : string
+        'none'/False/None - no detrending will be applied;
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+    gaussianize : bool
+        If True, gaussianizes the timeseries
+    standardize : bool
+        If True, standardizes the timeseries
+
+    Returns
+    -------
+
+    res : array
+        the processed time series
+
+    '''
+
+    if detrend == 'none' or detrend is False or detrend is None:
+        ys_d = ys
+    else:
+        ys_d = detrend(ys, ts, method=detrend, params=params)
+
+    if standardize:
+        res, _, _ = std(ys_d)
+    else:
+        res = ys_d
+
+    if gaussianize:
+        res = gauss(res)
+
+    return res
+
 def assertPositiveInt(*args):
     ''' Assert that the args are all positive integers.
     '''
     for arg in args:
         assert isinstance(arg, int) and arg >= 1
-
-def ar1_model(ts, tau, n=None):
-    ''' Return a time series with the AR1 process
-
-    Args
-    ----
-
-    ts : array
-        time axis of the time series
-    tau : float
-        the averaged persistence
-    n : int
-        the length of the AR1 process
-
-    Returns
-    -------
-
-    r : array
-        the AR1 time series
-
-    References
-    ----------
-
-    Schulz, M. & Mudelsee, M. REDFIT: estimating red-noise spectra directly from unevenly spaced
-        paleoclimatic time series. Computers & Geosciences 28, 421–426 (2002).
-
-    '''
-    if n is None:
-        n = np.size(ts)
-    else:
-        assertPositiveInt(n)
-
-    r = np.zeros(n)
-
-    r[0] = 1
-    for i in range(1, n):
-        scaled_dt = (ts[i] - ts[i-1]) / tau
-        rho = np.exp(-scaled_dt)
-        err = np.random.normal(0, np.sqrt(1 - rho**2), 1)
-        r[i] = r[i-1]*rho + err
-
-    return r
 
 def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, params=['default', 4, 0, 1],
               gaussianize=False, standardize=True):
@@ -1218,6 +1311,272 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
 
     return psd
 
+def wwz(ys, ts, tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
+        nMC=200, nproc=8, detrend=False, params=['default', 4, 0, 1],
+        gaussianize=False, standardize=True, method='default', len_bd=0,
+        bc_mode='reflect', reflect_type='odd'):
+    ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coefficients
+
+    Args
+    ----
+
+    ys : array
+        a time series, NaNs will be deleted automatically
+    ts : array
+        the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
+    tau : array
+        the evenly-spaced time points
+    freq : array
+        vector of frequency
+    c : float
+        the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+    Neff : int
+        effective number of points
+    nMC : int
+        the number of Monte-Carlo simulations
+    nproc : int
+        the number of processes for multiprocessing
+    detrend : str
+        None - the original time series is assumed to have no trend;
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay
+               filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+    method : string
+        'Foster' - the original WWZ method;
+        'Kirchner' - the method Kirchner adapted from Foster;
+        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+    len_bd : int
+        the number of the ghost grids want to creat on each boundary
+    bc_mode : string
+        {'constant', 'edge', 'linear_ramp', 'maximum', 'mean', 'median', 'minimum', 'reflect' , 'symmetric', 'wrap'}
+        For more details, see np.lib.pad()
+    reflect_type : string
+         {‘even’, ‘odd’}, optional
+         Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
+         For the ‘odd’ style, the extented part of the array is created by subtracting the reflected values from two times the edge value.
+         For more details, see np.lib.pad()
+
+    Returns
+    -------
+
+    wwa : array
+        the weighted wavelet amplitude.
+    AR1_q : array
+        AR1 simulations
+    coi : array
+        cone of influence
+    freq : array
+        vector of frequency
+    tau : array
+        the evenly-spaced time points, namely the time shift for wavelet analysis
+    Neffs : array
+        the matrix of effective number of points in the time-scale coordinates
+    coeff : array
+        the wavelet transform coefficents
+
+    '''
+    assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
+
+    ys_cut, ts_cut, freq, tau = prepare_wwz(
+        ys, ts, freq=freq, tau=tau, len_bd=len_bd,
+        bc_mode=bc_mode, reflect_type=reflect_type
+    )
+
+    wwz_func = get_wwz_func(nproc, method)
+    wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freq, tau, Neff=Neff, c=c, nproc=nproc,
+                                        detrend=detrend, params=params,
+                                        gaussianize=gaussianize, standardize=standardize)
+
+    # Monte-Carlo simulations of AR1 process
+    nt = np.size(tau)
+    nf = np.size(freq)
+
+    wwa_red = np.ndarray(shape=(nMC, nt, nf))
+    AR1_q = np.ndarray(shape=(nt, nf))
+
+    if nMC >= 1:
+        #  tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
+
+        for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
+            #  r = wa.ar1_model(ts_cut, tauest)
+            r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
+            wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freq, tau, c=c, Neff=Neff, nproc=nproc,
+                                                 detrend=detrend, params=params,
+                                                 gaussianize=gaussianize, standardize=standardize)
+
+        for j in range(nt):
+            for k in range(nf):
+                AR1_q[j, k] = mquantiles(wwa_red[:, j, k], 0.95)
+
+    else:
+        AR1_q = None
+
+    # calculate the cone of influence
+    coi = make_coi(tau, Neff=Neff_coi)
+
+    Results = collections.namedtuple('Results', ['amplitude', 'phase', 'AR1_q', 'coi', 'freq', 'time', 'Neffs', 'coeff'])
+    res = Results(amplitude=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
+
+    return res
+def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
+        tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False,
+        nMC=200, params=['default', 4, 0, 1],
+        gaussianize=False, standardize=True, method='default'):
+    ''' Return the cross-wavelet coherence of two time series.
+
+    Args
+    ----
+
+    ys1 : array
+        first of two time series
+    ys2 : array
+        second of the two time series
+    ts1 : array
+        time axis of first time series
+    ts2 : array
+        time axis of the second time series
+    tau : array
+        the evenly-spaced time points
+    freq : array
+        vector of frequency
+    c : float
+        the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+    Neff : int
+        effective number of points
+    nproc : int
+        the number of processes for multiprocessing
+    nMC : int
+        the number of Monte-Carlo simulations
+    detrend : string
+        None - the original time series is assumed to have no trend;
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay
+               filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+    gaussianize : bool
+        If True, gaussianizes the timeseries
+    standardize : bool
+        If True, standardizes the timeseries
+    method : string
+        'Foster' - the original WWZ method;
+        'Kirchner' - the method Kirchner adapted from Foster;
+        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+
+    Returns
+    -------
+
+    res : dict
+        contains the cross wavelet coherence, cross-wavelet phase,
+        vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
+
+    '''
+    assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
+
+    if tau is None:
+        lb1, ub1 = np.min(ts1), np.max(ts1)
+        lb2, ub2 = np.min(ts2), np.max(ts2)
+        lb = np.max([lb1, lb2])
+        ub = np.min([ub1, ub2])
+
+        inside = ts1[(ts1>=lb) & (ts1<=ub)]
+        tau = np.linspace(lb, ub, np.size(inside)//10)
+        print(f'Setting tau={tau[:3]}...{tau[-3:]}, ntau={np.size(tau)}')
+
+    if freq is None:
+        s0 = 2*np.median(np.diff(ts1))
+        nv = 12
+        a0 = 2**(1/nv)
+        noct = np.floor(np.log2(np.size(ts1)))-1
+        scale = s0*a0**(np.arange(noct*nv+1))
+        freq = 1/scale[::-1]
+        print(f'Setting freq={freq[:3]}...{freq[-3:]}, nfreq={np.size(freq)}')
+
+    ys1_cut, ts1_cut, freq1, tau1 = prepare_wwz(ys1, ts1, freq=freq, tau=tau)
+    ys2_cut, ts2_cut, freq2, tau2 = prepare_wwz(ys2, ts2, freq=freq, tau=tau)
+
+    if np.any(tau1 != tau2):
+        print('inconsistent `tau`, recalculating...')
+        tau_min = np.min([np.min(tau1), np.min(tau2)])
+        tau_max = np.max([np.max(tau1), np.max(tau2)])
+        ntau = np.max([np.size(tau1), np.size(tau2)])
+        tau = np.linspace(tau_min, tau_max, ntau)
+    else:
+        tau = tau1
+
+    if np.any(freq1 != freq2):
+        print('inconsistent `freq`, recalculating...')
+        freq_min = np.min([np.min(freq1), np.min(freq2)])
+        freq_max = np.max([np.max(freq1), np.max(freq2)])
+        nfreq = np.max([np.size(freq1), np.size(freq2)])
+        freq = np.linspace(freq_min, freq_max, nfreq)
+    else:
+        freq = freq1
+
+    if freq[0] == 0:
+        freq = freq[1:] # delete 0 frequency if present
+
+    res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
+                   nproc=nproc, detrend=detrend, params=params,
+                   gaussianize=gaussianize, standardize=standardize, method=method)
+    res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
+                   nproc=nproc, detrend=detrend, params=params,
+                   gaussianize=gaussianize, standardize=standardize, method=method)
+
+    wt_coeff1 = res_wwz1.coeff[1] - res_wwz1.coeff[2]*1j
+    wt_coeff2 = res_wwz2.coeff[1] - res_wwz2.coeff[2]*1j
+
+    xw_coherence, xw_phase = wavelet_coherence(wt_coeff1, wt_coeff2, freq, tau, smooth_factor=smooth_factor)
+    xwt, xw_amplitude, _ = cross_wt(wt_coeff1, wt_coeff2)
+
+    # Monte-Carlo simulations of AR1 process
+    nt = np.size(tau)
+    nf = np.size(freq)
+
+    coherence_red = np.ndarray(shape=(nMC, nt, nf))
+    AR1_q = np.ndarray(shape=(nt, nf))
+
+    if nMC >= 1:
+
+        for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
+            r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
+            r2 = ar1_sim(ys2_cut, np.size(ts2_cut), 1, ts=ts2_cut)
+            res_wwz_r1 = wwz(r1, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
+                                                     detrend=detrend, params=params,
+                                                     gaussianize=gaussianize, standardize=standardize)
+            res_wwz_r2 = wwz(r2, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
+                                                     detrend=detrend, params=params,
+                                                     gaussianize=gaussianize, standardize=standardize)
+
+            wt_coeffr1 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
+            wt_coeffr2 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
+            coherence_red[i, :, :], phase_red = wavelet_coherence(wt_coeffr1, wt_coeffr2, freq, tau, smooth_factor=smooth_factor)
+
+        for j in range(nt):
+            for k in range(nf):
+                AR1_q[j, k] = mquantiles(coherence_red[:, j, k], 0.95)
+
+    else:
+        AR1_q = None
+
+    coi = make_coi(tau, Neff=Neff)
+    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xwt', 'freq', 'time', 'AR1_q', 'coi'])
+    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase, xwt=xwt,
+                  freq=freq, time=tau, AR1_q=AR1_q, coi=coi)
+
+    return res
 def freq_vector_lomb_scargle(ts, nf=None, ofac=4, hifac=1):
     ''' Return the frequency vector based on the Lomb-Scargle algorithm.
 
