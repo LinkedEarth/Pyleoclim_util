@@ -68,7 +68,8 @@ class Series:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.time)}'
 
-    def plot(self, figsize=[10, 4], title=None, savefig_settings={}, ax=None, **plot_args):
+    def plot(self, figsize=[10, 4], title=None, savefig_settings={}, ax=None,
+             **plot_args):
         ''' Plot the timeseries
 
         Args
@@ -575,7 +576,6 @@ class Coherence:
 
 class Lipd:
     def __init__(self, lipd_list):
-        self.lipd_list = lipd_list
         self.plot_default = {'ice/rock': ['#FFD600','h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
@@ -589,6 +589,30 @@ class Lipd:
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
                 'other':['k','o']}
+    
+    def getLipd(self, usr_path=None):
+        """Read Lipd files into a dictionary
+
+        Sets the dictionary as global variable so that it doesn't have to be provided
+        as an argument for every function.
+    
+        Args
+        ----
+    
+        usr_path : str
+                  The path to a directory or a single file. (Optional argument)
+    
+        Returns
+        -------
+    
+        lipd_dict : dict
+                   a dictionary containing the LiPD library
+    
+        """
+        global lipd_dict
+        lipd_dict = lpd.readLipd(usr_path=usr_path)
+        return lipd_dict
+        
 
 class LipdSeries:
     def __init__(self, ts):
