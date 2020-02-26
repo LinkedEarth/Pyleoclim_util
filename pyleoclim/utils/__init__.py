@@ -11,6 +11,7 @@ Defaults set as per the original function
 
 from .plotting import set_style
 from .plotting import showfig
+from .spectral import *
 
 __all__ = [
     'set_style',

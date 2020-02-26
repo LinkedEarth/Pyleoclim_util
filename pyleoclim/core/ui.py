@@ -177,7 +177,7 @@ class Series:
         if linewidth is not None:
             plot_kwargs.update({'linewidth': linewidth})
 
-        res = plotting.plot_series(
+        res = plotting.plot_xy(
             self.time, self.value,
             figsize=figsize, xlabel=xlabel, ylabel=ylabel,
             title=title, savefig_settings=savefig_settings,

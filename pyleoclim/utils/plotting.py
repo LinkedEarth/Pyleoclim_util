@@ -189,9 +189,8 @@ def plot_hist(y, bins = None, hist = True, label = None,
     return ax 
 
 
-def plot_series(time, value, figsize=None, xlabel=None, ylabel=None, title=None,
-                savefig_settings=None, ax=None, legend=True,
-                plot_kwargs=None, lgd_kwargs=None):
+def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
+            savefig_settings=None, ax=None, legend=True, plot_kwargs=None, lgd_kwargs=None):
     ''' Plot the timeseries
 
     Args
@@ -217,7 +216,7 @@ def plot_series(time, value, figsize=None, xlabel=None, ylabel=None, title=None,
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
 
-    ax.plot(time, value, **plot_kwargs)
+    ax.plot(x, y, **plot_kwargs)
 
     if xlabel is not None:
         ax.set_xlabel(xlabel)

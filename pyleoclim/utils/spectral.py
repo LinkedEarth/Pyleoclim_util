@@ -13,6 +13,11 @@ from scipy import signal
 import nitime.algorithms as nialg
 import collections
 
+__all__ = [
+    'wwz_psd',
+    'mtm',
+]
+
 from .wavelet import (
     preprocess,
     is_evenly_spaced,
