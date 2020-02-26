@@ -70,8 +70,12 @@ class Series:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.time)}'
 
-    def plot(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None,
-             savefig_settings={}, ax=None, **plot_args):
+    def plot(self, figsize=[10, 4],
+             marker=None, markersize=None, color=None,
+             linestyle=None, linewidth=None,
+             label=None, xlabel=None, ylabel=None, title=None,
+             legend=True, plot_kwargs=None, lgd_kwargs=None,
+             savefig_settings=None, ax=None):
         ''' Plot the timeseries
 
         Args
@@ -80,20 +84,71 @@ class Series:
         figsize : list
             a list of two integers indicating the figure size
 
+        marker : str
+            e.g., 'o' for dots
+            See [matplotlib.markers](https://matplotlib.org/3.1.3/api/markers_api.html) for details
+
+        markersize : float
+            the size of the marker
+
+        linestyle : str
+            e.g., '--' for dashed line
+            See [matplotlib.linestyles](https://matplotlib.org/3.1.0/gallery/lines_bars_and_markers/linestyles.html) for details
+
+        linewidth : float
+            the width of the line
+
+        label : str
+            the label for the line
+
+        xlabel : str
+            the label for the x-axis
+
+        ylabel : str
+            the label for the y-axis
+
         title : str
             the title for the figure
+
+        legend : {True, False}
+            plot legend or not
+
+        plot_kwargs : dict
+            the dictionary of keyword arguments for ax.plot()
+            See [matplotlib.pyplot.plot](https://matplotlib.org/3.1.3/api/_as_gen/matplotlib.pyplot.plot.html) for details
+
+        lgd_kwargs : dict
+            the dictionary of keyword arguments for ax.legend()
+            See [matplotlib.pyplot.legend](https://matplotlib.org/3.1.3/api/_as_gen/matplotlib.pyplot.legend.html) for details
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        ax : matplotlib.axis, optional
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        Returns
+        -------
+
+        fig : matplotlib.figure
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
+
+        ax : matplotlib.axis
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        Notes
+        -----
+
+        When `ax` is passed, the return will be `ax` only; otherwise, both `fig` and `ax` will be returned.
+
         '''
-        if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
-
-        ax.plot(self.time, self.value, **plot_args)
-
+        # generate default axis labels
         time_label, value_label = self.make_labels()
 
         if xlabel is None:
@@ -102,20 +157,35 @@ class Series:
         if ylabel is None:
             ylabel = value_label
 
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        plot_kwargs = {} if plot_kwargs is None else plot_kewargs.copy()
 
-        if title is not None:
-            ax.set_title(title)
+        if label is not None:
+            plot_kwargs.update({'label': label})
 
-        if 'fig' in locals():
-            if 'path' in savefig_settings:
-                plotting.savefig(fig, savefig_settings)
-            else:
-                plotting.showfig(fig)
-            return fig, ax
-        else:
-            return ax
+        if marker is not None:
+            plot_kwargs.update({'marker': marker})
+
+        if markersize is not None:
+            plot_kwargs.update({'markersize': markersize})
+
+        if color is not None:
+            plot_kwargs.update({'color': color})
+
+        if linestyle is not None:
+            plot_kwargs.update({'linestyle': linestyle})
+
+        if linewidth is not None:
+            plot_kwargs.update({'linewidth': linewidth})
+
+        res = plotting.plot_series(
+            self.time, self.value,
+            figsize=figsize, xlabel=xlabel, ylabel=ylabel,
+            title=title, savefig_settings=savefig_settings,
+            ax=ax, legend=legend,
+            plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
+        )
+
+        return res
 
     def distplot(self, figsize=[10, 4], title=None, savefig_settings={}, ax=None, ylabel='KDE', **plot_args):
         ''' Plot the distribution of the timeseries values

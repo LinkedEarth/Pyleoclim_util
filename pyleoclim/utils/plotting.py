@@ -14,63 +14,6 @@ import matplotlib as mpl
 import seaborn as sns
 
 
-def plot(x,y,markersize=50,marker='ro',x_label=None ,y_label=None,
-         title =None, legend=True, figsize =[10,4], ax = None, **plot_args):
-    """ Make a 2-D plot
-    
-    Args
-    ----
-    
-    x : numpy array
-       a 1xn numpy array of values for the x-axis
-    y : numpy array
-       a 1xn numpy array for the y-axis
-    markersize : int
-                the size of the marker
-    marker : string or list
-            color and shape of the marker
-    x_axis_label : str
-                  the label for the x-axis
-    y_axis_label : str
-                  the label for the y-axis
-    title : str
-           the title for the plot
-    figsize : list
-              the size of the figure
-    ax : object
-        The axis to be specified (useful to integrate plot into a subplot)
-            
-    Returns
-    -------
-    
-    ax : The axis 
-    fig : The figure
-    
-    """
-    
-    if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
-
-    ax.plot(x, y, **plot_args)
-
-    time_label, value_label = self.make_labels()
-
-    ax.set_xlabel(time_label)
-    ax.set_ylabel(value_label)
-
-    if title is not None:
-        ax.set_title(title)
-
-    if 'fig' in locals():
-        if 'path' in savefig_settings:
-            savefig(fig, savefig_settings)
-        else:
-            showfig(fig)
-        return fig, ax
-    else:
-        return ax
-    
-    
 def plot_ens(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = None,
             y_label = None, title = None, figsize = [10,4], ax = None):
     """Plot Ensemble Values
@@ -245,9 +188,63 @@ def plot_hist(y, bins = None, hist = True, label = None,
             
     return ax 
 
+
+def plot_series(time, value, figsize=None, xlabel=None, ylabel=None, title=None,
+                savefig_settings=None, ax=None, legend=True,
+                plot_kwargs=None, lgd_kwargs=None):
+    ''' Plot the timeseries
+
+    Args
+    ----
+
+    figsize : list
+        a list of two integers indicating the figure size
+
+    title : str
+        the title for the figure
+
+    savefig_settings : dict
+        the dictionary of arguments for plt.savefig(); some notes below:
+        - "path" must be specified; it can be any existed or non-existed path,
+          with or without a suffix; if the suffix is not given in "path", it will follow "format"
+        - "format" can be one of {"pdf", "eps", "png", "ps"}
+    '''
+    # handle dict defaults
+    savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+    plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+    lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+
+    ax.plot(time, value, **plot_kwargs)
+
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
+
+    if title is not None:
+        ax.set_title(title)
+
+    if legend:
+        ax.legend(**lgd_kwargs)
+    else:
+        ax.legend().remove()
+
+    if 'fig' in locals():
+        if 'path' in savefig_settings:
+            savefig(fig, savefig_settings)
+        else:
+            showfig(fig)
+        return fig, ax
+    else:
+        return ax
+
 #----------
 # utilities
-#---------- 
+#----------
 def in_notebook():
     ''' Check if the code is executed in a Jupyter notebook
     '''
