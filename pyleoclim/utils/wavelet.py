@@ -7,6 +7,13 @@ Created on Tue Feb 25 08:14:31 2020
 
 Functions concerning wavelet analysis
 """
+
+
+__all__ = [
+    'wwz',
+    'xwc',
+]
+
 import numpy as np
 import statsmodels.api as sm
 from scipy import optimize, signal

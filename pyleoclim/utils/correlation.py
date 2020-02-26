@@ -8,6 +8,11 @@ Created on Tue Feb 25 06:01:55 2020
 Contains all relevant functions for Correlation analysis
 """
 
+__all__ = [
+    'corr_sig',
+    'fdr',
+]
+
 import numpy as np
 from scipy.stats import pearsonr
 from scipy.stats.mstats import gmean
@@ -16,9 +21,9 @@ from scipy.stats import gaussian_kde
 import statsmodels.api as sm
 from sklearn import preprocessing
 
-#--------
-#Wrappers
-#-------
+#----------
+# Wrappers
+#----------
 
 def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     """ Estimates the significance of correlations between non IID time series by 3 independent methods:
@@ -130,9 +135,9 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
 
     return fdr_res
 
-#------
-#Main functions
-#-----
+#-----------
+# Utilities
+#-----------
 
 def corr_ttest(y1, y2, alpha=0.05):
     """ Estimates the significance of correlations between 2 time series using

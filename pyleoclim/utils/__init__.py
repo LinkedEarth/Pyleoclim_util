@@ -11,6 +11,8 @@ Defaults set as per the original function
 
 from .plotting import *
 from .spectral import *
+from .correlation import *
+from .causality import *
 
 __all__ = [
     'set_style',

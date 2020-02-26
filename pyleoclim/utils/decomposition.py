@@ -6,6 +6,13 @@ Created on Tue Feb 25 06:29:36 2020
 @author: deborahkhider
 Contains decompoistion methods (PCA, SSA...)
 """
+
+__all__[
+    'pca',
+    'ssa',
+    'mssa',
+]
+
 import numpy as np
 from sklearn.decomposition import PCA
 from .wavelet import preprocess

@@ -8,6 +8,11 @@ Created on Tue Feb 25 06:15:52 2020
 Handles filtering
 """
 
+__all__ = [
+    'butterworth',
+    'savitzky_golay',
+]
+
 import numpy as np
 from math import factorial
 import statsmodels.api as sm
