@@ -9,11 +9,11 @@ Contains all basic block functions for pyleoclim.
 Defaults set as per the original function
 """
 
-from .plotting import set_style
-from .plotting import showfig
+from .plotting import *
 from .spectral import *
 
 __all__ = [
     'set_style',
+    'savefig',
     'showfig',
 ]

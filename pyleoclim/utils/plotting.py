@@ -8,11 +8,17 @@ Created on Tue Feb 25 05:45:52 2020
 Contains all relevant plotting functions
 """
 
+__all__ = [
+    'set_style',
+    'showfig',
+    'savefig',
+    'plot_xy',
+]
+
 import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
 import seaborn as sns
-
 
 def plot_ens(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = None,
             y_label = None, title = None, figsize = [10,4], ax = None):
