@@ -20,6 +20,7 @@ __all__ = [
     'gaussianize_single',
     'detrend',
     'detect_outliers',
+    'is_evenly_spaced',
 ]
 
 import numpy as np
@@ -631,3 +632,33 @@ def detect_outliers(ts, ys, args={}):
             is_outlier.append(False)
 
     return is_outlier
+
+
+def is_evenly_spaced(ts):
+    ''' Check if a time axis is evenly spaced.
+
+    Args
+    ----
+
+    ts : array
+        the time axis of a time series
+
+    Returns
+    -------
+
+    check : bool
+        True - evenly spaced; False - unevenly spaced.
+
+    '''
+    if ts is None:
+        check = True
+    else:
+        dts = np.diff(ts)
+        dt_mean = np.mean(dts)
+        if any(dt == dt_mean for dt in np.diff(ts)):
+            check = True
+        else:
+            check = False
+
+    return check
+
