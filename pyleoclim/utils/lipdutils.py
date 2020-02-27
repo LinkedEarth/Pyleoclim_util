@@ -1384,3 +1384,28 @@ def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo):
         ensembleValuesToPaleo[:,i]=np.interp(depthPaleo,depthEnsemble,ensembleValues[:,i])
 
     return ensembleValuesToPaleo
+
+def gen_dict_extract(key, var):
+    '''Recursively searches for all the values in nested dictionaries corresponding 
+    to a particular key
+    
+    Args
+    ----
+    
+    key : str
+        The key to search for
+    var : dict
+        The dictionary to search
+    
+    '''
+    if hasattr(var,'items'):
+        for k, v in var.items():
+            if k == key:
+                yield v
+            if isinstance(v, dict):
+                for result in gen_dict_extract(key, v):
+                    yield result
+            elif isinstance(v, list):
+                for d in v:
+                    for result in gen_dict_extract(key, d):
+                        yield result
