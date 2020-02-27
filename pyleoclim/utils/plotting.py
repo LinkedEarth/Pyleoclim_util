@@ -196,7 +196,7 @@ def plot_hist(y, bins = None, hist = True, label = None,
 
 
 def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
-            savefig_settings=None, ax=None, legend=True, plot_kwargs=None, lgd_kwargs=None):
+            savefig_settings=None, ax=None, legend=True, plot_kwargs=None, lgd_kwargs=None, mute=False):
     ''' Plot the timeseries
 
     Args
@@ -242,7 +242,8 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
         if 'path' in savefig_settings:
             savefig(fig, savefig_settings)
         else:
-            showfig(fig)
+            if not mute:
+                showfig(fig)
         return fig, ax
     else:
         return ax
