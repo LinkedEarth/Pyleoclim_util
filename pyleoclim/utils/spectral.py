@@ -16,6 +16,9 @@ import collections
 __all__ = [
     'wwz_psd',
     'mtm',
+    'lomb_scargle',
+    'welch',
+    'periodogram'
 ]
 
 from .tsutils import (

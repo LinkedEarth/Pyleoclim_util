@@ -10,7 +10,7 @@ from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
 from ..utils import causality as causalutils
 
-from textwrap import dedent
+#from textwrap import dedent
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -262,10 +262,16 @@ class Series:
         spec_func = {
             'wwz': specutils.wwz_psd,
             'mtm': specutils.mtm,
+            'lomb_scargle': specutils.lomb_scargle,
+            'welch': specutils.welch,
+            'periodogram': specutils.periodogram
         }
         args = {}
         args['wwz'] = {}
         args['mtm'] = {}
+        args['lomb_scargle'] = {}
+        args['welch'] = {}
+        args['periodogram'] = {}
         args[method].update(settings)
         spec_res = spec_func[method](self.value, self.time, **args[method])
         if type(spec_res) is dict:
