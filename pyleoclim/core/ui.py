@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 from tabulate import tabulate
 from collections import namedtuple
+from copy import deepcopy
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 from matplotlib.colors import BoundaryNorm, Normalize
@@ -80,7 +81,7 @@ class Series:
              linestyle=None, linewidth=None,
              label=None, xlabel=None, ylabel=None, title=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None,
-             savefig_settings=None, ax=None):
+             savefig_settings=None, ax=None, mute=False):
         ''' Plot the timeseries
 
         Args
@@ -191,11 +192,12 @@ class Series:
             title=title, savefig_settings=savefig_settings,
             ax=ax, legend=legend,
             plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
+            mute=mute,
         )
 
         return res
 
-    def distplot(self, figsize=[10, 4], title=None, savefig_settings={}, ax=None, ylabel='KDE', **plot_args):
+    def distplot(self, figsize=[10, 4], title=None, savefig_settings={}, ax=None, ylabel='KDE', mute=False, **plot_args):
         ''' Plot the distribution of the timeseries values
 
         Args
@@ -230,30 +232,41 @@ class Series:
             if 'path' in savefig_settings:
                 plotting.savefig(fig, savefig_settings)
             else:
-                plotting.showfig(fig)
+                if not mute:
+                    plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
+    def copy(self):
+        return deepcopy(self)
+
     def clean(self):
         ''' Clean up the timeseries by removing NaNs and sort with increasing time points
         '''
-        y_cleaned, t_cleaned = tsutils.clean_ts(self.value, self.time)
-        self.time = t_cleaned
-        self.value = y_cleaned
-        return self
+        new = self.copy()
+        v_mod, t_mod = tsutils.clean_ts(self.value, self.time)
+        new.time = t_mod
+        new.value = v_mod
+        return new
 
     def gaussianize(self):
-        self.value = tsutils.gaussianize(self.value)
-        return self
+        new = self.copy()
+        v_mod = tsutils.gaussianize(self.value)
+        new.value = v_mod
+        return new
 
     def standardize(self):
-        self.value = tsutils.standardize(self.value)
-        return self
+        new = self.copy()
+        v_mod = tsutils.standardize(self.value)[0]
+        new.value = v_mod
+        return new
 
     def detrend(self, method='emd', **kwargs):
-        self.value = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
-        return self
+        new = self.copy()
+        v_mod = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
+        new.value = v_mod
+        return new
 
     def spectral(self, method='wwz', settings=None, label=None):
         ''' Perform spectral analysis on the timeseries
@@ -402,6 +415,10 @@ class PSD:
         self.spec_args = spec_args
         self.signif_qs = signif_qs
         self.signif_method = signif_method
+
+    def copy(self):
+        return deepcopy(self)
+
     def __str__(self):
         table = {
             'Frequency': self.freq,
@@ -413,18 +430,19 @@ class PSD:
 
     def signif_test(self, number=200, method='ar1', seed=None, qs=[0.9, 0.95, 0.99],
                     settings=None):
+        new = self.copy()
         surr = self.timeseries.surrogates(
             number=number, seed=seed, method=method, settings=settings
         )
         surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
-        self.signif_qs = surr_psd.quantiles(qs=qs)
-        self.signif_method = method
+        new.signif_qs = surr_psd.quantiles(qs=qs)
+        new.signif_method = method
 
-        return self
+        return new
 
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='Amplitude', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None,
-             xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None,
+             xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
              plot_legend=True, lgd_kwargs=None, xticks=None, yticks=None, plot_kwargs=None,
              signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
         ''' Plot the power sepctral density (PSD)
@@ -549,7 +567,8 @@ class PSD:
             if 'path' in savefig_settings:
                 plotting.savefig(fig, savefig_settings)
             else:
-                plotting.showfig(fig)
+                if not mute:
+                    plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -562,6 +581,9 @@ class Scalogram:
         self.coi = np.array(coi)
         self.label = label
 
+    def copy(self):
+        return deepcopy(self)
+
     def __str__(self):
         table = {
             'Frequency': self.frequency,
@@ -573,7 +595,7 @@ class Scalogram:
         return f'Dimension: {np.size(self.frequency)} x {np.size(self.time)}'
 
     def plot(self, in_period=True, xlabel='Time', ylabel=None, title=None,
-             ylim=None, xlim=None, yticks=None, figsize=[10, 8],
+             ylim=None, xlim=None, yticks=None, figsize=[10, 8], mute=False,
              contourf_style={}, cbar_style={}, savefig_settings={}, ax=None):
         ''' Plot the scalogram from wavelet analysis
 
@@ -649,7 +671,8 @@ class Scalogram:
             if 'path' in savefig_settings:
                 plotting.savefig(fig, savefig_settings)
             else:
-                plotting.showfig(fig)
+                if not mute:
+                    plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -663,8 +686,11 @@ class Coherence:
         self.coi = np.array(coi)
         self.phase = np.array(phase)
 
+    def copy(self):
+        return deepcopy(self)
+
     def plot(self, xlabel='Time', ylabel='Period', title=None, figsize=[10, 8],
-             ylim=None, xlim=None, in_period=True, yticks=None,
+             ylim=None, xlim=None, in_period=True, yticks=None, mute=False,
              contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, ax=None,
              under_clr='ivory', over_clr='black', bad_clr='dimgray'):
         ''' Plot the wavelet coherence result
@@ -772,7 +798,6 @@ class Coherence:
         if xlim is not None:
             ax.set_xlim(xlim)
 
-
         if title is not None:
             ax.set_title(title)
 
@@ -780,7 +805,8 @@ class Coherence:
             if 'path' in savefig_settings:
                 plotting.savefig(fig, savefig_settings)
             else:
-                plotting.showfig(fig)
+                if not mute:
+                    plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -790,6 +816,9 @@ class MultipleSeries:
         self.series_list = series_list
         self.surrogate_method = surrogate_method
         self.surrogate_args = surrogate_args
+
+    def copy(self):
+        return deepcopy(self)
 
     def spectral(self, method='wwz', settings={}):
         settings = {} if settings is None else settings.copy()
@@ -808,7 +837,7 @@ class MultipleSeries:
              linestyle=None, linewidth=None,
              label=None, xlabel=None, ylabel=None, title=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None,
-             savefig_settings=None, ax=None):
+             savefig_settings=None, ax=None, mute=False):
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
@@ -828,7 +857,8 @@ class MultipleSeries:
             if 'path' in savefig_settings:
                 plotting.savefig(fig, savefig_settings)
             else:
-                plotting.showfig(fig)
+                if not mute:
+                    plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -836,6 +866,9 @@ class MultipleSeries:
 class MultiplePSD:
     def __init__(self, psd_list):
         self.psd_list = psd_list
+
+    def copy(self):
+        return deepcopy(self)
 
     def quantiles(self, qs=[0.05, 0.5, 0.95]):
         freq = np.copy(self.psd_list[0].frequency)
@@ -859,7 +892,7 @@ class MultiplePSD:
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
-             plot_kwargs=None, lgd_kwargs=None):
+             plot_kwargs=None, lgd_kwargs=None, mute=False):
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
@@ -879,7 +912,8 @@ class MultiplePSD:
             if 'path' in savefig_settings:
                 plotting.savefig(fig, savefig_settings)
             else:
-                plotting.showfig(fig)
+                if not mute:
+                    plotting.showfig(fig)
             return fig, ax
         else:
             return ax
