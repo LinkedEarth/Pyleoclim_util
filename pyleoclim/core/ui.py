@@ -23,19 +23,23 @@ from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 from matplotlib.colors import BoundaryNorm, Normalize
 from matplotlib import cm
 
+from tqdm import tqdm
+from scipy.stats.mstats import mquantiles
+
 
 def dict2namedtuple(d):
     tupletype = namedtuple('tupletype', sorted(d))
     return tupletype(**d)
 
 class Series:
-    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None):
+    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None):
         self.time = np.array(time)
         self.value = np.array(value)
         self.time_name = time_name
         self.time_unit = time_unit
         self.value_name = value_name
         self.value_unit = value_unit
+        self.label = label
 
     def make_labels(self):
         if self.time_name is not None:
@@ -158,7 +162,10 @@ class Series:
         if ylabel is None:
             ylabel = value_label
 
-        plot_kwargs = {} if plot_kwargs is None else plot_kewargs.copy()
+        plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+
+        if label is None:
+            label = self.label
 
         if label is not None:
             plot_kwargs.update({'label': label})
@@ -235,25 +242,33 @@ class Series:
         self.time = t_cleaned
         self.value = y_cleaned
 
-    def spectral(self, method='wwz', settings={}):
+    def spectral(self, method='wwz', settings=None, label=None):
         ''' Perform spectral analysis on the timeseries
         '''
+        settings = {} if settings is None else settings.copy()
         spec_func = {
             'wwz': specutils.wwz_psd,
             'mtm': specutils.mtm,
         }
         args = {}
-        args.update(settings)
-        spec_res = spec_func[method](self.value, self.time, **args)
+        args['wwz'] = {}
+        args['mtm'] = {}
+        args[method].update(settings)
+        spec_res = spec_func[method](self.value, self.time, **args[method])
         if type(spec_res) is dict:
             spec_res = dict2namedtuple(spec_res)
 
-        psd = PSD(freq=spec_res.freq, amplitude=spec_res.psd)
+        if label is None:
+            label = self.label
+
+        psd = PSD(frequency=spec_res.freq, amplitude=spec_res.psd, label=label, timeseries=self,
+                  spec_method=method, spec_args=args[method])
         return psd
 
-    def wavelet(self, method='wwz', nv=12, settings={}):
+    def wavelet(self, method='wwz', nv=12, settings=None):
         ''' Perform wavelet analysis on the timeseries
         '''
+        settings = {} if settings is None else settings.copy()
         wave_func = {
             'wwz': waveutils.wwz,
         }
@@ -264,16 +279,24 @@ class Series:
         scale = s0*a0**(np.arange(noct*nv+1))
         freq = 1/scale[::-1]
 
-        args = {'tau': self.time, 'freq': freq}
-        args.update(settings)
-        wave_res = wave_func[method](self.value, self.time, **args)
-        scal = Scalogram(freq=wave_res.freq, time=wave_res.time, amplitude=wave_res.amplitude, coi=wave_res.coi)
+        args = {}
+        args['wwz'] = {'tau': self.time, 'freq': freq}
+        args[method].update(settings)
+        wave_res = wave_func[method](self.value, self.time, **args[method])
+        scal = Scalogram(
+            frequency=wave_res.freq,
+            time=wave_res.time,
+            amplitude=wave_res.amplitude,
+            coi=wave_res.coi,
+            label=self.label
+        )
 
         return scal
 
-    def wavelet_coherence(self, target_series, nv=12, method='wwz', settings={}):
+    def wavelet_coherence(self, target_series, nv=12, method='wwz', settings=None):
         ''' Perform wavelet coherence analysis with the target timeseries
         '''
+        settings = {} if settings is None else settings.copy()
         xwc_func = {
             'wwz': waveutils.xwc,
         }
@@ -290,17 +313,19 @@ class Series:
         dt2 = np.median(np.diff(t2))
         overlap = np.arange(np.max([t1[0], t2[0]]), np.min([t1[-1], t2[-1]]), np.max([dt1, dt2]))
 
-        args = {'tau': overlap, 'freq': freq}
-        args.update(settings)
-        xwc_res = xwc_func[method](self.value, self.time, target_series.value, target_series.time, **args)
+        args = {}
+        args['wwz'] = {'tau': overlap, 'freq': freq}
+        args[method].update(settings)
+        xwc_res = xwc_func[method](self.value, self.time, target_series.value, target_series.time, **args[method])
 
-        coh = Coherence(freq=xwc_res.freq, time=xwc_res.time, coherence=xwc_res.xw_coherence, phase=xwc_res.xw_phase, coi=xwc_res.coi)
+        coh = Coherence(frequency=xwc_res.freq, time=xwc_res.time, coherence=xwc_res.xw_coherence, phase=xwc_res.xw_phase, coi=xwc_res.coi)
 
         return coh
 
-    def correlation(self, target_series, settings={}):
+    def correlation(self, target_series, settings=None):
         ''' Perform correlation analysis with the target timeseries
         '''
+        settings = {} if settings is None else settings.copy()
         args = {}
         args.update(settings)
         r, signif, p = corrutils.corr_sig(self.value, target_series.value, **args)
@@ -311,29 +336,53 @@ class Series:
         }
         return corr_res
 
-    def causality(self, target_series, settings={}):
+    def causality(self, target_series, method='liang', settings=None):
         ''' Perform causality analysis with the target timeseries
         '''
+        settings = {} if settings is None else settings.copy()
         args = {}
-        args.update(settings)
-        causal_res = causalutils.causality_est(self.value, target_series.value, **args)
+        args['liang'] = {}
+        args[method].update(settings)
+        causal_res = causalutils.causality_est(self.value, target_series.value, method=method, **args[method])
         return causal_res
-    def surrogates(self, number=1, length=None, method='ar1'):
+
+    def surrogates(self, method='ar1', number=1, length=None, seed=None, settings=None):
+        settings = {} if settings is None else settings.copy()
         surrogate_func = {
             'ar1': tsmodel.ar1_sim,
         }
+        args = {}
+        args['ar1'] = {'ts': self.time}
+        args[method].update(settings)
 
         if length is None:
             length = np.size(self.value)
 
-        surrogates = surrogate_func[method](self.value, number, length, ts=self.time)
+        if seed is not None:
+            np.random.seed(seed)
 
-        return surrogates
+        surr_res = surrogate_func[method](self.value, length, number, **args[method])
+
+        s_list = []
+        for s in surr_res.T:
+            s_tmp = Series(time=self.time, value=s)
+            s_list.append(s_tmp)
+
+        surr = MultipleSeries(series_list=s_list, surrogate_method=method, surrogate_args=args[method])
+
+        return surr
 
 class PSD:
-    def __init__(self, freq, amplitude):
-        self.freq = np.array(freq)
+    def __init__(self, frequency, amplitude, label=None, timeseries=None,
+                 spec_method=None, spec_args=None, signif_qs=None, signif_method=None):
+        self.frequency = np.array(frequency)
         self.amplitude = np.array(amplitude)
+        self.label = label
+        self.timeseries = timeseries
+        self.spec_method = spec_method
+        self.spec_args = spec_args
+        self.signif_qs = signif_qs
+        self.signif_method = signif_method
     def __str__(self):
         table = {
             'Frequency': self.freq,
@@ -343,9 +392,22 @@ class PSD:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.freq)}'
 
-    def plot(self, in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
-             xlim=None, ylim=None, figsize=[10, 4], savefig_settings={}, ax=None,
-             plot_legend=True, lgd_settings={}, xticks=None, yticks=None, **plot_args):
+    def signif_test(self, number=200, method='ar1', seed=None, qs=[0.9, 0.95, 0.99],
+                    settings=None):
+        surr = self.timeseries.surrogates(
+            number=number, seed=seed, method=method, settings=settings
+        )
+        surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
+        self.signif_qs = surr_psd.quantiles(qs=qs)
+        self.signif_method = method
+
+        return self
+
+    def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='Amplitude', title=None,
+             marker=None, markersize=None, color=None, linestyle=None, linewidth=None,
+             xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None,
+             plot_legend=True, lgd_kwargs=None, xticks=None, yticks=None, plot_kwargs=None,
+             signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
         ''' Plot the power sepctral density (PSD)
 
         Args
@@ -363,13 +425,37 @@ class PSD:
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+        lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+
+        if label is None:
+            label = self.label
+
+        if label is not None:
+            plot_kwargs.update({'label': label})
+
+        if marker is not None:
+            plot_kwargs.update({'marker': marker})
+
+        if markersize is not None:
+            plot_kwargs.update({'markersize': markersize})
+
+        if color is not None:
+            plot_kwargs.update({'color': color})
+
+        if linestyle is not None:
+            plot_kwargs.update({'linestyle': linestyle})
+
+        if linewidth is not None:
+            plot_kwargs.update({'linewidth': linewidth})
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
         if in_period:
-            idx = np.argwhere(self.freq==0)
-            x_axis = 1/np.delete(self.freq, idx)
+            idx = np.argwhere(self.frequency==0)
+            x_axis = 1/np.delete(self.frequency, idx)
             y_axis = np.delete(self.amplitude, idx)
             if xlabel is None:
                 xlabel = 'Period'
@@ -383,8 +469,8 @@ class PSD:
                 xlim = [np.max(xticks), np.min(xticks)]
 
         else:
-            idx = np.argwhere(self.freq==0)
-            x_axis = np.delete(self.freq, idx)
+            idx = np.argwhere(self.frequency==0)
+            x_axis = np.delete(self.frequency, idx)
             y_axis = np.delete(self.amplitude, idx)
             if xlabel is None:
                 xlabel = 'Frequency'
@@ -394,7 +480,26 @@ class PSD:
                 xlim = [np.min(xlim), np.max(xlim)]
 
         ax.set_xlim(xlim)
-        ax.plot(x_axis, y_axis, **plot_args)
+        ax.plot(x_axis, y_axis, **plot_kwargs)
+
+        # plot significance levels
+        if self.signif_qs is not None:
+            signif_method_label = {
+                'ar1': 'AR(1)',
+            }
+            nqs = np.size(self.signif_qs.psd_list)
+
+            for i, q in enumerate(self.signif_qs.psd_list):
+                idx = np.argwhere(q.frequency==0)
+                signif_x_axis = 1/np.delete(q.frequency, idx) if in_period else np.delete(q.frequency, idx)
+                signif_y_axis = np.delete(q.amplitude, idx)
+                ax.plot(
+                    signif_x_axis, signif_y_axis,
+                    label=f'{signif_method_label[self.signif_method]}, {q.label} threshold',
+                    color=signif_clr,
+                    linestyle=signif_linestyles[i%3],
+                    linewidth=signif_linewidth,
+                )
 
         if in_loglog:
             ax.set_xscale('log', nonposx='clip')
@@ -415,7 +520,7 @@ class PSD:
 
         if plot_legend:
             lgd_args = {'frameon': False}
-            lgd_args.update(lgd_settings)
+            lgd_args.update(lgd_kwargs)
             ax.legend(**lgd_args)
 
         if title is not None:
@@ -431,21 +536,22 @@ class PSD:
             return ax
 
 class Scalogram:
-    def __init__(self, freq, time, amplitude, coi):
-        self.freq = np.array(freq)
+    def __init__(self, frequency, time, amplitude, coi, label=None):
+        self.frequency = np.array(frequency)
         self.time = np.array(time)
         self.amplitude = np.array(amplitude)
         self.coi = np.array(coi)
+        self.label = label
 
     def __str__(self):
         table = {
-            'Frequency': self.freq,
+            'Frequency': self.frequency,
             'Time': self.time,
             'Amplitude': self.amplitude,
         }
 
         msg = print(tabulate(table, headers='keys'))
-        return f'Dimension: {np.size(self.freq)} x {np.size(self.time)}'
+        return f'Dimension: {np.size(self.frequency)} x {np.size(self.time)}'
 
     def plot(self, in_period=True, xlabel='Time', ylabel=None, title=None,
              ylim=None, xlim=None, yticks=None, figsize=[10, 8],
@@ -474,7 +580,7 @@ class Scalogram:
             fig, ax = plt.subplots(figsize=figsize)
 
         if in_period:
-            y_axis = 1/self.freq
+            y_axis = 1/self.frequency
             if ylabel is None:
                 ylabel = 'Period'
 
@@ -483,7 +589,7 @@ class Scalogram:
                 mask = (yticks_default >= np.min(y_axis)) & (yticks_default <= np.max(y_axis))
                 yticks = yticks_default[mask]
         else:
-            y_axis = self.freq
+            y_axis = self.frequency
             if ylabel is None:
                 ylabel = 'Frequency'
 
@@ -531,8 +637,8 @@ class Scalogram:
 
 
 class Coherence:
-    def __init__(self, freq, time, coherence, phase, coi):
-        self.freq = np.array(freq)
+    def __init__(self, frequency, time, coherence, phase, coi):
+        self.frequency = np.array(frequency)
         self.time = np.array(time)
         self.coherence = np.array(coherence)
         self.coi = np.array(coi)
@@ -563,7 +669,7 @@ class Coherence:
             fig, ax = plt.subplots(figsize=figsize)
 
         if in_period:
-            y_axis = 1/self.freq
+            y_axis = 1/self.frequency
             if ylabel is None:
                 ylabel = 'Period'
 
@@ -572,7 +678,7 @@ class Coherence:
                 mask = (yticks_default >= np.min(y_axis)) & (yticks_default <= np.max(y_axis))
                 yticks = yticks_default[mask]
         else:
-            y_axis = self.freq
+            y_axis = self.frequency
             if ylabel is None:
                 ylabel = 'Frequency'
 
@@ -635,7 +741,7 @@ class Coherence:
         phase = np.copy(self.phase)
         phase[self.coherence < pt] = np.nan
 
-        X, Y = np.meshgrid(self.time, 1/self.freq)
+        X, Y = np.meshgrid(self.time, 1/self.frequency)
         U, V = np.cos(phase).T, np.sin(phase).T
 
         ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
@@ -650,6 +756,105 @@ class Coherence:
 
         if title is not None:
             ax.set_title(title)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, savefig_settings)
+            else:
+                plotting.showfig(fig)
+            return fig, ax
+        else:
+            return ax
+
+class MultipleSeries:
+    def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
+        self.series_list = series_list
+        self.surrogate_method = surrogate_method
+        self.surrogate_args = surrogate_args
+
+    def spectral(self, method='wwz', settings={}):
+        settings = {} if settings is None else settings.copy()
+
+        psd_list = []
+        for s in tqdm(self.series_list):
+            psd_tmp = s.spectral(method=method, settings=settings)
+            psd_list.append(psd_tmp)
+
+        psds = MultiplePSD(psd_list=psd_list)
+
+        return psds
+
+    def plot(self, figsize=[10, 4],
+             marker=None, markersize=None, color=None,
+             linestyle=None, linewidth=None,
+             label=None, xlabel=None, ylabel=None, title=None,
+             legend=True, plot_kwargs=None, lgd_kwargs=None,
+             savefig_settings=None, ax=None):
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+        lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        for s in self.series_list:
+            ax = s.plot(
+                figsize=figsize, marker=marker, markersize=markersize, color=color, linestyle=linestyle,
+                linewidth=linewidth, label=label, xlabel=xlabel, ylabel=ylabel, title=title,
+                legend=False, plot_kwargs=plot_kwargs, ax=ax,
+            )
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, savefig_settings)
+            else:
+                plotting.showfig(fig)
+            return fig, ax
+        else:
+            return ax
+
+class MultiplePSD:
+    def __init__(self, psd_list):
+        self.psd_list = psd_list
+
+    def quantiles(self, qs=[0.05, 0.5, 0.95]):
+        freq = np.copy(self.psd_list[0].frequency)
+        amps = []
+        for psd in self.psd_list:
+            if not np.array_equal(psd.frequency, freq):
+                raise ValueError('Frequency axis not consistent across the PSD list!')
+
+            amps.append(psd.amplitude)
+
+        amps = np.array(amps)
+        amp_qs = mquantiles(amps, qs, axis=0)
+
+        psd_list = []
+        for i, amp in enumerate(amp_qs):
+            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%')
+            psd_list.append(psd_tmp)
+
+        psds = MultiplePSD(psd_list=psd_list)
+        return psds
+
+    def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
+             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
+             plot_kwargs=None, lgd_kwargs=None):
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+        lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        for psd in self.psd_list:
+            ax = psd.plot(
+                figsize=figsize, in_loglog=in_loglog, in_period=in_period, label=psd.label, xlabel=xlabel, ylabel=ylabel,
+                title=title, xlim=xlim, ylim=ylim, savefig_settings=savefig_settings, ax=ax,
+                xticks=xticks, yticks=yticks, plot_legend=plot_legend, plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
+            )
 
         if 'fig' in locals():
             if 'path' in savefig_settings:

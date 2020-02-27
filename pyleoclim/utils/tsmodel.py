@@ -51,7 +51,8 @@ def ar1_model(ts, tau, n=None):
 
     return r
 
-def ar1_fit(ys, ts=None, detrend= None, params=["default", 4, 0, 1]):
+#  def ar1_fit(ys, ts=None, detrend= None, params=["default", 4, 0, 1]):
+def ar1_fit(ys, ts=None):
     ''' Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
 
     Args
@@ -81,13 +82,16 @@ def ar1_fit(ys, ts=None, detrend= None, params=["default", 4, 0, 1]):
     '''
 
     if is_evenly_spaced(ts):
-        g = ar1_fit_evenly(ys, ts, detrend=detrend, params=params)
+        #  g = ar1_fit_evenly(ys, ts, detrend=detrend, params=params)
+        g = ar1_fit_evenly(ys, ts)
     else:
-        g = tau_estimation(ys, ts, detrend=detrend, params=params)
+        #  g = tau_estimation(ys, ts, detrend=detrend, params=params)
+        g = tau_estimation(ys, ts)
 
     return g
 
-def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
+def ar1_sim(ys, n, p, ts=None):
+#  def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
     ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from `ys` and `ts`
 
     Args
@@ -123,7 +127,8 @@ def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
     red = np.empty(shape=(n, p))  # declare array
 
     if is_evenly_spaced(ts):
-        g = ar1_fit(ys, ts=ts, detrend=detrend, params=params)
+        #  g = ar1_fit(ys, ts=ts, detrend=detrend, params=params)
+        g = ar1_fit(ys, ts=ts)
         sig = np.std(ys)
 
         # specify model parameters (statsmodel wants lag0 coefficents as unity)
@@ -136,7 +141,8 @@ def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
             red[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n)
 
     else:
-        tau_est = ar1_fit(ys, ts=ts, detrend=detrend, params=params)
+        #  tau_est = ar1_fit(ys, ts=ts, detrend=detrend, params=params)
+        tau_est = ar1_fit(ys, ts=ts)
         for i in np.arange(p):
             red[:, i] = ar1_model(ts, tau_est, n=n)
 
@@ -145,8 +151,8 @@ def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
 
     return red
 
-def ar1_fit_evenly(ys, ts, detrend=False, params=["default", 4, 0, 1],
-                   gaussianize=False):
+def ar1_fit_evenly(ys, ts):
+#  def ar1_fit_evenly(ys, ts, detrend=False, params=["default", 4, 0, 1], gaussianize=False):
     ''' Returns the lag-1 autocorrelation from ar1 fit.
 
     Args
@@ -178,14 +184,15 @@ def ar1_fit_evenly(ys, ts, detrend=False, params=["default", 4, 0, 1],
         lag-1 autocorrelation coefficient
 
     '''
-    pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize)
-    ar1_mod = sm.tsa.AR(pd_ys, missing='drop').fit(maxlag=1)
+    #  pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize)
+    #  ar1_mod = sm.tsa.AR(pd_ys, missing='drop').fit(maxlag=1)
+    ar1_mod = sm.tsa.AR(ys, missing='drop').fit(maxlag=1)
     g = ar1_mod.params[1]
 
     return g
 
-def tau_estimation(ys, ts, detrend=False, params=["default", 4, 0, 1], 
-                   gaussianize=False, standardize=True):
+def tau_estimation(ys, ts):
+#  def tau_estimation(ys, ts, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
     ''' Return the estimated persistence of a givenevenly/unevenly spaced time series.
 
     Args
@@ -223,12 +230,13 @@ def tau_estimation(ys, ts, detrend=False, params=["default", 4, 0, 1],
         Comput. Geosci. 28, 69–72 (2002).
 
     '''
-    pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
+    #  pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
     dt = np.diff(ts)
     #  assert dt > 0, "The time points should be increasing!"
 
     def ar1_fun(a):
-        return np.sum((pd_ys[1:] - pd_ys[:-1]*a**dt)**2)
+        #  return np.sum((pd_ys[1:] - pd_ys[:-1]*a**dt)**2)
+        return np.sum((ys[1:] - ys[:-1]*a**dt)**2)
 
     a_est = optimize.minimize_scalar(ar1_fun, bounds=[0, 1], method='bounded').x
     #  a_est = optimize.minimize_scalar(ar1_fun, method='brent').x

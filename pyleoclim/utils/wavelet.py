@@ -17,6 +17,7 @@ __all__ = [
 import numpy as np
 import statsmodels.api as sm
 from scipy import signal
+from scipy.stats.mstats import mquantiles
 from pathos.multiprocessing import ProcessingPool as Pool
 import numba as nb
 from numba.errors import NumbaPerformanceWarning
@@ -1100,22 +1101,24 @@ def wwz(ys, ts, tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
     nt = np.size(tau)
     nf = np.size(freq)
 
-    wwa_red = np.ndarray(shape=(nMC, nt, nf))
-    AR1_q = np.ndarray(shape=(nt, nf))
+    #  wwa_red = np.ndarray(shape=(nMC, nt, nf))
+    #  AR1_q = np.ndarray(shape=(nt, nf))
 
-    if nMC >= 1:
-        for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
-            r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
-            wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freq, tau, c=c, Neff=Neff, nproc=nproc,
-                                                 detrend=detrend, params=params,
-                                                 gaussianize=gaussianize, standardize=standardize)
+    #  if nMC >= 1:
+        #  for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
+            #  r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
+            #  wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freq, tau, c=c, Neff=Neff, nproc=nproc,
+                                                 #  detrend=detrend, params=params,
+                                                 #  gaussianize=gaussianize, standardize=standardize)
 
-        for j in range(nt):
-            for k in range(nf):
-                AR1_q[j, k] = mquantiles(wwa_red[:, j, k], 0.95)
+        #  for j in range(nt):
+            #  for k in range(nf):
+                #  AR1_q[j, k] = mquantiles(wwa_red[:, j, k], 0.95)
 
-    else:
-        AR1_q = None
+    #  else:
+        #  AR1_q = None
+    wwa_red = None
+    AR1_q = None
 
     # calculate the cone of influence
     coi = make_coi(tau, Neff=Neff_coi)

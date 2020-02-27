@@ -429,27 +429,30 @@ def wwz_psd(ys, ts, freq=None, tau=None, c=1e-3, nproc=8, nMC=200,
     # Monte-Carlo simulations of AR1 process
     nf = np.size(freq)
 
-    psd_ar1 = np.ndarray(shape=(nMC, nf))
+    #  psd_ar1 = np.ndarray(shape=(nMC, nf))
 
-    if nMC >= 1:
-        #  tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
+    #  if nMC >= 1:
+        #  #  tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
 
-        for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
-            #  r = wa.ar1_model(ts_cut, tauest)
-            r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
-            res_red = wwz(r, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
-                                                                     detrend=detrend, params=params,
-                                                                     gaussianize=gaussianize, standardize=standardize,
-                                                                     method=method)
-            psd_ar1[i, :] = wa.wwa2psd(res_red.wwa, ts_cut, res_red.Neffs,
-                                       freq=res_red.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
-            #  psd_ar1[i, 1/freqs_red > np.max(coi_red)] = np.nan  # cut off the unreliable part out of the coi
-            #  psd_ar1 = psd_ar1[1/freqs_red <= np.max(coi_red)] # cut off the unreliable part out of the coi
+        #  for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
+            #  #  r = wa.ar1_model(ts_cut, tauest)
+            #  r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
+            #  res_red = wwz(r, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
+                                                                     #  detrend=detrend, params=params,
+                                                                     #  gaussianize=gaussianize, standardize=standardize,
+                                                                     #  method=method)
+            #  psd_ar1[i, :] = wa.wwa2psd(res_red.wwa, ts_cut, res_red.Neffs,
+                                       #  freq=res_red.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+            #  #  psd_ar1[i, 1/freqs_red > np.max(coi_red)] = np.nan  # cut off the unreliable part out of the coi
+            #  #  psd_ar1 = psd_ar1[1/freqs_red <= np.max(coi_red)] # cut off the unreliable part out of the coi
 
-        psd_ar1_q95 = mquantiles(psd_ar1, 0.95, axis=0)[0]
+        #  psd_ar1_q95 = mquantiles(psd_ar1, 0.95, axis=0)[0]
 
-    else:
-        psd_ar1_q95 = None
+    #  else:
+        #  psd_ar1_q95 = None
+
+    psd_ar1_q95 = None
+    psd_ar1 = None
 
     Results = collections.namedtuple('Results', ['psd', 'freq', 'psd_ar1_q95', 'psd_ar1'])
     res = Results(psd=psd, freq=freq, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)

@@ -14,3 +14,6 @@ from .utils import *
 from .core import *
 #from .workflow import *
 
+from .utils import plotting
+plotting.set_style()
+
