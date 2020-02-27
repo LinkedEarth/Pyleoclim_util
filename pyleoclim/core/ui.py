@@ -4,7 +4,7 @@
 
 Created on Jan 31, 2020
 '''
-from ..utils import tsutils, plotting, mapping, lipdutils
+from ..utils import tsutils, plotting, mapping, lipdutils, tsmodel
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
@@ -22,6 +22,7 @@ from collections import namedtuple
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 from matplotlib.colors import BoundaryNorm, Normalize
 from matplotlib import cm
+
 
 def dict2namedtuple(d):
     tupletype = namedtuple('tupletype', sorted(d))
@@ -230,9 +231,7 @@ class Series:
     def clean(self):
         ''' Clean up the timeseries by removing NaNs and sort with increasing time points
         '''
-        y = self.value
-        t = self.time
-        y_cleaned, t_cleaned = tsutils.clean_ts(y, t)
+        y_cleaned, t_cleaned = tsutils.clean_ts(self.value, self.time)
         self.time = t_cleaned
         self.value = y_cleaned
 
@@ -319,7 +318,17 @@ class Series:
         args.update(settings)
         causal_res = causalutils.causality_est(self.value, target_series.value, **args)
         return causal_res
+    def surrogates(self, number=1, length=None, method='ar1'):
+        surrogate_func = {
+            'ar1': tsmodel.ar1_sim,
+        }
 
+        if length is None:
+            length = np.size(self.value)
+
+        surrogates = surrogate_func[method](self.value, number, length, ts=self.time)
+
+        return surrogates
 
 class PSD:
     def __init__(self, freq, amplitude):

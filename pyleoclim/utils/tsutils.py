@@ -662,3 +662,58 @@ def is_evenly_spaced(ts):
 
     return check
 
+
+# alias
+std = standardize
+gauss = gaussianize
+def preprocess(ys, ts, detrend=False, params=["default", 4, 0, 1],
+               gaussianize=False, standardize=True):
+    ''' Return the processed time series using detrend and standardization.
+
+    Args
+    ----
+
+    ys : array
+        a time series
+    ts : array
+        The time axis for the timeseries. Necessary for use with
+        the Savitzky-Golay filters method since the series should be evenly spaced.
+    detrend : string
+        'none'/False/None - no detrending will be applied;
+        'linear' - a linear least-squares fit to `ys` is subtracted;
+        'constant' - the mean of `ys` is subtracted
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+    params : list
+        The paramters for the Savitzky-Golay filters. The first parameter
+        corresponds to the window size (default it set to half of the data)
+        while the second parameter correspond to the order of the filter
+        (default is 4). The third parameter is the order of the derivative
+        (the default is zero, which means only smoothing.)
+    gaussianize : bool
+        If True, gaussianizes the timeseries
+    standardize : bool
+        If True, standardizes the timeseries
+
+    Returns
+    -------
+
+    res : array
+        the processed time series
+
+    '''
+
+    if detrend == 'none' or detrend is False or detrend is None:
+        ys_d = ys
+    else:
+        ys_d = detrend(ys, ts, method=detrend, params=params)
+
+    if standardize:
+        res, _, _ = std(ys_d)
+    else:
+        res = ys_d
+
+    if gaussianize:
+        res = gauss(res)
+
+    return res
+

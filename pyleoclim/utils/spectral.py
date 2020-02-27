@@ -18,9 +18,12 @@ __all__ = [
     'mtm',
 ]
 
-from .wavelet import (
-    preprocess,
+from .tsutils import (
     is_evenly_spaced,
+    preprocess,
+)
+
+from .wavelet import (
     make_freq_vector,
     prepare_wwz,
     wwz,
@@ -90,7 +93,6 @@ def welch(ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args
         ana_args['nperseg']=len(ts)
 
     # preprocessing
-    
     ys, ts = clean_ts(ys, ts)
     ys = preprocess(ys, ts, **prep_args)
 
@@ -123,7 +125,6 @@ def welch(ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args
 
 
 def mtm(ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
-    #  ''' Call MTM from the package [spectrum](https://github.com/cokelaer/spectrum)
     ''' Call MTM from the package [nitime](http://nipy.org)
 
     Args
@@ -167,8 +168,6 @@ def mtm(ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', inter
         the result dictionary, including
         - freq (array): the frequency vector
         - psd (array): the spectral density vector
-
-
     '''
     # preprocessing
     ys, ts = clean_ts(ys, ts)
@@ -187,9 +186,6 @@ def mtm(ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', inter
     fs = 1 / dt
 
     # spectral analysis
-    #  res = spectrum.MultiTapering(ys, sampling=fs, NW=NW, **ana_args)
-    #  freq = res.frequencies()
-    #  psd = res.psd
     freq, psd, nu = nialg.multi_taper_psd(ys, Fs=fs, NW=NW, **ana_args)  # call nitime func
 
     # fix the zero frequency point

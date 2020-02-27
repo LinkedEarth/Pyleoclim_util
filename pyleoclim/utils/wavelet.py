@@ -16,7 +16,7 @@ __all__ = [
 
 import numpy as np
 import statsmodels.api as sm
-from scipy import optimize, signal
+from scipy import signal
 from pathos.multiprocessing import ProcessingPool as Pool
 import numba as nb
 from numba.errors import NumbaPerformanceWarning
@@ -24,10 +24,11 @@ import warnings
 import collections
 import scipy.fftpack as fft
 
-from .tsutils import standardize as std
-from .tsutils import gaussianize as gauss
-from .tsutils import clean_ts
 from .tsmodel import ar1_sim
+from .tsutils import (
+    clean_ts,
+    preprocess,
+)
 
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
@@ -158,110 +159,6 @@ class AliasFilter(object):
         spectr = freq**(-alpha) / (1 + (freq/fc)**2)
 
         return spectr
-
-def tau_estimation(ys, ts, detrend=False, params=["default", 4, 0, 1], 
-                   gaussianize=False, standardize=True):
-    ''' Return the estimated persistence of a givenevenly/unevenly spaced time series.
-
-    Args
-    ----
-
-    ys : array
-        a time series
-    ts : array
-        time axis of the time series
-    detrend : string
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
-    gaussianize : bool
-        If True, gaussianizes the timeseries
-    standardize : bool
-        If True, standardizes the timeseries
-
-    Returns
-    -------
-
-    tau_est : float
-        the estimated persistence
-
-    References
-    ----------
-
-    Mudelsee, M. TAUEST: A Computer Program for Estimating Persistence in Unevenly Spaced Weather/Climate Time Series.
-        Comput. Geosci. 28, 69–72 (2002).
-
-    '''
-    pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
-    dt = np.diff(ts)
-    #  assert dt > 0, "The time points should be increasing!"
-
-    def ar1_fun(a):
-        return np.sum((pd_ys[1:] - pd_ys[:-1]*a**dt)**2)
-
-    a_est = optimize.minimize_scalar(ar1_fun, bounds=[0, 1], method='bounded').x
-    #  a_est = optimize.minimize_scalar(ar1_fun, method='brent').x
-
-    tau_est = -1 / np.log(a_est)
-
-    return tau_est
-
-def preprocess(ys, ts, detrend=False, params=["default", 4, 0, 1], 
-               gaussianize=False, standardize=True):
-    ''' Return the processed time series using detrend and standardization.
-
-    Args
-    ----
-
-    ys : array
-        a time series
-    ts : array
-        The time axis for the timeseries. Necessary for use with
-        the Savitzky-Golay filters method since the series should be evenly spaced.
-    detrend : string
-        'none'/False/None - no detrending will be applied;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
-    gaussianize : bool
-        If True, gaussianizes the timeseries
-    standardize : bool
-        If True, standardizes the timeseries
-
-    Returns
-    -------
-
-    res : array
-        the processed time series
-
-    '''
-
-    if detrend == 'none' or detrend is False or detrend is None:
-        ys_d = ys
-    else:
-        ys_d = detrend(ys, ts, method=detrend, params=params)
-
-    if standardize:
-        res, _, _ = std(ys_d)
-    else:
-        res = ys_d
-
-    if gaussianize:
-        res = gauss(res)
-
-    return res
 
 def assertPositiveInt(*args):
     ''' Assert that the args are all positive integers.
@@ -1207,8 +1104,6 @@ def wwz(ys, ts, tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
     AR1_q = np.ndarray(shape=(nt, nf))
 
     if nMC >= 1:
-        #  tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend, gaussianize=gaussianize, standardize=standardize)
-
         for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
             wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freq, tau, c=c, Neff=Neff, nproc=nproc,
