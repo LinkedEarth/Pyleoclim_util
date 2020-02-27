@@ -241,6 +241,19 @@ class Series:
         y_cleaned, t_cleaned = tsutils.clean_ts(self.value, self.time)
         self.time = t_cleaned
         self.value = y_cleaned
+        return self
+
+    def gaussianize(self):
+        self.value = tsutils.gaussianize(self.value)
+        return self
+
+    def standardize(self):
+        self.value = tsutils.standardize(self.value)
+        return self
+
+    def detrend(self, method='emd', **kwargs):
+        self.value = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
+        return self
 
     def spectral(self, method='wwz', settings=None, label=None):
         ''' Perform spectral analysis on the timeseries
