@@ -408,7 +408,7 @@ class Series:
 
         surr_res = surrogate_func[method](self.value, length, number, **args[method])
         if len(np.shape(surr_res)) == 1:
-            surr_res = [surr_res]
+            surr_res = surr_res[:, np.newaxis]
 
         s_list = []
         for s in surr_res.T:
