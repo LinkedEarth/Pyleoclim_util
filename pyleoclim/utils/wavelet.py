@@ -1247,31 +1247,33 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     nt = np.size(tau)
     nf = np.size(freq)
 
-    coherence_red = np.ndarray(shape=(nMC, nt, nf))
-    AR1_q = np.ndarray(shape=(nt, nf))
+    #  coherence_red = np.ndarray(shape=(nMC, nt, nf))
+    #  AR1_q = np.ndarray(shape=(nt, nf))
+    coherence_red = None
+    AR1_q = None
 
-    if nMC >= 1:
+    #  if nMC >= 1:
 
-        for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
-            r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
-            r2 = ar1_sim(ys2_cut, np.size(ts2_cut), 1, ts=ts2_cut)
-            res_wwz_r1 = wwz(r1, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
-                                                     detrend=detrend, params=params,
-                                                     gaussianize=gaussianize, standardize=standardize)
-            res_wwz_r2 = wwz(r2, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
-                                                     detrend=detrend, params=params,
-                                                     gaussianize=gaussianize, standardize=standardize)
+        #  for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
+            #  r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
+            #  r2 = ar1_sim(ys2_cut, np.size(ts2_cut), 1, ts=ts2_cut)
+            #  res_wwz_r1 = wwz(r1, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
+                                                     #  detrend=detrend, params=params,
+                                                     #  gaussianize=gaussianize, standardize=standardize)
+            #  res_wwz_r2 = wwz(r2, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
+                                                     #  detrend=detrend, params=params,
+                                                     #  gaussianize=gaussianize, standardize=standardize)
 
-            wt_coeffr1 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
-            wt_coeffr2 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
-            coherence_red[i, :, :], phase_red = wavelet_coherence(wt_coeffr1, wt_coeffr2, freq, tau, smooth_factor=smooth_factor)
+            #  wt_coeffr1 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
+            #  wt_coeffr2 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
+            #  coherence_red[i, :, :], phase_red = wavelet_coherence(wt_coeffr1, wt_coeffr2, freq, tau, smooth_factor=smooth_factor)
 
-        for j in range(nt):
-            for k in range(nf):
-                AR1_q[j, k] = mquantiles(coherence_red[:, j, k], 0.95)
+        #  for j in range(nt):
+            #  for k in range(nf):
+                #  AR1_q[j, k] = mquantiles(coherence_red[:, j, k], 0.95)
 
-    else:
-        AR1_q = None
+    #  else:
+        #  AR1_q = None
 
     coi = make_coi(tau, Neff=Neff)
     Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xwt', 'freq', 'time', 'AR1_q', 'coi'])

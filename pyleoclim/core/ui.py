@@ -26,6 +26,7 @@ from matplotlib import cm
 
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
+import warnings
 
 
 def dict2namedtuple(d):
@@ -271,9 +272,12 @@ class Series:
         new.value = v_mod
         return new
 
-    def spectral(self, method='wwz', settings=None, label=None):
+    def spectral(self, method='wwz', settings=None, label=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
         '''
+        if not verbose:
+            warnings.simplefilter('ignore')
+
         settings = {} if settings is None else settings.copy()
         spec_func = {
             'wwz': specutils.wwz_psd,
@@ -307,9 +311,12 @@ class Series:
 
         return psd
 
-    def wavelet(self, method='wwz', nv=12, settings=None):
+    def wavelet(self, method='wwz', nv=12, settings=None, verbose=False):
         ''' Perform wavelet analysis on the timeseries
         '''
+        if not verbose:
+            warnings.simplefilter('ignore')
+
         settings = {} if settings is None else settings.copy()
         wave_func = {
             'wwz': waveutils.wwz,
@@ -338,9 +345,12 @@ class Series:
 
         return scal
 
-    def wavelet_coherence(self, target_series, nv=12, method='wwz', settings=None):
+    def wavelet_coherence(self, target_series, nv=12, method='wwz', settings=None, verbose=False):
         ''' Perform wavelet coherence analysis with the target timeseries
         '''
+        if not verbose:
+            warnings.simplefilter('ignore')
+
         settings = {} if settings is None else settings.copy()
         xwc_func = {
             'wwz': waveutils.xwc,
@@ -363,7 +373,15 @@ class Series:
         args[method].update(settings)
         xwc_res = xwc_func[method](self.value, self.time, target_series.value, target_series.time, **args[method])
 
-        coh = Coherence(frequency=xwc_res.freq, time=xwc_res.time, coherence=xwc_res.xw_coherence, phase=xwc_res.xw_phase, coi=xwc_res.coi)
+        coh = Coherence(
+            frequency=xwc_res.freq,
+            time=xwc_res.time,
+            coherence=xwc_res.xw_coherence,
+            phase=xwc_res.xw_phase,
+            coi=xwc_res.coi,
+            timeseries1=self,
+            timeseries2=target_series,
+        )
 
         return coh
 
@@ -443,7 +461,7 @@ class PSD:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.freq)}'
 
-    def signif_test(self, number=200, method='ar1', seed=None, qs=[0.9, 0.95, 0.99],
+    def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95],
                     settings=None):
         new = self.copy()
         surr = self.timeseries.surrogates(
@@ -746,12 +764,19 @@ class Scalogram:
 
 
 class Coherence:
-    def __init__(self, frequency, time, coherence, phase, coi):
+    def __init__(self, frequency, time, coherence, phase, coi=None, timeseries1=None, timeseries2=None, signif_qs=None, signif_method=None):
         self.frequency = np.array(frequency)
         self.time = np.array(time)
         self.coherence = np.array(coherence)
-        self.coi = np.array(coi)
+        if coi is not None:
+            self.coi = np.array(coi)
+        else:
+            self.coi = waveutils.make_coi(self.time, Neff=Neff)
         self.phase = np.array(phase)
+        self.timeseries1 = timeseries1
+        self.timeseries2 = timeseries2
+        self.signif_qs = signif_qs
+        self.signif_method = signif_method
 
     def copy(self):
         return deepcopy(self)
@@ -759,6 +784,7 @@ class Coherence:
     def plot(self, xlabel='Time', ylabel='Period', title=None, figsize=[10, 8],
              ylim=None, xlim=None, in_period=True, yticks=None, mute=False,
              contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, ax=None,
+             signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              under_clr='ivory', over_clr='black', bad_clr='dimgray'):
         ''' Plot the wavelet coherence result
 
@@ -810,6 +836,20 @@ class Coherence:
 
         cont = ax.contourf(self.time, y_axis, self.coherence.T, **contourf_args)
 
+        # plot significance levels
+        if self.signif_qs is not None:
+            signif_method_label = {
+                'ar1': 'AR(1)',
+            }
+            signif_coh = self.signif_qs.scalogram_list[0]
+            signif_boundary = self.coherence.T / signif_coh.amplitude.T
+            ax.contour(
+                self.time, y_axis, signif_boundary, [-99, 1],
+                colors=signif_clr,
+                linestyles=signif_linestyles,
+                linewidths=signif_linewidths,
+            )
+
         # plot colorbar
         cbar_args = {
             'drawedges': False,
@@ -851,14 +891,18 @@ class Coherence:
         width = phase_args['width']
 
         phase = np.copy(self.phase)
-        phase[self.coherence < pt] = np.nan
+
+        if self.signif_qs is None:
+            phase[self.coherence < pt] = np.nan
+        else:
+            phase[signif_boundary.T < 1] = np.nan
 
         X, Y = np.meshgrid(self.time, 1/self.frequency)
         U, V = np.cos(phase).T, np.sin(phase).T
 
         ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
                   U[::skip_y, ::skip_x], V[::skip_y, ::skip_x],
-                  scale=scale, width=width)
+                  scale=scale, width=width, zorder=99)
 
         ax.set_ylim(ylim)
 
@@ -877,6 +921,39 @@ class Coherence:
             return fig, ax
         else:
             return ax
+
+    def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95], settings=None):
+        new = self.copy()
+        surr1 = self.timeseries1.surrogates(
+            number=number, seed=seed, method=method, settings=settings
+        )
+        surr2 = self.timeseries2.surrogates(
+            number=number, seed=seed, method=method, settings=settings
+        )
+
+        cohs = []
+        for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs'):
+            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i])
+            cohs.append(coh_tmp.coherence)
+
+        cohs = np.array(cohs)
+
+        ne, nf, nt = np.shape(cohs)
+
+        coh_qs = np.ndarray(shape=(np.size(qs), nf, nt))
+        for i in range(nf):
+            for j in range(nt):
+                coh_qs[:,i,j] = mquantiles(cohs[:,i,j], qs)
+
+        scal_list = []
+        for i, amp in enumerate(coh_qs):
+            scal_tmp = Scalogram(frequency=self.frequency, time=self.time, amplitude=amp, coi=self.coi, label=f'{qs[i]*100:g}%')
+            scal_list.append(scal_tmp)
+
+        new.signif_qs = MultipleScalogram(scalogram_list=scal_list)
+        new.signif_method = method
+
+        return new
 
 class MultipleSeries:
     def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
