@@ -80,7 +80,7 @@ class Series:
     def plot(self, figsize=[10, 4],
              marker=None, markersize=None, color=None,
              linestyle=None, linewidth=None, xlim=None, ylim=None,
-             label=None, xlabel=None, ylabel=None, title=None,
+             label=None, xlabel=None, ylabel=None, title=None, zorder=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None, alpha=None,
              savefig_settings=None, ax=None, mute=False):
         ''' Plot the timeseries
@@ -189,6 +189,9 @@ class Series:
 
         if alpha is not None:
             plot_kwargs.update({'alpha': alpha})
+
+        if zorder is not None:
+            plot_kwargs.update({'zorder': zorder})
 
         res = plotting.plot_xy(
             self.time, self.value,
@@ -476,8 +479,8 @@ class PSD:
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='Amplitude', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
-             plot_legend=True, lgd_kwargs=None, xticks=None, yticks=None, plot_kwargs=None,
-             signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
+             plot_legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
+             plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
         ''' Plot the power sepctral density (PSD)
 
         Args
@@ -519,6 +522,12 @@ class PSD:
 
         if linewidth is not None:
             plot_kwargs.update({'linewidth': linewidth})
+
+        if alpha is not None:
+            plot_kwargs.update({'alpha': alpha})
+
+        if zorder is not None:
+            plot_kwargs.update({'zorder': zorder})
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
