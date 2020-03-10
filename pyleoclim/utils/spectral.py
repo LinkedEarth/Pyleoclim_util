@@ -88,7 +88,6 @@ def welch(ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args
         - psd (array): the spectral density vector
 
     '''
-    #make default nperseg len(ts)//3
     if not ana_args or not ana_args.get('nperseg'):
         ana_args['nperseg']=len(ts)
 
@@ -126,40 +125,40 @@ def welch(ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args
 
 def mtm(ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
     ''' Call MTM from the package [nitime](http://nipy.org)
+    https://github.com/nipy/nitime/blob/master/nitime/algorithms/spectral.py
 
     Args
     ----
 
-    ys : array
-        a time series
-    ts : array
-        time axis of the time series
-    ana_args : dict
-        the arguments for spectral analysis with periodogram, including
-        - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
-        - nfft (int): length of the FFT used. If None the length of x will be used.
-        - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
-        - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
-        see https://docs.scipy.org/doc/scipy-0.13.0/reference/generated/scipy.signal.periodogram.html for the details
-    interp_method : string
-        {'interp', 'bin'}): perform interpolation or binning
-    interp_args :dict
-        the arguments for the interpolation or binning methods, for the details, check interp() and binvalues()
-    prep_args : dict
-        the arguments for preprocess, including
-        - detrend (str): 'none' - the original time series is assumed to have no trend;
-                         'linear' - a linear least-squares fit to `ys` is subtracted;
-                         'constant' - the mean of `ys` is subtracted
-                         'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                             filters and the resulting filtered series is subtracted from y.
-                         'hht' - detrending with Hilbert-Huang Transform
-        - params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                         corresponds to the window size (default it set to half of the data)
-                         while the second parameter correspond to the order of the filter
-                         (default is 4). The third parameter is the order of the derivative
-                         (the default is zero, which means only smoothing.)
-        - gaussianize (bool): If True, gaussianizes the timeseries
-        - standardize (bool): If True, standardizes the timeseries
+    s : ndarray
+           An array of sampled random processes, where the time axis is assumed to
+           be on the last axis
+    Fs : float
+        Sampling rate of the signal
+    NW : float
+        The normalized half-bandwidth of the data tapers, indicating a
+        multiple of the fundamental frequency of the DFT (Fs/N).
+        Common choices are n/2, for n >= 4. This parameter is unitless
+        and more MATLAB compatible. As an alternative, set the BW
+        parameter in Hz. See Notes on bandwidth.
+    ana args : dict
+        -BW : float
+            The sampling-relative bandwidth of the data tapers, in Hz.
+        -adaptive : {True/False}
+           Use an adaptive weighting routine to combine the PSD estimates of
+           different tapers.
+        -jackknife : {True/False}
+           Use the jackknife method to make an estimate of the PSD variance
+           at each point.
+        -low_bias : {True/False}
+           Rather than use 2NW tapers, only use the tapers that have better than
+           90% spectral concentration within the bandwidth (still using
+           a maximum of 2NW tapers)
+        -sides : str (optional)   [ 'default' | 'onesided' | 'twosided' ]
+             This determines which sides of the spectrum to return.
+             For complex-valued inputs, the default is two-sided, for real-valued
+             inputs, default is one-sided Indicates whether to return a one-sided
+             or two-sided
 
     Returns
     -------
