@@ -162,6 +162,25 @@ def mtm(ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', inter
              For complex-valued inputs, the default is two-sided, for real-valued
              inputs, default is one-sided Indicates whether to return a one-sided
              or two-sided
+    interp_method : string
+        {'interp', 'bin'}): perform interpolation or binning
+    interp_args : dict
+        the arguments for the interpolation or binning methods, for the details, check interp() and binvalues()
+    prep_args : dict
+        the arguments for preprocess, including
+        - detrend (str): 'none' - the original time series is assumed to have no trend;
+                         'linear' - a linear least-squares fit to `ys` is subtracted;
+                         'constant' - the mean of `ys` is subtracted
+                         'savitzy-golay' - ys is filtered using the Savitzky-Golay
+                             filters and the resulting filtered series is subtracted from y.
+                         'hht' - detrending with Hilbert-Huang Transform
+        - params (list): The paramters for the Savitzky-Golay filters. The first parameter
+                         corresponds to the window size (default it set to half of the data)
+                         while the second parameter correspond to the order of the filter
+                         (default is 4). The third parameter is the order of the derivative
+                         (the default is zero, which means only smoothing.)
+        - gaussianize (bool): If True, gaussianizes the timeseries
+        - standardize (bool): If True, standardizes the timeseries
 
     Returns
     -------
