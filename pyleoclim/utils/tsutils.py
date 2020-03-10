@@ -148,7 +148,7 @@ def bin_values(x, y, bin_size=None, start=None, end=None):
     return bins, binned_values, n, error
 
 
-def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None):
+def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **args):
     """ Linear interpolation onto a new x-axis
 
     Args
@@ -164,6 +164,8 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None):
            where/when to start the interpolation. Default is min..
     end : float
          where/when to stop the interpolation. Default is max.
+    args :  args
+        Aguments specific to interpolate.interp1D. See scipy for details https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html    
 
     Returns
     -------
@@ -193,8 +195,10 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None):
 
     #Make sure the data is increasing
     data = pd.DataFrame({"x-axis": x, "y-axis": y}).sort_values('x-axis')
+    
+    # Add arguments
 
-    interp_values = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type)(xi)
+    interp_values = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**args)(xi)
 
     return xi, interp_values
 

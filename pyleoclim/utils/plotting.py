@@ -195,7 +195,7 @@ def plot_hist(y, bins = None, hist = True, label = None,
     return ax 
 
 
-def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
+def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None, ylim=None,
             savefig_settings=None, ax=None, legend=True, plot_kwargs=None, lgd_kwargs=None, mute=False):
     ''' Plot the timeseries
 
@@ -232,6 +232,12 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 
     if title is not None:
         ax.set_title(title)
+
+    if xlim is not None:
+        ax.set_xlim(xlim)
+
+    if ylim is not None:
+        ax.set_ylim(ylim)
 
     if legend:
         ax.legend(**lgd_kwargs)
