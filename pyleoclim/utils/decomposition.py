@@ -301,7 +301,7 @@ def ssa_all(data, M, MC=1000, f=0.3):
     '''
 
 
-    Xr = standardize(data)
+    Xr = standardize(data)[0]
     N = len(data)
     c = np.zeros(M)
 
