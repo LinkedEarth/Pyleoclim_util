@@ -7,7 +7,7 @@ Created on Tue Feb 25 06:29:36 2020
 Contains decompoistion methods (PCA, SSA...)
 """
 
-__all__[
+__all__ = [
     'pca',
     'ssa',
     'mssa',
