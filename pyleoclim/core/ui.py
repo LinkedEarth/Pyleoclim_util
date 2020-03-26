@@ -436,7 +436,7 @@ class Series:
             s_tmp = Series(time=self.time, value=s)
             s_list.append(s_tmp)
 
-        surr = MultipleSeries(series_list=s_list, surrogate_method=method, surrogate_args=args[method])
+        surr = SurrogateSeries(series_list=s_list, surrogate_method=method, surrogate_args=args[method])
 
         return surr
 
@@ -965,10 +965,8 @@ class Coherence:
         return new
 
 class MultipleSeries:
-    def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
+    def __init__(self, series_list):
         self.series_list = series_list
-        self.surrogate_method = surrogate_method
-        self.surrogate_args = surrogate_args
 
     def copy(self):
         return deepcopy(self)
@@ -997,6 +995,12 @@ class MultipleSeries:
 
         return scals
 
+
+class SurrogateSeries(MultipleSeries):
+    def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
+        self.series_list = series_list
+        self.surrogate_method = surrogate_method
+        self.surrogate_args = surrogate_args
     def plot(self, figsize=[10, 4],
              marker=None, markersize=None, color=None,
              linestyle=None, linewidth=None,
