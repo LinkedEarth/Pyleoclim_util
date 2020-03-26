@@ -86,83 +86,6 @@ def pca(x,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,it
     pca=PCA(n_components=n_components,copy=copy,whiten=whiten,svd_solver=svd_solver,tol=tol,iterated_power=iterated_power,random_state=random_state)
     return pca.fit(x).__dict__
 
-def ssa(ys, ts, M, MC=1000, f=0.3, method='SSA', prep_args={}):
-    '''
-    Args
-    ----
-
-    ys : array
-        time series
-    ts: array
-       time axis
-    M : int
-       window size
-    MC : int
-        Number of iteration in the Monte-Carlo process
-    f : float
-       fraction (0<f<=1) of good data points for identifying
-    method (str, {'SSA', 'MSSA'}) : str({'SSA','MSSA'})
-                                   perform SSA or MSSA
-
-    prep_args : dict
-              the arguments for preprocess, including
-                detrend : str
-                         'none' - the original time series is assumed to have no trend;
-                         'linear' - a linear least-squares fit to `ys` is subtracted;
-                         'constant' - the mean of `ys` is subtracted
-                         'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                                             filters and the resulting filtered series is subtracted from y.
-                          'hht' - detrending with Hilbert-Huang Transform
-                params  : list
-                           The paramters for the Savitzky-Golay filters. The first parameter
-                           corresponds to the window size (default it set to half of the data)
-                           while the second parameter correspond to the order of the filter
-                          (default is 4). The third parameter is the order of the derivative
-                          (the default is zero, which means only smoothing.)
-                gaussianize : bool
-                             If True, gaussianizes the timeseries
-                standardize : bool
-                             If True, standardizes the timeseries
-
-    Returns
-    -------
-
-    res_dict : dictionary
-              the result dictionary, including
-                 deval : array
-                        eigenvalue spectrum
-                 eig_vec : array
-                          eigenvalue vector
-                 q05 : float
-                      The 5% percentile of eigenvalues
-                 q95 : float
-                      The 95% percentile of eigenvalues
-                 pc: 2D array
-                    matrix of principal components
-                 rc: 2D array
-                    matrix of RCs (nrec,N,nrec*M) (only if K>0)
-    '''
-
-    
-    ys, ts = clean_ts(ys, ts)
-    ys = preprocess(ys, ts, **prep_args)
-
-    ssa_func = {
-        'SSA': ssa_all,
-        'MSSA': mssa,
-    }
-    deval, eig_vec, q05, q95, pc, rc = ssa_func[method](ys, M, MC=MC, f=f)
-
-    res_dict = {
-        'deval': deval,
-        'eig_vec': eig_vec,
-        'q05': q05,
-        'q95': q95,
-        'pc': pc,
-        'rc': rc,
-    }
-
-    return res_dict
 
 def mssa(data, M, MC=1000, f=0.3):
     '''Multi-channel SSA analysis
@@ -268,7 +191,7 @@ def mssa(data, M, MC=1000, f=0.3):
 
     return deval, eig_vec, q95, q05, PC, RC
 
-def ssa_all(data, M, MC=1000, f=0.3):
+def ssa(ys, M, MC=1000, f=0.3):
     '''SSA analysis for a time series
     (applicable for data including missing values)
     and test the significance by Monte-Carlo method
@@ -276,7 +199,7 @@ def ssa_all(data, M, MC=1000, f=0.3):
     Args
     ----
 
-    data : array
+    ys : array
           time series
     M : int
        window size
@@ -301,8 +224,8 @@ def ssa_all(data, M, MC=1000, f=0.3):
     '''
 
 
-    Xr = standardize(data)[0]
-    N = len(data)
+    Xr = standardize(ys)[0]
+    N = len(ys)
     c = np.zeros(M)
 
     for j in range(M):
