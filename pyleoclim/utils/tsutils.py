@@ -32,6 +32,8 @@ from scipy import special
 from scipy import signal
 from pyhht import EMD
 from sklearn.cluster import DBSCAN
+from matplotlib import cm
+import matplotlib.pyplot as plt
 
 from .filter import savitzky_golay
 
@@ -601,7 +603,7 @@ def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
     return ys
 
 
-def detect_outliers(ts, ys, args={}):
+def detect_outliers(ts, ys, args={},plot=False):
     ''' Function to detect outliers in the given timeseries
     Args
     ----
@@ -610,6 +612,8 @@ def detect_outliers(ts, ys, args={}):
          time axis of time series
     ys : array
          y values of time series
+    plot : boolean
+          false by default, if true plots the outliers using a scatter plot
     args : dict
          arguments for the DBSCAN function from sklearn,
          for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
@@ -626,7 +630,7 @@ def detect_outliers(ts, ys, args={}):
 
     outlier_detection = DBSCAN(**args)
 
-    clusters = outlier_detection.fit_predict(ys.values.reshape(-1,1))
+    clusters = outlier_detection.fit_predict(ys.reshape(-1,1))
     is_outlier = []
 
     for value in clusters:
@@ -634,6 +638,11 @@ def detect_outliers(ts, ys, args={}):
             is_outlier.append(True)
         else:
             is_outlier.append(False)
+   
+    if(plot==True):
+	    cmap = cm.get_cmap('Set1')
+	    plt.scatter(ts,ys,c=clusters,cmap=cmap)
+
 
     return is_outlier
 

@@ -440,6 +440,14 @@ class Series:
 
         return surr
 
+    def remove_outliers(self):
+        outlier_points = np.array(tsutils.detect_outliers(self.time,self.value))
+        outlier_indices = np.where(outlier_points==True)
+        self.ys = np.delete(self.value,outlier_indices)
+        self.time = np.delete(self.time,outlier_indices)
+        return self.ys,self.time
+
+
 class PSD:
     def __init__(self, frequency, amplitude, label=None, timeseries=None,
                  spec_method=None, spec_args=None, signif_qs=None, signif_method=None):
