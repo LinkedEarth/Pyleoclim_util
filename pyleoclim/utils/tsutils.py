@@ -640,8 +640,14 @@ def detect_outliers(ts, ys, args={},plot=False):
             is_outlier.append(False)
    
     if(plot==True):
-	    cmap = cm.get_cmap('Set1')
-	    plt.scatter(ts,ys,c=clusters,cmap=cmap)
+
+        fig, ax = plt.subplots(figsize=[10,4])
+
+        cmap = cm.get_cmap('Set1')
+        plt.show()
+        plt.scatter(ts,ys,c=clusters,cmap=cmap)
+        return fig,ax,is_outlier
+
 
 
     return is_outlier

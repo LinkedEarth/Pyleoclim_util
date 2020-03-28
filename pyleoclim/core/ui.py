@@ -441,6 +441,18 @@ class Series:
         return surr
 
     def remove_outliers(self):
+        ''' Removes outliers from a timeseries
+        Args
+        ----
+        self : timeseries object
+
+        Returns
+        -------
+        ys : array
+            y axis of timeseries
+        time : array
+              x axis of timeseries
+        '''
         outlier_points = np.array(tsutils.detect_outliers(self.time,self.value))
         outlier_indices = np.where(outlier_points==True)
         self.ys = np.delete(self.value,outlier_indices)
