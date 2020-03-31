@@ -440,6 +440,23 @@ class Series:
 
         return surr
 
+    def detect_outliers(self,**kwargs):
+        '''
+        Detects outliers in a timeseries
+        Args
+        ----
+        self : timeseries object
+        **kwargs : dict
+                  optional parameters for DBSCAN
+        Returns
+        -------
+        is_outlier : array
+                    a list of boolean values indicating whether the point is an outlier or not
+        '''
+        is_outlier = np.array(tsutils.detect_outliers(self.time, self.value, args=kwargs))
+        return is_outlier
+
+
     def remove_outliers(self,**kwargs):
         ''' Removes outliers from a timeseries
         Args
