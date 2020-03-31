@@ -78,6 +78,39 @@ def pca(x,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,it
 
     dict
         Sklearn PCA object dictionary of all attributes and values.
+        
+        -components_array, shape (n_components, n_features)
+            Principal axes in feature space, representing the directions of maximum variance in the data. The components are sorted by explained_variance_.
+        
+        -explained_variance_array, shape (n_components,)
+            The amount of variance explained by each of the selected components.
+            Equal to n_components largest eigenvalues of the covariance matrix of X.
+            New in version 0.18.
+        
+        -explained_variance_ratio_array, shape (n_components,)
+            Percentage of variance explained by each of the selected components.
+            If n_components is not set then all components are stored and the sum of the ratios is equal to 1.0.
+        
+        -singular_values_array, shape (n_components,)
+            The singular values corresponding to each of the selected components. The singular values are equal to the 2-norms of the n_components variables in the lower-dimensional space.
+            New in version 0.19.
+        
+        -mean_array, shape (n_features,)
+            Per-feature empirical mean, estimated from the training set.
+            Equal to X.mean(axis=0).
+        
+        -n_components_int
+            The estimated number of components. When n_components is set to ‘mle’ or a number between 0 and 1 (with svd_solver == ‘full’) this number is estimated from input data. Otherwise it equals the parameter n_components, or the lesser value of n_features and n_samples if n_components is None.
+        
+        -n_features_int
+            Number of features in the training data.
+        
+        -n_samples_int
+            Number of samples in the training data.
+        
+        -noise_variance_float
+            The estimated noise covariance following the Probabilistic PCA model from Tipping and Bishop 1999. See “Pattern Recognition and Machine Learning” by C. Bishop, 12.2.1 p. 574 or http://www.miketipping.com/papers/met-mppca.pdf. It is required to compute the estimated data covariance and score samples.
+            Equal to the average of (min(n_features, n_samples) - n_components) smallest eigenvalues of the covariance matrix of X.
 
 
     '''
@@ -191,7 +224,7 @@ def mssa(data, M, MC=1000, f=0.3):
 
     return deval, eig_vec, q95, q05, PC, RC
 
-def ssa(ys, M, MC=1000, f=0.3):
+def ssa(ys, M=None, MC=1000, f=0.3):
     '''SSA analysis for a time series
     (applicable for data including missing values)
     and test the significance by Monte-Carlo method
@@ -223,9 +256,10 @@ def ssa(ys, M, MC=1000, f=0.3):
         matrix of RCs (N*M, nmode) (only if K>0)
     '''
 
-
     Xr = standardize(ys)[0]
     N = len(ys)
+    if not M:
+        M=int(N/10)
     c = np.zeros(M)
 
     for j in range(M):
