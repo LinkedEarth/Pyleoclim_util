@@ -15,13 +15,13 @@ from ..utils import causality as causalutils
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
+#import pandas as pd
 from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
-from matplotlib.colors import BoundaryNorm, Normalize
+#from matplotlib.colors import BoundaryNorm, Normalize
 from matplotlib import cm
 
 from tqdm import tqdm
@@ -458,7 +458,27 @@ class Series:
         self.ys = np.delete(self.value,outlier_indices)
         self.time = np.delete(self.time,outlier_indices)
         return self.ys,self.time
-
+    
+    def  interp(self,method ='linear',**kwargs):
+        '''Interpolate a time series onto  a new  time axis
+        
+        Available interpolation scheme includes linear and spline
+        
+        '''
+        new = self.copy()
+        x_mod, v_mod = tsutils.interp(self.time,self.value,interp_type=method,**kwargs)
+        new.time = x_mod
+        new.value = v_mod
+        return new
+    
+    def bin(self,**kwargs):
+        '''Bin values in a time series
+        '''
+        new=self.copy()
+        x_mod, v_mod = tsutils.bin_values(self.time,self.value,**kwargs)
+        new.time = x_mod
+        new.value = v_mod
+        return new
 
 class PSD:
     def __init__(self, frequency, amplitude, label=None, timeseries=None,
