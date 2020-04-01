@@ -275,8 +275,15 @@ class Series:
         new.value = v_mod
         return new
 
-    def spectral(self, method='wwz', settings=None, label=None, verbose=False):
+    def spectral(self, method='wwz', freq_method='log', freq_kwargs=None, settings=None, label=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
+
+        Args
+        ----
+
+        freq_method : str
+            {'scale', 'nfft', 'Lomb-Scargle', 'Welch'}
+
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -290,7 +297,11 @@ class Series:
             'periodogram': specutils.periodogram
         }
         args = {}
-        args['wwz'] = {}
+        if 'freq' not in settings:
+            freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+            freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
+
+        args['wwz'] = {'freq': freq}
         args['mtm'] = {}
         args['lomb_scargle'] = {}
         args['welch'] = {}
@@ -314,7 +325,7 @@ class Series:
 
         return psd
 
-    def wavelet(self, method='wwz', nv=12, settings=None, verbose=False):
+    def wavelet(self, method='wwz', settings=None, freq_method='log', freq_kwargs=None, verbose=False):
         ''' Perform wavelet analysis on the timeseries
         '''
         if not verbose:
@@ -324,12 +335,9 @@ class Series:
         wave_func = {
             'wwz': waveutils.wwz,
         }
-        # generate default freq
-        s0 = 2*np.median(np.diff(self.time))
-        a0 = 2**(1/nv)
-        noct = np.floor(np.log2(np.size(self.time)))-1
-        scale = s0*a0**(np.arange(noct*nv+1))
-        freq = 1/scale[::-1]
+
+        freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+        freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
 
         args = {}
         args['wwz'] = {'tau': self.time, 'freq': freq}
@@ -348,7 +356,7 @@ class Series:
 
         return scal
 
-    def wavelet_coherence(self, target_series, nv=12, method='wwz', settings=None, verbose=False):
+    def wavelet_coherence(self, target_series, method='wwz', settings=None, freq_method='log', freq_kwargs=None, verbose=False):
         ''' Perform wavelet coherence analysis with the target timeseries
         '''
         if not verbose:
@@ -358,12 +366,9 @@ class Series:
         xwc_func = {
             'wwz': waveutils.xwc,
         }
-        # generate default freq
-        s0 = 2*np.median(np.diff(self.time))
-        a0 = 2**(1/nv)
-        noct = np.floor(np.log2(np.size(self.time)))-1
-        scale = s0*a0**(np.arange(noct*nv+1))
-        freq = 1/scale[::-1]
+
+        freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+        freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
 
         t1 = np.copy(self.time)
         t2 = np.copy(target_series.time)
@@ -456,7 +461,6 @@ class Series:
         is_outlier = np.array(tsutils.detect_outliers(self.time, self.value, args=kwargs))
         return is_outlier
 
-
     def remove_outliers(self,**kwargs):
         ''' Removes outliers from a timeseries
         Args
@@ -479,7 +483,7 @@ class Series:
         self.time = np.delete(self.time,outlier_indices)
         return self.ys,self.time
     
-    def  interp(self,method ='linear',**kwargs):
+    def interp(self, method='linear', **kwargs):
         '''Interpolate a time series onto  a new  time axis
         
         Available interpolation scheme includes linear and spline
@@ -490,7 +494,7 @@ class Series:
         new.time = x_mod
         new.value = v_mod
         return new
-    
+
     def bin(self,**kwargs):
         '''Bin values in a time series
         '''

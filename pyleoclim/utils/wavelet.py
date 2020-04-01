@@ -1014,7 +1014,7 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
 
     return psd
 
-def wwz(ys, ts, tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
+def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
         nMC=200, nproc=8, detrend=False, params=['default', 4, 0, 1],
         gaussianize=False, standardize=True, method='default', len_bd=0,
         bc_mode='reflect', reflect_type='odd'):
@@ -1031,6 +1031,10 @@ def wwz(ys, ts, tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
         the evenly-spaced time points
     freq : array
         vector of frequency
+    freq_method : str
+        when freq=None, freq will be ganerated according to freq_method
+    freq_kwargs : str
+        used when freq=None for certain methods
     c : float
         the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
     Neff : int
@@ -1088,7 +1092,8 @@ def wwz(ys, ts, tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
 
     ys_cut, ts_cut, freq, tau = prepare_wwz(
-        ys, ts, freq=freq, tau=tau, len_bd=len_bd,
+        ys, ts, freq=freq, freq_method=freq_method, freq_kwargs=freq_kwargs,
+        tau=tau, len_bd=len_bd,
         bc_mode=bc_mode, reflect_type=reflect_type
     )
 
@@ -1128,7 +1133,8 @@ def wwz(ys, ts, tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
 
     return res
 def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
-        tau=None, freq=None, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False,
+        tau=None, freq=None, freq_method='log', freq_kwargs=None,
+        c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False,
         nMC=200, params=['default', 4, 0, 1],
         gaussianize=False, standardize=True, method='default'):
     ''' Return the cross-wavelet coherence of two time series.
@@ -1198,12 +1204,8 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         print(f'Setting tau={tau[:3]}...{tau[-3:]}, ntau={np.size(tau)}')
 
     if freq is None:
-        s0 = 2*np.median(np.diff(ts1))
-        nv = 12
-        a0 = 2**(1/nv)
-        noct = np.floor(np.log2(np.size(ts1)))-1
-        scale = s0*a0**(np.arange(noct*nv+1))
-        freq = 1/scale[::-1]
+        freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+        freq = make_freq_vector(ts_cut, method=freq_method, **freq_kwargs)
         print(f'Setting freq={freq[:3]}...{freq[-3:]}, nfreq={np.size(freq)}')
 
     ys1_cut, ts1_cut, freq1, tau1 = prepare_wwz(ys1, ts1, freq=freq, tau=tau)
@@ -1381,7 +1383,70 @@ def freq_vector_nfft(ts):
 
     return freq
 
-def make_freq_vector(ts, method = 'nfft', **kwargs):
+def freq_vector_scale(ts, nv=12):
+    ''' Return the frequency vector based on scales
+
+    Args
+    ----
+
+    ts : array
+        time axis of the time series
+
+    nv : int
+        the parameter that controls the number of freq points
+
+    Returns
+    -------
+
+    freq : array
+        the frequency vector
+
+    '''
+
+    s0 = 2*np.median(np.diff(ts))
+    a0 = 2**(1/nv)
+    noct = np.floor(np.log2(np.size(ts)))-1  # number of octave
+    scale = s0*a0**(np.arange(noct*nv+1))
+    freq = 1/scale[::-1]
+
+    return freq
+
+def freq_vector_log(ts, nfreq=None):
+    ''' Return the frequency vector based on logspace
+
+    Args
+    ----
+
+    ts : array
+        time axis of the time series
+
+    nv : int
+        the parameter that controls the number of freq points
+
+    Returns
+    -------
+
+    freq : array
+        the frequency vector
+
+    '''
+
+    nt = np.size(ts)
+    dt = np.median(np.diff(ts))
+    fs = 1 / dt
+    if nfreq is None:
+        nfreq = nt//10 + 1
+
+    fmin = 1/nt
+    fmax = fs/2
+    start = np.log2(fmin)
+    stop = np.log2(fmax)
+
+    freq = np.logspace(start, stop, nfreq, base=2)
+
+    return freq
+
+def make_freq_vector(ts, method='log', **kwargs):
     ''' Make frequency vector- Selector function.
 
     This function selects among various methods to obtain the frequency
@@ -1414,8 +1479,12 @@ def make_freq_vector(ts, method = 'nfft', **kwargs):
         freq = freq_vector_lomb_scargle(ts,**kwargs)
     elif method == 'Welch':
         freq = freq_vector_welch(ts)
-    else:
+    elif method == 'nfft':
         freq = freq_vector_nfft(ts)
+    elif method == 'scale':
+        freq = freq_vector_scale(ts, **kwargs)
+    elif method == 'log':
+        freq = freq_vector_log(ts, **kwargs)
     #  freq = freq[1:]  # discard the first element 0
 
     return freq
@@ -1712,7 +1781,7 @@ def get_wwz_func(nproc, method):
 
     return wwz_func
 
-def prepare_wwz(ys, ts, freq=None, tau=None, len_bd=0, bc_mode='reflect', reflect_type='odd', **kwargs):
+def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None, len_bd=0, bc_mode='reflect', reflect_type='odd', **kwargs):
     ''' Return the truncated time series with NaNs deleted and estimate frequency vector and tau
 
     Args
@@ -1723,8 +1792,12 @@ def prepare_wwz(ys, ts, freq=None, tau=None, len_bd=0, bc_mode='reflect', reflec
     ts : array
         the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
     freq : array
-        vector of frequency. If None, use the nfft method.If using Lomb-Scargle, additional parameters
-        may be set. See make_freq_vector
+        vector of frequency. If None, will be ganerated according to freq_method.
+        may be set.
+    freq_method : str
+        when freq=None, freq will be ganerated according to freq_method
+    freq_kwargs : str
+        used when freq=None for certain methods
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
         if the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so
@@ -1803,7 +1876,8 @@ def prepare_wwz(ys, ts, freq=None, tau=None, len_bd=0, bc_mode='reflect', reflec
     ys_cut = ys[(np.min(tau) <= ts) & (ts <= np.max(tau))]
 
     if freq is None:
-        freq = make_freq_vector(ts_cut, method='nfft')
+        freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+        freq = make_freq_vector(ts_cut, method=freq_method, **freq_kwargs)
 
     # remove 0 in freq vector
     freq = freq[freq != 0]
