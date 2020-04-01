@@ -297,9 +297,8 @@ class Series:
             'periodogram': specutils.periodogram
         }
         args = {}
-        if 'freq' not in settings:
-            freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-            freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
+        freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+        freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
 
         args['wwz'] = {'freq': freq}
         args['mtm'] = {}
