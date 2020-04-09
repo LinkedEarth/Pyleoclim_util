@@ -475,12 +475,14 @@ class Series:
         time : array
               x axis of timeseries
         '''
-
+        new=self.copy()
         outlier_points = np.array(tsutils.detect_outliers(self.time,self.value,args=kwargs))
         outlier_indices = np.where(outlier_points==True)
-        self.ys = np.delete(self.value,outlier_indices)
-        self.time = np.delete(self.time,outlier_indices)
-        return self.ys,self.time
+        ys = np.delete(self.value,outlier_indices)
+        t = np.delete(self.time,outlier_indices)
+        new.value = ys
+        new.time  = t
+        return new
     
     def interp(self, method='linear', **kwargs):
         '''Interpolate a time series onto  a new  time axis
