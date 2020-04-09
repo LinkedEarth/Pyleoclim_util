@@ -339,7 +339,7 @@ class Series:
         freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
 
         args = {}
-        args['wwz'] = {'tau': self.time, 'freq': freq}
+        args['wwz'] = {'freq': freq}
         args[method].update(settings)
         wave_res = wave_func[method](self.value, self.time, **args[method])
         scal = Scalogram(
@@ -1048,12 +1048,12 @@ class MultipleSeries:
 
         return psds
 
-    def wavelet(self, method='wwz', nv=12, settings={}):
+    def wavelet(self, method='wwz', settings={}):
         settings = {} if settings is None else settings.copy()
 
         scal_list = []
         for s in tqdm(self.series_list, desc='Performing wavelet analysis on surrogates'):
-            scal_tmp = s.wavelet(method=method, nv=nv, settings=settings)
+            scal_tmp = s.wavelet(method=method, settings=settings)
             scal_list.append(scal_tmp)
 
         scals = MultipleScalogram(scalogram_list=scal_list)
