@@ -269,6 +269,15 @@ class Series:
         new.value = v_mod
         return new
 
+    def slice(self, timespan):
+        ''' Slicing the timeseries with a timespan (tuple or list)
+        '''
+        new = self.copy()
+        mask = (self.year >= timespan[0]) & (self.year <= timespan[1])
+        new.time = self.time[mask]
+        new.value = self.value[mask]
+        return new
+
     def detrend(self, method='emd', **kwargs):
         new = self.copy()
         v_mod = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
