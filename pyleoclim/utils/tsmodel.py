@@ -189,6 +189,10 @@ def ar1_fit_evenly(ys, ts):
     ar1_mod = sm.tsa.AR(ys, missing='drop').fit(maxlag=1)
     g = ar1_mod.params[1]
 
+    if g > 1:
+        print('Warning: AR(1) fitted autocorrelation greater than 1; setting to 1')
+        g = 1
+
     return g
 
 def tau_estimation(ys, ts):

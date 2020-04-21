@@ -2,10 +2,7 @@ import os
 import sys
 import io
 
-#  from setuptools import setup, find_packages
-from setuptools import find_packages
-from numpy.distutils.core import Extension
-from numpy.distutils.core import setup
+from setuptools import setup, find_packages
 
 version = '0.4.10'
 
