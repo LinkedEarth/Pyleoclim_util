@@ -162,10 +162,37 @@ class AliasFilter(object):
 
         return spectr
     
-def cwt(ys,ts,scales=None,wavelet='morl',sampling_period=1.0,method='conv',axis=-1):
-    if scales is None:
-        raise ValueError('missing scales parameter, array of wavelet scales to use.')
+def cwt(ys,ts,scales,wavelet='morl',sampling_period=1.0,method='conv',axis=-1):
+    '''
+    pywavelet documentation: https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
     
+    Parameters
+    ----------
+    ys : array, series
+    ts : array, time 
+    scales : array (float)
+        different wavelet scales to use
+    wavelet : TYPE
+        types of wavelet options in function documentation link. The default is 'morl'.
+    sampling_period : float, optional
+        sampling period for frequencies output. The default is 1.0.
+    method : str, optional
+        cwt computation  method. 'conv','fft'. or 'auto' The default is 'conv'.
+    axis : int, optional
+        axis over which to compute cwt. The default is -1, the last axis.
+
+
+    Returns
+    -------
+    res : dictionary
+        'freq' - array(float) 
+            frequencies
+        'time' - array(float)
+        'amplitude' - array(float)
+        'coi' - array(float)
+            cone of inference
+
+    '''    
     freq,coeff=pywt.cwt(data=ys,scales=scales,wavelet=wavelet,sampling_period=sampling_period,method=method,axis=axis)
     amplitude=abs(coeff)
     if wavelet=='morl' or wavelet[:4]=='cmor':
