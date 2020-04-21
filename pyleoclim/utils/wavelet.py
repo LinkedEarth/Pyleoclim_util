@@ -24,6 +24,7 @@ from numba.errors import NumbaPerformanceWarning
 import warnings
 import collections
 import scipy.fftpack as fft
+import pywt
 
 from .tsmodel import ar1_sim
 from .tsutils import (
@@ -160,7 +161,20 @@ class AliasFilter(object):
         spectr = freq**(-alpha) / (1 + (freq/fc)**2)
 
         return spectr
-
+    
+def cwt(ys,ts,scales=None,wavelet='morl',sampling_period=1.0,method='conv',axis=-1):
+    if scales is None:
+        raise ValueError('missing scales parameter, array of wavelet scales to use.')
+    
+    freq,coeff=pywt.cwt(data=ys,scales=scales,wavelet=wavelet,sampling_period=sampling_period,method=method,axis=axis)
+    amplitude=abs(coeff)
+    if wavelet=='morl' or wavelet[:4]=='cmor':
+        coi=make_coi(tau=ts,Neff=6)
+    else:
+        coi=make_coi(tau=ts)
+    Results = collections.namedtuple('Results', ['amplitude','coi', 'freq', 'time', 'coeff'])
+    res = Results(amplitude=amplitude, coi=coi, freq=freq, time=ts, coeff=coeff)
+    return res
 def assertPositiveInt(*args):
     ''' Assert that the args are all positive integers.
     '''

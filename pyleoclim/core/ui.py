@@ -316,6 +316,8 @@ class Series:
 
     def wavelet(self, method='wwz', nv=12, settings=None, verbose=False):
         ''' Perform wavelet analysis on the timeseries
+        
+        cwt wavelets documented on https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -323,6 +325,7 @@ class Series:
         settings = {} if settings is None else settings.copy()
         wave_func = {
             'wwz': waveutils.wwz,
+            'cwt': waveutils.cwt,
         }
         # generate default freq
         s0 = 2*np.median(np.diff(self.time))
@@ -333,6 +336,7 @@ class Series:
 
         args = {}
         args['wwz'] = {'tau': self.time, 'freq': freq}
+        args['cwt'] = {'wavelet' : 'morl'}
         args[method].update(settings)
         wave_res = wave_func[method](self.value, self.time, **args[method])
         scal = Scalogram(
