@@ -273,7 +273,7 @@ class Series:
         ''' Slicing the timeseries with a timespan (tuple or list)
         '''
         new = self.copy()
-        mask = (self.year >= timespan[0]) & (self.year <= timespan[1])
+        mask = (self.time >= timespan[0]) & (self.time <= timespan[1])
         new.time = self.time[mask]
         new.value = self.value[mask]
         return new
