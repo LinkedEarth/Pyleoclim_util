@@ -16,5 +16,6 @@ __all__=[
     'PSD',
     'Scalogram',
     'Coherence',
-    'MultiplePSD'
+    'MultiplePSD',
+    'Lipd'
 ]

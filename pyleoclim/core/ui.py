@@ -28,6 +28,8 @@ from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
 import warnings
 
+import lipd as lpd
+
 
 def dict2namedtuple(d):
     tupletype = namedtuple('tupletype', sorted(d))
@@ -1207,7 +1209,7 @@ class MultipleScalogram:
 
 
 class Lipd:
-    def __init__(self, lipd_list):
+    def __init__(self, usr_path=None):
         self.plot_default = {'ice/rock': ['#FFD600','h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
@@ -1221,29 +1223,9 @@ class Lipd:
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
                 'other':['k','o']}
-    
-    def getLipd(self, usr_path=None):
-        """Read Lipd files into a dictionary
-
-        Sets the dictionary as global variable so that it doesn't have to be provided
-        as an argument for every function.
-    
-        Args
-        ----
-    
-        usr_path : str
-                  The path to a directory or a single file. (Optional argument)
-    
-        Returns
-        -------
-    
-        lipd_dict : dict
-                   a dictionary containing the LiPD library
-    
-        """
-        global lipd_dict
-        lipd_dict = lpd.readLipd(usr_path=usr_path)
-        return lipd_dict
+        if usr_path == None:
+            usr_path=''
+        self.lipd=lpd.readLipd(usr_path=usr_path)
         
 
 class LipdSeries:
