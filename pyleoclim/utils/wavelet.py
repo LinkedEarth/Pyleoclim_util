@@ -168,7 +168,7 @@ def cwt(ys,ts,scales,wavelet='morl',sampling_period=1.0,method='conv',axis=-1):
     
     Parameters
     ----------
-    ys : array, series
+    ys : array, signal
     ts : array, time 
     scales : array (float)
         different wavelet scales to use
@@ -193,8 +193,8 @@ def cwt(ys,ts,scales,wavelet='morl',sampling_period=1.0,method='conv',axis=-1):
             cone of inference
 
     '''    
-    freq,coeff=pywt.cwt(data=ys,scales=scales,wavelet=wavelet,sampling_period=sampling_period,method=method,axis=axis)
-    amplitude=abs(coeff)
+    coeff,freq=pywt.cwt(data=ys,scales=scales,wavelet=wavelet,sampling_period=sampling_period,method=method,axis=axis)
+    amplitude=abs(coeff).T
     if wavelet=='morl' or wavelet[:4]=='cmor':
         coi=make_coi(tau=ts,Neff=6)
     else:
