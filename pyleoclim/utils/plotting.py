@@ -205,8 +205,36 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None,
     figsize : list
         a list of two integers indicating the figure size
 
+    xlabel : str
+        label for x-axis
+
+    ylabel : str
+        label for y-axis
+
     title : str
         the title for the figure
+
+    xlim : str
+        the limit range for x-axis
+
+    ylim : str
+        the limit range for y-axis
+
+    ax : pyplot.axis
+        the pyplot.axis object
+
+    legend : bool
+        plot legend or not
+
+    lgd_kwargs : dict
+        the keyword arguments for ax.legend()
+
+    plot_kwargs : dict
+        the keyword arguments for ax.plot()
+
+    mute : bool
+        if True, the plot will not show;
+        recommend to turn on when more subplots are going to be added
 
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
