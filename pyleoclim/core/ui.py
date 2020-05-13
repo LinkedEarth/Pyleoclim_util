@@ -27,6 +27,7 @@ from matplotlib import cm
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
 import warnings
+import os
 
 import lipd as lpd
 
@@ -1209,7 +1210,7 @@ class MultipleScalogram:
 
 
 class Lipd:
-    def __init__(self, usr_path=None):
+    def __init__(self, query=False, query_args={}, usr_path=None, lipd_dict=None):
         self.plot_default = {'ice/rock': ['#FFD600','h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
@@ -1223,9 +1224,115 @@ class Lipd:
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
                 'other':['k','o']}
-        if usr_path == None:
-            usr_path=''
-        self.lipd=lpd.readLipd(usr_path=usr_path)
+       
+        #check that query has matching terms            
+        if query==True and bool(query_args)==False:
+            raise ValueError('When query is set to true, you must define query terms')
+        if query==False and usr_path==None and lipd_dict==None:
+            usr_path==''
+        
+        #deal with the query dictionary
+        if query==True and bool(query_args)==True:
+            if 'archiveType' in query_args.keys():
+                archiveType=query_args['archiveType']
+            else:
+                archiveType = [ ]
+            if 'proxyObsType' in query_args.keys():
+                proxyObsType=query_args['proxyObsType']
+            else:
+                proxyObsType=[ ]
+            if 'infVarType' in query_args.keys():
+                infVarType=query_args['infVarType']
+            else:
+                infVarType=[ ]
+            if 'sensorGenus' in query_args.keys():
+                sensorGenus = query_args['sensorGenus']
+            else:
+                sensorGenus = [ ]
+            if 'sensorSpecies' in query_args.keys():
+                sensorSpecies = query_args['sensorSpecies']
+            else:
+                sensorSpecies=[ ]
+            if 'interpName' in query_args.keys():
+                interpName = query_args['interpName']
+            else:
+                interpName=[ ]
+            if 'interpDetail' in query_args.keys():
+                interpDetail = query_args['interpDetail']
+            else:
+                interpDetail = [ ]
+            if 'ageUnits' in query_args.keys():
+                ageUnits = query_args['ageUnits']
+            else:
+                ageUnits = [ ]
+            if 'ageBound' in query_args.keys():
+                ageBound = query_args['ageBound']
+            else:
+                ageBound=[ ]
+            if 'ageBoundType' in query_args.keys():
+                ageBoundType = query_args['ageBoundType']
+            else:
+                ageBoundType = [ ]
+            if 'recordLength' in query_args.keys():
+                recordLength = query_args['recordLength']
+            else:
+                recordLength = [ ]
+            if 'resolution' in query_args.keys():
+                resolution = query_args['resolution']
+            else:
+                resolution = [ ]
+            if 'lat' in query_args.keys():
+                lat = query_args['lat']
+            else:
+                lat = [ ]
+            if 'lon' in query_args.keys():
+                lon = query_args['lon']
+            else:
+                lon = [ ]
+            if 'alt' in query_args.keys():
+                alt = query_args['alt']
+            else:
+                alt= [ ]
+            if 'download_folder' in query_args.keys():
+                download_folder = query_args['download_folder']
+            else:
+                download_folder=os.getcwd()+'/'
+            
+            lipdutils.queryLinkedEarth(archiveType=archiveType, proxyObsType=proxyObsType, infVarType = infVarType, sensorGenus=sensorGenus,
+                    sensorSpecies=sensorSpecies, interpName =interpName, interpDetail =interpDetail, ageUnits = ageUnits,
+                    ageBound = ageBound, ageBoundType = ageBoundType, recordLength = recordLength, resolution = resolution,
+                    lat = lat, lon = lon, alt = alt, print_response = False, download_lipd = True,
+                    download_folder = download_folder)
+            D_query = lpd.readLipd(download_folder)
+            if 'archiveType' in D_query.keys():
+                D_query={D_query['dataSetName']:D_query}
+        else:
+            D_query={}
+        #prepare the dictionaries for all possible scenarios
+        if usr_path!=None:
+            D_path = lpd.readLipd(usr_path)
+            #make sure that it's more than one
+            if 'archiveType' in D_path.keys():
+                D_path={D_path['dataSetName']:D_path}
+        else:
+            D_path={}
+        if lipd_dict!=None:
+            D_dict=lipd_dict
+            if 'archiveType' in D_dict.keys():
+                D_dict={D_dict['dataSetName']:D_dict}
+        else:
+            D_dict={}
+        
+        #assemble
+        self.lipd={}
+        self.lipd.update(D_query)
+        self.lipd.update(D_path)
+        self.lipd.update(D_dict)
+            
+    def __repr__(self):
+        return str(self.__dict__)
+    
+    
         
 
 class LipdSeries:
@@ -1343,6 +1450,6 @@ class LipdSeries:
         if 'path' in savefig_settings:
             plotting.savefig(fig, savefig_settings)
         else:
-            plooting.showfig(fig)
+            plotting.showfig(fig)
 
         return fig

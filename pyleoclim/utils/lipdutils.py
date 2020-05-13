@@ -11,9 +11,22 @@ Also handles integration with the LinkedEarth wiki and the LinkedEarth Ontology
 
 """
 
+__all__=[
+        'enumerateLipds',
+        'getTs',
+        'promptForVariable',
+        'queryLinkedEarth',
+        'timeUnitsCheck',
+        'LipdToOntology',
+        'whatArchives',
+        'whatProxyObservations',
+        'whatProxySensors',
+        'whatInferredVariables',
+        'whatInterpretations']
+
 import lipd as lpd
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import os
 import json
 import requests
@@ -470,7 +483,7 @@ def LipdToOntology(archiveType):
     """ standardize archiveType
 
     Transform the archiveType from their LiPD name to their ontology counterpart
-
+    
     Args
     ----
 
@@ -495,6 +508,7 @@ def LipdToOntology(archiveType):
         archiveType = 'molluskshells'
 
     return archiveType
+
 
 def timeUnitsCheck(units):
     """ This function attempts to make sense of the time units by checking for equivalence
@@ -565,13 +579,16 @@ def whatArchives(print_response=True):
     }"""
 
     response = requests.post(url, data = {'query': query})
-    res = json.loads(response.text)
+    res_i = json.loads(response.text)
 
     if print_response == True:
         print("The following archive types are available on the wiki:")
-        for item in res['results']['bindings']:
+        for item in res_i['results']['bindings']:
             print ("*" + item['a']['value'])
-
+    res=[]
+    for item in res_i['results']['bindings']:
+        res.append(item['a']['value'])
+        
     return res
 
 def whatProxyObservations(print_response=True):
@@ -602,13 +619,17 @@ def whatProxyObservations(print_response=True):
     }"""
 
     response = requests.post(url, data = {'query': query})
-    res = json.loads(response.text)
+    res_i = json.loads(response.text)
 
     if print_response==True:
         print("The following proxy observation types are available on the wiki: ")
-        for item in res['results']['bindings']:
-            print ("*" + item['a']['value'])
-
+        for item in res_i['results']['bindings']:
+            print (item['a']['value'])
+    
+    res=[]
+    for item in res_i['results']['bindings']:
+        res.append(item['a']['value'])
+        
     return res
 
 def whatProxySensors(print_response=True):
@@ -639,12 +660,16 @@ def whatProxySensors(print_response=True):
     }"""
 
     response = requests.post(url, data = {'query': query})
-    res = json.loads(response.text)
+    res_i = json.loads(response.text)
 
     if print_response == True:
         print("The available sensor genus/species are: ")
-        for item in res['results']['bindings']:
+        for item in res_i['results']['bindings']:
             print ("*" + 'Genus: '+item['a']['value']+' Species: ' +item['b']['value'])
+    
+    res=[]
+    for item in res_i['results']['bindings']:
+        res.append(item['a']['value'])
 
     return res
 
@@ -675,16 +700,18 @@ def whatInferredVariables(print_response=True):
     }"""
 
     response = requests.post(url, data = {'query': query})
-    res = json.loads(response.text)
+    res_i = json.loads(response.text)
 
     if print_response == True:
         print("The following Inferred Variable types are available on the wiki: ")
-        for item in res['results']['bindings']:
+        for item in res_i['results']['bindings']:
             print ("*" + item['a']['value'])
-
+            res=[]
+    for item in res_i['results']['bindings']:
+        res.append(item['a']['value'])
     return res
 
-def whatIntepretations(print_response=True):
+def whatInterpretations(print_response=True):
     """ Get the names for interpretations from LinkedEarth Ontology
 
     Args
@@ -713,18 +740,20 @@ def whatIntepretations(print_response=True):
     }"""
 
     response = requests.post(url, data = {'query': query})
-    res = json.loads(response.text)
+    res_i = json.loads(response.text)
 
     if print_response==True:
         print("The following interpretation are available on the wiki: ")
-        for item in res['results']['bindings']:
+        for item in res_i['results']['bindings']:
             print ("*" + 'Name: '+item['a']['value']+' Detail: ' +item['b']['value'])
-
+    res=[]
+    for item in res_i['results']['bindings']:
+        res.append(item['a']['value'])        
     return res
 
 def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensorGenus=[ ],
-                    sensorSpecies=[ ], interpName =[ ], interpDetail =[ ], ageUnits = ["yr BP"],
-                    ageBound = [ ], ageBoundType = ["any"], recordLength = [ ], resolution = [ ],
+                    sensorSpecies=[ ], interpName =[ ], interpDetail =[ ], ageUnits = [ ],
+                    ageBound = [ ], ageBoundType = [ ], recordLength = [ ], resolution = [ ],
                     lat = [ ], lon = [ ], alt = [ ], print_response = True, download_lipd = True,
                     download_folder = 'default'):
     """ This function allows to query the LinkedEarth wiki for records.
@@ -1098,24 +1127,28 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
     #print(query)
     response = requests.post(url, data = {'query': query})
     res = json.loads(response.text)
-
-    if print_response == True or download_lipd == True:
+    if print_response == True:
+        for item in res['results']['bindings']: 
+            print (item['dataset']['value'])
+    
+    #download files
+    if download_lipd == True:
         for item in res['results']['bindings']:
-            if print_response == True:
-                print (item['dataset']['value'])
-            elif download_lipd == True:
-                dataset = (item['dataset']['value']).split('/')[-1]
-                download_url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid='+dataset
-                if download_folder == 'default':
-                    path = os.getcwd()+'/'+dataset+'.lpd'
+            dataset = (item['dataset']['value']).split('/')[-1]
+            download_url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid='+dataset
+            if download_folder == 'default':
+                path = os.getcwd()+'/'   
+            else:
+                if download_folder[-1] == '/':
+                    path = download_folder
                     wget.download(download_url, path)
                 else:
-                    if download_folder[-1] == '/':
-                        path = download_folder
-                        wget.download(download_url, path)
-                    else:
-                        path = download_folder+'/'
-                        wget.download(download_url, path)
+                    path = download_folder+'/'
+            if os.path.exists(path) == False:
+                os.mkdir(path)
+            wget.download(download_url, path+'/'+dataset+'.lpd')
+    
+    return res
 
 """
 Deal with models

@@ -13,9 +13,6 @@ from .plotting import *
 from .spectral import *
 from .correlation import *
 from .causality import *
+from .lipdutils import *
 
-__all__ = [
-    'set_style',
-    'savefig',
-    'showfig',
-]
+
