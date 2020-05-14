@@ -234,7 +234,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None,
 
     mute : bool
         if True, the plot will not show;
-        recommend to turn on when more subplots are going to be added
+        recommend to turn on when more modifications are going to be made on ax
 
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
