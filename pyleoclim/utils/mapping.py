@@ -7,12 +7,13 @@ Created on Tue Feb 25 05:46:36 2020
 
 Contains all relevant mapping functions
 """
+__all__=['map_all']
 
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-import random
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 from .plotting import savefig, showfig 
 
@@ -192,9 +193,11 @@ def set_proj(projection='Robinson', proj_default = True):
     
     return proj
 
-def map_all(lat, lon, criteria, projection = 'Robinson', proj_default = True,
+def map_all(lat, lon, criteria, marker=None, color =None,
+            projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
-           figsize = [10,4], ax = None, palette=None, markersize = 50):
+           figsize = None, ax = None, scatter_kwargs=None, legend=True,
+           lgd_kwargs=None,savefig_settings=None, mute=False):
     """ Map the location of all lat/lon according to some criteria
     
     Map the location of all lat/lon according to some criteria. The choice of 
@@ -206,12 +209,21 @@ def map_all(lat, lon, criteria, projection = 'Robinson', proj_default = True,
     
     lat : list
         a list of latitude.
+        
     lon : list
         a list of longitude.
+        
     criteria : list
-        a list of criteria for plotting purposes. For instance,
+        a list of unique criteria for plotting purposes. For instance,
         a map by the types of archive present in the dataset or proxy
-        observations.
+        observations.     
+    
+    marker : list
+        a list of possible markers for each criterion. If None, will use pyleoclim default
+    
+    color : list
+        a list of possible colors for each criterion. If None, will use pyleoclim default
+    
     projection : string
         the map projection. Available projections:
         'Robinson' (default), 'PlateCarree', 'AlbertsEqualArea',
@@ -222,38 +234,54 @@ def map_all(lat, lon, criteria, projection = 'Robinson', proj_default = True,
         'Geostationary','NearsidePerspective','EckertI','EckertII',
         'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
         'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+        
     proj_default : bool
         If True, uses the standard projection attributes.
         Enter new attributes in a dictionary to change them. Lists of attributes
         can be found in the Cartopy documentation: 
             https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+            
     background : bool
         If True, uses a shaded relief background (only one 
         available in Cartopy)
+        
     borders : bool
-        Draws the countries border. Defaults is off (False). 
+        Draws the countries border. Defaults is off (False).
+        
     rivers : bool
         Draws major rivers. Default is off (False).
+        
     lakes : bool
         Draws major lakes. 
-        Default is off (False).
-    palette : dict
-        A dictionary of plotting color/marker by criteria. The
-        keys should correspond to ***unique*** criteria with a list of 
-        associated values. The list should be in the format 
-        ['color', 'marker'].
-    markersize : int
-        The size of the marker.
+        Default is off (False).  
+        
     figsize : list
         the size for the figure
+        
     ax: axis,optional
         Return as axis instead of figure (useful to integrate plot into a subplot) 
         
+    plot_kwargs : dict
+        Dictionary of arguments available in matplotlib.pyplot.scatter (https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html).     
+    
+    legend : bool
+        Whether the draw a legend on the figure
+    
+    lgd_kwargs : dict
+        Dictionary of arguments for matplotlib.pyplot.legend (https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html)
+    
+    savefig_settings : dict
+        Dictionary of arguments for matplotlib.pyplot.saveFig.
+        - "path" must be specified; it can be any existed or non-existed path,
+          with or without a suffix; if the suffix is not given in "path", it will follow "format"
+        - "format" can be one of {"pdf", "eps", "png", "ps"}
+    
     Returns
     -------
     
     ax: The figure, or axis if ax specified      
     """
+    
     #Check that the lists have the same length and convert to numpy arrays
     if len(lat)!=len(lon) or len(lat)!=len(criteria) or len(lon)!=len(criteria):
         raise ValueError("Latitude, Longitude, and criteria list must be the same" +\
@@ -263,34 +291,42 @@ def map_all(lat, lon, criteria, projection = 'Robinson', proj_default = True,
     if proj_default is not True and type(proj_default) is not dict:
         raise TypeError('The default for the projections should either be provided'+
                  ' as a dictionary or set to True')
-        
-    # If palette is not given, then make a random one.
-    if not palette:
-        marker_list = ['o','v','^','<','>','8','s','p','*','h','D']
-        color_list = ['#FFD600','#FF8B00','k','#86CDFA','#00BEFF','#4169E0',\
-                 '#8A4513','r','#FF1492','#32CC32','#FFD600','#2F4F4F']
-        # select at random for unique entries in criteria
-        marker = [random.choice(marker_list) for _ in range(len(set(criteria)))]
-        color = [random.choice(color_list) for _ in range(len(set(criteria)))]
-        crit_unique = [crit for crit in set(criteria)]
-        #initialize the palette
-        palette = {crit_unique[0]:[color[0],marker[0]]}
-        for i in range(len(crit_unique)):
-            d1 = {crit_unique[i]:[color[i],marker[i]]}
-            palette.update(d1)
+    
+    # handle dict defaults
+    savefig_settings={} if savefig_settings is None else savefig_settings.copy()
+    scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
+    lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+    
+    if marker!=None:
+        if 'marker' in scatter_kwargs.keys(): 
+            print('marker has been set as a parameter to the map_all function, overriding scatter_kwargs')
+            del scatter_kwargs['marker']
+        if len(marker)!=len(criteria):
+            raise ValueError('The marker vector should have the same length as the criteria vector')
+    
+    
+    if color!=None:
+        if 'facecolor' in scatter_kwargs.keys(): 
+            print('facecolor has been set as a parameter to the map_all function, overriding scatter_kwargs')
+            del scatter_kwargs['facecolor']
+        if len(color)!=len(criteria):
+            raise ValueError('The color vector should have the same length as the criteria vector')
+    
+    #get unique criteria/color/marker
+    
+    color_data=pd.DataFrame({'criteria':criteria,'color':color,'marker':marker})
+    palette = color_data.drop_duplicates(subset='criteria')
     
     # get the projection:
-    proj = setProj(projection=projection, proj_default=proj_default)        
+    proj = set_proj(projection=projection, proj_default=proj_default)        
     # Make the figure        
-    if not ax:
+    if ax is None:
         fig, ax = plt.subplots(figsize=figsize,subplot_kw=dict(projection=proj))     
     # draw the coastlines    
     ax.coastlines()
-    
     # Background
     if background is True:
-        ax.stock_img()
-            
+        ax.stock_img()     
     #Other extra information
     if borders is True:
         ax.add_feature(cfeature.BORDERS)
@@ -300,110 +336,63 @@ def map_all(lat, lon, criteria, projection = 'Robinson', proj_default = True,
         ax.add_feature(cfeature.RIVERS)
     
     # Get the indexes by criteria
-    for crit in set(criteria):
-        # Grab the indices with same criteria
-        index = [i for i,x in enumerate(criteria) if x == crit]
-        ax.scatter(np.array(lon)[index],np.array(lat)[index],
-                    s= markersize,
-                    facecolor = palette[crit][0],
-                    marker = palette[crit][1],
-                    zorder = 10,
-                    label = crit,
-                    transform=ccrs.PlateCarree())
-    plt.legend(loc = 'center', bbox_to_anchor=(1.1,0.5),scatterpoints = 1,
-               frameon = False, fontsize = 8, markerscale = 0.7)
+    
+    if color==None and marker==None:
+        for crit in set(criteria):
+            # Grab the indices with same criteria
+            index = [i for i,x in enumerate(criteria) if x == crit]
+            ax.scatter(np.array(lon)[index],np.array(lat)[index],
+                        zorder = 10,
+                        label = crit,
+                        transform=ccrs.PlateCarree(),
+                        **scatter_kwargs)
+    elif color==None and marker!=None:
+        for crit in set(criteria):
+            # Grab the indices with same criteria
+            index = [i for i,x in enumerate(criteria) if x == crit]
+            ax.scatter(np.array(lon)[index],np.array(lat)[index],
+                        zorder = 10,
+                        label = crit,
+                        transform=ccrs.PlateCarree(),
+                        marker = palette[palette['criteria']==crit]['marker'].iloc[0],
+                        **scatter_kwargs)
+    elif color!=None and marker==None:
+        for crit in set(criteria):
+            # Grab the indices with same criteria
+            index = [i for i,x in enumerate(criteria) if x == crit]
+            ax.scatter(np.array(lon)[index],np.array(lat)[index],
+                        zorder = 10,
+                        label = crit,
+                        transform=ccrs.PlateCarree(),
+                        facecolor = palette[palette['criteria']==crit]['color'].iloc[0],
+                        **scatter_kwargs)
+    elif color!=None and marker!=None:
+        for crit in set(criteria):
+            # Grab the indices with same criteria
+            index = [i for i,x in enumerate(criteria) if x == crit]
+            ax.scatter(np.array(lon)[index],np.array(lat)[index],
+                        zorder = 10,
+                        label = crit,
+                        transform=ccrs.PlateCarree(),
+                        facecolor = palette[palette['criteria']==crit]['color'].iloc[0],
+                        marker=palette[palette['criteria']==crit]['marker'].iloc[0],
+                        **scatter_kwargs)
+    
+    if legend == True:
+        ax.legend(**lgd_kwargs)
+    else:
+        ax.legend().remove()
+    
+    if 'fig' in locals():
+        if 'path' in savefig_settings:
+            savefig(fig, savefig_settings)
+        else:
+            if not mute:
+                showfig(fig)
+        return fig, ax
+    else:
+        return ax
     
     return ax    
         
-def map_one(lat, lon, projection = 'Orthographic', proj_default = True, label = None,
-           background = True,borders = False, rivers = False, lakes = False,
-           markersize = 50, marker = "ro", figsize = [4,4], 
-           ax = None):
-    """ Map one location on the globe
-    
-    Args
-    ----
-    
-    lat : float
-        a float number representing latitude
-    lon : float
-        a float number representing longitude
-    projection : string
-        the map projection. Available projections:
-        'Robinson', 'PlateCarree', 'AlbertsEqualArea',
-        'AzimuthalEquidistant','EquidistantConic','LambertConformal',
-        'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
-        'Sinusoidal','Stereographic','TransverseMercator','UTM',
-        'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
-        'Geostationary','NearsidePerspective','EckertI','EckertII',
-        'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
-        'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-    proj_default : bool
-        If True, uses the standard projection attributes, including centering.
-        Enter new attributes in a dictionary to change them. Lists of attributes
-        can be found in the Cartopy documentation: 
-            https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
-    background : bool
-        If True, uses a shaded relief background (only one 
-        available in Cartopy)
-    label : string
-        label for the point. Default is None. 
-    borders : bool
-        Draws the countries border. Defaults is off (False). 
-    rivers : bool
-        Draws major rivers. Default is off (False).
-    lakes : bool
-        Draws major lakes. 
-        Default is off (False).
-    markersize : int
-        The size of the marker.
-    marker : string or list
-        color and type of marker. 
-    figsize : list
-        the size for the figure
-    ax : optional, axis
-        Return as axis instead of figure (useful to integrate plot into a subplot) 
-    
-    Returns
-    -------
-    
-    ax : the axis
-    fig : the figure
-    
-    """
-    # get the projection:
-    if proj_default is True:
-        proj_default = {'central_longitude':lon}
-    proj = setProj(projection=projection, proj_default=proj_default)        
-    # Make the figure        
-    if not ax:
-        fig, ax = plt.subplots(figsize=figsize,subplot_kw=dict(projection=proj))     
-    # draw the coastlines    
-    ax.coastlines()
-    
-    # Background
-    if background is True:
-        ax.stock_img()  
-    
-    #Other extra information
-    if borders is True:
-        ax.add_feature(cfeature.BORDERS)
-    if lakes is True:
-        ax.add_feature(cfeature.LAKES)
-    if rivers is True:
-        ax.add_feature(cfeature.RIVERS)
-    
-    # Draw the point
-    ax.scatter(np.array(lon),np.array(lat),
-               s= markersize,
-               facecolor = marker[0],
-               marker = marker[1],
-               zorder = 10,
-               transform=ccrs.PlateCarree())
-    
-    # Add a label if necessary
-    if label is not None:
-       assert type(label) is str, 'Label should be of type string'
-       ax.annotate(label,(np.array(lon),np.array(lat)),fontweight='bold')
-        
-    return fig, ax
+

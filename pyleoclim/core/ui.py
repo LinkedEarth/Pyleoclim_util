@@ -1332,7 +1332,52 @@ class Lipd:
     def __repr__(self):
         return str(self.__dict__)
     
-    
+    def mapAllArchive(self, projection = 'Robinson', proj_default = True,
+           background = True,borders = False, rivers = False, lakes = False,
+           figsize = None, ax = None, marker=None, color=None, 
+           markersize = None, scatter_kwargs=None,
+           legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
+        
+        #get the information from the LiPD dict
+        lat=[]
+        lon=[]
+        archiveType=[]
+        
+        for idx, key in enumerate(self.lipd):
+            d = self.lipd[key]
+            lat.append(d['geo']['geometry']['coordinates'][1])
+            lon.append(d['geo']['geometry']['coordinates'][0])
+            archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower())
+        
+        # make sure criteria is in the plot_default list
+        for idx,val in enumerate(archiveType):
+            if val not in self.plot_default.keys():
+                archiveType[idx] = 'other'
+        
+        if markersize is not None:
+            scatter_kwargs.update({'markersize': markersize})
+        
+        if marker==None:
+            marker=[]
+            for item in archiveType:
+                marker.append(self.plot_default[item][1])
+        
+        if color==None:
+            color=[]
+            for item in archiveType:
+                color.append(self.plot_default[item][0])
+        
+        res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
+                              marker=marker, color =color,
+                              projection = projection, proj_default = proj_default,
+                              background = background,borders = borders, 
+                              rivers = rivers, lakes = lakes,
+                              figsize = figsize, ax = ax, 
+                              scatter_kwargs=scatter_kwargs, legend=legend,
+                              lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
+                              mute=mute)
+        
+        return res
         
 
 class LipdSeries:

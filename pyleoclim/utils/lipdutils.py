@@ -866,8 +866,9 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
 
-    SELECT  distinct ?dataset
+    SELECT  distinct ?dataset ?dataset_label
     WHERE {
+    ?dataset rdfs:label ?dataset_label
     """
 
     ### Look for data field
@@ -1134,7 +1135,7 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
     #download files
     if download_lipd == True:
         for item in res['results']['bindings']:
-            dataset = (item['dataset']['value']).split('/')[-1]
+            dataset = (item['dataset_label']['value'])
             download_url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid='+dataset
             if download_folder == 'default':
                 path = os.getcwd()+'/'   
