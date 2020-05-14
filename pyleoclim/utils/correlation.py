@@ -73,7 +73,7 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     return r, signif, p
 
 def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
-    ''' Determine significance based on the FDR approach
+    ''' Determine significance based on the FDR approach (translated from fdr.R by Dr. Chris Paciorek)
 
     Args
     ----
@@ -88,11 +88,11 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
         Method for performing the testing.
         - 'original' follows Benjamini & Hochberg (1995);
         - 'general' is much more conservative, requiring no assumptions on the p-values (see Benjamini & Yekutieli (2001)).
-        We recommend using 'original', and if desired, using 'adj_method="mean"' to increase power.
+        'original' is recommended, and if desired, using 'adj_method="mean"' to increase power.
 
     adj_method: {'mean', 'storey', 'two-stage'}
         Method for increasing the power of the procedure by estimating the proportion of alternative p-values.
-        - 'mean', the modified Storey estimator that we suggest in Ventura et al. (2004)
+        - 'mean', the modified Storey estimator in Ventura et al. (2004)
         - 'storey', the method of Storey (2002)
         - 'two-stage', the iterative approach of Benjamini et al. (2001)
 
@@ -105,6 +105,11 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
 
     fdr_res : array or None
         A vector of the indices of the significant tests; None if no significant tests
+
+    References
+    ----------
+
+    - The fdr.R by Dr. Chris Paciorek: https://www.stat.berkeley.edu/~paciorek/research/code/code.html
 
     '''
     n = len(pvals)

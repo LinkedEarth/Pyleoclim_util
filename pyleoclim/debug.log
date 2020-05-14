@@ -73,3 +73,20 @@
 2020-02-19 19:36:34,962 [DEBUG] shapely.geos: Trying `CDLL(libc.so.6)`
 2020-02-19 19:36:34,963 [DEBUG] shapely.geos: Library path: 'libc.so.6'
 2020-02-19 19:36:34,963 [DEBUG] shapely.geos: DLL: <CDLL 'libc.so.6', handle 7fda020434e8 at 0x7fd9e561ef90>
+2020-05-13 10:19:27,621 [DEBUG] shapely.geos: Trying `CDLL(/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib)`
+2020-05-13 10:19:27,635 [DEBUG] shapely.geos: Library path: '/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib'
+2020-05-13 10:19:27,636 [DEBUG] shapely.geos: DLL: <CDLL '/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib', handle 7f81c502ab70 at 0x7f821d28c990>
+2020-05-13 10:19:27,636 [DEBUG] shapely.geos: Trying `CDLL(/usr/lib/libc.dylib)`
+2020-05-13 10:19:27,636 [DEBUG] shapely.geos: Library path: '/usr/lib/libc.dylib'
+2020-05-13 10:19:27,636 [DEBUG] shapely.geos: DLL: <CDLL '/usr/lib/libc.dylib', handle 1031376e0 at 0x7f821d62ee90>
+2020-05-13 10:19:32,907 [DEBUG] parso.cache: pickle loaded: /Users/fzhu/Github/Pyleoclim_util/pyleoclim/__init__.py
+2020-05-13 10:19:34,322 [DEBUG] parso.python.diff: diff parser start
+2020-05-13 10:19:34,322 [DEBUG] parso.python.diff: line_lengths old: 1; new: 1
+2020-05-13 10:19:34,322 [DEBUG] parso.python.diff: -> code[replace] old[1:1] new[1:1]
+2020-05-13 10:19:34,322 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 0 in part parser)
+2020-05-13 10:19:34,322 [DEBUG] parso.python.diff: diff parser end
+2020-05-13 10:19:35,480 [DEBUG] parso.python.diff: diff parser start
+2020-05-13 10:19:35,480 [DEBUG] parso.python.diff: line_lengths old: 1; new: 1
+2020-05-13 10:19:35,480 [DEBUG] parso.python.diff: -> code[replace] old[1:1] new[1:1]
+2020-05-13 10:19:35,481 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 0 in part parser)
+2020-05-13 10:19:35,481 [DEBUG] parso.python.diff: diff parser end
