@@ -1015,7 +1015,7 @@ class Coherence:
         else:
             return ax
 
-    def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95], settings=None):
+    def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95], settings=None, mute_pbar=False):
         new = self.copy()
         surr1 = self.timeseries1.surrogates(
             number=number, seed=seed, method=method, settings=settings
@@ -1025,7 +1025,7 @@ class Coherence:
         )
 
         cohs = []
-        for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs'):
+        for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', position=0, leave=True, disable=mute_pbar):
             coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i])
             cohs.append(coh_tmp.coherence)
 
@@ -1073,11 +1073,11 @@ class MultipleSeries:
             new.series_list[idx]=s
         return new
 
-    def spectral(self, method='wwz', settings={}):
+    def spectral(self, method='wwz', settings={}, mute_pbar=False):
         settings = {} if settings is None else settings.copy()
 
         psd_list = []
-        for s in tqdm(self.series_list, desc='Performing spectral analysis on surrogates'):
+        for s in tqdm(self.series_list, desc='Performing spectral analysis on surrogates', position=0, leave=True, disable=mute_pbar):
             psd_tmp = s.spectral(method=method, settings=settings)
             psd_list.append(psd_tmp)
 
@@ -1085,11 +1085,11 @@ class MultipleSeries:
 
         return psds
 
-    def wavelet(self, method='wwz', settings={}):
+    def wavelet(self, method='wwz', settings={}, mute_pbar=False):
         settings = {} if settings is None else settings.copy()
 
         scal_list = []
-        for s in tqdm(self.series_list, desc='Performing wavelet analysis on surrogates'):
+        for s in tqdm(self.series_list, desc='Performing wavelet analysis on surrogates', position=0, leave=True, disable=mute_pbar):
             scal_tmp = s.wavelet(method=method, settings=settings)
             scal_list.append(scal_tmp)
 
