@@ -73,7 +73,7 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     return r, signif, p
 
 def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
-    ''' Determine significance based on the FDR approach
+    ''' Determine significance based on the FDR approach (translated from fdr.R by Dr. Chris Paciorek)
 
     Args
     ----
@@ -88,11 +88,11 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
         Method for performing the testing.
         - 'original' follows Benjamini & Hochberg (1995);
         - 'general' is much more conservative, requiring no assumptions on the p-values (see Benjamini & Yekutieli (2001)).
-        We recommend using 'original', and if desired, using 'adj_method="mean"' to increase power.
+        'original' is recommended, and if desired, using 'adj_method="mean"' to increase power.
 
     adj_method: {'mean', 'storey', 'two-stage'}
         Method for increasing the power of the procedure by estimating the proportion of alternative p-values.
-        - 'mean', the modified Storey estimator that we suggest in Ventura et al. (2004)
+        - 'mean', the modified Storey estimator in Ventura et al. (2004)
         - 'storey', the method of Storey (2002)
         - 'two-stage', the iterative approach of Benjamini et al. (2001)
 
@@ -105,6 +105,11 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
 
     fdr_res : array or None
         A vector of the indices of the significant tests; None if no significant tests
+
+    References
+    ----------
+
+    - The fdr.R by Dr. Chris Paciorek: https://www.stat.berkeley.edu/~paciorek/research/code/code.html
 
     '''
     n = len(pvals)
@@ -658,66 +663,3 @@ def prop_alt(pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 
 
     else:
         raise ValueError('Wrong method: {method}!')
-
-def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
-    ''' Determine significance based on the FDR approach
-
-    Args
-    ----
-
-    pvals : list or array
-        A vector of p-values on which to conduct the multiple testing.
-
-    qlevel : float
-        The proportion of false positives desired.
-
-    method : {'original', 'general'}
-        Method for performing the testing.
-        - 'original' follows Benjamini & Hochberg (1995);
-        - 'general' is much more conservative, requiring no assumptions on the p-values (see Benjamini & Yekutieli (2001)).
-        We recommend using 'original', and if desired, using 'adj_method="mean"' to increase power.
-
-    adj_method: {'mean', 'storey', 'two-stage'}
-        Method for increasing the power of the procedure by estimating the proportion of alternative p-values.
-        - 'mean', the modified Storey estimator that we suggest in Ventura et al. (2004)
-        - 'storey', the method of Storey (2002)
-        - 'two-stage', the iterative approach of Benjamini et al. (2001)
-
-    adj_args : dict
-        Arguments for adj_method; see prop_alt() for description,
-        but note that for "two-stage", qlevel and fdr_method are taken from the qlevel and method arguments for fdr()
-
-    Returns
-    -------
-
-    fdr_res : array or None
-        A vector of the indices of the significant tests; None if no significant tests
-
-    '''
-    n = len(pvals)
-
-    a = 0
-    if adj_method is not None:
-        if adj_method == 'two-stage':
-            qlevel = qlevel / (1+qlevel)  # see Benjamini et al. (2001) for proof that this controls the FDR at level qlevel
-            adj_args['qlevel'] = qlevel
-            adj_args['fdr_method'] = method
-            print(f'Adjusting cutoff using two-stage method, with method: {adj_args["fdr_method"]}; qlevel: {adj_args["qlevel"]}')
-
-        elif adj_method == 'mean':
-            if adj_args == {}:
-                 # default arguments for "mean" method of Ventura et al. (2004)
-                adj_args['edf_lower'] = 0.8
-                adj_args['num_steps'] = 20
-            print(f'Adjusting cutoff using mean method, with edf_lower: {adj_args["edf_lower"]}; num_steps: {adj_args["num_steps"]}')
-
-        a = prop_alt(pvals, adj_method, adj_args)
-
-    if a == 1:
-        # all hypotheses are estimated to be alternatives
-        fdr_res = np.arange(n)
-    else:
-        qlevel = qlevel / (1-a)  # adjust for estimate of a; default is 0
-        fdr_res = fdr_master(pvals, qlevel, method)
-
-    return fdr_res
