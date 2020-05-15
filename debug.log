@@ -1,0 +1,24 @@
+2020-05-14 17:25:37,271 [DEBUG] shapely.geos: Trying `CDLL(/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib)`
+2020-05-14 17:25:37,276 [DEBUG] shapely.geos: Library path: '/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib'
+2020-05-14 17:25:37,276 [DEBUG] shapely.geos: DLL: <CDLL '/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib', handle 7ff9b5782da0 at 0x7ffa0bb1e990>
+2020-05-14 17:25:37,276 [DEBUG] shapely.geos: Trying `CDLL(/usr/lib/libc.dylib)`
+2020-05-14 17:25:37,276 [DEBUG] shapely.geos: Library path: '/usr/lib/libc.dylib'
+2020-05-14 17:25:37,276 [DEBUG] shapely.geos: DLL: <CDLL '/usr/lib/libc.dylib', handle 10c88c6e0 at 0x7ffa0b75a290>
+2020-05-14 17:34:10,406 [DEBUG] shapely.geos: Trying `CDLL(/usr/lib/libc.dylib)`
+2020-05-14 17:34:10,406 [DEBUG] shapely.geos: Library path: '/usr/lib/libc.dylib'
+2020-05-14 17:34:10,406 [DEBUG] shapely.geos: DLL: <CDLL '/usr/lib/libc.dylib', handle 1097226e0 at 0x7fbe13414950>
+2020-05-14 17:35:14,298 [DEBUG] shapely.geos: Trying `CDLL(/usr/lib/libc.dylib)`
+2020-05-14 17:35:14,299 [DEBUG] shapely.geos: Library path: '/usr/lib/libc.dylib'
+2020-05-14 17:35:14,299 [DEBUG] shapely.geos: DLL: <CDLL '/usr/lib/libc.dylib', handle 10f8636e0 at 0x7fe920e468d0>
+2020-05-14 17:40:56,410 [DEBUG] shapely.geos: Trying `CDLL(/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib)`
+2020-05-14 17:40:56,415 [DEBUG] shapely.geos: Library path: '/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib'
+2020-05-14 17:40:56,415 [DEBUG] shapely.geos: DLL: <CDLL '/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib', handle 7fc0d2e69700 at 0x7fc139c56a10>
+2020-05-14 17:40:56,415 [DEBUG] shapely.geos: Trying `CDLL(/usr/lib/libc.dylib)`
+2020-05-14 17:40:56,415 [DEBUG] shapely.geos: Library path: '/usr/lib/libc.dylib'
+2020-05-14 17:40:56,415 [DEBUG] shapely.geos: DLL: <CDLL '/usr/lib/libc.dylib', handle 10cfcb6e0 at 0x7fc119da92d0>
+2020-05-14 17:43:00,578 [DEBUG] shapely.geos: Trying `CDLL(/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib)`
+2020-05-14 17:43:00,582 [DEBUG] shapely.geos: Library path: '/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib'
+2020-05-14 17:43:00,582 [DEBUG] shapely.geos: DLL: <CDLL '/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib', handle 7fb0f5e430e0 at 0x7fb15a9843d0>
+2020-05-14 17:43:00,582 [DEBUG] shapely.geos: Trying `CDLL(/usr/lib/libc.dylib)`
+2020-05-14 17:43:00,583 [DEBUG] shapely.geos: Library path: '/usr/lib/libc.dylib'
+2020-05-14 17:43:00,583 [DEBUG] shapely.geos: DLL: <CDLL '/usr/lib/libc.dylib', handle 119f856e0 at 0x7fb139f31e10>

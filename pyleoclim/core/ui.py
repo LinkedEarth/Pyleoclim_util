@@ -525,7 +525,7 @@ class Series:
         return new
 
 class PSD:
-    def __init__(self, frequency, amplitude, label=None, timeseries=None,
+    def __init__(self, frequency, amplitude, label=None, timeseries=None, plot_kwargs=None,
                  spec_method=None, spec_args=None, signif_qs=None, signif_method=None):
         self.frequency = np.array(frequency)
         self.amplitude = np.array(amplitude)
@@ -535,18 +535,19 @@ class PSD:
         self.spec_args = spec_args
         self.signif_qs = signif_qs
         self.signif_method = signif_method
+        self.plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
 
     def copy(self):
         return deepcopy(self)
 
     def __str__(self):
         table = {
-            'Frequency': self.freq,
+            'Frequency': self.frequency,
             'Amplitude': self.amplitude,
         }
 
         msg = print(tabulate(table, headers='keys'))
-        return f'Length: {np.size(self.freq)}'
+        return f'Length: {np.size(self.frequency)}'
 
     def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95],
                     settings=None):
@@ -583,7 +584,7 @@ class PSD:
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-        plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+        plot_kwargs = self.plot_kwargs if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
         if label is None:
@@ -1141,7 +1142,7 @@ class MultiplePSD:
     def copy(self):
         return deepcopy(self)
 
-    def quantiles(self, qs=[0.05, 0.5, 0.95]):
+    def quantiles(self, qs=[0.05, 0.5, 0.95], lw=[0.5, 1.5, 0.5]):
         freq = np.copy(self.psd_list[0].frequency)
         amps = []
         for psd in self.psd_list:
@@ -1155,7 +1156,7 @@ class MultiplePSD:
 
         psd_list = []
         for i, amp in enumerate(amp_qs):
-            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%')
+            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'lw': lw[i]})
             psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)
@@ -1173,10 +1174,14 @@ class MultiplePSD:
             fig, ax = plt.subplots(figsize=figsize)
 
         for psd in self.psd_list:
+            tmp_plot_kwargs = {}
+            if psd.plot_kwargs is not None:
+                tmp_plot_kwargs.update(psd.plot_kwargs)
+            tmp_plot_kwargs.update(plot_kwargs)
             ax = psd.plot(
                 figsize=figsize, in_loglog=in_loglog, in_period=in_period, label=psd.label, xlabel=xlabel, ylabel=ylabel,
                 title=title, xlim=xlim, ylim=ylim, savefig_settings=savefig_settings, ax=ax,
-                xticks=xticks, yticks=yticks, plot_legend=plot_legend, plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
+                xticks=xticks, yticks=yticks, plot_legend=plot_legend, plot_kwargs=tmp_plot_kwargs, lgd_kwargs=lgd_kwargs,
             )
 
         if 'fig' in locals():
