@@ -90,3 +90,15 @@
 2020-05-13 10:19:35,480 [DEBUG] parso.python.diff: -> code[replace] old[1:1] new[1:1]
 2020-05-13 10:19:35,481 [DEBUG] parso.python.diff: parse_part from 1 to 1 (to 0 in part parser)
 2020-05-13 10:19:35,481 [DEBUG] parso.python.diff: diff parser end
+2020-05-14 17:35:46,080 [DEBUG] shapely.geos: Trying `CDLL(/usr/lib/libc.dylib)`
+2020-05-14 17:35:46,081 [DEBUG] shapely.geos: Library path: '/usr/lib/libc.dylib'
+2020-05-14 17:35:46,082 [DEBUG] shapely.geos: DLL: <CDLL '/usr/lib/libc.dylib', handle 1063506e0 at 0x7ff62376ff50>
+2020-05-14 17:38:27,650 [DEBUG] shapely.geos: Trying `CDLL(/usr/lib/libc.dylib)`
+2020-05-14 17:38:27,650 [DEBUG] shapely.geos: Library path: '/usr/lib/libc.dylib'
+2020-05-14 17:38:27,650 [DEBUG] shapely.geos: DLL: <CDLL '/usr/lib/libc.dylib', handle 104c8c6e0 at 0x7fd521b69a10>
+2020-05-14 17:39:01,449 [DEBUG] shapely.geos: Trying `CDLL(/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib)`
+2020-05-14 17:39:01,454 [DEBUG] shapely.geos: Library path: '/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib'
+2020-05-14 17:39:01,454 [DEBUG] shapely.geos: DLL: <CDLL '/Users/fzhu/Apps/miniconda3/envs/py3.7/bin/../lib/libgeos_c.dylib', handle 7fc1112eebd0 at 0x7fc15d1513d0>
+2020-05-14 17:39:01,454 [DEBUG] shapely.geos: Trying `CDLL(/usr/lib/libc.dylib)`
+2020-05-14 17:39:01,454 [DEBUG] shapely.geos: Library path: '/usr/lib/libc.dylib'
+2020-05-14 17:39:01,454 [DEBUG] shapely.geos: DLL: <CDLL '/usr/lib/libc.dylib', handle 10b5906e0 at 0x7fc15d159090>

@@ -60,6 +60,7 @@ setup(
         "numba",
         "nitime",
         "tabulate",
+        "PyWavelets",
     ],
     python_requires=">=3.6.0"
 )
