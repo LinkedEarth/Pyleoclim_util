@@ -1478,7 +1478,7 @@ def freq_vector_log(ts, nfreq=None):
     if nfreq is None:
         nfreq = nt//10 + 1
 
-    fmin = 1/nt
+    fmin = 2/(np.max(ts)-np.min(ts))
     fmax = fs/2
     start = np.log2(fmin)
     stop = np.log2(fmax)
