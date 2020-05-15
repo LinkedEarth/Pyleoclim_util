@@ -1054,6 +1054,24 @@ class MultipleSeries:
 
     def copy(self):
         return deepcopy(self)
+    
+    def standardize(self):
+        new=self.copy()
+        for idx,item in enumerate(new.series_list):
+            s=item.copy()
+            v_mod=tsutils.standardize(item.value)[0]
+            s.value=v_mod
+            new.series_list[idx]=s
+        return new
+    
+    def detrend(self,method='emd',**kwargs):
+        new=self.copy()
+        for idx,item in enumerate(new.series_list):
+            s=item.copy()
+            v_mod=tsutils.detrend(item.value,x=item.time,method=method,**kwargs)
+            s.value=v_mod
+            new.series_list[idx]=s
+        return new
 
     def spectral(self, method='wwz', settings={}):
         settings = {} if settings is None else settings.copy()
@@ -1332,6 +1350,23 @@ class Lipd:
     def __repr__(self):
         return str(self.__dict__)
     
+    def copy(self):
+        return deepcopy(self)
+    
+    def to_tso(self):
+        ts_list=lpd.extractTs(self.__dict__['lipd'])
+        return ts_list
+    
+    def extract(self,dataSetName):
+        new = self.copy()
+        try:
+            dict_out=self.__dict__['lipd'][dataSetName]
+            new.lipd=dict_out
+        except:
+            pass
+        
+        return new 
+        
     def mapAllArchive(self, projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
            figsize = None, ax = None, marker=None, color=None, 
@@ -1378,11 +1413,15 @@ class Lipd:
                               mute=mute)
         
         return res
-        
 
-class LipdSeries:
-    def __init__(self, ts):
-        self.ts = ts
+        
+class LipdSeries(Series):
+    def __init__(self, tso):
+        if type(tso) is list:
+            self.lipd_ts=lipdutils.getTs(tso)
+        else:
+            self.lipd_ts=tso        
+                    
         self.plot_default = {'ice/rock': ['#FFD600','h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
@@ -1396,105 +1435,195 @@ class LipdSeries:
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
                 'other':['k','o']}
-
-    def mapone(self, projection='Orthographic', proj_default=True,
-               background=True, label='default', borders=False,
-               rivers=False, lakes=False, markersize=50, marker="default",
-               figsize=[4,4], ax=None, savefig_settings={}):
-        """ Create a Map for a single record
-
-        Orthographic projection map of a single record.
-
-        Args
-        ----
-
-        timeseries : object
-                    a LiPD timeseries object. Will prompt for one if not given
-        projection : string
-                    the map projection. Available projections:
-                    'Robinson', 'PlateCarree', 'AlbertsEqualArea',
-                    'AzimuthalEquidistant','EquidistantConic','LambertConformal',
-                    'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
-                    'Sinusoidal','Stereographic','TransverseMercator','UTM',
-                    'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
-                    'Geostationary','NearsidePerspective','EckertI','EckertII',
-                    'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
-                    'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-        proj_default : bool
-                      If True, uses the standard projection attributes, including centering.
-                      Enter new attributes in a dictionary to change them. Lists of attributes
-            can be found in the Cartopy documentation:
-                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
-        background : bool
-                    If True, uses a shaded relief background (only one
-                    available in Cartopy)
-        label : str
-               label for archive marker. Default is to use the name of the
-               physical sample. If no archive name is available, default to
-               None. None returns no label.
-        borders : bool
-                 Draws the countries border. Defaults is off (False).
-        rivers : bool
-                Draws major rivers. Default is off (False).
-        lakes : bool
-               Draws major lakes. Default is off (False).
-        markersize : int
-                    The size of the marker.
-        marker : str or list
-                color and type of marker. Default will use the
-                default color palette for archives
-        figsize : list
-                 the size for the figure
-
-        savefig_settings : dict
-            the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
-              with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
-
-        Returns
-        -------
-        The figure
-
-        """
-
-        # Get latitude/longitude
-
-        lat = self.ts['geo_meanLat']
-        lon = self.ts['geo_meanLon']
-
-        if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
-
-        # Make sure it's in the palette
-        if marker == 'default':
-            archiveType = lipdutils.LipdToOntology(self.ts['archiveType']).lower()
-            if archiveType not in self.plot_default.keys():
-                archiveType = 'other'
-            marker = self.plot_default[archiveType]
-
-        # Get the label
-        if label == 'default':
-            for i in self.ts.keys():
-                if 'physicalSample_name' in i:
-                    label = self.ts[i]
-                elif 'measuredOn_name' in i:
-                    label = self.ts[i]
-            if label == 'default':
-                label = None
-        elif label is None:
-            label = None
+    
+        time, label= lipdutils.checkTimeAxis(self.lipd_ts)
+        if label=='age':
+            time_name='Age'
+            if 'ageUnits' in self.lipd_ts.keys():
+                time_unit=self.lipd_ts['ageUnits']
+            else:
+                time_unit=None
+        elif label=='year':
+            time_name='Year'
+            if 'yearUnits' in self.lipd_ts.keys():
+                time_unit=self.lipd_ts['yearUnits']
+            else:
+                time_unit=None
+    
+        value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
+        #Remove NaNs
+        ys_tmp=np.copy(value)
+        value=value[~np.isnan(ys_tmp)]
+        time=time[~np.isnan(ys_tmp)]
+        value_name=self.lipd_ts['paleoData_variableName']
+        if 'paleoData_units' in self.lipd_ts.keys():
+            value_unit=self.lipd_ts['paleoData_units']
         else:
-            raise TypeError('the argument label should be of type str')
-
-        fig, ax = mapping.mapOne(lat, lon, projection = projection, proj_default = proj_default,
-               background = background, label = label, borders = borders, rivers = rivers, lakes = lakes,
-               markersize = markersize, marker = marker, figsize = figsize, ax = ax)
-
-        # Save the figure if "path" is specified in savefig_settings
-        if 'path' in savefig_settings:
-            plotting.savefig(fig, savefig_settings)
+            value_unit=None
+        label=self.lipd_ts['dataSetName']
+        super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
+             time_unit=time_unit,value_name=value_name,value_unit=value_unit,
+             label=label)
+        
+    def copy(self):
+        return deepcopy(self)
+    
+    def chronEnsembleToPaleo(self,D,modelNumber=None,tableNumber=None):
+        #get the corresponding LiPD
+        dataSetName=self.lipd_ts['dataSetName']
+        if type(D) is dict:
+            try:
+                lipd=D[dataSetName]
+            except:
+                lipd=D
         else:
-            plotting.showfig(fig)
+            a=D.extract(dataSetName)
+            lipd=a.__dict__['lipd']
+        #Look for the ensemble and get values
+        csv_dict=lpd.getCsv(lipd)
+        chron,paleo = lipdutils.isEnsemble(csv_dict)
+        if len(chron)==0:
+            raise ValueError("No ChronMeasurementTables available")
+        elif len(chron)>1:
+            if modelNumber==None or tableNumber==None:
+                csvName=lipdutils.whichEnsemble(chron)
+            else:
+                str1='model'+str(modelNumber)
+                str2='ensemble'+str(tableNumber)
+                for item in chron:
+                    if str1 in item and str2 in item:
+                        csvName=item
+            depth, ensembleValues =lipdutils.getEnsemble(csv_dict,csvName)
+        else:    
+            depth, ensembleValues =lipdutils.getEnsemble(csv_dict,chron[0])
+        #make sure it's sorted
+        sort_ind = np.argsort(depth)
+        depth=list(np.array(depth)[sort_ind])
+        ensembleValues=ensembleValues[sort_ind,:]
+        #Map to paleovalues
+        key=[]
+        for item in self.lipd_ts.keys():
+            if 'depth' in item and 'Units' not in item:
+                key.append(item)
+        key=key[0]
+        ds= np.array(self.lipd_ts[key],dtype='float64')
+        ys= np.array(self.lipd_ts['paleoData_values'],dtype='float64')
+        #Remove NaNs
+        ys_tmp=np.copy(ys)
+        ds=ds[~np.isnan(ys_tmp)]
+        ensembleValuestoPaleo=lipdutils.mapAgeEnsembleToPaleoData(ensembleValues, depth, ds)
+        #create multipleseries
+        s_list=[]
+        for s in ensembleValuestoPaleo.T:
+            s_tmp=Series(time=s,value=self.value)
+            s_list.append(s_tmp)
+        
+        ms = MultipleSeries(series_list=s_list)
+        
+        return ms
+        
+#        
+#
+#    def mapone(self, projection='Orthographic', proj_default=True,
+#               background=True, label='default', borders=False,
+#               rivers=False, lakes=False, markersize=50, marker="default",
+#               figsize=[4,4], ax=None, savefig_settings={}):
+#        """ Create a Map for a single record
+#
+#        Orthographic projection map of a single record.
+#
+#        Args
+#        ----
+#
+#        timeseries : object
+#                    a LiPD timeseries object. Will prompt for one if not given
+#        projection : string
+#                    the map projection. Available projections:
+#                    'Robinson', 'PlateCarree', 'AlbertsEqualArea',
+#                    'AzimuthalEquidistant','EquidistantConic','LambertConformal',
+#                    'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
+#                    'Sinusoidal','Stereographic','TransverseMercator','UTM',
+#                    'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
+#                    'Geostationary','NearsidePerspective','EckertI','EckertII',
+#                    'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
+#                    'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
+#        proj_default : bool
+#                      If True, uses the standard projection attributes, including centering.
+#                      Enter new attributes in a dictionary to change them. Lists of attributes
+#            can be found in the Cartopy documentation:
+#                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
+#        background : bool
+#                    If True, uses a shaded relief background (only one
+#                    available in Cartopy)
+#        label : str
+#               label for archive marker. Default is to use the name of the
+#               physical sample. If no archive name is available, default to
+#               None. None returns no label.
+#        borders : bool
+#                 Draws the countries border. Defaults is off (False).
+#        rivers : bool
+#                Draws major rivers. Default is off (False).
+#        lakes : bool
+#               Draws major lakes. Default is off (False).
+#        markersize : int
+#                    The size of the marker.
+#        marker : str or list
+#                color and type of marker. Default will use the
+#                default color palette for archives
+#        figsize : list
+#                 the size for the figure
+#
+#        savefig_settings : dict
+#            the dictionary of arguments for plt.savefig(); some notes below:
+#            - "path" must be specified; it can be any existed or non-existed path,
+#              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+#            - "format" can be one of {"pdf", "eps", "png", "ps"}
+#
+#        Returns
+#        -------
+#        The figure
+#
+#        """
+#
+#        # Get latitude/longitude
+#
+#        lat = self.ts['geo_meanLat']
+#        lon = self.ts['geo_meanLon']
+#
+#        if ax is None:
+#            fig, ax = plt.subplots(figsize=figsize)
+#
+#        # Make sure it's in the palette
+#        if marker == 'default':
+#            archiveType = lipdutils.LipdToOntology(self.ts['archiveType']).lower()
+#            if archiveType not in self.plot_default.keys():
+#                archiveType = 'other'
+#            marker = self.plot_default[archiveType]
+#
+#        # Get the label
+#        if label == 'default':
+#            for i in self.ts.keys():
+#                if 'physicalSample_name' in i:
+#                    label = self.ts[i]
+#                elif 'measuredOn_name' in i:
+#                    label = self.ts[i]
+#            if label == 'default':
+#                label = None
+#        elif label is None:
+#            label = None
+#        else:
+#            raise TypeError('the argument label should be of type str')
+#
+#        fig, ax = mapping.mapOne(lat, lon, projection = projection, proj_default = proj_default,
+#               background = background, label = label, borders = borders, rivers = rivers, lakes = lakes,
+#               markersize = markersize, marker = marker, figsize = figsize, ax = ax)
+#
+#        # Save the figure if "path" is specified in savefig_settings
+#        if 'path' in savefig_settings:
+#            plotting.savefig(fig, savefig_settings)
+#        else:
+#            plotting.showfig(fig)
+#
+#        return fig
 
-        return fig
+    

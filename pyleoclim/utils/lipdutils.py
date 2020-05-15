@@ -1196,6 +1196,7 @@ def isModel(csvName, lipd):
 
     return model, objectName
 
+
 def modelNumber(model):
     """Assign a new or existing model number
 
@@ -1255,7 +1256,7 @@ def isMeasurement(csv_dict):
 
     return chronMeasurementTables, paleoMeasurementTables
 
-def whichMeasurement(measurementTableList, csv_dict):
+def whichMeasurement(measurementTableList):
     """Select a measurement table from a list
 
     Use in conjunction with the function isMeasurement
@@ -1265,9 +1266,7 @@ def whichMeasurement(measurementTableList, csv_dict):
 
     measurementTableList : list
         List of measurement tables contained in the LiPD file. Output from the isMeasurement function
-    csv_list : list
-        Dictionary of available csv
-
+    
     Returns
     -------
 
@@ -1352,15 +1351,48 @@ def isEnsemble(csv_dict):
 
     return chronEnsembleTables, paleoEnsembleTables
 
-def getEnsembleValues(ensemble_dict):
+def whichEnsemble(ensembleTableList):
+    """Select an ensemble table from a list
+
+    Use in conjunction with the function isMeasurement
+
+    Args
+    ----
+
+    measurementTableList : list
+        List of measurement tables contained in the LiPD file. Output from the isMeasurement function
+    csv_list : list
+        Dictionary of available csv
+
+    Returns
+    -------
+
+    csvName : string
+        the name of the csv file
+
+    """
+    if len(ensembleTableList)>1:
+        print("More than one table is available.")
+        for idx, val in enumerate(ensembleTableList):
+            print(idx, ": ", val)
+        csvName = ensembleTableList[int(input("Which one would you like to use? "))]
+    else:
+        csvName = ensembleTableList[0]
+
+    return csvName
+
+def getEnsemble(csv_dict, csvName):
     """ Grabs the ensemble values and depth vector from the dictionary and
     return them into two numpy arrays.
 
     Args
     ----
 
-    ensemble_dict : dict
-        dictionary containing the ensemble information
+    csv_dict : dict
+        dictionary containing the availableTables
+    
+    csvName : str
+        Name of the csv
 
     Returns
     -------
@@ -1370,7 +1402,7 @@ def getEnsembleValues(ensemble_dict):
     ensembleValues : array
         The matrix of Ensemble values
     """
-
+    ensemble_dict=csv_dict[csvName]    
     for val in ensemble_dict.keys():
         number = ensemble_dict[val]["number"]
         if type(number) is int:
