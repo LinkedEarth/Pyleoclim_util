@@ -314,7 +314,7 @@ class Series:
 
         args['wwz'] = {'freq': freq}
         args['mtm'] = {}
-        args['lomb_scargle'] = {}
+        args['lomb_scargle'] = {'freq': freq}
         args['welch'] = {}
         args['periodogram'] = {}
         args[method].update(settings)
@@ -1076,7 +1076,7 @@ class MultipleSeries:
 
     def spectral(self, method='wwz', settings={}, mute_pbar=False):
         settings = {} if settings is None else settings.copy()
-        if 'freq' not in settings.keys():
+        if method in ['wwz', 'lomb_scargle'] and 'freq' not in settings.keys():
             res=[]
             for s in(self.series_list):
                 c=np.mean(np.diff(s.value))
@@ -1188,10 +1188,13 @@ class MultiplePSD:
                 tmp_plot_kwargs.update(psd.plot_kwargs)
             tmp_plot_kwargs.update(plot_kwargs)
             ax = psd.plot(
-                figsize=figsize, in_loglog=in_loglog, in_period=in_period, label=psd.label, xlabel=xlabel, ylabel=ylabel,
+                figsize=figsize, in_loglog=in_loglog, in_period=in_period, xlabel=xlabel, ylabel=ylabel,
                 title=title, xlim=xlim, ylim=ylim, savefig_settings=savefig_settings, ax=ax,
                 xticks=xticks, yticks=yticks, plot_legend=plot_legend, plot_kwargs=tmp_plot_kwargs, lgd_kwargs=lgd_kwargs,
             )
+
+        if title is not None:
+            ax.set_title(title)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
@@ -1202,6 +1205,71 @@ class MultiplePSD:
             return fig, ax
         else:
             return ax
+
+    def plot_envelope(self, figsize=[10, 4], qs=[0.025, 0.5, 0.975],
+             in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
+             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
+             curve_clr=sns.xkcd_rgb['pale red'], curve_lw=3, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.3, shade_label=None,
+             lgd_kwargs=None, mute=False, members_plot_num=10, members_alpha=0.3, members_lw=1, seed=None):
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        if members_plot_num > 0:
+            if seed is not None:
+                np.random.seed(seed)
+
+            npsd = np.size(self.psd_list)
+            random_draw_idx = np.random.choice(npsd, members_plot_num)
+
+            for idx in random_draw_idx:
+                self.psd_list[idx].plot(
+                    in_loglog=in_loglog, in_period=in_period, xlabel=xlabel, ylabel=ylabel,
+                    xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, ax=ax, color='gray', alpha=members_alpha,
+                    zorder=99, linewidth=members_lw,
+                )
+            ax.plot(np.nan, np.nan, color='gray', label=f'example members (n={members_plot_num})')
+
+        psd_qs = self.quantiles(qs=qs)
+        psd_qs.psd_list[1].plot(
+            in_loglog=in_loglog, in_period=in_period, xlabel=xlabel, ylabel=ylabel, linewidth=curve_lw,
+            xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, ax=ax, color=curve_clr, zorder=100
+        )
+
+
+        if in_period:
+            x_axis = 1/psd_qs.psd_list[0].frequency
+        else:
+            x_axis = psd_qs.psd_list[0].frequency
+
+        if shade_label is None:
+            shade_label = f'{psd_qs.psd_list[0].label}-{psd_qs.psd_list[-1].label}'
+
+        ax.fill_between(
+            x_axis, psd_qs.psd_list[0].amplitude, psd_qs.psd_list[-1].amplitude,
+            color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=shade_label,
+        )
+
+        if title is not None:
+            ax.set_title(title)
+
+        if plot_legend:
+            lgd_args = {'frameon': False}
+            lgd_args.update(lgd_kwargs)
+            ax.legend(**lgd_args)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, savefig_settings)
+            else:
+                if not mute:
+                    plotting.showfig(fig)
+            return fig, ax
+        else:
+            return ax
+
 
 class MultipleScalogram:
     def __init__(self, scalogram_list):
