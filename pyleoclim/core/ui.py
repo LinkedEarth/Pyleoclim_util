@@ -1076,7 +1076,16 @@ class MultipleSeries:
 
     def spectral(self, method='wwz', settings={}, mute_pbar=False):
         settings = {} if settings is None else settings.copy()
-
+        if 'freq' not in settings.keys():
+            res=[]
+            for s in(self.series_list):
+                c=np.mean(np.diff(s.value))
+                res.append(c)
+            res=np.array(res)
+            idx = np.argmin(res)
+            ts=self.series_list[idx].time
+            freq=waveutils.make_freq_vector(ts)
+            settings.update({'freq':freq})
         psd_list = []
         for s in tqdm(self.series_list, desc='Performing spectral analysis on surrogates', position=0, leave=True, disable=mute_pbar):
             psd_tmp = s.spectral(method=method, settings=settings)
