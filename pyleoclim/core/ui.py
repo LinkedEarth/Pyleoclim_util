@@ -38,6 +38,35 @@ def dict2namedtuple(d):
 
 class Series:
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None):
+        """Create a pyleoSeries object
+        
+        Args
+        ----
+        
+        time : list or numpy.array
+            Time values for the time series
+        
+        value : list of numpy.array
+            ordinate values for the time series
+        
+        time_name : string
+            Name of the time vector (e.g., 'Age').
+            Default is None. This is used to label the time axis on plots
+        
+        time_unit : string
+            Units for the time vector (e.g., 'yr B.P.').
+            Default is None
+        
+        value_name : string
+            Name of the value vector (e.g., 'temperature')
+            Default is None
+            
+        value_unit : string
+            Units for the value vector (e.g., 'deg C')
+        
+        label : string
+            Name of the time series (e.g., 'Nino 3.4')
+        """
         self.time = np.array(time)
         self.value = np.array(value)
         self.time_name = time_name
@@ -1610,109 +1639,91 @@ class LipdSeries(Series):
         ms = MultipleSeries(series_list=s_list)
         
         return ms
+    
+    def map(self,projection = 'Orthographic', proj_default = True,
+           background = True,borders = False, rivers = False, lakes = False,
+           figsize = None, ax = None, marker=None, color=None, 
+           markersize = None, scatter_kwargs=None,
+           legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
+
+        #get the information from the timeseries
+        lat=[self.lipd_ts['geo_meanLat']]
+        lon=[self.lipd_ts['geo_meanLon']]
+        archiveType=lipdutils.LipdToOntology(self.lipd_ts['archiveType'])
         
-#        
-#
-#    def mapone(self, projection='Orthographic', proj_default=True,
-#               background=True, label='default', borders=False,
-#               rivers=False, lakes=False, markersize=50, marker="default",
-#               figsize=[4,4], ax=None, savefig_settings={}):
-#        """ Create a Map for a single record
-#
-#        Orthographic projection map of a single record.
-#
-#        Args
-#        ----
-#
-#        timeseries : object
-#                    a LiPD timeseries object. Will prompt for one if not given
-#        projection : string
-#                    the map projection. Available projections:
-#                    'Robinson', 'PlateCarree', 'AlbertsEqualArea',
-#                    'AzimuthalEquidistant','EquidistantConic','LambertConformal',
-#                    'LambertCylindrical','Mercator','Miller','Mollweide','Orthographic' (Default),
-#                    'Sinusoidal','Stereographic','TransverseMercator','UTM',
-#                    'InterruptedGoodeHomolosine','RotatedPole','OSGB','EuroPP',
-#                    'Geostationary','NearsidePerspective','EckertI','EckertII',
-#                    'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
-#                    'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-#        proj_default : bool
-#                      If True, uses the standard projection attributes, including centering.
-#                      Enter new attributes in a dictionary to change them. Lists of attributes
-#            can be found in the Cartopy documentation:
-#                https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
-#        background : bool
-#                    If True, uses a shaded relief background (only one
-#                    available in Cartopy)
-#        label : str
-#               label for archive marker. Default is to use the name of the
-#               physical sample. If no archive name is available, default to
-#               None. None returns no label.
-#        borders : bool
-#                 Draws the countries border. Defaults is off (False).
-#        rivers : bool
-#                Draws major rivers. Default is off (False).
-#        lakes : bool
-#               Draws major lakes. Default is off (False).
-#        markersize : int
-#                    The size of the marker.
-#        marker : str or list
-#                color and type of marker. Default will use the
-#                default color palette for archives
-#        figsize : list
-#                 the size for the figure
-#
-#        savefig_settings : dict
-#            the dictionary of arguments for plt.savefig(); some notes below:
-#            - "path" must be specified; it can be any existed or non-existed path,
-#              with or without a suffix; if the suffix is not given in "path", it will follow "format"
-#            - "format" can be one of {"pdf", "eps", "png", "ps"}
-#
-#        Returns
-#        -------
-#        The figure
-#
-#        """
-#
-#        # Get latitude/longitude
-#
-#        lat = self.ts['geo_meanLat']
-#        lon = self.ts['geo_meanLon']
-#
-#        if ax is None:
-#            fig, ax = plt.subplots(figsize=figsize)
-#
-#        # Make sure it's in the palette
-#        if marker == 'default':
-#            archiveType = lipdutils.LipdToOntology(self.ts['archiveType']).lower()
-#            if archiveType not in self.plot_default.keys():
-#                archiveType = 'other'
-#            marker = self.plot_default[archiveType]
-#
-#        # Get the label
-#        if label == 'default':
-#            for i in self.ts.keys():
-#                if 'physicalSample_name' in i:
-#                    label = self.ts[i]
-#                elif 'measuredOn_name' in i:
-#                    label = self.ts[i]
-#            if label == 'default':
-#                label = None
-#        elif label is None:
-#            label = None
-#        else:
-#            raise TypeError('the argument label should be of type str')
-#
-#        fig, ax = mapping.mapOne(lat, lon, projection = projection, proj_default = proj_default,
-#               background = background, label = label, borders = borders, rivers = rivers, lakes = lakes,
-#               markersize = markersize, marker = marker, figsize = figsize, ax = ax)
-#
-#        # Save the figure if "path" is specified in savefig_settings
-#        if 'path' in savefig_settings:
-#            plotting.savefig(fig, savefig_settings)
-#        else:
-#            plotting.showfig(fig)
-#
-#        return fig
+        # make sure criteria is in the plot_default list
+        if archiveType not in self.plot_default.keys():
+            archiveType = 'other'
+        
+        if markersize is not None:
+            scatter_kwargs.update({'markersize': markersize})
+        
+        if marker==None:
+            marker= self.plot_default[archiveType][1]
+        
+        if color==None:
+            color=self.plot_default[archiveType][0]
+        
+        if proj_default==True:
+            proj1={'central_latitude':lat[0],
+                   'central_longitude':lon[0]}
+            proj2={'central_latitude':lat[0]}
+            proj3={'central_longitude':lon[0]}
+
+        archiveType=[archiveType] #list so it will work with map_all
+        marker=[marker]
+        color=[color]
+        
+        if proj_default==True:
+            
+            try:
+                res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
+                              marker=marker, color =color,
+                              projection = projection, proj_default = proj1,
+                              background = background,borders = borders, 
+                              rivers = rivers, lakes = lakes,
+                              figsize = figsize, ax = ax, 
+                              scatter_kwargs=scatter_kwargs, legend=legend,
+                              lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
+                              mute=mute)
+            
+            except:
+                try:
+                    res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
+                              marker=marker, color =color,
+                              projection = projection, proj_default = proj3,
+                              background = background,borders = borders, 
+                              rivers = rivers, lakes = lakes,
+                              figsize = figsize, ax = ax, 
+                              scatter_kwargs=scatter_kwargs, legend=legend,
+                              lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
+                              mute=mute)
+                except:
+                    res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
+                              marker=marker, color =color,
+                              projection = projection, proj_default = proj2,
+                              background = background,borders = borders, 
+                              rivers = rivers, lakes = lakes,
+                              figsize = figsize, ax = ax, 
+                              scatter_kwargs=scatter_kwargs, legend=legend,
+                              lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
+                              mute=mute)
+            
+        else:
+            res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
+                              marker=marker, color =color,
+                              projection = projection, proj_default = proj_default,
+                              background = background,borders = borders, 
+                              rivers = rivers, lakes = lakes,
+                              figsize = figsize, ax = ax, 
+                              scatter_kwargs=scatter_kwargs, legend=legend,
+                              lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
+                              mute=mute)
+        return res
+        
+        
+    
+    
+        
 
     

@@ -318,7 +318,8 @@ def map_all(lat, lon, criteria, marker=None, color =None,
     palette = color_data.drop_duplicates(subset='criteria')
     
     # get the projection:
-    proj = set_proj(projection=projection, proj_default=proj_default)        
+    proj = set_proj(projection=projection, proj_default=proj_default) 
+    data_crs = ccrs.PlateCarree()       
     # Make the figure        
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize,subplot_kw=dict(projection=proj))     
@@ -344,7 +345,7 @@ def map_all(lat, lon, criteria, marker=None, color =None,
             ax.scatter(np.array(lon)[index],np.array(lat)[index],
                         zorder = 10,
                         label = crit,
-                        transform=ccrs.PlateCarree(),
+                        transform=data_crs,
                         **scatter_kwargs)
     elif color==None and marker!=None:
         for crit in set(criteria):
@@ -353,7 +354,7 @@ def map_all(lat, lon, criteria, marker=None, color =None,
             ax.scatter(np.array(lon)[index],np.array(lat)[index],
                         zorder = 10,
                         label = crit,
-                        transform=ccrs.PlateCarree(),
+                        transform=data_crs,
                         marker = palette[palette['criteria']==crit]['marker'].iloc[0],
                         **scatter_kwargs)
     elif color!=None and marker==None:
@@ -363,7 +364,7 @@ def map_all(lat, lon, criteria, marker=None, color =None,
             ax.scatter(np.array(lon)[index],np.array(lat)[index],
                         zorder = 10,
                         label = crit,
-                        transform=ccrs.PlateCarree(),
+                        transform=data_crs,
                         facecolor = palette[palette['criteria']==crit]['color'].iloc[0],
                         **scatter_kwargs)
     elif color!=None and marker!=None:
@@ -373,7 +374,7 @@ def map_all(lat, lon, criteria, marker=None, color =None,
             ax.scatter(np.array(lon)[index],np.array(lat)[index],
                         zorder = 10,
                         label = crit,
-                        transform=ccrs.PlateCarree(),
+                        transform=data_crs,
                         facecolor = palette[palette['criteria']==crit]['color'].iloc[0],
                         marker=palette[palette['criteria']==crit]['marker'].iloc[0],
                         **scatter_kwargs)
