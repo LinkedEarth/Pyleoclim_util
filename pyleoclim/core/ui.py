@@ -456,7 +456,7 @@ class Series:
 
         s_list = []
         for s in surr_res.T:
-            s_tmp = Series(time=self.time, value=s)
+            s_tmp = Series(time=self.time, value=s, time_name=self.time_name, time_unit=self.time_unit, value_name=self.value_name, value_unit=self.value_unit)
             s_list.append(s_tmp)
 
         surr = SurrogateSeries(series_list=s_list, surrogate_method=method, surrogate_args=args[method])
@@ -526,7 +526,7 @@ class Series:
 
 class PSD:
     def __init__(self, frequency, amplitude, label=None, timeseries=None, plot_kwargs=None,
-                 spec_method=None, spec_args=None, signif_qs=None, signif_method=None):
+                 spec_method=None, spec_args=None, signif_qs=None, signif_method=None, period_unit=None):
         self.frequency = np.array(frequency)
         self.amplitude = np.array(amplitude)
         self.label = label
@@ -536,6 +536,10 @@ class PSD:
         self.signif_qs = signif_qs
         self.signif_method = signif_method
         self.plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+        if period_unit is not None:
+            self.period_unit = period_unit
+        elif timeseries is not None:
+            self.period_unit = timeseries.time_unit
 
     def copy(self):
         return deepcopy(self)
@@ -622,7 +626,7 @@ class PSD:
             x_axis = 1/np.delete(self.frequency, idx)
             y_axis = np.delete(self.amplitude, idx)
             if xlabel is None:
-                xlabel = 'Period'
+                xlabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
 
             if xticks is None:
                 xticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
@@ -1152,6 +1156,9 @@ class MultiplePSD:
         return deepcopy(self)
 
     def quantiles(self, qs=[0.05, 0.5, 0.95], lw=[0.5, 1.5, 0.5]):
+        if self.psd_list[0].timeseries is not None:
+            period_unit = self.psd_list[0].timeseries.time_unit
+
         freq = np.copy(self.psd_list[0].frequency)
         amps = []
         for psd in self.psd_list:
@@ -1165,7 +1172,7 @@ class MultiplePSD:
 
         psd_list = []
         for i, amp in enumerate(amp_qs):
-            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'lw': lw[i]})
+            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'lw': lw[i]}, period_unit=period_unit)
             psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)
