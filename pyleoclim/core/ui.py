@@ -641,7 +641,7 @@ class PSD:
             x_axis = np.delete(self.frequency, idx)
             y_axis = np.delete(self.amplitude, idx)
             if xlabel is None:
-                xlabel = 'Frequency'
+                xlabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
 
             if xlim is None:
                 xlim = ax.get_xlim()
