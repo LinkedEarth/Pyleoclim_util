@@ -108,6 +108,31 @@ class Series:
 
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.time)}'
+    
+    def stats(self):
+        """ Compute basic statistics for the time series
+        
+        Args
+        ----
+        
+        ts: pyleoclim Series Object
+        
+        Returns
+        -------
+       
+        res : dictionary 
+            Contains the mean, median, minimum value, maximum value, standard
+            deviation, and interquartile range for the Series. 
+
+        """
+        mean, median, min_, max_, std, IQR = tsutils.simple_stats(self.value)
+        res={'mean':mean,
+             'median':median,
+             'min':min_,
+             'max':max_,
+             'std':std,
+             'IQR': IQR}
+        return res
 
     def plot(self, figsize=[10, 4],
              marker=None, markersize=None, color=None,
@@ -300,6 +325,46 @@ class Series:
         v_mod = tsutils.standardize(self.value)[0]
         new.value = v_mod
         return new
+    
+    def segment(self, factor=10):
+        """Gap detection
+        
+        This function segments a timeseries into n number of parts following a gap
+            detection algorithm. The rule of gap detection is very simple:
+            we define the intervals between time points as dts, then if dts[i] is larger than factor * dts[i-1],
+            we think that the change of dts (or the gradient) is too large, and we regard it as a breaking point
+            and divide the time series into two segments here
+        
+        Args
+        ----
+        
+        ts : pyleoclim Series 
+        
+        factor : float
+            The factor that adjusts the threshold for gap detection
+        
+        Returns
+        -------
+        
+        res : pyleoclim MultipleSeries Object or pyleoclim Series Object
+            If gaps were detected, returns the segments in a MultipleSeries object,
+            else, returns the original timeseries. 
+        
+        """
+        seg_y, seg_t, n_segs = tsutils.ts2segments(self.value,self.time,factor=factor)
+        if len(seg_y)>1:
+            s_list=[]
+            for idx,s in enumerate(seg_y):
+                s_tmp=Series(time=seg_t[idx],value=s,time_name=self.time_name, 
+                             time_unit=self.time_unit, value_name=self.value_name,
+                             value_unit=self.value_unit,label=self.label)
+                s_list.append(s_tmp)  
+            res=MultipleSeries(series_list=s_list) 
+        elif len(seg_y)==1:
+            res=self.copy()
+        else:
+            raise ValueError('No timeseries detected')
+        return res 
 
     def slice(self, timespan):
         ''' Slicing the timeseries with a timespan (tuple or list)
@@ -1529,6 +1594,12 @@ class Lipd:
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
                               mute=mute)
+        
+        return res
+    
+    def mapNearRecord():
+        
+        res={}
         
         return res
 
