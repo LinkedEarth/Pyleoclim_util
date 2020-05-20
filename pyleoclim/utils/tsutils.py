@@ -534,7 +534,7 @@ def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
         - linear: the result of a linear least-squares fit to y is subtracted from y.
         - constant: only the mean of data is subtrated.
         - "savitzy-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-        - "emd" (default): Empiracal mode decomposition
+        - "emd" (default): Empirical mode decomposition
     params : list
         The paramters for the Savitzky-Golay filters. The first parameter
         corresponds to the window size (default it set to half of the data)
