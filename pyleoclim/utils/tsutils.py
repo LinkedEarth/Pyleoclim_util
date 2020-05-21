@@ -21,6 +21,7 @@ __all__ = [
     'detrend',
     'detect_outliers',
     'is_evenly_spaced',
+    'remove_outliers'
 ]
 
 import numpy as np
@@ -38,9 +39,10 @@ import matplotlib.pyplot as plt
 import numpy.matlib
 from sklearn.neighbors import NearestNeighbors
 import math
-
-from .filter import savitzky_golay
 from .plotting import plot_scatter_xy
+from .filter import savitzky_golay
+
+
 
 def simple_stats(y, axis=None):
     """ Computes simple statistics

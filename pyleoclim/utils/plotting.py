@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Feb 25 05:45:52 2020
-
 @author: deborahkhider
-
 Contains all relevant plotting functions
 """
 
@@ -20,16 +18,17 @@ import pathlib
 import matplotlib as mpl
 import seaborn as sns
 
-def plot_ens(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = None,
-            y_label = None, title = None, figsize = [10,4], ax = None):
+
+def plot_ens(ageEns, y, ens=None, color='r', alpha=0.005, x_label=None,
+             y_label=None, title=None, figsize=[10, 4], ax=None):
     """Plot Ensemble Values
-    
-    This function allows to plot all or a subset of ensemble members of a 
+
+    This function allows to plot all or a subset of ensemble members of a
     timeseries
-    
+
     Args
     ----
-    
+
     ageEns : numpy array
             Age ensemble data. Iterations should be stored in columns
     y : numpy array
@@ -51,47 +50,47 @@ def plot_ens(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = None,
              Size of the figure. Default is [10,4]
     ax : object
         Return as axis instead of figure
-    
+
     Returns
     -------
     ax : Axis for the figure
     fig : The figure
-    
+
     TODO
     ----
-    Enable paleoEnsemble       
-    
+    Enable paleoEnsemble
+
     """
 
-    #Make sure that the ensemble and paleo values are numpy arrays
+    # Make sure that the ensemble and paleo values are numpy arrays
     ageEns = np.array(ageEns)
     y = np.array(y)
-    
+
     # Make sure that the length of y is the same as the number of rows in ensemble array
     if len(y) != np.shape(ageEns)[0]:
         raise ValueError("The length of the paleoData is different than number of rows in ensemble table!")
 
     # Figure out the number of ensembles to plot
     if not ens:
-        if np.shape(ageEns)[1]<500:
+        if np.shape(ageEns)[1] < 500:
             ens = np.shape(ageEns)[1]
         else:
             ens = 500
             print("Plotting 500 ensemble members")
     elif ens > np.shape(ageEns)[1]:
         ens = np.shape(ageEns)[1]
-        print("Plotting all available ensemble members") 
-        
-    # Figure setting
+        print("Plotting all available ensemble members")
+
+        # Figure setting
     if not ax:
-        fig, ax = plt.subplots(figsize = figsize)
-        
+        fig, ax = plt.subplots(figsize=figsize)
+
     # Finally make the plot
     plt.style.use("ggplot")
-    for i in np.arange(0,ens,1):
-        plt.plot(ageEns[:,i],y,alpha=alpha,color=color)
+    for i in np.arange(0, ens, 1):
+        plt.plot(ageEns[:, i], y, alpha=alpha, color=color)
     if x_label == None:
-        x_label =''
+        x_label = ''
     if y_label == None:
         y_label = ''
     if title == None:
@@ -100,30 +99,31 @@ def plot_ens(ageEns, y, ens = None, color = 'r', alpha = 0.005, x_label = None,
     plt.ylabel(y_label)
     plt.title(title)
 
-    return fig, ax    
+    return fig, ax
 
-def plot_hist(y, bins = None, hist = True, label = None, 
-              kde = True, rug = False, fit = None, hist_kws = {"label":"Histogram"},
-              kde_kws = {"label":"KDE fit"}, rug_kws = {"label":"rug"},
-              fit_kws = {"label":"fit"}, color ='0.7' , vertical = False,
-              norm_hist = True, figsize = [5,5], ax = None):
+
+def plot_hist(y, bins=None, hist=True, label=None,
+              kde=True, rug=False, fit=None, hist_kws={"label": "Histogram"},
+              kde_kws={"label": "KDE fit"}, rug_kws={"label": "rug"},
+              fit_kws={"label": "fit"}, color='0.7', vertical=False,
+              norm_hist=True, figsize=[5, 5], ax=None):
     """ Plot a univariate distribution of the PaleoData values
-            
+
     This function is based on the seaborn displot function, which is
-    itself a combination of the matplotlib hist function with the 
-    seaborn kdeplot() and rugplot() functions. It can also fit 
+    itself a combination of the matplotlib hist function with the
+    seaborn kdeplot() and rugplot() functions. It can also fit
     scipy.stats distributions and plot the estimated PDF over the data.
-        
+
     Args
     ----
-    
+
     y : array
-       nx1 numpy array. No missing values allowed 
+       nx1 numpy array. No missing values allowed
     bins : int
-          Specification of hist bins following matplotlib(hist), 
+          Specification of hist bins following matplotlib(hist),
           or None to use Freedman-Diaconis rule
     hist : bool
-          Whether to plot a (normed) histogram 
+          Whether to plot a (normed) histogram
     label : str
            The label for the axis
     kde : bool
@@ -131,8 +131,8 @@ def plot_hist(y, bins = None, hist = True, label = None,
     rug : bool
          Whether to draw a rugplot on the support axis
     fit : object
-         Random variable object. An object with fit method, returning 
-         a tuple that can be passed to a pdf method of positional 
+         Random variable object. An object with fit method, returning
+         a tuple that can be passed to a pdf method of positional
          arguments following a grid of values to evaluate the pdf on.
     hist _kws : Dictionary
     kde_kws : Dictionary
@@ -140,7 +140,7 @@ def plot_hist(y, bins = None, hist = True, label = None,
     fit_kws : Dictionary
              Keyword arguments for underlying plotting functions.
              If modifying the dictionary, make sure the labels "hist",
-             "kde","rug","fit" are stall passed.        
+             "kde","rug","fit" are stall passed.
     color : str
            matplotlib color. Color to plot everything but the
            fitted curve in.
@@ -148,57 +148,54 @@ def plot_hist(y, bins = None, hist = True, label = None,
               if True, oberved values are on y-axis.
     norm_hist : bool
                If True (default), the histrogram height shows
-               a density rather than a count. This is implied if a KDE or 
+               a density rather than a count. This is implied if a KDE or
                fitted density is plotted
     figsize : list
              the size of the figure
     ax : object
-        Return as axis instead of figure (useful to integrate plot into a subplot)     
- 
+        Return as axis instead of figure (useful to integrate plot into a subplot)
+
     Returns
     -------
-    
+
     ax : The axis to the figure
     fig :  The figure
 """
 
     # make sure y is a numpy array
     y = np.array(y)
-    
+
     # Check that these are vectors and not matrices
     # Check that these are vectors and not matrices
-    if len(np.shape(y))>2:
-        raise TypeError("x and y should be vectors and not matrices") 
-     
+    if len(np.shape(y)) > 2:
+        raise TypeError("x and y should be vectors and not matrices")
+
     if not ax:
         fig, ax = plt.subplots(figsize=figsize)
 
-    sns.distplot(y,bins=bins, hist=hist, kde=kde, rug=rug,
-                  fit=fit, hist_kws = hist_kws,
-                  kde_kws = kde_kws,rug_kws = rug_kws,
-                  axlabel = label, color = color,
-                  vertical = vertical, norm_hist = norm_hist)         
-                
-       
-        
+    sns.distplot(y, bins=bins, hist=hist, kde=kde, rug=rug,
+                 fit=fit, hist_kws=hist_kws,
+                 kde_kws=kde_kws, rug_kws=rug_kws,
+                 axlabel=label, color=color,
+                 vertical=vertical, norm_hist=norm_hist)
+
     # Add a label to the PDF axis
     if label == None:
         label = ''
-        
+
     if vertical == True:
         plt.xlabel('PDF')
         plt.ylabel(label)
     else:
         plt.ylabel('PDF')
         plt.xlabel(label)
-            
+
     return ax
 
 
 def plot_scatter_xy(x, y, scatter_points, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None, ylim=None,
                     savefig_settings=None, ax=None, legend=True, plot_kwargs=None, lgd_kwargs=None, mute=False):
     ''' Plot the timeseries
-
     Args
     ------
     x : array
@@ -207,42 +204,29 @@ def plot_scatter_xy(x, y, scatter_points, figsize=None, xlabel=None, ylabel=None
      values of timeseries
     scatter_points : array
         indices of scatter points
-
     figsize : list
         a list of two integers indicating the figure size
-
     xlabel : str
         label for x-axis
-
     ylabel : str
         label for y-axis
-
-
     title : str
         the title for the figure
-
     xlim : str
         the limit range for x-axis
-
     ylim : str
         the limit range for y-axis
-
     ax : pyplot.axis
         the pyplot.axis object
-
     legend : bool
         plot legend or not
-
     lgd_kwargs : dict
         the keyword arguments for ax.legend()
-
     plot_kwargs : dict
         the keyword arguments for ax.plot()
-
     mute : bool
         if True, the plot will not show;
         recommend to turn on when more modifications are going to be made on ax
-
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existed or non-existed path,
@@ -294,44 +278,31 @@ def plot_scatter_xy(x, y, scatter_points, figsize=None, xlabel=None, ylabel=None
 def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None, ylim=None,
             savefig_settings=None, ax=None, legend=True, plot_kwargs=None, lgd_kwargs=None, mute=False):
     ''' Plot the timeseries
-
     Args
     ----
-
     figsize : list
         a list of two integers indicating the figure size
-
     xlabel : str
         label for x-axis
-
     ylabel : str
         label for y-axis
-
     title : str
         the title for the figure
-
     xlim : str
         the limit range for x-axis
-
     ylim : str
         the limit range for y-axis
-
     ax : pyplot.axis
         the pyplot.axis object
-
     legend : bool
         plot legend or not
-
     lgd_kwargs : dict
         the keyword arguments for ax.legend()
-
     plot_kwargs : dict
         the keyword arguments for ax.plot()
-
     mute : bool
         if True, the plot will not show;
         recommend to turn on when more modifications are going to be made on ax
-
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existed or non-existed path,
@@ -378,9 +349,10 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None,
     else:
         return ax
 
-#----------
+
+# ----------
 # utilities
-#----------
+# ----------
 def in_notebook():
     ''' Check if the code is executed in a Jupyter notebook
     '''
@@ -391,6 +363,7 @@ def in_notebook():
     except ImportError:
         return False
     return True
+
 
 def showfig(fig):
     if in_notebook:
@@ -405,12 +378,11 @@ def showfig(fig):
     else:
         plt.show()
 
+
 def savefig(fig, settings={}, verbose=True):
     ''' Save a figure to a path
-
     Args
     ----
-
     fig : figure
         the figure to save
     settings : dict
@@ -418,7 +390,6 @@ def savefig(fig, settings={}, verbose=True):
         - "path" must be specified; it can be any existed or non-existed path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
-
     '''
     if 'path' not in settings:
         raise ValueError('"path" must be specified in `settings`!')
@@ -444,6 +415,7 @@ def savefig(fig, settings={}, verbose=True):
 
     if verbose:
         print(f'Figure saved at: "{str(path)}"')
+
 
 def set_style(style='journal', font_scale=1.5):
     ''' Modify the visualization style; inspired by [Seaborn](https://github.com/mwaskom/seaborn)
@@ -556,7 +528,7 @@ def set_style(style='journal', font_scale=1.5):
         })
 
     # modify font size based on font scale
-    font_dict.update({k: v*font_scale for k, v in font_dict.items()})
+    font_dict.update({k: v * font_scale for k, v in font_dict.items()})
 
     for d in [style_dict, font_dict]:
         mpl.rcParams.update(d)
