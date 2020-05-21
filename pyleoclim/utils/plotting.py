@@ -192,7 +192,103 @@ def plot_hist(y, bins = None, hist = True, label = None,
         plt.ylabel('PDF')
         plt.xlabel(label)
             
-    return ax 
+    return ax
+
+
+def plot_scatter_xy(x, y, scatter_points, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None, ylim=None,
+                    savefig_settings=None, ax=None, legend=True, plot_kwargs=None, lgd_kwargs=None, mute=False):
+    ''' Plot the timeseries
+
+    Args
+    ------
+    x : array
+      x axis of timeseries
+    y : array
+     values of timeseries
+    scatter_points : array
+        indices of scatter points
+
+    figsize : list
+        a list of two integers indicating the figure size
+
+    xlabel : str
+        label for x-axis
+
+    ylabel : str
+        label for y-axis
+
+
+    title : str
+        the title for the figure
+
+    xlim : str
+        the limit range for x-axis
+
+    ylim : str
+        the limit range for y-axis
+
+    ax : pyplot.axis
+        the pyplot.axis object
+
+    legend : bool
+        plot legend or not
+
+    lgd_kwargs : dict
+        the keyword arguments for ax.legend()
+
+    plot_kwargs : dict
+        the keyword arguments for ax.plot()
+
+    mute : bool
+        if True, the plot will not show;
+        recommend to turn on when more modifications are going to be made on ax
+
+    savefig_settings : dict
+        the dictionary of arguments for plt.savefig(); some notes below:
+        - "path" must be specified; it can be any existed or non-existed path,
+          with or without a suffix; if the suffix is not given in "path", it will follow "format"
+        - "format" can be one of {"pdf", "eps", "png", "ps"}
+    '''
+    # handle dict defaults
+    savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+    plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+    lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+
+    ax.plot(x, y, **plot_kwargs, color='green')
+    ax.scatter(x[scatter_points], y[scatter_points], color='red')
+
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
+
+    if title is not None:
+        ax.set_title(title)
+
+    if xlim is not None:
+        ax.set_xlim(xlim)
+
+    if ylim is not None:
+        ax.set_ylim(ylim)
+
+    if legend:
+        ax.legend(**lgd_kwargs)
+    else:
+        ax.legend().remove()
+
+    if 'fig' in locals():
+        if 'path' in savefig_settings:
+            savefig(fig, savefig_settings)
+        else:
+            if not mute:
+                showfig(fig)
+        return fig, ax
+    else:
+        return ax
 
 
 def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None, ylim=None,

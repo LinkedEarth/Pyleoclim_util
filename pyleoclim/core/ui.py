@@ -22,7 +22,6 @@ from copy import deepcopy
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 #from matplotlib.colors import BoundaryNorm, Normalize
-from matplotlib import cm
 
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
@@ -557,46 +556,35 @@ class Series:
 
         return surr
 
-    def detect_outliers(self,**kwargs):
+    def outliers(self, auto=True, remove=True, figs=True):
         '''
-        Detects outliers in a timeseries
+        Detects outliers in a timeseries and removes if specified
         Args
         ----
         self : timeseries object
-        **kwargs : dict
-                  optional parameters for DBSCAN
+        auto : boolean
+               True by default, detects knee in the plot automatically
+       remove : boolean
+               True by default, removes all outlier points if detected
+       figs   : boolean
+               True by default, returns all fig from tsutils
         Returns
         -------
-        is_outlier : array
-                    a list of boolean values indicating whether the point is an outlier or not
+        new : Series
+             Time series with outliers removed if they exist
         '''
-        is_outlier = np.array(tsutils.detect_outliers(self.time, self.value, args=kwargs))
-        return is_outlier
 
-    def remove_outliers(self,**kwargs):
-        ''' Removes outliers from a timeseries
-        Args
-        ----
-        self : timeseries object
-        **kwargs : dict
-                  optional parameters for DBSCAN
+        new = self.copy()
 
-        Returns
-        -------
-        ys : array
-            y axis of timeseries
-        time : array
-              x axis of timeseries
-        '''
-        new=self.copy()
-        outlier_points = np.array(tsutils.detect_outliers(self.time,self.value,args=kwargs))
-        outlier_indices = np.where(outlier_points==True)
-        ys = np.delete(self.value,outlier_indices)
-        t = np.delete(self.time,outlier_indices)
-        new.value = ys
-        new.time  = t
+        outlier_indices = np.array(tsutils.detect_outliers(self.time, self.value, auto=auto, plot=figs))
+        if remove == True:
+            new = self.copy()
+            ys = np.delete(self.value, outlier_indices)
+            t = np.delete(self.time, outlier_indices)
+            new.value = ys
+            new.time = t
+
         return new
-    
     def interp(self, method='linear', **kwargs):
         '''Interpolate a time series onto  a new  time axis
         

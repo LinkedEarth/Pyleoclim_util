@@ -35,8 +35,12 @@ from sklearn.cluster import DBSCAN
 from matplotlib import cm
 import matplotlib.pyplot as plt
 
-from .filter import savitzky_golay
+import numpy.matlib
+from sklearn.neighbors import NearestNeighbors
+import math
 
+from .filter import savitzky_golay
+from .plotting import plot_scatter_xy
 
 def simple_stats(y, axis=None):
     """ Computes simple statistics
@@ -603,55 +607,155 @@ def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
     return ys
 
 
-def detect_outliers(ts, ys, args={},plot=False):
+def distance_neighbors(signal):
+    '''Finds Distance of each point in the timeseries from it's 4 nearest neighbors
+       Args
+       ----
+       signal : array
+               the timeseries
+       Returns
+       -------
+       distances : array
+                  Distance of each point from it's nearest neighbors in decreasing order
+    '''
+    nn = NearestNeighbors(4) # 4 nearest neighbors
+    nbrs =nn.fit(signal.reshape(-1,1))
+    distances, indices = nbrs.kneighbors(signal.reshape(-1,1))
+    distances = sorted(distances[:,-1],reverse=True)
+    return distances
+
+def find_knee(distances):
+    '''Finds knee point automatically in a given array sorted in decreasing order
+       Args
+       ---
+       distances : array
+                  Distance of each point in the timeseries from it's nearest neighbors in decreasing order
+      Returns
+      -------
+      knee : float
+            knee point in the array
+    '''
+    nPoints = len(distances)
+    allCoord = np.vstack((range(nPoints), distances)).T
+    np.array([range(nPoints), distances])
+    firstPoint = allCoord[0]
+    lineVec = allCoord[-1] - allCoord[0]
+    lineVecNorm = lineVec / np.sqrt(np.sum(lineVec**2))
+    vecFromFirst = allCoord - firstPoint
+    scalarProduct = np.sum(vecFromFirst * np.matlib.repmat(lineVecNorm, nPoints, 1), axis=1)
+    vecFromFirstParallel = np.outer(scalarProduct, lineVecNorm)
+    vecToLine = vecFromFirst - vecFromFirstParallel
+    distToLine = np.sqrt(np.sum(vecToLine ** 2, axis=1))
+    idxOfBestPoint = np.argmax(distToLine)
+    knee = distances[idxOfBestPoint]
+    return knee		
+
+
+def detect_outliers(ts, ys, plot=True, auto=True):
     ''' Function to detect outliers in the given timeseries
+       Args
+       ----
+
+       ts : array
+            time axis of time series
+       ys : array
+            y values of time series
+       plot : boolean
+             true by default, plots the outliers using a scatter plot
+       auto : boolean
+             true by default, if false the user manually
+
+            for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
+
+       Returns
+       -------
+
+       outliers : array
+                   a list of values consisting of outlier indices
+       '''
+
+    try:
+        minpts = math.log(len(ys))
+        distances = distance_neighbors(ys)
+        flag = all(v < 0.0001 for v in distances)
+
+        knee_point = find_knee(distances)
+        mark = distances.index(knee_point)
+        index = [i for i in range(len(distances))]
+
+        fig, ax = plt.subplots(figsize=[10, 4])
+
+        ax.plot(index, distances)
+
+
+        if auto == True:
+            ax.annotate("knee={}".format(knee_point), (mark, knee_point),
+                        arrowprops=dict(facecolor='black', shrink=0.05))
+            ax.set_xlabel('Indices')
+            ax.set_ylabel('Distance')
+            plt.show()
+            if flag == True:
+                knee_point = 0.1
+
+            db = DBSCAN(eps=knee_point, min_samples=minpts)
+            clusters = db.fit(ys.reshape(-1, 1))
+            cluster_labels = clusters.labels_
+            outliers = np.where(cluster_labels == -1)
+        if auto == False:
+            ax.annotate("knee",(mark, knee_point),arrowprops=dict(facecolor='black', shrink=0.05))
+            plt.show()
+            eps = float(input('Enter the value for eps(knee point)'))
+            fig,ax = plt.subplots(figsize=[10, 4])
+            ax.plot(index,distances)
+
+            ax.annotate("knee={}".format(eps), (mark, knee_point),
+                        arrowprops=dict(facecolor='black', shrink=0.05))
+            ax.set_xlabel('Indices')
+            ax.set_ylabel('Distance')
+            plt.show()
+
+
+            db = DBSCAN(eps=eps, min_samples=minpts)
+            clusters = db.fit(ys.reshape(-1, 1))
+            cluster_labels = clusters.labels_
+            outliers = np.where(cluster_labels == -1)
+        if plot == True:
+            fig,ax =plot_scatter_xy(ts,ys,outliers,figsize=[10,4],xlabel='time',ylabel='value')
+        return outliers
+
+    except ValueError:
+        choice = input('Switch to Auto Mode(y/n)?')
+        choice = choice.lower()
+        if choice == 'y':
+            a = detect_outliers(ts, ys, auto=True)
+            return a
+        else:
+            exit(0)
+            
+def remove_outliers(ts,ys,outlier_points):
+    ''' Removes outliers from a timeseries
     Args
     ----
 
     ts : array
-         time axis of time series
+         x axis of timeseries
     ys : array
-         y values of time series
-    plot : boolean
-          false by default, if true plots the outliers using a scatter plot
-    args : dict
-         arguments for the DBSCAN function from sklearn,
-         for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
+        y axis of timeseries
+   outlier_points : array
+                   indices of outlier points
 
     Returns
     -------
-
-    is_outlier : array
-                a list of boolean values indicating whether the point is an outlier or not
+    ys : array
+        y axis of timeseries
+    ts : array
+          x axis of timeseries
     '''
 
-    if args == {}:
-        args = {'eps': 0.2, 'metric': 'euclidean'}
+    ys = np.delete(ys,outlier_points)
+    ts = np.delete(ts,outlier_points)
 
-    outlier_detection = DBSCAN(**args)
-
-    clusters = outlier_detection.fit_predict(ys.reshape(-1,1))
-    is_outlier = []
-
-    for value in clusters:
-        if value == -1:
-            is_outlier.append(True)
-        else:
-            is_outlier.append(False)
-   
-    if(plot==True):
-
-        fig, ax = plt.subplots(figsize=[10,4])
-
-        cmap = cm.get_cmap('Set1')
-        plt.show()
-        plt.scatter(ts,ys,c=clusters,cmap=cmap)
-        return fig,ax,is_outlier
-
-
-
-    return is_outlier
-
+    return ys,ts
 
 def is_evenly_spaced(ts):
     ''' Check if a time axis is evenly spaced.
