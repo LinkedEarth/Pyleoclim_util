@@ -18,5 +18,7 @@ __all__=[
     'Coherence',
     'MultiplePSD',
     'Lipd',
-    'LipdSeries'
+    'LipdSeries',
+    'MultipleSeries',
+    'SurrogateSeries'
 ]
