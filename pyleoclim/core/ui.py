@@ -1157,6 +1157,18 @@ class MultipleSeries:
             s.value=v_mod
             new.series_list[idx]=s
         return new
+    def mssa(self, M, MC=1000, f=0.3):
+        data = []
+        for val in self.series_list:
+            data.append(val.value)
+        data = np.transpose(np.asarray(data))
+
+
+        deval, eig_vec, q05, q95, PC, RC = decomposition.mssa(data, M=M, MC=MC, f=f)
+        res = {'deval': deval, 'eig_vec': eig_vec, 'q05': q05, 'q95': q95, 'PC': PC, 'RC': RC}
+        return res
+
+
     
     def detrend(self,method='emd',**kwargs):
         new=self.copy()
