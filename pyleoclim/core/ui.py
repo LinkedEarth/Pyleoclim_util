@@ -1148,6 +1148,7 @@ class MultipleSeries:
 
     def copy(self):
         return deepcopy(self)
+
     
     def standardize(self):
         new=self.copy()
@@ -1167,8 +1168,19 @@ class MultipleSeries:
         deval, eig_vec, q05, q95, PC, RC = decomposition.mssa(data, M=M, MC=MC, f=f)
         res = {'deval': deval, 'eig_vec': eig_vec, 'q05': q05, 'q95': q95, 'PC': PC, 'RC': RC}
         return res
-
-
+    def pca(self):
+        data = []
+        for val in self.series_list:
+            data.append(val.value)
+        a = len(data[0])
+        r = data[1:]
+        flag = all (len(v)==a for v in r)
+        if flag==False:
+            print('All Time Series should be of same length')
+            return
+        data = np.transpose(np.asarray(data))
+        res = decomposition.pca(data)
+        return res
     
     def detrend(self,method='emd',**kwargs):
         new=self.copy()
