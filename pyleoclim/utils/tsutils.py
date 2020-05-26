@@ -653,8 +653,12 @@ def find_knee(distances):
     return knee		
 
 
-def detect_outliers(ts, ys, plot=True, auto=True):
+def detect_outliers(ts, ys, plot=True, auto=True,**plot_kwargs):
     ''' Function to detect outliers in the given timeseries
+    
+       for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
+
+    
        Args
        ----
 
@@ -666,8 +670,7 @@ def detect_outliers(ts, ys, plot=True, auto=True):
              true by default, plots the outliers using a scatter plot
        auto : boolean
              true by default, if false the user manually
-
-            for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
+       plot_kwargs : dict     
 
        Returns
        -------
@@ -686,7 +689,6 @@ def detect_outliers(ts, ys, plot=True, auto=True):
         index = [i for i in range(len(distances))]
 
         fig, ax = plt.subplots(figsize=[10, 4])
-
         ax.plot(index, distances)
 
 
@@ -723,6 +725,7 @@ def detect_outliers(ts, ys, plot=True, auto=True):
             outliers = np.where(cluster_labels == -1)
         if plot == True:
             fig,ax =plot_scatter_xy(ts,ys,outliers,figsize=[10,4],xlabel='time',ylabel='value')
+        
         return outliers
 
     except ValueError:
