@@ -193,8 +193,11 @@ def plot_hist(y, bins=None, hist=True, label=None,
     return ax
 
 
-def plot_scatter_xy(x, y, scatter_points, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None, ylim=None,
-                    savefig_settings=None, ax=None, legend=True, plot_kwargs=None, lgd_kwargs=None, mute=False):
+def plot_scatter_xy(x, y, scatter_points, figsize=None, xlabel=None, 
+                    ylabel=None, title=None, xlim=None, ylim=None,
+                    savefig_settings=None, ax=None, legend=True, 
+                    plot_kwargs=None, lgd_kwargs=None, mute=False):
+    
     ''' Plot the timeseries
     Args
     ------
