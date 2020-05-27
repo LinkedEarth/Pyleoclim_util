@@ -267,7 +267,8 @@ class Series:
         res = {'deval': deval, 'eig_vec': eig_vec, 'q05': q05, 'q95': q95, 'PC': PC, 'RC': RC}
         return res
 
-    def distplot(self, figsize=[10, 4], title=None, savefig_settings={}, ax=None, ylabel='KDE', mute=False, **plot_kwargs):
+    def distplot(self, figsize=[10, 4], title=None, savefig_settings={},
+                 ax=None, ylabel='KDE', mute=False, **plot_kwargs):
         ''' Plot the distribution of the timeseries values
 
         Args
@@ -571,9 +572,9 @@ class Series:
         self : timeseries object
         auto : boolean
                True by default, detects knee in the plot automatically
-       remove : boolean
+        remove : boolean
                True by default, removes all outlier points if detected
-       figs   : boolean
+        figs   : boolean
                True by default, returns all fig from tsutils
         Returns
         -------
@@ -1157,18 +1158,6 @@ class MultipleSeries:
             s.value=v_mod
             new.series_list[idx]=s
         return new
-    def mssa(self, M, MC=1000, f=0.3):
-        data = []
-        for val in self.series_list:
-            data.append(val.value)
-        data = np.transpose(np.asarray(data))
-
-
-        deval, eig_vec, q05, q95, PC, RC = decomposition.mssa(data, M=M, MC=MC, f=f)
-        res = {'deval': deval, 'eig_vec': eig_vec, 'q05': q05, 'q95': q95, 'PC': PC, 'RC': RC}
-        return res
-
-
     
     def detrend(self,method='emd',**kwargs):
         new=self.copy()
@@ -1429,7 +1418,7 @@ class Lipd:
                 'sclerosponge' : ['r','o'],
                 'speleothem' : ['#FF1492','d'],
                 'wood' : ['#32CC32','^'],
-                'molluskshells' : ['#FFD600','h'],
+                'mollusk shells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
                 'other':['k','o']}
        
@@ -1443,12 +1432,48 @@ class Lipd:
         if query==True and bool(query_args)==True:
             if 'archiveType' in query_args.keys():
                 archiveType=query_args['archiveType']
+                if type(archiveType) == str:
+                    archiveType=lipdutils.pre_process_str(archiveType)
+                    archiveType=[archiveType]
+                else: 
+                    archiveType=lipdutils.pre_process_list(archiveType)
+                availableType=lipdutils.whatArchives(print_response=False)
+                availableTypeP=lipdutils.pre_process_list(availableType)
+                res=[]
+                for item in archiveType:
+                    indices = [i for i, x in enumerate(availableTypeP) if x == item]
+                if len(indices)!=0:
+                    res.append(np.array(availableType)[indices].tolist())
+                res=np.unique(np.array(res)).tolist()
+                if len(res)==0:
+                    archiveType = [ ]
+                else:
+                    archiveType=res
             else:
                 archiveType = [ ]
+            
             if 'proxyObsType' in query_args.keys():
                 proxyObsType=query_args['proxyObsType']
+                if type(proxyObsType) == str:
+                    proxyObsType=lipdutils.pre_process_str(proxyObsType)
+                    proxyObsType=[proxyObsType]
+                else:
+                    proxyObsType=lipdutils.pre_process_list(proxyObsType)
+                availableProxy=lipdutils.whatProxyObservations(print_response=False)
+                availableProxyP=lipdutils.pre_process_list(availableProxy)
+                res=[]
+                for item in proxyObsType:
+                    indices = [i for i, x in enumerate(availableProxyP) if x == item]
+                if len(indices)!=0:
+                    res.append(np.array(availableProxy)[indices].tolist())
+                res=np.unique(np.array(res)).tolist()
+                if len(res)==0:
+                    proxyObsType = [ ]
+                else:
+                    proxyObsType=res
             else:
                 proxyObsType=[ ]
+                
             if 'infVarType' in query_args.keys():
                 infVarType=query_args['infVarType']
             else:
@@ -1511,6 +1536,7 @@ class Lipd:
                     ageBound = ageBound, ageBoundType = ageBoundType, recordLength = recordLength, resolution = resolution,
                     lat = lat, lon = lon, alt = alt, print_response = False, download_lipd = True,
                     download_folder = download_folder)
+            
             D_query = lpd.readLipd(download_folder)
             if 'archiveType' in D_query.keys():
                 D_query={D_query['dataSetName']:D_query}

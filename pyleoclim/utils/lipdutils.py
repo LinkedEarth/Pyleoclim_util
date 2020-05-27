@@ -11,26 +11,21 @@ Also handles integration with the LinkedEarth wiki and the LinkedEarth Ontology
 
 """
 
-__all__=[
-        'enumerateLipds',
-        'getTs',
-        'promptForVariable',
-        'queryLinkedEarth',
-        'timeUnitsCheck',
-        'LipdToOntology',
-        'whatArchives',
+__all__=['whatArchives',
         'whatProxyObservations',
         'whatProxySensors',
         'whatInferredVariables',
-        'whatInterpretations']
+        'whatInterpretations',
+        'queryLinkedEarth']
 
 import lipd as lpd
 import numpy as np
-#import matplotlib.pyplot as plt
 import os
 import json
 import requests
 import wget
+from unidecode import unidecode
+import string
 
 
 """
@@ -498,17 +493,16 @@ def LipdToOntology(archiveType):
 
     """
     #Align with the ontology
-    if archiveType.lower()== "ice core":
+    if archiveType.lower()== "icecore":
         archiveType = 'glacier ice'
     elif archiveType.lower()== 'tree':
         archiveType = 'wood'
     elif archiveType.lower() == 'borehole':
         archiveType = 'ice/rock'
     elif archiveType.lower() == 'bivalve':
-        archiveType = 'molluskshells'
+        archiveType = 'mollusk shells'
 
     return archiveType
-
 
 def timeUnitsCheck(units):
     """ This function attempts to make sense of the time units by checking for equivalence
@@ -547,6 +541,8 @@ def timeUnitsCheck(units):
         unit_group = 'unknown'
 
     return unit_group
+
+
 
 def whatArchives(print_response=True):
     """ Get the names for ArchiveType from LinkedEarth Ontology
@@ -1151,6 +1147,65 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
     
     return res
 
+def pre_process_list(list_str):
+    """ Pre-process a series of string for capitalized letters, space, punctuations
+    
+    Args
+    ----
+    list_str : list
+        A list of strings from which to strip capitals, spaces, and other characters
+    
+    Returns
+    -------
+    res : list
+        A list of strings with capitalization, spaces, and punctuation removed
+    """
+    res=[]
+    for item in list_str:
+        res.append(pre_process_str(item))
+    return res
+
+def similar_string(list_str, search):
+    """ Returns a list of indices for strings with similar values
+    
+    Args
+    ----
+    
+    list_str : list
+        A list of strings
+    
+    search : str
+        A keyword search
+    
+    Returns
+    -------
+    
+    indices: list
+        A list of indices with similar value as the keyword
+    """
+    #exact matches
+    indices = [i for i, x in enumerate(list_str) if x == search]
+    # proximity matches
+    return indices
+
+def pre_process_str(word):
+    """Pre-process a string for capitalized letters, space, punctuations
+    
+    Args
+    ----
+    string : str
+        A string from which to strip capitals, spaces, and other characters
+    
+    Returns
+    -------
+    res : str
+        A string with capitalization, spaces, and punctuation removed
+    """
+    d=word.replace(" ","").lower()
+    stopset=list(string.punctuation)
+    res="".join([i for i in d if i not in stopset])
+    return res
+        
 """
 Deal with models
 """
