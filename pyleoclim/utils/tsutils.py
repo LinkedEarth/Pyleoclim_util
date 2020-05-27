@@ -40,7 +40,7 @@ import numpy.matlib
 from sklearn.neighbors import NearestNeighbors
 import math
 from sys import exit
-from .plotting import plot_scatter_xy,plot_xy
+from .plotting import plot_scatter_xy,plot_xy,savefig,showfig
 from .filter import savitzky_golay
 
 
@@ -654,7 +654,10 @@ def find_knee(distances):
     return knee		
 
 
-def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],save_knee=None,save_outliers=None):
+def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
+                    plot_outliers_kwargs=None,plot_knee_kwargs=None,
+                    figsize=[10,4],saveknee_settings=None,
+                    saveoutliers_settings=None,mute=False):
     ''' Function to detect outliers in the given timeseries
     
        for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
@@ -679,6 +682,8 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,plot_out
        outliers : array
                    a list of values consisting of outlier indices
        '''
+    #Take care of arguments for the knee plot
+    saveknee_settings = {} if saveknee_settings is None else saveknee_settings.copy()
 
     try:
         minpts = math.log(len(ys))
@@ -688,52 +693,47 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,plot_out
         knee_point = find_knee(distances)
         mark = distances.index(knee_point)
         index = [i for i in range(len(distances))]
-        if plot_knee == False:
-            fig1 = None
-            ax1 =  None
-        else:
-
-            fig1, ax1 = plt.subplots(figsize=figsize)
-            plot_xy(index, distances,xlabel='Indices',ax=ax1,ylabel='Distances',savefig_settings=save_knee,plot_kwargs=plot_knee_kwargs)
-
-            if flag == True:
-                knee_point = 0.1
-            ax1.annotate("knee={}".format(knee_point), (mark, knee_point),
-                        arrowprops=dict(facecolor='black', shrink=0.05))
-            plt.show()
-
+            
         if auto == True:
             db = DBSCAN(eps=knee_point, min_samples=minpts)
             clusters = db.fit(ys.reshape(-1, 1))
             cluster_labels = clusters.labels_
             outliers = np.where(cluster_labels == -1)
+            if plot_knee==True:
+                fig1, ax1 = plt.subplots(figsize=figsize)
+                if flag == True:
+                    knee_point = 0.1
+                ax1.annotate("knee={}".format(knee_point), (mark, knee_point),
+                        arrowprops=dict(facecolor='black', shrink=0.05))
+                plot_xy(index, distances,xlabel='Indices',ylabel='Distances',plot_kwargs=plot_knee_kwargs,ax=ax1)
+                
+        
         elif auto == False:
-
-            eps = float(input('Enter the value for eps(knee point)'))
-            if plot_knee == False:
-                fig1 = None
-                ax1 = None
-            else:
+            plot_xy(index, distances, xlabel='Indices', ylabel='Distances',plot_kwargs=plot_knee_kwargs)
+            eps = float(input('Enter the value for knee point'))
+            if plot_knee==True:
                 fig1,ax1 = plt.subplots(figsize=figsize)
-                plot_xy(index, distances, xlabel='Indices', ylabel='Distances',plot_kwargs=plot_knee_kwargs,savefig_settings=save_knee,ax=ax1)
-
                 ax1.annotate("knee={}".format(eps), (mark, knee_point),
                         arrowprops=dict(facecolor='black', shrink=0.05))
+                plot_xy(index, distances, xlabel='Indices', ylabel='Distances',plot_kwargs=plot_knee_kwargs,ax=ax1)
 
             db = DBSCAN(eps=eps, min_samples=minpts)
             clusters = db.fit(ys.reshape(-1, 1))
             cluster_labels = clusters.labels_
             outliers = np.where(cluster_labels == -1)
-        if plot_outliers ==False:
-            fig2,ax2=None,None
-        else:
-            fig2,ax2 = plt.subplots(figsize=figsize)
+        
+        if 'fig1' in locals():
+            if 'path' in saveknee_settings:
+                savefig(fig1,saveknee_settings)
+            else:
+                showfig(fig1)
+                
+        if plot_outliers==True:
             x2 = ts[outliers]
             y2 = ys[outliers]
-            plot_scatter_xy(ts,ys,x2,y2,figsize=figsize,xlabel='time',ylabel='value',savefig_settings=save_outliers,plot_kwargs=plot_outliers_kwargs)
-
+            plot_scatter_xy(ts,ys,x2,y2,figsize=figsize,xlabel='time',ylabel='value',savefig_settings=saveoutliers_settings,plot_kwargs=plot_outliers_kwargs)
         
-        return outliers,fig1,ax1,fig2,ax2
+        return outliers
 
     except ValueError:
         choice = input('Switch to Auto Mode(y/n)?')

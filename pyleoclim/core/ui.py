@@ -564,7 +564,9 @@ class Series:
 
         return surr
 
-    def outliers(self, auto=True, remove=True, fig_outliers=True,fig_knee=True,plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],save_knee=None,save_outliers=None):
+    def outliers(self, auto=True, remove=True, fig_outliers=True,fig_knee=True,
+                 plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],
+                 saveknee_settings=None,saveoutliers_settings=None):
         '''
         Detects outliers in a timeseries and removes if specified
         Args
@@ -593,8 +595,10 @@ class Series:
         '''
         new = self.copy()
 
-        outlier_indices,fig1,ax1,fig2,ax2 = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
-                                                           figsize=figsize,save_knee=save_knee,save_outliers=save_outliers,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
+        #outlier_indices,fig1,ax1,fig2,ax2 = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
+        #                                                   figsize=figsize,save_knee=save_knee,save_outliers=save_outliers,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
+        outlier_indices = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
+                                                           figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
         outlier_indices = np.asarray(outlier_indices)
         if remove == True:
             new = self.copy()
@@ -602,8 +606,9 @@ class Series:
             t = np.delete(self.time, outlier_indices)
             new.value = ys
             new.time = t
-
+            
         return new
+    
     def interp(self, method='linear', **kwargs):
         '''Interpolate a time series onto  a new  time axis
 
