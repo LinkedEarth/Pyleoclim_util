@@ -39,31 +39,31 @@ def dict2namedtuple(d):
 class Series:
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None):
         """Create a pyleoSeries object
-        
+
         Args
         ----
-        
+
         time : list or numpy.array
             Time values for the time series
-        
+
         value : list of numpy.array
             ordinate values for the time series
-        
+
         time_name : string
             Name of the time vector (e.g., 'Age').
             Default is None. This is used to label the time axis on plots
-        
+
         time_unit : string
             Units for the time vector (e.g., 'yr B.P.').
             Default is None
-        
+
         value_name : string
             Name of the value vector (e.g., 'temperature')
             Default is None
-            
+
         value_unit : string
             Units for the value vector (e.g., 'deg C')
-        
+
         label : string
             Name of the time series (e.g., 'Nino 3.4')
         """
@@ -108,21 +108,21 @@ class Series:
 
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.time)}'
-    
+
     def stats(self):
         """ Compute basic statistics for the time series
-        
+
         Args
         ----
-        
+
         ts: pyleoclim Series Object
-        
+
         Returns
         -------
-       
-        res : dictionary 
+
+        res : dictionary
             Contains the mean, median, minimum value, maximum value, standard
-            deviation, and interquartile range for the Series. 
+            deviation, and interquartile range for the Series.
 
         """
         mean, median, min_, max_, std, IQR = tsutils.simple_stats(self.value)
@@ -332,46 +332,46 @@ class Series:
         v_mod = tsutils.standardize(self.value)[0]
         new.value = v_mod
         return new
-    
+
     def segment(self, factor=10):
         """Gap detection
-        
+
         This function segments a timeseries into n number of parts following a gap
             detection algorithm. The rule of gap detection is very simple:
             we define the intervals between time points as dts, then if dts[i] is larger than factor * dts[i-1],
             we think that the change of dts (or the gradient) is too large, and we regard it as a breaking point
             and divide the time series into two segments here
-        
+
         Args
         ----
-        
-        ts : pyleoclim Series 
-        
+
+        ts : pyleoclim Series
+
         factor : float
             The factor that adjusts the threshold for gap detection
-        
+
         Returns
         -------
-        
+
         res : pyleoclim MultipleSeries Object or pyleoclim Series Object
             If gaps were detected, returns the segments in a MultipleSeries object,
-            else, returns the original timeseries. 
-        
+            else, returns the original timeseries.
+
         """
         seg_y, seg_t, n_segs = tsutils.ts2segments(self.value,self.time,factor=factor)
         if len(seg_y)>1:
             s_list=[]
             for idx,s in enumerate(seg_y):
-                s_tmp=Series(time=seg_t[idx],value=s,time_name=self.time_name, 
+                s_tmp=Series(time=seg_t[idx],value=s,time_name=self.time_name,
                              time_unit=self.time_unit, value_name=self.value_name,
                              value_unit=self.value_unit,label=self.label)
-                s_list.append(s_tmp)  
-            res=MultipleSeries(series_list=s_list) 
+                s_list.append(s_tmp)
+            res=MultipleSeries(series_list=s_list)
         elif len(seg_y)==1:
             res=self.copy()
         else:
             raise ValueError('No timeseries detected')
-        return res 
+        return res
 
     def slice(self, timespan):
         ''' Slicing the timeseries with a timespan (tuple or list)
@@ -439,7 +439,7 @@ class Series:
 
     def wavelet(self, method='wwz', settings=None, freq_method='log', freq_kwargs=None, verbose=False):
         ''' Perform wavelet analysis on the timeseries
-        
+
         cwt wavelets documented on https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
         '''
         if not verbose:
@@ -564,7 +564,7 @@ class Series:
 
         return surr
 
-    def outliers(self, auto=True, remove=True, figs=True):
+    def outliers(self, auto=True, remove=True, fig_outliers=True,fig_knee=True,plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],save_knee=None,save_outliers=None):
         '''
         Detects outliers in a timeseries and removes if specified
         Args
@@ -574,17 +574,28 @@ class Series:
                True by default, detects knee in the plot automatically
         remove : boolean
                True by default, removes all outlier points if detected
-        figs   : boolean
-               True by default, returns all fig from tsutils
-        Returns
-        -------
+       fig_knee  : boolean
+               True by default, plots knee plot if true
+       fig_outliers : boolean
+                     True by degault, plots outliers if true
+       save_knee : dict
+                  default parameters from matplotlib savefig None by default
+       save_outliers : dict
+                  default parameters from matplotlib savefig None by default
+      plot_knee_kwargs : dict
+      plot_outliers_kwargs : dict
+      figsize : list
+               by default [10,4]
+     Returns
+     -------
         new : Series
              Time series with outliers removed if they exist
         '''
-
         new = self.copy()
 
-        outlier_indices = np.array(tsutils.detect_outliers(self.time, self.value, auto=auto, plot=figs))
+        outlier_indices,fig1,ax1,fig2,ax2 = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
+                                                           figsize=figsize,save_knee=save_knee,save_outliers=save_outliers,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
+        outlier_indices = np.asarray(outlier_indices)
         if remove == True:
             new = self.copy()
             ys = np.delete(self.value, outlier_indices)
@@ -595,9 +606,9 @@ class Series:
         return new
     def interp(self, method='linear', **kwargs):
         '''Interpolate a time series onto  a new  time axis
-        
+
         Available interpolation scheme includes linear and spline
-        
+
         '''
         new = self.copy()
         x_mod, v_mod = tsutils.interp(self.time,self.value,interp_type=method,**kwargs)
@@ -1149,7 +1160,7 @@ class MultipleSeries:
 
     def copy(self):
         return deepcopy(self)
-    
+
     def standardize(self):
         new=self.copy()
         for idx,item in enumerate(new.series_list):
@@ -1158,7 +1169,32 @@ class MultipleSeries:
             s.value=v_mod
             new.series_list[idx]=s
         return new
-    
+
+    def mssa(self, M, MC=1000, f=0.3):
+        data = []
+        for val in self.series_list:
+            data.append(val.value)
+        data = np.transpose(np.asarray(data))
+
+
+        deval, eig_vec, q05, q95, PC, RC = decomposition.mssa(data, M=M, MC=MC, f=f)
+        res = {'deval': deval, 'eig_vec': eig_vec, 'q05': q05, 'q95': q95, 'PC': PC, 'RC': RC}
+        return res
+
+    def pca(self):
+        data = []
+        for val in self.series_list:
+            data.append(val.value)
+        a = len(data[0])
+        r = data[1:]
+        flag = all (len(v)==a for v in r)
+        if flag==False:
+            print('All Time Series should be of same length')
+            return
+        data = np.transpose(np.asarray(data))
+        res = decomposition.pca(data)
+        return res
+
     def detrend(self,method='emd',**kwargs):
         new=self.copy()
         for idx,item in enumerate(new.series_list):
@@ -1201,12 +1237,6 @@ class MultipleSeries:
 
         return scals
 
-
-class SurrogateSeries(MultipleSeries):
-    def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
-        self.series_list = series_list
-        self.surrogate_method = surrogate_method
-        self.surrogate_args = surrogate_args
     def plot(self, figsize=[10, 4],
              marker=None, markersize=None, color=None,
              linestyle=None, linewidth=None,
@@ -1237,6 +1267,13 @@ class SurrogateSeries(MultipleSeries):
             return fig, ax
         else:
             return ax
+
+
+class SurrogateSeries(MultipleSeries):
+    def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
+        self.series_list = series_list
+        self.surrogate_method = surrogate_method
+        self.surrogate_args = surrogate_args
 
 class MultiplePSD:
     def __init__(self, psd_list):
@@ -1421,13 +1458,13 @@ class Lipd:
                 'mollusk shells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
                 'other':['k','o']}
-       
-        #check that query has matching terms            
+
+        #check that query has matching terms
         if query==True and bool(query_args)==False:
             raise ValueError('When query is set to true, you must define query terms')
         if query==False and usr_path==None and lipd_dict==None:
             usr_path==''
-        
+
         #deal with the query dictionary
         if query==True and bool(query_args)==True:
             if 'archiveType' in query_args.keys():
@@ -1435,7 +1472,7 @@ class Lipd:
                 if type(archiveType) == str:
                     archiveType=lipdutils.pre_process_str(archiveType)
                     archiveType=[archiveType]
-                else: 
+                else:
                     archiveType=lipdutils.pre_process_list(archiveType)
                 availableType=lipdutils.whatArchives(print_response=False)
                 availableTypeP=lipdutils.pre_process_list(availableType)
@@ -1451,7 +1488,7 @@ class Lipd:
                     archiveType=res
             else:
                 archiveType = [ ]
-            
+
             if 'proxyObsType' in query_args.keys():
                 proxyObsType=query_args['proxyObsType']
                 if type(proxyObsType) == str:
@@ -1473,7 +1510,7 @@ class Lipd:
                     proxyObsType=res
             else:
                 proxyObsType=[ ]
-                
+
             if 'infVarType' in query_args.keys():
                 infVarType=query_args['infVarType']
             else:
@@ -1530,13 +1567,13 @@ class Lipd:
                 download_folder = query_args['download_folder']
             else:
                 download_folder=os.getcwd()+'/'
-            
+
             lipdutils.queryLinkedEarth(archiveType=archiveType, proxyObsType=proxyObsType, infVarType = infVarType, sensorGenus=sensorGenus,
                     sensorSpecies=sensorSpecies, interpName =interpName, interpDetail =interpDetail, ageUnits = ageUnits,
                     ageBound = ageBound, ageBoundType = ageBoundType, recordLength = recordLength, resolution = resolution,
                     lat = lat, lon = lon, alt = alt, print_response = False, download_lipd = True,
                     download_folder = download_folder)
-            
+
             D_query = lpd.readLipd(download_folder)
             if 'archiveType' in D_query.keys():
                 D_query={D_query['dataSetName']:D_query}
@@ -1556,23 +1593,23 @@ class Lipd:
                 D_dict={D_dict['dataSetName']:D_dict}
         else:
             D_dict={}
-        
+
         #assemble
         self.lipd={}
         self.lipd.update(D_query)
         self.lipd.update(D_path)
         self.lipd.update(D_dict)
-            
+
     def __repr__(self):
         return str(self.__dict__)
-    
+
     def copy(self):
         return deepcopy(self)
-    
+
     def to_tso(self):
         ts_list=lpd.extractTs(self.__dict__['lipd'])
         return ts_list
-    
+
     def extract(self,dataSetName):
         new = self.copy()
         try:
@@ -1580,70 +1617,70 @@ class Lipd:
             new.lipd=dict_out
         except:
             pass
-        
-        return new 
-        
+
+        return new
+
     def mapAllArchive(self, projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
-           figsize = None, ax = None, marker=None, color=None, 
+           figsize = None, ax = None, marker=None, color=None,
            markersize = None, scatter_kwargs=None,
            legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
-        
+
         #get the information from the LiPD dict
         lat=[]
         lon=[]
         archiveType=[]
-        
+
         for idx, key in enumerate(self.lipd):
             d = self.lipd[key]
             lat.append(d['geo']['geometry']['coordinates'][1])
             lon.append(d['geo']['geometry']['coordinates'][0])
             archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower())
-        
+
         # make sure criteria is in the plot_default list
         for idx,val in enumerate(archiveType):
             if val not in self.plot_default.keys():
                 archiveType[idx] = 'other'
-        
+
         if markersize is not None:
             scatter_kwargs.update({'markersize': markersize})
-        
+
         if marker==None:
             marker=[]
             for item in archiveType:
                 marker.append(self.plot_default[item][1])
-        
+
         if color==None:
             color=[]
             for item in archiveType:
                 color.append(self.plot_default[item][0])
-        
+
         res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
                               marker=marker, color =color,
                               projection = projection, proj_default = proj_default,
-                              background = background,borders = borders, 
+                              background = background,borders = borders,
                               rivers = rivers, lakes = lakes,
-                              figsize = figsize, ax = ax, 
+                              figsize = figsize, ax = ax,
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
                               mute=mute)
-        
-        return res
-    
-    def mapNearRecord():
-        
-        res={}
-        
+
         return res
 
-        
+    def mapNearRecord():
+
+        res={}
+
+        return res
+
+
 class LipdSeries(Series):
     def __init__(self, tso):
         if type(tso) is list:
             self.lipd_ts=lipdutils.getTs(tso)
         else:
-            self.lipd_ts=tso        
-                    
+            self.lipd_ts=tso
+
         self.plot_default = {'ice/rock': ['#FFD600','h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
@@ -1657,7 +1694,7 @@ class LipdSeries(Series):
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
                 'other':['k','o']}
-    
+
         time, label= lipdutils.checkTimeAxis(self.lipd_ts)
         if label=='age':
             time_name='Age'
@@ -1671,7 +1708,7 @@ class LipdSeries(Series):
                 time_unit=self.lipd_ts['yearUnits']
             else:
                 time_unit=None
-    
+
         value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
         #Remove NaNs
         ys_tmp=np.copy(value)
@@ -1686,10 +1723,10 @@ class LipdSeries(Series):
         super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
              time_unit=time_unit,value_name=value_name,value_unit=value_unit,
              label=label)
-        
+
     def copy(self):
         return deepcopy(self)
-    
+
     def chronEnsembleToPaleo(self,D,modelNumber=None,tableNumber=None):
         #get the corresponding LiPD
         dataSetName=self.lipd_ts['dataSetName']
@@ -1716,7 +1753,7 @@ class LipdSeries(Series):
                     if str1 in item and str2 in item:
                         csvName=item
             depth, ensembleValues =lipdutils.getEnsemble(csv_dict,csvName)
-        else:    
+        else:
             depth, ensembleValues =lipdutils.getEnsemble(csv_dict,chron[0])
         #make sure it's sorted
         sort_ind = np.argsort(depth)
@@ -1739,14 +1776,14 @@ class LipdSeries(Series):
         for s in ensembleValuestoPaleo.T:
             s_tmp=Series(time=s,value=self.value)
             s_list.append(s_tmp)
-        
+
         ms = MultipleSeries(series_list=s_list)
-        
+
         return ms
-    
+
     def map(self,projection = 'Orthographic', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
-           figsize = None, ax = None, marker=None, color=None, 
+           figsize = None, ax = None, marker=None, color=None,
            markersize = None, scatter_kwargs=None,
            legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
 
@@ -1754,20 +1791,20 @@ class LipdSeries(Series):
         lat=[self.lipd_ts['geo_meanLat']]
         lon=[self.lipd_ts['geo_meanLon']]
         archiveType=lipdutils.LipdToOntology(self.lipd_ts['archiveType'])
-        
+
         # make sure criteria is in the plot_default list
         if archiveType not in self.plot_default.keys():
             archiveType = 'other'
-        
+
         if markersize is not None:
             scatter_kwargs.update({'markersize': markersize})
-        
+
         if marker==None:
             marker= self.plot_default[archiveType][1]
-        
+
         if color==None:
             color=self.plot_default[archiveType][0]
-        
+
         if proj_default==True:
             proj1={'central_latitude':lat[0],
                    'central_longitude':lon[0]}
@@ -1777,28 +1814,28 @@ class LipdSeries(Series):
         archiveType=[archiveType] #list so it will work with map_all
         marker=[marker]
         color=[color]
-        
+
         if proj_default==True:
-            
+
             try:
                 res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
                               marker=marker, color =color,
                               projection = projection, proj_default = proj1,
-                              background = background,borders = borders, 
+                              background = background,borders = borders,
                               rivers = rivers, lakes = lakes,
-                              figsize = figsize, ax = ax, 
+                              figsize = figsize, ax = ax,
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
                               mute=mute)
-            
+
             except:
                 try:
                     res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
                               marker=marker, color =color,
                               projection = projection, proj_default = proj3,
-                              background = background,borders = borders, 
+                              background = background,borders = borders,
                               rivers = rivers, lakes = lakes,
-                              figsize = figsize, ax = ax, 
+                              figsize = figsize, ax = ax,
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
                               mute=mute)
@@ -1806,28 +1843,21 @@ class LipdSeries(Series):
                     res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
                               marker=marker, color =color,
                               projection = projection, proj_default = proj2,
-                              background = background,borders = borders, 
+                              background = background,borders = borders,
                               rivers = rivers, lakes = lakes,
-                              figsize = figsize, ax = ax, 
+                              figsize = figsize, ax = ax,
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
                               mute=mute)
-            
+
         else:
             res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
                               marker=marker, color =color,
                               projection = projection, proj_default = proj_default,
-                              background = background,borders = borders, 
+                              background = background,borders = borders,
                               rivers = rivers, lakes = lakes,
-                              figsize = figsize, ax = ax, 
+                              figsize = figsize, ax = ax,
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
                               mute=mute)
         return res
-        
-        
-    
-    
-        
-
-    

@@ -39,7 +39,8 @@ import matplotlib.pyplot as plt
 import numpy.matlib
 from sklearn.neighbors import NearestNeighbors
 import math
-from .plotting import plot_scatter_xy
+from sys import exit
+from .plotting import plot_scatter_xy,plot_xy
 from .filter import savitzky_golay
 
 
@@ -653,7 +654,7 @@ def find_knee(distances):
     return knee		
 
 
-def detect_outliers(ts, ys, plot=True, auto=True,**plot_kwargs):
+def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],save_knee=None,save_outliers=None):
     ''' Function to detect outliers in the given timeseries
     
        for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
@@ -687,46 +688,52 @@ def detect_outliers(ts, ys, plot=True, auto=True,**plot_kwargs):
         knee_point = find_knee(distances)
         mark = distances.index(knee_point)
         index = [i for i in range(len(distances))]
+        if plot_knee == False:
+            fig1 = None
+            ax1 =  None
+        else:
 
-        fig, ax = plt.subplots(figsize=[10, 4])
-        ax.plot(index, distances)
+            fig1, ax1 = plt.subplots(figsize=figsize)
+            plot_xy(index, distances,xlabel='Indices',ax=ax1,ylabel='Distances',savefig_settings=save_knee,plot_kwargs=plot_knee_kwargs)
 
-
-        if auto == True:
-            ax.annotate("knee={}".format(knee_point), (mark, knee_point),
-                        arrowprops=dict(facecolor='black', shrink=0.05))
-            ax.set_xlabel('Indices')
-            ax.set_ylabel('Distance')
-            plt.show()
             if flag == True:
                 knee_point = 0.1
+            ax1.annotate("knee={}".format(knee_point), (mark, knee_point),
+                        arrowprops=dict(facecolor='black', shrink=0.05))
+            plt.show()
 
+        if auto == True:
             db = DBSCAN(eps=knee_point, min_samples=minpts)
             clusters = db.fit(ys.reshape(-1, 1))
             cluster_labels = clusters.labels_
             outliers = np.where(cluster_labels == -1)
-        if auto == False:
-            ax.annotate("knee",(mark, knee_point),arrowprops=dict(facecolor='black', shrink=0.05))
-            plt.show()
+        elif auto == False:
+
             eps = float(input('Enter the value for eps(knee point)'))
-            fig,ax = plt.subplots(figsize=[10, 4])
-            ax.plot(index,distances)
+            if plot_knee == False:
+                fig1 = None
+                ax1 = None
+            else:
+                fig1,ax1 = plt.subplots(figsize=figsize)
+                plot_xy(index, distances, xlabel='Indices', ylabel='Distances',plot_kwargs=plot_knee_kwargs,savefig_settings=save_knee,ax=ax1)
 
-            ax.annotate("knee={}".format(eps), (mark, knee_point),
+                ax1.annotate("knee={}".format(eps), (mark, knee_point),
                         arrowprops=dict(facecolor='black', shrink=0.05))
-            ax.set_xlabel('Indices')
-            ax.set_ylabel('Distance')
-            plt.show()
-
 
             db = DBSCAN(eps=eps, min_samples=minpts)
             clusters = db.fit(ys.reshape(-1, 1))
             cluster_labels = clusters.labels_
             outliers = np.where(cluster_labels == -1)
-        if plot == True:
-            fig,ax =plot_scatter_xy(ts,ys,outliers,figsize=[10,4],xlabel='time',ylabel='value')
+        if plot_outliers ==False:
+            fig2,ax2=None,None
+        else:
+            fig2,ax2 = plt.subplots(figsize=figsize)
+            x2 = ts[outliers]
+            y2 = ys[outliers]
+            plot_scatter_xy(ts,ys,x2,y2,figsize=figsize,xlabel='time',ylabel='value',savefig_settings=save_outliers,plot_kwargs=plot_outliers_kwargs)
+
         
-        return outliers
+        return outliers,fig1,ax1,fig2,ax2
 
     except ValueError:
         choice = input('Switch to Auto Mode(y/n)?')
@@ -735,7 +742,7 @@ def detect_outliers(ts, ys, plot=True, auto=True,**plot_kwargs):
             a = detect_outliers(ts, ys, auto=True)
             return a
         else:
-            exit(0)
+            exit(1)
             
 def remove_outliers(ts,ys,outlier_points):
     ''' Removes outliers from a timeseries
