@@ -14,5 +14,7 @@ from .spectral import *
 from .correlation import *
 from .causality import *
 from .lipdutils import *
+from .mapping import *
+from .tsutils import *
 
 
