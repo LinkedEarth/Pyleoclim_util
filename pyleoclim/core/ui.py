@@ -1160,7 +1160,6 @@ class MultipleSeries:
     def copy(self):
         return deepcopy(self)
 
-    
     def standardize(self):
         new=self.copy()
         for idx,item in enumerate(new.series_list):
@@ -1169,6 +1168,7 @@ class MultipleSeries:
             s.value=v_mod
             new.series_list[idx]=s
         return new
+
     def mssa(self, M, MC=1000, f=0.3):
         data = []
         for val in self.series_list:
@@ -1179,6 +1179,7 @@ class MultipleSeries:
         deval, eig_vec, q05, q95, PC, RC = decomposition.mssa(data, M=M, MC=MC, f=f)
         res = {'deval': deval, 'eig_vec': eig_vec, 'q05': q05, 'q95': q95, 'PC': PC, 'RC': RC}
         return res
+
     def pca(self):
         data = []
         for val in self.series_list:
@@ -1235,12 +1236,6 @@ class MultipleSeries:
 
         return scals
 
-
-class SurrogateSeries(MultipleSeries):
-    def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
-        self.series_list = series_list
-        self.surrogate_method = surrogate_method
-        self.surrogate_args = surrogate_args
     def plot(self, figsize=[10, 4],
              marker=None, markersize=None, color=None,
              linestyle=None, linewidth=None,
@@ -1271,6 +1266,13 @@ class SurrogateSeries(MultipleSeries):
             return fig, ax
         else:
             return ax
+
+
+class SurrogateSeries(MultipleSeries):
+    def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
+        self.series_list = series_list
+        self.surrogate_method = surrogate_method
+        self.surrogate_args = surrogate_args
 
 class MultiplePSD:
     def __init__(self, psd_list):
