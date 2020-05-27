@@ -104,8 +104,8 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
     Args
     ----
 
-    x : array
-        The data for test whether the time series in the second column Granger causes the time series in the first column. Missing values are not supported.
+    y1, y2: array
+        vectors of (real) numbers with identical length, no NaNs allowed
     maxlag : int or int iterable
         If an integer, computes the test for all lags up to maxlag. If an iterable, computes the tests only for the lags in maxlag.
     addconst : bool

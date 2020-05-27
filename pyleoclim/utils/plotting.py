@@ -193,7 +193,7 @@ def plot_hist(y, bins=None, hist=True, label=None,
     return ax
 
 
-def plot_scatter_xy(x, y, scatter_points, figsize=None, xlabel=None, 
+def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
                     ylabel=None, title=None, xlim=None, ylim=None,
                     savefig_settings=None, ax=None, legend=True, 
                     plot_kwargs=None, lgd_kwargs=None, mute=False):
@@ -201,12 +201,14 @@ def plot_scatter_xy(x, y, scatter_points, figsize=None, xlabel=None,
     ''' Plot the timeseries
     Args
     ------
-    x : array
+    x1 : array
       x axis of timeseries
-    y : array
+    y1 : array
      values of timeseries
-    scatter_points : array
-        indices of scatter points
+    x1 : array
+        x axis of scatter points
+    y2 : array
+        y of scatter points
     figsize : list
         a list of two integers indicating the figure size
     xlabel : str
@@ -244,8 +246,8 @@ def plot_scatter_xy(x, y, scatter_points, figsize=None, xlabel=None,
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
 
-    ax.plot(x, y, **plot_kwargs, color='green')
-    ax.scatter(x[scatter_points], y[scatter_points], color='red')
+    ax.plot(x1, y1, **plot_kwargs, color='green')
+    ax.scatter(x2, y2, color='red')
 
     if xlabel is not None:
         ax.set_xlabel(xlabel)

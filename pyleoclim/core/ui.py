@@ -563,7 +563,7 @@ class Series:
 
         return surr
 
-    def outliers(self, auto=True, remove=True, figs=True):
+    def outliers(self, auto=True, remove=True, fig_outliers=True,fig_knee=True,plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],save_knee=None,save_outliers=None):
         '''
         Detects outliers in a timeseries and removes if specified
         Args
@@ -573,17 +573,28 @@ class Series:
                True by default, detects knee in the plot automatically
        remove : boolean
                True by default, removes all outlier points if detected
-       figs   : boolean
-               True by default, returns all fig from tsutils
-        Returns
-        -------
+       fig_knee  : boolean
+               True by default, plots knee plot if true
+       fig_outliers : boolean
+                     True by degault, plots outliers if true
+       save_knee : dict
+                  default parameters from matplotlib savefig None by default
+       save_outliers : dict
+                  default parameters from matplotlib savefig None by default
+      plot_knee_kwargs : dict
+      plot_outliers_kwargs : dict
+      figsize : list
+               by default [10,4]
+     Returns
+     -------
         new : Series
              Time series with outliers removed if they exist
         '''
-
         new = self.copy()
 
-        outlier_indices = np.array(tsutils.detect_outliers(self.time, self.value, auto=auto, plot=figs))
+        outlier_indices,fig1,ax1,fig2,ax2 = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
+                                                           figsize=figsize,save_knee=save_knee,save_outliers=save_outliers,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
+        outlier_indices = np.asarray(outlier_indices)
         if remove == True:
             new = self.copy()
             ys = np.delete(self.value, outlier_indices)
