@@ -49,7 +49,7 @@ setup(
         "numpy>=1.16.4",
         "matplotlib>=3.1.0",
         "scipy>=1.3.1",
-        "statsmodels>=0.8.0",
+        "statsmodels>=0.10.1",
         "seaborn>=0.9.0",
         "scikit-learn>=0.21.3",
         "pathos>=0.2.4",
