@@ -78,36 +78,36 @@ def pca(x,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,it
 
     dict
         Sklearn PCA object dictionary of all attributes and values.
-        
+
         -components_array, shape (n_components, n_features)
             Principal axes in feature space, representing the directions of maximum variance in the data. The components are sorted by explained_variance_.
-        
+
         -explained_variance_array, shape (n_components,)
             The amount of variance explained by each of the selected components.
             Equal to n_components largest eigenvalues of the covariance matrix of X.
             New in version 0.18.
-        
+
         -explained_variance_ratio_array, shape (n_components,)
             Percentage of variance explained by each of the selected components.
             If n_components is not set then all components are stored and the sum of the ratios is equal to 1.0.
-        
+
         -singular_values_array, shape (n_components,)
             The singular values corresponding to each of the selected components. The singular values are equal to the 2-norms of the n_components variables in the lower-dimensional space.
             New in version 0.19.
-        
+
         -mean_array, shape (n_features,)
             Per-feature empirical mean, estimated from the training set.
             Equal to X.mean(axis=0).
-        
+
         -n_components_int
             The estimated number of components. When n_components is set to ‘mle’ or a number between 0 and 1 (with svd_solver == ‘full’) this number is estimated from input data. Otherwise it equals the parameter n_components, or the lesser value of n_features and n_samples if n_components is None.
-        
+
         -n_features_int
             Number of features in the training data.
-        
+
         -n_samples_int
             Number of samples in the training data.
-        
+
         -noise_variance_float
             The estimated noise covariance following the Probabilistic PCA model from Tipping and Bishop 1999. See “Pattern Recognition and Machine Learning” by C. Bishop, 12.2.1 p. 574 or http://www.miketipping.com/papers/met-mppca.pdf. It is required to compute the estimated data covariance and score samples.
             Equal to the average of (min(n_features, n_samples) - n_components) smallest eigenvalues of the covariance matrix of X.
@@ -140,16 +140,16 @@ def mssa(data, M, MC=1000, f=0.3):
     Returns
     -------
 
-    deval : array
+    eig_val : array
            eigenvalue spectrum
-    q05 : float
+    eig_val05 : float
          The 5% percentile of eigenvalues
-    q95 : float
+    eig_val95 : float
          The 95% percentile of eigenvalues
     PC : 2D array
          matrix of principal components
     RC : 2D array
-        matrix of RCs (nrec,N,nrec*M) (only if K>0)
+        matrix of RCs (nrec,N,nrec*M)
 
     '''
     N = len(data[:, 0])
@@ -160,11 +160,11 @@ def mssa(data, M, MC=1000, f=0.3):
             Y[:, m + irec * M] = data[m:N - M + 1 + m, irec]
 
     C = np.dot(np.nan_to_num(np.transpose(Y)), np.nan_to_num(Y)) / (N - M + 1)
-    eig_val, eig_vec = eigh(C)
+    D, eig_vec = eigh(C)
 
-    sort_tmp = np.sort(eig_val)
-    deval = sort_tmp[::-1]
-    sortarg = np.argsort(-eig_val)
+    sort_tmp = np.sort(D)
+    eig_val = sort_tmp[::-1]
+    sortarg = np.argsort(-D)
 
     eig_vec = eig_vec[:, sortarg]
 
@@ -173,7 +173,7 @@ def mssa(data, M, MC=1000, f=0.3):
     noise = np.zeros((nrec, N, MC))
     for irec in np.arange(nrec):
         noise[irec, 0, :] = data[0, irec]
-    Lamda_R = np.zeros((nrec * M, MC))
+    eig_val_R = np.zeros((nrec * M, MC))
     # estimate coefficents of ar1 processes, and then generate ar1 time series (noise)
     for irec in np.arange(nrec):
         Xr = data[:, irec]
@@ -190,11 +190,11 @@ def mssa(data, M, MC=1000, f=0.3):
             for im in np.arange(0, M):
                 Ym[:, im + irec * M] = noise[irec, im:N - M + 1 + im, m]
         Cn = np.dot(np.nan_to_num(np.transpose(Ym)), np.nan_to_num(Ym)) / (N - M + 1)
-        # Lamda_R[:,m] = np.diag(np.dot(np.dot(eig_vec,Cn),np.transpose(eig_vec)))
-        Lamda_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eig_vec), Cn), eig_vec))
+        # eig_val_R[:,m] = np.diag(np.dot(np.dot(eig_vec,Cn),np.transpose(eig_vec)))
+        eig_val_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eig_vec), Cn), eig_vec))
 
-    q95 = np.percentile(Lamda_R, 95, axis=1)
-    q05 = np.percentile(Lamda_R, 5, axis=1)
+    eig_val95 = np.percentile(eig_val_R, 95, axis=1)
+    eig_val05 = np.percentile(eig_val_R, 5, axis=1)
 
 
     # determine principal component time series
@@ -222,9 +222,9 @@ def mssa(data, M, MC=1000, f=0.3):
             for n in np.arange(N):
                 RC[k, n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
 
-    return deval, eig_vec, q95, q05, PC, RC
+    return eig_val, eig_vec, eig_val95, eig_val05, PC, RC
 
-def ssa(ys, M=None, MC=1000, f=0.3):
+def ssa(ys, M=None, MC=1000):
     '''SSA analysis for a time series
     (applicable for data including missing values)
     and test the significance by Monte-Carlo method
@@ -244,11 +244,11 @@ def ssa(ys, M=None, MC=1000, f=0.3):
     Returns
     -------
 
-    deval : array
+    eig_val : array
            eigenvalue spectrum
-    q05 : float
+    eig_val05 : float
          The 5% percentile of eigenvalues
-    q95 : float
+    eig_val95 : float
          The 95% percentile of eigenvalues
     PC : 2D array
         matrix of principal components
@@ -267,37 +267,14 @@ def ssa(ys, M=None, MC=1000, f=0.3):
         c[j] = sum(prod[~np.isnan(prod)]) / (sum(~np.isnan(prod)) - 1)
 
 
-    C = toeplitz(c[0:M])
+    C = toeplitz(c[0:M])  #form correlation matrix
 
-    eig_val, eig_vec = eigh(C)
+    D, eig_vec = eigh(C) # solve eigendecomposition
 
-    sort_tmp = np.sort(eig_val)
-    deval = sort_tmp[::-1]
-    sortarg = np.argsort(-eig_val)
-
+    sort_tmp = np.sort(D)
+    eig_val = sort_tmp[::-1]
+    sortarg = np.argsort(-D)
     eig_vec = eig_vec[:, sortarg]
-
-    coefs_est, var_est = alg.AR_est_YW(Xr[~np.isnan(Xr)], 1)
-    sigma_est = np.sqrt(var_est)
-
-    noise = np.zeros((N, MC))
-    noise[0, :] = Xr[0]
-    Lamda_R = np.zeros((M, MC))
-
-    for jt in range(1, N):
-        noise[jt, :] = coefs_est * noise[jt - 1, :] + sigma_est * np.random.randn(1, MC)
-
-    for m in range(MC):
-        noise[:, m] = (noise[:, m] - np.mean(noise[:, m])) / (np.std(noise[:, m], ddof=1))
-        Gn = np.correlate(noise[:, m], noise[:, m], "full")
-        lgs = np.arange(-N + 1, N)
-        Gn = Gn / (N - abs(lgs))
-        Cn = toeplitz(Gn[N - 1:N - 1 + M])
-        # Lamda_R[:,m] = np.diag(np.dot(np.dot(eig_vec,Cn),np.transpose(eig_vec)))
-        Lamda_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eig_vec), Cn), eig_vec))
-
-    q95 = np.percentile(Lamda_R, 95, axis=1)
-    q05 = np.percentile(Lamda_R, 5, axis=1)
 
     # determine principal component time series
     PC = np.zeros((N - M + 1, M))
@@ -324,4 +301,34 @@ def ssa(ys, M=None, MC=1000, f=0.3):
         for n in np.arange(N):
             RC[n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
 
-    return deval, eig_vec, q05, q95, PC, RC
+    # TODO: implement automatic truncation criteria.
+
+    if MC > 0:
+        # If Monte-Carlo SSA is requested
+        coefs_est, var_est = alg.AR_est_YW(Xr[~np.isnan(Xr)], 1)
+        sigma_est = np.sqrt(var_est)
+
+        noise = np.zeros((N, MC))
+        noise[0, :] = Xr[0]
+        eig_val_R = np.zeros((M, MC))
+
+        for jt in range(1, N):
+            # TODO: update to proper AR simulation, e.g. with statsmodels
+            noise[jt, :] = coefs_est * noise[jt - 1, :] + sigma_est * np.random.randn(1, MC)
+
+        for m in range(MC):
+            noise[:, m] = (noise[:, m] - np.mean(noise[:, m])) / (np.std(noise[:, m], ddof=1))
+            Gn = np.correlate(noise[:, m], noise[:, m], "full")
+            lgs = np.arange(-N + 1, N)
+            Gn = Gn / (N - abs(lgs))
+            Cn = toeplitz(Gn[N - 1:N - 1 + M])
+            # eig_val_R[:,m] = np.diag(np.dot(np.dot(eig_vec,Cn),np.transpose(eig_vec)))
+            eig_val_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eig_vec), Cn), eig_vec))
+
+        eig_val95 = np.percentile(eig_val_R, 95, axis=1)
+        eig_val05 = np.percentile(eig_val_R, 5, axis=1)
+    else:
+        eig_val05 = None
+        eig_val95 = None
+
+    return eig_val, eig_vec, eig_val05, eig_val95, PC, RC
