@@ -20,7 +20,7 @@ from scipy import signal
 from scipy.stats.mstats import mquantiles
 from pathos.multiprocessing import ProcessingPool as Pool
 import numba as nb
-from numba.errors import NumbaPerformanceWarning
+from numba.core.errors import NumbaPerformanceWarning
 import warnings
 import collections
 import scipy.fftpack as fft
