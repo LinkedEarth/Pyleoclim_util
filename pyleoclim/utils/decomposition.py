@@ -224,7 +224,7 @@ def mssa(data, M, MC=1000, f=0.3):
 
     return eig_val, eig_vec, eig_val95, eig_val05, PC, RC
 
-def ssa(ys, M=None, MC=0, f=0.3):
+def ssa(X, M=None, MC=0, f=0.3):
     '''Singular spectrum analysis for a time series X, using the method of [1] and
     the formulation of [3]. Optionally (MC>0), the significance of eigenvalues
     is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [2].
