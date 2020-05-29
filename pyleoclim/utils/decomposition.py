@@ -176,8 +176,8 @@ def mssa(data, M, MC=1000, f=0.3):
     eig_val_R = np.zeros((nrec * M, MC))
     # estimate coefficents of ar1 processes, and then generate ar1 time series (noise)
     for irec in np.arange(nrec):
-        Xr = data[:, irec]
-        coefs_est, var_est = alg.AR_est_YW(Xr[~np.isnan(Xr)], 1)
+        Xs = data[:, irec]
+        coefs_est, var_est = alg.AR_est_YW(Xs[~np.isnan(Xs)], 1)
         sigma_est = np.sqrt(var_est)
 
         for jt in range(1, N):
@@ -267,7 +267,7 @@ def ssa(X, M=None, MC=0, f=0.3):
 
     '''
 
-    Xr, mu, _ = standardize(X)
+    Xs, mu, _ = standardize(X)
 
     N = len(X)
 
@@ -276,7 +276,7 @@ def ssa(X, M=None, MC=0, f=0.3):
     c = np.zeros(M)
 
     for j in range(M):
-        prod = Xr[0:N - j] * Xr[j:N]
+        prod = Xs[0:N - j] * Xs[j:N]
         c[j] = sum(prod[~np.isnan(prod)]) / (sum(~np.isnan(prod)) - 1)
 
 
@@ -295,7 +295,7 @@ def ssa(X, M=None, MC=0, f=0.3):
     for k in np.arange(M):
         for i in np.arange(0, N - M + 1):
             #   modify for nan
-            prod = Xr[i:i + M] * eig_vec[:, k]
+            prod = Xs[i:i + M] * eig_vec[:, k]
             ngood = sum(~np.isnan(prod))
             #   must have at least m*f good points
             if ngood >= M * f:
@@ -314,16 +314,16 @@ def ssa(X, M=None, MC=0, f=0.3):
         for n in np.arange(N):
             RC[n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
 
-    RC = RC + np.repmat(mu, (N, M))  # put the mean back in
+    RC = RC + np.tile(mu, reps=[N, M])  # put the mean back in
     # TODO: implement automatic truncation criteria.
 
     if MC > 0:
         # If Monte-Carlo SSA is requested. NOTE: DO NOT ATTEMPT IF MISSING DATA. Use https://github.com/SMAC-Group/uAR1 instead.
-        coefs_est, var_est = alg.AR_est_YW(Xr, 1)
+        coefs_est, var_est = alg.AR_est_YW(Xs, 1)
         sigma_est = np.sqrt(var_est)
 
         noise = np.zeros((N, MC))
-        noise[0, :] = Xr[0]
+        noise[0, :] = Xs[0]
         eig_val_R = np.zeros((M, MC))
 
         for jt in range(1, N):
