@@ -224,40 +224,53 @@ def mssa(data, M, MC=1000, f=0.3):
 
     return eig_val, eig_vec, eig_val95, eig_val05, PC, RC
 
-def ssa(ys, M=None, MC=1000):
-    '''SSA analysis for a time series
-    (applicable for data including missing values)
-    and test the significance by Monte-Carlo method
+def ssa(ys, M=None, MC=0, f=0.3):
+    '''Singular spectrum analysis for a time series X, using the method of [1] and
+    the formulation of [3]. Optionally (MC>0), the significance of eigenvalues
+    is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [2].
 
     Args
     ----
 
-    ys : array
-          time series
+    X : array of length N
+          time series (evenly-spaced, possibly with with up to f*N NaNs)
     M : int
-       window size
+       window size (default: 10% of the length of the series)
     MC : int
-        Number of iteration in the Monte-Carlo process
-    f : fraction
-       fraction (0<f<=1) of good data points for identifying significant PCs [f = 0.3]
+        Number of iteration in the Monte-Carlo process (default M=0, bypasses Monte Carlo SSA)
 
     Returns
     -------
 
-    eig_val : array
-           eigenvalue spectrum
-    eig_val05 : float
-         The 5% percentile of eigenvalues
-    eig_val95 : float
-         The 95% percentile of eigenvalues
-    PC : 2D array
+    eig_val : (M, 1) array
+        eigenvalue spectrum
+    PC : (N - M + 1, M) array
         matrix of principal components
-    RC : 2D array
-        matrix of RCs (N*M, nmode) (only if K>0)
+    RC : (N,  M) array
+        matrix of reconstructed components
+    eig_val_q : (M, 2) array
+         The 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC >0 ]
+
+    References:
+    -----------
+    [1] Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
+    dynamics, with applications to paleoclimatic time series, Physica D, 35,
+    395–424.
+
+    [2] Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
+    oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
+
+    [3] Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
+    A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002),
+    Advanced spectral methods for climatic time series, Rev. Geophys., 40(1),
+    1003–1052, doi:10.1029/2000RG000092.
+
     '''
 
-    Xr = standardize(ys)[0]
-    N = len(ys)
+    Xr, mu, _ = standardize(X)
+
+    N = len(X)
+
     if not M:
         M=int(N/10)
     c = np.zeros(M)
@@ -301,11 +314,12 @@ def ssa(ys, M=None, MC=1000):
         for n in np.arange(N):
             RC[n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
 
+    RC = RC + np.repmat(mu, (N, M))  # put the mean back in
     # TODO: implement automatic truncation criteria.
 
     if MC > 0:
-        # If Monte-Carlo SSA is requested
-        coefs_est, var_est = alg.AR_est_YW(Xr[~np.isnan(Xr)], 1)
+        # If Monte-Carlo SSA is requested. NOTE: DO NOT ATTEMPT IF MISSING DATA. Use https://github.com/SMAC-Group/uAR1 instead.
+        coefs_est, var_est = alg.AR_est_YW(Xr, 1)
         sigma_est = np.sqrt(var_est)
 
         noise = np.zeros((N, MC))
@@ -322,13 +336,12 @@ def ssa(ys, M=None, MC=1000):
             lgs = np.arange(-N + 1, N)
             Gn = Gn / (N - abs(lgs))
             Cn = toeplitz(Gn[N - 1:N - 1 + M])
-            # eig_val_R[:,m] = np.diag(np.dot(np.dot(eig_vec,Cn),np.transpose(eig_vec)))
             eig_val_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eig_vec), Cn), eig_vec))
 
-        eig_val95 = np.percentile(eig_val_R, 95, axis=1)
-        eig_val05 = np.percentile(eig_val_R, 5, axis=1)
+        eig_val_q = np.empty((M,2))
+        eig_val_q[:,0] = np.percentile(eig_val_R, 5, axis=1)
+        eig_val_q[:,1] = np.percentile(eig_val_R, 95, axis=1)
     else:
-        eig_val05 = None
-        eig_val95 = None
+        eig_val_q = None
 
-    return eig_val, eig_vec, eig_val05, eig_val95, PC, RC
+    return eig_val, eig_vec, PC, RC, eig_val_q

@@ -174,7 +174,7 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **ar
     end : float
          where/when to stop the interpolation. Default is max.
     args :  args
-        Aguments specific to interpolate.interp1D. See scipy for details https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html    
+        Aguments specific to interpolate.interp1D. See scipy for details https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html
 
     Returns
     -------
@@ -204,7 +204,7 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **ar
 
     #Make sure the data is increasing
     data = pd.DataFrame({"x-axis": x, "y-axis": y}).sort_values('x-axis')
-    
+
     # Add arguments
 
     interp_values = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**args)(xi)
@@ -331,10 +331,10 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     assert x.ndim <= 2, 'The time series x should be a vector or 2-D array!'
 
     mu = np.nanmean(x, axis=axis)  # the mean of the original time series
-    sig = np.nanstd(x, axis=axis, ddof=ddof)  # the std of the original time series
+    sig = np.nanstd(x, axis=axis, ddof=ddof)  # the standard deviation of the original time series
 
     mu2 = np.asarray(np.copy(mu))  # the mean used in the calculation of zscore
-    sig2 = np.asarray(np.copy(sig) / scale)  # the std used in the calculation of zscore
+    sig2 = np.asarray(np.copy(sig) / scale)  # the standard deviation used in the calculation of zscore
 
     if np.any(np.abs(sig) < eps):  # check if x contains (nearly) constant time series
         warnings.warn('Constant or nearly constant time series not rescaled.')
@@ -651,7 +651,7 @@ def find_knee(distances):
     distToLine = np.sqrt(np.sum(vecToLine ** 2, axis=1))
     idxOfBestPoint = np.argmax(distToLine)
     knee = distances[idxOfBestPoint]
-    return knee		
+    return knee
 
 
 def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
@@ -659,10 +659,10 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
                     figsize=[10,4],saveknee_settings=None,
                     saveoutliers_settings=None,mute=False):
     ''' Function to detect outliers in the given timeseries
-    
+
        for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
 
-    
+
        Args
        ----
 
@@ -674,7 +674,7 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
              true by default, plots the outliers using a scatter plot
        auto : boolean
              true by default, if false the user manually
-       plot_kwargs : dict     
+       plot_kwargs : dict
 
        Returns
        -------
@@ -693,7 +693,7 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
         knee_point = find_knee(distances)
         mark = distances.index(knee_point)
         index = [i for i in range(len(distances))]
-            
+
         if auto == True:
             db = DBSCAN(eps=knee_point, min_samples=minpts)
             clusters = db.fit(ys.reshape(-1, 1))
@@ -706,8 +706,8 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
                 ax1.annotate("knee={}".format(knee_point), (mark, knee_point),
                         arrowprops=dict(facecolor='black', shrink=0.05))
                 plot_xy(index, distances,xlabel='Indices',ylabel='Distances',plot_kwargs=plot_knee_kwargs,ax=ax1)
-                
-        
+
+
         elif auto == False:
             plot_xy(index, distances, xlabel='Indices', ylabel='Distances',plot_kwargs=plot_knee_kwargs)
             eps = float(input('Enter the value for knee point'))
@@ -721,18 +721,18 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
             clusters = db.fit(ys.reshape(-1, 1))
             cluster_labels = clusters.labels_
             outliers = np.where(cluster_labels == -1)
-        
+
         if 'fig1' in locals():
             if 'path' in saveknee_settings:
                 savefig(fig1,saveknee_settings)
             else:
                 showfig(fig1)
-                
+
         if plot_outliers==True:
             x2 = ts[outliers]
             y2 = ys[outliers]
             plot_scatter_xy(ts,ys,x2,y2,figsize=figsize,xlabel='time',ylabel='value',savefig_settings=saveoutliers_settings,plot_kwargs=plot_outliers_kwargs)
-        
+
         return outliers
 
     except ValueError:
@@ -743,7 +743,7 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
             return a
         else:
             exit(1)
-            
+
 def remove_outliers(ts,ys,outlier_points):
     ''' Removes outliers from a timeseries
     Args
@@ -851,4 +851,3 @@ def preprocess(ys, ts, detrend=False, params=["default", 4, 0, 1],
         res = gauss(res)
 
     return res
-
