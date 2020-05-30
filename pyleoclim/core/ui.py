@@ -1175,7 +1175,7 @@ class MultipleSeries:
             new.series_list[idx]=s
         return new
 
-    def mssa(self, M, MC=1000, f=0.3):
+    def mssa(self, M, MC=0, f=0.5):
         data = []
         for val in self.series_list:
             data.append(val.value)
