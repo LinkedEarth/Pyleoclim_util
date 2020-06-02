@@ -114,12 +114,12 @@ def ar1_sim(y, n , p, t=None):
         # specify model parameters (statmodel want lag0 coefficent as unity)
         ar = np.r_[1, -g]  # AR model parameter
         ma = np.r_[1, 0.0]  # MA model parameters
-        sig_n = sig*np.sqrt(1-g**2)  # theoretical noise variance for Yr to achieve the same variance as y
+        sig_n = sig*np.sqrt(1-g**2)  # theoretical noise variance for the process to achieve the same variance as y
 
         # simulate AR(1) model for each column
         for i in np.arange(p):
-            Yr[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n)
-
+            #Yr[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n) # old statsmodels syntax
+            Yr[:, i] = sm.tsa.ArmaProcess(ar, ma).generate_sample(nsample=n, scale=sig_n, burnin=50) # statsmodels v0.11.1-?
     else:
         #  tau_est = ar1_fit(y, t=t, detrend=detrend, params=params)
         tau_est = ar1_fit(y, t=t)
@@ -150,12 +150,17 @@ def ar1_fit_evenly(y, t):
     '''
     #  pd_y = preprocess(y, t, detrend=detrend, params=params, gaussianize=gaussianize)
     #  ar1_mod = sm.tsa.AR(pd_y, missing='drop').fit(maxlag=1)
-    ar1_mod = sm.tsa.AR(y, missing='drop').fit(maxlag=1)
-    g = ar1_mod.params[1]
+    #ar1_mod = sm.tsa.AR(y, missing='drop').fit(maxlag=1)
+    #g = ar1_mod.params[1]
+
+    # syntax compatible with statsmodels v0.11.1
+    ar1_mod = sm.tsa.ARMA(y, (1, 0), missing='drop').fit(trend='nc', disp=0)
+    g = ar1_mod1.params[0]
 
     if g > 1:
-        print('Warning: AR(1) fitted autocorrelation greater than 1; setting to 1')
-        g = 1
+        print('Warning: AR(1) fitted autocorrelation greater than 1; setting to 1-eps^{1/4}')
+        eps = np.spacing(1.0)
+        g = 1.0 - eps**(1/4)
 
     return g
 

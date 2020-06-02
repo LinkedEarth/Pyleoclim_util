@@ -253,14 +253,14 @@ def ssa(y, M=None, MC=0, f=0.5):
 
     References:
     -----------
-    [1] Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
+    [1]_ Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
     dynamics, with applications to paleoclimatic time series, Physica D, 35,
     395–424.
 
-    [2] Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
+    [2]_ Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
     oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
 
-    [3] Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
+    [3]_ Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
     A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002),
     Advanced spectral methods for climatic time series, Rev. Geophys., 40(1),
     1003–1052, doi:10.1029/2000RG000092.
