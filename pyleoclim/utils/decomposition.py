@@ -322,16 +322,17 @@ def ssa(y, M=None, MC=0, f=0.5):
 
 
     if MC > 0: # If Monte-Carlo SSA is requested.
-        # NOTE: DO NOT ATTEMPT IF MISSING DATA. Use https://github.com/SMAC-Group/uAR1 instead.
+        # TODO: translate and use https://github.com/SMAC-Group/uAR1 here
 
         noise = ar1_sim(ys, N, MC)  # generate MC AR(1) surrogates of y
 
         eig_val_R = np.zeros((M, MC)) # define eigenvalue matrix
 
+        lgs = np.arange(-N + 1, N)
+
         for m in range(MC):
             xn, _ , _ = standardize(noise[:, m]) # collapse to unit variance
             Gn = np.correlate(xn, xn, "full")
-            lgs = np.arange(-N + 1, N)
             Gn = Gn / (N - abs(lgs))
             Cn = toeplitz(Gn[N - 1:N - 1 + M])
             eig_val_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eig_vec), Cn), eig_vec))

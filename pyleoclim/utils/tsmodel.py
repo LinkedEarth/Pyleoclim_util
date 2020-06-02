@@ -2,9 +2,9 @@
 '''
 
 import numpy as np
-import statmodels.api as sm
-from .tutils import is_evenly_spaced
-from .tutils import preprocess
+import statsmodels.api as sm
+from .tsutils import is_evenly_spaced
+#from .tsutils import preprocess   # no longer used here
 from scipy import optimize
 
 __all__ = [
@@ -137,29 +137,13 @@ def ar1_fit_evenly(y, t):
 
     Args
     ----
-
     y : array
         vector of (float) numbers as a time series
     t : array
-        The time axis for the timeseries. Necessary for use with the Savitzky-Golay filters method since the series should be evenly spaced.
-    detrend : string
-        'linear' - a linear least-squares fit to `y` is subtracted;
-        'constant' - the mean of `y` is subtracted
-        'savitzy-golay' - y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
-    gaussianize : bool
-        If True, gaussianizes the timeseries
-    standardize : bool
-        If True, standardizes the timeseries
+        The time axis for the timeseries.
 
     Returns
     -------
-
     g : float
         lag-1 autocorrelation coefficient
 
@@ -177,7 +161,7 @@ def ar1_fit_evenly(y, t):
 
 def tau_estimation(y, t):
 #  def tau_estimation(y, t, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
-    ''' Return the estimated persistence of a givenevenly/unevenly spaced time series.
+    ''' Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
     Args
     ----
@@ -186,20 +170,6 @@ def tau_estimation(y, t):
         a time series
     t : array
         time axis of the time series
-    detrend : string
-        'linear' - a linear least-squares fit to `y` is subtracted;
-        'constant' - the mean of `y` is subtracted
-        'savitzy-golay' - y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
-    gaussianize : bool
-        If True, gaussianizes the timeseries
-    standardize : bool
-        If True, standardizes the timeseries
 
     Returns
     -------
