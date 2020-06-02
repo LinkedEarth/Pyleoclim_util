@@ -130,7 +130,7 @@ def mssa(data, M, MC=1000, f=0.3):
     data : array
           multiple time series (dimension: length of time series x total number of time series)
     M : int
-       window size
+       window size (embedding dimension)
     MC : int
        Number of iteration in the Monte-Carlo process
     f : float
