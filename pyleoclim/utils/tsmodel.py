@@ -118,7 +118,7 @@ def ar1_sim(y, n , p, t=None):
 
         # simulate AR(1) model for each column
         for i in np.arange(p):
-            Yr[:, i] = sm.ta.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n)
+            Yr[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n)
 
     else:
         #  tau_est = ar1_fit(y, t=t, detrend=detrend, params=params)
@@ -149,8 +149,8 @@ def ar1_fit_evenly(y, t):
 
     '''
     #  pd_y = preprocess(y, t, detrend=detrend, params=params, gaussianize=gaussianize)
-    #  ar1_mod = sm.ta.AR(pd_y, missing='drop').fit(maxlag=1)
-    ar1_mod = sm.ta.AR(y, missing='drop').fit(maxlag=1)
+    #  ar1_mod = sm.tsa.AR(pd_y, missing='drop').fit(maxlag=1)
+    ar1_mod = sm.tsa.AR(y, missing='drop').fit(maxlag=1)
     g = ar1_mod.params[1]
 
     if g > 1:
