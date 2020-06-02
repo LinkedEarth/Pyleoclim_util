@@ -17,10 +17,9 @@ import numpy as np
 from sklearn.decomposition import PCA
 from .wavelet import preprocess
 from .tsutils import clean_ts, standardize
-from scipy.linalg import eigh
+from .tsmodels import ar1_sim
+from scipy.linalg import eigh, toeplitz
 from nitime import algorithms as alg
-from scipy.linalg import toeplitz
-
 
 #------
 #Main functions
