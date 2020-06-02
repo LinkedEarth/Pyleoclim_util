@@ -224,20 +224,21 @@ def mssa(data, M, MC=1000, f=0.3):
 
     return eig_val, eig_vec, eig_val95, eig_val05, PC, RC
 
-def ssa(X, M=None, MC=0, f=0.5):
-    '''Singular spectrum analysis for a time series X, using the method of [1] and
+def ssa(y, M=None, MC=0, f=0.5):
+    '''Singular spectrum analysis for a time series y, using the method of [1] and
     the formulation of [3]. Optionally (MC>0), the significance of eigenvalues
     is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [2].
 
     Args
     ----
 
-    X : array of length N
+    y : array of length N
           time series (evenly-spaced, possibly with with up to f*N NaNs)
     M : int
        window size (default: 10% of the length of the series)
     MC : int
-        Number of iteration in the Monte-Carlo process (default M=0, bypasses Monte Carlo SSA)
+        Number of iteration in the Monte-Carlo process (default MC=0, bypasses Monte Carlo SSA)
+        Note: currently only supported for evenly-spaced, gap-free data.
 
     Returns
     -------
@@ -267,16 +268,16 @@ def ssa(X, M=None, MC=0, f=0.5):
 
     '''
 
-    Xs, mu, _ = standardize(X)
+    ys, mu, _ = standardize(y)
 
-    N = len(X)
+    N = len(y)
 
     if not M:
         M=int(N/10)
     c = np.zeros(M)
 
     for j in range(M):
-        prod = Xs[0:N - j] * Xs[j:N]
+        prod = ys[0:N - j] * ys[j:N]
         c[j] = sum(prod[~np.isnan(prod)]) / (sum(~np.isnan(prod)) - 1)
 
 
@@ -295,7 +296,7 @@ def ssa(X, M=None, MC=0, f=0.5):
     for k in np.arange(M):
         for i in np.arange(0, N - M + 1):
             #   modify for nan
-            prod = Xs[i:i + M] * eig_vec[:, k]
+            prod = ys[i:i + M] * eig_vec[:, k]
             ngood = sum(~np.isnan(prod))
             #   must have at least m*f good points
             if ngood >= M * f:
@@ -315,24 +316,21 @@ def ssa(X, M=None, MC=0, f=0.5):
             RC[n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
 
     RC = RC + np.tile(mu, reps=[N, M])  # put the mean back in
-    # TODO: implement automatic truncation criteria.
 
-    if MC > 0:
-        # If Monte-Carlo SSA is requested. NOTE: DO NOT ATTEMPT IF MISSING DATA. Use https://github.com/SMAC-Group/uAR1 instead.
-        coefs_est, var_est = alg.AR_est_YW(Xs, 1)
-        sigma_est = np.sqrt(var_est)
+    # TODO: implement automatic truncation criteria: (1) Kaiser rule (2) significant MC-SSA modes
+    # and (3) variance % criterion (e.g. first K modes that explain at least 90% of the variance).
 
-        noise = np.zeros((N, MC))
-        noise[0, :] = Xs[0]
-        eig_val_R = np.zeros((M, MC))
 
-        for jt in range(1, N):
-            # TODO: update to proper AR simulation, e.g. with statsmodels
-            noise[jt, :] = coefs_est * noise[jt - 1, :] + sigma_est * np.random.randn(1, MC)
+    if MC > 0: # If Monte-Carlo SSA is requested.
+        # NOTE: DO NOT ATTEMPT IF MISSING DATA. Use https://github.com/SMAC-Group/uAR1 instead.
+
+        noise = ar1_sim(ys, N, MC)  # generate MC AR(1) surrogates of y
+
+        eig_val_R = np.zeros((M, MC)) # define eigenvalue matrix
 
         for m in range(MC):
-            noise[:, m] = (noise[:, m] - np.mean(noise[:, m])) / (np.std(noise[:, m], ddof=1))
-            Gn = np.correlate(noise[:, m], noise[:, m], "full")
+            xn, _ , _ = standardize(noise[:, m]) # collapse to unit variance
+            Gn = np.correlate(xn, xn, "full")
             lgs = np.arange(-N + 1, N)
             Gn = Gn / (N - abs(lgs))
             Cn = toeplitz(Gn[N - 1:N - 1 + M])
