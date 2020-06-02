@@ -22,6 +22,7 @@ from collections import namedtuple
 from copy import deepcopy
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
+from matplotlib import cm
 #from matplotlib.colors import BoundaryNorm, Normalize
 
 from tqdm import tqdm
@@ -812,7 +813,8 @@ class PSD:
 
 class Scalogram:
     def __init__(self, frequency, time, amplitude, coi=None, label=None, Neff=3, timeseries=None,
-                 wave_method=None, wave_args=None, signif_qs=None, signif_method=None):
+                 wave_method=None, wave_args=None, signif_qs=None, signif_method=None,
+                 period_unit=None, time_label=None):
         '''
         Args
         ----
@@ -837,6 +839,14 @@ class Scalogram:
         self.wave_args = wave_args
         self.signif_qs = signif_qs
         self.signif_method = signif_method
+        if period_unit is not None:
+            self.period_unit = period_unit
+        elif timeseries is not None:
+            self.period_unit = timeseries.time_unit
+        if time_label is not None:
+            self.time_label = time_label
+        elif timeseries is not None:
+            self.time_label = f'{timeseries.time_name}'
 
     def copy(self):
         return deepcopy(self)
@@ -851,7 +861,7 @@ class Scalogram:
         msg = print(tabulate(table, headers='keys'))
         return f'Dimension: {np.size(self.frequency)} x {np.size(self.time)}'
 
-    def plot(self, in_period=True, xlabel='Time', ylabel=None, title=None,
+    def plot(self, in_period=True, xlabel=None, ylabel=None, title=None,
              ylim=None, xlim=None, yticks=None, figsize=[10, 8], mute=False,
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              contourf_style={}, cbar_style={}, savefig_settings={}, ax=None):
@@ -881,7 +891,7 @@ class Scalogram:
         if in_period:
             y_axis = 1/self.frequency
             if ylabel is None:
-                ylabel = 'Period'
+                ylabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
 
             if yticks is None:
                 yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
@@ -890,7 +900,10 @@ class Scalogram:
         else:
             y_axis = self.frequency
             if ylabel is None:
-                ylabel = 'Frequency'
+                ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
+
+        if xlabel is None:
+            xlabel = self.time_label
 
         cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
         ax.set_yscale('log', nonposy='clip')
@@ -968,7 +981,9 @@ class Scalogram:
 
 
 class Coherence:
-    def __init__(self, frequency, time, coherence, phase, coi=None, timeseries1=None, timeseries2=None, signif_qs=None, signif_method=None):
+    def __init__(self, frequency, time, coherence, phase, coi=None,
+                 timeseries1=None, timeseries2=None, signif_qs=None, signif_method=None, Neff=3,
+                 period_unit=None, time_label=None):
         self.frequency = np.array(frequency)
         self.time = np.array(time)
         self.coherence = np.array(coherence)
@@ -981,11 +996,19 @@ class Coherence:
         self.timeseries2 = timeseries2
         self.signif_qs = signif_qs
         self.signif_method = signif_method
+        if period_unit is not None:
+            self.period_unit = period_unit
+        elif timeseries1 is not None:
+            self.period_unit = timeseries1.time_unit
+        if time_label is not None:
+            self.time_label = time_label
+        elif timeseries1 is not None:
+            self.time_label = f'{timeseries1.time_name}'
 
     def copy(self):
         return deepcopy(self)
 
-    def plot(self, xlabel='Time', ylabel='Period', title=None, figsize=[10, 8],
+    def plot(self, xlabel=None, ylabel=None, title=None, figsize=[10, 8],
              ylim=None, xlim=None, in_period=True, yticks=None, mute=False,
              contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, ax=None,
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
@@ -1013,7 +1036,7 @@ class Coherence:
         if in_period:
             y_axis = 1/self.frequency
             if ylabel is None:
-                ylabel = 'Period'
+                ylabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
 
             if yticks is None:
                 yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
@@ -1022,7 +1045,7 @@ class Coherence:
         else:
             y_axis = self.frequency
             if ylabel is None:
-                ylabel = 'Frequency'
+                ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
 
         # plot coherence amplitude
         contourf_args = {
@@ -1084,8 +1107,8 @@ class Coherence:
         ax.set_ylabel(ylabel)
 
         # plot phase
-        dt = np.max([int(np.median(np.diff(self.time))), 1])
-        phase_args = {'pt': 0.5, 'skip_x': 10*dt, 'skip_y': 5*dt, 'scale': 30, 'width': 0.004}
+        xaxis_range = np.max(self.time) - np.min(self.time)
+        phase_args = {'pt': 0.5, 'skip_x': int(xaxis_range//10), 'skip_y': int(np.max(y_axis)//50), 'scale': 30, 'width': 0.004}
         phase_args.update(phase_style)
 
         pt = phase_args['pt']
