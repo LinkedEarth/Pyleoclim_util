@@ -155,7 +155,7 @@ def ar1_fit_evenly(y, t):
 
     # syntax compatible with statsmodels v0.11.1
     ar1_mod = sm.tsa.ARMA(y, (1, 0), missing='drop').fit(trend='nc', disp=0)
-    g = ar1_mod1.params[0]
+    g = ar1_mod.params[0]
 
     if g > 1:
         print('Warning: AR(1) fitted autocorrelation greater than 1; setting to 1-eps^{1/4}')
