@@ -542,6 +542,37 @@ def set_style(style='journal', font_scale=1.5):
 
 def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
             savefig_settings=None, ax=None,  plot_kwargs=None, mute=False,color=None):
+    ''' Plot the timeseries
+      Args
+      ------
+      x : nested list
+        x values of individual  timeseries
+      y : nested list
+       y values of individual timeseries
+
+      figsize : list
+          a list of two integers indicating the figure size
+      xlabel : str
+          label for x-axis
+      ylabel : str
+          label for y-axis
+      title : str
+          the title for the figure
+
+      ax : pyplot.axis
+          the pyplot.axis object
+      
+      plot_kwargs : dict
+          the keyword arguments for ax.plot()
+      mute : bool
+          if True, the plot will not show;
+          recommend to turn on when more modifications are going to be made on ax
+      savefig_settings : dict
+          the dictionary of arguments for plt.savefig(); some notes below:
+          - "path" must be specified; it can be any existed or non-existed path,
+            with or without a suffix; if the suffix is not given in "path", it will follow "format"
+          - "format" can be one of {"pdf", "eps", "png", "ps"}
+      '''
 
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
     plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
