@@ -4,31 +4,31 @@
 import numpy as np
 import statsmodels.api as sm
 from .tsutils import is_evenly_spaced
-from .tsutils import preprocess
+#from .tsutils import preprocess   # no longer used here
 from scipy import optimize
 
 __all__ = [
     'ar1_sim',
 ]
 
-def ar1_model(ts, tau, n=None):
-    ''' Return a time series with the AR1 process
-
+def ar1_model(t, tau, n=None):
+    ''' Simulate a (possibly irregularly-sampled) AR(1) process with given decay
+        constant tau, à la REDFIT.
     Args
     ----
 
-    ts : array
+    t :  array
         time axis of the time series
     tau : float
         the averaged persistence
     n : int
-        the length of the AR1 process
+        the length of the AR(1) process
 
     Returns
     -------
 
-    r : array
-        the AR1 time series
+    y : array
+        the AR(1) time series
 
     References
     ----------
@@ -38,40 +38,30 @@ def ar1_model(ts, tau, n=None):
 
     '''
     if n is None:
-        n = np.size(ts)
+        n = np.size(t)
 
-    r = np.zeros(n)
+    y    = np.zeros(n)
+    y[0] = 0  # initializing
 
-    r[0] = 1
     for i in range(1, n):
-        scaled_dt = (ts[i] - ts[i-1]) / tau
+        scaled_dt = (t[i] - t[i-1]) / tau
         rho = np.exp(-scaled_dt)
         err = np.random.normal(0, np.sqrt(1 - rho**2), 1)
-        r[i] = r[i-1]*rho + err
+        y[i] = y[i-1]*rho + err
 
-    return r
+    return y
 
-#  def ar1_fit(ys, ts=None, detrend= None, params=["default", 4, 0, 1]):
-def ar1_fit(ys, ts=None):
-    ''' Returns the lag-1 autocorrelation from ar1 fit OR persistence from tauest.
+#  def ar1_fit(y, t=None, detrend= None, params=["default", 4, 0, 1]):
+def ar1_fit(y, t=None):
+    ''' Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
 
     Args
     ----
 
-    ys : array
+    y : array
         the time series
-    ts : array
+    t : array
         the time axis of that series
-    detrend : string
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
 
     Returns
     -------
@@ -81,145 +71,110 @@ def ar1_fit(ys, ts=None):
         OR estimated persistence (for unevenly-spaced time series)
     '''
 
-    if is_evenly_spaced(ts):
-        #  g = ar1_fit_evenly(ys, ts, detrend=detrend, params=params)
-        g = ar1_fit_evenly(ys, ts)
+    if is_evenly_spaced(t):
+        #  g = ar1_fit_evenly(y, t, detrend=detrend, params=params)
+        g = ar1_fit_evenly(y, t)
     else:
-        #  g = tau_estimation(ys, ts, detrend=detrend, params=params)
-        g = tau_estimation(ys, ts)
+        #  g = tau_estimation(y, t, detrend=detrend, params=params)
+        g = tau_estimation(y, t)
 
     return g
 
-def ar1_sim(ys, n, p, ts=None):
-#  def ar1_sim(ys, n, p, ts=None, detrend=False, params=["default", 4, 0, 1]):
-    ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g calculated from `ys` and `ts`
+def ar1_sim(y, n , p, t=None):
+#  def ar1_sim(y, n, p, t=None, detrend=False, params=["default", 4, 0, 1]):
+    ''' Produce p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from `y` and (if provided) `t`
 
     Args
     ----
 
-    ys : array
+    y : array
         a time series
     n : int
-        row dimensions
+        row dimension  (number of samples)
     p : int
-        column dimensions
-    ts : array
-        the time axis of that series
-    detrend : string
-        None - the original time series is assumed to have no trend;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+        column dimension (number of surrogates)
+    t : array
+        the time axis of the series
 
     Returns
     -------
 
-    red : array
-        n rows by p columns matrix of an AR1 process
+    Yr : array
+        n by p matrix of simulated AR(1) vector
 
     '''
-    red = np.empty(shape=(n, p))  # declare array
 
-    if is_evenly_spaced(ts):
-        #  g = ar1_fit(ys, ts=ts, detrend=detrend, params=params)
-        g = ar1_fit(ys, ts=ts)
-        sig = np.std(ys)
+    Yr = np.empty(shape=(n, p))  # declare array
 
-        # specify model parameters (statsmodel wants lag0 coefficents as unity)
+    if is_evenly_spaced(t):
+        #  g = ar1_fit(y, t=t, detrend=detrend, params=params)
+        g = ar1_fit(y, t=t)
+        sig = np.std(y)
+
+        # specify model parameters (statmodel want lag0 coefficent as unity)
         ar = np.r_[1, -g]  # AR model parameter
         ma = np.r_[1, 0.0]  # MA model parameters
-        sig_n = sig*np.sqrt(1-g**2)  # theoretical noise variance for red to achieve the same variance as ys
+        sig_n = sig*np.sqrt(1-g**2)  # theoretical noise variance for the process to achieve the same variance as y
 
         # simulate AR(1) model for each column
         for i in np.arange(p):
-            red[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n)
-
+            #Yr[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n) # old statsmodels syntax
+            Yr[:, i] = sm.tsa.ArmaProcess(ar, ma).generate_sample(nsample=n, scale=sig_n, burnin=50) # statsmodels v0.11.1-?
     else:
-        #  tau_est = ar1_fit(ys, ts=ts, detrend=detrend, params=params)
-        tau_est = ar1_fit(ys, ts=ts)
+        #  tau_est = ar1_fit(y, t=t, detrend=detrend, params=params)
+        tau_est = ar1_fit(y, t=t)
         for i in np.arange(p):
-            red[:, i] = ar1_model(ts, tau_est, n=n)
+            Yr[:, i] = ar1_model(t, tau_est, n=n)
 
     if p == 1:
-        red = red[:, 0]
+        Yr = Yr[:, 0]
 
-    return red
+    return Yr
 
-def ar1_fit_evenly(ys, ts):
-#  def ar1_fit_evenly(ys, ts, detrend=False, params=["default", 4, 0, 1], gaussianize=False):
-    ''' Returns the lag-1 autocorrelation from ar1 fit.
+def ar1_fit_evenly(y, t):
+#  def ar1_fit_evenly(y, t, detrend=False, params=["default", 4, 0, 1], gaussianize=False):
+    ''' Returns the lag-1 autocorrelation from AR(1) fit.
 
     Args
     ----
-
-    ys : array
+    y : array
         vector of (float) numbers as a time series
-    ts : array
-        The time axis for the timeseries. Necessary for use with the Savitzky-Golay filters method since the series should be evenly spaced.
-    detrend : string
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
-    gaussianize : bool
-        If True, gaussianizes the timeseries
-    standardize : bool
-        If True, standardizes the timeseries
+    t : array
+        The time axis for the timeseries.
 
     Returns
     -------
-
     g : float
         lag-1 autocorrelation coefficient
 
     '''
-    #  pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize)
-    #  ar1_mod = sm.tsa.AR(pd_ys, missing='drop').fit(maxlag=1)
-    ar1_mod = sm.tsa.AR(ys, missing='drop').fit(maxlag=1)
-    g = ar1_mod.params[1]
+    #  pd_y = preprocess(y, t, detrend=detrend, params=params, gaussianize=gaussianize)
+    #  ar1_mod = sm.tsa.AR(pd_y, missing='drop').fit(maxlag=1)
+    #ar1_mod = sm.tsa.AR(y, missing='drop').fit(maxlag=1)
+    #g = ar1_mod.params[1]
+
+    # syntax compatible with statsmodels v0.11.1
+    ar1_mod = sm.tsa.ARMA(y, (1, 0), missing='drop').fit(trend='nc', disp=0)
+    g = ar1_mod.params[0]
 
     if g > 1:
-        print('Warning: AR(1) fitted autocorrelation greater than 1; setting to 1')
-        g = 1
+        print('Warning: AR(1) fitted autocorrelation greater than 1; setting to 1-eps^{1/4}')
+        eps = np.spacing(1.0)
+        g = 1.0 - eps**(1/4)
 
     return g
 
-def tau_estimation(ys, ts):
-#  def tau_estimation(ys, ts, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
-    ''' Return the estimated persistence of a givenevenly/unevenly spaced time series.
+def tau_estimation(y, t):
+#  def tau_estimation(y, t, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
+    ''' Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
     Args
     ----
 
-    ys : array
+    y : array
         a time series
-    ts : array
+    t : array
         time axis of the time series
-    detrend : string
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
-    gaussianize : bool
-        If True, gaussianizes the timeseries
-    standardize : bool
-        If True, standardizes the timeseries
 
     Returns
     -------
@@ -234,13 +189,13 @@ def tau_estimation(ys, ts):
         Comput. Geosci. 28, 69–72 (2002).
 
     '''
-    #  pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
-    dt = np.diff(ts)
-    #  assert dt > 0, "The time points should be increasing!"
+    #  pd_y = preprocess(y, t, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
+    dt = np.diff(t)
+    #  assert dt > 0, "The time point should be increasing!"
 
     def ar1_fun(a):
-        #  return np.sum((pd_ys[1:] - pd_ys[:-1]*a**dt)**2)
-        return np.sum((ys[1:] - ys[:-1]*a**dt)**2)
+        #  return np.sum((pd_y[1:] - pd_y[:-1]*a**dt)**2)
+        return np.sum((y[1:] - y[:-1]*a**dt)**2)
 
     a_est = optimize.minimize_scalar(ar1_fun, bounds=[0, 1], method='bounded').x
     #  a_est = optimize.minimize_scalar(ar1_fun, method='brent').x
@@ -248,4 +203,3 @@ def tau_estimation(ys, ts):
     tau_est = -1 / np.log(a_est)
 
     return tau_est
-

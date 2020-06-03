@@ -17,10 +17,9 @@ import numpy as np
 from sklearn.decomposition import PCA
 from .wavelet import preprocess
 from .tsutils import clean_ts, standardize
-from scipy.linalg import eigh
+from .tsmodel import ar1_sim
+from scipy.linalg import eigh, toeplitz
 from nitime import algorithms as alg
-from scipy.linalg import toeplitz
-
 
 #------
 #Main functions
@@ -131,7 +130,7 @@ def mssa(data, M, MC=1000, f=0.3):
     data : array
           multiple time series (dimension: length of time series x total number of time series)
     M : int
-       window size
+       window size (embedding dimension)
     MC : int
        Number of iteration in the Monte-Carlo process
     f : float
@@ -224,20 +223,21 @@ def mssa(data, M, MC=1000, f=0.3):
 
     return eig_val, eig_vec, eig_val95, eig_val05, PC, RC
 
-def ssa(X, M=None, MC=0, f=0.5):
-    '''Singular spectrum analysis for a time series X, using the method of [1] and
+def ssa(y, M=None, MC=0, f=0.5):
+    '''Singular spectrum analysis for a time series y, using the method of [1] and
     the formulation of [3]. Optionally (MC>0), the significance of eigenvalues
     is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [2].
 
     Args
     ----
 
-    X : array of length N
+    y : array of length N
           time series (evenly-spaced, possibly with with up to f*N NaNs)
     M : int
        window size (default: 10% of the length of the series)
     MC : int
-        Number of iteration in the Monte-Carlo process (default M=0, bypasses Monte Carlo SSA)
+        Number of iteration in the Monte-Carlo process (default MC=0, bypasses Monte Carlo SSA)
+        Note: currently only supported for evenly-spaced, gap-free data.
 
     Returns
     -------
@@ -253,30 +253,30 @@ def ssa(X, M=None, MC=0, f=0.5):
 
     References:
     -----------
-    [1] Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
+    [1]_ Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
     dynamics, with applications to paleoclimatic time series, Physica D, 35,
     395–424.
 
-    [2] Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
+    [2]_ Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
     oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
 
-    [3] Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
+    [3]_ Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
     A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002),
     Advanced spectral methods for climatic time series, Rev. Geophys., 40(1),
     1003–1052, doi:10.1029/2000RG000092.
 
     '''
 
-    Xs, mu, _ = standardize(X)
+    ys, mu, _ = standardize(y)
 
-    N = len(X)
+    N = len(y)
 
     if not M:
         M=int(N/10)
     c = np.zeros(M)
 
     for j in range(M):
-        prod = Xs[0:N - j] * Xs[j:N]
+        prod = ys[0:N - j] * ys[j:N]
         c[j] = sum(prod[~np.isnan(prod)]) / (sum(~np.isnan(prod)) - 1)
 
 
@@ -295,7 +295,7 @@ def ssa(X, M=None, MC=0, f=0.5):
     for k in np.arange(M):
         for i in np.arange(0, N - M + 1):
             #   modify for nan
-            prod = Xs[i:i + M] * eig_vec[:, k]
+            prod = ys[i:i + M] * eig_vec[:, k]
             ngood = sum(~np.isnan(prod))
             #   must have at least m*f good points
             if ngood >= M * f:
@@ -315,25 +315,23 @@ def ssa(X, M=None, MC=0, f=0.5):
             RC[n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
 
     RC = RC + np.tile(mu, reps=[N, M])  # put the mean back in
-    # TODO: implement automatic truncation criteria.
 
-    if MC > 0:
-        # If Monte-Carlo SSA is requested. NOTE: DO NOT ATTEMPT IF MISSING DATA. Use https://github.com/SMAC-Group/uAR1 instead.
-        coefs_est, var_est = alg.AR_est_YW(Xs, 1)
-        sigma_est = np.sqrt(var_est)
+    # TODO: implement automatic truncation criteria: (1) Kaiser rule (2) significant MC-SSA modes
+    # and (3) variance % criterion (e.g. first K modes that explain at least 90% of the variance).
 
-        noise = np.zeros((N, MC))
-        noise[0, :] = Xs[0]
-        eig_val_R = np.zeros((M, MC))
 
-        for jt in range(1, N):
-            # TODO: update to proper AR simulation, e.g. with statsmodels
-            noise[jt, :] = coefs_est * noise[jt - 1, :] + sigma_est * np.random.randn(1, MC)
+    if MC > 0: # If Monte-Carlo SSA is requested.
+        # TODO: translate and use https://github.com/SMAC-Group/uAR1 here
+
+        noise = ar1_sim(ys, n=N, p=MC)  # generate MC AR(1) surrogates of y
+
+        eig_val_R = np.zeros((M, MC)) # define eigenvalue matrix
+
+        lgs = np.arange(-N + 1, N)
 
         for m in range(MC):
-            noise[:, m] = (noise[:, m] - np.mean(noise[:, m])) / (np.std(noise[:, m], ddof=1))
-            Gn = np.correlate(noise[:, m], noise[:, m], "full")
-            lgs = np.arange(-N + 1, N)
+            xn, _ , _ = standardize(noise[:, m]) # center and standardize
+            Gn = np.correlate(xn, xn, "full")
             Gn = Gn / (N - abs(lgs))
             Cn = toeplitz(Gn[N - 1:N - 1 + M])
             eig_val_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eig_vec), Cn), eig_vec))
