@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
 import seaborn as sns
+import matplotlib.pylab as pl
+import numpy as np
 
 
 def plot_ens(ageEns, y, ens=None, color='r', alpha=0.005, x_label=None,
@@ -537,3 +539,61 @@ def set_style(style='journal', font_scale=1.5):
 
     for d in [style_dict, font_dict]:
         mpl.rcParams.update(d)
+
+def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
+            savefig_settings=None, ax=None,  plot_kwargs=None, mute=False,color=None):
+
+    savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+    plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+    
+
+    
+    min_x = min([a for i in x for a in i])
+    max_x = max([a for i in x for a in i])
+
+    if ax is None:
+        fig, ax = plt.subplots(len(x),1,figsize=figsize,sharex=True)
+
+
+    fig.subplots_adjust(hspace=0.0001)
+    for i in range(len(x)):
+        c = color[i]
+
+        ax[i].plot(x[i], y[i], color=c)
+
+        ax[i].set_xlim(0, max_x)
+        # ax[i].set_xticks(np.arange(min_x,max_x))
+        if xlabel is None:
+            ax[i].set_xlabel('time')
+        if ylabel is None:
+            ax[i].set_ylabel('Series {}'.format(i + 1))
+        if i % 2 == 0:
+            ax[i].yaxis.set_label_position("right")
+            ax[i].yaxis.tick_right()
+
+        ax[i].spines['top'].set_visible(False)
+        ax[i].spines['bottom'].set_visible(False)
+
+        ax[i].tick_params(axis='y', colors=c)
+        ax[i].yaxis.label.set_color(c)
+
+        ax[i].tick_params(axis='both', which='major', labelsize=12)
+
+
+    if 'fig' in locals():
+        if 'path' in savefig_settings:
+            savefig(fig, savefig_settings)
+        else:
+            if not mute:
+                showfig(fig)
+        return fig, ax
+    else:
+        return ax
+
+
+
+
+
+
+
+

@@ -23,6 +23,7 @@ from copy import deepcopy
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 from matplotlib import cm
+import matplotlib.pylab as pl
 #from matplotlib.colors import BoundaryNorm, Normalize
 
 from tqdm import tqdm
@@ -1296,6 +1297,23 @@ class MultipleSeries:
         else:
             return ax
 
+    def stackplot(self, figsize=[10, 4],
+              color=None, xlabel=None,
+             ylabel=None, title=None,
+             plot_kwargs=None,savefig_settings=None,
+             ax=None, mute=False):
+
+
+        x = []
+        y = []
+        for s in self.series_list:
+            x.append(s.time)
+            y.append(s.value)
+        color = pl.cm.jet(np.linspace(0.3, 1, len(x)))
+        fig,ax = plotting.stackplot(x,y,figsize=figsize,color=color,xlabel=xlabel,
+                                    ylabel=ylabel,title=title,plot_kwargs=plot_kwargs,
+                                    savefig_settings=savefig_settings,ax=ax,mute=mute)
+        return fig,ax
 
 class SurrogateSeries(MultipleSeries):
     def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
