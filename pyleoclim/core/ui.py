@@ -1108,8 +1108,9 @@ class Coherence:
         ax.set_ylabel(ylabel)
 
         # plot phase
+        yaxis_range = np.max(y_axis) - np.min(y_axis)
         xaxis_range = np.max(self.time) - np.min(self.time)
-        phase_args = {'pt': 0.5, 'skip_x': int(xaxis_range//10), 'skip_y': int(np.max(y_axis)//50), 'scale': 30, 'width': 0.004}
+        phase_args = {'pt': 0.5, 'skip_x': int(xaxis_range//10), 'skip_y': int(yaxis_range//50), 'scale': 30, 'width': 0.004}
         phase_args.update(phase_style)
 
         pt = phase_args['pt']
