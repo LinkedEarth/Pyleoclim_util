@@ -424,7 +424,7 @@ def savefig(fig, settings={}, verbose=True):
         print(f'Figure saved at: "{str(path)}"')
 
 
-def set_style(style='journal', font_scale=1.5):
+def set_style(style='journal', font_scale=1.0):
     ''' Modify the visualization style; inspired by [Seaborn](https://github.com/mwaskom/seaborn)
     '''
     mpl.rcParams.update(mpl.rcParamsDefault)
@@ -507,7 +507,10 @@ def set_style(style='journal', font_scale=1.5):
             'xtick.minor.width': 0,
             'ytick.minor.width': 0,
         })
-    elif 'matplotlib' in style:
+    elif 'matplotlib' in style or 'default' in style:
+        mpl.rcParams.update(mpl.rcParamsDefault)
+    else:
+        print(f'Style [{style}] not availabel! Setting to `matplotlib` ...')
         mpl.rcParams.update(mpl.rcParamsDefault)
 
     if '_spines' in style:
