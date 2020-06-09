@@ -546,9 +546,9 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
       Args
       ------
       x : nested list
-        x values of individual  timeseries
+        x values of individual timeseries
       y : nested list
-       y values of individual timeseries
+        y values of individual timeseries
 
       figsize : list
           a list of two integers indicating the figure size
@@ -561,7 +561,7 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 
       ax : pyplot.axis
           the pyplot.axis object
-      
+
       plot_kwargs : dict
           the keyword arguments for ax.plot()
       mute : bool
@@ -572,6 +572,8 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
           - "path" must be specified; it can be any existed or non-existed path,
             with or without a suffix; if the suffix is not given in "path", it will follow "format"
           - "format" can be one of {"pdf", "eps", "png", "ps"}
+      color : list
+             list of colors chosen from a particular coloring scheme  with the same size as the multiple series to distinguish different series
       '''
 
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -581,6 +583,7 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     
     min_x = min([a for i in x for a in i])
     max_x = max([a for i in x for a in i])
+    set_style('journal_spines')
 
     if ax is None:
         fig, ax = plt.subplots(len(x),1,figsize=figsize,sharex=True)
@@ -588,25 +591,32 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 
     fig.subplots_adjust(hspace=0.0001)
     for i in range(len(x)):
-        c = color[i]
+        if color is not None:
 
-        ax[i].plot(x[i], y[i], color=c)
+            ax[i].plot(x[i], y[i], color=color[i])
+        else:
+            ax[i].plot(x[i], y[i])
+
 
         ax[i].set_xlim(0, max_x)
         # ax[i].set_xticks(np.arange(min_x,max_x))
         if xlabel is None:
-            ax[i].set_xlabel('time')
+            ax[i].set_xlabel('Time')
         if ylabel is None:
             ax[i].set_ylabel('Series {}'.format(i + 1))
-        if i % 2 == 0:
+        if i % 2 == 1:
             ax[i].yaxis.set_label_position("right")
             ax[i].yaxis.tick_right()
 
+            ax[i].spines['left'].set_visible(False)
+        else:
+            ax[i].spines['right'].set_visible(False)
         ax[i].spines['top'].set_visible(False)
-        ax[i].spines['bottom'].set_visible(False)
-
-        ax[i].tick_params(axis='y', colors=c)
-        ax[i].yaxis.label.set_color(c)
+        if i!=len(x)-1:
+            ax[i].spines['bottom'].set_visible(False)
+        if color is not None:
+            ax[i].tick_params(axis='y', colors=color[i])
+            ax[i].yaxis.label.set_color(color[i])
 
         ax[i].tick_params(axis='both', which='major', labelsize=12)
 
