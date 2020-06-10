@@ -514,13 +514,21 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, settings=None):
+    def correlation(self, target_series, timespan=None, settings=None):
         ''' Perform correlation analysis with the target timeseries
         '''
         settings = {} if settings is None else settings.copy()
         args = {}
         args.update(settings)
-        r, signif, p = corrutils.corr_sig(self.value, target_series.value, **args)
+
+        if timespan is None:
+            value1 = self.value
+            value2 = target_series.value
+        else:
+            value1 = self.slice(timespan).value
+            value2 = target_series.slice(timespan).value
+
+        r, signif, p = corrutils.corr_sig(value1, value2, **args)
         corr_res = {
             'r': r,
             'signif': signif,
@@ -544,7 +552,7 @@ class Series:
             'ar1': tsmodel.ar1_sim,
         }
         args = {}
-        args['ar1'] = {'ts': self.time}
+        args['ar1'] = {'t': self.time}
         args[method].update(settings)
 
         if length is None:
