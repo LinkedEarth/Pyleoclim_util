@@ -3,7 +3,10 @@
 
 import numpy as np
 import statsmodels.api as sm
-from .tsutils import is_evenly_spaced
+from .tsutils import (
+    is_evenly_spaced,
+    clean_ts,
+)
 #from .tsutils import preprocess   # no longer used here
 from scipy import optimize
 
@@ -103,6 +106,8 @@ def ar1_sim(y, n , p, t=None):
         n by p matrix of simulated AR(1) vector
 
     '''
+    if t is not None:
+        y, t = clean_ts(y, t)
 
     Yr = np.empty(shape=(n, p))  # declare array
 
