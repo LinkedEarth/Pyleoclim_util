@@ -39,7 +39,7 @@ def dict2namedtuple(d):
     return tupletype(**d)
 
 class Series:
-    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None):
+    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True):
         """Create a pyleoSeries object
 
         Args
@@ -68,9 +68,15 @@ class Series:
 
         label : string
             Name of the time series (e.g., 'Nino 3.4')
+
+        clean_ts : bool
+            remove the NaNs and let the time axis to be increasing if True
         """
-        self.time = np.array(time)
-        self.value = np.array(value)
+        if clean_ts:
+            value, time = tsutils.clean_ts(np.array(value), np.array(time))
+
+        self.time = time
+        self.value = value
         self.time_name = time_name
         self.time_unit = time_unit
         self.value_name = value_name
