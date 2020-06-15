@@ -1173,6 +1173,7 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
     res = Results(amplitude=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
 
     return res
+
 def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau=None, freq=None, freq_method='log', freq_kwargs=None,
         c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False,
@@ -1244,13 +1245,14 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau = np.linspace(lb, ub, np.size(inside)//10)
         print(f'Setting tau={tau[:3]}...{tau[-3:]}, ntau={np.size(tau)}')
 
-    if freq is None:
-        freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        freq = make_freq_vector(ts_cut, method=freq_method, **freq_kwargs)
-        print(f'Setting freq={freq[:3]}...{freq[-3:]}, nfreq={np.size(freq)}')
-
     ys1_cut, ts1_cut, freq1, tau1 = prepare_wwz(ys1, ts1, freq=freq, tau=tau)
     ys2_cut, ts2_cut, freq2, tau2 = prepare_wwz(ys2, ts2, freq=freq, tau=tau)
+
+    if freq is None:
+        freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+        freq = make_freq_vector(ts1_cut, method=freq_method, **freq_kwargs)
+        print(f'Setting freq={freq[:3]}...{freq[-3:]}, nfreq={np.size(freq)}')
+
 
     if np.any(tau1 != tau2):
         print('inconsistent `tau`, recalculating...')

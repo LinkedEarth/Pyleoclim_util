@@ -547,6 +547,8 @@ class Series:
         return causal_res
 
     def surrogates(self, method='ar1', number=1, length=None, seed=None, settings=None):
+        ''' Generate surrogates with increasing time axis
+        '''
         settings = {} if settings is None else settings.copy()
         surrogate_func = {
             'ar1': tsmodel.ar1_sim,
@@ -567,7 +569,7 @@ class Series:
 
         s_list = []
         for s in surr_res.T:
-            s_tmp = Series(time=self.time, value=s, time_name=self.time_name, time_unit=self.time_unit, value_name=self.value_name, value_unit=self.value_unit)
+            s_tmp = Series(time=np.sort(self.time), value=s, time_name=self.time_name, time_unit=self.time_unit, value_name=self.value_name, value_unit=self.value_unit)
             s_list.append(s_tmp)
 
         surr = SurrogateSeries(series_list=s_list, surrogate_method=method, surrogate_args=args[method])
