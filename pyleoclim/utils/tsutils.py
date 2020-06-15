@@ -571,11 +571,7 @@ def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
         # Check whether the timeseries is unvenly-spaced and interpolate if needed
         if len(np.unique(np.diff(x)))>1:
             warnings.warn("Timeseries is not evenly-spaced, interpolating...")
-            interp_step = np.nanmean(np.diff(x))
-            start = np.nanmin(x)
-            end = np.nanmax(x)
-            x_interp, y_interp = interp(x,y,interp_step=interp_step,\
-                                             start=start,end=end)
+            x_interp, y_interp = interp(x,y,bounds_error=False,fill_value='extrapolate')
         else:
             x_interp = x
             y_interp = y
