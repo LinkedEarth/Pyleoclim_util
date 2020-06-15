@@ -557,19 +557,16 @@ class Series:
         args['ar1'] = {'t': self.time}
         args[method].update(settings)
 
-        if length is None:
-            length = np.size(self.value)
-
         if seed is not None:
             np.random.seed(seed)
 
-        surr_res = surrogate_func[method](self.value, length, number, **args[method])
+        surr_res = surrogate_func[method](self.value, number, **args[method])
         if len(np.shape(surr_res)) == 1:
             surr_res = surr_res[:, np.newaxis]
 
         s_list = []
         for s in surr_res.T:
-            s_tmp = Series(time=np.sort(self.time), value=s, time_name=self.time_name, time_unit=self.time_unit, value_name=self.value_name, value_unit=self.value_unit)
+            s_tmp = Series(time=self.time, value=s, time_name=self.time_name, time_unit=self.time_unit, value_name=self.value_name, value_unit=self.value_unit)
             s_list.append(s_tmp)
 
         surr = SurrogateSeries(series_list=s_list, surrogate_method=method, surrogate_args=args[method])

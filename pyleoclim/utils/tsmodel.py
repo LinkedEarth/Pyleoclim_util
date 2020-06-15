@@ -14,7 +14,7 @@ __all__ = [
     'ar1_sim',
 ]
 
-def ar1_model(t, tau, n=None):
+def ar1_model(t, tau):
     ''' Simulate a (possibly irregularly-sampled) AR(1) process with given decay
         constant tau, à la REDFIT.
     Args
@@ -24,8 +24,6 @@ def ar1_model(t, tau, n=None):
         time axis of the time series
     tau : float
         the averaged persistence
-    n : int
-        the length of the AR(1) process
 
     Returns
     -------
@@ -40,9 +38,7 @@ def ar1_model(t, tau, n=None):
         paleoclimatic time series. Computers & Geosciences 28, 421–426 (2002).
 
     '''
-    if n is None:
-        n = np.size(t)
-
+    n = np.size(t)
     y    = np.zeros(n)
     y[0] = 0  # initializing
 
@@ -83,17 +79,14 @@ def ar1_fit(y, t=None):
 
     return g
 
-def ar1_sim(y, n , p, t=None):
-#  def ar1_sim(y, n, p, t=None, detrend=False, params=["default", 4, 0, 1]):
+def ar1_sim(y, p, t=None):
     ''' Produce p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from `y` and (if provided) `t`
 
     Args
     ----
 
     y : array
-        a time series
-    n : int
-        row dimension  (number of samples)
+        a time series; NaNs not allowed
     p : int
         column dimension (number of surrogates)
     t : array
@@ -106,9 +99,7 @@ def ar1_sim(y, n , p, t=None):
         n by p matrix of simulated AR(1) vector
 
     '''
-    if t is not None:
-        y, t = clean_ts(y, t)
-
+    n = np.size(y)
     Yr = np.empty(shape=(n, p))  # declare array
 
     if is_evenly_spaced(t):
@@ -129,7 +120,7 @@ def ar1_sim(y, n , p, t=None):
         #  tau_est = ar1_fit(y, t=t, detrend=detrend, params=params)
         tau_est = ar1_fit(y, t=t)
         for i in np.arange(p):
-            Yr[:, i] = ar1_model(t, tau_est, n=n)
+            Yr[:, i] = ar1_model(t, tau_est)
 
     if p == 1:
         Yr = Yr[:, 0]
