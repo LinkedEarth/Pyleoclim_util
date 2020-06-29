@@ -20,5 +20,6 @@ __all__=[
     'Lipd',
     'LipdSeries',
     'MultipleSeries',
-    'SurrogateSeries'
+    'SurrogateSeries',
+    'MultipleScalogram'
 ]
