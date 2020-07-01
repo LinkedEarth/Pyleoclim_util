@@ -13,6 +13,8 @@ from scipy import signal
 import nitime.algorithms as nialg
 import collections
 
+from scipy.stats.mstats import mquantiles
+
 __all__ = [
     'wwz_psd',
     'mtm',
@@ -24,6 +26,7 @@ __all__ = [
 from .tsutils import (
     is_evenly_spaced,
     preprocess,
+    clean_ts
 )
 
 from .wavelet import (
@@ -43,75 +46,119 @@ from .tsutils import clean_ts, interp, bin_values
 #---------
 
 
-def welch(ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
-    '''
+def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None, 
+           return_onesided=True, detrend = None, params=["default", 4, 0, 1],
+           gaussianize=False, standardize=False,
+           scaling='density', average='mean'):
+    '''Estimate power spectral density using Welch's method
+    
+    Wrapper for the function implemented in scipy.signal. 
+    See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html for details.
+    
+    Welch's method [1] is an approach for spectral density estimation. It computes an estimate of the power spectral density by dividing the data into overlapping segments, computing a modified periodogram for each segment and averaging the periodograms.
+    
     Args
     ----
 
     ys : array
         a time series
-    ts  array
+    ts : array
         time axis of the time series
-    ana_args : dict
-        the arguments for spectral analysis with periodogram, including
-        - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
-        - nfft (int): length of the FFT used. If None the length of x will be used.
-        - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
-        - nperseg (int): Length of each segment. Defaults to None, but if window is str or tuple, is set to 256, and if window is array_like, is set to the length of the window.
-        - noverlap (int): Number of points to overlap between segments. If None, noverlap = nperseg // 2. Defaults to None.
-        - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
-        - axis (int):     Axis along which the periodogram is computed; the default is over the last axis (i.e. axis=-1).
-        - average : { ‘mean’, ‘median’ }, optional
-        see https://docs.scipy.org/doc/scipy-1.2.1/reference/generated/scipy.signal.welch.html for details
-    interp_method : string
-        {'interp', 'bin'}): perform interpolation or binning
-    interp_args : dict
-        the arguments for the interpolation or binning methods, for the details, check interp() and binvalues()
-    prep_args : dict
-        the arguments for preprocess, including
-        - detrend (str): 'none' - the original time series is assumed to have no trend;
-                         'linear' - a linear least-squares fit to `ys` is subtracted;
-                         'constant' - the mean of `ys` is subtracted
-                         'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                             filters and the resulting filtered series is subtracted from y.
-                         'hht' - detrending with Hilbert-Huang Transform
-        - params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                         corresponds to the window size (default it set to half of the data)
-                         while the second parameter correspond to the order of the filter
-                         (default is 4). The third parameter is the order of the derivative
-                         (the default is zero, which means only smoothing.)
-        - gaussianize (bool): If True, gaussianizes the timeseries
-        - standardize (bool): If True, standardizes the timeseries
-
+    window : string or tuple
+        Desired window to use. Possible values:
+            - boxcar 
+            - triang
+            - blackman
+            - hamming
+            - hann (default)
+            - bartlett
+            - flattop
+            - parzen
+            - bohman
+            - blackmanharris
+            - nuttail
+            - barthann
+            - kaiser (needs beta)
+            - gaussian (needs standard deviation)
+            - general_gaussian (needs power, width)
+            - slepian (needs width)
+            - dpss (needs normalized half-bandwidth)
+            - chebwin (needs attenuation)
+            - exponential (needs decay scale)
+            - tukey (needs taper fraction)
+        If the window requires no parameters, then window can be a string.
+        If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.
+        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.      
+      nperseg : int
+          Length of each segment. If none, npersef=len(ys)/2. Default to None This will give three segments with 50% overlap
+      noverlap : int
+          Number of points to overlap. If None, noverlap=nperseg//2. Defaults to None, represents 50% overlap
+      nfft: int
+          Length of the FFT used, if a zero padded FFT is desired. If None, the FFT length is nperseg
+      return_onesided : bool
+          If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Defaults to True, but for complex data, a two-sided spectrum is always returned.
+      detrend : str
+          If None, no detrending is applied. Available detrending methods:
+              - None - no detrending will be applied (default);
+              - linear - a linear least-squares fit to `ys` is subtracted;
+              - constant - the mean of `ys` is subtracted
+              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+              - emd - Empirical mode decomposition
+      params : list
+          The paramters for the Savitzky-Golay filters. The first parameter
+          corresponds to the window size (default it set to half of the data)
+          while the second parameter correspond to the order of the filter
+          (default is 4). The third parameter is the order of the derivative
+          (the default is zero, which means only smoothing.)
+      gaussianize : bool
+          If True, gaussianizes the timeseries
+      standardize : bool
+          If True, standardizes the timeseries
+      scaling : {"density,"spectrum}
+          Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density'
+      average : {'mean','median'}
+          Method to use when averaging periodograms. Defaults to ‘mean’.
     Returns
     -------
     res_dict : dict
         the result dictionary, including
         - freq (array): the frequency vector
         - psd (array): the spectral density vector
+        
+    References
+    ----------
+    [1] P. Welch, “The use of the fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms”, IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.
 
     '''
-    if not ana_args or not ana_args.get('nperseg'):
-        ana_args['nperseg']=len(ts)
+    
+    ts = np.array(ts)
+    ys = np.array(ys)
+    
+    if len(ts) != len(ys):
+        raise ValueError('Time and value axis should be the same length')
+    
+    if nperseg == None:
+        nperseg = len(ys/2)
 
+    # remove NaNs
+    ys, ts = clean_ts(ys,ts)
+    # check for evenly-spaced
+    check = is_evenly_spaced(ts)
+    if check == False:
+        raise ValueError('For the Welch method, data should be evenly spaced')
     # preprocessing
-    ys, ts = clean_ts(ys, ts)
-    ys = preprocess(ys, ts, **prep_args)
+    ys = preprocess(ys, ts, detrend=detrend, params=["default", 4, 0, 1],
+               gaussianize=gaussianize, standardize=standardize)
 
-    # if data is not evenly spaced, interpolate
-    if not is_evenly_spaced(ts):
-        interp_func = {
-            'interp': interp,
-            'bin': bin_values,
-        }
-        ts, ys = interp_func[interp_method](ts, ys, **interp_args)
 
     # calculate sampling frequency fs
     dt = np.median(np.diff(ts))
     fs = 1 / dt
 
     # spectral analysis with scipy welch
-    freq, psd = signal.welch(ys, fs, **ana_args)
+    freq, psd = signal.welch(ys, fs=fs, window=window,nperseg=nperseg,nooverlap=noverlap,
+                             nfft=nfft, return_onesided=return_onesided, scaling=scaling,
+                             average=average, detrend = False, axis=-1)
 
     # fix zero frequency point
     if freq[0] == 0:
@@ -126,62 +173,60 @@ def welch(ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args
     return res_dict
 
 
-def mtm(ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
-    ''' Call MTM from the package [nitime](http://nipy.org)
-    https://github.com/nipy/nitime/blob/master/nitime/algorithms/spectral.py
+def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
+           gaussianize=False, standardize=False, adaptive=False, jackknife=True,
+           low_bias=True, sides='default', nfft=None):
+    ''' Retuns spectral density using a multi-taper method.
+    
+    
+    Based on the function in the time series analysis for neuroscience toolbox: http://nipy.org/nitime/api/generated/nitime.algorithms.spectral.html 
 
     Args
     ----
 
-    s : ndarray
-           An array of sampled random processes, where the time axis is assumed to
-           be on the last axis
-    Fs : float
-        Sampling rate of the signal
+    ys : array
+        a time series
+    ts : array
+        time axis of the time series 
     NW : float
         The normalized half-bandwidth of the data tapers, indicating a
         multiple of the fundamental frequency of the DFT (Fs/N).
-        Common choices are n/2, for n >= 4. This parameter is unitless
-        and more MATLAB compatible. As an alternative, set the BW
-        parameter in Hz. See Notes on bandwidth.
-    ana args : dict
-        -BW : float
-            The sampling-relative bandwidth of the data tapers, in Hz.
-        -adaptive : {True/False}
-           Use an adaptive weighting routine to combine the PSD estimates of
-           different tapers.
-        -jackknife : {True/False}
-           Use the jackknife method to make an estimate of the PSD variance
-           at each point.
-        -low_bias : {True/False}
-           Rather than use 2NW tapers, only use the tapers that have better than
-           90% spectral concentration within the bandwidth (still using
-           a maximum of 2NW tapers)
-        -sides : str (optional)   [ 'default' | 'onesided' | 'twosided' ]
-             This determines which sides of the spectrum to return.
-             For complex-valued inputs, the default is two-sided, for real-valued
-             inputs, default is one-sided Indicates whether to return a one-sided
-             or two-sided
-    interp_method : string
-        {'interp', 'bin'}): perform interpolation or binning
-    interp_args : dict
-        the arguments for the interpolation or binning methods, for the details, check interp() and binvalues()
-    prep_args : dict
-        the arguments for preprocess, including
-        - detrend (str): 'none' - the original time series is assumed to have no trend;
-                         'linear' - a linear least-squares fit to `ys` is subtracted;
-                         'constant' - the mean of `ys` is subtracted
-                         'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                             filters and the resulting filtered series is subtracted from y.
-                         'hht' - detrending with Hilbert-Huang Transform
-        - params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                         corresponds to the window size (default it set to half of the data)
-                         while the second parameter correspond to the order of the filter
-                         (default is 4). The third parameter is the order of the derivative
-                         (the default is zero, which means only smoothing.)
-        - gaussianize (bool): If True, gaussianizes the timeseries
-        - standardize (bool): If True, standardizes the timeseries
-
+        Common choices are n/2, for n >= 4. 
+    BW : float
+        The sampling-relative bandwidth of the data tapers
+    detrend : str
+          If None, no detrending is applied. Available detrending methods:
+              - None - no detrending will be applied (default);
+              - linear - a linear least-squares fit to `ys` is subtracted;
+              - constant - the mean of `ys` is subtracted
+              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+              - emd - Empirical mode decomposition
+      params : list
+          The paramters for the Savitzky-Golay filters. The first parameter
+          corresponds to the window size (default it set to half of the data)
+          while the second parameter correspond to the order of the filter
+          (default is 4). The third parameter is the order of the derivative
+          (the default is zero, which means only smoothing.)
+      gaussianize : bool
+          If True, gaussianizes the timeseries
+      standardize : bool
+          If True, standardizes the timeseries
+      adaptive : {True/False}
+          Use an adaptive weighting routine to combine the PSD estimates of
+          different tapers.
+      jackknife : {True/False}
+          Use the jackknife method to make an estimate of the PSD variance
+          at each point.
+      low_bias : {True/False}
+          Rather than use 2NW tapers, only use the tapers that have better than
+          90% spectral concentration within the bandwidth (still using
+          a maximum of 2NW tapers)
+      sides : str (optional)   [ 'default' | 'onesided' | 'twosided' ]
+          This determines which sides of the spectrum to return.
+          For complex-valued inputs, the default is two-sided, for real-valued
+          inputs, default is one-sided Indicates whether to return a one-sided
+          or two-sided
+    
     Returns
     -------
 
@@ -191,23 +236,31 @@ def mtm(ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', inter
         - psd (array): the spectral density vector
     '''
     # preprocessing
-    ys, ts = clean_ts(ys, ts)
-    ys = preprocess(ys, ts, **prep_args)
+    ts = np.array(ts)
+    ys = np.array(ys)
+    
+    if len(ts) != len(ys):
+        raise ValueError('Time and value axis should be the same length')
 
-    # interpolate if not evenly-spaced
-    if not is_evenly_spaced(ts):
-        interp_func = {
-            'interp': interp,
-            'bin': bin_values,
-        }
-        ts, ys = interp_func[interp_method](ts, ys, **interp_args)
+    # remove NaNs
+    ys, ts = clean_ts(ys,ts)
+    # check for evenly-spaced
+    check = is_evenly_spaced(ts)
+    if check == False:
+        raise ValueError('For the MTM method, data should be evenly spaced')
+    # preprocessing
+    ys = preprocess(ys, ts, detrend=detrend, params=["default", 4, 0, 1],
+               gaussianize=gaussianize, standardize=standardize)
 
-    # calculate sampling frequency
+
+    # calculate sampling frequency fs
     dt = np.median(np.diff(ts))
     fs = 1 / dt
 
     # spectral analysis
-    freq, psd, nu = nialg.multi_taper_psd(ys, Fs=fs, NW=NW, **ana_args)  # call nitime func
+    freq, psd, nu = nialg.multi_taper_psd(ys, Fs=fs, NW=NW, BW=BW,adaptive=adaptive,
+                                          jackknife=jackknife, low_bias=low_bias,
+                                          sides=sides,NFFT=nfft)  # call nitime func
 
     # fix the zero frequency point
     if freq[0] == 0:
@@ -222,9 +275,14 @@ def mtm(ys, ts, NW=2.5, ana_args={}, prep_args={}, interp_method='interp', inter
     return res_dict
 
 
-def lomb_scargle(ys, ts, freq=None, make_freq_method='nfft', prep_args={}, ana_args={}):
+def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle', 
+                 freq_kwargs=None, n50=3, window='hann',
+                 detrend = None, params=["default", 4, 0, 1],
+                 gaussianize=False, 
+                 standardize=False):
     """ Return the computed periodogram using lomb-scargle algorithm
-    Lombscargle algorithm
+    
+    Uses the lombscargle implementation from scipy.signal: https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle 
 
     Args
     ----
@@ -233,30 +291,65 @@ def lomb_scargle(ys, ts, freq=None, make_freq_method='nfft', prep_args={}, ana_a
         a time series
     ts : array
         time axis of the time series
-    freq : array
-        vector of frequency
-    make_freq_method : string
-        Method to be used to make the time series. Default is nfft
-    prep_args : dict
-                the arguments for preprocess, including
-                - detrend (str): 'none' - the original time series is assumed to have no trend;
-                                 'linear' - a linear least-squares fit to `ys` is subtracted;
-                                 'constant' - the mean of `ys` is subtracted
-                                 'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                                     filters and the resulting filtered series is subtracted from y.
-                                 'hht' - detrending with Hilbert-Huang Transform
-                - params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                                 corresponds to the window size (default it set to half of the data)
-                                 while the second parameter correspond to the order of the filter
-                                 (default is 4). The third parameter is the order of the derivative
-                                 (the default is zero, which means only smoothing.)
-                - gaussianize (bool): If True, gaussianizes the timeseries
-                - standardize (bool): If True, standardizes the timeseries
-    ana_args : dict
-        Extra argumemnts which may be needed such as
-        - precenter (bool): Pre-center amplitudes by subtracting the mean
-        - normalize (bool): Compute normalized periodogram
-
+    freq : str or array
+        vector of frequency.
+        If string, uses the following method:        
+    freq_method : str
+        Method to generate the frequency vector if not set directly. The following options are avialable:
+            - log 
+            - lomb-scargle (default)
+            - welch
+            - scale
+            - nfft
+        See utils.wavelet.make_freq_vector for details
+    freq_kwargs : dict
+        Arguments for the method chosen in freq_method. See specific functions in utils.wavelet for details
+        By default, uses dt=median(ts), ofac=4 and hifac=1 for Lomb-Scargle
+    n50: int
+        The number of 50% overlapping segment to apply
+    window : str or tuple
+        Desired window to use. Possible values:
+            - boxcar 
+            - triang
+            - blackman
+            - hamming
+            - hann (default)
+            - bartlett
+            - flattop
+            - parzen
+            - bohman
+            - blackmanharris
+            - nuttail
+            - barthann
+            - kaiser (needs beta)
+            - gaussian (needs standard deviation)
+            - general_gaussian (needs power, width)
+            - slepian (needs width)
+            - dpss (needs normalized half-bandwidth)
+            - chebwin (needs attenuation)
+            - exponential (needs decay scale)
+            - tukey (needs taper fraction)
+        If the window requires no parameters, then window can be a string.
+        If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.
+        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.        
+    detrend : str
+          If None, no detrending is applied. Available detrending methods:
+              - None - no detrending will be applied (default);
+              - linear - a linear least-squares fit to `ys` is subtracted;
+              - constant - the mean of `ys` is subtracted
+              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+              - emd - Empirical mode decomposition
+      params : list
+          The paramters for the Savitzky-Golay filters. The first parameter
+          corresponds to the window size (default it set to half of the data)
+          while the second parameter correspond to the order of the filter
+          (default is 4). The third parameter is the order of the derivative
+          (the default is zero, which means only smoothing.)
+      gaussianize : bool
+          If True, gaussianizes the timeseries
+      standardize : bool
+          If True, standardizes the timeseriesprep_args : dict
+             
     Returns
     -------
 
@@ -265,21 +358,63 @@ def lomb_scargle(ys, ts, freq=None, make_freq_method='nfft', prep_args={}, ana_a
         - freq (array): the frequency vector
         - psd (array): the spectral density vector
     """
-    ys, ts = clean_ts(ys, ts)
-    ys = preprocess(ys, ts, **prep_args)
+    ts = np.array(ts)
+    ys = np.array(ys)
+    
+    if len(ts) != len(ys):
+        raise ValueError('Time and value axis should be the same length')
+    
+    if n50<=0:
+        raise ValueError('Number of overlapping segments should be greater than 1')
+    
+    # remove NaNs
+    ys, ts = clean_ts(ys,ts)
+    
+    # preprocessing
+    ys = preprocess(ys, ts, detrend=detrend, params=["default", 4, 0, 1],
+               gaussianize=gaussianize, standardize=standardize)
+    
+    # divide into segments
+    nseg=int(np.floor(2*len(ts)/(n50+1)))
+    index=np.array(np.arange(0,len(ts),nseg/2),dtype=int)
+    index[-1]=len(ts) #make it ends at the time series
+    
+    ts_seg=[]
+    ys_seg=[]
+    
+    for idx,i in enumerate(np.arange(0,len(index)-2,1)):
+        ts_seg.append(ts[index[idx]:index[idx+2]])
+        ys_seg.append(ys[index[idx]:index[idx+2]])
 
+    
+    # calculate the frequency vector if needed
     if freq is None:
-        freq = make_freq_vector(ts, method=make_freq_method)
-
+        freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+        if 'dt' not in freq_kwargs.keys():
+            dt = np.median(np.diff(ts))
+            freq_kwargs.update({'dt':dt})
+        freq = make_freq_vector(ts_seg[0],
+                                method=freq_method,
+                                **freq_kwargs)
+    
     freq_angular = 2 * np.pi * freq
 
     # fix the zero frequency point
     if freq[0] == 0:
         freq_copy = freq[1:]
         freq_angular = 2 * np.pi * freq_copy
-
-    psd = signal.lombscargle(ts, ys, freq_angular, **ana_args)
-
+    
+    psd_seg=[]
+    
+    for idx,item in enumerate(ys_seg):
+        psd_seg.append(signal.lombscargle(ts_seg[idx],
+                                          item*signal.get_window(window,len(ts_seg[idx])), 
+                                          freq_angular))
+    
+                       
+    # add them up
+    psd=np.sum(psd_seg,axis=0)
+    
     if freq[0] == 0:
         psd = np.insert(psd, 0, np.nan)
 
@@ -292,8 +427,13 @@ def lomb_scargle(ys, ts, freq=None, make_freq_method='nfft', prep_args={}, ana_a
     return res_dict
 
 
-def periodogram(ys, ts, ana_args={}, prep_args={}, interp_method='interp', interp_args={}):
-    ''' Call periodogram from scipy
+def periodogram(ys, ts, window='hann', nfft=None, 
+           return_onesided=True, detrend = None, params=["default", 4, 0, 1],
+           gaussianize=False, standardize=False,
+           scaling='density'):
+    ''' Estimate power spectral density using a periodogram
+    
+    Based on the function from scipy: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.periodogram.html
 
     Args
     ----
@@ -302,32 +442,55 @@ def periodogram(ys, ts, ana_args={}, prep_args={}, interp_method='interp', inter
         a time series
     ts : array
         time axis of the time series
-    ana_args : dict
-        the arguments for spectral analysis with periodogram, including
-        - window (str): Desired window to use. See get_window for a list of windows and required parameters. If window is an array it will be used directly as the window. Defaults to None; equivalent to ‘boxcar’.
-        - nfft (int): length of the FFT used. If None the length of x will be used.
-        - return_onesided (bool): If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Note that for complex data, a two-sided spectrum is always returned.
-        - scaling (str, {'density', 'spectrum'}): Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz if x is measured in V and computing the power spectrum (‘spectrum’) where Pxx has units of V**2 if x is measured in V. Defaults to ‘density’
-        see https://docs.scipy.org/doc/scipy-0.13.0/reference/generated/scipy.signal.periodogram.html for the details
-    interp_method : string
-        {'interp', 'bin'}): perform interpolation or binning
-    interp_args : dict
-        the arguments for the interpolation or binning methods, for the details, check interp() and binvalues()
-    prep_args : dict)
-        the arguments for preprocess, including
-        - detrend (str): 'none' - the original time series is assumed to have no trend;
-                         'linear' - a linear least-squares fit to `ys` is subtracted;
-                         'constant' - the mean of `ys` is subtracted
-                         'savitzy-golay' - ys is filtered using the Savitzky-Golay
-                             filters and the resulting filtered series is subtracted from y.
-                         'hht' - detrending with Hilbert-Huang Transform
-        - params (list): The paramters for the Savitzky-Golay filters. The first parameter
-                         corresponds to the window size (default it set to half of the data)
-                         while the second parameter correspond to the order of the filter
-                         (default is 4). The third parameter is the order of the derivative
-                         (the default is zero, which means only smoothing.)
-        - gaussianize (bool): If True, gaussianizes the timeseries
-        - standardize (bool): If True, standardizes the timeseries
+    window : string or tuple
+        Desired window to use. Possible values:
+            - boxcar (default)
+            - triang
+            - blackman
+            - hamming
+            - hann 
+            - bartlett
+            - flattop
+            - parzen
+            - bohman
+            - blackmanharris
+            - nuttail
+            - barthann
+            - kaiser (needs beta)
+            - gaussian (needs standard deviation)
+            - general_gaussian (needs power, width)
+            - slepian (needs width)
+            - dpss (needs normalized half-bandwidth)
+            - chebwin (needs attenuation)
+            - exponential (needs decay scale)
+            - tukey (needs taper fraction)
+        If the window requires no parameters, then window can be a string.
+        If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.
+        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.      
+      nfft: int
+          Length of the FFT used, if a zero padded FFT is desired. If None, the FFT length is nperseg
+      return_onesided : bool
+          If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Defaults to True, but for complex data, a two-sided spectrum is always returned.
+      detrend : str
+          If None, no detrending is applied. Available detrending methods:
+              - None - no detrending will be applied (default);
+              - linear - a linear least-squares fit to `ys` is subtracted;
+              - constant - the mean of `ys` is subtracted
+              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+              - emd - Empirical mode decomposition
+      params : list
+          The paramters for the Savitzky-Golay filters. The first parameter
+          corresponds to the window size (default it set to half of the data)
+          while the second parameter correspond to the order of the filter
+          (default is 4). The third parameter is the order of the derivative
+          (the default is zero, which means only smoothing.)
+      gaussianize : bool
+          If True, gaussianizes the timeseries
+      standardize : bool
+          If True, standardizes the timeseries
+      scaling : {"density,"spectrum}
+          Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density'
+      
 
     Returns
     -------
@@ -338,24 +501,31 @@ def periodogram(ys, ts, ana_args={}, prep_args={}, interp_method='interp', inter
         - psd (array): the spectral density vector
 
     '''
+    ts = np.array(ts)
+    ys = np.array(ys)
+    
+    if len(ts) != len(ys):
+        raise ValueError('Time and value axis should be the same length')
+    
+        # remove NaNs
+    ys, ts = clean_ts(ys,ts)
+    # check for evenly-spaced
+    check = is_evenly_spaced(ts)
+    if check == False:
+        raise ValueError('For the Periodogram method, data should be evenly spaced')
     # preprocessing
-    ys, ts = clean_ts(ys, ts)
-    ys = preprocess(ys, ts, **prep_args)
+    ys = preprocess(ys, ts, detrend=detrend, params=["default", 4, 0, 1],
+               gaussianize=gaussianize, standardize=standardize)
 
-    # interpolate if not evenly-spaced
-    if not is_evenly_spaced(ts):
-        interp_func = {
-            'interp': interp,
-            'bin': bin_values,
-        }
-        ts, ys = interp_func[interp_method](ts, ys, **interp_args)
 
-    # calculate sampling frequency
+    # calculate sampling frequency fs
     dt = np.median(np.diff(ts))
     fs = 1 / dt
-
+    
     # spectral analysis
-    freq, psd = signal.periodogram(ys, fs, **ana_args)
+    freq, psd = signal.periodogram(ys, fs, window=window, nfft=nfft, 
+                                   detrend=False, return_onesided=return_onesided, 
+                                   scaling=scaling, axis=-1)
 
     # fix the zero frequency point
     if freq[0] == 0:
@@ -370,9 +540,10 @@ def periodogram(ys, ts, ana_args={}, prep_args={}, interp_method='interp', inter
     return res_dict
 
 
-def wwz_psd(ys, ts, freq=None, tau=None, c=1e-3, nproc=8, nMC=200,
+def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
+            tau=None, c=1e-3, nproc=8, nMC=200,
             detrend=False, params=["default", 4, 0, 1], gaussianize=False,
-            standardize=True, Neff=3, anti_alias=False, avgs=2,
+            standardize=False, Neff=3, anti_alias=False, avgs=2,
             method='default'):
     ''' Return the psd of a timeseries directly using wwz method.
 
@@ -385,6 +556,16 @@ def wwz_psd(ys, ts, freq=None, tau=None, c=1e-3, nproc=8, nMC=200,
         the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
     freq : array
         vector of frequency
+    freq_method : str
+        Method to generate the frequency vector if not set directly. The following options are avialable:
+            - log (default)
+            - lomb-scargle
+            - welch
+            - scale
+            - nfft
+        See utils.wavelet.make_freq_vector for details
+    freq_kwargs : str
+        Arguments for the method chosen in freq_method. See specific functions in utils.wavelet for details
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
     c : float
@@ -413,10 +594,11 @@ def wwz_psd(ys, ts, freq=None, tau=None, c=1e-3, nproc=8, nMC=200,
         'Foster' - the original WWZ method;
         'Kirchner' - the method Kirchner adapted from Foster;
         'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
-        'default' - the Numba version of the Kirchner algorithm will be called
+        'default' - the Numba version of the Kirchner algorithm will be called. Defaults to default
     Neff : int
         effective number of points
-    anti_alias : bool): If True, uses anti-aliasing
+    anti_alias : bool
+        If True, uses anti-aliasing
     avgs : int
         flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
         OR from measurements averaged over each sampling interval (avgs==1)
@@ -434,7 +616,9 @@ def wwz_psd(ys, ts, freq=None, tau=None, c=1e-3, nproc=8, nMC=200,
         the psds of AR1 processes
 
     '''
-    ys_cut, ts_cut, freq, tau = prepare_wwz(ys, ts, freq=freq, tau=tau)
+    ys_cut, ts_cut, freq, tau = prepare_wwz(ys, ts, freq=freq, 
+                                            freq_method=freq_method,
+                                            freq_kwargs=freq_kwargs,tau=tau)
 
     # get wwa but AR1_q is not needed here so set nMC=0
     #  wwa, _, _, coi, freq, _, Neffs, _ = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
@@ -448,7 +632,7 @@ def wwz_psd(ys, ts, freq=None, tau=None, c=1e-3, nproc=8, nMC=200,
     #  freqs = freqs[1/freqs <= np.max(coi)]
 
     # Monte-Carlo simulations of AR1 process
-    nf = np.size(freq)
+    #nf = np.size(freq)
 
     #  psd_ar1 = np.ndarray(shape=(nMC, nf))
 

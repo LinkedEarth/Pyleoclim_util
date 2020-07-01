@@ -17,7 +17,7 @@ __all__ = [
 import numpy as np
 import statsmodels.api as sm
 from scipy import signal
-from scipy.stats.mstats import mquantiles
+#from scipy.stats.mstats import mquantiles
 from pathos.multiprocessing import ProcessingPool as Pool
 import numba as nb
 from numba.core.errors import NumbaPerformanceWarning
@@ -1173,7 +1173,6 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
     res = Results(amplitude=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
 
     return res
-
 def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau=None, freq=None, freq_method='log', freq_kwargs=None,
         c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False,
@@ -1245,14 +1244,13 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau = np.linspace(lb, ub, np.size(inside)//10)
         print(f'Setting tau={tau[:3]}...{tau[-3:]}, ntau={np.size(tau)}')
 
-    ys1_cut, ts1_cut, freq1, tau1 = prepare_wwz(ys1, ts1, freq=freq, tau=tau)
-    ys2_cut, ts2_cut, freq2, tau2 = prepare_wwz(ys2, ts2, freq=freq, tau=tau)
-
     if freq is None:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        freq = make_freq_vector(ts1_cut, method=freq_method, **freq_kwargs)
+        freq = make_freq_vector(ts_cut, method=freq_method, **freq_kwargs)
         print(f'Setting freq={freq[:3]}...{freq[-3:]}, nfreq={np.size(freq)}')
 
+    ys1_cut, ts1_cut, freq1, tau1 = prepare_wwz(ys1, ts1, freq=freq, tau=tau)
+    ys2_cut, ts2_cut, freq2, tau2 = prepare_wwz(ys2, ts2, freq=freq, tau=tau)
 
     if np.any(tau1 != tau2):
         print('inconsistent `tau`, recalculating...')
@@ -1326,7 +1324,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
                   freq=freq, time=tau, AR1_q=AR1_q, coi=coi)
 
     return res
-def freq_vector_lomb_scargle(ts, nf=None, ofac=4, hifac=1):
+def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
     ''' Return the frequency vector based on the Lomb-Scargle algorithm.
 
     Args
@@ -1334,12 +1332,17 @@ def freq_vector_lomb_scargle(ts, nf=None, ofac=4, hifac=1):
 
     ts : array
         time axis of the time series
+    dt : float
+        The resolution of the data. If None, uses the median resolution. Defaults to None. 
+    nf : int
+        Number of frequency points. 
+        If None, calculated as the difference between the highest and lowest frequencies (set by hifac and ofac) divided by resolution. Defaults to None
     ofac : float
         Oversampling rate that influences the resolution of the frequency axis,
                  when equals to 1, it means no oversamling (should be >= 1).
-                 The default value 4 is usaually a good value.
+                 The default value 4 is usually a good value.
     hifac : float
-        fhi/fnyq (should be >= 1), where fhi is the highest frequency that
+        fhi/fnyq (should be <= 1), where fhi is the highest frequency that
         can be analyzed by the Lomb-Scargle algorithm and fnyq is the Nyquist frequency.
 
     Returns
@@ -1355,14 +1358,15 @@ def freq_vector_lomb_scargle(ts, nf=None, ofac=4, hifac=1):
 
     '''
     assert ofac >= 1 and hifac <= 1, "`ofac` should be >= 1, and `hifac` should be <= 1"
-
-    dt = np.median(np.diff(ts))
+    
+    if dt is None:
+        dt = np.median(np.diff(ts))
     flo = (1/(2*dt)) / (np.size(ts)*ofac)
     fhi = hifac / (2*dt)
 
     if nf is None:
         df = flo
-        nf = (fhi - flo) / df + 1
+        nf = int((fhi - flo) / df + 1)
 
     freq = np.linspace(flo, fhi, nf)
 
@@ -1498,9 +1502,10 @@ def make_freq_vector(ts, method='log', **kwargs):
     Args
     ----
 
-    ts : array): time axis of the time series
+    ts : array
+        Time axis of the time series
     method : string
-        The method to use. Options are 'nfft' (default), 'Lomb-Scargle', 'Welch'
+        The method to use. Options are 'log' (default), 'nfft', 'lomb-scargle', 'welch', and 'scale'
     kwargs : dict, optional
             For Lomb_Scargle, additional parameters may be passed:
             - nf (int): number of frequency points
@@ -1518,9 +1523,9 @@ def make_freq_vector(ts, method='log', **kwargs):
 
     '''
 
-    if method == 'Lomb-Scargle':
+    if method == 'lomb-scargle':
         freq = freq_vector_lomb_scargle(ts,**kwargs)
-    elif method == 'Welch':
+    elif method == 'welch':
         freq = freq_vector_welch(ts)
     elif method == 'nfft':
         freq = freq_vector_nfft(ts)
@@ -1528,6 +1533,8 @@ def make_freq_vector(ts, method='log', **kwargs):
         freq = freq_vector_scale(ts, **kwargs)
     elif method == 'log':
         freq = freq_vector_log(ts, **kwargs)
+    else:
+        raise ValueError('This method is not supported')
     #  freq = freq[1:]  # discard the first element 0
 
     return freq
