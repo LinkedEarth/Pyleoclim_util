@@ -118,6 +118,7 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
           Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density'
       average : {'mean','median'}
           Method to use when averaging periodograms. Defaults to ‘mean’.
+          
     Returns
     -------
     res_dict : dict
@@ -279,7 +280,8 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
                  freq_kwargs=None, n50=3, window='hann',
                  detrend = None, params=["default", 4, 0, 1],
                  gaussianize=False, 
-                 standardize=False):
+                 standardize=False,
+                 average='mean'):
     """ Return the computed periodogram using lomb-scargle algorithm
     
     Uses the lombscargle implementation from scipy.signal: https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle 
@@ -332,7 +334,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
         If the window requires no parameters, then window can be a string.
         If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.
         If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.        
-    detrend : str
+     detrend : str
           If None, no detrending is applied. Available detrending methods:
               - None - no detrending will be applied (default);
               - linear - a linear least-squares fit to `ys` is subtracted;
@@ -349,6 +351,8 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
           If True, gaussianizes the timeseries
       standardize : bool
           If True, standardizes the timeseriesprep_args : dict
+      average : {'mean','median'}
+          Method to use when averaging periodograms. Defaults to ‘mean’.   
              
     Returns
     -------
@@ -400,9 +404,9 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
     freq_angular = 2 * np.pi * freq
 
     # fix the zero frequency point
-    if freq[0] == 0:
-        freq_copy = freq[1:]
-        freq_angular = 2 * np.pi * freq_copy
+    #if freq[0] == 0:
+        #freq_copy = freq[1:]
+        #freq_angular = 2 * np.pi * freq_copy
     
     psd_seg=[]
     
@@ -410,13 +414,17 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
         psd_seg.append(signal.lombscargle(ts_seg[idx],
                                           item*signal.get_window(window,len(ts_seg[idx])), 
                                           freq_angular))
+                           
+    # average them up
+    if average=='mean':
+        psd=np.mean(psd_seg,axis=0)
+    elif average=='median':
+        psd=np.median(psd_seg,axis=0)
+    else:
+        raise ValueError('Average should either be set to mean or median')
     
-                       
-    # add them up
-    psd=np.sum(psd_seg,axis=0)
-    
-    if freq[0] == 0:
-        psd = np.insert(psd, 0, np.nan)
+    #if freq[0] == 0:
+        #psd = np.insert(psd, 0, np.nan)
 
     # output result
     res_dict = {
@@ -541,7 +549,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
 
 
 def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
-            tau=None, c=1e-3, nproc=8, nMC=200,
+            tau=None, c=1e-3, nproc=8,
             detrend=False, params=["default", 4, 0, 1], gaussianize=False,
             standardize=False, Neff=3, anti_alias=False, avgs=2,
             method='default'):
@@ -564,7 +572,7 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             - scale
             - nfft
         See utils.wavelet.make_freq_vector for details
-    freq_kwargs : str
+    freq_kwargs : dict
         Arguments for the method chosen in freq_method. See specific functions in utils.wavelet for details
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -572,8 +580,6 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         the decay constant, the default value 1e-3 is good for most of the cases
     nproc : int
         the number of processes for multiprocessing
-    nMC : int
-        the number of Monte-Carlo simulations
     detrend : str
         None - the original time series is assumed to have no trend;
         'linear' - a linear least-squares fit to `ys` is subtracted;
