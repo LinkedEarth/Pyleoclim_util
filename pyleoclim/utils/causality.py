@@ -31,10 +31,11 @@ def causality_est(y1, y2, method='liang', signif_test='isospec', nsim=1000,\
 
     y1, y2 : array
         vectors of (real) numbers with identical length, no NaNs allowed
-    method : array
-        only "liang" for now
-    signif_test : str
+    method : {'liang','granger'}
+        The method to use for causality estimation. Either uses Granger causality or the method developed by Liang.
+    signif_test : {'isopersist', 'isospec'}
         the method for significance test
+        see signif_isospec and signif_isopersist for details. 
     nsim : int
         the number of AR(1) surrogates for significance test
     qs : list

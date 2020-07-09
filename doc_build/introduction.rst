@@ -9,15 +9,7 @@ Such data often come in the form of timeseries with missing values and age uncer
 so the package includes several low-level methods to deal with these issues,
 as well as high-level methods that re-use those within scientific workflows.
 
-High-level modules assume that data are stored in the Linked Paleo Data (`LiPD <http://www.clim-past.net/12/1093/2016/>`_) format
-and makes extensive use of the `LiPD utilities <http://nickmckay.github.io/LiPD-utilities/>`_. Low-level modules are primarily
-based on numpy arrays or Pandas dataframes, so Pyleoclim contains a lot of
-timeseries analysis code (e.g. spectral analysis, singular spectrum analysis,
-wavelet analysis, correlation analysis) that can apply to these more common types
-as well. See the example folder for details.
-
-The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses very much like `GeoChronR <http://nickmckay.github.io/GeoChronR/>`_.
-
+The 
 **Current Capabilities:**
 
 * binning

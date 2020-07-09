@@ -3,29 +3,22 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Pyleoclim's documentation!
-=====================================
-
-Contents:
-
 .. toctree::
-   :maxdepth: 3
+   :hidden:
 
-   introduction
-   installation
-   main
-   map
-   plot
-   stats
-   timeseries
-   lipdutils
-   summaryplots
-   spectral
-   rbchron
+   installation.rst
+   ui.rst
+
+Introduction
+============
+
+Pyleoclim is a Python package designed for the analysis of paleoclimate data.
+
+Pyleoclim makes use of various data science libraries (numpy, pandas, scikit-learn) for time series analysis and Matplotlib and Cartopy for the creation of publication quality figures.
+
+Key features of Pyleoclim are its object-oriented  
 
 
-Indices and tables
-==================
 
 * :ref:`genindex`
 * :ref:`modindex`
