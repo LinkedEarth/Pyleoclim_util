@@ -85,10 +85,8 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
-</ul>
-
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
             
           
         </div>
@@ -206,7 +204,7 @@
 <span class="sd">    Wrapper for the function implemented in scipy.signal.welch </span>
 <span class="sd">    See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html for details.</span>
 <span class="sd">    </span>
-<span class="sd">    Welch&#39;s method [1] is an approach for spectral density estimation. It computes an estimate of the power spectral density by dividing the data into overlapping segments, computing a modified periodogram for each segment and averaging the periodograms.</span>
+<span class="sd">    Welch&#39;s method is an approach for spectral density estimation. It computes an estimate of the power spectral density by dividing the data into overlapping segments, computing a modified periodogram for each segment and averaging the periodograms.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -287,7 +285,7 @@
 <span class="sd">        </span>
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
-<span class="sd">    [1] P. Welch, “The use of the fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms”, IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.</span>
+<span class="sd">    P. Welch, “The use of the fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms”, IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -356,7 +354,7 @@
     <span class="k">return</span> <span class="n">res_dict</span></div>
 
 
-<span class="k">def</span> <span class="nf">mtm</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">NW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">BW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<div class="viewcode-block" id="mtm"><a class="viewcode-back" href="../../../utils/spectral/mtm.html#pyleoclim.utils.mtm">[docs]</a><span class="k">def</span> <span class="nf">mtm</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">NW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">BW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
            <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">adaptive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">jackknife</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
            <span class="n">low_bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sides</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Retuns spectral density using a multi-taper method.</span>
@@ -423,7 +421,31 @@
 <span class="sd">    periodogram : Estimate power spectral density using a periodogram</span>
 <span class="sd">    welch : Retuns spectral density using the welch method</span>
 <span class="sd">    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm</span>
-<span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method.    </span>
+<span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method. </span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    </span>
+<span class="sd">    .. plot::</span>
+<span class="sd">        :context: close-figs</span>
+
+<span class="sd">        &gt;&gt;&gt; from pyleoclim import utils</span>
+<span class="sd">        &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; # Create a signal</span>
+<span class="sd">        &gt;&gt;&gt; time = np.arange(2001)</span>
+<span class="sd">        &gt;&gt;&gt; f = 1/50</span>
+<span class="sd">        &gt;&gt;&gt; signal = np.cos(2*np.pi*f*time)</span>
+<span class="sd">        &gt;&gt;&gt; # Spectral Analysis</span>
+<span class="sd">        &gt;&gt;&gt; res = utils.mtm(signal, time)</span>
+<span class="sd">        &gt;&gt;&gt; # plot</span>
+<span class="sd">        &gt;&gt;&gt; fig = plt.loglog(</span>
+<span class="sd">        ...           res[&#39;freq&#39;],</span>
+<span class="sd">        ...           res[&#39;psd&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; plt.xlabel(&#39;Frequency&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.ylabel(&#39;PSD&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.show()    </span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="c1"># preprocessing</span>
     <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
@@ -462,10 +484,10 @@
         <span class="s1">&#39;psd&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">psd</span><span class="p">),</span>
     <span class="p">}</span>
 
-    <span class="k">return</span> <span class="n">res_dict</span>
+    <span class="k">return</span> <span class="n">res_dict</span></div>
 
 
-<span class="k">def</span> <span class="nf">lomb_scargle</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_method</span><span class="o">=</span><span class="s1">&#39;lomb-scargle&#39;</span><span class="p">,</span> 
+<div class="viewcode-block" id="lomb_scargle"><a class="viewcode-back" href="../../../utils/spectral/lombscargle.html#pyleoclim.utils.lomb_scargle">[docs]</a><span class="k">def</span> <span class="nf">lomb_scargle</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_method</span><span class="o">=</span><span class="s1">&#39;lomb-scargle&#39;</span><span class="p">,</span> 
                  <span class="n">freq_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n50</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hann&#39;</span><span class="p">,</span>
                  <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
                  <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
@@ -557,6 +579,35 @@
 <span class="sd">    mtm : Retuns spectral density using a multi-taper method</span>
 <span class="sd">    welch : Returns power spectral density using the Welch method</span>
 <span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method.</span>
+<span class="sd">    </span>
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Lomb, N. R. (1976). Least-squares frequency analysis of unequally spaced data. Astrophysics and Space Science 39, 447-462. </span>
+<span class="sd">    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853. </span>
+<span class="sd">    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853. </span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    </span>
+<span class="sd">    .. plot::</span>
+<span class="sd">        :context: close-figs</span>
+
+<span class="sd">        &gt;&gt;&gt; from pyleoclim import utils</span>
+<span class="sd">        &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; # Create a signal</span>
+<span class="sd">        &gt;&gt;&gt; time = np.arange(2001)</span>
+<span class="sd">        &gt;&gt;&gt; f = 1/50</span>
+<span class="sd">        &gt;&gt;&gt; signal = np.cos(2*np.pi*f*time)</span>
+<span class="sd">        &gt;&gt;&gt; # Spectral Analysis</span>
+<span class="sd">        &gt;&gt;&gt; res = utils.lomb_scargle(signal, time)</span>
+<span class="sd">        &gt;&gt;&gt; # plot</span>
+<span class="sd">        &gt;&gt;&gt; fig = plt.loglog(</span>
+<span class="sd">        ...           res[&#39;freq&#39;],</span>
+<span class="sd">        ...           res[&#39;psd&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; plt.xlabel(&#39;Frequency&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.ylabel(&#39;PSD&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.show()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
     <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
@@ -628,10 +679,10 @@
         <span class="s1">&#39;psd&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">psd</span><span class="p">),</span>
     <span class="p">}</span>
 
-    <span class="k">return</span> <span class="n">res_dict</span>
+    <span class="k">return</span> <span class="n">res_dict</span></div>
 
 
-<span class="k">def</span> <span class="nf">periodogram</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hann&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+<div class="viewcode-block" id="periodogram"><a class="viewcode-back" href="../../../utils/spectral/periodogram.html#pyleoclim.utils.periodogram">[docs]</a><span class="k">def</span> <span class="nf">periodogram</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hann&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
            <span class="n">return_onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
            <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
            <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;density&#39;</span><span class="p">):</span>
@@ -710,6 +761,29 @@
 <span class="sd">    mtm : Retuns spectral density using a multi-taper method</span>
 <span class="sd">    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm</span>
 <span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method.</span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    </span>
+<span class="sd">    .. plot::</span>
+<span class="sd">        :context: close-figs</span>
+
+<span class="sd">        &gt;&gt;&gt; from pyleoclim import utils</span>
+<span class="sd">        &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; # Create a signal</span>
+<span class="sd">        &gt;&gt;&gt; time = np.arange(2001)</span>
+<span class="sd">        &gt;&gt;&gt; f = 1/50</span>
+<span class="sd">        &gt;&gt;&gt; signal = np.cos(2*np.pi*f*time)</span>
+<span class="sd">        &gt;&gt;&gt; # Spectral Analysis</span>
+<span class="sd">        &gt;&gt;&gt; res = utils.periodogram(signal, time)</span>
+<span class="sd">        &gt;&gt;&gt; # plot</span>
+<span class="sd">        &gt;&gt;&gt; fig = plt.loglog(</span>
+<span class="sd">        ...           res[&#39;freq&#39;],</span>
+<span class="sd">        ...           res[&#39;psd&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; plt.xlabel(&#39;Frequency&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.ylabel(&#39;PSD&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.show()</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
@@ -748,10 +822,10 @@
         <span class="s1">&#39;psd&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">psd</span><span class="p">),</span>
     <span class="p">}</span>
 
-    <span class="k">return</span> <span class="n">res_dict</span>
+    <span class="k">return</span> <span class="n">res_dict</span></div>
 
 
-<span class="k">def</span> <span class="nf">wwz_psd</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_method</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">freq_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="wwz_psd"><a class="viewcode-back" href="../../../utils/spectral/wwz_psd.html#pyleoclim.utils.wwz_psd">[docs]</a><span class="k">def</span> <span class="nf">wwz_psd</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_method</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">freq_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">nproc</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
             <span class="n">detrend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">standardize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">Neff</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">anti_alias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avgs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
@@ -830,6 +904,34 @@
 <span class="sd">    mtm : Retuns spectral density using a multi-taper method</span>
 <span class="sd">    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm</span>
 <span class="sd">    welch : Estimate power spectral density using the Welch method</span>
+<span class="sd">   </span>
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Foster, G. (1996). Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112(4), 1709-1729. </span>
+<span class="sd">    Kirchner, J. W. (2005). Aliasin in 1/f(alpha) noise spectra: origins, consequences, and remedies. Physical Review E covering statistical, nonlinear, biological, and soft matter physics, 71, 66110. </span>
+<span class="sd">    </span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    </span>
+<span class="sd">    .. plot::</span>
+<span class="sd">        :context: close-figs</span>
+
+<span class="sd">        &gt;&gt;&gt; from pyleoclim import utils</span>
+<span class="sd">        &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; # Create a signal</span>
+<span class="sd">        &gt;&gt;&gt; time = np.arange(2001)</span>
+<span class="sd">        &gt;&gt;&gt; f = 1/50</span>
+<span class="sd">        &gt;&gt;&gt; signal = np.cos(2*np.pi*f*time)</span>
+<span class="sd">        &gt;&gt;&gt; # Spectral Analysis</span>
+<span class="sd">        &gt;&gt;&gt; res = utils.wwz_psd(signal, time)</span>
+<span class="sd">        &gt;&gt;&gt; # plot</span>
+<span class="sd">        &gt;&gt;&gt; fig = plt.loglog(</span>
+<span class="sd">        ...           res[&#39;freq&#39;],</span>
+<span class="sd">        ...           res[&#39;psd&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; plt.xlabel(&#39;Frequency&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.ylabel(&#39;PSD&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.show()</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">ys_cut</span><span class="p">,</span> <span class="n">ts_cut</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">prepare_wwz</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> 
@@ -878,7 +980,7 @@
     <span class="n">Results</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Results&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;psd&#39;</span><span class="p">,</span> <span class="s1">&#39;freq&#39;</span><span class="p">,</span> <span class="s1">&#39;psd_ar1_q95&#39;</span><span class="p">,</span> <span class="s1">&#39;psd_ar1&#39;</span><span class="p">])</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">Results</span><span class="p">(</span><span class="n">psd</span><span class="o">=</span><span class="n">psd</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">psd_ar1_q95</span><span class="o">=</span><span class="n">psd_ar1_q95</span><span class="p">,</span> <span class="n">psd_ar1</span><span class="o">=</span><span class="n">psd_ar1</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">res</span>
+    <span class="k">return</span> <span class="n">res</span></div>
 </pre></div>
 
            </div>

@@ -2,8 +2,11 @@
 
 .. toctree::
    :hidden:
-
    spectral/welch.rst
+   spectral/periodogram.rst
+   spectral/mtm.rst
+   spectral/lombscargle.rst
+   spectral/wwz_psd.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -36,8 +39,18 @@ Spectral
 
    * - :ref:`welch <utils_welch>`
      - Estimate power spectral density using Welch's method
-   * - Row 2, column 1
-     - Row 2, column 2
+   * - :ref:`periodogram <utils_periodogram>`
+     - Estimate power spectral density using periodogram method
+   * - :ref:`mtm <utils_mtm>`
+     - Estimate power spectral density using multi-taper method
+   * - :ref:`lomb_scargle <utils_lombscargle>`
+     - Estimate power spectral density using the Lomb-Scargle method
+   * - :ref:`wwz_psd <utils_wwzpsd>`
+     - Estimate power spectral density using the Weighted Z-Transform wavelet method
+
+
+
+
 
 
 Tsmodel

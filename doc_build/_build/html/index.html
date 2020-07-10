@@ -36,8 +36,7 @@
 
     
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Installation" href="installation.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -86,10 +85,13 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Introduction</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#getting-involved">Getting Involved</a></li>
 </ul>
-
+</div>
             
           
         </div>
@@ -177,13 +179,29 @@
     text-align: unset;
 }
 </style>
-<div class="toctree-wrapper compound">
-</div>
 <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>Pyleoclim is a Python package designed for the analysis of paleoclimate data.</p>
 <p>Pyleoclim makes use of various data science libraries (numpy, pandas, scikit-learn) for time series analysis and Matplotlib and Cartopy for the creation of publication quality figures.</p>
 <p>Key features of Pyleoclim are its object-oriented <a class="reference internal" href="core/introduction.html#ui-introduction"><span class="std std-ref">Series</span></a> which can be directly manipulated for plotting, spectral and wavelet analysis, and other time series-appropriate operations as well as its ability to manipulate <a class="reference external" href="http://lipd.net">LiPD</a> files directly, handling most of the data transformations internally.</p>
+<p>The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses. Age ensembles can be obtained through the <a class="reference external" href="http://nickmckay.github.io/GeoChronR/">GeoChronR</a> package.</p>
+</div>
+<div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation guide</span></a> provides information on getting up and running. The main Pyleoclim’s function are available through its objected-oriented <a class="reference internal" href="core/introduction.html#ui-introduction"><span class="std std-ref">interface</span></a> and documented in the form of a user guide, available online and in PDF format from GitHub.</p>
+</div>
+<div class="section" id="getting-involved">
+<h1>Getting Involved<a class="headerlink" href="#getting-involved" title="Permalink to this headline">¶</a></h1>
+<p>Pyleoclim was originally developed to allows scientists to analyze datasets in the LiPD format, including visualization, mapping, and time series analysis. Pyleoclim has been made freely available under the terms of the <a class="reference external" href="https://github.com/LinkedEarth/Pyleoclim_util/blob/master/license">GNU Public License</a>.</p>
+<p>There are many ways to get involved in the development of Pyleoclim:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If you write a paper making use of Pyleoclim, please consider <a class="reference internal" href="citation.html#citing-pyleoclim"><span class="std std-ref">citing</span></a>.</p></li>
+<li><p>Report bugs and problems with the code or documentation to our <a class="reference external" href="https://github.com/LinkedEarth/Pyleoclim_util/issues">GitHub repository</a>. Please make sure that there is not outstanding issues that cover the problem you’re experiencing.</p></li>
+<li><p>Contribute bug fixes</p></li>
+<li><p>Contribute enhancements and new features</p></li>
+</ul>
+</div></blockquote>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -196,13 +214,6 @@
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-    </div>
   
 
   <hr/>

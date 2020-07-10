@@ -53,7 +53,7 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
     Wrapper for the function implemented in scipy.signal.welch 
     See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html for details.
     
-    Welch's method [1] is an approach for spectral density estimation. It computes an estimate of the power spectral density by dividing the data into overlapping segments, computing a modified periodogram for each segment and averaging the periodograms.
+    Welch's method is an approach for spectral density estimation. It computes an estimate of the power spectral density by dividing the data into overlapping segments, computing a modified periodogram for each segment and averaging the periodograms.
     
     Parameters
     ----------
@@ -134,7 +134,7 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
         
     References
     ----------
-    [1] P. Welch, “The use of the fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms”, IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.
+    P. Welch, “The use of the fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms”, IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.
 
     Examples
     --------
@@ -270,7 +270,31 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
     periodogram : Estimate power spectral density using a periodogram
     welch : Retuns spectral density using the welch method
     lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
-    wwz_psd : Return the psd of a timeseries using wwz method.    
+    wwz_psd : Return the psd of a timeseries using wwz method. 
+    
+    Examples
+    --------
+    
+    .. plot::
+        :context: close-figs
+
+        >>> from pyleoclim import utils
+        >>> import matplotlib.pyplot as plt
+        >>> import numpy as np
+        >>> # Create a signal
+        >>> time = np.arange(2001)
+        >>> f = 1/50
+        >>> signal = np.cos(2*np.pi*f*time)
+        >>> # Spectral Analysis
+        >>> res = utils.mtm(signal, time)
+        >>> # plot
+        >>> fig = plt.loglog(
+        ...           res['freq'],
+        ...           res['psd'])
+        >>> plt.xlabel('Frequency')
+        >>> plt.ylabel('PSD')
+        >>> plt.show()    
+
     '''
     # preprocessing
     ts = np.array(ts)
@@ -404,6 +428,35 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
     mtm : Retuns spectral density using a multi-taper method
     welch : Returns power spectral density using the Welch method
     wwz_psd : Return the psd of a timeseries using wwz method.
+    
+    References
+    ----------
+    Lomb, N. R. (1976). Least-squares frequency analysis of unequally spaced data. Astrophysics and Space Science 39, 447-462. 
+    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853. 
+    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853. 
+
+    Examples
+    --------
+    
+    .. plot::
+        :context: close-figs
+
+        >>> from pyleoclim import utils
+        >>> import matplotlib.pyplot as plt
+        >>> import numpy as np
+        >>> # Create a signal
+        >>> time = np.arange(2001)
+        >>> f = 1/50
+        >>> signal = np.cos(2*np.pi*f*time)
+        >>> # Spectral Analysis
+        >>> res = utils.lomb_scargle(signal, time)
+        >>> # plot
+        >>> fig = plt.loglog(
+        ...           res['freq'],
+        ...           res['psd'])
+        >>> plt.xlabel('Frequency')
+        >>> plt.ylabel('PSD')
+        >>> plt.show()
     """
     ts = np.array(ts)
     ys = np.array(ys)
@@ -557,6 +610,29 @@ def periodogram(ys, ts, window='hann', nfft=None,
     mtm : Retuns spectral density using a multi-taper method
     lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
     wwz_psd : Return the psd of a timeseries using wwz method.
+    
+    Examples
+    --------
+    
+    .. plot::
+        :context: close-figs
+
+        >>> from pyleoclim import utils
+        >>> import matplotlib.pyplot as plt
+        >>> import numpy as np
+        >>> # Create a signal
+        >>> time = np.arange(2001)
+        >>> f = 1/50
+        >>> signal = np.cos(2*np.pi*f*time)
+        >>> # Spectral Analysis
+        >>> res = utils.periodogram(signal, time)
+        >>> # plot
+        >>> fig = plt.loglog(
+        ...           res['freq'],
+        ...           res['psd'])
+        >>> plt.xlabel('Frequency')
+        >>> plt.ylabel('PSD')
+        >>> plt.show()
 
     '''
     ts = np.array(ts)
@@ -677,6 +753,34 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     mtm : Retuns spectral density using a multi-taper method
     lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
     welch : Estimate power spectral density using the Welch method
+   
+    References
+    ----------
+    Foster, G. (1996). Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112(4), 1709-1729. 
+    Kirchner, J. W. (2005). Aliasin in 1/f(alpha) noise spectra: origins, consequences, and remedies. Physical Review E covering statistical, nonlinear, biological, and soft matter physics, 71, 66110. 
+    
+    Examples
+    --------
+    
+    .. plot::
+        :context: close-figs
+
+        >>> from pyleoclim import utils
+        >>> import matplotlib.pyplot as plt
+        >>> import numpy as np
+        >>> # Create a signal
+        >>> time = np.arange(2001)
+        >>> f = 1/50
+        >>> signal = np.cos(2*np.pi*f*time)
+        >>> # Spectral Analysis
+        >>> res = utils.wwz_psd(signal, time)
+        >>> # plot
+        >>> fig = plt.loglog(
+        ...           res['freq'],
+        ...           res['psd'])
+        >>> plt.xlabel('Frequency')
+        >>> plt.ylabel('PSD')
+        >>> plt.show()
 
     '''
     ys_cut, ts_cut, freq, tau = prepare_wwz(ys, ts, freq=freq, 

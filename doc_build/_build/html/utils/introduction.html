@@ -85,10 +85,24 @@
               
             
             
-              <ul>
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Pyleoclim Utilities (pyleoclim.utils)</a><ul>
+<li><a class="reference internal" href="#causality">Causality</a></li>
+<li><a class="reference internal" href="#correlation">Correlation</a></li>
+<li><a class="reference internal" href="#decomposition">Decomposition</a></li>
+<li><a class="reference internal" href="#filter">Filter</a></li>
+<li><a class="reference internal" href="#mapping">Mapping</a></li>
+<li><a class="reference internal" href="#plotting">Plotting</a></li>
+<li><a class="reference internal" href="#spectral">Spectral</a></li>
+<li><a class="reference internal" href="#tsmodel">Tsmodel</a></li>
+<li><a class="reference internal" href="#wavelet">Wavelet</a></li>
+<li><a class="reference internal" href="#tsutils">Tsutils</a></li>
+<li><a class="reference internal" href="#lipdutils">Lipdutils</a></li>
 </ul>
-
+</li>
+</ul>
+</div>
             
           
         </div>
@@ -176,8 +190,6 @@
     text-align: unset;
 }
 </style>
-<div class="toctree-wrapper compound" id="utils-introduction">
-</div>
 <div class="section" id="pyleoclim-utilities-pyleoclim-utils">
 <h1>Pyleoclim Utilities (pyleoclim.utils)<a class="headerlink" href="#pyleoclim-utilities-pyleoclim-utils" title="Permalink to this headline">¶</a></h1>
 <p>Pyleoclim makes extensive use of functions from <a class="reference external" href="https://numpy.org">Numpy</a>, <a class="reference external" href="https://pandas.pydata.org">Pandas</a>, <a class="reference external" href="https://www.scipy.org">Scipy</a>, and <a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn</a>. Please note that some default parameter values for these functions have been changed to more appropriate values for paleoclimate datasets.</p>
@@ -210,8 +222,17 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="spectral/welch.html#utils-welch"><span class="std std-ref">welch</span></a></p></td>
 <td><p>Estimate power spectral density using Welch’s method</p></td>
 </tr>
-<tr class="row-even"><td><p>Row 2, column 1</p></td>
-<td><p>Row 2, column 2</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="spectral/periodogram.html#utils-periodogram"><span class="std std-ref">periodogram</span></a></p></td>
+<td><p>Estimate power spectral density using periodogram method</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="spectral/mtm.html#utils-mtm"><span class="std std-ref">mtm</span></a></p></td>
+<td><p>Estimate power spectral density using multi-taper method</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="spectral/lombscargle.html#utils-lombscargle"><span class="std std-ref">lomb_scargle</span></a></p></td>
+<td><p>Estimate power spectral density using the Lomb-Scargle method</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="spectral/wwz_psd.html#utils-wwzpsd"><span class="std std-ref">wwz_psd</span></a></p></td>
+<td><p>Estimate power spectral density using the Weighted Z-Transform wavelet method</p></td>
 </tr>
 </tbody>
 </table>
