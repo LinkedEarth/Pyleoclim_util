@@ -1,0 +1,591 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>LiPD Utilities &mdash; Pyleoclim 0.4.10 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.10
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>LiPD Utilities</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/deprec/lipdutils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="lipd-utilities">
+<h1>LiPD Utilities<a class="headerlink" href="#lipd-utilities" title="Permalink to this headline">¶</a></h1>
+<p>This modules allow basic manipulation of LiPD files</p>
+<div class="section" id="creating-directories-and-saving">
+<h2>Creating Directories and saving<a class="headerlink" href="#creating-directories-and-saving" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="lipd-files">
+<h2>LiPD files<a class="headerlink" href="#lipd-files" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.enumerateLipds">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">enumerateLipds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lipds</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.enumerateLipds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enumerate the LiPD files loaded in the workspace</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lipds</strong> (<em>dict</em>) – A dictionary of LiPD files. Can be obtained from
+pyleoclim.readLipd()</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.getLipd">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">getLipd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lipds</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.getLipd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prompt for a LiPD file</p>
+<p>Ask the user to select a LiPD file from a list
+Use this function in conjunction with enumerateLipds()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lipds</strong> (<em>dict</em>) – A dictionary of LiPD files. Can be obtained from
+pyleoclim.readLipd()</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>select_lipd</strong> – The index of the LiPD file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="handling-variables">
+<h2>Handling Variables<a class="headerlink" href="#handling-variables" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.promptForVariable">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">promptForVariable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.promptForVariable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prompt for a specific variable</p>
+<p>Ask the user to select the variable they are interested in.
+Use this function in conjunction with readHeaders() or getTSO()</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>select_var</strong> – The index of the variable</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.xAxisTs">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">xAxisTs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeseries</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.xAxisTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the x-axis for the timeseries.
+:param timeseries: a timeseries object
+:type timeseries: dict</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>x_axis</strong> (<em>array</em>) – the values for the x-axis representation</p></li>
+<li><p><strong>label</strong> (<em>string</em>) – returns either “age”, “year”, or “depth”</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.checkXaxis">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">checkXaxis</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeseries</span></em>, <em class="sig-param"><span class="n">x_axis</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.checkXaxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that a x-axis is present for the timeseries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeseries</strong> (<em>dict</em>) – a timeseries</p></li>
+<li><p><strong>x_axis</strong> (<em>string</em>) – the x-axis representation, either depth, age or year</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x</strong> (<em>array</em>) – the values for the x-axis representation,</p></li>
+<li><p><strong>label</strong> (<em>string</em>) – returns either “age”, “year”, or “depth”</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.checkTimeAxis">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">checkTimeAxis</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeseries</span></em>, <em class="sig-param"><span class="n">x_axis</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.checkTimeAxis" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function makes sure that time is available for the timeseries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>timeseries</strong> (<em>dict</em>) – A LiPD timeseries object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>x</strong> (<em>array</em>) – the time values for the timeseries</p></li>
+<li><p><strong>label</strong> (<em>string</em>) – the time representation for the timeseries</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.searchVar">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">searchVar</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeseries_list</span></em>, <em class="sig-param"><span class="n">key</span></em>, <em class="sig-param"><span class="n">exact</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">override</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.searchVar" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function search for key words (exact match) for a variable</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeseries_list</strong> (<em>list</em>) – A list of available series</p></li>
+<li><p><strong>key</strong> (<em>list</em>) – A list of keys to search</p></li>
+<li><p><strong>exact</strong> (<em>bool</em>) – if True, looks for an exact match.</p></li>
+<li><p><strong>override</strong> (<em>bool</em>) – if True, override the exact match if no match is found</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>match</strong> – A list of keys for the timeseries that match the selection
+criteria.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="handling-timeseries-objects">
+<h2>Handling timeseries objects<a class="headerlink" href="#handling-timeseries-objects" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.enumerateTs">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">enumerateTs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeseries_list</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.enumerateTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enumerate the available time series objects</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>timeseries_list</strong> (<em>list</em>) – a  list of available timeseries objects.
+To use the timeseries loaded upon initiation of the
+pyleoclim package, use pyleo.time_series.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.getTs">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">getTs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">timeseries_list</span></em>, <em class="sig-param"><span class="n">option</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.getTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a specific timeseries object from a dictionary of timeseries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timeseries_list</strong> (<em>list</em>) – a  list of available timeseries objects.
+To use the timeseries loaded upon initiation of the
+pyleoclim package, use pyleo.time_series.</p></li>
+<li><p><strong>option</strong> (<em>string</em>) – An expression to filter the datasets. Uses lipd.filterTs()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>timeseries</strong> – A single timeseries object if not optional filter selected or a filtered
+list if optional arguments given</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>single timeseries object or list of timeseries</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="linking-lipds-to-the-linkedearth-ontology">
+<h2>Linking LiPDs to the LinkedEarth Ontology<a class="headerlink" href="#linking-lipds-to-the-linkedearth-ontology" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.LipdToOntology">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">LipdToOntology</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">archiveType</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.LipdToOntology" title="Permalink to this definition">¶</a></dt>
+<dd><p>standardize archiveType</p>
+<p>Transform the archiveType from their LiPD name to their ontology counterpart</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>archiveType</strong> (<em>string</em>) – name of the archiveType from the LiPD file</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>archiveType</strong> – archiveType according to the ontology</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.timeUnitsCheck">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">timeUnitsCheck</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">units</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.timeUnitsCheck" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function attempts to make sense of the time units by checking for equivalence</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>units</strong> (<em>string</em>) – The units string for the timeseries</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>unit_group</strong> – Whether the units belongs to age_units, kage_units, year_units, or undefined</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="dealing-with-models">
+<h2>Dealing with models<a class="headerlink" href="#dealing-with-models" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.isModel">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">isModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">csvName</span></em>, <em class="sig-param"><span class="n">lipd</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.isModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check for the presence of a model in the same object than the measurement table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csvName</strong> (<em>string</em>) – The name of the csv file corresponding to the measurement table</p></li>
+<li><p><strong>lipd</strong> (<em>dict</em>) – A LiPD object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>model</strong> (<em>list</em>) – List of models already available</p></li>
+<li><p><strong>dataObject</strong> (<em>string</em>) – The name of the paleoData or ChronData
+object in which the model(s) are stored</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.modelNumber">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">modelNumber</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.modelNumber" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assign a new or existing model number</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>model</strong> (<em>list</em>) – List of possible model number. Obtained from isModel</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>modelNum</strong> – The number of the model</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="extracting-tables">
+<h2>Extracting tables<a class="headerlink" href="#extracting-tables" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.isMeasurement">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">isMeasurement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">csv_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.isMeasurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether measurement tables are available</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>csv_dict</strong> (<em>dict</em>) – Dictionary of available csv</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>paleoMeasurementTables</strong> (<em>list</em>) – List of available paleoMeasurementTables</p></li>
+<li><p><strong>chronMeasurementTables</strong> (<em>list</em>) – List of available chronMeasurementTables</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.whichMeasurement">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">whichMeasurement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">measurementTableList</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.whichMeasurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a measurement table from a list</p>
+<p>Use in conjunction with the function isMeasurement</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>measurementTableList</strong> (<em>list</em>) – List of measurement tables contained in the LiPD file. Output from the isMeasurement function</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>csvName</strong> – the name of the csv file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.getMeasurement">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">getMeasurement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">csvName</span></em>, <em class="sig-param"><span class="n">lipd</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.getMeasurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the dictionary corresponding to the measurement table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>csvName</strong> (<em>string</em>) – The name of the csv file</p></li>
+<li><p><strong>lipd</strong> (<em>dict</em>) – The LiPD object from which to extract the data</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>ts_list</strong> – A dictionary containing data and metadata for each column in the
+csv file.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="dealing-with-ensembles">
+<h2>Dealing with ensembles<a class="headerlink" href="#dealing-with-ensembles" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.isEnsemble">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">isEnsemble</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">csv_dict</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.isEnsemble" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether ensembles are available</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>csv_dict</strong> (<em>dict</em>) – Dictionary of available csv</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>paleoEnsembleTables</strong> (<em>list</em>) – List of available paleoEnsembleTables</p></li>
+<li><p><strong>chronEnsembleTables</strong> (<em>list</em>) – List of availale chronEnsemble Tables</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyleoclim.lipdutils.mapAgeEnsembleToPaleoData">
+<code class="sig-prename descclassname">pyleoclim.lipdutils.</code><code class="sig-name descname">mapAgeEnsembleToPaleoData</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ensembleValues</span></em>, <em class="sig-param"><span class="n">depthEnsemble</span></em>, <em class="sig-param"><span class="n">depthPaleo</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.lipdutils.mapAgeEnsembleToPaleoData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map the depth for the ensemble age values to the paleo depth</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ensembleValues</strong> (<em>array</em>) – A matrix of possible age models. Realizations
+should be stored in columns</p></li>
+<li><p><strong>depthEnsemble</strong> (<em>array</em>) – A vector of depth. The vector should have the same
+length as the number of rows in the ensembleValues</p></li>
+<li><p><strong>depthPaleo</strong> (<em>array</em>) – A vector corresponding to the depth at which there
+are paleodata information</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>ensembleValuesToPaleo</strong> – A matrix of age ensemble on the PaleoData scale</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

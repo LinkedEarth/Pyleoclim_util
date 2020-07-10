@@ -1,8 +1,7 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
   
@@ -12,28 +11,30 @@
   
 
   
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
   
   
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
-        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
 </head>
@@ -49,7 +50,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> Pyleoclim
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
           
 
           
@@ -76,6 +77,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -84,22 +86,13 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Pyleoclim</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../main.html">Main Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../map.html">Mapping Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../plot.html">Plotting Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../stats.html">Statistics Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../timeseries.html">Timeseries Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../lipdutils.html">LiPD Utilities</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../summaryplots.html">Summary Plots</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../spectral.html">Spectral Functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../rbchron.html">RBchron</a></li>
 </ul>
 
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -138,7 +131,7 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Overview: module code</li>
     
@@ -156,16 +149,8 @@
            <div itemprop="articleBody">
             
   <h1>All modules for which code is available</h1>
-<ul><li><a href="pyleoclim.html">pyleoclim</a></li>
-<ul><li><a href="pyleoclim/lipdutils.html">pyleoclim.lipdutils</a></li>
-<li><a href="pyleoclim/map.html">pyleoclim.map</a></li>
-<li><a href="pyleoclim/plot.html">pyleoclim.plot</a></li>
-<li><a href="pyleoclim/rbchron.html">pyleoclim.rbchron</a></li>
-<li><a href="pyleoclim/spectral.html">pyleoclim.spectral</a></li>
-<li><a href="pyleoclim/stats.html">pyleoclim.stats</a></li>
-<li><a href="pyleoclim/summaryplots.html">pyleoclim.summaryplots</a></li>
-<li><a href="pyleoclim/timeseries.html">pyleoclim.timeseries</a></li>
-</ul></ul>
+<ul><li><a href="pyleoclim/utils/spectral.html">pyleoclim.utils.spectral</a></li>
+</ul>
 
            </div>
            
@@ -177,11 +162,19 @@
 
   <div role="contentinfo">
     <p>
+        
         &copy; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -192,7 +185,6 @@
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {
