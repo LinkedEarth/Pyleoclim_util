@@ -12,7 +12,7 @@ from pyleoclim import utils
 import matplotlib.pyplot as plt
 import numpy as np
 
-def welch():
+def welch_example():
 #create a periodic signal
     time = np.arange(2001)
     f = 1/50
