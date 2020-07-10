@@ -292,24 +292,25 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    </span>
-<span class="sd">    .. plot:: spectral_examples.py welch_example</span>
-<span class="sd">        :include-source:</span>
-<span class="sd">        # &gt;&gt;&gt; from pyleoclim import utils</span>
-<span class="sd">        # &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
-<span class="sd">        # &gt;&gt;&gt; import numpy as np</span>
-<span class="sd">        # &gt;&gt;&gt; # Create a signal</span>
-<span class="sd">        # &gt;&gt;&gt; time = np.arange(2001)</span>
-<span class="sd">        # &gt;&gt;&gt; f = 1/50</span>
-<span class="sd">        # &gt;&gt;&gt; signal = np.cos(2*np.pi*f*time)</span>
-<span class="sd">        # &gt;&gt;&gt; # Spectral Analysis</span>
-<span class="sd">        # &gt;&gt;&gt; res=utils.welch()</span>
-<span class="sd">        # &gt;&gt;&gt; # plot</span>
-<span class="sd">        # &gt;&gt;&gt; fig = plt.loglog(</span>
-<span class="sd">        # ...           res[&#39;freq&#39;],</span>
-<span class="sd">        # ...           res[&#39;psd&#39;])</span>
-<span class="sd">        # &gt;&gt;&gt; plt.xlabel(&#39;Frequency&#39;)</span>
-<span class="sd">        # &gt;&gt;&gt; plt.ylabel(&#39;PSD&#39;)</span>
-<span class="sd">        # &gt;&gt;&gt; plt.show()</span>
+<span class="sd">    .. plot::</span>
+<span class="sd">        :context: close-figs</span>
+
+<span class="sd">        &gt;&gt;&gt; from pyleoclim import utils</span>
+<span class="sd">        &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; # Create a signal</span>
+<span class="sd">        &gt;&gt;&gt; time = np.arange(2001)</span>
+<span class="sd">        &gt;&gt;&gt; f = 1/50</span>
+<span class="sd">        &gt;&gt;&gt; signal = np.cos(2*np.pi*f*time)</span>
+<span class="sd">        &gt;&gt;&gt; # Spectral Analysis</span>
+<span class="sd">        &gt;&gt;&gt; res = utils.welch(signal, time)</span>
+<span class="sd">        &gt;&gt;&gt; # plot</span>
+<span class="sd">        &gt;&gt;&gt; fig = plt.loglog(</span>
+<span class="sd">        ...           res[&#39;freq&#39;],</span>
+<span class="sd">        ...           res[&#39;psd&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; plt.xlabel(&#39;Frequency&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.ylabel(&#39;PSD&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.show()</span>
 <span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
     
