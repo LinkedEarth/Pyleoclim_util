@@ -7,6 +7,8 @@
    spectral/mtm.rst
    spectral/lombscargle.rst
    spectral/wwz_psd.rst
+   causality/granger.rst
+   causality/liang.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -15,6 +17,14 @@ Pyleoclim makes extensive use of functions from `Numpy <https://numpy.org>`_, `P
 
 Causality
 ---------
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`granger <utils_granger>`
+     - Estimate Granger causality
+   * - :ref:`liang <utils_liang>`
+     - Estimate Liang causality
 
 Correlation
 -----------

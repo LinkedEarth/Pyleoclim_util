@@ -546,10 +546,14 @@ class Series:
         ''' Perform causality analysis with the target timeseries
         '''
         settings = {} if settings is None else settings.copy()
+        spec_func={
+            'liang':causalutils.liang_causality,
+            'granger':causalutils.granger_causality}
         args = {}
         args['liang'] = {}
+        args['granger'] = {}
         args[method].update(settings)
-        causal_res = causalutils.causality_est(self.value, target_series.value, method=method, **args[method])
+        causal_res = spec_func[method](self.value, target_series.value, **args[method])
         return causal_res
 
     def surrogates(self, method='ar1', number=1, length=None, seed=None, settings=None):

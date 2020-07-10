@@ -1,0 +1,680 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyleoclim.utils.causality &mdash; Pyleoclim 0.4.10 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.4.10
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyleoclim.utils.causality</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyleoclim.utils.causality</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Feb 25 05:47:03 2020</span>
+
+<span class="sd">@author: deborahkhider</span>
+
+<span class="sd">Contains all relevant functions for causality analysis</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;liang_causality&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;granger_causality&#39;</span>
+<span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">statsmodels.tsa.stattools</span> <span class="kn">import</span> <span class="n">grangercausalitytests</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span> <span class="nn">.correlation</span> <span class="kn">import</span> <span class="n">sm_ar1_fit</span><span class="p">,</span> <span class="n">sm_ar1_sim</span><span class="p">,</span> <span class="n">phaseran</span>
+<span class="kn">from</span> <span class="nn">scipy.stats.mstats</span> <span class="kn">import</span> <span class="n">mquantiles</span>
+
+<span class="c1">#-------</span>
+<span class="c1">#Main functions</span>
+<span class="c1">#--------</span>
+<div class="viewcode-block" id="granger_causality"><a class="viewcode-back" href="../../../utils/causality/granger.html#pyleoclim.utils.granger_causality">[docs]</a><span class="k">def</span> <span class="nf">granger_causality</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">maxlag</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">addconst</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    statsmodels granger causality tests</span>
+
+<span class="sd">    Four tests for granger non causality of 2 time series.</span>
+
+<span class="sd">    All four tests give similar results. params_ftest and ssr_ftest are equivalent based on F test which is identical to lmtest:grangertest in R.</span>
+<span class="sd">    </span>
+<span class="sd">    Wrapper for the functions described in statsmodel (https://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.grangercausalitytests.html)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    y1, y2: array</span>
+<span class="sd">        vectors of (real) numbers with identical length, no NaNs allowed</span>
+<span class="sd">    maxlag : int or int iterable</span>
+<span class="sd">        If an integer, computes the test for all lags up to maxlag. If an iterable, computes the tests only for the lags in maxlag.</span>
+<span class="sd">    addconst : bool</span>
+<span class="sd">        Include a constant in the model.</span>
+<span class="sd">    verbose : bool</span>
+<span class="sd">        Print results</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    dict</span>
+<span class="sd">        All test results, dictionary keys are the number of lags. For each lag the values are a tuple, with the first element a dictionary with test statistic,</span>
+<span class="sd">        pvalues, degrees of freedom, the second element are the OLS estimation results for the restricted model, the unrestricted model and the restriction (contrast)</span>
+<span class="sd">        matrix for the parameter f_test.</span>
+<span class="sd">        </span>
+<span class="sd">    Notes</span>
+<span class="sd">    ------</span>
+<span class="sd">    The Null hypothesis for grangercausalitytests is that the time series in the second column, x2, does NOT Granger cause the time series in the first column, x1. Grange causality means that past values of x2 have a statistically significant effect on the current value of x1, taking past values of x1 into account as regressors. We reject the null hypothesis that x2 does not Granger cause x1 if the pvalues are below a desired size of the test.</span>
+
+<span class="sd">    The null hypothesis for all four test is that the coefficients corresponding to past values of the second time series are zero.</span>
+
+<span class="sd">    ‘params_ftest’, ‘ssr_ftest’ are based on F distribution</span>
+
+<span class="sd">    ‘ssr_chi2test’, ‘lrtest’ are based on chi-square distribution</span>
+<span class="sd">    </span>
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    liang_causality : information flow estimated using the Liang algorithm</span>
+<span class="sd">    </span>
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Granger, C. W. J. (1969). Investigating causal relations by econometric models and cross-spectral methods. Econometrica, 37(3), 424-438. </span>
+<span class="sd">    </span>
+<span class="sd">    Granger, C. W. J. (1980). Testing for causality: A personal viewpoont. Journal of Economic Dynamics and Control, 2, 329-352. </span>
+<span class="sd">    </span>
+<span class="sd">    Granger, C. W. J. (1988). Some recent development in a concept of causality. Journal of Econometrics, 39(1-2), 199-211. </span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">y2</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Timeseries must be of same length&#39;</span><span class="p">)</span>
+
+    <span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">([</span><span class="n">y1</span><span class="p">,</span><span class="n">y2</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">grangercausalitytests</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">maxlag</span><span class="o">=</span><span class="n">maxlag</span><span class="p">,</span><span class="n">addconst</span><span class="o">=</span><span class="n">addconst</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="liang_causality"><a class="viewcode-back" href="../../../utils/causality/liang.html#pyleoclim.utils.liang_causality">[docs]</a><span class="k">def</span> <span class="nf">liang_causality</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">npt</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">signif_test</span><span class="o">=</span><span class="s1">&#39;isospec&#39;</span><span class="p">,</span> <span class="n">nsim</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+                    <span class="n">qs</span><span class="o">=</span><span class="p">[</span><span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.995</span><span class="p">]):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Estimate the Liang information transfer from series y2 to series y1 with </span>
+<span class="sd">    singificance estimates using either an AR(1) test with series with the same</span>
+<span class="sd">    persistence or surrogates with randomized phases.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    y1, y2 : array</span>
+<span class="sd">        vectors of (real) numbers with identical length, no NaNs allowed</span>
+
+<span class="sd">    npt : int  &gt;=1</span>
+<span class="sd">        time advance in performing Euler forward differencing,</span>
+<span class="sd">        e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,</span>
+<span class="sd">        npt=1 should be used</span>
+<span class="sd">    </span>
+<span class="sd">    signif_test : {&#39;isopersist&#39;, &#39;isospec&#39;}</span>
+<span class="sd">        the method for significance test</span>
+<span class="sd">        see signif_isospec and signif_isopersist for details. </span>
+<span class="sd">        </span>
+<span class="sd">    nsim : int</span>
+<span class="sd">        the number of AR(1) surrogates for significance test</span>
+<span class="sd">        </span>
+<span class="sd">    qs : list</span>
+<span class="sd">        the quantiles for significance test</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res : dict</span>
+<span class="sd">        A dictionary of results including:</span>
+<span class="sd">            T21 : float</span>
+<span class="sd">                information flow from y2 to y1 (Note: not y1 -&gt; y2!)</span>
+<span class="sd">            tau21 : float</span>
+<span class="sd">                the standardized information flow from y2 to y1</span>
+<span class="sd">            Z : float</span>
+<span class="sd">                the total information flow from y2 to y1</span>
+<span class="sd">            T21_noise_qs : list</span>
+<span class="sd">                the quantiles of the information flow from noise2 to noise1 for significance testing</span>
+<span class="sd">            tau21_noise_qs : list</span>
+<span class="sd">                the quantiles of the standardized information flow from noise2 to noise1 for significance testing</span>
+<span class="sd">    </span>
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    granger_causality : information flow estimated using the Granger algorithm</span>
+<span class="sd">    causality.signif_isopersist : significance test with AR(1) with same persistence</span>
+<span class="sd">    causality.signif_isospec : significance test with surrogates with randomized phases</span>
+<span class="sd">    </span>
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and</span>
+<span class="sd">            Applications. Entropy, 15, 327-360, doi:10.3390/e15010327</span>
+<span class="sd">    </span>
+<span class="sd">    Liang, X.S. (2014) Unraveling the cause-efect relation between timeseries.</span>
+<span class="sd">        Physical review, E 90, 052150</span>
+<span class="sd">    </span>
+<span class="sd">    Liang, X.S. (2015) Normalizing the causality between time series.</span>
+<span class="sd">        Physical review, E 92, 022126</span>
+<span class="sd">    </span>
+<span class="sd">    Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio.</span>
+<span class="sd">        Physical review, E 94, 052201</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">dt</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">nm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+
+    <span class="n">grad1</span> <span class="o">=</span> <span class="p">(</span><span class="n">y1</span><span class="p">[</span><span class="mi">0</span><span class="o">+</span><span class="n">npt</span><span class="p">:]</span> <span class="o">-</span> <span class="n">y1</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="n">npt</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">npt</span><span class="p">)</span>
+    <span class="n">grad2</span> <span class="o">=</span> <span class="p">(</span><span class="n">y2</span><span class="p">[</span><span class="mi">0</span><span class="o">+</span><span class="n">npt</span><span class="p">:]</span> <span class="o">-</span> <span class="n">y2</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="n">npt</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">npt</span><span class="p">)</span>
+
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">y1</span><span class="p">[:</span><span class="o">-</span><span class="n">npt</span><span class="p">]</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">y2</span><span class="p">[:</span><span class="o">-</span><span class="n">npt</span><span class="p">]</span>
+
+    <span class="n">N</span> <span class="o">=</span> <span class="n">nm</span> <span class="o">-</span> <span class="n">npt</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span>
+    <span class="n">detC</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+
+    <span class="n">dC</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">dC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y1</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">grad1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">grad1</span><span class="p">)))</span>
+    <span class="n">dC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y1</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">grad2</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">grad2</span><span class="p">)))</span>
+    <span class="n">dC</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y2</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">grad1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">grad1</span><span class="p">)))</span>
+    <span class="n">dC</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y2</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">grad2</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">grad2</span><span class="p">)))</span>
+
+    <span class="n">dC</span> <span class="o">/=</span> <span class="n">N</span><span class="o">-</span><span class="mi">1</span>
+
+    <span class="n">a11</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">a12</span> <span class="o">=</span> <span class="o">-</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">a11</span> <span class="o">/=</span> <span class="n">detC</span>
+    <span class="n">a12</span> <span class="o">/=</span> <span class="n">detC</span>
+
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">grad1</span><span class="p">)</span> <span class="o">-</span> <span class="n">a11</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span> <span class="o">-</span> <span class="n">a12</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">R1</span> <span class="o">=</span> <span class="n">grad1</span> <span class="o">-</span> <span class="p">(</span><span class="n">f1</span> <span class="o">+</span> <span class="n">a11</span><span class="o">*</span><span class="n">y1</span> <span class="o">+</span> <span class="n">a12</span><span class="o">*</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">Q1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">R1</span><span class="o">*</span><span class="n">R1</span><span class="p">)</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">Q1</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">N</span><span class="p">)</span>
+
+    <span class="n">NI</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y1</span><span class="o">*</span><span class="n">y1</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y2</span><span class="o">*</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">R1</span><span class="o">*</span><span class="n">R1</span><span class="p">)</span> <span class="o">-</span> <span class="n">N</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">R1</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y1</span><span class="o">*</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">R1</span><span class="o">*</span><span class="n">y1</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">R1</span><span class="o">*</span><span class="n">y2</span><span class="p">)</span>
+
+    <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+    <span class="n">invNI</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">NI</span><span class="p">)</span>
+    <span class="n">var_a12</span> <span class="o">=</span> <span class="n">invNI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">T21</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">C</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">detC</span>
+    <span class="n">var_T21</span> <span class="o">=</span> <span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">var_a12</span>
+
+    <span class="n">dH1_star</span><span class="o">=</span> <span class="n">a11</span>
+    <span class="n">dH1_noise</span> <span class="o">=</span> <span class="n">b1</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">T21</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dH1_star</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dH1_noise</span><span class="p">)</span>
+
+    <span class="n">tau21</span> <span class="o">=</span> <span class="n">T21</span> <span class="o">/</span> <span class="n">Z</span>
+    <span class="n">dH1_star</span> <span class="o">=</span> <span class="n">dH1_star</span> <span class="o">/</span> <span class="n">Z</span>
+    <span class="n">dH1_noise</span> <span class="o">=</span> <span class="n">dH1_noise</span> <span class="o">/</span> <span class="n">Z</span>
+    
+    <span class="n">signif_test_func</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;isopersist&#39;</span><span class="p">:</span> <span class="n">signif_isopersist</span><span class="p">,</span>
+            <span class="s1">&#39;isospec&#39;</span><span class="p">:</span> <span class="n">signif_isospec</span><span class="p">,</span>
+        <span class="p">}</span>
+    
+    <span class="n">signif_dict</span> <span class="o">=</span> <span class="n">signif_test_func</span><span class="p">[</span><span class="n">signif_test</span><span class="p">](</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;liang&#39;</span><span class="p">,</span> <span class="n">nsim</span><span class="o">=</span><span class="n">nsim</span><span class="p">,</span> <span class="n">qs</span><span class="o">=</span><span class="n">qs</span><span class="p">,</span> <span class="n">npt</span><span class="o">=</span><span class="n">npt</span><span class="p">)</span>
+    <span class="n">T21_noise_qs</span> <span class="o">=</span> <span class="n">signif_dict</span><span class="p">[</span><span class="s1">&#39;T21_noise_qs&#39;</span><span class="p">]</span>
+    <span class="n">tau21_noise_qs</span> <span class="o">=</span> <span class="n">signif_dict</span><span class="p">[</span><span class="s1">&#39;tau21_noise_qs&#39;</span><span class="p">]</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;T21&#39;</span><span class="p">:</span> <span class="n">T21</span><span class="p">,</span>
+        <span class="s1">&#39;tau21&#39;</span><span class="p">:</span> <span class="n">tau21</span><span class="p">,</span>
+        <span class="s1">&#39;Z&#39;</span><span class="p">:</span> <span class="n">Z</span><span class="p">,</span>
+        <span class="s1">&#39;dH1_star&#39;</span><span class="p">:</span> <span class="n">dH1_star</span><span class="p">,</span>
+        <span class="s1">&#39;dH1_noise&#39;</span><span class="p">:</span> <span class="n">dH1_noise</span><span class="p">,</span>
+        <span class="s1">&#39;signif_qs&#39;</span> <span class="p">:</span> <span class="n">qs</span><span class="p">,</span>
+        <span class="s1">&#39;T21_noise&#39;</span> <span class="p">:</span> <span class="n">T21_noise_qs</span><span class="p">,</span>
+        <span class="s1">&#39;tau21_noise&#39;</span> <span class="p">:</span> <span class="n">tau21_noise_qs</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+<span class="k">def</span> <span class="nf">liang</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">npt</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Estimate the Liang information transfer from series y2 to series y1 </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    y1, y2 : array</span>
+<span class="sd">        vectors of (real) numbers with identical length, no NaNs allowed</span>
+
+<span class="sd">    npt : int  &gt;=1</span>
+<span class="sd">        time advance in performing Euler forward differencing,</span>
+<span class="sd">        e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,</span>
+<span class="sd">        npt=1 should be used</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res : dict</span>
+<span class="sd">        A dictionary of results including:</span>
+<span class="sd">            T21 : float</span>
+<span class="sd">                information flow from y2 to y1 (Note: not y1 -&gt; y2!)</span>
+<span class="sd">            tau21 : float</span>
+<span class="sd">                the standardized information flow from y2 to y1</span>
+<span class="sd">            Z : float</span>
+<span class="sd">                the total information flow from y2 to y1</span>
+<span class="sd">            </span>
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    liang_causality : information flow estimated using the Granger algorithm</span>
+<span class="sd">    signif_isopersist : significance test with AR(1) with same persistence</span>
+<span class="sd">    signif_isospec : significance test with surrogates with randomized phases</span>
+<span class="sd">    </span>
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and</span>
+<span class="sd">            Applications. Entropy, 15, 327-360, doi:10.3390/e15010327</span>
+<span class="sd">    </span>
+<span class="sd">    Liang, X.S. (2014) Unraveling the cause-effect relation between timeseries.</span>
+<span class="sd">        Physical review, E 90, 052150</span>
+<span class="sd">    </span>
+<span class="sd">    Liang, X.S. (2015) Normalizing the causality between time series.</span>
+<span class="sd">        Physical review, E 92, 022126</span>
+<span class="sd">    </span>
+<span class="sd">    Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio.</span>
+<span class="sd">        Physical review, E 94, 052201</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">dt</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">nm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+
+    <span class="n">grad1</span> <span class="o">=</span> <span class="p">(</span><span class="n">y1</span><span class="p">[</span><span class="mi">0</span><span class="o">+</span><span class="n">npt</span><span class="p">:]</span> <span class="o">-</span> <span class="n">y1</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="n">npt</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">npt</span><span class="p">)</span>
+    <span class="n">grad2</span> <span class="o">=</span> <span class="p">(</span><span class="n">y2</span><span class="p">[</span><span class="mi">0</span><span class="o">+</span><span class="n">npt</span><span class="p">:]</span> <span class="o">-</span> <span class="n">y2</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="n">npt</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">npt</span><span class="p">)</span>
+
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">y1</span><span class="p">[:</span><span class="o">-</span><span class="n">npt</span><span class="p">]</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">y2</span><span class="p">[:</span><span class="o">-</span><span class="n">npt</span><span class="p">]</span>
+
+    <span class="n">N</span> <span class="o">=</span> <span class="n">nm</span> <span class="o">-</span> <span class="n">npt</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cov</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span>
+    <span class="n">detC</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+
+    <span class="n">dC</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">dC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y1</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">grad1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">grad1</span><span class="p">)))</span>
+    <span class="n">dC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y1</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">grad2</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">grad2</span><span class="p">)))</span>
+    <span class="n">dC</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y2</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">grad1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">grad1</span><span class="p">)))</span>
+    <span class="n">dC</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">y2</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y2</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">grad2</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">grad2</span><span class="p">)))</span>
+
+    <span class="n">dC</span> <span class="o">/=</span> <span class="n">N</span><span class="o">-</span><span class="mi">1</span>
+
+    <span class="n">a11</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">a12</span> <span class="o">=</span> <span class="o">-</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">a11</span> <span class="o">/=</span> <span class="n">detC</span>
+    <span class="n">a12</span> <span class="o">/=</span> <span class="n">detC</span>
+
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">grad1</span><span class="p">)</span> <span class="o">-</span> <span class="n">a11</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span> <span class="o">-</span> <span class="n">a12</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">R1</span> <span class="o">=</span> <span class="n">grad1</span> <span class="o">-</span> <span class="p">(</span><span class="n">f1</span> <span class="o">+</span> <span class="n">a11</span><span class="o">*</span><span class="n">y1</span> <span class="o">+</span> <span class="n">a12</span><span class="o">*</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">Q1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">R1</span><span class="o">*</span><span class="n">R1</span><span class="p">)</span>
+    <span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">Q1</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">N</span><span class="p">)</span>
+
+    <span class="n">NI</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y1</span><span class="o">*</span><span class="n">y1</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y2</span><span class="o">*</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">3</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">R1</span><span class="o">*</span><span class="n">R1</span><span class="p">)</span> <span class="o">-</span> <span class="n">N</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">R1</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y1</span><span class="o">*</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">R1</span><span class="o">*</span><span class="n">y1</span><span class="p">)</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">dt</span><span class="o">/</span><span class="n">b1</span><span class="o">**</span><span class="mi">3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">R1</span><span class="o">*</span><span class="n">y2</span><span class="p">)</span>
+
+    <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="n">NI</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">NI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+    <span class="n">invNI</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">NI</span><span class="p">)</span>
+    <span class="n">var_a12</span> <span class="o">=</span> <span class="n">invNI</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="n">T21</span> <span class="o">=</span> <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="n">C</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">dC</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">detC</span>
+    <span class="n">var_T21</span> <span class="o">=</span> <span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">var_a12</span>
+
+    <span class="n">dH1_star</span><span class="o">=</span> <span class="n">a11</span>
+    <span class="n">dH1_noise</span> <span class="o">=</span> <span class="n">b1</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">C</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">T21</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dH1_star</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dH1_noise</span><span class="p">)</span>
+
+    <span class="n">tau21</span> <span class="o">=</span> <span class="n">T21</span> <span class="o">/</span> <span class="n">Z</span>
+    <span class="n">dH1_star</span> <span class="o">=</span> <span class="n">dH1_star</span> <span class="o">/</span> <span class="n">Z</span>
+    <span class="n">dH1_noise</span> <span class="o">=</span> <span class="n">dH1_noise</span> <span class="o">/</span> <span class="n">Z</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;T21&#39;</span><span class="p">:</span> <span class="n">T21</span><span class="p">,</span>
+        <span class="s1">&#39;tau21&#39;</span><span class="p">:</span> <span class="n">tau21</span><span class="p">,</span>
+        <span class="s1">&#39;Z&#39;</span><span class="p">:</span> <span class="n">Z</span><span class="p">,</span>
+        <span class="s1">&#39;dH1_star&#39;</span><span class="p">:</span> <span class="n">dH1_star</span><span class="p">,</span>
+        <span class="s1">&#39;dH1_noise&#39;</span><span class="p">:</span> <span class="n">dH1_noise</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">res</span>
+
+<div class="viewcode-block" id="signif_isopersist"><a class="viewcode-back" href="../../../utils/causality/isopersist.html#pyleoclim.utils.signif_isopersist">[docs]</a><span class="k">def</span> <span class="nf">signif_isopersist</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span>
+                      <span class="n">nsim</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">qs</span><span class="o">=</span><span class="p">[</span><span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.995</span><span class="p">],</span>
+                      <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; significance test with AR(1) with same persistence</span>
+
+<span class="sd">    parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    y1, y2 : array</span>
+<span class="sd">        vectors of (real) numbers with identical length, no NaNs allowed</span>
+<span class="sd">    method : {&#39;liang&#39;}</span>
+<span class="sd">        estimates for the Liang method</span>
+<span class="sd">    npt : int&gt;=1</span>
+<span class="sd">        time advance in performing Euler forward differencing,</span>
+<span class="sd">        e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,</span>
+<span class="sd">        npt=1 should be used.</span>
+<span class="sd">    nsim : int</span>
+<span class="sd">        the number of AR(1) surrogates for significance test</span>
+<span class="sd">    qs : list</span>
+<span class="sd">        the quantiles for significance test</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    res_dict : dict</span>
+<span class="sd">        A dictionary with the following information:</span>
+<span class="sd">          T21_noise_qs : list</span>
+<span class="sd">            the quantiles of the information flow from noise2 to noise1 for significance testing</span>
+<span class="sd">          tau21_noise_qs : list</span>
+<span class="sd">            the quantiles of the standardized information flow from noise2 to noise1 for significance testing</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">g1</span> <span class="o">=</span> <span class="n">sm_ar1_fit</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+    <span class="n">g2</span> <span class="o">=</span> <span class="n">sm_ar1_fit</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">sig1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+    <span class="n">sig2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">y2</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+    <span class="n">noise1</span> <span class="o">=</span> <span class="n">sm_ar1_sim</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">nsim</span><span class="p">,</span> <span class="n">g1</span><span class="p">,</span> <span class="n">sig1</span><span class="p">)</span>
+    <span class="n">noise2</span> <span class="o">=</span> <span class="n">sm_ar1_sim</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">nsim</span><span class="p">,</span> <span class="n">g2</span><span class="p">,</span> <span class="n">sig2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;liang&#39;</span><span class="p">:</span>
+        <span class="n">npt</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;npt&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;npt&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">T21_noise</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tau21_noise</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nsim</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Calculating causality between surrogates&#39;</span><span class="p">):</span>
+            <span class="n">res_noise</span> <span class="o">=</span> <span class="n">liang</span><span class="p">(</span><span class="n">noise1</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">noise2</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">npt</span><span class="o">=</span><span class="n">npt</span><span class="p">)</span>
+            <span class="n">tau21_noise</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_noise</span><span class="p">[</span><span class="s1">&#39;tau21&#39;</span><span class="p">])</span>
+            <span class="n">T21_noise</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_noise</span><span class="p">[</span><span class="s1">&#39;T21&#39;</span><span class="p">])</span>
+        <span class="n">tau21_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tau21_noise</span><span class="p">)</span>
+        <span class="n">T21_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">T21_noise</span><span class="p">)</span>
+        <span class="n">tau21_noise_qs</span> <span class="o">=</span> <span class="n">mquantiles</span><span class="p">(</span><span class="n">tau21_noise</span><span class="p">,</span> <span class="n">qs</span><span class="p">)</span>
+        <span class="n">T21_noise_qs</span> <span class="o">=</span> <span class="n">mquantiles</span><span class="p">(</span><span class="n">T21_noise</span><span class="p">,</span> <span class="n">qs</span><span class="p">)</span>
+
+        <span class="n">res_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;tau21_noise_qs&#39;</span><span class="p">:</span> <span class="n">tau21_noise_qs</span><span class="p">,</span>
+            <span class="s1">&#39;T21_noise_qs&#39;</span><span class="p">:</span> <span class="n">T21_noise_qs</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="c1">#TODO add granger method</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1"> is not a valid method&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res_dict</span></div>
+
+<div class="viewcode-block" id="signif_isospec"><a class="viewcode-back" href="../../../utils/causality/isospec.html#pyleoclim.utils.signif_isospec">[docs]</a><span class="k">def</span> <span class="nf">signif_isospec</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span>
+                   <span class="n">nsim</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">qs</span><span class="o">=</span><span class="p">[</span><span class="mf">0.005</span><span class="p">,</span> <span class="mf">0.025</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.975</span><span class="p">,</span> <span class="mf">0.995</span><span class="p">],</span>
+                   <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; significance test with surrogates with randomized phases</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    y1, y2 : array</span>
+<span class="sd">            vectors of (real) numbers with identical length, no NaNs allowed</span>
+<span class="sd">    method : {&#39;liang&#39;}</span>
+<span class="sd">            estimates for the Liang method</span>
+<span class="sd">    npt : int&gt;=1</span>
+<span class="sd">         time advance in performing Euler forward differencing,</span>
+<span class="sd">         e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,</span>
+<span class="sd">         npt=1 should be used.</span>
+<span class="sd">    nsim : int</span>
+<span class="sd">          the number of surrogates for significance test</span>
+<span class="sd">    qs : list</span>
+<span class="sd">        the quantiles for significance test</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    res_dict : dict</span>
+<span class="sd">        A dictionary with the following information:</span>
+<span class="sd">          T21_noise_qs : list</span>
+<span class="sd">                        the quantiles of the information flow from noise2 to noise1 for significance testing</span>
+<span class="sd">          tau21_noise_qs : list</span>
+<span class="sd">                          the quantiles of the standardized information flow from noise2 to noise1 for significance testing</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="n">noise1</span> <span class="o">=</span> <span class="n">phaseran</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">nsim</span><span class="p">)</span>
+    <span class="n">noise2</span> <span class="o">=</span> <span class="n">phaseran</span><span class="p">(</span><span class="n">y2</span><span class="p">,</span> <span class="n">nsim</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;liang&#39;</span><span class="p">:</span>
+        <span class="n">npt</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;npt&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;npt&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">T21_noise</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tau21_noise</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nsim</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;Calculating causality between surrogates&#39;</span><span class="p">):</span>
+            <span class="n">res_noise</span> <span class="o">=</span> <span class="n">liang</span><span class="p">(</span><span class="n">noise1</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">noise2</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">npt</span><span class="o">=</span><span class="n">npt</span><span class="p">)</span>
+            <span class="n">tau21_noise</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_noise</span><span class="p">[</span><span class="s1">&#39;tau21&#39;</span><span class="p">])</span>
+            <span class="n">T21_noise</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res_noise</span><span class="p">[</span><span class="s1">&#39;T21&#39;</span><span class="p">])</span>
+        <span class="n">tau21_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tau21_noise</span><span class="p">)</span>
+        <span class="n">T21_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">T21_noise</span><span class="p">)</span>
+        <span class="n">tau21_noise_qs</span> <span class="o">=</span> <span class="n">mquantiles</span><span class="p">(</span><span class="n">tau21_noise</span><span class="p">,</span> <span class="n">qs</span><span class="p">)</span>
+        <span class="n">T21_noise_qs</span> <span class="o">=</span> <span class="n">mquantiles</span><span class="p">(</span><span class="n">T21_noise</span><span class="p">,</span> <span class="n">qs</span><span class="p">)</span>
+
+        <span class="n">res_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;tau21_noise_qs&#39;</span><span class="p">:</span> <span class="n">tau21_noise_qs</span><span class="p">,</span>
+            <span class="s1">&#39;T21_noise_qs&#39;</span><span class="p">:</span> <span class="n">T21_noise_qs</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="c1">#TODO add Granger</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s1"> is not a valid method&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res_dict</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -16,5 +16,9 @@ from .causality import *
 from .lipdutils import *
 from .mapping import *
 from .tsutils import *
+from .tsmodel import *
+from .decomposition import *
+from .filter import *
+from .tsutils import *
 
 
