@@ -44,17 +44,17 @@ from .tsutils import clean_ts, interp, bin_values
 #---------
 
 
-def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None, 
+def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
            return_onesided=True, detrend = None, params=["default", 4, 0, 1],
-           gaussianize=False, standardize=False,
+           gaussianize=False, standardize=True,
            scaling='density', average='mean'):
     '''Estimate power spectral density using Welch's method
-    
-    Wrapper for the function implemented in scipy.signal.welch 
+
+    Wrapper for the function implemented in scipy.signal.welch
     See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html for details.
-    
+
     Welch's method is an approach for spectral density estimation. It computes an estimate of the power spectral density by dividing the data into overlapping segments, computing a modified periodogram for each segment and averaging the periodograms.
-    
+
     Parameters
     ----------
 
@@ -64,7 +64,7 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
         time axis of the time series
     window : string or tuple
         Desired window to use. Possible values:
-            - boxcar 
+            - boxcar
             - triang
             - blackman
             - hamming
@@ -86,7 +86,7 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
             - tukey (needs taper fraction)
         If the window requires no parameters, then window can be a string.
         If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.
-        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.      
+        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.
       nperseg : int
           Length of each segment. If none, nperseg=len(ys)/2. Default to None This will give three segments with 50% overlap
       noverlap : int
@@ -116,29 +116,29 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
           Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density'
       average : {'mean','median'}
           Method to use when averaging periodograms. Defaults to ‘mean’.
-          
+
     Returns
     -------
     res_dict : dict
         the result dictionary, including
         - freq (array): the frequency vector
         - psd (array): the spectral density vector
-        
-        
+
+
     See Also
     --------
     periodogram : Estimate power spectral density using a periodogram
     mtm : Retuns spectral density using a multi-taper method
     lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
     wwz_psd : Return the psd of a timeseries using wwz method.
-        
+
     References
     ----------
     P. Welch, “The use of the fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms”, IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.
 
     Examples
     --------
-    
+
     .. plot::
         :context: close-figs
 
@@ -158,15 +158,15 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
         >>> plt.xlabel('Frequency')
         >>> plt.ylabel('PSD')
         >>> plt.show()
-    
+
     '''
-    
+
     ts = np.array(ts)
     ys = np.array(ys)
-    
+
     if len(ts) != len(ys):
         raise ValueError('Time and value axis should be the same length')
-    
+
     if nperseg == None:
         nperseg = len(ys/2)
 
@@ -204,12 +204,12 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
 
 
 def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
-           gaussianize=False, standardize=False, adaptive=False, jackknife=True,
+           gaussianize=False, standardize=True, adaptive=False, jackknife=True,
            low_bias=True, sides='default', nfft=None):
     ''' Retuns spectral density using a multi-taper method.
-    
-    
-    Based on the function in the time series analysis for neuroscience toolbox: http://nipy.org/nitime/api/generated/nitime.algorithms.spectral.html 
+
+
+    Based on the function in the time series analysis for neuroscience toolbox: http://nipy.org/nitime/api/generated/nitime.algorithms.spectral.html
 
     Parameters
     ----------
@@ -217,11 +217,11 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
     ys : array
         a time series
     ts : array
-        time axis of the time series 
+        time axis of the time series
     NW : float
         The normalized half-bandwidth of the data tapers, indicating a
         multiple of the fundamental frequency of the DFT (Fs/N).
-        Common choices are n/2, for n >= 4. 
+        Common choices are n/2, for n >= 4.
     BW : float
         The sampling-relative bandwidth of the data tapers
     detrend : str
@@ -256,7 +256,7 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
           For complex-valued inputs, the default is two-sided, for real-valued
           inputs, default is one-sided Indicates whether to return a one-sided
           or two-sided
-    
+
     Returns
     -------
 
@@ -264,17 +264,17 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
         the result dictionary, including
         - freq (array): the frequency vector
         - psd (array): the spectral density vector
-        
+
     See Also
     --------
     periodogram : Estimate power spectral density using a periodogram
     welch : Retuns spectral density using the welch method
     lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
-    wwz_psd : Return the psd of a timeseries using wwz method. 
-    
+    wwz_psd : Return the psd of a timeseries using wwz method.
+
     Examples
     --------
-    
+
     .. plot::
         :context: close-figs
 
@@ -293,13 +293,13 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
         ...           res['psd'])
         >>> plt.xlabel('Frequency')
         >>> plt.ylabel('PSD')
-        >>> plt.show()    
+        >>> plt.show()
 
     '''
     # preprocessing
     ts = np.array(ts)
     ys = np.array(ys)
-    
+
     if len(ts) != len(ys):
         raise ValueError('Time and value axis should be the same length')
 
@@ -336,15 +336,15 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
     return res_dict
 
 
-def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle', 
+def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
                  freq_kwargs=None, n50=3, window='hann',
                  detrend = None, params=["default", 4, 0, 1],
-                 gaussianize=False, 
-                 standardize=False,
+                 gaussianize=False,
+                 standardize=True,
                  average='mean'):
     """ Return the computed periodogram using lomb-scargle algorithm
-    
-    Uses the lombscargle implementation from scipy.signal: https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle 
+
+    Uses the lombscargle implementation from scipy.signal: https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle
 
     Parameters
     ----------
@@ -355,10 +355,10 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
         time axis of the time series
     freq : str or array
         vector of frequency.
-        If string, uses the following method:        
+        If string, uses the following method:
     freq_method : str
         Method to generate the frequency vector if not set directly. The following options are avialable:
-            - log 
+            - log
             - lomb-scargle (default)
             - welch
             - scale
@@ -371,7 +371,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
         The number of 50% overlapping segment to apply
     window : str or tuple
         Desired window to use. Possible values:
-            - boxcar 
+            - boxcar
             - triang
             - blackman
             - hamming
@@ -393,7 +393,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
             - tukey (needs taper fraction)
         If the window requires no parameters, then window can be a string.
         If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.
-        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.        
+        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.
      detrend : str
           If None, no detrending is applied. Available detrending methods:
               - None - no detrending will be applied (default);
@@ -412,8 +412,8 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
       standardize : bool
           If True, standardizes the timeseriesprep_args : dict
       average : {'mean','median'}
-          Method to use when averaging periodograms. Defaults to ‘mean’.   
-             
+          Method to use when averaging periodograms. Defaults to ‘mean’.
+
     Returns
     -------
 
@@ -421,25 +421,25 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
         the result dictionary, including
         - freq (array): the frequency vector
         - psd (array): the spectral density vector
-        
+
     See Also
     --------
     periodogram : Estimate power spectral density using a periodogram
     mtm : Retuns spectral density using a multi-taper method
     welch : Returns power spectral density using the Welch method
     wwz_psd : Return the psd of a timeseries using wwz method.
-    
+
     References
     ----------
-    Lomb, N. R. (1976). Least-squares frequency analysis of unequally spaced data. Astrophysics and Space Science 39, 447-462. 
-    
-    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853. 
-    
-    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853. 
+    Lomb, N. R. (1976). Least-squares frequency analysis of unequally spaced data. Astrophysics and Space Science 39, 447-462.
+
+    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.
+
+    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.
 
     Examples
     --------
-    
+
     .. plot::
         :context: close-figs
 
@@ -462,33 +462,33 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
     """
     ts = np.array(ts)
     ys = np.array(ys)
-    
+
     if len(ts) != len(ys):
         raise ValueError('Time and value axis should be the same length')
-    
+
     if n50<=0:
         raise ValueError('Number of overlapping segments should be greater than 1')
-    
+
     # remove NaNs
     ys, ts = clean_ts(ys,ts)
-    
+
     # preprocessing
     ys = preprocess(ys, ts, detrend=detrend, params=["default", 4, 0, 1],
                gaussianize=gaussianize, standardize=standardize)
-    
+
     # divide into segments
     nseg=int(np.floor(2*len(ts)/(n50+1)))
     index=np.array(np.arange(0,len(ts),nseg/2),dtype=int)
     index[-1]=len(ts) #make it ends at the time series
-    
+
     ts_seg=[]
     ys_seg=[]
-    
+
     for idx,i in enumerate(np.arange(0,len(index)-2,1)):
         ts_seg.append(ts[index[idx]:index[idx+2]])
         ys_seg.append(ys[index[idx]:index[idx+2]])
 
-    
+
     # calculate the frequency vector if needed
     if freq is None:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
@@ -498,21 +498,21 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
         freq = make_freq_vector(ts_seg[0],
                                 method=freq_method,
                                 **freq_kwargs)
-    
+
     freq_angular = 2 * np.pi * freq
 
     # fix the zero frequency point
     #if freq[0] == 0:
         #freq_copy = freq[1:]
         #freq_angular = 2 * np.pi * freq_copy
-    
+
     psd_seg=[]
-    
+
     for idx,item in enumerate(ys_seg):
         psd_seg.append(signal.lombscargle(ts_seg[idx],
-                                          item*signal.get_window(window,len(ts_seg[idx])), 
+                                          item*signal.get_window(window,len(ts_seg[idx])),
                                           freq_angular))
-                           
+
     # average them up
     if average=='mean':
         psd=np.mean(psd_seg,axis=0)
@@ -520,7 +520,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
         psd=np.median(psd_seg,axis=0)
     else:
         raise ValueError('Average should either be set to mean or median')
-    
+
     #if freq[0] == 0:
         #psd = np.insert(psd, 0, np.nan)
 
@@ -533,12 +533,12 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
     return res_dict
 
 
-def periodogram(ys, ts, window='hann', nfft=None, 
+def periodogram(ys, ts, window='hann', nfft=None,
            return_onesided=True, detrend = None, params=["default", 4, 0, 1],
-           gaussianize=False, standardize=False,
+           gaussianize=False, standardize=True,
            scaling='density'):
     ''' Estimate power spectral density using a periodogram
-    
+
     Based on the function from scipy: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.periodogram.html
 
     Parameters
@@ -554,7 +554,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
             - triang
             - blackman
             - hamming
-            - hann 
+            - hann
             - bartlett
             - flattop
             - parzen
@@ -572,7 +572,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
             - tukey (needs taper fraction)
         If the window requires no parameters, then window can be a string.
         If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.
-        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.      
+        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.
       nfft: int
           Length of the FFT used, if a zero padded FFT is desired. If None, the FFT length is nperseg
       return_onesided : bool
@@ -596,7 +596,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
           If True, standardizes the timeseries
       scaling : {"density,"spectrum}
           Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density'
-      
+
 
     Returns
     -------
@@ -605,17 +605,17 @@ def periodogram(ys, ts, window='hann', nfft=None,
         the result dictionary, including
         - freq (array): the frequency vector
         - psd (array): the spectral density vector
-    
+
     See Also
     --------
     welch : Estimate power spectral density using the welch method
     mtm : Retuns spectral density using a multi-taper method
     lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
     wwz_psd : Return the psd of a timeseries using wwz method.
-    
+
     Examples
     --------
-    
+
     .. plot::
         :context: close-figs
 
@@ -639,10 +639,10 @@ def periodogram(ys, ts, window='hann', nfft=None,
     '''
     ts = np.array(ts)
     ys = np.array(ys)
-    
+
     if len(ts) != len(ys):
         raise ValueError('Time and value axis should be the same length')
-    
+
         # remove NaNs
     ys, ts = clean_ts(ys,ts)
     # check for evenly-spaced
@@ -657,10 +657,10 @@ def periodogram(ys, ts, window='hann', nfft=None,
     # calculate sampling frequency fs
     dt = np.median(np.diff(ts))
     fs = 1 / dt
-    
+
     # spectral analysis
-    freq, psd = signal.periodogram(ys, fs, window=window, nfft=nfft, 
-                                   detrend=False, return_onesided=return_onesided, 
+    freq, psd = signal.periodogram(ys, fs, window=window, nfft=nfft,
+                                   detrend=False, return_onesided=return_onesided,
                                    scaling=scaling, axis=-1)
 
     # fix the zero frequency point
@@ -679,7 +679,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
 def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             tau=None, c=1e-3, nproc=8,
             detrend=False, params=["default", 4, 0, 1], gaussianize=False,
-            standardize=False, Neff=3, anti_alias=False, avgs=2,
+            standardize=True, Neff=3, anti_alias=False, avgs=2,
             method='default'):
     ''' Return the psd of a timeseries using wwz method.
 
@@ -748,22 +748,22 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         the 95% quantile of the psds of AR1 processes
     psd_ar1 : array
         the psds of AR1 processes
-    
+
     See Also
     --------
     periodogram : Estimate power spectral density using a periodogram
     mtm : Retuns spectral density using a multi-taper method
     lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
     welch : Estimate power spectral density using the Welch method
-   
+
     References
     ----------
-    Foster, G. (1996). Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112(4), 1709-1729. 
-    Kirchner, J. W. (2005). Aliasin in 1/f(alpha) noise spectra: origins, consequences, and remedies. Physical Review E covering statistical, nonlinear, biological, and soft matter physics, 71, 66110. 
-    
+    Foster, G. (1996). Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112(4), 1709-1729.
+    Kirchner, J. W. (2005). Aliasin in 1/f(alpha) noise spectra: origins, consequences, and remedies. Physical Review E covering statistical, nonlinear, biological, and soft matter physics, 71, 66110.
+
     Examples
     --------
-    
+
     .. plot::
         :context: close-figs
 
@@ -785,7 +785,7 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         >>> plt.show()
 
     '''
-    ys_cut, ts_cut, freq, tau = prepare_wwz(ys, ts, freq=freq, 
+    ys_cut, ts_cut, freq, tau = prepare_wwz(ys, ts, freq=freq,
                                             freq_method=freq_method,
                                             freq_kwargs=freq_kwargs,tau=tau)
 
