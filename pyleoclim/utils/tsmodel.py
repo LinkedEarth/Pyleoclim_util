@@ -14,7 +14,7 @@ __all__ = [
     'ar1_sim',
 ]
 
-def ar1_model(t, tau):
+def ar1_model(t, tau, output_sigma=1):
     ''' Simulate a (possibly irregularly-sampled) AR(1) process with given decay
         constant tau, à la REDFIT.
     Args
@@ -39,13 +39,13 @@ def ar1_model(t, tau):
 
     '''
     n = np.size(t)
-    y    = np.zeros(n)
+    y = np.zeros(n)
     y[0] = 0  # initializing
 
     for i in range(1, n):
         scaled_dt = (t[i] - t[i-1]) / tau
         rho = np.exp(-scaled_dt)
-        err = np.random.normal(0, np.sqrt(1 - rho**2), 1)
+        err = np.random.normal(0, np.sqrt(1 - rho**2)*output_sigma, 1)
         y[i] = y[i-1]*rho + err
 
     return y
@@ -102,10 +102,10 @@ def ar1_sim(y, p, t=None):
     n = np.size(y)
     Yr = np.empty(shape=(n, p))  # declare array
 
+    sig = np.std(y)
     if is_evenly_spaced(t):
         #  g = ar1_fit(y, t=t, detrend=detrend, params=params)
         g = ar1_fit(y, t=t)
-        sig = np.std(y)
 
         # specify model parameters (statmodel want lag0 coefficent as unity)
         ar = np.r_[1, -g]  # AR model parameter
@@ -118,9 +118,11 @@ def ar1_sim(y, p, t=None):
             Yr[:, i] = sm.tsa.ArmaProcess(ar, ma).generate_sample(nsample=n, scale=sig_n, burnin=50) # statsmodels v0.11.1-?
     else:
         #  tau_est = ar1_fit(y, t=t, detrend=detrend, params=params)
-        tau_est = ar1_fit(y, t=t)
+        tau_est = tau_estimation(y, t)
         for i in np.arange(p):
-            Yr[:, i] = ar1_model(t, tau_est)
+            # the output of ar1_model is unit variance,
+            # multiply by sig to be consistent with the original tinput timeseries
+            Yr[:, i] = ar1_model(t, tau_est, output_sigma=sig)
 
     if p == 1:
         Yr = Yr[:, 0]
