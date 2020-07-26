@@ -383,9 +383,33 @@ class Series:
 
     def slice(self, timespan):
         ''' Slicing the timeseries with a timespan (tuple or list)
+
+        Args
+        ----
+
+        timespan : tuple or list
+            The list of time points for slicing, whose length must be even.
+            When there are n time points, the output Series includes n/2 segments.
+            For example, if timespan = [a, b], then the sliced output includes one segment [a, b];
+            if timespan = [a, b, c, d], then the sliced output includes segment [a, b] and segment [c, d].
+
+        Returns
+        -------
+
+        new : Series
+            The sliced Series object.
+
         '''
         new = self.copy()
-        mask = (self.time >= timespan[0]) & (self.time <= timespan[1])
+        n_elements = len(timespan)
+        if n_elements % 2 == 1:
+            raise ValueError('The number of elements in timespan must be even!')
+
+        n_segments = int(n_elements / 2)
+        mask = [False for i in range(np.size(self.time))]
+        for i in range(n_segments):
+            mask |= (self.time >= timespan[i*2]) & (self.time <= timespan[i*2+1])
+
         new.time = self.time[mask]
         new.value = self.value[mask]
         return new
