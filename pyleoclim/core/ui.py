@@ -320,7 +320,7 @@ class Series:
             return ax
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
-                    time_lim=None, value_lim=None, period_lim=None, psd_lim=None):
+                    time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100):
         ''' Generate summary plot of spectral and wavelet analysis on a timeseries
 
         Args
@@ -367,19 +367,21 @@ class Series:
 
         ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
         if scalogram is None:
-            scalogram = self.wavelet()
+            scalogram = self.wavelet().signif_test(number=n_signif_test)
 
         ax['scal'] = scalogram.plot(ax=ax['scal'], cbar_style={'orientation': 'horizontal', 'pad': 0.1})
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
         if psd is None:
-            psd = self.spectral()
+            psd = self.spectral().signif_test(number=n_signif_test)
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True)
         if period_lim is not None:
             ax['psd'].set_ylim(period_lim)
         ax['psd'].set_ylabel(None)
         ax['psd'].tick_params(axis='y', direction='in', labelleft=False)
+        ax['psd'].legend().remove()
+
         if psd_lim is not None:
             ax['psd'].set_xlim(psd_lim)
 
