@@ -320,11 +320,18 @@ class Series:
             return ax
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
-                    time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100):
+                    time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
+                    time_label=None, value_label=None, period_label=None, psd_label=None):
         ''' Generate summary plot of spectral and wavelet analysis on a timeseries
 
         Args
         ----
+
+        psd : PSD
+            the PSD object of a Series
+
+        scalogram : Scalogram
+            the Scalogram object of a Series
 
         figsize : list
             a list of two integers indicating the figure size
@@ -336,13 +343,25 @@ class Series:
             the limitation of the time axis
 
         value_lim : list or tuple
-            the limitation of the value axis for the timeseries
+            the limitation of the value axis of the timeseries
 
         period_lim : list or tuple
             the limitation of the period axis
 
         psd_lim : list or tuple
             the limitation of the psd axis
+
+        time_label : str
+            the label for the time axis
+
+        value_label : str
+            the label for the value axis of the timeseries
+
+        period_label : str
+            the label for the period axis
+
+        psd_label : str
+            the label for the amplitude axis of PDS
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
@@ -387,6 +406,18 @@ class Series:
 
         if title is not None:
             ax['ts'].set_title(title)
+
+        if value_label is not None:
+            ax['ts'].set_ylabel(value_label)
+
+        if time_label is not None:
+            ax['scal'].set_xlabel(time_label)
+
+        if period_label is not None:
+            ax['scal'].set_ylabel(period_label)
+
+        if psd_label is not None:
+            ax['psd'].set_xlabel(psd_label)
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, savefig_settings)
