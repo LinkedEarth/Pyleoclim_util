@@ -24,6 +24,7 @@ from copy import deepcopy
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 from matplotlib import cm
 import matplotlib.pylab as pl
+from matplotlib import gridspec
 #from matplotlib.colors import BoundaryNorm, Normalize
 
 from tqdm import tqdm
@@ -275,7 +276,7 @@ class Series:
         res = {'eig_val': eig_val, 'eig_vec': eig_vec, 'PC': PC, 'RC': RC, 'eig_val_q': eig_val_q}
         return res
 
-    def distplot(self, figsize=[10, 4], title=None, savefig_settings={},
+    def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                  ax=None, ylabel='KDE', mute=False, **plot_kwargs):
         ''' Plot the distribution of the timeseries values
 
@@ -294,6 +295,7 @@ class Series:
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         '''
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
@@ -316,6 +318,78 @@ class Series:
             return fig, ax
         else:
             return ax
+
+    def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
+                    time_lim=None, value_lim=None, period_lim=None, psd_lim=None):
+        ''' Generate summary plot of spectral and wavelet analysis on a timeseries
+
+        Args
+        ----
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        time_lim : list or tuple
+            the limitation of the time axis
+
+        value_lim : list or tuple
+            the limitation of the value axis for the timeseries
+
+        period_lim : list or tuple
+            the limitation of the period axis
+
+        psd_lim : list or tuple
+            the limitation of the psd axis
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+        '''
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        fig = plt.figure(figsize=figsize)
+        gs = gridspec.GridSpec(6, 12)
+        gs.update(wspace=0, hspace=0)
+
+        ax = {}
+        ax['ts'] = plt.subplot(gs[0:1, :-3])
+        ax['ts'] = self.plot(ax=ax['ts'])
+        if time_lim is not None:
+            ax['ts'].set_xlim(time_lim)
+        if value_lim is not None:
+            ax['ts'].set_ylim(value_lim)
+
+        ax['ts'].spines['bottom'].set_visible(False)
+
+        ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
+        if scalogram is None:
+            scalogram = self.wavelet()
+
+        ax['scal'] = scalogram.plot(ax=ax['scal'], cbar_style={'orientation': 'horizontal', 'pad': 0.1})
+
+        ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
+        if psd is None:
+            psd = self.spectral()
+
+        ax['psd'] = psd.plot(ax=ax['psd'], transpose=True)
+        if period_lim is not None:
+            ax['psd'].set_ylim(period_lim)
+        ax['psd'].set_ylabel(None)
+        ax['psd'].tick_params(axis='y', direction='in', labelleft=False)
+        if psd_lim is not None:
+            ax['psd'].set_xlim(psd_lim)
+
+        if title is not None:
+            ax['ts'].set_title(title)
+
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, savefig_settings)
+
+        return fig, ax
 
     def copy(self):
         return deepcopy(self)
@@ -688,7 +762,7 @@ class PSD:
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = timeseries.time_unit
+            self.period_unit = f'{timeseries.time_unit}s'
 
     def copy(self):
         return deepcopy(self)
@@ -715,7 +789,7 @@ class PSD:
         return new
 
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='Amplitude', title=None,
-             marker=None, markersize=None, color=None, linestyle=None, linewidth=None,
+             marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
              plot_legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
              plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
@@ -796,7 +870,15 @@ class PSD:
                 xlim = ax.get_xlim()
                 xlim = [np.min(xlim), np.max(xlim)]
 
-        ax.set_xlim(xlim)
+        if transpose:
+            x_axis, y_axis = y_axis, x_axis
+            xlim, ylim = ylim, xlim
+            xticks, yticks = yticks, xticks
+            xlabel, ylabel = ylabel, xlabel
+            ax.set_ylim(ylim[::-1])
+        else:
+            ax.set_xlim(xlim)
+
         ax.plot(x_axis, y_axis, **plot_kwargs)
 
         # plot significance levels
@@ -810,6 +892,9 @@ class PSD:
                 idx = np.argwhere(q.frequency==0)
                 signif_x_axis = 1/np.delete(q.frequency, idx) if in_period else np.delete(q.frequency, idx)
                 signif_y_axis = np.delete(q.amplitude, idx)
+                if transpose:
+                    signif_x_axis, signif_y_axis = signif_y_axis, signif_x_axis
+
                 ax.plot(
                     signif_x_axis, signif_y_axis,
                     label=f'{signif_method_label[self.signif_method]}, {q.label} threshold',
