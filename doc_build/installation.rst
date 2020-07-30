@@ -73,13 +73,25 @@ Install Pyleoclim
 Building from source for the f2py feature of WWZ
 """"""""""""""""""""""""""""""""""""""""""""""""
 
-The default version of WWZ is relying on `Numba <http://numba.pydata.org/>`_.
-To achieve accelartion of the alogrithm, one may build the f2py vesion from the source code:
+The default version of WWZ that comes with the installation steps mentioned above is relying on `Numba <http://numba.pydata.org/>`_.
+It is fast enough for lightweight spectral & wavelet analysis tasks, in which case we recommend sticking with the default installation and not worrying about this section.
+
+However, it could be slow for heavy use (e.g. performing it for hundreds of times on timeseries with length longer than 1000 points), in which case we recommend activating the f2py feature to achieve an accelartion of around 50% (see a loose benchmark notebook `here <https://github.com/LinkedEarth/Pyleoclim_util/blob/Development/example_notebooks/WWZ_numba.ipynb>`_).
+
+To do that, a Fortran compiler (e.g. :code:`gfortran` or :code:`ifort`) is required on your local machine, and the related Fortran source code should be compiled locally following the steps below:
 
 - download the source code, either via git clone or just download the .zip file from the `Github repo <https://github.com/LinkedEarth/Pyleoclim_util>`_
 - go to the directory :code:`Pyleoclim_util/pyleoclim/f2py`, and then type :code:`make` to compile the .f90 source code with :code:`gfortran`
 - one may also edit the :code:`Makefile` to use :code:`ifort` as the compiler to achieve further acceleration; just comment out the line for :code:`gfortran` and use the line for :code:`ifort` below
+- a :code:`.so` file will be generated if the compilation is successful
+- copy the :code:`.so` file into the directory :code:`Pyleoclim_util/pyleoclim/utils` where Pyleoclim is installed on your machine. To find out the location, one may import the package in Python and "print" it:
 
+.. code-block:: python
+
+  import pyleoclim as pyleo
+  print(pyleo)
+
+Again, unless you are planning to make heavy use of the WWZ functionality, we recommend using the default installation.
 
 Installing R
 """"""""""""
