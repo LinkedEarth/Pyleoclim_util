@@ -1,0 +1,208 @@
+2020-07-29 14:51:33,044 [WARNING] matplotlib.legend: No handles with labels found to put in legend.
+2020-07-29 14:51:33,088 [DEBUG] matplotlib.colorbar: locator: <matplotlib.ticker.FixedLocator object at 0x7fb269724090>
+2020-07-29 14:51:33,088 [DEBUG] matplotlib.colorbar: Using fixed locator on colorbar
+2020-07-29 14:51:33,091 [DEBUG] matplotlib.colorbar: Setting pcolormesh
+2020-07-29 14:51:46,742 [WARNING] matplotlib.legend: No handles with labels found to put in legend.
+2020-07-29 14:51:46,781 [DEBUG] matplotlib.colorbar: locator: <matplotlib.ticker.FixedLocator object at 0x7fb261c3b810>
+2020-07-29 14:51:46,781 [DEBUG] matplotlib.colorbar: Using fixed locator on colorbar
+2020-07-29 14:51:46,785 [DEBUG] matplotlib.colorbar: Setting pcolormesh
+2020-07-29 14:51:46,853 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:46,854 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:46,889 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:46,889 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:46,929 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:46,930 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:46,932 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:46,932 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:46,933 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:46,933 [DEBUG] matplotlib.ticker: ticklocs array([], dtype=float64)
+2020-07-29 14:51:47,123 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,123 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,124 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,124 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,125 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,125 [DEBUG] matplotlib.ticker: ticklocs array([], dtype=float64)
+2020-07-29 14:51:47,128 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,128 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,160 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,160 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,220 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,220 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,224 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,224 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,237 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,237 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,238 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,238 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,239 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,239 [DEBUG] matplotlib.ticker: ticklocs array([], dtype=float64)
+2020-07-29 14:51:47,240 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,240 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,241 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,241 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,242 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,242 [DEBUG] matplotlib.ticker: ticklocs array([], dtype=float64)
+2020-07-29 14:51:47,244 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,244 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,249 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,249 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,286 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,286 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,291 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,291 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,301 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,301 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,302 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,302 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,303 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,303 [DEBUG] matplotlib.ticker: ticklocs array([], dtype=float64)
+2020-07-29 14:51:47,304 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,304 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,305 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,305 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,305 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,306 [DEBUG] matplotlib.ticker: ticklocs array([], dtype=float64)
+2020-07-29 14:51:47,307 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,307 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,311 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,311 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,330 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,330 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,335 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,335 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,346 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,346 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,347 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,347 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,348 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,348 [DEBUG] matplotlib.ticker: ticklocs array([], dtype=float64)
+2020-07-29 14:51:47,349 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,349 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,350 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,350 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,351 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,351 [DEBUG] matplotlib.ticker: ticklocs array([], dtype=float64)
+2020-07-29 14:51:47,353 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,353 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,357 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,357 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,395 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,395 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,408 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,408 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,446 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,446 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,447 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,447 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,448 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,448 [DEBUG] matplotlib.ticker: ticklocs array([], dtype=float64)
+2020-07-29 14:51:47,460 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,460 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,461 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,461 [DEBUG] matplotlib.ticker: ticklocs array([1.e-04, 1.e-02, 1.e+00, 1.e+02, 1.e+04])
+2020-07-29 14:51:47,462 [DEBUG] matplotlib.ticker: vmin 0.01 vmax 10.0
+2020-07-29 14:51:47,462 [DEBUG] matplotlib.ticker: ticklocs array([], dtype=float64)
+2020-07-29 14:51:47,464 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,464 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])
+2020-07-29 14:51:47,474 [DEBUG] matplotlib.ticker: vmin 0.2 vmax 20.0
+2020-07-29 14:51:47,474 [DEBUG] matplotlib.ticker: ticklocs array([2.e-02, 3.e-02, 4.e-02, 5.e-02, 6.e-02, 7.e-02, 8.e-02, 9.e-02,
+       2.e-01, 3.e-01, 4.e-01, 5.e-01, 6.e-01, 7.e-01, 8.e-01, 9.e-01,
+       2.e+00, 3.e+00, 4.e+00, 5.e+00, 6.e+00, 7.e+00, 8.e+00, 9.e+00,
+       2.e+01, 3.e+01, 4.e+01, 5.e+01, 6.e+01, 7.e+01, 8.e+01, 9.e+01,
+       2.e+02, 3.e+02, 4.e+02, 5.e+02, 6.e+02, 7.e+02, 8.e+02, 9.e+02,
+       2.e+03, 3.e+03, 4.e+03, 5.e+03, 6.e+03, 7.e+03, 8.e+03, 9.e+03])

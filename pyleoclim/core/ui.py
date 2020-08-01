@@ -609,6 +609,8 @@ class Series:
             label=self.label,
             timeseries=self,
             wave_method=method,
+            freq_method=freq_method,
+            freq_kwargs=freq_kwargs,
             wave_args=args[method],
         )
 
@@ -647,6 +649,8 @@ class Series:
             coi=xwc_res.coi,
             timeseries1=self,
             timeseries2=target_series,
+            freq_method=freq_method,
+            freq_kwargs=freq_kwargs,
         )
 
         return coh
@@ -973,7 +977,7 @@ class PSD:
 
 class Scalogram:
     def __init__(self, frequency, time, amplitude, coi=None, label=None, Neff=3, timeseries=None,
-                 wave_method=None, wave_args=None, signif_qs=None, signif_method=None,
+                 wave_method=None, wave_args=None, signif_qs=None, signif_method=None, freq_method=None, freq_kwargs=None,
                  period_unit=None, time_label=None):
         '''
         Args
@@ -999,6 +1003,8 @@ class Scalogram:
         self.wave_args = wave_args
         self.signif_qs = signif_qs
         self.signif_method = signif_method
+        self.freq_method = freq_method
+        self.freq_kwargs = freq_kwargs
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
@@ -1142,8 +1148,8 @@ class Scalogram:
 
 class Coherence:
     def __init__(self, frequency, time, coherence, phase, coi=None,
-                 timeseries1=None, timeseries2=None, signif_qs=None, signif_method=None, Neff=3,
-                 period_unit=None, time_label=None):
+                 timeseries1=None, timeseries2=None, signif_qs=None, signif_method=None,
+                 freq_method=None, freq_kwargs=None, Neff=3, period_unit=None, time_label=None):
         self.frequency = np.array(frequency)
         self.time = np.array(time)
         self.coherence = np.array(coherence)
@@ -1156,6 +1162,8 @@ class Coherence:
         self.timeseries2 = timeseries2
         self.signif_qs = signif_qs
         self.signif_method = signif_method
+        self.freq_method = freq_method
+        self.freq_kwargs = freq_kwargs
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries1 is not None:
@@ -1321,7 +1329,7 @@ class Coherence:
 
         cohs = []
         for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', position=0, leave=True, disable=mute_pbar):
-            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i])
+            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i], freq_method=self.freq_method, freq_kwargs=self.freq_kwargs)
             cohs.append(coh_tmp.coherence)
 
         cohs = np.array(cohs)
@@ -1335,7 +1343,10 @@ class Coherence:
 
         scal_list = []
         for i, amp in enumerate(coh_qs):
-            scal_tmp = Scalogram(frequency=self.frequency, time=self.time, amplitude=amp, coi=self.coi, label=f'{qs[i]*100:g}%')
+            scal_tmp = Scalogram(
+                    frequency=self.frequency, time=self.time, amplitude=amp, coi=self.coi,
+                    freq_method=self.freq_method, freq_kwargs=self.freq_kwargs, label=f'{qs[i]*100:g}%',
+                )
             scal_list.append(scal_tmp)
 
         new.signif_qs = MultipleScalogram(scalogram_list=scal_list)
@@ -1393,7 +1404,7 @@ class MultipleSeries:
             new.series_list[idx]=s
         return new
 
-    def spectral(self, method='wwz', settings={}, mute_pbar=False):
+    def spectral(self, method='wwz', settings={}, mute_pbar=False, freq_method='log', freq_kwargs=None):
         settings = {} if settings is None else settings.copy()
         if method in ['wwz', 'lomb_scargle'] and 'freq' not in settings.keys():
             res=[]
@@ -1403,7 +1414,8 @@ class MultipleSeries:
             res=np.array(res)
             idx = np.argmin(res)
             ts=self.series_list[idx].time
-            freq=waveutils.make_freq_vector(ts)
+            freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+            freq=waveutils.make_freq_vector(ts, freq_method=freq_method, **freq_kwargs)
             settings.update({'freq':freq})
         psd_list = []
         for s in tqdm(self.series_list, desc='Performing spectral analysis on surrogates', position=0, leave=True, disable=mute_pbar):
