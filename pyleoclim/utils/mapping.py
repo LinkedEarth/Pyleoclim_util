@@ -20,8 +20,8 @@ from .plotting import savefig, showfig
 def set_proj(projection='Robinson', proj_default = True): 
     """ Set the projection for Cartopy.
     
-    Args
-    ----
+    Parameters
+    ----------
     
     projection : string
         the map projection. Available projections:
@@ -34,7 +34,7 @@ def set_proj(projection='Robinson', proj_default = True):
         'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
         'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
     proj_default : bool
-        If True, uses the standard projection attributes.
+        If True, uses the standard projection attributes from Cartopy.
         Enter new attributes in a dictionary to change them. Lists of attributes
         can be found in the Cartopy documentation: 
             https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv
@@ -42,6 +42,11 @@ def set_proj(projection='Robinson', proj_default = True):
     Returns
     -------
         proj : the Cartopy projection object
+        
+    See Also
+    --------
+    map_all : mapping function making use of the projection
+    
     """
     if proj_default is not True and type(proj_default) is not dict:
         raise TypeError('The default for the projections should either be provided'+
@@ -200,23 +205,21 @@ def map_all(lat, lon, criteria, marker=None, color =None,
            lgd_kwargs=None,savefig_settings=None, mute=False):
     """ Map the location of all lat/lon according to some criteria
     
-    Map the location of all lat/lon according to some criteria. The choice of 
-    plotting color/marker is passed through palette according to unique 
-    criteria (e.g., record name, archive type, proxy observation type).
+    Map the location of all lat/lon according to some criteria. Based on functions defined in the Cartopy package. 
     
-    Args
-    ----
+    Parameters
+    ----------
     
     lat : list
-        a list of latitude.
+        a list of latitudes.
         
     lon : list
-        a list of longitude.
+        a list of longitudes.
         
     criteria : list
         a list of unique criteria for plotting purposes. For instance,
         a map by the types of archive present in the dataset or proxy
-        observations.     
+        observations. Should have the same length as lon/lat.  
     
     marker : list
         a list of possible markers for each criterion. If None, will use pyleoclim default
@@ -261,7 +264,7 @@ def map_all(lat, lon, criteria, marker=None, color =None,
     ax: axis,optional
         Return as axis instead of figure (useful to integrate plot into a subplot) 
         
-    plot_kwargs : dict
+    scatter_kwargs : dict
         Dictionary of arguments available in matplotlib.pyplot.scatter (https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html).     
     
     legend : bool
@@ -276,10 +279,18 @@ def map_all(lat, lon, criteria, marker=None, color =None,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
     
+    mute : bool
+        if True, the plot will not show;
+        recommend to set to true when more modifications are going to be made on ax
+    
     Returns
     -------
     
-    ax: The figure, or axis if ax specified      
+    ax: The figure, or axis if ax specified 
+
+    See Also
+    --------
+    mapping.set_proj : Set the projection for Cartopy-based maps
     """
     
     #Check that the lists have the same length and convert to numpy arrays

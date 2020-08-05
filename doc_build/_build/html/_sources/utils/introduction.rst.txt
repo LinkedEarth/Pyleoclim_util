@@ -9,6 +9,8 @@
    spectral/wwz_psd.rst
    causality/granger.rst
    causality/liang.rst
+   mapping/map_all.rst
+   mapping/set_proj.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -37,6 +39,12 @@ Filter
 
 Mapping
 -------
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`map <utils_mapall>`
+     - Maps records according to some criteria (e.g, proxy type, interpretation)
 
 Plotting
 --------
