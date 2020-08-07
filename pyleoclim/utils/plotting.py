@@ -11,188 +11,14 @@ __all__ = [
     'showfig',
     'savefig',
     'plot_xy',
+    'plot_scatter_xy',
+    'stackplot'
 ]
 
 import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
-import seaborn as sns
-import matplotlib.pylab as pl
-import numpy as np
 
-
-def plot_ens(ageEns, y, ens=None, color='r', alpha=0.005, x_label=None,
-             y_label=None, title=None, figsize=[10, 4], ax=None):
-    """Plot Ensemble Values
-
-    This function allows to plot all or a subset of ensemble members of a
-    timeseries
-
-    Args
-    ----
-
-    ageEns : numpy array
-            Age ensemble data. Iterations should be stored in columns
-    y : numpy array
-       Ordinate values
-    ens : int
-         Number of ensemble to plots. If None, will choose either the number
-         of ensembles stored in the ensemble matrix or 500, whichever is lower
-    color : str
-           Linecolor (default is red)
-    alpha : float
-           Transparency setting for each line (default is 0.005)
-    x_label : str
-             Label for the x-axis
-    y_label : str
-             Label for the y-axis
-    title : str
-           Title for the figure
-    figsize : list
-             Size of the figure. Default is [10,4]
-    ax : object
-        Return as axis instead of figure
-
-    Returns
-    -------
-    ax : Axis for the figure
-    fig : The figure
-
-    TODO
-    ----
-    Enable paleoEnsemble
-
-    """
-
-    # Make sure that the ensemble and paleo values are numpy arrays
-    ageEns = np.array(ageEns)
-    y = np.array(y)
-
-    # Make sure that the length of y is the same as the number of rows in ensemble array
-    if len(y) != np.shape(ageEns)[0]:
-        raise ValueError("The length of the paleoData is different than number of rows in ensemble table!")
-
-    # Figure out the number of ensembles to plot
-    if not ens:
-        if np.shape(ageEns)[1] < 500:
-            ens = np.shape(ageEns)[1]
-        else:
-            ens = 500
-            print("Plotting 500 ensemble members")
-    elif ens > np.shape(ageEns)[1]:
-        ens = np.shape(ageEns)[1]
-        print("Plotting all available ensemble members")
-
-        # Figure setting
-    if not ax:
-        fig, ax = plt.subplots(figsize=figsize)
-
-    # Finally make the plot
-    plt.style.use("ggplot")
-    for i in np.arange(0, ens, 1):
-        plt.plot(ageEns[:, i], y, alpha=alpha, color=color)
-    if x_label == None:
-        x_label = ''
-    if y_label == None:
-        y_label = ''
-    if title == None:
-        title = ''
-    plt.xlabel(x_label)
-    plt.ylabel(y_label)
-    plt.title(title)
-
-    return fig, ax
-
-
-def plot_hist(y, bins=None, hist=True, label=None,
-              kde=True, rug=False, fit=None, hist_kws={"label": "Histogram"},
-              kde_kws={"label": "KDE fit"}, rug_kws={"label": "rug"},
-              fit_kws={"label": "fit"}, color='0.7', vertical=False,
-              norm_hist=True, figsize=[5, 5], ax=None):
-    """ Plot a univariate distribution of the PaleoData values
-
-    This function is based on the seaborn displot function, which is
-    itself a combination of the matplotlib hist function with the
-    seaborn kdeplot() and rugplot() functions. It can also fit
-    scipy.stats distributions and plot the estimated PDF over the data.
-
-    Args
-    ----
-
-    y : array
-       nx1 numpy array. No missing values allowed
-    bins : int
-          Specification of hist bins following matplotlib(hist),
-          or None to use Freedman-Diaconis rule
-    hist : bool
-          Whether to plot a (normed) histogram
-    label : str
-           The label for the axis
-    kde : bool
-         Whether to plot a gaussian kernel density estimate
-    rug : bool
-         Whether to draw a rugplot on the support axis
-    fit : object
-         Random variable object. An object with fit method, returning
-         a tuple that can be passed to a pdf method of positional
-         arguments following a grid of values to evaluate the pdf on.
-    hist _kws : Dictionary
-    kde_kws : Dictionary
-    rug_kws : Dictionary
-    fit_kws : Dictionary
-             Keyword arguments for underlying plotting functions.
-             If modifying the dictionary, make sure the labels "hist",
-             "kde","rug","fit" are stall passed.
-    color : str
-           matplotlib color. Color to plot everything but the
-           fitted curve in.
-    vertical : bool
-              if True, oberved values are on y-axis.
-    norm_hist : bool
-               If True (default), the histrogram height shows
-               a density rather than a count. This is implied if a KDE or
-               fitted density is plotted
-    figsize : list
-             the size of the figure
-    ax : object
-        Return as axis instead of figure (useful to integrate plot into a subplot)
-
-    Returns
-    -------
-
-    ax : The axis to the figure
-    fig :  The figure
-"""
-
-    # make sure y is a numpy array
-    y = np.array(y)
-
-    # Check that these are vectors and not matrices
-    # Check that these are vectors and not matrices
-    if len(np.shape(y)) > 2:
-        raise TypeError("x and y should be vectors and not matrices")
-
-    if not ax:
-        fig, ax = plt.subplots(figsize=figsize)
-
-    sns.distplot(y, bins=bins, hist=hist, kde=kde, rug=rug,
-                 fit=fit, hist_kws=hist_kws,
-                 kde_kws=kde_kws, rug_kws=rug_kws,
-                 axlabel=label, color=color,
-                 vertical=vertical, norm_hist=norm_hist)
-
-    # Add a label to the PDF axis
-    if label == None:
-        label = ''
-
-    if vertical == True:
-        plt.xlabel('PDF')
-        plt.ylabel(label)
-    else:
-        plt.ylabel('PDF')
-        plt.xlabel(label)
-
-    return ax
 
 
 def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
@@ -200,14 +26,16 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
                     savefig_settings=None, ax=None, legend=True, 
                     plot_kwargs=None, lgd_kwargs=None, mute=False):
     
-    ''' Plot the timeseries
-    Args
-    ------
+    ''' Plot a scatter on top of a line plot.
+    
+    Parameters
+    ----------
+    
     x1 : array
-      x axis of timeseries
+      x axis of timeseries1 - plotted as a line
     y1 : array
-     values of timeseries
-    x1 : array
+     values of timeseries1 - plotted as a line
+    x2 : array
         x axis of scatter points
     y2 : array
         y of scatter points
@@ -219,10 +47,10 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
         label for y-axis
     title : str
         the title for the figure
-    xlim : str
-        the limit range for x-axis
-    ylim : str
-        the limit range for y-axis
+    xlim : list
+        set the limits of the x axis
+    ylim : list
+        set the limits of the y axis
     ax : pyplot.axis
         the pyplot.axis object
     legend : bool
@@ -233,12 +61,25 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
         the keyword arguments for ax.plot()
     mute : bool
         if True, the plot will not show;
-        recommend to turn on when more modifications are going to be made on ax
+         recommend to turn on when more modifications are going to be made on ax
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existed or non-existed path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+    Returns
+    -------
+    
+    ax : the pyplot.axis object
+    
+    See Also
+    -------- 
+    
+    set_style : set different styles for the figures. Should be set before invoking the plotting functions
+    savefig : save figures
+    showfig : equivalent to plt.show(). Platform-dependent
+    
     '''
     # handle dict defaults
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -282,11 +123,17 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
         return ax
 
 
-def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None, ylim=None,
-            savefig_settings=None, ax=None, legend=True, plot_kwargs=None, lgd_kwargs=None, mute=False):
-    ''' Plot the timeseries
+def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, 
+            xlim=None, ylim=None,savefig_settings=None, ax=None,
+            legend=True, plot_kwargs=None, lgd_kwargs=None, mute=False):
+    ''' Plot a timeseries
+    
     Args
     ----
+    x : array
+        The time axis for the timeseries
+    y : array
+        The values of the timeseries
     figsize : list
         a list of two integers indicating the figure size
     xlabel : str
@@ -295,10 +142,10 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None,
         label for y-axis
     title : str
         the title for the figure
-    xlim : str
-        the limit range for x-axis
-    ylim : str
-        the limit range for y-axis
+    xlim : list
+        set the limits of the x axis
+    ylim : list
+        set the limits of the y axis
     ax : pyplot.axis
         the pyplot.axis object
     legend : bool
@@ -315,6 +162,19 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None,
         - "path" must be specified; it can be any existed or non-existed path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
+        
+    Returns
+    -------
+
+    ax : the pyplot.axis object
+
+    See Also
+    --------
+    
+    set_style : set different styles for the figures. Should be set before invoking the plotting functions
+    savefig : save figures
+    showfig : equivalent to plt.show(). Platform-dependent
+        
     '''
     # handle dict defaults
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -356,6 +216,116 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, xlim=None,
     else:
         return ax
 
+def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, 
+              xlim=None, ylim=None, title=None,
+            savefig_settings=None, ax=None, set_style=None, 
+            plot_kwargs=None, mute=False,color=None):
+    ''' Stack plot of timeseries
+    
+    Please not that this function uses a different default style than the Pyleoclim package.
+    To change the style, pass it in the set_style argument    
+      
+    Args
+    ------
+    x : nested list
+        x values of individual timeseries
+    y : nested list
+        y values of individual timeseries
+    figsize : list
+        a list of two integers indicating the figure size
+    xlabel : str
+        label for x-axis
+    ylabel : str
+        label for y-axis
+    xlim : list
+        set the limits of the x axis
+    ylim : nested list
+        set the limits of the y axes. Should be the same length as y
+    title : str
+        the title for the figure
+    ax : pyplot.axis
+        the pyplot.axis object
+    plot_kwargs : dict
+        the keyword arguments for ax.plot()
+    mute : bool
+        if True, the plot will not show;
+          recommend to turn on when more modifications are going to be made on ax
+    savefig_settings : dict
+        the dictionary of arguments for plt.savefig(); some notes below:
+        - "path" must be specified; it can be any existed or non-existed path,
+          with or without a suffix; if the suffix is not given in "path", it will follow "format"
+        - "format" can be one of {"pdf", "eps", "png", "ps"}
+    color : list
+        list of colors chosen from a particular coloring scheme with the same size as y to distinguish different series
+        
+    See Also
+    --------
+    
+    set_style : set different styles for the figures. Should be set before invoking the plotting functions
+    savefig : save figures
+    showfig : equivalent to plt.show(). Platform-dependent
+    
+      '''
+
+    savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+    plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+       
+    min_x = min([a for i in x for a in i])
+    max_x = max([a for i in x for a in i])
+    if set_style is None:
+        set_style('journal_spines')
+
+    if ax is None:
+        fig, ax = plt.subplots(len(x),1,figsize=figsize,sharex=True)
+
+    fig.subplots_adjust(hspace=0.0001)
+    for i in range(len(x)):
+        if color is not None:
+
+            ax[i].plot(x[i], y[i], color=color[i])
+        else:
+            ax[i].plot(x[i], y[i])
+            
+        #Set the limits    
+        if xlim is not None:
+            ax[i].set_xlim(xlim)
+        else:
+            ax[i].set_xlim(0, max_x)
+        
+        if ylim is not None:
+            ax[i].set_ylim(ylim[i])
+        
+        # ax[i].set_xticks(np.arange(min_x,max_x))
+        if xlabel is None:
+            ax[i].set_xlabel('Time')
+        if ylabel is None:
+            ax[i].set_ylabel('Series {}'.format(i + 1))
+        if i % 2 == 1:
+            ax[i].yaxis.set_label_position("right")
+            ax[i].yaxis.tick_right()
+
+            ax[i].spines['left'].set_visible(False)
+        else:
+            ax[i].spines['right'].set_visible(False)
+        ax[i].spines['top'].set_visible(False)
+        if i!=len(x)-1:
+            ax[i].spines['bottom'].set_visible(False)
+        if color is not None:
+            ax[i].tick_params(axis='y', colors=color[i])
+            ax[i].yaxis.label.set_color(color[i])
+
+        ax[i].tick_params(axis='both', which='major', labelsize=12)
+
+
+    if 'fig' in locals():
+        if 'path' in savefig_settings:
+            savefig(fig, savefig_settings)
+        else:
+            if not mute:
+                showfig(fig)
+        return fig, ax
+    else:
+        return ax
 
 # ----------
 # utilities
@@ -543,96 +513,7 @@ def set_style(style='journal', font_scale=1.0):
     for d in [style_dict, font_dict]:
         mpl.rcParams.update(d)
 
-def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
-            savefig_settings=None, ax=None,  plot_kwargs=None, mute=False,color=None):
-    ''' Plot the timeseries
-      Args
-      ------
-      x : nested list
-        x values of individual timeseries
-      y : nested list
-        y values of individual timeseries
 
-      figsize : list
-          a list of two integers indicating the figure size
-      xlabel : str
-          label for x-axis
-      ylabel : str
-          label for y-axis
-      title : str
-          the title for the figure
-
-      ax : pyplot.axis
-          the pyplot.axis object
-
-      plot_kwargs : dict
-          the keyword arguments for ax.plot()
-      mute : bool
-          if True, the plot will not show;
-          recommend to turn on when more modifications are going to be made on ax
-      savefig_settings : dict
-          the dictionary of arguments for plt.savefig(); some notes below:
-          - "path" must be specified; it can be any existed or non-existed path,
-            with or without a suffix; if the suffix is not given in "path", it will follow "format"
-          - "format" can be one of {"pdf", "eps", "png", "ps"}
-      color : list
-             list of colors chosen from a particular coloring scheme  with the same size as the multiple series to distinguish different series
-      '''
-
-    savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-    plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
-    
-
-    
-    min_x = min([a for i in x for a in i])
-    max_x = max([a for i in x for a in i])
-    set_style('journal_spines')
-
-    if ax is None:
-        fig, ax = plt.subplots(len(x),1,figsize=figsize,sharex=True)
-
-
-    fig.subplots_adjust(hspace=0.0001)
-    for i in range(len(x)):
-        if color is not None:
-
-            ax[i].plot(x[i], y[i], color=color[i])
-        else:
-            ax[i].plot(x[i], y[i])
-
-
-        ax[i].set_xlim(0, max_x)
-        # ax[i].set_xticks(np.arange(min_x,max_x))
-        if xlabel is None:
-            ax[i].set_xlabel('Time')
-        if ylabel is None:
-            ax[i].set_ylabel('Series {}'.format(i + 1))
-        if i % 2 == 1:
-            ax[i].yaxis.set_label_position("right")
-            ax[i].yaxis.tick_right()
-
-            ax[i].spines['left'].set_visible(False)
-        else:
-            ax[i].spines['right'].set_visible(False)
-        ax[i].spines['top'].set_visible(False)
-        if i!=len(x)-1:
-            ax[i].spines['bottom'].set_visible(False)
-        if color is not None:
-            ax[i].tick_params(axis='y', colors=color[i])
-            ax[i].yaxis.label.set_color(color[i])
-
-        ax[i].tick_params(axis='both', which='major', labelsize=12)
-
-
-    if 'fig' in locals():
-        if 'path' in savefig_settings:
-            savefig(fig, savefig_settings)
-        else:
-            if not mute:
-                showfig(fig)
-        return fig, ax
-    else:
-        return ax
 
 
 
