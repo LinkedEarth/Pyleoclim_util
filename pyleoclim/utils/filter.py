@@ -14,7 +14,6 @@ __all__ = [
 ]
 
 import numpy as np
-from math import factorial
 import statsmodels.api as sm
 from scipy import signal
 
@@ -22,7 +21,8 @@ from scipy import signal
 #Main functions
 #-----
 
-def savitzky_golay(y, window_size, order, deriv=0, rate=1):
+def savitzky_golay(ys,window_length=None, polyorder=2, deriv=0, delta=1,
+                   axis=-1,mode='interp',cval=0):
     """ Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     The Savitzky-Golay filter removes high frequency noise from data.
@@ -35,67 +35,105 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     approach is to make for each point a least-square fit with a
     polynomial of high order over a odd-sized window centered at
     the point.
+    
+    Uses the implementation from scipy.signal: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html
 
-    Args
-    ----
+    Parameters
+    ----------
 
-    y : array
-        the values of the time history of the signal.
-    window_size : int
-        the length of the window. Must be an odd integer number.
-    order : int
-        the order of the polynomial used in the filtering. Must be less then `window_size` - 1.
+    ys : array
+        the values of the signal to be filtered
+        
+    window_length : int
+        The length of the filter window. Must be a positive off integer. 
+            If mode is 'interp', window_length must be less than or equal to the size of ys. 
+            Default is the size of ys.
+    
+    polyorder : int
+        The order of the polynomial used to fit the samples. polyorder Must be less than window_length. 
+            Default is 2
+    
     deriv : int
-        the order of the derivative to compute (default = 0 means only smoothing)
-
+        The order of the derivative to compute. 
+            This must be a nonnegative integer. 
+            The default is 0, which means to filter the data without differentiating
+    
+    delta : float
+        The spacing of the samples to which the filter will be applied.
+            This is only used if deriv>0.
+            Default is 1.0
+    
+    axis : int
+        The axis of the array ys along which the filter will be applied. Default is -1
+    
+    mode : str
+        Must be ‘mirror’, ‘constant’, ‘nearest’, ‘wrap’ or ‘interp’. This determines the type of extension to use for the padded signal to which the filter is applied. When mode is ‘constant’, the padding value is given by cval. See the Notes for more details on ‘mirror’, ‘constant’, ‘wrap’, and ‘nearest’. When the ‘interp’ mode is selected (the default), no extension is used. Instead, a degree polyorder polynomial is fit to the last window_length values of the edges, and this polynomial is used to evaluate the last window_length // 2 output values.
+    
+    cval : scalar
+        Value to fill past the edges of the input if mode is ‘constant’. Default is 0.0.
+    
     Returns
     -------
 
-    ys : array
+    yf : array
         ndarray of shape (N), the smoothed signal (or it's n-th derivative).
 
-    Reference
-    ---------
+    References
+    ----------
 
-    - A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of
+    A. Savitzky, M. J. E. Golay, Smoothing and Differentiation of
         Data by Simplified Least Squares Procedures. Analytical
         Chemistry, 1964, 36 (8), pp 1627-1639.
-    - Numerical Recipes 3rd Edition: The Art of Scientific Computing
+        
+    Numerical Recipes 3rd Edition: The Art of Scientific Computing
         W.H. Press, S.A. Teukolsky, W.T. Vetterling, B.P. Flannery
         Cambridge University Press ISBN-13: 9780521880688
-    - SciPy Cookbook: shttps://github.com/scipy/scipy-cookbook/blob/master/ipython/SavitzkyGolay.ipynb
+        
+    SciPy Cookbook: shttps://github.com/scipy/scipy-cookbook/blob/master/ipython/SavitzkyGolay.ipynb
+    
+    Notes
+    -----
+    
+    Details on the mode option:
+        
+       - ‘mirror’: Repeats the values at the edges in reverse order. The value closest to the edge is not included.
+       - ‘nearest’: The extension contains the nearest input value.
+       - ‘constant’: The extension contains the value given by the cval argument.
+       - ‘wrap’: The extension contains the values from the other end of the array. 
     """
-    if type(window_size) is not int:
-        raise TypeError("window_size should be of type int")
-    if type(order) is not int:
-        raise TypeError("order should be of type int")
-    # Check window size and order
-    if window_size % 2 != 1 or window_size < 1:
-        raise TypeError("window_size size must be a positive odd number")
-    if window_size < order + 2:
-        raise TypeError("window_size is too small for the polynomials order")
-    order_range = range(order+1)
-    half_window = (window_size-1) // 2
-    # precompute coefficients
-    b = np.mat([[k**i for i in order_range] for k in range(-half_window, half_window+1)])
-    m = np.linalg.pinv(b).A[deriv] * rate**deriv * factorial(deriv)
-    # pad the signal at the extremes with
-    # values taken from the signal itself
-    firstvals = y[0] - np.abs(y[1:half_window+1][::-1] - y[0])
-    lastvals = y[-1] + np.abs(y[-half_window-1:-1][::-1] - y[-1])
-    y = np.concatenate((firstvals, y, lastvals))
+    
+    if window_length==None:
+        window_length=int(np.ceil(len(ys))//2*2+1)
+    elif type(window_length) is not int:
+        raise TypeError("window_length should be of type int")
+    
+    if type(polyorder) is not int:
+        raise TypeError("polyorder should be of type int")
+    
+    if window_length % 2 != 1 or window_length < 1:
+        raise TypeError("window_length size must be a positive odd number")
+    if window_length < polyorder + 2:
+        raise TypeError("window_length is too small for the polynomials order")
+    
+    yf=signal.savgol_filter(ys,window_length=window_length,
+                            polyorder=polyorder,
+                            deriv=deriv,
+                            delta=delta,
+                            axis=axis,
+                            mode=mode,
+                            cval=0)
 
-    return np.convolve(m[::-1], y, mode='valid')
+    return yf
 
 def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFrac=0.1):
     """ Pad a timeseries based on timeseries model predictions
 
-    Args
-    ----
+    Parameters
+    ----------
 
-    x : numpy array
+    ys : numpy array
         Evenly-spaced timeseries
-    t : numpy array
+    ts : numpy array
         Time axis
     method : string
         The method to use to pad the series
@@ -116,10 +154,10 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
     yp : array
         padded timeseries
     tp : array
-        augmented axis
+        augmented time axis
 
-    Author
-    ------
+    Authors
+    -------
 
     Julien Emile-Geay, Deborah Khider
     """
@@ -164,8 +202,8 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
                 reflect_type='odd',params=(2,1,2),padFrac=0.1):
     '''Applies a Butterworth filter with frequency fc, with padding
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : numpy array
         Timeseries
