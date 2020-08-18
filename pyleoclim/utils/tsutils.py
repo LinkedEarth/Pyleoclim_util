@@ -522,11 +522,11 @@ def gaussianize_single(X_single):
     return Xn_single
 
 
-def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
+def detrend(y, x = None, method = "emd", sg_kwargs = None):
     """Detrend a timeseries according to three methods
 
-    Detrending methods include, "linear", "constant", and using a low-pass
-        Savitzky-Golay filters (default).
+    Detrending methods include, "linear", "constant", using a low-pass
+        Savitzky-Golay filter, and using eigen mode decomposition (default).
 
     Args
     ----
@@ -540,7 +540,7 @@ def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
         The type of detrending:
         - linear: the result of a linear least-squares fit to y is subtracted from y.
         - constant: only the mean of data is subtrated.
-        - "savitzy-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        - "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
         - "emd" (default): Empirical mode decomposition
     params : list
         The paramters for the Savitzky-Golay filters. The first parameter
@@ -564,10 +564,10 @@ def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
         ys = signal.detrend(y,type='linear')
     elif method == 'constant':
         ys = signal.detrend(y,type='constant')
-    elif method == "savitzy-golay":
+    elif method == "savitzky-golay":
         # Check that the timeseries is uneven and interpolate if needed
         if x is None:
-            raise ValueError("A time axis is needed for use with the Savitzky-Golay filters method")
+            raise ValueError("A time axis is needed for use with the Savitzky-Golay filter method")
         # Check whether the timeseries is unvenly-spaced and interpolate if needed
         if len(np.unique(np.diff(x)))>1:
             warnings.warn("Timeseries is not evenly-spaced, interpolating...")
@@ -575,21 +575,9 @@ def detrend(y, x = None, method = "emd", params = ["default",4,0,1]):
         else:
             x_interp = x
             y_interp = y
-        if params[0] == "default":
-            l = len(y) # Use the length of the timeseries for the window side
-            l = np.ceil(l)//2*2+1 # Make sure this is an odd number
-            l = int(l) # Make sure that the type is int
-            o = int(params[1]) # Make sure the order is type int
-            d = int(params[2])
-            e = int(params[3])
-        else:
-            #Assume the users know what s/he is doing and just force to type int
-            l = int(params[0])
-            o = int(params[1])
-            d = int(params[2])
-            e = int(params[3])
+        sg_kwargs = {} if sg_kwargs is None else sg_kwargs.copy()
         # Now filter
-        y_filt = savitzky_golay(y_interp,l,o,d,e)
+        y_filt = savitzky_golay(y_interp,**sg_kwargs)
         # Put it all back on the original x axis
         y_filt_x = np.interp(x,x_interp,y_filt)
         ys = y-y_filt_x
