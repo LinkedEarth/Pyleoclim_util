@@ -272,8 +272,7 @@ class Series:
 
     def ssa(self, M=None, MC=0, f=0.3):
 
-        eig_val, eig_vec, PC, RC, eig_val_q = decomposition.ssa(self.value, M=M, MC=MC, f=f)
-        res = {'eig_val': eig_val, 'eig_vec': eig_vec, 'PC': PC, 'RC': RC, 'eig_val_q': eig_val_q}
+        res = decomposition.ssa(self.value, M=M, MC=MC, f=f)
         return res
 
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
@@ -1377,8 +1376,7 @@ class MultipleSeries:
         data = np.transpose(np.asarray(data))
 
 
-        deval, eig_vec, q05, q95, PC, RC = decomposition.mssa(data, M=M, MC=MC, f=f)
-        res = {'deval': deval, 'eig_vec': eig_vec, 'q05': q05, 'q95': q95, 'PC': PC, 'RC': RC}
+        res = decomposition.mssa(data, M=M, MC=MC, f=f)
         return res
 
     def pca(self):
