@@ -14,6 +14,9 @@
    filter/savitzky_golay.rst
    filter/ts_pad.rst
    filter/butterworth.rst
+   decomposition/pca.rst
+   decomposition/mssa.rst
+   decomposition/ssa.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -36,6 +39,18 @@ Correlation
 
 Decomposition
 -------------
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`Principal Component Analysis <utils_pca>`
+     - Decomposition of a signal or data set in terms of orthogonal basis functions.
+   * - :ref:`Singular Spectrum Analysis <utils_ssa>`
+     - Nonparametric spectral estimation for timeseries.
+   * - :ref:`Multi Channel Singular Spectrum Analysis <utils_mssa>`
+     - Nonparametric spectral estimation for multivariate timeseries.
+
 
 Filter
 ------

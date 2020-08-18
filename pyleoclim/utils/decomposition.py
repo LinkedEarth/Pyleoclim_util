@@ -27,7 +27,7 @@ from nitime import algorithms as alg
 def pca(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,iterated_power='auto',random_state=None):
     '''Principal Component Analysis (Empirical Orthogonal Functions)
     
-    Decomposition of a signal or data set in terms of othogonal basis functions.
+    Decomposition of a signal or data set in terms of orthogonal basis functions.
 
     From scikit-learn: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
 
@@ -149,10 +149,15 @@ def mssa(ys, M=None, nMC=1000, f=0.3):
     -------
     res : dict 
         Containing:
+            
         - eig_val : array of eigenvalue spectrum
+        
         - eig_val05 : The 5% percentile of eigenvalues
+        
         - eig_val95 : The 95% percentile of eigenvalues
+        
         - PC : matrix of principal components (2D array)
+        
         - RC : matrix of RCs (nrec,N,nrec*M) (2D array)
     
     See Also
@@ -237,7 +242,9 @@ def mssa(ys, M=None, nMC=1000, f=0.3):
     return res
 
 def ssa(ys, M=None, nMC=0, f=0.5):
-    '''Singular spectrum analysis for a time series y, using the method of [1] and
+    '''Singular spectrum analysis
+    
+    Nonparametric spectral estimation for timeseries. It uses the method of [1] and
     the formulation of [3]. Optionally (MC>0), the significance of eigenvalues
     is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [2].
 
@@ -259,9 +266,13 @@ def ssa(ys, M=None, nMC=0, f=0.5):
     
     res : dict
         Containing:
+            
         - eig_val : (M, 1) array of eigenvalue spectrum
+        
         - PC : (N - M + 1, M) array of principal components
+        
         - RC : (N,  M) array of reconstructed components
+        
         - eig_val_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC >0 ]
 
     References
