@@ -234,6 +234,12 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
     ------
 
     Julien Emile-Geay
+    
+    See also
+    --------
+    
+    ts_pad : Pad a timeseries based on timeseries model predictions
+    
     '''
     nyq = 0.5 * fs
 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>granger_causality (pyleoclim.utils.granger_causality) &mdash; Pyleoclim 0.4.10 documentation</title>
+  <title>butterworth (pyleoclim.utils.butterworth) &mdash; Pyleoclim 0.4.10 documentation</title>
   
 
   
@@ -87,7 +87,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">granger_causality (pyleoclim.utils.granger_causality)</a></li>
+<li><a class="reference internal" href="#">butterworth (pyleoclim.utils.butterworth)</a></li>
 </ul>
 </div>
             
@@ -134,13 +134,13 @@
     
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>granger_causality (pyleoclim.utils.granger_causality)</li>
+      <li>butterworth (pyleoclim.utils.butterworth)</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/utils/causality/granger.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/utils/filter/butterworth.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -177,49 +177,45 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="granger-causality-pyleoclim-utils-granger-causality">
-<span id="utils-granger"></span><h1>granger_causality (pyleoclim.utils.granger_causality)<a class="headerlink" href="#granger-causality-pyleoclim-utils-granger-causality" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="butterworth-pyleoclim-utils-butterworth">
+<span id="utils-butterworth"></span><h1>butterworth (pyleoclim.utils.butterworth)<a class="headerlink" href="#butterworth-pyleoclim-utils-butterworth" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pyleoclim.utils.granger_causality">
-<code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">granger_causality</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y1</span></em>, <em class="sig-param"><span class="n">y2</span></em>, <em class="sig-param"><span class="n">maxlag</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">addconst</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/causality.html#granger_causality"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.granger_causality" title="Permalink to this definition">¶</a></dt>
-<dd><p>statsmodels granger causality tests</p>
-<p>Four tests for granger non causality of 2 time series.</p>
-<p>All four tests give similar results. params_ftest and ssr_ftest are equivalent based on F test which is identical to lmtest:grangertest in R.</p>
-<p>Wrapper for the functions described in statsmodel (<a class="reference external" href="https://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.grangercausalitytests.html">https://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.grangercausalitytests.html</a>)</p>
+<dt id="pyleoclim.utils.butterworth">
+<code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">butterworth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ys</span></em>, <em class="sig-param"><span class="n">fc</span></em>, <em class="sig-param"><span class="n">fs</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">filter_order</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">pad</span><span class="o">=</span><span class="default_value">'reflect'</span></em>, <em class="sig-param"><span class="n">reflect_type</span><span class="o">=</span><span class="default_value">'odd'</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">2, 1, 2</span></em>, <em class="sig-param"><span class="n">padFrac</span><span class="o">=</span><span class="default_value">0.1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/filter.html#butterworth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.butterworth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies a Butterworth filter with frequency fc, with padding</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>y2</strong> (<em>y1</em><em>,</em>) – vectors of (real) numbers with identical length, no NaNs allowed</p></li>
-<li><p><strong>maxlag</strong> (<em>int</em><em> or </em><em>int iterable</em><em>, </em><em>optional</em>) – If an integer, computes the test for all lags up to maxlag. If an iterable, computes the tests only for the lags in maxlag.</p></li>
-<li><p><strong>addconst</strong> (<em>bool</em><em>, </em><em>optional</em>) – Include a constant in the model.</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>) – Print results</p></li>
+<li><p><strong>ys</strong> (<em>numpy array</em>) – Timeseries</p></li>
+<li><p><strong>fc</strong> (<em>float</em><em> or </em><em>list</em>) – cutoff frequency. If scalar, it is interpreted as a low-frequency cutoff (lowpass)
+If fc is a list,  it is interpreted as a frequency band (f1, f2), with f1 &lt; f2 (bandpass)</p></li>
+<li><p><strong>fs</strong> (<em>float</em>) – sampling frequency</p></li>
+<li><p><strong>filter_order</strong> (<em>int</em>) – order n of Butterworth filter</p></li>
+<li><p><strong>pad</strong> (<em>string</em>) – Indicates if padding is needed.
+- ‘reflect’: Reflects the timeseries
+- ‘ARIMA’: Uses an ARIMA model for the padding
+- None: No padding.</p></li>
+<li><p><strong>params</strong> (<em>tuple</em>) – model parameters for ARIMA model (if pad = True)</p></li>
+<li><p><strong>padFrac</strong> (<em>float</em>) – fraction of the series to be padded</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>All test results, dictionary keys are the number of lags. For each lag the values are a tuple, with the first element a dictionary with test statistic,
-pvalues, degrees of freedom, the second element are the OLS estimation results for the restricted model, the unrestricted model and the restriction (contrast)
-matrix for the parameter f_test.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>yf</strong> (<em>array</em>) – filtered array</p></li>
+<li><p><em>Author</em></p></li>
+<li><p><em>——</em></p></li>
+<li><p><em>Julien Emile-Geay</em></p></li>
+</ul>
+</p>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<p>The Null hypothesis for grangercausalitytests is that the time series in the second column, x2, does NOT Granger cause the time series in the first column, x1. Grange causality means that past values of x2 have a statistically significant effect on the current value of x1, taking past values of x1 into account as regressors. We reject the null hypothesis that x2 does not Granger cause x1 if the pvalues are below a desired size of the test.</p>
-<p>The null hypothesis for all four test is that the coefficients corresponding to past values of the second time series are zero.</p>
-<p>‘params_ftest’, ‘ssr_ftest’ are based on F distribution</p>
-<p>‘ssr_chi2test’, ‘lrtest’ are based on chi-square distribution</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="liang.html#pyleoclim.utils.liang_causality" title="pyleoclim.utils.liang_causality"><code class="xref py py-func docutils literal notranslate"><span class="pre">liang_causality()</span></code></a></dt><dd><p>information flow estimated using the Liang algorithm</p>
+<dt><code class="xref py py-func docutils literal notranslate"><span class="pre">ts_pad()</span></code></dt><dd><p>Pad a timeseries based on timeseries model predictions</p>
 </dd>
 </dl>
 </div>
-<p class="rubric">References</p>
-<p>Granger, C. W. J. (1969). Investigating causal relations by econometric models and cross-spectral methods. Econometrica, 37(3), 424-438.</p>
-<p>Granger, C. W. J. (1980). Testing for causality: A personal viewpoont. Journal of Economic Dynamics and Control, 2, 329-352.</p>
-<p>Granger, C. W. J. (1988). Some recent development in a concept of causality. Journal of Econometrics, 39(1-2), 199-211.</p>
 </dd></dl>
 
 </div>

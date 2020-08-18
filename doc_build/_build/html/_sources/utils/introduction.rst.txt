@@ -11,6 +11,9 @@
    causality/liang.rst
    mapping/map_all.rst
    mapping/set_proj.rst
+   filter/savitzky_golay.rst
+   filter/ts_pad.rst
+   filter/butterworth.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -36,6 +39,15 @@ Decomposition
 
 Filter
 ------
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`Savitzky-Golay filter <utils_savitzky_golay>`
+     - Smooth (and optionally differentiate) data with a Savitzky-Golay filter
+   * - :ref:`Butterworth filter <utils_butterworth>`
+     - Applies a Butterworth filter with frequency fc, with optional padding
 
 Mapping
 -------
