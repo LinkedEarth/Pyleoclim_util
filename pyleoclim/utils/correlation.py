@@ -5,7 +5,7 @@ Created on Tue Feb 25 06:01:55 2020
 
 @author: deborahkhider
 
-Contains all relevant functions for Correlation analysis
+Contains all relevant functions for correlation analysis
 """
 
 __all__ = [
@@ -21,42 +21,58 @@ from scipy.stats import gaussian_kde
 import statsmodels.api as sm
 from sklearn import preprocessing
 
-#----------
-# Wrappers
-#----------
 
 def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
-    """ Estimates the significance of correlations between non IID time series by 3 independent methods:
-    1) 'ttest': T-test where d.o.f are corrected for the effect of serial correlation
+    """ Estimates the Pearson's correlation and associated significance between two non IID time series
+    
+    The significance of the correlation is assessed using one of the following methods:
+        
+    1) 'ttest': T-test adjusted for effective sample size.
     2) 'isopersistent': AR(1) modeling of x and y.
     3) 'isospectral': phase randomization of original inputs. (default)
-    The T-test is parametric test, hence cheap but usually wrong except in idyllic circumstances.
+    
+    The T-test is a parametric test, hence computationally cheap but can only be performed in idyllic circumstances.
     The others are non-parametric, but their computational requirements scales with nsim.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     y1 : array
         vector of (real) numbers of same length as y2, no NaNs allowed
+        
     y2 : array
         vector of (real) numbers of same length as y1, no NaNs allowed
+        
     nsim : int
         the number of simulations [default: 1000]
-    method : string
-        methods 1-3 above [default: 'isospectral']
+        
+    method : {'ttest','isopersistent','isospectral'}
+        method for significance testing
+        
     alpha : float
         significance level for critical value estimation [default: 0.05]
 
     Returns
     -------
-
-     r : float
-         correlation between x and y
-     signif : bool
-         true (1) if significant; false (0) otherwise
-     p : float
-         Fraction of time series with higher correlation coefficents than observed (approximates the p-value).
+    res : dict 
+        Containing:
+            
+        - r : correlation between x and y
+         
+        - signif : true (1) if significant; false (0) otherwise
+         
+        - p : Fraction of time series with higher correlation coefficents than observed (approximates the p-value).
          Note that signif = True if and only if p <= alpha.
+         
+    See Also
+    --------
+
+    corr_ttest : Estimates the significance of correlations between 2 time series using the classical T-test adjusted for effective sample size.
+    
+    corr_isopersist : Computes correlation between two timeseries, and their significance using Ar(1) modeling.
+    
+    corr_isospec : Estimates the significance of the correlation using phase randomization
+     
     """
     y1 = np.array(y1, dtype=float)
     y2 = np.array(y2, dtype=float)
@@ -70,13 +86,18 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     elif method == 'isospectral':
         (r, signif, p) = corr_isospec(y1, y2, alpha=alpha, nsim=nsim)
 
-    return r, signif, p
+    res={'r':r,'signif':signif,'p':p}    
+    
+    return res
 
 def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
-    ''' Determine significance based on the FDR approach (translated from fdr.R by Dr. Chris Paciorek)
-
-    Args
-    ----
+    ''' Determine significance based on the FDR approach
+    
+    The false discovery rate is a method of conceptualizing the rate of type I errors in null hypothesis testing when conducting multiple comparisons. 
+    Translated from fdr.R by Dr. Chris Paciorek 
+    
+    Parameters
+    ----------
 
     pvals : list or array
         A vector of p-values on which to conduct the multiple testing.
@@ -86,15 +107,15 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
 
     method : {'original', 'general'}
         Method for performing the testing.
-        - 'original' follows Benjamini & Hochberg (1995);
-        - 'general' is much more conservative, requiring no assumptions on the p-values (see Benjamini & Yekutieli (2001)).
-        'original' is recommended, and if desired, using 'adj_method="mean"' to increase power.
+            - 'original' follows Benjamini & Hochberg (1995);
+            - 'general' is much more conservative, requiring no assumptions on the p-values (see Benjamini & Yekutieli (2001)).
+            'original' is recommended, and if desired, using 'adj_method="mean"' to increase power.
 
     adj_method: {'mean', 'storey', 'two-stage'}
         Method for increasing the power of the procedure by estimating the proportion of alternative p-values.
-        - 'mean', the modified Storey estimator in Ventura et al. (2004)
-        - 'storey', the method of Storey (2002)
-        - 'two-stage', the iterative approach of Benjamini et al. (2001)
+            - 'mean', the modified Storey estimator in Ventura et al. (2004)
+            - 'storey', the method of Storey (2002)
+            - 'two-stage', the iterative approach of Benjamini et al. (2001)
 
     adj_args : dict
         Arguments for adj_method; see prop_alt() for description,
@@ -109,7 +130,7 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
     References
     ----------
 
-    - The fdr.R by Dr. Chris Paciorek: https://www.stat.berkeley.edu/~paciorek/research/code/code.html
+    - fdr.R by Dr. Chris Paciorek: https://www.stat.berkeley.edu/~paciorek/research/code/code.html
 
     '''
     n = len(pvals)
@@ -146,17 +167,20 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
 
 def corr_ttest(y1, y2, alpha=0.05):
     """ Estimates the significance of correlations between 2 time series using
-    the classical T-test with degrees of freedom modified for autocorrelation.
-    This function creates 'nsim' random time series that have the same power
-    spectrum as the original time series but with random phases.
-
-    Args
-    ----
+    the classical T-test adjusted for effective sample size.
+    
+    The degrees of freedom are adjusted following n_eff=n(1-g)/(1+g) where g is the lag-1 autocorrelation. 
+    
+    
+    Parameters
+    ----------
 
     y1 : array
         vectors of (real) numbers with identical length, no NaNs allowed
+        
     y2 : array
         vectors of (real) numbers with identical length, no NaNs allowed
+        
     alpha : float
         significance level for critical value estimation [default: 0.05]
 
@@ -165,10 +189,20 @@ def corr_ttest(y1, y2, alpha=0.05):
 
     r : float
          correlation between x and y
+         
     signif : bool
         true (1) if significant; false (0) otherwise
+        
     pval : float
-        test p-value (the probability of the test statstic exceeding the observed one by chance alone)
+        test p-value (the probability of the test statistic exceeding the observed one by chance alone)
+        
+    See Also
+    --------
+    
+    corr_isopersist : Estimate Pearson's correlation and associated significance using AR(1)
+    
+    corr_isospec : Estimate Pearson's correlation and associated significance using phase randomization
+    
     """
     r = pearsonr(y1, y2)[0]
 
@@ -193,20 +227,24 @@ def corr_ttest(y1, y2, alpha=0.05):
     return r, signif, pval
 
 def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
-    ''' Computes correlation between two timeseries, and their significance.
-    The latter is gauged via a non-parametric (Monte Carlo) simulation of
+    ''' Computes the Pearson's correlation between two timeseries, and their significance using Ar(1) modeling.
+    
+    The significance is gauged via a non-parametric (Monte Carlo) simulation of
     correlations with nsim AR(1) processes with identical persistence
     properties as x and y ; the measure of which is the lag-1 autocorrelation (g).
 
-    Args
-    ----
+    Parameters
+    ----------
 
     y1 : array
         vectors of (real) numbers with identical length, no NaNs allowed
+        
     y2 : array
         vectors of (real) numbers with identical length, no NaNs allowed
+        
     alpha : float
         significance level for critical value estimation [default: 0.05]
+        
     nsim : int
         number of simulations [default: 1000]
 
@@ -215,8 +253,10 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
 
     r : float
         correlation between x and y
+        
     signif : bool
         true (1) if significant; false (0) otherwise
+        
     pval : float
         test p-value (the probability of the test statstic exceeding the observed one by chance alone)
 
@@ -229,6 +269,14 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
     The test is rejected (signif = 1) if pval <= alpha, otherwise signif=0;
     (Some Rights Reserved) Hepta Technologies, 2009
     v1.0 USC, Aug 10 2012, based on corr_signif.
+    
+    See Also
+    --------
+    
+    corr_ttest: Estimates Pearson's correlation and associated significance using a t-test.
+    
+    corr_isospec : Estimates Pearson's correlation and associated significance using 
+    
     '''
 
     r = pearsonr(y1, y2)[0]
@@ -262,8 +310,8 @@ def isopersistent_rn(X, p):
     ''' Generates p realization of a red noise [i.e. AR(1)] process
     with same persistence properties as X (Mean and variance are also preserved).
 
-    Args
-    ----
+    Parameters
+    ----------
 
     X : array
         vector of (real) numbers as a time series, no NaNs allowed
@@ -293,13 +341,13 @@ def isopersistent_rn(X, p):
 
     return red, g
 
-def sm_ar1_fit(ts):
+def sm_ar1_fit(ys):
     ''' Return the lag-1 autocorrelation from ar1 fit using statsmodels.
 
-    Args
-    ----
+    Parameters
+    ----------
 
-    ts : array
+    ys : array
         vector of (real) numbers as a time series
 
     Returns
@@ -310,7 +358,7 @@ def sm_ar1_fit(ts):
     '''
 
 
-    ar1_mod = sm.tsa.AR(ts, missing='drop').fit(maxlag=1)
+    ar1_mod = sm.tsa.AR(ys, missing='drop').fit(maxlag=1)
     g = ar1_mod.params[1]
 
     return g
@@ -318,8 +366,8 @@ def sm_ar1_fit(ts):
 def sm_ar1_sim(n, p, g, sig):
     ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g using statsmodels
 
-    Args
-    ----
+    Parameters
+    ----------
 
     n : int
         row dimensions
@@ -328,6 +376,7 @@ def sm_ar1_sim(n, p, g, sig):
 
     g : float
         lag-1 autocorrelation coefficient
+        
     sig : float
         the standard deviation of the original time series
 
@@ -353,13 +402,15 @@ def sm_ar1_sim(n, p, g, sig):
 def red_noise(N, M, g):
     ''' Produce M realizations of an AR1 process of length N with lag-1 autocorrelation g
 
-    Args
-    ----
+    Parameters
+    ----------
 
     N : int
         row dimensions
+        
     M : int
         column dimensions
+        
     g : float
         lag-1 autocorrelation coefficient
 
@@ -383,22 +434,25 @@ def red_noise(N, M, g):
     return red
 
 def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
-    ''' Phase randomization correltation estimates
+    ''' Estimates the significance of the correlation using phase randomization
 
     Estimates the significance of correlations between non IID
     time series by phase randomization of original inputs.
     This function creates 'nsim' random time series that have the same power
     spectrum as the original time series but random phases.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     y1 : array
         vectors of (real) numbers with identical length, no NaNs allowed
+        
     y2 : array
         vectors of (real) numbers with identical length, no NaNs allowed
+        
     alpha : float
         significance level for critical value estimation [default: 0.05]
+        
     nsim : int
         number of simulations [default: 1000]
 
@@ -407,21 +461,32 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
 
     r : float
         correlation between y1 and y2
+        
     signif : bool
         true (1) if significant; false (0) otherwise
+        
     F : float
         Fraction of time series with higher correlation coefficents than observed (approximates the p-value).
 
-    Reference
+    References
     ---------
 
     - Ebisuzaki, W, 1997: A method to estimate the statistical
     significance of a correlation when the data are serially correlated.
     J. of Climate, 10, 2147-2153.
+    
     - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series
     with Several Simultaneously Measured Variables (1994)
     Physical Review Letters, Vol 73, Number 7
     (Some Rights Reserved) USC Climate Dynamics Lab, 2012.
+    
+    See Also
+    --------
+    
+    corr_ttest : Estimates Pearson's correlation and associated significance using a t-test
+    
+    corr_isopersist : Estimates Pearson's correlation and associated significance using AR(1) simulations
+    
     '''
     r = pearsonr(y1, y2)[0]
 
@@ -446,18 +511,25 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
     return r, signif, F
 
 def phaseran(recblk, nsurr):
-    ''' Phaseran by Carlos Gias
+    ''' Simultaneous phase randomization of a set of time series
+    
+    It creates blocks of surrogate data with the same second order properties as the original
+    time series dataset by transforming the oriinal data into the frequency domain, randomizing the
+    phases simultaneoulsy across the time series and converting the data back into the time domain. 
+    
+    Written by Carlos Gias for MATLAB
 
     http://www.mathworks.nl/matlabcentral/fileexchange/32621-phase-randomization/content/phaseran.m
 
-    Args
-    ----
+    Parameters
+    ----------
 
     recblk : numpy array
         2D array , Row: time sample. Column: recording.
         An odd number of time samples (height) is expected.
         If that is not the case, recblock is reduced by 1 sample before the surrogate data is created.
         The class must be double and it must be nonsparse.
+    
     nsurr : int
         is the number of image block surrogates that you want to generate.
 
@@ -467,11 +539,13 @@ def phaseran(recblk, nsurr):
     surrblk : numpy array
         3D multidimensional array image block with the surrogate datasets along the third dimension
 
-    Reference
-    ---------
+    References
+    ----------
 
-    Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994)
+    - Prichard, D., Theiler, J. Generating Surrogate Data for Time Series with Several Simultaneously Measured Variables (1994)
     Physical Review Letters, Vol 73, Number 7
+    
+    - Carlos Gias (2020). Phase randomization, MATLAB Central File Exchange
     '''
     # Get parameters
     nfrms = recblk.shape[0]
@@ -512,8 +586,8 @@ def phaseran(recblk, nsurr):
 def fdr_basic(pvals,qlevel=0.05):
     ''' The basic FDR of Benjamini & Hochberg (1995).
 
-    Args
-    ----
+    Parameters
+    ----------
 
     pvals : list or array
         A vector of p-values on which to conduct the multiple testing.
@@ -526,6 +600,12 @@ def fdr_basic(pvals,qlevel=0.05):
 
     fdr_res : array or None
         A vector of the indices of the significant tests; None if no significant tests
+
+    References
+    ----------
+    
+    - Benjamini, Yoav; Hochberg, Yosef (1995). "Controlling the false discovery rate: a practical and powerful approach to multiple testing". Journal of the Royal Statistical Society, Series B. 57 (1): 289–300. MR 1325392
+    
 
     '''
 
@@ -544,10 +624,10 @@ def fdr_basic(pvals,qlevel=0.05):
     return fdr_res
 
 def fdr_master(pvals, qlevel=0.05, method='original'):
-    ''' Perform various versions of the FDR procedure, but without the modification
+    ''' Perform various versions of the FDR procedure
 
-    Args
-    ----
+    Parameters
+    ----------
 
     pvals : list or array
         A vector of p-values on which to conduct the multiple testing.
@@ -567,6 +647,13 @@ def fdr_master(pvals, qlevel=0.05, method='original'):
     fdr_res : array or None
         A vector of the indices of the significant tests; None if no significant tests
 
+    References
+    ----------
+    
+    - Benjamini, Yoav; Hochberg, Yosef (1995). "Controlling the false discovery rate: a practical and powerful approach to multiple testing". Journal of the Royal Statistical Society, Series B. 57 (1): 289–300. MR 1325392
+    
+    - Benjamini, Yoav; Yekutieli, Daniel (2001). "The control of the false discovery rate in multiple testing under dependency". Annals of Statistics. 29 (4): 1165–1188. doi:10.1214/aos/1013699998 
+
     '''
     if method == 'general':
         n = len(pvals)
@@ -578,8 +665,8 @@ def fdr_master(pvals, qlevel=0.05, method='original'):
 def storey(edf_quantile, pvals):
     ''' The basic Storey (2002) estimator of a, the proportion of alternative hypotheses.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     edf_quantile : float
         The quantile of the empirical distribution function at which to estimate a.
@@ -592,6 +679,11 @@ def storey(edf_quantile, pvals):
 
     a : int
         estimate of a, the number of alternative hypotheses
+        
+    References
+    ----------
+    
+    - Storey, J.D., 2002, A direct approach to False Discovery Rates. Journal of the Royal Statistical Society, Series B, 64, 3, 479-498
 
     '''
     if edf_quantile >= 1 or edf_quantile <= 0:
@@ -605,8 +697,8 @@ def storey(edf_quantile, pvals):
 def prop_alt(pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 20}):
     ''' Calculate an estimate of a, the proportion of alternative hypotheses, using one of several methods
 
-    Args
-    ----
+    Parameters
+    ----------
 
     pvals : list or array
         A vector of p-values on which to estimate a
@@ -632,6 +724,15 @@ def prop_alt(pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 
 
     a : int
         estimate of a, the number of alternative hypotheses
+    
+    References
+    ----------
+    
+    - Storey, J.D. (2002). A direct approach to False Discovery Rates. Journal of the Royal Statistical Society, Series B, 64, 3, 479-498
+    
+    - Benjamini, Yoav; Yekutieli, Daniel (2001). "The control of the false discovery rate in multiple testing under dependency". Annals of Statistics. 29 (4): 1165–1188. doi:10.1214/aos/1013699998 
+    
+    - Ventura, V., Paciorek, C., Risbey, J.S. (2004). Controlling the proportion of falsely rejected hypotheses when conducting multiple tests with climatological data. Journal of climate, 17, 4343-4356
 
     '''
     n = len(pvals)

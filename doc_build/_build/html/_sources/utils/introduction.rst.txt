@@ -17,6 +17,8 @@
    decomposition/pca.rst
    decomposition/mssa.rst
    decomposition/ssa.rst
+   correlation/corr_sig.rst
+   correlation/fdr.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -29,13 +31,23 @@ Causality
    :widths: 30 70
    :header-rows: 0
 
-   * - :ref:`granger <utils_granger>`
+   * - :ref:`granger_causality <utils_granger>`
      - Estimate Granger causality
-   * - :ref:`liang <utils_liang>`
+   * - :ref:`liang_causality <utils_liang>`
      - Estimate Liang causality
 
 Correlation
 -----------
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`corr_sig <utils_corr_sig>`
+     - Estimates the Pearson's correlation and associated significance between two non IID time series.
+   * - :ref:`fdr <utils_fdr>`
+     - False Discovery Rate
+
 
 Decomposition
 -------------
@@ -44,13 +56,12 @@ Decomposition
    :widths: 30 70
    :header-rows: 0
 
-   * - :ref:`Principal Component Analysis <utils_pca>`
-     - Decomposition of a signal or data set in terms of orthogonal basis functions.
-   * - :ref:`Singular Spectrum Analysis <utils_ssa>`
-     - Nonparametric spectral estimation for timeseries.
-   * - :ref:`Multi Channel Singular Spectrum Analysis <utils_mssa>`
-     - Nonparametric spectral estimation for multivariate timeseries.
-
+   * - :ref:`pca <utils_pca>`
+     - Principal Component Analysis
+   * - :ref:`ssa <utils_ssa>`
+     - Singular Spectrum Analysis
+   * - :ref:`MSSA <utils_mssa>`
+     - Multi Channel Singular Spectrum Analysis.
 
 Filter
 ------
@@ -93,11 +104,6 @@ Spectral
    * - :ref:`wwz_psd <utils_wwzpsd>`
      - Estimate power spectral density using the Weighted Z-Transform wavelet method
 
-
-
-
-
-
 Tsmodel
 -------
 
@@ -109,3 +115,4 @@ Tsutils
 
 Lipdutils
 ---------
+This module contains functions to manipulate LiPD files and automate data transformation whenever possible.
