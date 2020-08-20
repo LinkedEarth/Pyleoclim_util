@@ -26,32 +26,32 @@ from nitime import algorithms as alg
 
 def pca(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,iterated_power='auto',random_state=None):
     '''Principal Component Analysis (Empirical Orthogonal Functions)
-    
+
     Decomposition of a signal or data set in terms of orthogonal basis functions.
 
     From scikit-learn: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
 
     Parameters
     ----------
-    
+
     ys : array
         timeseries
-        
+
     n_components : int,None,or str
          [default: None]
         Number of components to keep. if n_components is not set all components are kept:
         If n_components == 'mle' and svd_solver == 'full', Minka’s MLE is used to guess the dimension. Use of n_components == 'mle' will interpret svd_solver == 'auto' as svd_solver == 'full'.
         If 0 < n_components < 1 and svd_solver == 'full', select the number of components such that the amount of variance that needs to be explained is greater than the percentage specified by n_components.
         If svd_solver == 'arpack', the number of components must be strictly less than the minimum of n_features and n_samples.
-    
+
     copy : bool,optional
         [default: True]
         If False, data passed to fit are overwritten and running fit(X).transform(X) will not yield the expected results, use fit_transform(X) instead.
-    
+
     whiten : bool,optional
         [default: False]
         When True (False by default) the components_ vectors are multiplied by the square root of n_samples and then divided by the singular values to ensure uncorrelated outputs with unit component-wise variances.
-    
+
     svd_solver : str {‘auto’, ‘full’, ‘arpack’, ‘randomized’}
         If auto :
             The solver is selected by a default policy based on X.shape and n_components: if the input data is larger than 500x500 and the number of components to extract is lower than 80% of the smallest dimension of the data, then the more efficient ‘randomized’ method is enabled.
@@ -65,15 +65,15 @@ def pca(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,i
 
         If randomized :
             run randomized SVD by the method of Halko et al.
-    
+
     tol : float >= 0 ,optional
         [default: 0]
         Tolerance for singular values computed by svd_solver == ‘arpack’.
-    
+
     iterated_power : int >= 0, or string {'auto'}
         [default: 'auto']
         Number of iterations for the power method computed by svd_solver == ‘randomized’.
-   
+
     random_state : int, RandomState instance, or None, optional
         [default: None]
         If int, random_state is the seed used by the random number generator; If RandomState instance, random_state is the random number generator;
@@ -127,49 +127,58 @@ def pca(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,i
 
 def mssa(ys, M=None, nMC=1000, f=0.3):
     '''Multi-channel singular spectrum analysis analysis
-    
-    This MSSA method is applicable for data with missing values and uses a Monte-Carlo method to test the significance. 
+
+    Multivariate generalization of SSA [2], using the original algorithm of [1].
 
     Parameters
     ----------
 
     ys : array
           multiple time series (dimension: length of time series x total number of time series)
-    
+
     M : int
        window size (embedding dimension, default: 10% of the length of the series)
-    
+
     nMC : int
        Number of iteration in the Monte-Carlo process
-    
+
     f : float
        fraction (0<f<=1) of good data points for identifying significant PCs [f = 0.3]
 
     Returns
     -------
-    res : dict 
+    res : dict
         Containing:
-            
+
         - eig_val : array of eigenvalue spectrum
-        
+
         - eig_val05 : The 5% percentile of eigenvalues
-        
+
         - eig_val95 : The 95% percentile of eigenvalues
-        
+
         - PC : matrix of principal components (2D array)
-        
+
         - RC : matrix of RCs (nrec,N,nrec*M) (2D array)
-    
+
+    References
+    ----------
+    [1]_ Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
+    dynamics, with applications to paleoclimatic time series, Physica D, 35,
+    395–424.
+
+    [2]_ Jiang, N., J. D. Neelin, and M. Ghil (1995), Quasi-quadrennial and
+    quasi-biennial variability in the equatorial Pacific, Clim. Dyn., 12, 101-112.
+
     See Also
     --------
-    
+
     ssa : Singular Spectrum Analysis (one channel)
 
     '''
     N = len(ys[:, 0])
     nrec = len(ys[0, :])
     if M == None:
-        M=int(N/10)    
+        M=int(N/10)
     Y = np.zeros((N - M + 1, nrec * M))
     for irec in np.arange(nrec):
         for m in np.arange(0, M):
@@ -237,42 +246,45 @@ def mssa(ys, M=None, nMC=1000, f=0.3):
 
             for n in np.arange(N):
                 RC[k, n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
-    res = {'eig_val': eig_val, 'eig_vec': eig_vec, 'q05': eig_val95, 'q95': eig_val05, 'PC': PC, 'RC': RC}            
-    
+    res = {'eig_val': eig_val, 'eig_vec': eig_vec, 'q05': eig_val95, 'q95': eig_val05, 'PC': PC, 'RC': RC}
+
     return res
 
 def ssa(ys, M=None, nMC=0, f=0.5):
     '''Singular spectrum analysis
-    
-    Nonparametric spectral estimation for timeseries. It uses the method of [1] and
-    the formulation of [3]. Optionally (MC>0), the significance of eigenvalues
-    is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [2].
+
+    Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
+    This implementation  uses the method of [1], with applications presented in [2]
+    Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
+    The method expects regular spacing, but is tolerant to missing values, up to a fraction 0<f<1 (see [4]).
 
     Parameters
     ----------
 
     ys : array of length N
           time series (evenly-spaced, possibly with with up to f*N NaNs)
-    
+
     M : int
        window size (default: 10% of the length of the series)
-    
-    MC : int
-        Number of iteration in the Monte-Carlo process (default MC=0, bypasses Monte Carlo SSA)
+
+    nMC : int
+        Number of iteration in the Monte-Carlo process (default nMC=0, bypasses Monte Carlo SSA)
         Note: currently only supported for evenly-spaced, gap-free data.
+
+    f : maximum allowable fraction of missing values.
 
     Returns
     -------
-    
+
     res : dict
         Containing:
-            
+
         - eig_val : (M, 1) array of eigenvalue spectrum
-        
+
         - PC : (N - M + 1, M) array of principal components
-        
+
         - RC : (N,  M) array of reconstructed components
-        
+
         - eig_val_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC >0 ]
 
     References
@@ -281,17 +293,20 @@ def ssa(ys, M=None, nMC=0, f=0.5):
     dynamics, with applications to paleoclimatic time series, Physica D, 35,
     395–424.
 
-    [2]_ Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
-    oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
-
-    [3]_ Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
+    [2]_ Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
     A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002),
     Advanced spectral methods for climatic time series, Rev. Geophys., 40(1),
     1003–1052, doi:10.1029/2000RG000092.
-    
+
+    [3]_ Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
+    oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
+
+    [4]_ Schoellhamer, D. H. (2001), Singular spectrum analysis for time series with
+    missing data, Geophysical Research Letters, 28(16), 3187–3190, doi:10.1029/2000GL012698.
+
     See Also
     --------
-    
+
     mssa : Multi-channel SSA
 
     '''
