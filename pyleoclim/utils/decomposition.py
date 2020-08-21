@@ -125,7 +125,7 @@ def pca(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,i
     return pca.fit(ys).__dict__
 
 
-def mssa(ys, M=None, nMC=1000, f=0.3):
+def mssa(ys, M=None, nMC=0, f=0.3):
     '''Multi-channel singular spectrum analysis analysis
 
     Multivariate generalization of SSA [2], using the original algorithm of [1].
@@ -140,7 +140,7 @@ def mssa(ys, M=None, nMC=1000, f=0.3):
        window size (embedding dimension, default: 10% of the length of the series)
 
     nMC : int
-       Number of iteration in the Monte-Carlo process
+       Number of iteration in the Monte-Carlo process [default=0, no Monte Carlo process]
 
     f : float
        fraction (0<f<=1) of good data points for identifying significant PCs [f = 0.3]
@@ -250,7 +250,7 @@ def mssa(ys, M=None, nMC=1000, f=0.3):
 
     return res
 
-def ssa(ys, M=None, nMC=1000, f=0.5):
+def ssa(ys, M=None, nMC=0, f=0.5):
     '''Singular spectrum analysis
 
     Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
@@ -268,7 +268,7 @@ def ssa(ys, M=None, nMC=1000, f=0.5):
        window size (default: 10% of the length of the series)
 
     nMC : int
-        Number of iteration in the Monte-Carlo process (default nMC=1000, bypasses Monte Carlo SSA)
+        Number of iteration in the Monte-Carlo process (default nMC=0, bypasses Monte Carlo SSA)
         Note: currently only supported for evenly-spaced, gap-free data.
 
     f : maximum allowable fraction of missing values.

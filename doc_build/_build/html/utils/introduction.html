@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Pyleoclim Utilities (pyleoclim.utils) &mdash; Pyleoclim 0.4.10 documentation</title>
+  <title>Pyleoclim Utilities (pyleoclim.utils) &mdash; Pyleoclim 0.5.0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.4.10
+                0.5.0
               </div>
             
           
@@ -318,7 +318,34 @@
 </div>
 <div class="section" id="lipdutils">
 <h2>Lipdutils<a class="headerlink" href="#lipdutils" title="Permalink to this headline">¶</a></h2>
-<p>This module contains functions to manipulate LiPD files and automate data transformation whenever possible.</p>
+<p>This module contains functions to manipulate LiPD files and automate data transformation whenever possible. These functions are used throughout Pyleoclim but are not meant for direct interactions. A list of these functions can be found <a class="reference internal" href="lipdutils/private.html#lipdutils-private"><span class="std std-ref">here</span></a>.</p>
+<p>The most relevant functions concern querying the LinkedEarth wiki. The first 5 functions can be used to get relevant query terms.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 70%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="lipdutils/whatArchives.html#utils-whatarchives"><span class="std std-ref">whatArchives</span></a></p></td>
+<td><p>Query the names of all ArchiveTypes from the LinkedEarth Ontology</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lipdutils/whatProxyObservations.html#utils-whatproxyobservations"><span class="std std-ref">whatProxyObservations</span></a></p></td>
+<td><p>Query the names of all ProxyObservations from the LinkedEarth Ontology</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="xref std std-ref">whatProxySensors</span></p></td>
+<td><p>Query the names of all ProxySensors from the LinkedEarth Ontology</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lipdutils/whatInferredVariables.html#utils-whatinferredvariables"><span class="std std-ref">whatInferredVariables</span></a></p></td>
+<td><p>Query the names of all InferredVariables from the LinkedEarth Ontology</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="lipdutils/whatInterpretations.html#utils-whatinterpretations"><span class="std std-ref">whatInterpretations</span></a></p></td>
+<td><p>Query the names of all Interpretations from the LinkedEarth Ontology.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="lipdutils/queryLinkedEarth.html#utils-querylinkedearth"><span class="std std-ref">queryLinkedEarth</span></a></p></td>
+<td><p>Query the LinkedEarth wiki for datasets.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -334,7 +361,7 @@
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay
 
     </p>
   </div>

@@ -19,6 +19,13 @@
    decomposition/ssa.rst
    correlation/corr_sig.rst
    correlation/fdr.rst
+   lipdutils/private.rst
+   lipdutils/whatArchives.rst
+   lipdutils/whatProxyObservations.rst
+   lipdutils/whatProxySensors.rst
+   lipdutils/whatInferredVariables.rst
+   lipdutils/whatInterpretations.rst
+   lipdutils/queryLinkedEarth.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -115,4 +122,23 @@ Tsutils
 
 Lipdutils
 ---------
-This module contains functions to manipulate LiPD files and automate data transformation whenever possible.
+This module contains functions to manipulate LiPD files and automate data transformation whenever possible. These functions are used throughout Pyleoclim but are not meant for direct interactions. A list of these functions can be found :ref:`here <lipdutils_private>`.
+
+The most relevant functions concern querying the LinkedEarth wiki. The first 5 functions can be used to get relevant query terms.
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`whatArchives <utils_whatArchives>`
+     - Query the names of all ArchiveTypes from the LinkedEarth Ontology
+   * - :ref:`whatProxyObservations <utils_whatProxyObservations>`
+     - Query the names of all ProxyObservations from the LinkedEarth Ontology
+   * - :ref:`whatProxySensors <utils_whatProxySensors>`
+     - Query the names of all ProxySensors from the LinkedEarth Ontology
+   * - :ref:`whatInferredVariables <utils_whatInferredVariables>`
+     - Query the names of all InferredVariables from the LinkedEarth Ontology
+   * - :ref:`whatInterpretations <utils_whatInterpretations>`
+     - Query the names of all Interpretations from the LinkedEarth Ontology.
+   * - :ref:`queryLinkedEarth <utils_queryLinkedEarth>`
+     - Query the LinkedEarth wiki for datasets.

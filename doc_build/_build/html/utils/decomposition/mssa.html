@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>mssa (pyleoclim.utils.mssa) &mdash; Pyleoclim 0.4.10 documentation</title>
+  <title>mssa (pyleoclim.utils.mssa) &mdash; Pyleoclim 0.5.0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.4.10
+                0.5.0
               </div>
             
           
@@ -183,7 +183,7 @@
 <dt id="pyleoclim.utils.mssa">
 <code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">mssa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ys</span></em>, <em class="sig-param"><span class="n">M</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nMC</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">f</span><span class="o">=</span><span class="default_value">0.3</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/decomposition.html#mssa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.mssa" title="Permalink to this definition">¶</a></dt>
 <dd><p>Multi-channel singular spectrum analysis analysis</p>
-<p>This MSSA method is applicable for data with missing values and uses a Monte-Carlo method to test the significance.</p>
+<p>Multivariate generalization of SSA [2], using the original algorithm of [1].</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -208,6 +208,12 @@
 <dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
+<p class="rubric">References</p>
+<p><a href="#id3"><span class="problematic" id="id1">[1]_</span></a> Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
+dynamics, with applications to paleoclimatic time series, Physica D, 35,
+395–424.</p>
+<p><a href="#id4"><span class="problematic" id="id2">[2]_</span></a> Jiang, N., J. D. Neelin, and M. Ghil (1995), Quasi-quadrennial and
+quasi-biennial variability in the equatorial Pacific, Clim. Dyn., 12, 101-112.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
@@ -231,7 +237,7 @@
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2017-2019, Deborah Khider, Feng Zhu, Julien Emile-Geay
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay
 
     </p>
   </div>

@@ -24,7 +24,7 @@ import os
 import json
 import requests
 import wget
-from unidecode import unidecode
+#from unidecode import unidecode
 import string
 
 
@@ -35,12 +35,11 @@ The following functions handle the LiPD files
 def enumerateLipds(lipds):
     """Enumerate the LiPD files loaded in the workspace
 
-    Args
-    ----
+    Parameters
+    ----------
 
     lipds : dict
-        A dictionary of LiPD files. Can be obtained from
-        pyleoclim.readLipd()
+        A dictionary of LiPD files. 
 
     """
     print("Below are the available records")
@@ -54,8 +53,8 @@ def getLipd(lipds):
     Ask the user to select a LiPD file from a list
     Use this function in conjunction with enumerateLipds()
 
-    Args
-    ----
+    Parameters
+    ----------
 
     lipds : dict
         A dictionary of LiPD files. Can be obtained from
@@ -99,11 +98,13 @@ def promptForVariable():
 
 def xAxisTs(timeseries):
     """ Get the x-axis for the timeseries.
-    Args
-    ----
+    
+    Parameters
+    ----------
     
     timeseries : dict
         a timeseries object
+    
     Returns
     -------
     
@@ -112,6 +113,7 @@ def xAxisTs(timeseries):
     label : string
         returns either "age", "year", or "depth"
     """
+    
     if "depth" in timeseries.keys() and "age" in timeseries.keys() or\
             "depth" in timeseries.keys() and "year" in timeseries.keys():
         print("Both time and depth information available, selecting time")
@@ -141,11 +143,12 @@ def xAxisTs(timeseries):
 def checkXaxis(timeseries, x_axis= None):
     """Check that a x-axis is present for the timeseries
 
-    Args
-    ----
+    Parameters
+    ----------
 
     timeseries : dict
         a timeseries
+        
     x_axis : string
         the x-axis representation, either depth, age or year
 
@@ -153,7 +156,8 @@ def checkXaxis(timeseries, x_axis= None):
     -------
 
     x : array
-        the values for the x-axis representation,
+        the values for the x-axis representation
+        
     label : string
         returns either "age", "year", or "depth"
 
@@ -187,8 +191,8 @@ def checkXaxis(timeseries, x_axis= None):
 def checkTimeAxis(timeseries, x_axis = None):
     """ This function makes sure that time is available for the timeseries
 
-    Args
-    ----
+    Parameters
+    ----------
 
     timeseries : dict
         A LiPD timeseries object
@@ -198,6 +202,7 @@ def checkTimeAxis(timeseries, x_axis = None):
 
     x : array
         the time values for the timeseries
+        
     label : string
         the time representation for the timeseries
     """
@@ -231,15 +236,18 @@ def checkTimeAxis(timeseries, x_axis = None):
 def searchVar(timeseries_list, key, exact = True, override = True):
     """ This function search for key words (exact match) for a variable
 
-    Args
-    ----
+    Parameters
+    ----------
 
     timeseries_list : list
         A list of available series
+        
     key : list
         A list of keys to search
+        
     exact : bool
         if True, looks for an exact match.
+        
     override : bool
         if True, override the exact match if no match is found
 
@@ -419,13 +427,12 @@ The following functions handle the time series objects
 def enumerateTs(timeseries_list):
     """Enumerate the available time series objects
 
-    Args
-    ----
+    Parameters
+    ----------
 
     timeseries_list : list
         a  list of available timeseries objects.
-        To use the timeseries loaded upon initiation of the
-        pyleoclim package, use pyleo.time_series.
+        
 
     """
     available_y = []
@@ -444,13 +451,12 @@ def enumerateTs(timeseries_list):
 def getTs(timeseries_list, option = None):
     """Get a specific timeseries object from a dictionary of timeseries
 
-    Args
-    ----
+    Parameters
+    ----------
 
     timeseries_list : list
         a  list of available timeseries objects.
-        To use the timeseries loaded upon initiation of the
-        pyleoclim package, use pyleo.time_series.
+        
     option : string
         An expression to filter the datasets. Uses lipd.filterTs()
 
@@ -472,15 +478,15 @@ def getTs(timeseries_list, option = None):
     return timeseries
 
 """
-Functions to handle data on the wiki
+Functions to handle data on the LinkedEarth Platform
 """
 def LipdToOntology(archiveType):
     """ standardize archiveType
 
     Transform the archiveType from their LiPD name to their ontology counterpart
     
-    Args
-    ----
+    Parameters
+    ----------
 
     archiveType : string
         name of the archiveType from the LiPD file
@@ -507,8 +513,8 @@ def LipdToOntology(archiveType):
 def timeUnitsCheck(units):
     """ This function attempts to make sense of the time units by checking for equivalence
 
-    Args
-    ----
+    Parameters
+    ----------
 
     units : string
         The units string for the timeseries
@@ -547,8 +553,8 @@ def timeUnitsCheck(units):
 def whatArchives(print_response=True):
     """ Get the names for ArchiveType from LinkedEarth Ontology
 
-    Args
-    ----
+    Parameters
+    ----------
 
     print_response : bool
         Whether to print the results on the console. Default is True
@@ -557,6 +563,7 @@ def whatArchives(print_response=True):
     -------
 
     res : JSON-object with the request from LinkedEarth wiki api
+    
     """
     url = "http://wiki.linked.earth/store/ds/query"
 
@@ -590,8 +597,8 @@ def whatArchives(print_response=True):
 def whatProxyObservations(print_response=True):
     """ Get the names for ProxyObservations from LinkedEarth Ontology
 
-    Args
-    ----
+    Parameters
+    ----------
 
     print_response : bool
         Whether to print the results on the console. Default is True
@@ -631,8 +638,8 @@ def whatProxyObservations(print_response=True):
 def whatProxySensors(print_response=True):
     """ Get the names for ProxySensors from LinkedEarth Ontology
 
-    Args
-    ----
+    Parameters
+    ----------
 
     print_response : bool
         Whether to print the results on the console. Default is True
@@ -672,8 +679,8 @@ def whatProxySensors(print_response=True):
 def whatInferredVariables(print_response=True):
     """ Get the names for InferredVariables from LinkedEarth Ontology
 
-    Args
-    ----
+    Parameters
+    ----------
 
     print_response : bool
         Whether to print the results on the console. Default is True
@@ -710,8 +717,8 @@ def whatInferredVariables(print_response=True):
 def whatInterpretations(print_response=True):
     """ Get the names for interpretations from LinkedEarth Ontology
 
-    Args
-    ----
+    Parameters
+    ----------
 
     print_response : bool
         Whether to print the results on the console. Default is True
@@ -758,52 +765,69 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
     If you have more than one keyword per catagory, enter them in a list. If you don't
     wish to use a particular terms, leave a blank in-between the brackets.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     archiveType : list of strings
         The type of archive (enter all query terms, separated by a comma)
+        
     proxyObsType : list of strings
         The type of proxy observation (enter all query terms, separated by a comma)
+        
     infVarType : list of strings
         The type of inferred variable (enter all query terms, separated by a comma)
+        
     sensorGenus : list of strings
         The Genus of the sensor (enter all query terms, separated by a comma)
+        
     sensorSpecies : list of strings
         The Species of the sensor (enter all query terms, separated by a comma)
+        
     interpName : list of strings
         The name of the interpretation (enter all query terms, separated by a comma)
+        
     interpDetail : list of strings
         The detail of the interpretation (enter all query terms, separated by a comma)
+        
     ageUnits : list of strings
         The units of in which the age (year) is expressed in.
         Warning: Separate each query if need to run across multiple age queries (i.e., yr B.P. vs kyr B.P.). If the units are different but the meaning is the same (e.g., yr B.P. vs yr BP, enter all search terms separated by a comma).
+    
     ageBound : list of floats
         Enter the minimum and maximum age value to search for.
         Warning: You MUST enter a minimum AND maximum value. If you wish to perform a query such as "all ages before 2000 A.D.", enter a minimum value of -99999 to cover all bases.
+    
     ageBoundType : list of strings
         The type of querying to perform. Possible values include: "any", "entire", and "entirely".
-        any: Overlap any portions of matching datasets (default)
-        entirely: are entirely overlapped by matching datasets
-        entire: overlap entire matching datasets but dataset can be shorter than the bounds
+        - any: Overlap any portions of matching datasets (default)
+        - entirely: are entirely overlapped by matching datasets
+        - entire: overlap entire matching datasets but dataset can be shorter than the bounds
+    
     recordLength : list of floats
         The minimum length the record needs to have while matching the ageBound criteria. For instance, "look for all records between 3000 and 6000 year BP with a record length of at least 1500 year".
+    
     resolution : list of floats
         The maximum resolution of the resord. Resolution has the same units as age/year. For instance, "look for all records with a resolution of at least 100 years".
         Warning: Resolution applies to specific variables rather than an entire dataset. Imagine the case where some measurements are made every cm while others are made every 5cm. If you require a specific variable to have the needed resolution, make sure that either the proxyObservationType, inferredVariableType, and/or Interpretation fields are completed.
+    
     lat : list of floats
         The minimum and maximum latitude. South is expressed with negative numbers.
         Warning: You MUST enter a minimum AND maximum value. If you wish to perform a query looking for records from the Northern Hemisphere, enter [0,90].
+    
     lon : list of floats
         The minimum and maximum longitude. West is expressed with negative numbers.
         Warning: You MUST enter a minimum AND a maximum value. If you wish to perform a query looking for records from the Western Hemisphere, enter [-180,0].
+    
     alt : list of floats
         The minimum and maximum altitude. Depth below sea level is expressed as negative numbers.
         Warning: You MUST enter a minimum AND a maximum value. If you wish to perform a query looking for records below a certain depth (e.g., 500), enter [-99999,-500].
+    
     print_response : bool
         If True, prints the URLs to the matching LiPD files
-    download_lip : bool
+    
+    download_lipd : bool
         If True, download the matching LiPD files
+    
     download_folder : string
         Location to download the LiPD files. If "default", will download in the current directory.
 
@@ -811,6 +835,40 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
     -------
 
     res : the response to the query
+    
+    Examples
+    --------
+    
+        .. code-block::
+            
+            >>> from pyleoclim import utils
+            >>> # variables and parameters
+            >>> archiveType=["marine sediment","Marine Sediment"]
+            >>> proxyObsType=[ ]
+            >>> infVarType=["Sea Surface Temperature"]
+            >>> sensorGenus=[ ]
+            >>> sensorSpecies=[ ]
+            >>> interpName=["temperature","Temperature"]
+            >>> interpDetail=["sea surface"]
+            >>> ageUnits=["kyr BP"]
+            >>> ageBound=[0,10]
+            >>> ageBoundType=["any"]
+            >>> recordLength=[4]
+            >>> resolution=[ ]
+            >>> lat=[-14,1.5]
+            >>> lon=[110,135]
+            >>> alt=[-10000,0]
+            >>> res = utils.queryLinkedEarth(archiveType=archiveType, proxyObsType=proxyObsType,
+            ...                     infVarType = infVarType, sensorGenus=sensorGenus,
+            ...                     sensorSpecies=sensorSpecies, interpName=interpName, 
+            ...                     interpDetail =interpDetail, ageUnits = ageUnits,
+            ...                     ageBound = ageBound, ageBoundType = ageBoundType,
+            ...                     recordLength = recordLength, resolution = resolution,
+            ...                     lat = lat, lon = lon, alt = alt, 
+            ...                     print_response = True, download_lipd = False,
+            ...                     download_folder = './lipd')
+            
+    
     """
     # Perform a lot of checks
     if len(ageBound)==1:
@@ -1150,13 +1208,15 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
 def pre_process_list(list_str):
     """ Pre-process a series of string for capitalized letters, space, punctuations
     
-    Args
-    ----
+    Parameters
+    ----------
+    
     list_str : list
         A list of strings from which to strip capitals, spaces, and other characters
     
     Returns
     -------
+    
     res : list
         A list of strings with capitalization, spaces, and punctuation removed
     """
@@ -1168,8 +1228,8 @@ def pre_process_list(list_str):
 def similar_string(list_str, search):
     """ Returns a list of indices for strings with similar values
     
-    Args
-    ----
+    Parameters
+    ----------
     
     list_str : list
         A list of strings
@@ -1191,8 +1251,9 @@ def similar_string(list_str, search):
 def pre_process_str(word):
     """Pre-process a string for capitalized letters, space, punctuations
     
-    Args
-    ----
+    Parameters
+    ----------
+    
     string : str
         A string from which to strip capitals, spaces, and other characters
     
@@ -1212,11 +1273,12 @@ Deal with models
 def isModel(csvName, lipd):
     """Check for the presence of a model in the same object than the measurement table
 
-    Args
-    ----
+    Parameters
+    ----------
 
     csvName : string
         The name of the csv file corresponding to the measurement table
+        
     lipd : dict
         A LiPD object
 
@@ -1225,6 +1287,7 @@ def isModel(csvName, lipd):
 
     model : list
         List of models already available
+        
     dataObject : string
         The name of the paleoData or ChronData
         object in which the model(s) are stored
@@ -1255,8 +1318,8 @@ def isModel(csvName, lipd):
 def modelNumber(model):
     """Assign a new or existing model number
 
-    Args
-    ----
+    Paraemeters
+    -----------
 
     model : list
         List of possible model number. Obtained from isModel
@@ -1286,8 +1349,8 @@ Get entire tables
 def isMeasurement(csv_dict):
     """ Check whether measurement tables are available
 
-    Args
-    ----
+    Parameters
+    ----------
 
     csv_dict : dict
         Dictionary of available csv
@@ -1316,8 +1379,8 @@ def whichMeasurement(measurementTableList):
 
     Use in conjunction with the function isMeasurement
 
-    Args
-    ----
+    Parameters
+    ----------
 
     measurementTableList : list
         List of measurement tables contained in the LiPD file. Output from the isMeasurement function
@@ -1342,8 +1405,8 @@ def whichMeasurement(measurementTableList):
 def getMeasurement(csvName, lipd):
     """Extract the dictionary corresponding to the measurement table
 
-    Args
-    ----
+    Parameters
+    ----------
 
     csvName : string
         The name of the csv file
@@ -1381,8 +1444,8 @@ Deal with ensembles
 def isEnsemble(csv_dict):
     """ Check whether ensembles are available
 
-    Args
-    ----
+    Parameters
+    ----------
 
     csv_dict : dict
         Dictionary of available csv
@@ -1411,8 +1474,8 @@ def whichEnsemble(ensembleTableList):
 
     Use in conjunction with the function isMeasurement
 
-    Args
-    ----
+    Parameters
+    ----------
 
     measurementTableList : list
         List of measurement tables contained in the LiPD file. Output from the isMeasurement function
@@ -1440,8 +1503,8 @@ def getEnsemble(csv_dict, csvName):
     """ Grabs the ensemble values and depth vector from the dictionary and
     return them into two numpy arrays.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     csv_dict : dict
         dictionary containing the availableTables
@@ -1453,7 +1516,8 @@ def getEnsemble(csv_dict, csvName):
     -------
 
     depth : array
-        Vector of depth \n
+        Vector of depth
+        
     ensembleValues : array
         The matrix of Ensemble values
     """
@@ -1471,8 +1535,8 @@ def getEnsemble(csv_dict, csvName):
 def mapAgeEnsembleToPaleoData(ensembleValues, depthEnsemble, depthPaleo):
     """ Map the depth for the ensemble age values to the paleo depth
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ensembleValues : array
         A matrix of possible age models. Realizations
@@ -1510,8 +1574,8 @@ def gen_dict_extract(key, var):
     '''Recursively searches for all the values in nested dictionaries corresponding 
     to a particular key
     
-    Args
-    ----
+    Parameters
+    ----------
     
     key : str
         The key to search for
