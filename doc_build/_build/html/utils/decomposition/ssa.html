@@ -181,7 +181,7 @@
 <span id="utils-ssa"></span><h1>ssa (pyleoclim.utils.ssa)<a class="headerlink" href="#ssa-pyleoclim-utils-ssa" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pyleoclim.utils.ssa">
-<code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">ssa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ys</span></em>, <em class="sig-param"><span class="n">M</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nMC</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">f</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/decomposition.html#ssa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.ssa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">ssa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ys</span></em>, <em class="sig-param"><span class="n">M</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nMC</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">f</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/decomposition.html#ssa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.ssa" title="Permalink to this definition">¶</a></dt>
 <dd><p>Singular spectrum analysis</p>
 <p>Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
 This implementation  uses the method of [1], with applications presented in [2]
@@ -192,7 +192,7 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ys</strong> (<em>array of length N</em>) – time series (evenly-spaced, possibly with with up to f*N NaNs)</p></li>
 <li><p><strong>M</strong> (<em>int</em>) – window size (default: 10% of the length of the series)</p></li>
-<li><p><strong>nMC</strong> (<em>int</em>) – Number of iteration in the Monte-Carlo process (default nMC=1000, bypasses Monte Carlo SSA)
+<li><p><strong>nMC</strong> (<em>int</em>) – Number of iteration in the Monte-Carlo process (default nMC=0, bypasses Monte Carlo SSA)
 Note: currently only supported for evenly-spaced, gap-free data.</p></li>
 <li><p><strong>f</strong> (<em>maximum allowable fraction of missing values.</em>) – </p></li>
 </ul>

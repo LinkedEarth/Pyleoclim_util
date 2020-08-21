@@ -234,7 +234,7 @@ def checkTimeAxis(timeseries, x_axis = None):
     return x, label
 
 def searchVar(timeseries_list, key, exact = True, override = True):
-    """ This function search for key words (exact match) for a variable
+    """ This function searched for keywords (exact match) for a variable
 
     Parameters
     ----------
@@ -867,7 +867,8 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
             ...                     lat = lat, lon = lon, alt = alt, 
             ...                     print_response = True, download_lipd = False,
             ...                     download_folder = './lipd')
-            
+            http://wiki.linked.earth/Special:URIResolver/MD01-2D2378.Xu.2008
+            http://wiki.linked.earth/Special:URIResolver/GeoB10069-2D3.Gibbons.2014
     
     """
     # Perform a lot of checks
@@ -1206,7 +1207,7 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
     return res
 
 def pre_process_list(list_str):
-    """ Pre-process a series of string for capitalized letters, space, punctuations
+    """ Pre-process a series of strings for capitalized letters, space, and punctuation
     
     Parameters
     ----------
@@ -1249,7 +1250,7 @@ def similar_string(list_str, search):
     return indices
 
 def pre_process_str(word):
-    """Pre-process a string for capitalized letters, space, punctuations
+    """Pre-process a string for capitalized letters, space, and punctuation
     
     Parameters
     ----------
@@ -1271,7 +1272,7 @@ def pre_process_str(word):
 Deal with models
 """
 def isModel(csvName, lipd):
-    """Check for the presence of a model in the same object than the measurement table
+    """Check for the presence of a model in the same object as the measurement table
 
     Parameters
     ----------
@@ -1500,8 +1501,8 @@ def whichEnsemble(ensembleTableList):
     return csvName
 
 def getEnsemble(csv_dict, csvName):
-    """ Grabs the ensemble values and depth vector from the dictionary and
-    return them into two numpy arrays.
+    """ Extracts the ensemble values and depth vector from the dictionary and
+    returns them into two numpy arrays.
 
     Parameters
     ----------

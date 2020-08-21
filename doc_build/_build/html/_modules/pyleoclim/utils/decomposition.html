@@ -276,7 +276,7 @@
     <span class="k">return</span> <span class="n">pca</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span><span class="o">.</span><span class="vm">__dict__</span></div>
 
 
-<div class="viewcode-block" id="mssa"><a class="viewcode-back" href="../../../utils/decomposition/mssa.html#pyleoclim.utils.mssa">[docs]</a><span class="k">def</span> <span class="nf">mssa</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nMC</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mf">0.3</span><span class="p">):</span>
+<div class="viewcode-block" id="mssa"><a class="viewcode-back" href="../../../utils/decomposition/mssa.html#pyleoclim.utils.mssa">[docs]</a><span class="k">def</span> <span class="nf">mssa</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nMC</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mf">0.3</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Multi-channel singular spectrum analysis analysis</span>
 
 <span class="sd">    Multivariate generalization of SSA [2], using the original algorithm of [1].</span>
@@ -291,7 +291,7 @@
 <span class="sd">       window size (embedding dimension, default: 10% of the length of the series)</span>
 
 <span class="sd">    nMC : int</span>
-<span class="sd">       Number of iteration in the Monte-Carlo process</span>
+<span class="sd">       Number of iteration in the Monte-Carlo process [default=0, no Monte Carlo process]</span>
 
 <span class="sd">    f : float</span>
 <span class="sd">       fraction (0&lt;f&lt;=1) of good data points for identifying significant PCs [f = 0.3]</span>
@@ -401,7 +401,7 @@
 
     <span class="k">return</span> <span class="n">res</span></div>
 
-<div class="viewcode-block" id="ssa"><a class="viewcode-back" href="../../../utils/decomposition/ssa.html#pyleoclim.utils.ssa">[docs]</a><span class="k">def</span> <span class="nf">ssa</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nMC</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<div class="viewcode-block" id="ssa"><a class="viewcode-back" href="../../../utils/decomposition/ssa.html#pyleoclim.utils.ssa">[docs]</a><span class="k">def</span> <span class="nf">ssa</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">M</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nMC</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Singular spectrum analysis</span>
 
 <span class="sd">    Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.</span>
@@ -419,7 +419,7 @@
 <span class="sd">       window size (default: 10% of the length of the series)</span>
 
 <span class="sd">    nMC : int</span>
-<span class="sd">        Number of iteration in the Monte-Carlo process (default nMC=1000, bypasses Monte Carlo SSA)</span>
+<span class="sd">        Number of iteration in the Monte-Carlo process (default nMC=0, bypasses Monte Carlo SSA)</span>
 <span class="sd">        Note: currently only supported for evenly-spaced, gap-free data.</span>
 
 <span class="sd">    f : maximum allowable fraction of missing values.</span>

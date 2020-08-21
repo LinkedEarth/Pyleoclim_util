@@ -181,7 +181,7 @@
 <span id="utils-mssa"></span><h1>mssa (pyleoclim.utils.mssa)<a class="headerlink" href="#mssa-pyleoclim-utils-mssa" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pyleoclim.utils.mssa">
-<code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">mssa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ys</span></em>, <em class="sig-param"><span class="n">M</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nMC</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">f</span><span class="o">=</span><span class="default_value">0.3</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/decomposition.html#mssa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.mssa" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">mssa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ys</span></em>, <em class="sig-param"><span class="n">M</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nMC</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">f</span><span class="o">=</span><span class="default_value">0.3</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/decomposition.html#mssa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.mssa" title="Permalink to this definition">¶</a></dt>
 <dd><p>Multi-channel singular spectrum analysis analysis</p>
 <p>Multivariate generalization of SSA [2], using the original algorithm of [1].</p>
 <dl class="field-list simple">
@@ -189,7 +189,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ys</strong> (<em>array</em>) – multiple time series (dimension: length of time series x total number of time series)</p></li>
 <li><p><strong>M</strong> (<em>int</em>) – window size (embedding dimension, default: 10% of the length of the series)</p></li>
-<li><p><strong>nMC</strong> (<em>int</em>) – Number of iteration in the Monte-Carlo process</p></li>
+<li><p><strong>nMC</strong> (<em>int</em>) – Number of iteration in the Monte-Carlo process [default=0, no Monte Carlo process]</p></li>
 <li><p><strong>f</strong> (<em>float</em>) – fraction (0&lt;f&lt;=1) of good data points for identifying significant PCs [f = 0.3]</p></li>
 </ul>
 </dd>
