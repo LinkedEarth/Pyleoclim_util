@@ -45,7 +45,7 @@ from .wavelet import (
 
 
 def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
-           return_onesided=True, detrend = None, params=["default", 4, 0, 1],
+           return_onesided=True, detrend = None, sg_kwargs = None,
            gaussianize=False, standardize=True,
            scaling='density', average='mean'):
     '''Estimate power spectral density using Welch's method
@@ -102,12 +102,8 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
               - constant - the mean of `ys` is subtracted
               - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
               - emd - Empirical mode decomposition
-      params : list
-          The paramters for the Savitzky-Golay filters. The first parameter
-          corresponds to the window size (default it set to half of the data)
-          while the second parameter correspond to the order of the filter
-          (default is 4). The third parameter is the order of the derivative
-          (the default is zero, which means only smoothing.)
+      sg_kwargs : dict
+          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
       gaussianize : bool
           If True, gaussianizes the timeseries
       standardize : bool
@@ -125,12 +121,13 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
         - psd (array): the spectral density vector
 
 
-    See Also
+    See also
     --------
     periodogram : Estimate power spectral density using a periodogram
     mtm : Retuns spectral density using a multi-taper method
     lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
     wwz_psd : Return the psd of a timeseries using wwz method.
+    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
 
     References
     ----------
@@ -177,7 +174,7 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
     if check == False:
         raise ValueError('For the Welch method, data should be evenly spaced')
     # preprocessing
-    ys = preprocess(ys, ts, detrend=detrend, params=["default", 4, 0, 1],
+    ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs,
                gaussianize=gaussianize, standardize=standardize)
 
 
@@ -203,7 +200,7 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
     return res_dict
 
 
-def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
+def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
            gaussianize=False, standardize=True, adaptive=False, jackknife=True,
            low_bias=True, sides='default', nfft=None):
     ''' Retuns spectral density using a multi-taper method.
@@ -231,12 +228,8 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
               - constant - the mean of `ys` is subtracted
               - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
               - emd - Empirical mode decomposition
-      params : list
-          The paramters for the Savitzky-Golay filters. The first parameter
-          corresponds to the window size (default it set to half of the data)
-          while the second parameter correspond to the order of the filter
-          (default is 4). The third parameter is the order of the derivative
-          (the default is zero, which means only smoothing.)
+      sg_kwargs : dict
+          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
       gaussianize : bool
           If True, gaussianizes the timeseries
       standardize : bool
@@ -271,6 +264,7 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
     welch : Retuns spectral density using the welch method
     lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
     wwz_psd : Return the psd of a timeseries using wwz method.
+    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
 
     Examples
     --------
@@ -310,7 +304,7 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
     if check == False:
         raise ValueError('For the MTM method, data should be evenly spaced')
     # preprocessing
-    ys = preprocess(ys, ts, detrend=detrend, params=["default", 4, 0, 1],
+    ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs,
                gaussianize=gaussianize, standardize=standardize)
 
 
@@ -338,7 +332,7 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, params=["default", 4, 0, 1],
 
 def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
                  freq_kwargs=None, n50=3, window='hann',
-                 detrend = None, params=["default", 4, 0, 1],
+                 detrend = None, sg_kwargs=None,
                  gaussianize=False,
                  standardize=True,
                  average='mean'):
@@ -401,12 +395,8 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
               - constant - the mean of `ys` is subtracted
               - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
               - emd - Empirical mode decomposition
-      params : list
-          The paramters for the Savitzky-Golay filters. The first parameter
-          corresponds to the window size (default it set to half of the data)
-          while the second parameter correspond to the order of the filter
-          (default is 4). The third parameter is the order of the derivative
-          (the default is zero, which means only smoothing.)
+      sg_kwargs : dict
+          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
       gaussianize : bool
           If True, gaussianizes the timeseries
       standardize : bool
@@ -428,6 +418,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
     mtm : Retuns spectral density using a multi-taper method
     welch : Returns power spectral density using the Welch method
     wwz_psd : Return the psd of a timeseries using wwz method.
+    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
 
     References
     ----------
@@ -473,7 +464,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
     ys, ts = clean_ts(ys,ts)
 
     # preprocessing
-    ys = preprocess(ys, ts, detrend=detrend, params=["default", 4, 0, 1],
+    ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs,
                gaussianize=gaussianize, standardize=standardize)
 
     # divide into segments
@@ -534,7 +525,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
 
 
 def periodogram(ys, ts, window='hann', nfft=None,
-           return_onesided=True, detrend = None, params=["default", 4, 0, 1],
+           return_onesided=True, detrend = None, sg_kwargs=None,
            gaussianize=False, standardize=True,
            scaling='density'):
     ''' Estimate power spectral density using a periodogram
@@ -584,19 +575,14 @@ def periodogram(ys, ts, window='hann', nfft=None,
               - constant - the mean of `ys` is subtracted
               - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
               - emd - Empirical mode decomposition
-      params : list
-          The paramters for the Savitzky-Golay filters. The first parameter
-          corresponds to the window size (default it set to half of the data)
-          while the second parameter correspond to the order of the filter
-          (default is 4). The third parameter is the order of the derivative
-          (the default is zero, which means only smoothing.)
+      sg_kwargs : dict
+          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
       gaussianize : bool
           If True, gaussianizes the timeseries
       standardize : bool
           If True, standardizes the timeseries
       scaling : {"density,"spectrum}
           Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density'
-
 
     Returns
     -------
@@ -612,6 +598,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
     mtm : Retuns spectral density using a multi-taper method
     lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
     wwz_psd : Return the psd of a timeseries using wwz method.
+    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
 
     Examples
     --------
@@ -650,7 +637,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
     if check == False:
         raise ValueError('For the Periodogram method, data should be evenly spaced')
     # preprocessing
-    ys = preprocess(ys, ts, detrend=detrend, params=["default", 4, 0, 1],
+    ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs,
                gaussianize=gaussianize, standardize=standardize)
 
 
@@ -678,7 +665,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
 
 def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             tau=None, c=1e-3, nproc=8,
-            detrend=False, params=["default", 4, 0, 1], gaussianize=False,
+            detrend=False, sg_kwargs=None, gaussianize=False,
             standardize=True, Neff=3, anti_alias=False, avgs=2,
             method='default'):
     ''' Return the psd of a timeseries using wwz method.
@@ -714,12 +701,8 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         'constant' - the mean of `ys` is subtracted
         'savitzy-golay' - ys is filtered using the Savitzky-Golay
                filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+    sg_kwargs : dict
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -755,6 +738,7 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     mtm : Retuns spectral density using a multi-taper method
     lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
     welch : Estimate power spectral density using the Welch method
+    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
 
     References
     ----------
@@ -792,7 +776,7 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     # get wwa but AR1_q is not needed here so set nMC=0
     #  wwa, _, _, coi, freq, _, Neffs, _ = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
     res_wwz = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
-              detrend=detrend, params=params,
+              detrend=detrend, sg_kwargs=sg_kwargs,
               gaussianize=gaussianize, standardize=standardize, method=method)
 
     psd = wwa2psd(res_wwz.amplitude, ts_cut, res_wwz.Neffs, freq=res_wwz.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)

@@ -542,18 +542,20 @@ def detrend(y, x = None, method = "emd", sg_kwargs = None):
         - constant: only the mean of data is subtrated.
         - "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
         - "emd" (default): Empirical mode decomposition
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+    sg_kwargs : dict
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
 
     Returns
     -------
 
     ys : array
         The detrended timeseries.
+
+    See also
+    --------
+
+    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+
     """
     y = np.array(y)
 
@@ -785,7 +787,7 @@ def is_evenly_spaced(ts):
 # alias
 std = standardize
 gauss = gaussianize
-def preprocess(ys, ts, detrend=False, params=["default", 4, 0, 1],
+def preprocess(ys, ts, detrend=False, sg_kwargs=None,
                gaussianize=False, standardize=True):
     ''' Return the processed time series using detrend and standardization.
 
@@ -802,12 +804,8 @@ def preprocess(ys, ts, detrend=False, params=["default", 4, 0, 1],
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
         'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+    sg_kwargs : dict
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -819,12 +817,17 @@ def preprocess(ys, ts, detrend=False, params=["default", 4, 0, 1],
     res : array
         the processed time series
 
+    See also
+    --------
+
+    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+
     '''
 
     if detrend == 'none' or detrend is False or detrend is None:
         ys_d = ys
     else:
-        ys_d = detrend(ys, ts, method=detrend, params=params)
+        ys_d = detrend(ys, ts, method=detrend, sg_kwargs=sg_kwargs)
 
     if standardize:
         res, _, _ = std(ys_d)
