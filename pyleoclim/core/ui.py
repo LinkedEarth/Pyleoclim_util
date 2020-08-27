@@ -668,12 +668,7 @@ class Series:
             value1 = self.slice(timespan).value
             value2 = target_series.slice(timespan).value
 
-        r, signif, p = corrutils.corr_sig(value1, value2, **args)
-        corr_res = {
-            'r': r,
-            'signif': signif,
-            'pvalue': p,
-        }
+        corr_res = corrutils.corr_sig(value1, value2, **args)
         return corr_res
 
     def causality(self, target_series, method='liang', settings=None):
