@@ -475,11 +475,15 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
     ts_seg=[]
     ys_seg=[]
 
-    for idx,i in enumerate(np.arange(0,len(index)-2,1)):
-        ts_seg.append(ts[index[idx]:index[idx+2]])
-        ys_seg.append(ys[index[idx]:index[idx+2]])
 
-
+    if n50>1:
+        for idx,i in enumerate(np.arange(0,len(index)-2,1)):
+            ts_seg.append(ts[index[idx]:index[idx+2]])
+            ys_seg.append(ys[index[idx]:index[idx+2]])
+    else:
+        ts_seg.append(ts)
+        ys_seg.append(ys)
+        
     # calculate the frequency vector if needed
     if freq is None:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
@@ -639,7 +643,6 @@ def periodogram(ys, ts, window='hann', nfft=None,
     # preprocessing
     ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs,
                gaussianize=gaussianize, standardize=standardize)
-
 
     # calculate sampling frequency fs
     dt = np.median(np.diff(ts))
