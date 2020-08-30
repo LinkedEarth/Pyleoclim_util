@@ -356,22 +356,26 @@ def showfig(fig):
         plt.show()
 
 
-def savefig(fig, settings={}, verbose=True):
+def savefig(fig, path=None, settings={}, verbose=True):
     ''' Save a figure to a path
+
     Args
     ----
     fig : figure
         the figure to save
+    path : str
+        the path to save the figure, can be ignored and specify in "settings" instead
     settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
-        - "path" must be specified; it can be any existed or non-existed path,
-          with or without a suffix; if the suffix is not given in "path", it will follow "format"
+        - "path" must be specified in settings if not assigned with the keyword argument;
+          it can be any existed or non-existed path, with or without a suffix;
+          if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
     '''
-    if 'path' not in settings:
-        raise ValueError('"path" must be specified in `settings`!')
+    if path is None and 'path' not in settings:
+        raise ValueError('"path" must be specified, either with the keyword argument or be specified in `settings`!')
 
-    savefig_args = {'bbox_inches': 'tight'}
+    savefig_args = {'bbox_inches': 'tight', 'path': path}
     savefig_args.update(settings)
 
     path = pathlib.Path(savefig_args['path'])
