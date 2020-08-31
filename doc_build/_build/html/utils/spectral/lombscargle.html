@@ -181,7 +181,7 @@
 <span id="utils-lombscargle"></span><h1>lomb_scargle (pyleoclim.utils.lomb_scargle)<a class="headerlink" href="#lomb-scargle-pyleoclim-utils-lomb-scargle" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
 <dt id="pyleoclim.utils.lomb_scargle">
-<code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">lomb_scargle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ys</span></em>, <em class="sig-param"><span class="n">ts</span></em>, <em class="sig-param"><span class="n">freq</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_method</span><span class="o">=</span><span class="default_value">'lomb-scargle'</span></em>, <em class="sig-param"><span class="n">freq_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n50</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">window</span><span class="o">=</span><span class="default_value">'hann'</span></em>, <em class="sig-param"><span class="n">detrend</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">params</span><span class="o">=</span><span class="default_value">['default', 4, 0, 1]</span></em>, <em class="sig-param"><span class="n">gaussianize</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">standardize</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">average</span><span class="o">=</span><span class="default_value">'mean'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/spectral.html#lomb_scargle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.lomb_scargle" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">lomb_scargle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ys</span></em>, <em class="sig-param"><span class="n">ts</span></em>, <em class="sig-param"><span class="n">freq</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_method</span><span class="o">=</span><span class="default_value">'lomb-scargle'</span></em>, <em class="sig-param"><span class="n">freq_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">n50</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">window</span><span class="o">=</span><span class="default_value">'hann'</span></em>, <em class="sig-param"><span class="n">detrend</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sg_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gaussianize</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">standardize</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">average</span><span class="o">=</span><span class="default_value">'mean'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/spectral.html#lomb_scargle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.lomb_scargle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the computed periodogram using lomb-scargle algorithm</p>
 <p>Uses the lombscargle implementation from scipy.signal: <a class="reference external" href="https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle">https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle</a></p>
 <dl class="field-list simple">
@@ -250,11 +250,7 @@ If window is a floating point number, it is interpreted as the beta parameter of
 </dl>
 </div></blockquote>
 <dl class="simple">
-<dt>params<span class="classifier">list</span></dt><dd><p>The paramters for the Savitzky-Golay filters. The first parameter
-corresponds to the window size (default it set to half of the data)
-while the second parameter correspond to the order of the filter
-(default is 4). The third parameter is the order of the derivative
-(the default is zero, which means only smoothing.)</p>
+<dt>sg_kwargs<span class="classifier">dict</span></dt><dd><p>The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</p>
 </dd>
 <dt>gaussianize<span class="classifier">bool</span></dt><dd><p>If True, gaussianizes the timeseries</p>
 </dd>
@@ -287,6 +283,8 @@ while the second parameter correspond to the order of the filter
 <dt><a class="reference internal" href="welch.html#pyleoclim.utils.welch" title="pyleoclim.utils.welch"><code class="xref py py-func docutils literal notranslate"><span class="pre">welch()</span></code></a></dt><dd><p>Returns power spectral density using the Welch method</p>
 </dd>
 <dt><a class="reference internal" href="wwz_psd.html#pyleoclim.utils.wwz_psd" title="pyleoclim.utils.wwz_psd"><code class="xref py py-func docutils literal notranslate"><span class="pre">wwz_psd()</span></code></a></dt><dd><p>Return the psd of a timeseries using wwz method.</p>
+</dd>
+<dt><code class="xref py py-func docutils literal notranslate"><span class="pre">utils.filter.savitzy_golay()</span></code></dt><dd><p>Filtering using Savitzy-Golay</p>
 </dd>
 </dl>
 </div>

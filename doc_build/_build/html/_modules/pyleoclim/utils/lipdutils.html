@@ -198,7 +198,7 @@
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lipds_list</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="s1">&#39;: &#39;</span><span class="p">,</span><span class="n">val</span><span class="p">)</span></div>
 
-<span class="k">def</span> <span class="nf">getLipd</span><span class="p">(</span><span class="n">lipds</span><span class="p">):</span>
+<div class="viewcode-block" id="getLipd"><a class="viewcode-back" href="../../../utils/lipdutils/getLipd.html#pyleoclim.utils.lipdutils.getLipd">[docs]</a><span class="k">def</span> <span class="nf">getLipd</span><span class="p">(</span><span class="n">lipds</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Prompt for a LiPD file</span>
 
 <span class="sd">    Ask the user to select a LiPD file from a list</span>
@@ -224,14 +224,14 @@
     <span class="n">lipd_name</span> <span class="o">=</span> <span class="n">lipds_list</span><span class="p">[</span><span class="n">choice</span><span class="p">]</span>
     <span class="n">select_lipd</span> <span class="o">=</span> <span class="n">lipds</span><span class="p">[</span><span class="n">lipd_name</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">select_lipd</span>
+    <span class="k">return</span> <span class="n">select_lipd</span></div>
 
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">The following functions work at the variables level</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="k">def</span> <span class="nf">promptForVariable</span><span class="p">():</span>
+<div class="viewcode-block" id="promptForVariable"><a class="viewcode-back" href="../../../utils/lipdutils/promptForVariable.html#pyleoclim.utils.lipdutils.promptForVariable">[docs]</a><span class="k">def</span> <span class="nf">promptForVariable</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Prompt for a specific variable</span>
 
 <span class="sd">    Ask the user to select the variable they are interested in.</span>
@@ -245,9 +245,9 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">select_var</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter the number of the variable you wish to use: &quot;</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">select_var</span>
+    <span class="k">return</span> <span class="n">select_var</span></div>
 
-<span class="k">def</span> <span class="nf">xAxisTs</span><span class="p">(</span><span class="n">timeseries</span><span class="p">):</span>
+<div class="viewcode-block" id="xAxisTs"><a class="viewcode-back" href="../../../utils/lipdutils/xAxisTs.html#pyleoclim.utils.lipdutils.xAxisTs">[docs]</a><span class="k">def</span> <span class="nf">xAxisTs</span><span class="p">(</span><span class="n">timeseries</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Get the x-axis for the timeseries.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
@@ -289,9 +289,9 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;No age or depth information available&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">x_axis</span><span class="p">,</span> <span class="n">label</span>
+    <span class="k">return</span> <span class="n">x_axis</span><span class="p">,</span> <span class="n">label</span></div>
 
-<span class="k">def</span> <span class="nf">checkXaxis</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="n">x_axis</span><span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="checkXaxis"><a class="viewcode-back" href="../../../utils/lipdutils/checkXaxis.html#pyleoclim.utils.lipdutils.checkXaxis">[docs]</a><span class="k">def</span> <span class="nf">checkXaxis</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="n">x_axis</span><span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check that a x-axis is present for the timeseries</span>
 
 <span class="sd">    Parameters</span>
@@ -337,7 +337,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;enter either &#39;depth&#39;,&#39;age&#39;,or &#39;year&#39;&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">label</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">label</span></div>
 
 <span class="k">def</span> <span class="nf">checkTimeAxis</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="n">x_axis</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; This function makes sure that time is available for the timeseries</span>
@@ -385,7 +385,7 @@
     <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">label</span>
 
 <span class="k">def</span> <span class="nf">searchVar</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">exact</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">override</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This function search for key words (exact match) for a variable</span>
+    <span class="sd">&quot;&quot;&quot; This function searched for keywords (exact match) for a variable</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1018,7 +1018,8 @@
 <span class="sd">            ...                     lat = lat, lon = lon, alt = alt, </span>
 <span class="sd">            ...                     print_response = True, download_lipd = False,</span>
 <span class="sd">            ...                     download_folder = &#39;./lipd&#39;)</span>
-<span class="sd">            </span>
+<span class="sd">            http://wiki.linked.earth/Special:URIResolver/MD01-2D2378.Xu.2008</span>
+<span class="sd">            http://wiki.linked.earth/Special:URIResolver/GeoB10069-2D3.Gibbons.2014</span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Perform a lot of checks</span>
@@ -1357,7 +1358,7 @@
     <span class="k">return</span> <span class="n">res</span></div>
 
 <span class="k">def</span> <span class="nf">pre_process_list</span><span class="p">(</span><span class="n">list_str</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Pre-process a series of string for capitalized letters, space, punctuations</span>
+    <span class="sd">&quot;&quot;&quot; Pre-process a series of strings for capitalized letters, space, and punctuation</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1400,7 +1401,7 @@
     <span class="k">return</span> <span class="n">indices</span>
 
 <span class="k">def</span> <span class="nf">pre_process_str</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Pre-process a string for capitalized letters, space, punctuations</span>
+    <span class="sd">&quot;&quot;&quot;Pre-process a string for capitalized letters, space, and punctuation</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1422,7 +1423,7 @@
 <span class="sd">Deal with models</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="k">def</span> <span class="nf">isModel</span><span class="p">(</span><span class="n">csvName</span><span class="p">,</span> <span class="n">lipd</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Check for the presence of a model in the same object than the measurement table</span>
+    <span class="sd">&quot;&quot;&quot;Check for the presence of a model in the same object as the measurement table</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1651,8 +1652,8 @@
     <span class="k">return</span> <span class="n">csvName</span>
 
 <span class="k">def</span> <span class="nf">getEnsemble</span><span class="p">(</span><span class="n">csv_dict</span><span class="p">,</span> <span class="n">csvName</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Grabs the ensemble values and depth vector from the dictionary and</span>
-<span class="sd">    return them into two numpy arrays.</span>
+    <span class="sd">&quot;&quot;&quot; Extracts the ensemble values and depth vector from the dictionary and</span>
+<span class="sd">    returns them into two numpy arrays.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

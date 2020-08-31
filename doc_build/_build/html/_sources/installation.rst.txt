@@ -1,25 +1,33 @@
 .. _installation:
 
+.. toctree::
+   :hidden:
+   anaconda_installation.rst
+
+.. note::
+  Pyleoclim requires the use of Python 3.8.
 
 Installation
 ============
 
 We recommend the use of Anaconda or Miniconda, with Pyleoclim setup in
-its own environment.
+its own environment. Some default packages shipping with the full Anaconda distribution are known to cause conflicts with the required Pyleoclim packages.
 
 Installing Anaconda or Miniconda
 """""""""""""""""""""""""""""""""
 
-To install Anaconda or Miniconda on your platform, follow the instructions from `this page <https://github.com/LinkedEarth/Pyleoclim_util/blob/Development/help/python-env-setup.md>`_ or `this page <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`_.
+To install Anaconda or Miniconda on your platform, follow the instructions from `this page <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>`_.
+
+Click :ref:`here <anaconda_installation>` for a quick tutorial on MacOs and Linux systems.
 
 Creating a new Anaconda environment
 """""""""""""""""""""""""""""""""""
 
-To create a new environment using Python 3.7 via command line:
+To create a new environment using Python 3.8 via command line:
 
 .. code-block:: bash
 
-  conda create -n pyleoenv python=3.7
+  conda create -n pyleoenv python=3.8
 
 To view a list of available environment:
 
@@ -58,25 +66,42 @@ Make sure that the pyleoenv environment is activated.
   conda install numpy
   conda install -c conda-forge cartopy
 
-Make sure that the package proj4 is version 5.2+
+Install Pyleoclim through Pypi
 
-.. code-block:: bash
-
-  conda list
-
-Install Pyleoclim
+The Pypi release contains the most stable version of Pyleoclim.
 
 .. code-block:: bash
 
   pip install pyleoclim
 
+To install the development version, which contains the most up-to-date features:
+
+.. code-block:: bash
+
+  pip install git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
+
+If you would like to use Jupyter Notebooks or Spyder for code development, install these packages in your environment:
+
+.. code-block:: bash
+
+  conda install spyder
+  conda install jupyter
+
+.. warning::
+  The GUI framework used by the LiPD packages may cause a known conflict with the GUI framework for spyder. If this is the case it is safe to downgrade the conflicting packages.
+
+.. code-block:: bash
+
+  pip install 'pyqt5<5.13'
+  pip install 'pyqtwebengine<5.13'
+
 Building from source for the f2py feature of WWZ
 """"""""""""""""""""""""""""""""""""""""""""""""
 
 The default version of WWZ that comes with the installation steps mentioned above is relying on `Numba <http://numba.pydata.org/>`_.
-It is fast enough for lightweight spectral & wavelet analysis tasks, in which case we recommend sticking with the default installation and not worrying about this section.
+It is fast enough for lightweight spectral & wavelet analysis tasks, in which case we recommend using the default installation.
 
-However, it could be slow for heavy use (e.g. performing it for hundreds of times on timeseries with length longer than 1000 points), in which case we recommend activating the f2py feature to achieve an accelartion of around 50% (see a loose benchmark notebook `here <https://github.com/LinkedEarth/Pyleoclim_util/blob/Development/example_notebooks/WWZ_numba.ipynb>`_).
+However, it could be slow for heavy use (e.g. performing it for hundreds of times on timeseries with length longer than 1000 points), in which case we recommend activating the f2py feature to achieve an acceleration of around 50% (see a loose benchmark notebook `here <https://github.com/LinkedEarth/Pyleoclim_util/blob/Development/example_notebooks/WWZ_numba.ipynb>`_).
 
 To do that, a Fortran compiler (e.g. :code:`gfortran` or :code:`ifort`) is required on your local machine, and the related Fortran source code should be compiled locally following the steps below:
 
@@ -92,13 +117,3 @@ To do that, a Fortran compiler (e.g. :code:`gfortran` or :code:`ifort`) is requi
   print(pyleo)
 
 Again, unless you are planning to make heavy use of the WWZ functionality, we recommend using the default installation.
-
-Installing R
-""""""""""""
-
-Some functionalities require an installation of `R <https://www.r-project.org?>`_.
-
-To install R, download a mirror `here <https://cran.r-project.org/mirrors.html>`_.
-Note that Rstudio is not needed when calling R from Python.
-
-Pyleoclim requires the `Bchron package <https://cran.r-project.org/web/packages/Bchron/index.html>`_. Pyleoclim will check for an installation of Bchron. It it doesn't exist, it will be installed.

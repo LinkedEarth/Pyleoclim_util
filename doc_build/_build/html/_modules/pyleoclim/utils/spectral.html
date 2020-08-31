@@ -196,7 +196,7 @@
 
 
 <div class="viewcode-block" id="welch"><a class="viewcode-back" href="../../../utils/spectral/welch.html#pyleoclim.utils.welch">[docs]</a><span class="k">def</span> <span class="nf">welch</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hann&#39;</span><span class="p">,</span><span class="n">nperseg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-           <span class="n">return_onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+           <span class="n">return_onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sg_kwargs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
            <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
            <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;density&#39;</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Estimate power spectral density using Welch&#39;s method</span>
@@ -253,12 +253,8 @@
 <span class="sd">              - constant - the mean of `ys` is subtracted</span>
 <span class="sd">              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.</span>
 <span class="sd">              - emd - Empirical mode decomposition</span>
-<span class="sd">      params : list</span>
-<span class="sd">          The paramters for the Savitzky-Golay filters. The first parameter</span>
-<span class="sd">          corresponds to the window size (default it set to half of the data)</span>
-<span class="sd">          while the second parameter correspond to the order of the filter</span>
-<span class="sd">          (default is 4). The third parameter is the order of the derivative</span>
-<span class="sd">          (the default is zero, which means only smoothing.)</span>
+<span class="sd">      sg_kwargs : dict</span>
+<span class="sd">          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</span>
 <span class="sd">      gaussianize : bool</span>
 <span class="sd">          If True, gaussianizes the timeseries</span>
 <span class="sd">      standardize : bool</span>
@@ -276,12 +272,13 @@
 <span class="sd">        - psd (array): the spectral density vector</span>
 
 
-<span class="sd">    See Also</span>
+<span class="sd">    See also</span>
 <span class="sd">    --------</span>
 <span class="sd">    periodogram : Estimate power spectral density using a periodogram</span>
 <span class="sd">    mtm : Retuns spectral density using a multi-taper method</span>
 <span class="sd">    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm</span>
 <span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method.</span>
+<span class="sd">    utils.filter.savitzy_golay : Filtering using Savitzy-Golay</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -328,7 +325,7 @@
     <span class="k">if</span> <span class="n">check</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For the Welch method, data should be evenly spaced&#39;</span><span class="p">)</span>
     <span class="c1"># preprocessing</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="n">sg_kwargs</span><span class="p">,</span>
                <span class="n">gaussianize</span><span class="o">=</span><span class="n">gaussianize</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="n">standardize</span><span class="p">)</span>
 
 
@@ -354,7 +351,7 @@
     <span class="k">return</span> <span class="n">res_dict</span></div>
 
 
-<div class="viewcode-block" id="mtm"><a class="viewcode-back" href="../../../utils/spectral/mtm.html#pyleoclim.utils.mtm">[docs]</a><span class="k">def</span> <span class="nf">mtm</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">NW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">BW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<div class="viewcode-block" id="mtm"><a class="viewcode-back" href="../../../utils/spectral/mtm.html#pyleoclim.utils.mtm">[docs]</a><span class="k">def</span> <span class="nf">mtm</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">NW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">BW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
            <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">adaptive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">jackknife</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
            <span class="n">low_bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sides</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Retuns spectral density using a multi-taper method.</span>
@@ -382,12 +379,8 @@
 <span class="sd">              - constant - the mean of `ys` is subtracted</span>
 <span class="sd">              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.</span>
 <span class="sd">              - emd - Empirical mode decomposition</span>
-<span class="sd">      params : list</span>
-<span class="sd">          The paramters for the Savitzky-Golay filters. The first parameter</span>
-<span class="sd">          corresponds to the window size (default it set to half of the data)</span>
-<span class="sd">          while the second parameter correspond to the order of the filter</span>
-<span class="sd">          (default is 4). The third parameter is the order of the derivative</span>
-<span class="sd">          (the default is zero, which means only smoothing.)</span>
+<span class="sd">      sg_kwargs : dict</span>
+<span class="sd">          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</span>
 <span class="sd">      gaussianize : bool</span>
 <span class="sd">          If True, gaussianizes the timeseries</span>
 <span class="sd">      standardize : bool</span>
@@ -422,6 +415,7 @@
 <span class="sd">    welch : Retuns spectral density using the welch method</span>
 <span class="sd">    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm</span>
 <span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method.</span>
+<span class="sd">    utils.filter.savitzy_golay : Filtering using Savitzy-Golay</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -461,7 +455,7 @@
     <span class="k">if</span> <span class="n">check</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For the MTM method, data should be evenly spaced&#39;</span><span class="p">)</span>
     <span class="c1"># preprocessing</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="n">sg_kwargs</span><span class="p">,</span>
                <span class="n">gaussianize</span><span class="o">=</span><span class="n">gaussianize</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="n">standardize</span><span class="p">)</span>
 
 
@@ -489,7 +483,7 @@
 
 <div class="viewcode-block" id="lomb_scargle"><a class="viewcode-back" href="../../../utils/spectral/lombscargle.html#pyleoclim.utils.lomb_scargle">[docs]</a><span class="k">def</span> <span class="nf">lomb_scargle</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_method</span><span class="o">=</span><span class="s1">&#39;lomb-scargle&#39;</span><span class="p">,</span>
                  <span class="n">freq_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n50</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hann&#39;</span><span class="p">,</span>
-                 <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                 <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">average</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">):</span>
@@ -552,12 +546,8 @@
 <span class="sd">              - constant - the mean of `ys` is subtracted</span>
 <span class="sd">              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.</span>
 <span class="sd">              - emd - Empirical mode decomposition</span>
-<span class="sd">      params : list</span>
-<span class="sd">          The paramters for the Savitzky-Golay filters. The first parameter</span>
-<span class="sd">          corresponds to the window size (default it set to half of the data)</span>
-<span class="sd">          while the second parameter correspond to the order of the filter</span>
-<span class="sd">          (default is 4). The third parameter is the order of the derivative</span>
-<span class="sd">          (the default is zero, which means only smoothing.)</span>
+<span class="sd">      sg_kwargs : dict</span>
+<span class="sd">          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</span>
 <span class="sd">      gaussianize : bool</span>
 <span class="sd">          If True, gaussianizes the timeseries</span>
 <span class="sd">      standardize : bool</span>
@@ -579,6 +569,7 @@
 <span class="sd">    mtm : Retuns spectral density using a multi-taper method</span>
 <span class="sd">    welch : Returns power spectral density using the Welch method</span>
 <span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method.</span>
+<span class="sd">    utils.filter.savitzy_golay : Filtering using Savitzy-Golay</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -624,7 +615,7 @@
     <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">clean_ts</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span><span class="n">ts</span><span class="p">)</span>
 
     <span class="c1"># preprocessing</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="n">sg_kwargs</span><span class="p">,</span>
                <span class="n">gaussianize</span><span class="o">=</span><span class="n">gaussianize</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="n">standardize</span><span class="p">)</span>
 
     <span class="c1"># divide into segments</span>
@@ -635,11 +626,15 @@
     <span class="n">ts_seg</span><span class="o">=</span><span class="p">[]</span>
     <span class="n">ys_seg</span><span class="o">=</span><span class="p">[]</span>
 
-    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)):</span>
-        <span class="n">ts_seg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">2</span><span class="p">]])</span>
-        <span class="n">ys_seg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ys</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">2</span><span class="p">]])</span>
 
-
+    <span class="k">if</span> <span class="n">n50</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="n">ts_seg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">2</span><span class="p">]])</span>
+            <span class="n">ys_seg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ys</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">2</span><span class="p">]])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ts_seg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+        <span class="n">ys_seg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
+        
     <span class="c1"># calculate the frequency vector if needed</span>
     <span class="k">if</span> <span class="n">freq</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">freq_kwargs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">freq_kwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">freq_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -685,7 +680,7 @@
 
 
 <div class="viewcode-block" id="periodogram"><a class="viewcode-back" href="../../../utils/spectral/periodogram.html#pyleoclim.utils.periodogram">[docs]</a><span class="k">def</span> <span class="nf">periodogram</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hann&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-           <span class="n">return_onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+           <span class="n">return_onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
            <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
            <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;density&#39;</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Estimate power spectral density using a periodogram</span>
@@ -735,19 +730,14 @@
 <span class="sd">              - constant - the mean of `ys` is subtracted</span>
 <span class="sd">              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.</span>
 <span class="sd">              - emd - Empirical mode decomposition</span>
-<span class="sd">      params : list</span>
-<span class="sd">          The paramters for the Savitzky-Golay filters. The first parameter</span>
-<span class="sd">          corresponds to the window size (default it set to half of the data)</span>
-<span class="sd">          while the second parameter correspond to the order of the filter</span>
-<span class="sd">          (default is 4). The third parameter is the order of the derivative</span>
-<span class="sd">          (the default is zero, which means only smoothing.)</span>
+<span class="sd">      sg_kwargs : dict</span>
+<span class="sd">          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</span>
 <span class="sd">      gaussianize : bool</span>
 <span class="sd">          If True, gaussianizes the timeseries</span>
 <span class="sd">      standardize : bool</span>
 <span class="sd">          If True, standardizes the timeseries</span>
 <span class="sd">      scaling : {&quot;density,&quot;spectrum}</span>
 <span class="sd">          Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density&#39;</span>
-
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -763,6 +753,7 @@
 <span class="sd">    mtm : Retuns spectral density using a multi-taper method</span>
 <span class="sd">    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm</span>
 <span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method.</span>
+<span class="sd">    utils.filter.savitzy_golay : Filtering using Savitzy-Golay</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -801,9 +792,8 @@
     <span class="k">if</span> <span class="n">check</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For the Periodogram method, data should be evenly spaced&#39;</span><span class="p">)</span>
     <span class="c1"># preprocessing</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="n">sg_kwargs</span><span class="p">,</span>
                <span class="n">gaussianize</span><span class="o">=</span><span class="n">gaussianize</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="n">standardize</span><span class="p">)</span>
-
 
     <span class="c1"># calculate sampling frequency fs</span>
     <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts</span><span class="p">))</span>
@@ -829,7 +819,7 @@
 
 <div class="viewcode-block" id="wwz_psd"><a class="viewcode-back" href="../../../utils/spectral/wwz_psd.html#pyleoclim.utils.wwz_psd">[docs]</a><span class="k">def</span> <span class="nf">wwz_psd</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_method</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">freq_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">nproc</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-            <span class="n">detrend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">detrend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">Neff</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">anti_alias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avgs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="n">method</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Return the psd of a timeseries using wwz method.</span>
@@ -865,12 +855,8 @@
 <span class="sd">        &#39;constant&#39; - the mean of `ys` is subtracted</span>
 <span class="sd">        &#39;savitzy-golay&#39; - ys is filtered using the Savitzky-Golay</span>
 <span class="sd">               filters and the resulting filtered series is subtracted from y.</span>
-<span class="sd">    params : list</span>
-<span class="sd">        The paramters for the Savitzky-Golay filters. The first parameter</span>
-<span class="sd">        corresponds to the window size (default it set to half of the data)</span>
-<span class="sd">        while the second parameter correspond to the order of the filter</span>
-<span class="sd">        (default is 4). The third parameter is the order of the derivative</span>
-<span class="sd">        (the default is zero, which means only smoothing.)</span>
+<span class="sd">    sg_kwargs : dict</span>
+<span class="sd">        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</span>
 <span class="sd">    gaussianize : bool</span>
 <span class="sd">        If True, gaussianizes the timeseries</span>
 <span class="sd">    standardize : bool</span>
@@ -906,6 +892,7 @@
 <span class="sd">    mtm : Retuns spectral density using a multi-taper method</span>
 <span class="sd">    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm</span>
 <span class="sd">    welch : Estimate power spectral density using the Welch method</span>
+<span class="sd">    utils.filter.savitzy_golay : Filtering using Savitzy-Golay</span>
 
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -943,7 +930,7 @@
     <span class="c1"># get wwa but AR1_q is not needed here so set nMC=0</span>
     <span class="c1">#  wwa, _, _, coi, freq, _, Neffs, _ = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,</span>
     <span class="n">res_wwz</span> <span class="o">=</span> <span class="n">wwz</span><span class="p">(</span><span class="n">ys_cut</span><span class="p">,</span> <span class="n">ts_cut</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">nproc</span><span class="o">=</span><span class="n">nproc</span><span class="p">,</span> <span class="n">nMC</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-              <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+              <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="n">sg_kwargs</span><span class="p">,</span>
               <span class="n">gaussianize</span><span class="o">=</span><span class="n">gaussianize</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="n">standardize</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
 
     <span class="n">psd</span> <span class="o">=</span> <span class="n">wwa2psd</span><span class="p">(</span><span class="n">res_wwz</span><span class="o">.</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">ts_cut</span><span class="p">,</span> <span class="n">res_wwz</span><span class="o">.</span><span class="n">Neffs</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">res_wwz</span><span class="o">.</span><span class="n">freq</span><span class="p">,</span> <span class="n">Neff</span><span class="o">=</span><span class="n">Neff</span><span class="p">,</span> <span class="n">anti_alias</span><span class="o">=</span><span class="n">anti_alias</span><span class="p">,</span> <span class="n">avgs</span><span class="o">=</span><span class="n">avgs</span><span class="p">)</span>

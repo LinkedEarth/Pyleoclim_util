@@ -87,10 +87,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">LiPD Utilities (pyleoclim.utils.Lipdutils)</a><ul>
-<li><a class="reference internal" href="#functions-to-handle-lipd-files">Functions to handle LiPD files</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">LiPD Utilities (pyleoclim.utils.Lipdutils)</a></li>
 </ul>
 </div>
             
@@ -183,8 +180,6 @@
 <div class="section" id="lipd-utilities-pyleoclim-utils-lipdutils">
 <h1>LiPD Utilities (pyleoclim.utils.Lipdutils)<a class="headerlink" href="#lipd-utilities-pyleoclim-utils-lipdutils" title="Permalink to this headline">¶</a></h1>
 <p>Pyleoclim is meant to directly handle datasets in the Linked Paleo Data (<a class="reference external" href="http://lipd.net">LiPD</a>) format. Pyleoclim works with timeseries objects and model tables present in these files.</p>
-<div class="section" id="functions-to-handle-lipd-files">
-<h2>Functions to handle LiPD files<a class="headerlink" href="#functions-to-handle-lipd-files" title="Permalink to this headline">¶</a></h2>
 <table class="colwidths-given docutils align-default">
 <colgroup>
 <col style="width: 30%" />
@@ -194,9 +189,77 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="enumerateLipds.html#lipdutils-enumeratelipds"><span class="std std-ref">enumerateLipds</span></a></p></td>
 <td><p>enumerate the LiPD files loaded in the workspace</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="getLipd.html#lipdutils-getlipd"><span class="std std-ref">getLipd</span></a></p></td>
+<td><p>Prompt for a LiPD files</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="promptForVariable.html#lipdutils-promptforvariable"><span class="std std-ref">promptForVariable</span></a></p></td>
+<td><p>Prompt for a specific variable</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="xAxisTs.html#lipdutils-xaxists"><span class="std std-ref">xAxisTs</span></a></p></td>
+<td><p>Get the x-axis for the timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="checkXaxis.html#lipdutils-checkxaxis"><span class="std std-ref">checkXaxis</span></a></p></td>
+<td><p>Check that a x-axis is present for the timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="xref std std-ref">checkTimeAxis</span></p></td>
+<td><p>This function makes sure that time is available for the timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="xref std std-ref">searchVar</span></p></td>
+<td><p>This functions searches for keywords (exact match) for a variable.</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="xref std std-ref">enumerateTs</span></p></td>
+<td><p>Enumerate the available time series objects</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="xref std std-ref">getTs</span></p></td>
+<td><p>Get a specific timeseries object from a dictionary of timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="xref std std-ref">LipdToOntology &lt;lipdutils_LipdToOntology</span></p></td>
+<td><p>Standardize archiveType</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="xref std std-ref">timeUnitsCheck</span></p></td>
+<td><p>This function attempts to make sense of the time units by checking for equivalence</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="xref std std-ref">pre_process_list</span></p></td>
+<td><p>Pre-process a series of strings for capitalized letters, space, and punctuation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="xref std std-ref">similar_string</span></p></td>
+<td><p>Returns a list of indices for strings with similar values</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="xref std std-ref">pre_process_str</span></p></td>
+<td><p>Pre-process a string for capitalized letters, space, and punctuation</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="xref std std-ref">isModel</span></p></td>
+<td><p>Check for the presence of a model in the same object as the measurement table</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="xref std std-ref">modelNumber</span></p></td>
+<td><p>Assign a new or existing model number</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="xref std std-ref">isMeasurement</span></p></td>
+<td><p>Check whether measurement tables are available</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="xref std std-ref">whichMeasurement</span></p></td>
+<td><p>Select a measurement table from a list</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="xref std std-ref">getMeasurement</span></p></td>
+<td><p>Extract the dictionary corresponding to the measurement table</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="xref std std-ref">isEnsemble</span></p></td>
+<td><p>Check whether ensembles are available</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="xref std std-ref">whichEnsemble</span></p></td>
+<td><p>Select an ensemble table from a list</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="xref std std-ref">getEnsemble</span></p></td>
+<td><p>Extracts the ensemble values and depth vector from the dictionary</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="xref std std-ref">mapAgeEnsembleToPaleoData</span></p></td>
+<td><p>Map the depth for the ensemble age values to the paleo depth</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="xref std std-ref">gen_dict_extract</span></p></td>
+<td><p>Recursively searches for all the values in nested dictionaries corresponding to a particular key</p></td>
+</tr>
 </tbody>
 </table>
-</div>
 </div>
 
 

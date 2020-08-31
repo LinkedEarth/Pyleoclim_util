@@ -92,7 +92,6 @@
 <li><a class="reference internal" href="#creating-a-new-anaconda-environment">Creating a new Anaconda environment</a></li>
 <li><a class="reference internal" href="#installing-pyleoclim">Installing Pyleoclim</a></li>
 <li><a class="reference internal" href="#building-from-source-for-the-f2py-feature-of-wwz">Building from source for the f2py feature of WWZ</a></li>
-<li><a class="reference internal" href="#installing-r">Installing R</a></li>
 </ul>
 </li>
 </ul>
@@ -184,18 +183,23 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="installation">
-<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pyleoclim requires the use of Python 3.8.</p>
+</div>
+<div class="section" id="id1">
+<h1>Installation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
 <p>We recommend the use of Anaconda or Miniconda, with Pyleoclim setup in
-its own environment.</p>
+its own environment. Some default packages shipping with the full Anaconda distribution are known to cause conflicts with the required Pyleoclim packages.</p>
 <div class="section" id="installing-anaconda-or-miniconda">
 <h2>Installing Anaconda or Miniconda<a class="headerlink" href="#installing-anaconda-or-miniconda" title="Permalink to this headline">¶</a></h2>
-<p>To install Anaconda or Miniconda on your platform, follow the instructions from <a class="reference external" href="https://github.com/LinkedEarth/Pyleoclim_util/blob/Development/help/python-env-setup.md">this page</a> or <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">this page</a>.</p>
+<p>To install Anaconda or Miniconda on your platform, follow the instructions from <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">this page</a>.</p>
+<p>Click <a class="reference internal" href="anaconda_install.html#anaconda-installation"><span class="std std-ref">here</span></a> for a quick tutorial on MacOs and Linux systems.</p>
 </div>
 <div class="section" id="creating-a-new-anaconda-environment">
 <h2>Creating a new Anaconda environment<a class="headerlink" href="#creating-a-new-anaconda-environment" title="Permalink to this headline">¶</a></h2>
-<p>To create a new environment using Python 3.7 via command line:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -n pyleoenv <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.7
+<p>To create a new environment using Python 3.8 via command line:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -n pyleoenv <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8
 </pre></div>
 </div>
 <p>To view a list of available environment:</p>
@@ -224,20 +228,34 @@ its own environment.</p>
 conda install -c conda-forge cartopy
 </pre></div>
 </div>
-<p>Make sure that the package proj4 is version 5.2+</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda list
+<p>Install Pyleoclim through Pypi</p>
+<p>The Pypi release contains the most stable version of Pyleoclim.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pyleoclim
 </pre></div>
 </div>
-<p>Install Pyleoclim</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pyleoclim
+<p>To install the development version, which contains the most up-to-date features:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
+</pre></div>
+</div>
+<p>If you would like to use Jupyter Notebooks or Spyder for code development, install these packages in your environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install spyder
+conda install jupyter
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The GUI framework used by the LiPD packages may cause a known conflict with the GUI framework for spyder. If this is the case it is safe to downgrade the conflicting packages.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="s1">&#39;pyqt5&lt;5.13&#39;</span>
+pip install <span class="s1">&#39;pyqtwebengine&lt;5.13&#39;</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="building-from-source-for-the-f2py-feature-of-wwz">
 <h2>Building from source for the f2py feature of WWZ<a class="headerlink" href="#building-from-source-for-the-f2py-feature-of-wwz" title="Permalink to this headline">¶</a></h2>
 <p>The default version of WWZ that comes with the installation steps mentioned above is relying on <a class="reference external" href="http://numba.pydata.org/">Numba</a>.
-It is fast enough for lightweight spectral &amp; wavelet analysis tasks, in which case we recommend sticking with the default installation and not worrying about this section.</p>
-<p>However, it could be slow for heavy use (e.g. performing it for hundreds of times on timeseries with length longer than 1000 points), in which case we recommend activating the f2py feature to achieve an accelartion of around 50% (see a loose benchmark notebook <a class="reference external" href="https://github.com/LinkedEarth/Pyleoclim_util/blob/Development/example_notebooks/WWZ_numba.ipynb">here</a>).</p>
+It is fast enough for lightweight spectral &amp; wavelet analysis tasks, in which case we recommend using the default installation.</p>
+<p>However, it could be slow for heavy use (e.g. performing it for hundreds of times on timeseries with length longer than 1000 points), in which case we recommend activating the f2py feature to achieve an acceleration of around 50% (see a loose benchmark notebook <a class="reference external" href="https://github.com/LinkedEarth/Pyleoclim_util/blob/Development/example_notebooks/WWZ_numba.ipynb">here</a>).</p>
 <p>To do that, a Fortran compiler (e.g. <code class="code docutils literal notranslate"><span class="pre">gfortran</span></code> or <code class="code docutils literal notranslate"><span class="pre">ifort</span></code>) is required on your local machine, and the related Fortran source code should be compiled locally following the steps below:</p>
 <ul class="simple">
 <li><p>download the source code, either via git clone or just download the .zip file from the <a class="reference external" href="https://github.com/LinkedEarth/Pyleoclim_util">Github repo</a></p></li>
@@ -251,13 +269,6 @@ It is fast enough for lightweight spectral &amp; wavelet analysis tasks, in whic
 </pre></div>
 </div>
 <p>Again, unless you are planning to make heavy use of the WWZ functionality, we recommend using the default installation.</p>
-</div>
-<div class="section" id="installing-r">
-<h2>Installing R<a class="headerlink" href="#installing-r" title="Permalink to this headline">¶</a></h2>
-<p>Some functionalities require an installation of <a class="reference external" href="https://www.r-project.org?">R</a>.</p>
-<p>To install R, download a mirror <a class="reference external" href="https://cran.r-project.org/mirrors.html">here</a>.
-Note that Rstudio is not needed when calling R from Python.</p>
-<p>Pyleoclim requires the <a class="reference external" href="https://cran.r-project.org/web/packages/Bchron/index.html">Bchron package</a>. Pyleoclim will check for an installation of Bchron. It it doesn’t exist, it will be installed.</p>
 </div>
 </div>
 
