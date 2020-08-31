@@ -103,7 +103,7 @@ def savitzky_golay(ys,window_length=None, polyorder=2, deriv=0, delta=1,
     """
     
     if window_length==None:
-        window_length=int(np.ceil(len(ys))//2*2+1)
+        window_length=int(np.ceil(len(ys))//2*2-1)
     elif type(window_length) is not int:
         raise TypeError("window_length should be of type int")
     

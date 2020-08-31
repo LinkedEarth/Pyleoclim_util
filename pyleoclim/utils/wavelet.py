@@ -208,7 +208,7 @@ def assertPositiveInt(*args):
     for arg in args:
         assert isinstance(arg, int) and arg >= 1
 
-def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, params=['default', 4, 0, 1],
+def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, sg_kwargs=None,
               gaussianize=False, standardize=True):
     ''' Return the weighted wavelet amplitude (WWA).
 
@@ -273,7 +273,7 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
     nt = np.size(tau)
     nf = np.size(freq)
 
-    pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
+    pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs, gaussianize=gaussianize, standardize=standardize)
 
     omega = make_omega(ts, freq)
 
@@ -324,7 +324,7 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
 
     return wwa, phase, Neffs, coeff
 
-def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=False, params=['default', 4, 0, 1],
+def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=False, sg_kwargs=None,
               gaussianize=False, standardize=True):
     ''' Return the weighted wavelet amplitude (WWA).
 
@@ -382,7 +382,7 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=Fal
     nt = np.size(tau)
     nf = np.size(freq)
 
-    pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
+    pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs, gaussianize=gaussianize, standardize=standardize)
 
     omega = make_omega(ts, freq)
 
@@ -445,7 +445,7 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=Fal
 
     return wwa, phase, Neffs, coeff
 
-def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, params=["default", 4, 0, 1],
+def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, sg_kwargs=None,
                    gaussianize=False, standardize=True):
     ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -511,7 +511,7 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
     nts = np.size(ts)
     nf = np.size(freq)
 
-    pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
+    pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs, gaussianize=gaussianize, standardize=standardize)
 
     omega = make_omega(ts, freq)
 
@@ -574,7 +574,7 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
     coeff = (a0, a1, a2)
 
     return wwa, phase, Neffs, coeff
-def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, params=['default', 4, 0, 1],
+def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
                    gaussianize=False, standardize=True):
     ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -629,7 +629,7 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend
     nts = np.size(ts)
     nf = np.size(freq)
 
-    pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
+    pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs, gaussianize=gaussianize, standardize=standardize)
 
     omega = make_omega(ts, freq)
 
@@ -706,7 +706,7 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend
 
     return wwa, phase, Neffs, coeff
 
-def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, params=["default", 4, 0, 1],
+def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, sg_kwargs=None,
                    gaussianize=False, standardize=True, nproc=1):
     ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -770,7 +770,7 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, p
     nts = np.size(ts)
     nf = np.size(freq)
 
-    pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
+    pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs, gaussianize=gaussianize, standardize=standardize)
 
     omega = make_omega(ts, freq)
 
@@ -845,7 +845,7 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, p
 
     return wwa, phase, Neffs, coeff
 
-def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, params=['default', 4, 0, 1],
+def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
                   gaussianize=False, standardize=True):
     ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -904,7 +904,7 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=
     nts = np.size(ts)
     nf = np.size(freq)
 
-    pd_ys = preprocess(ys, ts, detrend=detrend, params=params, gaussianize=gaussianize, standardize=standardize)
+    pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs, gaussianize=gaussianize, standardize=standardize)
 
     omega = make_omega(ts, freq)
 
@@ -1056,7 +1056,7 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
     return psd
 
 def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
-        nMC=200, nproc=8, detrend=False, params=['default', 4, 0, 1],
+        nMC=200, nproc=8, detrend=False, sg_kwargs=None,
         gaussianize=False, standardize=True, method='default', len_bd=0,
         bc_mode='reflect', reflect_type='odd'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coefficients
@@ -1140,7 +1140,7 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
 
     wwz_func = get_wwz_func(nproc, method)
     wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freq, tau, Neff=Neff, c=c, nproc=nproc,
-                                        detrend=detrend, params=params,
+                                        detrend=detrend, sg_kwargs=sg_kwargs,
                                         gaussianize=gaussianize, standardize=standardize)
 
     # Monte-Carlo simulations of AR1 process
@@ -1154,7 +1154,7 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
         #  for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
             #  r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
             #  wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freq, tau, c=c, Neff=Neff, nproc=nproc,
-                                                 #  detrend=detrend, params=params,
+                                                 #  detrend=detrend, sg_kwargs=sg_kwargs,
                                                  #  gaussianize=gaussianize, standardize=standardize)
 
         #  for j in range(nt):
@@ -1173,10 +1173,11 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
     res = Results(amplitude=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
 
     return res
+
 def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau=None, freq=None, freq_method='log', freq_kwargs=None,
-        c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False,
-        nMC=200, params=['default', 4, 0, 1],
+        c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
+        nMC=200,
         gaussianize=False, standardize=True, method='default'):
     ''' Return the cross-wavelet coherence of two time series.
 
@@ -1274,10 +1275,10 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         freq = freq[1:] # delete 0 frequency if present
 
     res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
-                   nproc=nproc, detrend=detrend, params=params,
+                   nproc=nproc, detrend=detrend, sg_kwargs=sg_kwargs,
                    gaussianize=gaussianize, standardize=standardize, method=method)
     res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
-                   nproc=nproc, detrend=detrend, params=params,
+                   nproc=nproc, detrend=detrend, sg_kwargs=sg_kwargs,
                    gaussianize=gaussianize, standardize=standardize, method=method)
 
     wt_coeff1 = res_wwz1.coeff[1] - res_wwz1.coeff[2]*1j
@@ -1301,10 +1302,10 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
             #  r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
             #  r2 = ar1_sim(ys2_cut, np.size(ts2_cut), 1, ts=ts2_cut)
             #  res_wwz_r1 = wwz(r1, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
-                                                     #  detrend=detrend, params=params,
+                                                     #  detrend=detrend, sg_kwargs=sg_kwrags,
                                                      #  gaussianize=gaussianize, standardize=standardize)
             #  res_wwz_r2 = wwz(r2, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
-                                                     #  detrend=detrend, params=params,
+                                                     #  detrend=detrend, sg_kwargs=sg_kwargs,
                                                      #  gaussianize=gaussianize, standardize=standardize)
 
             #  wt_coeffr1 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
