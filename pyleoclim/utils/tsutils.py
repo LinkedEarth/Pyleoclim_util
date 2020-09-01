@@ -710,7 +710,7 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
 
         if 'fig1' in locals():
             if 'path' in saveknee_settings:
-                savefig(fig1,saveknee_settings)
+                savefig(fig1, settings=saveknee_settings)
             else:
                 showfig(fig1)
 

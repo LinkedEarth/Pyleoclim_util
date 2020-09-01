@@ -397,7 +397,7 @@ def map_all(lat, lon, criteria, marker=None, color =None,
     
     if 'fig' in locals():
         if 'path' in savefig_settings:
-            savefig(fig, savefig_settings)
+            savefig(fig, settings=savefig_settings)
         else:
             if not mute:
                 showfig(fig)
