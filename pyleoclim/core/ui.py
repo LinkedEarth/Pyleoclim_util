@@ -310,7 +310,7 @@ class Series:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                plotting.savefig(fig, savefig_settings)
+                plotting.savefig(fig, settings=savefig_settings)
             else:
                 if not mute:
                     plotting.showfig(fig)
@@ -419,7 +419,7 @@ class Series:
             ax['psd'].set_xlabel(psd_label)
 
         if 'path' in savefig_settings:
-            plotting.savefig(fig, savefig_settings)
+            plotting.savefig(fig, settings=savefig_settings)
 
         return fig, ax
 
@@ -961,7 +961,7 @@ class PSD:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                plotting.savefig(fig, savefig_settings)
+                plotting.savefig(fig, settings=savefig_settings)
             else:
                 if not mute:
                     plotting.showfig(fig)
@@ -1115,7 +1115,7 @@ class Scalogram:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                plotting.savefig(fig, savefig_settings)
+                plotting.savefig(fig, settings=savefig_settings)
             else:
                 if not mute:
                     plotting.showfig(fig)
@@ -1304,7 +1304,7 @@ class Coherence:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                plotting.savefig(fig, savefig_settings)
+                plotting.savefig(fig, settings=savefig_settings)
             else:
                 if not mute:
                     plotting.showfig(fig)
@@ -1454,7 +1454,7 @@ class MultipleSeries:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                plotting.savefig(fig, savefig_settings)
+                plotting.savefig(fig, settings=savefig_settings)
             else:
                 if not mute:
                     plotting.showfig(fig)
@@ -1543,7 +1543,7 @@ class MultiplePSD:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                plotting.savefig(fig, savefig_settings)
+                plotting.savefig(fig, settings=savefig_settings)
             else:
                 if not mute:
                     plotting.showfig(fig)
@@ -1607,7 +1607,7 @@ class MultiplePSD:
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
-                plotting.savefig(fig, savefig_settings)
+                plotting.savefig(fig, settings=savefig_settings)
             else:
                 if not mute:
                     plotting.showfig(fig)
