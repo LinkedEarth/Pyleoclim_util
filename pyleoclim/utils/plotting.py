@@ -114,7 +114,7 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
 
     if 'fig' in locals():
         if 'path' in savefig_settings:
-            savefig(fig, savefig_settings)
+            savefig(fig, settings=savefig_settings)
         else:
             if not mute:
                 showfig(fig)
@@ -208,7 +208,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 
     if 'fig' in locals():
         if 'path' in savefig_settings:
-            savefig(fig, savefig_settings)
+            savefig(fig, settings=savefig_settings)
         else:
             if not mute:
                 showfig(fig)
@@ -319,7 +319,7 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
 
     if 'fig' in locals():
         if 'path' in savefig_settings:
-            savefig(fig, savefig_settings)
+            savefig(fig, settings=savefig_settings)
         else:
             if not mute:
                 showfig(fig)
