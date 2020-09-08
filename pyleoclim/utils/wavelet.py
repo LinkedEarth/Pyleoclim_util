@@ -1596,7 +1596,7 @@ def beta_estimation(psd, freq, fmin=None, fmax=None):
         return res
 
     logf = np.log(freq)
-    logf_step = logf[fminindx+1] - logf[fminindx]
+    logf_step = np.max(np.diff(logf))
     logf_start = logf[fminindx]
     logf_end = logf[fmaxindx]
     logf_binedges = np.arange(logf_start, logf_end+logf_step, logf_step)
@@ -1610,7 +1610,7 @@ def beta_estimation(psd, freq, fmin=None, fmax=None):
     for i in range(n_intervals):
         lb = logf_binedges[i]
         ub = logf_binedges[i+1]
-        q = np.where((logf > lb) & (logf <= ub))
+        q = np.where((logf >= lb) & (logf <= ub))
 
         logpsd_binned[i] = np.nanmean(logpsd[q])
         logf_binned[i] = (ub + lb) / 2
@@ -1624,7 +1624,7 @@ def beta_estimation(psd, freq, fmin=None, fmax=None):
     X = np.log10(f_binned)
     X_ex = sm.add_constant(X)
 
-    model = sm.OLS(Y, X_ex)
+    model = sm.OLS(Y, X_ex, missing='drop')
     results = model.fit()
 
     if np.size(results.params) < 2:
