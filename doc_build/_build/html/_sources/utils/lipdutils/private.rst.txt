@@ -2,9 +2,30 @@
 
 .. toctree::
    :hidden:
+   checkTimeAxis.rst
+   checkXaxis.rst
    enumerateLipds.rst
-
-LiPD Utilities (pyleoclim.utils.Lipdutils)
+   enumerateTs.rst
+   gen_dict_extract.rst
+   getEnsemble.rst
+   getLipd.rst
+   getMeasurement.rst
+   getTs.rst
+   isEnsemble.rst
+   isMeasurement.rst
+   isModel.rst
+   LipdToOntology.rst
+   pre_process_list.rst
+   pre_process_str.rst
+   promptForVariable.rst
+   searchVar.rst
+   similar_string.rst
+   timeUnitsCheck.rst
+   whichEnsemble.rst
+   whichMeasurement.rst
+   xAxisTs.rst
+   
+LiPD Utilities (pyleoclim.utils.lipdutils)
 ==========================================
 
 Pyleoclim is meant to directly handle datasets in the Linked Paleo Data (`LiPD <http://lipd.net>`_) format. Pyleoclim works with timeseries objects and model tables present in these files.

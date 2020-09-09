@@ -155,11 +155,6 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
         padded timeseries
     tp : array
         augmented time axis
-
-    Authors
-    -------
-
-    Julien Emile-Geay, Deborah Khider
     """
     padLength =  np.round(len(ts)*padFrac).astype(np.int64)
 
@@ -229,11 +224,6 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
 
     yf : array
         filtered array
-
-    Author
-    ------
-
-    Julien Emile-Geay
     
     See also
     --------
