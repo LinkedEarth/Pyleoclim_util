@@ -26,6 +26,10 @@
    lipdutils/whatInferredVariables.rst
    lipdutils/whatInterpretations.rst
    lipdutils/queryLinkedEarth.rst
+   plotting/private.rst
+   plotting/showfig.rst
+   plotting/savefig.rst
+   plotting/set_style.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -93,6 +97,21 @@ Mapping
 
 Plotting
 --------
+
+The functions contained in this module rely heavily on `matplotlib <https://matplotlib.org>_`. See :ref:`here <plotting_private>` for details. If considering plotting without making use of the functions in the ui module, we recommend using matplotlib directly.
+
+However, the following functions can be used to manipulate the default style and save settings.
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`showfig <utils_showfig>`
+     - Shows the figure
+   * - :ref:`savefig <utils_savefig>`
+     - Saves the figure to a user specified path
+   * - :ref:`set_style <utils_set_style>`
+     - Modifies the visualization style
 
 Spectral
 --------

@@ -1,4 +1,4 @@
-.. _utils_whatSensors:
+.. _utils_whatProxySensors:
 
 whatproxySensors (pyleoclim.utils.whatProxySensors)
 ===================================================

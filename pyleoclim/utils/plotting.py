@@ -10,9 +10,6 @@ __all__ = [
     'set_style',
     'showfig',
     'savefig',
-    'plot_xy',
-    'plot_scatter_xy',
-    'stackplot'
 ]
 
 import matplotlib.pyplot as plt
@@ -128,8 +125,8 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
             legend=True, plot_kwargs=None, lgd_kwargs=None, mute=False):
     ''' Plot a timeseries
     
-    Args
-    ----
+    Parameters
+    ----------
     x : array
         The time axis for the timeseries
     y : array
@@ -225,8 +222,8 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
     Please not that this function uses a different default style than the Pyleoclim package.
     To change the style, pass it in the set_style argument    
       
-    Args
-    ------
+    Parameters
+    ----------
     x : nested list
         x values of individual timeseries
     y : nested list
@@ -332,6 +329,12 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
 # ----------
 def in_notebook():
     ''' Check if the code is executed in a Jupyter notebook
+    
+    Returns
+    -------
+    
+    bool
+    
     '''
     try:
         from IPython import get_ipython
@@ -343,6 +346,23 @@ def in_notebook():
 
 
 def showfig(fig):
+    '''Show the figure
+
+    Parameters
+    ----------
+    fig : TYPE
+        The fig matplotlib object
+
+    Returns
+    -------
+    None
+    
+    See Also
+    --------
+    savefig : saves a figure to a specific path
+    in_notebook: Functions to sense a notebook environment
+
+    '''
     if in_notebook:
         try:
             from IPython.display import display
@@ -359,10 +379,10 @@ def showfig(fig):
 def savefig(fig, path=None, settings={}, verbose=True):
     ''' Save a figure to a path
 
-    Args
-    ----
+    Parameters
+    ----------
     fig : figure
-        the figure to save
+        the figure to save. Matplotlib object
     path : str
         the path to save the figure, can be ignored and specify in "settings" instead
     settings : dict
@@ -371,6 +391,11 @@ def savefig(fig, path=None, settings={}, verbose=True):
           it can be any existed or non-existed path, with or without a suffix;
           if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
+        
+    See Also
+    --------
+    
+    showfig : returns a visual of the figure. 
     '''
     if path is None and 'path' not in settings:
         raise ValueError('"path" must be specified, either with the keyword argument or be specified in `settings`!')
@@ -399,7 +424,26 @@ def savefig(fig, path=None, settings={}, verbose=True):
 
 
 def set_style(style='journal', font_scale=1.0):
-    ''' Modify the visualization style; inspired by [Seaborn](https://github.com/mwaskom/seaborn)
+    ''' Modify the visualization style
+    
+    This function is inspired by [Seaborn](https://github.com/mwaskom/seaborn).
+    See a demo in the example_notebooks folder on GitHub to look at the different styles
+    
+    Parameters
+    ----------
+    
+    style : {journal,web,matplotlib,_spines, _nospines,_grid,_nogrid}
+        set the styles for the figure:
+            - journal (default): fonts appropriate for paper
+            - web: web-like font (e.g. ggplot)
+            - matplotlib: the original matplotlib style
+            In addition, the following options are available:
+            - _spines/_nospines: allow to show/hide spines
+            - _grid/_nogrid: allow to show gridlines (default: _grid)
+    
+    font_scale : float
+        Default is 1. Corresponding to 12 Font Size. 
+    
     '''
     mpl.rcParams.update(mpl.rcParamsDefault)
 
