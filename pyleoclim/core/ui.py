@@ -1792,7 +1792,12 @@ class Lipd:
             D_query={}
         #prepare the dictionaries for all possible scenarios
         if usr_path!=None:
-            D_path = lpd.readLipd(usr_path)
+            # since readLipd() takes only absolute path and it will change the current working directory (CWD) without turning back,
+            # we need to record CWD manually and turn back after the data loading is finished
+            cwd = os.getcwd()
+            abs_path = os.path.abspath(usr_path)
+            D_path = lpd.readLipd(abs_path)
+            os.chdir(cwd)
             #make sure that it's more than one
             if 'archiveType' in D_path.keys():
                 D_path={D_path['dataSetName']:D_path}
