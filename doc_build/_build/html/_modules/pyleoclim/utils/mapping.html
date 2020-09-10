@@ -548,7 +548,7 @@
     
     <span class="k">if</span> <span class="s1">&#39;fig&#39;</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
         <span class="k">if</span> <span class="s1">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">savefig_settings</span><span class="p">:</span>
-            <span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">savefig_settings</span><span class="p">)</span>
+            <span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">savefig_settings</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">mute</span><span class="p">:</span>
                 <span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>

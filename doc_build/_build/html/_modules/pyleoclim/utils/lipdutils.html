@@ -339,7 +339,7 @@
 
     <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">label</span></div>
 
-<span class="k">def</span> <span class="nf">checkTimeAxis</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="n">x_axis</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="checkTimeAxis"><a class="viewcode-back" href="../../../utils/lipdutils/checkTimeAxis.html#pyleoclim.utils.lipdutils.checkTimeAxis">[docs]</a><span class="k">def</span> <span class="nf">checkTimeAxis</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="n">x_axis</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; This function makes sure that time is available for the timeseries</span>
 
 <span class="sd">    Parameters</span>
@@ -382,9 +382,9 @@
 
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">timeseries</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;float64&#39;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">label</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">label</span></div>
 
-<span class="k">def</span> <span class="nf">searchVar</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">exact</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">override</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="searchVar"><a class="viewcode-back" href="../../../utils/lipdutils/searchVar.html#pyleoclim.utils.lipdutils.searchVar">[docs]</a><span class="k">def</span> <span class="nf">searchVar</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">exact</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">override</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; This function searched for keywords (exact match) for a variable</span>
 
 <span class="sd">    Parameters</span>
@@ -570,12 +570,12 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">match</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">match</span>
+    <span class="k">return</span> <span class="n">match</span></div>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">The following functions handle the time series objects</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="k">def</span> <span class="nf">enumerateTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">):</span>
+<div class="viewcode-block" id="enumerateTs"><a class="viewcode-back" href="../../../utils/lipdutils/enumerateTs.html#pyleoclim.utils.lipdutils.enumerateTs">[docs]</a><span class="k">def</span> <span class="nf">enumerateTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Enumerate the available time series objects</span>
 
 <span class="sd">    Parameters</span>
@@ -597,9 +597,9 @@
 
 
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">available_y</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="s1">&#39;: &#39;</span><span class="p">,</span><span class="n">dataSetName</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="s1">&#39;: &#39;</span><span class="p">,</span><span class="n">dataSetName</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="s1">&#39;: &#39;</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span></div>
 
-<span class="k">def</span> <span class="nf">getTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">,</span> <span class="n">option</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="getTs"><a class="viewcode-back" href="../../../utils/lipdutils/getTs.html#pyleoclim.utils.lipdutils.getTs">[docs]</a><span class="k">def</span> <span class="nf">getTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">,</span> <span class="n">option</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get a specific timeseries object from a dictionary of timeseries</span>
 
 <span class="sd">    Parameters</span>
@@ -626,12 +626,12 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">timeseries</span> <span class="o">=</span> <span class="n">lpd</span><span class="o">.</span><span class="n">filterTs</span><span class="p">(</span><span class="n">timeseries_list</span><span class="p">,</span> <span class="n">option</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">timeseries</span>
+    <span class="k">return</span> <span class="n">timeseries</span></div>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Functions to handle data on the LinkedEarth Platform</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="k">def</span> <span class="nf">LipdToOntology</span><span class="p">(</span><span class="n">archiveType</span><span class="p">):</span>
+<div class="viewcode-block" id="LipdToOntology"><a class="viewcode-back" href="../../../utils/lipdutils/LipdToOntology.html#pyleoclim.utils.lipdutils.LipdToOntology">[docs]</a><span class="k">def</span> <span class="nf">LipdToOntology</span><span class="p">(</span><span class="n">archiveType</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; standardize archiveType</span>
 
 <span class="sd">    Transform the archiveType from their LiPD name to their ontology counterpart</span>
@@ -659,9 +659,9 @@
     <span class="k">elif</span> <span class="n">archiveType</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bivalve&#39;</span><span class="p">:</span>
         <span class="n">archiveType</span> <span class="o">=</span> <span class="s1">&#39;mollusk shells&#39;</span>
 
-    <span class="k">return</span> <span class="n">archiveType</span>
+    <span class="k">return</span> <span class="n">archiveType</span></div>
 
-<span class="k">def</span> <span class="nf">timeUnitsCheck</span><span class="p">(</span><span class="n">units</span><span class="p">):</span>
+<div class="viewcode-block" id="timeUnitsCheck"><a class="viewcode-back" href="../../../utils/lipdutils/timeUnitsCheck.html#pyleoclim.utils.lipdutils.timeUnitsCheck">[docs]</a><span class="k">def</span> <span class="nf">timeUnitsCheck</span><span class="p">(</span><span class="n">units</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; This function attempts to make sense of the time units by checking for equivalence</span>
 
 <span class="sd">    Parameters</span>
@@ -697,7 +697,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">unit_group</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
 
-    <span class="k">return</span> <span class="n">unit_group</span>
+    <span class="k">return</span> <span class="n">unit_group</span></div>
 
 
 
@@ -1357,7 +1357,7 @@
     
     <span class="k">return</span> <span class="n">res</span></div>
 
-<span class="k">def</span> <span class="nf">pre_process_list</span><span class="p">(</span><span class="n">list_str</span><span class="p">):</span>
+<div class="viewcode-block" id="pre_process_list"><a class="viewcode-back" href="../../../utils/lipdutils/pre_process_list.html#pyleoclim.utils.lipdutils.pre_process_list">[docs]</a><span class="k">def</span> <span class="nf">pre_process_list</span><span class="p">(</span><span class="n">list_str</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Pre-process a series of strings for capitalized letters, space, and punctuation</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
@@ -1375,9 +1375,9 @@
     <span class="n">res</span><span class="o">=</span><span class="p">[]</span>
     <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">list_str</span><span class="p">:</span>
         <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pre_process_str</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">res</span>
+    <span class="k">return</span> <span class="n">res</span></div>
 
-<span class="k">def</span> <span class="nf">similar_string</span><span class="p">(</span><span class="n">list_str</span><span class="p">,</span> <span class="n">search</span><span class="p">):</span>
+<div class="viewcode-block" id="similar_string"><a class="viewcode-back" href="../../../utils/lipdutils/similar_string.html#pyleoclim.utils.lipdutils.similar_string">[docs]</a><span class="k">def</span> <span class="nf">similar_string</span><span class="p">(</span><span class="n">list_str</span><span class="p">,</span> <span class="n">search</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Returns a list of indices for strings with similar values</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
@@ -1398,9 +1398,9 @@
     <span class="c1">#exact matches</span>
     <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">list_str</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">search</span><span class="p">]</span>
     <span class="c1"># proximity matches</span>
-    <span class="k">return</span> <span class="n">indices</span>
+    <span class="k">return</span> <span class="n">indices</span></div>
 
-<span class="k">def</span> <span class="nf">pre_process_str</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
+<div class="viewcode-block" id="pre_process_str"><a class="viewcode-back" href="../../../utils/lipdutils/pre_process_str.html#pyleoclim.utils.lipdutils.pre_process_str">[docs]</a><span class="k">def</span> <span class="nf">pre_process_str</span><span class="p">(</span><span class="n">word</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Pre-process a string for capitalized letters, space, and punctuation</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
@@ -1417,12 +1417,12 @@
     <span class="n">d</span><span class="o">=</span><span class="n">word</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="n">stopset</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">punctuation</span><span class="p">)</span>
     <span class="n">res</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">d</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stopset</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">res</span>
+    <span class="k">return</span> <span class="n">res</span></div>
         
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Deal with models</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="k">def</span> <span class="nf">isModel</span><span class="p">(</span><span class="n">csvName</span><span class="p">,</span> <span class="n">lipd</span><span class="p">):</span>
+<div class="viewcode-block" id="isModel"><a class="viewcode-back" href="../../../utils/lipdutils/isModel.html#pyleoclim.utils.lipdutils.isModel">[docs]</a><span class="k">def</span> <span class="nf">isModel</span><span class="p">(</span><span class="n">csvName</span><span class="p">,</span> <span class="n">lipd</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check for the presence of a model in the same object as the measurement table</span>
 
 <span class="sd">    Parameters</span>
@@ -1464,14 +1464,14 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">model</span><span class="o">=</span><span class="p">[]</span>
 
-    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">objectName</span>
+    <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">objectName</span></div>
 
 
-<span class="k">def</span> <span class="nf">modelNumber</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+<div class="viewcode-block" id="modelNumber"><a class="viewcode-back" href="../../../utils/lipdutils/modelNumber.html#pyleoclim.utils.lipdutils.modelNumber">[docs]</a><span class="k">def</span> <span class="nf">modelNumber</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Assign a new or existing model number</span>
 
-<span class="sd">    Paraemeters</span>
-<span class="sd">    -----------</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
 
 <span class="sd">    model : list</span>
 <span class="sd">        List of possible model number. Obtained from isModel</span>
@@ -1492,13 +1492,13 @@
         <span class="n">modelNum</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Your model number is &quot;</span><span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">modelNum</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">modelNum</span>
+    <span class="k">return</span> <span class="n">modelNum</span></div>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Get entire tables</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="k">def</span> <span class="nf">isMeasurement</span><span class="p">(</span><span class="n">csv_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="isMeasurement"><a class="viewcode-back" href="../../../utils/lipdutils/isMeasurement.html#pyleoclim.utils.lipdutils.isMeasurement">[docs]</a><span class="k">def</span> <span class="nf">isMeasurement</span><span class="p">(</span><span class="n">csv_dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Check whether measurement tables are available</span>
 
 <span class="sd">    Parameters</span>
@@ -1524,9 +1524,9 @@
         <span class="k">if</span> <span class="s2">&quot;measurement&quot;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">and</span> <span class="s2">&quot;paleo&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
             <span class="n">paleoMeasurementTables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">chronMeasurementTables</span><span class="p">,</span> <span class="n">paleoMeasurementTables</span>
+    <span class="k">return</span> <span class="n">chronMeasurementTables</span><span class="p">,</span> <span class="n">paleoMeasurementTables</span></div>
 
-<span class="k">def</span> <span class="nf">whichMeasurement</span><span class="p">(</span><span class="n">measurementTableList</span><span class="p">):</span>
+<div class="viewcode-block" id="whichMeasurement"><a class="viewcode-back" href="../../../utils/lipdutils/whichMeasurement.html#pyleoclim.utils.lipdutils.whichMeasurement">[docs]</a><span class="k">def</span> <span class="nf">whichMeasurement</span><span class="p">(</span><span class="n">measurementTableList</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Select a measurement table from a list</span>
 
 <span class="sd">    Use in conjunction with the function isMeasurement</span>
@@ -1552,9 +1552,9 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">csvName</span> <span class="o">=</span> <span class="n">measurementTableList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">csvName</span>
+    <span class="k">return</span> <span class="n">csvName</span></div>
 
-<span class="k">def</span> <span class="nf">getMeasurement</span><span class="p">(</span><span class="n">csvName</span><span class="p">,</span> <span class="n">lipd</span><span class="p">):</span>
+<div class="viewcode-block" id="getMeasurement"><a class="viewcode-back" href="../../../utils/lipdutils/getMeasurement.html#pyleoclim.utils.lipdutils.getMeasurement">[docs]</a><span class="k">def</span> <span class="nf">getMeasurement</span><span class="p">(</span><span class="n">csvName</span><span class="p">,</span> <span class="n">lipd</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Extract the dictionary corresponding to the measurement table</span>
 
 <span class="sd">    Parameters</span>
@@ -1587,13 +1587,13 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Key name should only include &#39;chron&#39; or &#39;paleo&#39;&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">ts_list</span>
+    <span class="k">return</span> <span class="n">ts_list</span></div>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Deal with ensembles</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="k">def</span> <span class="nf">isEnsemble</span><span class="p">(</span><span class="n">csv_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="isEnsemble"><a class="viewcode-back" href="../../../utils/lipdutils/isEnsemble.html#pyleoclim.utils.lipdutils.isEnsemble">[docs]</a><span class="k">def</span> <span class="nf">isEnsemble</span><span class="p">(</span><span class="n">csv_dict</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Check whether ensembles are available</span>
 
 <span class="sd">    Parameters</span>
@@ -1619,9 +1619,9 @@
         <span class="k">elif</span> <span class="s2">&quot;ensemble&quot;</span> <span class="ow">in</span> <span class="n">val</span> <span class="ow">and</span> <span class="s2">&quot;paleo&quot;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
             <span class="n">paleoEnsembleTables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">chronEnsembleTables</span><span class="p">,</span> <span class="n">paleoEnsembleTables</span>
+    <span class="k">return</span> <span class="n">chronEnsembleTables</span><span class="p">,</span> <span class="n">paleoEnsembleTables</span></div>
 
-<span class="k">def</span> <span class="nf">whichEnsemble</span><span class="p">(</span><span class="n">ensembleTableList</span><span class="p">):</span>
+<div class="viewcode-block" id="whichEnsemble"><a class="viewcode-back" href="../../../utils/lipdutils/whichEnsemble.html#pyleoclim.utils.lipdutils.whichEnsemble">[docs]</a><span class="k">def</span> <span class="nf">whichEnsemble</span><span class="p">(</span><span class="n">ensembleTableList</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Select an ensemble table from a list</span>
 
 <span class="sd">    Use in conjunction with the function isMeasurement</span>
@@ -1649,9 +1649,9 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">csvName</span> <span class="o">=</span> <span class="n">ensembleTableList</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="k">return</span> <span class="n">csvName</span>
+    <span class="k">return</span> <span class="n">csvName</span></div>
 
-<span class="k">def</span> <span class="nf">getEnsemble</span><span class="p">(</span><span class="n">csv_dict</span><span class="p">,</span> <span class="n">csvName</span><span class="p">):</span>
+<div class="viewcode-block" id="getEnsemble"><a class="viewcode-back" href="../../../utils/lipdutils/getEnsemble.html#pyleoclim.utils.lipdutils.getEnsemble">[docs]</a><span class="k">def</span> <span class="nf">getEnsemble</span><span class="p">(</span><span class="n">csv_dict</span><span class="p">,</span> <span class="n">csvName</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Extracts the ensemble values and depth vector from the dictionary and</span>
 <span class="sd">    returns them into two numpy arrays.</span>
 
@@ -1682,9 +1682,9 @@
             <span class="n">ensembleValues</span> <span class="o">=</span> <span class="n">ensemble_dict</span><span class="p">[</span><span class="n">val</span><span class="p">][</span><span class="s2">&quot;values&quot;</span><span class="p">]</span>
             <span class="n">ensembleValues</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ensembleValues</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">depth</span><span class="p">,</span> <span class="n">ensembleValues</span>
+    <span class="k">return</span> <span class="n">depth</span><span class="p">,</span> <span class="n">ensembleValues</span></div>
 
-<span class="k">def</span> <span class="nf">mapAgeEnsembleToPaleoData</span><span class="p">(</span><span class="n">ensembleValues</span><span class="p">,</span> <span class="n">depthEnsemble</span><span class="p">,</span> <span class="n">depthPaleo</span><span class="p">):</span>
+<div class="viewcode-block" id="mapAgeEnsembleToPaleoData"><a class="viewcode-back" href="../../../utils/lipdutils/mapAgeEnsembleToPaleoData.html#pyleoclim.utils.lipdutils.mapAgeEnsembleToPaleoData">[docs]</a><span class="k">def</span> <span class="nf">mapAgeEnsembleToPaleoData</span><span class="p">(</span><span class="n">ensembleValues</span><span class="p">,</span> <span class="n">depthEnsemble</span><span class="p">,</span> <span class="n">depthPaleo</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Map the depth for the ensemble age values to the paleo depth</span>
 
 <span class="sd">    Parameters</span>
@@ -1720,9 +1720,9 @@
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ensembleValues</span><span class="p">)[</span><span class="mi">1</span><span class="p">]):</span>
         <span class="n">ensembleValuesToPaleo</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">depthPaleo</span><span class="p">,</span><span class="n">depthEnsemble</span><span class="p">,</span><span class="n">ensembleValues</span><span class="p">[:,</span><span class="n">i</span><span class="p">])</span>
 
-    <span class="k">return</span> <span class="n">ensembleValuesToPaleo</span>
+    <span class="k">return</span> <span class="n">ensembleValuesToPaleo</span></div>
 
-<span class="k">def</span> <span class="nf">gen_dict_extract</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+<div class="viewcode-block" id="gen_dict_extract"><a class="viewcode-back" href="../../../utils/lipdutils/gen_dict_extract.html#pyleoclim.utils.lipdutils.gen_dict_extract">[docs]</a><span class="k">def</span> <span class="nf">gen_dict_extract</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;Recursively searches for all the values in nested dictionaries corresponding </span>
 <span class="sd">    to a particular key</span>
 <span class="sd">    </span>
@@ -1745,7 +1745,7 @@
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">v</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">gen_dict_extract</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
-                        <span class="k">yield</span> <span class="n">result</span>
+                        <span class="k">yield</span> <span class="n">result</span></div>
 </pre></div>
 
            </div>

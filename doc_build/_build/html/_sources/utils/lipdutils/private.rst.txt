@@ -2,9 +2,30 @@
 
 .. toctree::
    :hidden:
+   checkTimeAxis.rst
+   checkXaxis.rst
    enumerateLipds.rst
+   enumerateTs.rst
+   gen_dict_extract.rst
+   getEnsemble.rst
+   getLipd.rst
+   getMeasurement.rst
+   getTs.rst
+   isEnsemble.rst
+   isMeasurement.rst
+   isModel.rst
+   LipdToOntology.rst
+   pre_process_list.rst
+   pre_process_str.rst
+   promptForVariable.rst
+   searchVar.rst
+   similar_string.rst
+   timeUnitsCheck.rst
+   whichEnsemble.rst
+   whichMeasurement.rst
+   xAxisTs.rst
 
-LiPD Utilities (pyleoclim.utils.Lipdutils)
+LiPD Utilities (pyleoclim.utils.lipdutils)
 ==========================================
 
 Pyleoclim is meant to directly handle datasets in the Linked Paleo Data (`LiPD <http://lipd.net>`_) format. Pyleoclim works with timeseries objects and model tables present in these files.
@@ -31,11 +52,11 @@ Pyleoclim is meant to directly handle datasets in the Linked Paleo Data (`LiPD <
      - Enumerate the available time series objects
    * - :ref:`getTs <lipdutils_getTs>`
      - Get a specific timeseries object from a dictionary of timeseries
-   * - :ref:`LipdToOntology <lipdutils_LipdToOntology`
+   * - :ref:`LipdToOntology <lipdutils_LipdToOntology>`
      - Standardize archiveType
    * - :ref:`timeUnitsCheck <lipdutils_timeUnitsCheck>`
      - This function attempts to make sense of the time units by checking for equivalence
-   * - :ref:`pre_process_list <lipdutils_preprocesslist>`
+   * - :ref:`pre_process_list <lipdutils_pre_process_list>`
      - Pre-process a series of strings for capitalized letters, space, and punctuation.
    * - :ref:`similar_string <lipdutils_similar_string>`
      - Returns a list of indices for strings with similar values

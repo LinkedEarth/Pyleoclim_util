@@ -1319,8 +1319,8 @@ def isModel(csvName, lipd):
 def modelNumber(model):
     """Assign a new or existing model number
 
-    Paraemeters
-    -----------
+    Parameters
+    ----------
 
     model : list
         List of possible model number. Obtained from isModel
