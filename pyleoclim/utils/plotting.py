@@ -360,7 +360,7 @@ def showfig(fig):
     See Also
     --------
     savefig : saves a figure to a specific path
-    in_notebook: Functions to sense a notebook environment
+    plotting.in_notebook: Functions to sense a notebook environment
 
     '''
     if in_notebook:

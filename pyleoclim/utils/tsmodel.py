@@ -5,7 +5,7 @@ import numpy as np
 import statsmodels.api as sm
 from .tsutils import (
     is_evenly_spaced,
-    clean_ts,
+    #clean_ts,
 )
 #from .tsutils import preprocess   # no longer used here
 from scipy import optimize
@@ -17,8 +17,9 @@ __all__ = [
 def ar1_model(t, tau, output_sigma=1):
     ''' Simulate a (possibly irregularly-sampled) AR(1) process with given decay
         constant tau, à la REDFIT.
-    Args
-    ----
+    
+    Parameters
+    ----------
 
     t :  array
         time axis of the time series
@@ -50,12 +51,12 @@ def ar1_model(t, tau, output_sigma=1):
 
     return y
 
-#  def ar1_fit(y, t=None, detrend= None, params=["default", 4, 0, 1]):
+    
 def ar1_fit(y, t=None):
     ''' Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     y : array
         the time series
@@ -82,8 +83,8 @@ def ar1_fit(y, t=None):
 def ar1_sim(y, p, t=None):
     ''' Produce p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from `y` and (if provided) `t`
 
-    Args
-    ----
+    Parameters
+    ----------
 
     y : array
         a time series; NaNs not allowed
@@ -97,6 +98,17 @@ def ar1_sim(y, p, t=None):
 
     Yr : array
         n by p matrix of simulated AR(1) vector
+        
+    See Also
+    --------
+    
+    tsmodel.ar1_model : Simulates a (possibly irregularly-sampled) AR(1) process with given decay constant tau, à la REDFIT.
+
+    tsmodel.ar1_fit : Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
+    
+    tsmodel.ar1_fit_evenly : Returns the lag-1 autocorrelation from AR(1) fit.
+    
+    tsmodel.tau_estimation : Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
     '''
     n = np.size(y)
@@ -133,8 +145,8 @@ def ar1_fit_evenly(y, t):
 #  def ar1_fit_evenly(y, t, detrend=False, params=["default", 4, 0, 1], gaussianize=False):
     ''' Returns the lag-1 autocorrelation from AR(1) fit.
 
-    Args
-    ----
+    Parameters
+    ----------
     y : array
         vector of (float) numbers as a time series
     t : array
@@ -166,8 +178,8 @@ def tau_estimation(y, t):
 #  def tau_estimation(y, t, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
     ''' Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     y : array
         a time series

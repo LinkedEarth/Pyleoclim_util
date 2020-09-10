@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>corr_sig (pyleoclim.utils.corr_sig) &mdash; Pyleoclim 0.5.0 documentation</title>
+  <title>ar1_model (pyleoclim.utils.tsmodel.ar1_model) &mdash; Pyleoclim 0.5.0 documentation</title>
   
 
   
@@ -87,7 +87,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">corr_sig (pyleoclim.utils.corr_sig)</a></li>
+<li><a class="reference internal" href="#">ar1_model (pyleoclim.utils.tsmodel.ar1_model)</a></li>
 </ul>
 </div>
             
@@ -134,13 +134,13 @@
     
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>corr_sig (pyleoclim.utils.corr_sig)</li>
+      <li>ar1_model (pyleoclim.utils.tsmodel.ar1_model)</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/utils/correlation/corr_sig.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/utils/tsmodel/ar1_model.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -177,57 +177,34 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="corr-sig-pyleoclim-utils-corr-sig">
-<span id="utils-corr-sig"></span><h1>corr_sig (pyleoclim.utils.corr_sig)<a class="headerlink" href="#corr-sig-pyleoclim-utils-corr-sig" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="ar1-model-pyleoclim-utils-tsmodel-ar1-model">
+<span id="tsmodel-ar1-model"></span><h1>ar1_model (pyleoclim.utils.tsmodel.ar1_model)<a class="headerlink" href="#ar1-model-pyleoclim-utils-tsmodel-ar1-model" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pyleoclim.utils.corr_sig">
-<code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">corr_sig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">y1</span></em>, <em class="sig-param"><span class="n">y2</span></em>, <em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'isospectral'</span></em>, <em class="sig-param"><span class="n">alpha</span><span class="o">=</span><span class="default_value">0.05</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/correlation.html#corr_sig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.corr_sig" title="Permalink to this definition">¶</a></dt>
-<dd><p>Estimates the Pearson’s correlation and associated significance between two non IID time series</p>
-<p>The significance of the correlation is assessed using one of the following methods:</p>
-<ol class="arabic simple">
-<li><p>‘ttest’: T-test adjusted for effective sample size.</p></li>
-<li><p>‘isopersistent’: AR(1) modeling of x and y.</p></li>
-<li><p>‘isospectral’: phase randomization of original inputs. (default)</p></li>
-</ol>
-<p>The T-test is a parametric test, hence computationally cheap but can only be performed in idyllic circumstances.
-The others are non-parametric, but their computational requirements scales with nsim.</p>
+<dt id="pyleoclim.utils.tsmodel.ar1_model">
+<code class="sig-prename descclassname">pyleoclim.utils.tsmodel.</code><code class="sig-name descname">ar1_model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">tau</span></em>, <em class="sig-param"><span class="n">output_sigma</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/tsmodel.html#ar1_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.tsmodel.ar1_model" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Simulate a (possibly irregularly-sampled) AR(1) process with given decay</dt><dd><p>constant tau, à la REDFIT.</p>
+</dd>
+</dl>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>y1</strong> (<em>array</em>) – vector of (real) numbers of same length as y2, no NaNs allowed</p></li>
-<li><p><strong>y2</strong> (<em>array</em>) – vector of (real) numbers of same length as y1, no NaNs allowed</p></li>
-<li><p><strong>nsim</strong> (<em>int</em>) – the number of simulations [default: 1000]</p></li>
-<li><p><strong>method</strong> (<em>{'ttest'</em><em>,</em><em>'isopersistent'</em><em>,</em><em>'isospectral'}</em>) – method for significance testing</p></li>
-<li><p><strong>alpha</strong> (<em>float</em>) – significance level for critical value estimation [default: 0.05]</p></li>
+<li><p><strong>t</strong> (<em>array</em>) – time axis of the time series</p></li>
+<li><p><strong>tau</strong> (<em>float</em>) – the averaged persistence</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p><strong>res</strong> – Containing:</p>
-<ul class="simple">
-<li><p>r : correlation between x and y</p></li>
-<li><p>signif : true (1) if significant; false (0) otherwise</p></li>
-<li><p>p : Fraction of time series with higher correlation coefficents than observed (approximates the p-value).</p></li>
-</ul>
-<blockquote>
-<div><p>Note that signif = True if and only if p &lt;= alpha.</p>
-</div></blockquote>
-</p>
+<dd class="field-even"><p><strong>y</strong> – the AR(1) time series</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p>array</p>
 </dd>
 </dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
+<p class="rubric">References</p>
 <dl class="simple">
-<dt><a class="reference internal" href="corr_ttest.html#pyleoclim.utils.correlation.corr_ttest" title="pyleoclim.utils.correlation.corr_ttest"><code class="xref py py-func docutils literal notranslate"><span class="pre">correlation.corr_ttest()</span></code></a></dt><dd><p>Estimates the significance of correlations between 2 time series using the classical T-test adjusted for effective sample size.</p>
-</dd>
-<dt><a class="reference internal" href="corr_isopersist.html#pyleoclim.utils.correlation.corr_isopersist" title="pyleoclim.utils.correlation.corr_isopersist"><code class="xref py py-func docutils literal notranslate"><span class="pre">correlation.corr_isopersist()</span></code></a></dt><dd><p>Computes correlation between two timeseries, and their significance using Ar(1) modeling.</p>
-</dd>
-<dt><a class="reference internal" href="corr_isospec.html#pyleoclim.utils.correlation.corr_isospec" title="pyleoclim.utils.correlation.corr_isospec"><code class="xref py py-func docutils literal notranslate"><span class="pre">correlation.corr_isospec()</span></code></a></dt><dd><p>Estimates the significance of the correlation using phase randomization</p>
+<dt>Schulz, M. &amp; Mudelsee, M. REDFIT: estimating red-noise spectra directly from unevenly spaced</dt><dd><p>paleoclimatic time series. Computers &amp; Geosciences 28, 421–426 (2002).</p>
 </dd>
 </dl>
-</div>
 </dd></dl>
 
 </div>

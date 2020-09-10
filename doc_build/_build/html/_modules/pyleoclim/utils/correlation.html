@@ -218,11 +218,11 @@
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 
-<span class="sd">    corr_ttest : Estimates the significance of correlations between 2 time series using the classical T-test adjusted for effective sample size.</span>
+<span class="sd">    correlation.corr_ttest : Estimates the significance of correlations between 2 time series using the classical T-test adjusted for effective sample size.</span>
 <span class="sd">    </span>
-<span class="sd">    corr_isopersist : Computes correlation between two timeseries, and their significance using Ar(1) modeling.</span>
+<span class="sd">    correlation.corr_isopersist : Computes correlation between two timeseries, and their significance using Ar(1) modeling.</span>
 <span class="sd">    </span>
-<span class="sd">    corr_isospec : Estimates the significance of the correlation using phase randomization</span>
+<span class="sd">    correlation.corr_isospec : Estimates the significance of the correlation using phase randomization</span>
 <span class="sd">     </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">y1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
@@ -350,9 +350,9 @@
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    </span>
-<span class="sd">    corr_isopersist : Estimate Pearson&#39;s correlation and associated significance using AR(1)</span>
+<span class="sd">    correlation.corr_isopersist : Estimate Pearson&#39;s correlation and associated significance using AR(1)</span>
 <span class="sd">    </span>
-<span class="sd">    corr_isospec : Estimate Pearson&#39;s correlation and associated significance using phase randomization</span>
+<span class="sd">    correlation.corr_isospec : Estimate Pearson&#39;s correlation and associated significance using phase randomization</span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -424,9 +424,9 @@
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    </span>
-<span class="sd">    corr_ttest: Estimates Pearson&#39;s correlation and associated significance using a t-test.</span>
+<span class="sd">    correlation.corr_ttest: Estimates Pearson&#39;s correlation and associated significance using a t-test.</span>
 <span class="sd">    </span>
-<span class="sd">    corr_isospec : Estimates Pearson&#39;s correlation and associated significance using </span>
+<span class="sd">    correlation.corr_isospec : Estimates Pearson&#39;s correlation and associated significance using </span>
 <span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -634,9 +634,9 @@
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    </span>
-<span class="sd">    corr_ttest : Estimates Pearson&#39;s correlation and associated significance using a t-test</span>
+<span class="sd">    correlation.corr_ttest : Estimates Pearson&#39;s correlation and associated significance using a t-test</span>
 <span class="sd">    </span>
-<span class="sd">    corr_isopersist : Estimates Pearson&#39;s correlation and associated significance using AR(1) simulations</span>
+<span class="sd">    correlation.corr_isopersist : Estimates Pearson&#39;s correlation and associated significance using AR(1) simulations</span>
 <span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>

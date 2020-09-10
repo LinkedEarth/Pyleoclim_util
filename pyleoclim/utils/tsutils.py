@@ -33,7 +33,7 @@ from scipy import special
 from scipy import signal
 from pyhht import EMD
 from sklearn.cluster import DBSCAN
-from matplotlib import cm
+#from matplotlib import cm
 import matplotlib.pyplot as plt
 
 import numpy.matlib

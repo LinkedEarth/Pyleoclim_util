@@ -30,6 +30,7 @@
    plotting/showfig.rst
    plotting/savefig.rst
    plotting/set_style.rst
+   tsmodel/ar1_sim.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -132,6 +133,15 @@ Spectral
 
 Tsmodel
 -------
+
+This module generates simulated time series that can be used for significance testing.
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`ar1_sim <utils_ar1_sim>`
+     - Produces p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from `y` and (if provided) `t`
 
 Wavelet
 -------
