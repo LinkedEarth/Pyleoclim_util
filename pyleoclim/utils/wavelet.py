@@ -81,8 +81,8 @@ class AliasFilter(object):
         References
         ----------
 
-        1. Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
-                Phys Rev E Stat Nonlin Soft Matter Phys 71, 66110 (2005).
+        Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
+        Phys Rev E Stat Nonlin Soft Matter Phys 71, 66110 (2005).
 
         '''
         log_pwr = np.log(pwr)
@@ -264,7 +264,7 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
 
     Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
     Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
-        Nonlinear Processes in Geophysics 12, 345–352 (2005).
+    Nonlinear Processes in Geophysics 12, 345–352 (2005).
 
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
@@ -574,6 +574,7 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
     coeff = (a0, a1, a2)
 
     return wwa, phase, Neffs, coeff
+
 def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
                    gaussianize=False, standardize=True):
     ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
@@ -762,7 +763,7 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, s
 
     Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
     Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
-        Nonlinear Processes in Geophysics 12, 345–352 (2005).
+    Nonlinear Processes in Geophysics 12, 345–352 (2005).
 
     '''
     assertPositiveInt(Neff)
@@ -1061,8 +1062,8 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
         bc_mode='reflect', reflect_type='odd'):
     ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coefficients
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : array
         a time series, NaNs will be deleted automatically
@@ -1100,6 +1101,7 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
         'Foster' - the original WWZ method;
         'Kirchner' - the method Kirchner adapted from Foster;
         'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+        'Kirchner_numba' - Kirchner's algorithm with Numba support for acceleration (default)
     len_bd : int
         the number of the ghost grids want to creat on each boundary
     bc_mode : string
@@ -1776,7 +1778,7 @@ def psd_fBM(freq, ts, H):
     ----------
 
     Flandrin, P. On the spectrum of fractional Brownian motions.
-        IEEE Transactions on Information Theory 35, 197–199 (1989).
+    IEEE Transactions on Information Theory 35, 197–199 (1989).
 
     '''
     nf = np.size(freq)
@@ -1794,15 +1796,16 @@ def psd_fBM(freq, ts, H):
 def get_wwz_func(nproc, method):
     ''' Return the wwz function to use.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     nproc : int
         the number of processes for multiprocessing
     method : string
         'Foster' - the original WWZ method;
         'Kirchner' - the method Kirchner adapted from Foster;
-        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py (default)
+        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+        'Kirchner_numba' - Kirchner's algorithm with Numba support for acceleration (default)
 
     Returns
     -------
@@ -1961,8 +1964,8 @@ def cross_wt(coeff1, coeff2):
     References
     ----------
 
-    1.Grinsted, A., Moore, J. C. & Jevrejeva, S. Application of the cross wavelet transform and
-        wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004).
+    Grinsted, A., Moore, J. C. & Jevrejeva, S. Application of the cross wavelet transform and
+    wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004).
 
     '''
     xwt = coeff1 * np.conj(coeff2)

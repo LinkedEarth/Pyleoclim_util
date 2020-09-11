@@ -1,6 +1,0 @@
-.. _utils_savitzy_golay:
-
-savitzy_golay (pyleoclim.utils.savitzy_golay)
-=====================================
-
-.. autofunction:: pyleoclim.utils.savitzy_golay

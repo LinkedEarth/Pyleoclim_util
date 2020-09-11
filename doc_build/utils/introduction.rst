@@ -31,6 +31,8 @@
    plotting/savefig.rst
    plotting/set_style.rst
    tsmodel/ar1_sim.rst
+   tsmodel/colored_noise.rst
+   tsmodel/colored_noise_2regimes.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -142,6 +144,10 @@ This module generates simulated time series that can be used for significance te
 
    * - :ref:`ar1_sim <utils_ar1_sim>`
      - Produces p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from `y` and (if provided) `t`
+   * - :ref:`colored_noise <utils_colored_noise>`
+     - Generate a colored noise with given scaling facotr `alpha`
+   * - :ref:`colored_noise_2regimes <utils_colored_noise_2regimes>`
+     - Generate a colored noise with two regimes given scaling facotrs `alpha1` and `alpha2`
 
 Wavelet
 -------
