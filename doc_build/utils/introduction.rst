@@ -45,7 +45,10 @@
    tsutils/detect_outliers.rst
    tsutils/remove_outliers.rst
    tsutils/is_evenly_spaced.rst
-
+   wavelet/cwt.rst
+   wavelet/wwz.rst
+   wavelet/xwc.rst
+   wavelet/private.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -170,6 +173,8 @@ This module generates simulated time series that can be used for significance te
 
 Wavelet
 -------
+
+Functions for wavelet analysis. Includes some pre-processing and post-processing functions for spectral and wavelet analysis described :ref:`here <wavelet_private>`
 
 Tsutils
 -------
