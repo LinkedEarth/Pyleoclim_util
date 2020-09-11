@@ -953,6 +953,12 @@ class PSD:
 
         ax.plot(x_axis, y_axis, **plot_kwargs)
 
+        if xlim is not None:
+            ax.set_xlim(xlim)
+
+        if ylim is not None:
+            ax.set_ylim(ylim)
+
         # plot significance levels
         if self.signif_qs is not None:
             signif_method_label = {
@@ -976,8 +982,8 @@ class PSD:
                 )
 
         if in_loglog:
-            ax.set_xscale('log', nonposx='clip')
-            ax.set_yscale('log', nonposy='clip')
+            ax.set_xscale('log', nonpositive='clip')
+            ax.set_yscale('log', nonpositive='clip')
 
         if xticks is not None:
             ax.set_xticks(xticks)
