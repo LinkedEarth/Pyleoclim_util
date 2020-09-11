@@ -3,7 +3,7 @@
 """
 Created on Tue Feb 25 06:43:14 2020
 
-@author: deborahkhider
+@author: deborahkhider, fzhu
 
 Utilities to manipulate timeseries
 """
@@ -12,6 +12,7 @@ __all__ = [
     'simple_stats',
     'bin_values',
     'interp',
+    'on_common_axis',
     'standardize',
     'ts2segments',
     'clean_ts',
@@ -51,8 +52,8 @@ def simple_stats(y, axis=None):
     Computes the mean, median, min, max, standard deviation, and interquartile
     range of a numpy array y, ignoring NaNs.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     y: array
         A Numpy array
@@ -87,15 +88,15 @@ def simple_stats(y, axis=None):
     min_ = np.nanmin(y, axis=axis)
     max_ = np.nanmax(y, axis=axis)
     IQR = np.nanpercentile(y, 75, axis=axis) - np.nanpercentile(y, 25, axis=axis)
-
+    
     return mean, median, min_, max_, std, IQR
 
 
 def bin_values(x, y, bin_size=None, start=None, end=None):
     """ Bin the values
 
-    Args
-    ----
+    Parameters
+    ----------
 
     x : array
         The x-axis series.
@@ -106,7 +107,7 @@ def bin_values(x, y, bin_size=None, start=None, end=None):
     start : float
         Where/when to start binning. Default is the minimum
     end : float
-        When/where to stop binning. Defulat is the maximum
+        When/where to stop binning. Default is the maximum
 
     Returns
     -------
@@ -158,10 +159,10 @@ def bin_values(x, y, bin_size=None, start=None, end=None):
 
 
 def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **args):
-    """ Linear interpolation onto a new x-axis
+    """ Interpolation onto a new x-axis
 
-    Args
-    ----
+    Parameters
+    ----------
 
     x : array
        The x-axis
@@ -214,9 +215,11 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **ar
 
 def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None, end=None):
     """Places two timeseries on a common axis
+    
+    Note this function assumes that the time representation and units are the same (e.g., BP vs CE)
 
-    Args
-    ----
+    Parameters
+    ----------
     x1 : array
         x-axis values of the first timeseries
     y1 : array
@@ -227,9 +230,9 @@ def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=No
         y-axis values of the second timeseries
     method : str
         Which method to use to get the timeseries on the same x axis.
-        Valid entries: 'interpolation' (default), 'bin', 'None'. 'None' only
-        cuts the timeseries to the common period but does not attempt
-        to generate a common time axis
+        Valid entries: 'interpolation' (default, linear interpolation),
+        'bin', 'None'. 'None' only cuts the timeseries to the common 
+        period but does not attempt to generate a common time axis
     step : float
         The interpolation step. Default is mean resolution
         of lowest resolution series
@@ -295,8 +298,8 @@ def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=No
 def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     """ Centers and normalizes a given time series. Constant or nearly constant time series not rescaled.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     x : array
         vector of (real) numbers as a time series, NaNs allowed
@@ -324,8 +327,12 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
 
     1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
     2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
+    
+    See also
+    --------
+    
+    tsutils.preprocess : pre-processes a times series using standardization and detrending. 
 
-    @author: fzhu
     """
     x = np.asanyarray(x)
     assert x.ndim <= 2, 'The time series x should be a vector or 2-D array!'
@@ -360,8 +367,8 @@ def ts2segments(ys, ts, factor=10):
         we think that the change of dts (or the gradient) is too large, and we regard it as a breaking point
         and chop the time series into two segments here
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : array
         A time series, NaNs allowed
@@ -379,8 +386,6 @@ def ts2segments(ys, ts, factor=10):
         a list of the time axis of the several segments
     n_segs : int
         the number of segments
-
-    @author: fzhu
     '''
 
     ys, ts = clean_ts(ys, ts)
@@ -409,8 +414,8 @@ def ts2segments(ys, ts, factor=10):
 def clean_ts(ys, ts):
     ''' Delete the NaNs in the time series and sort it with time axis ascending
 
-    Args
-    ----
+    Parameters
+    ----------
     ys : array
         A time series, NaNs allowed
     ts : array
@@ -424,7 +429,6 @@ def clean_ts(ys, ts):
         The time axis of the time series without nans
 
     '''
-    # delete NaNs if there is any
     ys = np.asarray(ys, dtype=np.float)
     ts = np.asarray(ts, dtype=np.float)
     assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
@@ -447,8 +451,8 @@ def clean_ts(ys, ts):
 def annualize(ys, ts):
     ''' Annualize a time series whose time resolution is finer than 1 year
 
-    Args
-    ----
+    Parameters
+    ----------
     ys : array
         A time series, NaNs allowed
     ts : array
@@ -479,9 +483,22 @@ def annualize(ys, ts):
 
 
 def gaussianize(X):
-    """ Transforms a (proxy) timeseries to Gaussian distribution.
+    """ Transforms a (proxy) timeseries to a Gaussian distribution.
 
     Originator: Michael Erb, Univ. of Southern California - April 2017
+    
+    Parameters
+    ----------
+    
+    X : array
+        Values for the timeseries.
+    
+    Returns
+    -------
+    
+    Xn : array
+        Gaussianized timseries
+    
     """
 
     # Give every record at least one dimensions, or else the code will crash.
@@ -504,6 +521,18 @@ def gaussianize_single(X_single):
     """ Transforms a single (proxy) timeseries to Gaussian distribution.
 
     Originator: Michael Erb, Univ. of Southern California - April 2017
+    
+    Parameters
+    ----------
+    
+    X_single : 1D Array
+        A single timeseries
+        
+    Returns
+    -------
+    
+    Xn_single : Gaussianized values for a single timeseries.
+    
     """
     # Count only elements with data.
 
@@ -523,13 +552,13 @@ def gaussianize_single(X_single):
 
 
 def detrend(y, x = None, method = "emd", sg_kwargs = None):
-    """Detrend a timeseries according to three methods
+    """Detrend a timeseries according to four methods
 
     Detrending methods include, "linear", "constant", using a low-pass
         Savitzky-Golay filter, and using eigen mode decomposition (default).
 
-    Args
-    ----
+    Parameters
+    ----------
 
     y : array
        The series to be detrended.
@@ -541,7 +570,7 @@ def detrend(y, x = None, method = "emd", sg_kwargs = None):
         - linear: the result of a linear least-squares fit to y is subtracted from y.
         - constant: only the mean of data is subtrated.
         - "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-        - "emd" (default): Empirical mode decomposition
+        - "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
     sg_kwargs : dict
         The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
 
@@ -554,7 +583,9 @@ def detrend(y, x = None, method = "emd", sg_kwargs = None):
     See also
     --------
 
-    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    .filter.savitzky_golay : Filtering using Savitzy-Golay
+    
+    tsutils.preprocess : pre-processes a times series using standardization and detrending. 
 
     """
     y = np.array(y)
@@ -597,15 +628,18 @@ def detrend(y, x = None, method = "emd", sg_kwargs = None):
 
 
 def distance_neighbors(signal):
-    '''Finds Distance of each point in the timeseries from it's 4 nearest neighbors
-       Args
-       ----
+    '''Finds Distance of each point in the timeseries from its 4 nearest neighbors
+       
+       Parameters
+       ----------
+       
        signal : array
-               the timeseries
+           The timeseries
+               
        Returns
        -------
        distances : array
-                  Distance of each point from it's nearest neighbors in decreasing order
+           Distance of each point from its nearest neighbors in decreasing order
     '''
     nn = NearestNeighbors(4) # 4 nearest neighbors
     nbrs =nn.fit(signal.reshape(-1,1))
@@ -615,12 +649,16 @@ def distance_neighbors(signal):
 
 def find_knee(distances):
     '''Finds knee point automatically in a given array sorted in decreasing order
-       Args
-       ---
+    
+       Parameters
+       ----------
+       
        distances : array
                   Distance of each point in the timeseries from it's nearest neighbors in decreasing order
-      Returns
-      -------
+      
+       Returns
+       -------
+       
       knee : float
             knee point in the array
     '''
@@ -649,8 +687,8 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
        for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
 
 
-       Args
-       ----
+       Parameters
+       ----------
 
        ts : array
             time axis of time series
@@ -659,7 +697,7 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
        plot : boolean
              true by default, plots the outliers using a scatter plot
        auto : boolean
-             true by default, if false the user manually
+             true by default, if false the user manually selects the knee point
        plot_kwargs : dict
 
        Returns
@@ -667,6 +705,16 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
 
        outliers : array
                    a list of values consisting of outlier indices
+                   
+       See also
+       --------
+       
+       tsutils.distance_neighbors : Finds Distance of each point in the timeseries from its 4 nearest neighbors
+       
+       tsustils.find_knee : Finds knee point automatically in a given array sorted in decreasing order  
+       
+       remove_outliers : Removes outliers from a timeseries
+       
        '''
     #Take care of arguments for the knee plot
     saveknee_settings = {} if saveknee_settings is None else saveknee_settings.copy()
@@ -732,8 +780,9 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
 
 def remove_outliers(ts,ys,outlier_points):
     ''' Removes outliers from a timeseries
-    Args
-    ----
+    
+    Parameters
+    ----------
 
     ts : array
          x axis of timeseries
@@ -748,6 +797,11 @@ def remove_outliers(ts,ys,outlier_points):
         y axis of timeseries
     ts : array
           x axis of timeseries
+          
+    See also
+    --------
+    
+    detect_outliers : Function to detect outliers in the given timeseries
     '''
 
     ys = np.delete(ys,outlier_points)
@@ -758,8 +812,8 @@ def remove_outliers(ts,ys,outlier_points):
 def is_evenly_spaced(ts):
     ''' Check if a time axis is evenly spaced.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ts : array
         the time axis of a time series
@@ -787,12 +841,13 @@ def is_evenly_spaced(ts):
 # alias
 std = standardize
 gauss = gaussianize
+
 def preprocess(ys, ts, detrend=False, sg_kwargs=None,
                gaussianize=False, standardize=True):
     ''' Return the processed time series using detrend and standardization.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : array
         a time series

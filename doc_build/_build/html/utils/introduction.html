@@ -192,7 +192,7 @@
 </style>
 <div class="section" id="pyleoclim-utilities-pyleoclim-utils">
 <h1>Pyleoclim Utilities (pyleoclim.utils)<a class="headerlink" href="#pyleoclim-utilities-pyleoclim-utils" title="Permalink to this headline">¶</a></h1>
-<p>Pyleoclim makes extensive use of functions from <a class="reference external" href="https://numpy.org">Numpy</a>, <a class="reference external" href="https://pandas.pydata.org">Pandas</a>, <a class="reference external" href="https://www.scipy.org">Scipy</a>, and <a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn</a>. Please note that some default parameter values for these functions have been changed to more appropriate values for paleoclimate datasets.</p>
+<p>Pyleoclim makes extensive use of functions from <a class="reference external" href="https://numpy.org">numpy</a>, <a class="reference external" href="https://pandas.pydata.org">Pandas</a>, <a class="reference external" href="https://www.scipy.org">Scipy</a>, and <a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn</a>. Please note that some default parameter values for these functions have been changed to more appropriate values for paleoclimate datasets.</p>
 <div class="section" id="causality">
 <h2>Causality<a class="headerlink" href="#causality" title="Permalink to this headline">¶</a></h2>
 <table class="colwidths-given docutils align-default">
@@ -229,6 +229,7 @@
 </div>
 <div class="section" id="decomposition">
 <h2>Decomposition<a class="headerlink" href="#decomposition" title="Permalink to this headline">¶</a></h2>
+<p>Methods used for decomposition.</p>
 <table class="colwidths-given docutils align-default">
 <colgroup>
 <col style="width: 30%" />
@@ -236,7 +237,7 @@
 </colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="decomposition/pca.html#utils-pca"><span class="std std-ref">pca</span></a></p></td>
-<td><p>Principal Component Analysis</p></td>
+<td><p>Principal Component Analysis (PCA, aka EOF)</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="decomposition/ssa.html#utils-ssa"><span class="std std-ref">ssa</span></a></p></td>
 <td><p>Singular Spectrum Analysis</p></td>
@@ -249,6 +250,7 @@
 </div>
 <div class="section" id="filter">
 <h2>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h2>
+<p>Filtering functions</p>
 <table class="colwidths-given docutils align-default">
 <colgroup>
 <col style="width: 30%" />
@@ -266,6 +268,7 @@
 </div>
 <div class="section" id="mapping">
 <h2>Mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h2>
+<p>This module contains mapping function based on <cite>cartopy &lt;https://scitools.org.uk/cartopy/docs/latest/&gt;_</cite></p>
 <table class="colwidths-given docutils align-default">
 <colgroup>
 <col style="width: 30%" />
@@ -302,6 +305,7 @@
 </div>
 <div class="section" id="spectral">
 <h2>Spectral<a class="headerlink" href="#spectral" title="Permalink to this headline">¶</a></h2>
+<p>This modules contains several spectral methods applicable to paleoclimate data</p>
 <table class="colwidths-given docutils align-default">
 <colgroup>
 <col style="width: 30%" />
@@ -346,6 +350,57 @@
 </div>
 <div class="section" id="tsutils">
 <h2>Tsutils<a class="headerlink" href="#tsutils" title="Permalink to this headline">¶</a></h2>
+<p>This modules contain pre-processing functions for time series analysis.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 70%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="tsutils/simple_stats.html#utils-simple-stats"><span class="std std-ref">simple_stats</span></a></p></td>
+<td><p>Computes the mean, median, min, max, standard deviation and interquartile range of a timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="tsutils/bin_values.html#utils-bin-values"><span class="std std-ref">bin_values</span></a></p></td>
+<td><p>Bin the values into evenly-spaced bins</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="tsutils/interp.html#utils-interp"><span class="std std-ref">interp</span></a></p></td>
+<td><p>Interpolation function based on <cite>scipy.interpolate.interp1d &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html&gt;_</cite></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="tsutils/on_common_axis.html#utils-on-common-axis"><span class="std std-ref">on_common_axis</span></a></p></td>
+<td><p>Places two timeseries on a common axis</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="tsutils/standardize.html#utils-standardize"><span class="std std-ref">standardize</span></a></p></td>
+<td><p>Standardizes a timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="tsutils/ts2segments.html#utils-ts2segments"><span class="std std-ref">ts2segments</span></a></p></td>
+<td><p>Chop a timeseries into several segments based on gap detection</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="tsutils/clean_ts.html#utils-clean-ts"><span class="std std-ref">clean_ts</span></a></p></td>
+<td><p>Remove NaNs in the time series and sort it in ascending time order</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="tsutils/annualize.html#utils-annualize"><span class="std std-ref">annualize</span></a></p></td>
+<td><p>Annualize a time series whose time resolution is finer than 1 year</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="tsutils/gaussianize.html#utils-gaussianize"><span class="std std-ref">gaussianize</span></a></p></td>
+<td><p>Transforms a (proxy) timeseries to a Gaussian distribution</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="tsutils/gaussianize_single.html#utils-gaussianize-single"><span class="std std-ref">gaussianize_single</span></a></p></td>
+<td><p>Transforms a single (proxy) timeseries to a Gaussian distribution</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="tsutils/detrend.html#utils-detrend"><span class="std std-ref">detrend</span></a></p></td>
+<td><p>Applies linear, contant, low-pass filter, or decomposition-based detrending</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="tsutils/detect_outliers.html#utils-detect-outliers"><span class="std std-ref">detect_outliers</span></a></p></td>
+<td><p>Detect outliers in a timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="tsutils/remove_outliers.html#utils-remove-outliers"><span class="std std-ref">remove_outliers</span></a></p></td>
+<td><p>Remove outliers in a timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="tsutils/is_evenly_spaced.html#utils-is-evenly-spaced"><span class="std std-ref">is_evenly_spaced</span></a></p></td>
+<td><p>Detect whether a timeseries is evenly spaced in time</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="lipdutils">
 <h2>Lipdutils<a class="headerlink" href="#lipdutils" title="Permalink to this headline">¶</a></h2>
