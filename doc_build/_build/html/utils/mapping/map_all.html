@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>map_all (pyleoclim.utils.map_all) &mdash; Pyleoclim 0.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">map_all (pyleoclim.utils.map_all)</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>map_all (pyleoclim.utils.map_all)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/utils/mapping/map_all.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="map-all-pyleoclim-utils-map-all">
+<span id="utils-mapall"></span><h1>map_all (pyleoclim.utils.map_all)<a class="headerlink" href="#map-all-pyleoclim-utils-map-all" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="pyleoclim.utils.map_all">
+<code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">map_all</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lat</span></em>, <em class="sig-param"><span class="n">lon</span></em>, <em class="sig-param"><span class="n">criteria</span></em>, <em class="sig-param"><span class="n">marker</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">color</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">projection</span><span class="o">=</span><span class="default_value">'Robinson'</span></em>, <em class="sig-param"><span class="n">proj_default</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">background</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">borders</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">rivers</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">lakes</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">figsize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ax</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scatter_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">legend</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">lgd_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">savefig_settings</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">mute</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/mapping.html#map_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.map_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map the location of all lat/lon according to some criteria</p>
+<p>Map the location of all lat/lon according to some criteria. Based on functions defined in the Cartopy package.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat</strong> (<em>list</em>) – a list of latitudes.</p></li>
+<li><p><strong>lon</strong> (<em>list</em>) – a list of longitudes.</p></li>
+<li><p><strong>criteria</strong> (<em>list</em>) – a list of unique criteria for plotting purposes. For instance,
+a map by the types of archive present in the dataset or proxy
+observations. Should have the same length as lon/lat.</p></li>
+<li><p><strong>marker</strong> (<em>list</em>) – a list of possible markers for each criterion. If None, will use pyleoclim default</p></li>
+<li><p><strong>color</strong> (<em>list</em>) – a list of possible colors for each criterion. If None, will use pyleoclim default</p></li>
+<li><p><strong>projection</strong> (<em>string</em>) – the map projection. Available projections:
+‘Robinson’ (default), ‘PlateCarree’, ‘AlbertsEqualArea’,
+‘AzimuthalEquidistant’,’EquidistantConic’,’LambertConformal’,
+‘LambertCylindrical’,’Mercator’,’Miller’,’Mollweide’,’Orthographic’,
+‘Sinusoidal’,’Stereographic’,’TransverseMercator’,’UTM’,
+‘InterruptedGoodeHomolosine’,’RotatedPole’,’OSGB’,’EuroPP’,
+‘Geostationary’,’NearsidePerspective’,’EckertI’,’EckertII’,
+‘EckertIII’,’EckertIV’,’EckertV’,’EckertVI’,’EqualEarth’,’Gnomonic’,
+‘LambertAzimuthalEqualArea’,’NorthPolarStereo’,’OSNI’,’SouthPolarStereo’</p></li>
+<li><p><strong>proj_default</strong> (<em>bool</em>) – <p>If True, uses the standard projection attributes.
+Enter new attributes in a dictionary to change them. Lists of attributes
+can be found in the Cartopy documentation:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv">https://scitools.org.uk/cartopy/docs/latest/crs/projections.html#eckertiv</a></p>
+</div></blockquote>
+</p></li>
+<li><p><strong>background</strong> (<em>bool</em>) – If True, uses a shaded relief background (only one
+available in Cartopy)</p></li>
+<li><p><strong>borders</strong> (<em>bool</em>) – Draws the countries border. Defaults is off (False).</p></li>
+<li><p><strong>rivers</strong> (<em>bool</em>) – Draws major rivers. Default is off (False).</p></li>
+<li><p><strong>lakes</strong> (<em>bool</em>) – Draws major lakes.
+Default is off (False).</p></li>
+<li><p><strong>figsize</strong> (<em>list</em>) – the size for the figure</p></li>
+<li><p><strong>ax</strong> (<em>axis</em><em>,</em><em>optional</em>) – Return as axis instead of figure (useful to integrate plot into a subplot)</p></li>
+<li><p><strong>scatter_kwargs</strong> (<em>dict</em>) – Dictionary of arguments available in matplotlib.pyplot.scatter (<a class="reference external" href="https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html">https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.scatter.html</a>).</p></li>
+<li><p><strong>legend</strong> (<em>bool</em>) – Whether the draw a legend on the figure</p></li>
+<li><p><strong>lgd_kwargs</strong> (<em>dict</em>) – Dictionary of arguments for matplotlib.pyplot.legend (<a class="reference external" href="https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html">https://matplotlib.org/3.2.1/api/_as_gen/matplotlib.pyplot.legend.html</a>)</p></li>
+<li><p><strong>savefig_settings</strong> (<em>dict</em>) – <p>Dictionary of arguments for matplotlib.pyplot.saveFig.
+- “path” must be specified; it can be any existed or non-existed path,</p>
+<blockquote>
+<div><p>with or without a suffix; if the suffix is not given in “path”, it will follow “format”</p>
+</div></blockquote>
+<ul>
+<li><p>”format” can be one of {“pdf”, “eps”, “png”, “ps”}</p></li>
+</ul>
+</p></li>
+<li><p><strong>mute</strong> (<em>bool</em>) – if True, the plot will not show;
+recommend to set to true when more modifications are going to be made on ax</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>ax</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>The figure, or axis if ax specified</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="set_proj.html#pyleoclim.utils.mapping.set_proj" title="pyleoclim.utils.mapping.set_proj"><code class="xref py py-func docutils literal notranslate"><span class="pre">mapping.set_proj()</span></code></a></dt><dd><p>Set the projection for Cartopy-based maps</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

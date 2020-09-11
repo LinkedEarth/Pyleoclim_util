@@ -819,7 +819,7 @@ class PSD:
 
         return new
 
-    def beta_est(self, fmin=None, fmax=None):
+    def beta_est(self, fmin=None, fmax=None, verbose=False):
         ''' Estimate the scaling factor beta of the PSD in a log-log space
 
         Parameters
@@ -831,6 +831,8 @@ class PSD:
         fmax : float
             the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
 
+        verbose : bool
+            if True, will print out debug information
 
         Returns
         -------
@@ -849,7 +851,7 @@ class PSD:
         if fmax is None:
             fmax = np.max(self.frequency)
 
-        res = waveutils.beta_estimation(self.amplitude, self.frequency, fmin=fmin, fmax=fmax)
+        res = waveutils.beta_estimation(self.amplitude, self.frequency, fmin=fmin, fmax=fmax, verbose=verbose)
         res_dict = {
             'beta': res.beta,
             'std_err': res.std_err,
@@ -1563,7 +1565,7 @@ class MultiplePSD:
         psds = MultiplePSD(psd_list=psd_list)
         return psds
 
-    def beta_est(self, fmin=None, fmax=None):
+    def beta_est(self, fmin=None, fmax=None, verbose=False):
         ''' Estimate the scaling factor beta of the each PSD from the psd_list in a log-log space
 
         Parameters
@@ -1575,6 +1577,8 @@ class MultiplePSD:
         fmax : float
             the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
 
+        verbose : bool
+            if True, will print out debug information
 
         Returns
         -------
@@ -1600,7 +1604,7 @@ class MultiplePSD:
         res_dict['psd_binned'] = []
         res_dict['Y_reg'] = []
         for psd_obj in self.psd_list:
-            res = psd_obj.beta_est(fmin=fmin, fmax=fmax)
+            res = psd_obj.beta_est(fmin=fmin, fmax=fmax, verbose=verbose)
             for k in res_dict.keys():
                 res_dict[k].append(res[k])
 

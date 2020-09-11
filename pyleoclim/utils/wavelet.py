@@ -1554,7 +1554,7 @@ def make_freq_vector(ts, method='log', **kwargs):
 
     return freq
 
-def beta_estimation(psd, freq, fmin=None, fmax=None):
+def beta_estimation(psd, freq, fmin=None, fmax=None, verbose=False):
     ''' Estimate the power slope of a 1/f^beta process.
 
     Args
@@ -1568,6 +1568,8 @@ def beta_estimation(psd, freq, fmin=None, fmax=None):
         the min of frequency range for beta estimation
     fmax : float
         the max of frequency range for beta estimation
+    verbose : bool
+        if True, will print out debug information
 
     Returns
     -------
@@ -1595,9 +1597,10 @@ def beta_estimation(psd, freq, fmin=None, fmax=None):
 
     Results = collections.namedtuple('Results', ['beta', 'f_binned', 'psd_binned', 'Y_reg', 'std_err'])
     if np.max(freq) < fmax or np.min(freq) > fmin:
-        print(fmin, fmax)
-        print(np.min(freq), np.max(freq))
-        print('WRONG')
+        if verbose:
+            print(fmin, fmax)
+            print(np.min(freq), np.max(freq))
+            print('WRONG')
         res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
         return res
 
