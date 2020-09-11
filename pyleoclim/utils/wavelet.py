@@ -10,6 +10,7 @@ Functions concerning wavelet analysis
 
 
 __all__ = [
+    'cwt',
     'wwz',
     'xwc',
 ]
@@ -17,7 +18,6 @@ __all__ = [
 import numpy as np
 import statsmodels.api as sm
 from scipy import signal
-#from scipy.stats.mstats import mquantiles
 from pathos.multiprocessing import ProcessingPool as Pool
 import numba as nb
 from numba.core.errors import NumbaPerformanceWarning
@@ -25,8 +25,9 @@ import warnings
 import collections
 import scipy.fftpack as fft
 import pywt
+from scipy import optimize
 
-from .tsmodel import ar1_sim
+#from .tsmodel import ar1_sim
 from .tsutils import (
     clean_ts,
     preprocess,
@@ -43,14 +44,18 @@ warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 #----------------
 
 class AliasFilter(object):
-    '''Performing anti-alias filter on a psd @author: fzhu
+    '''Performing anti-alias filter on a psd 
+    
+    experimental: Use at your own risk
+    
+    @author: fzhu
     '''
 
     def alias_filter(self, freq, pwr, fs, fc, f_limit, avgs):
         ''' anti_alias filter
 
-        Args
-        ----
+        Parameters
+        ----------
 
         freq : array
             vector of frequencies in power spectrum
@@ -163,17 +168,20 @@ class AliasFilter(object):
         return spectr
     
 def cwt(ys,ts,scales,wavelet='morl',sampling_period=1.0,method='conv',axis=-1):
-    '''
+    '''Continous wavelet transform for evenly spaced data
+    
     pywavelet documentation: https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
     
     Parameters
     ----------
-    ys : array, signal
-    ts : array, time 
+    ys : array
+        signal
+    ts : array
+        time 
     scales : array (float)
         different wavelet scales to use
-    wavelet : TYPE
-        types of wavelet options in function documentation link. The default is 'morl'.
+    wavelet : str
+        types of wavelet options in function documentation link. The default is 'morl' for a morlet wavelet.
     sampling_period : float, optional
         sampling period for frequencies output. The default is 1.0.
     method : str, optional
@@ -202,8 +210,15 @@ def cwt(ys,ts,scales,wavelet='morl',sampling_period=1.0,method='conv',axis=-1):
     Results = collections.namedtuple('Results', ['amplitude','coi', 'freq', 'time', 'coeff'])
     res = Results(amplitude=amplitude, coi=coi, freq=freq, time=ts, coeff=coeff)
     return res
+
 def assertPositiveInt(*args):
-    ''' Assert that the args are all positive integers.
+    ''' Assert that the arguments are all positive integers.
+    
+    Parameters
+    ----------
+    
+    args
+    
     '''
     for arg in args:
         assert isinstance(arg, int) and arg >= 1
@@ -214,8 +229,8 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
 
     Original method from Foster. Not multiprocessing.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : array
         a time series
@@ -236,12 +251,9 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
         'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+    sg_kwargs : dict
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -2145,6 +2157,3 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 
     return rec_ts, t
 
-def wavelet_evenly():
-    #TODO
-    return
