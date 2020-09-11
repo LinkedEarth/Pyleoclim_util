@@ -244,7 +244,7 @@ def colored_noise(alpha, t, f0=None, m=None, seed=None):
     ----------
 
     Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
-        Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+    Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
     '''
     n = np.size(t)  # number of time points
     y = np.zeros(n)
@@ -295,8 +295,8 @@ def colored_noise_2regimes(alpha1, alpha2, f_break, t, f0=None, m=None, seed=Non
     References
     ----------
 
-     Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
-         Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+    Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
+    Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
     '''
     n = np.size(t)  # number of time points
     y = np.zeros(n)
