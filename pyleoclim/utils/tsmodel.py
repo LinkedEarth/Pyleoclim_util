@@ -12,6 +12,8 @@ from scipy import optimize
 
 __all__ = [
     'ar1_sim',
+    'colored_noise',
+    'colored_noise_2regimes',
 ]
 
 def ar1_model(t, tau, output_sigma=1):
@@ -213,3 +215,116 @@ def tau_estimation(y, t):
     tau_est = -1 / np.log(a_est)
 
     return tau_est
+
+
+def colored_noise(alpha, t, f0=None, m=None, seed=None):
+    ''' Generate a colored noise timeseries
+
+    Parameters
+    ----------
+    alpha : float
+        exponent of the 1/f^alpha noise
+
+    t : float
+        time vector of the generated noise
+
+    f0 : float
+        fundamental frequency
+
+    m : int
+        maximum number of the waves, which determines the highest frequency of the components in the synthetic noise
+
+    Returns
+    -------
+
+    y : array
+        the generated 1/f^alpha noise
+
+    References
+    ----------
+
+    Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
+        Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+    '''
+    n = np.size(t)  # number of time points
+    y = np.zeros(n)
+
+    if f0 is None:
+        f0 = 1/n  # fundamental frequency
+    if m is None:
+        m = n//2
+
+    k = np.arange(m) + 1  # wave numbers
+
+    if seed is not None:
+        np.random.seed(seed)
+
+    theta = np.random.rand(int(m))*2*np.pi  # random phase
+    for j in range(n):
+        coeff = (k*f0)**(-alpha/2)
+        sin_func = np.sin(2*np.pi*k*f0*t[j] + theta)
+        y[j] = np.sum(coeff*sin_func)
+
+    return y
+
+def colored_noise_2regimes(alpha1, alpha2, f_break, t, f0=None, m=None, seed=None):
+    ''' Generate a colored noise timeseries with two regimes
+
+    Parameters
+    ----------
+
+    alpha1, alpha2 : float
+        the exponent of the 1/f^alpha noise
+
+    f_break : float
+        the frequency where the scaling breaks
+
+    t : float
+        time vector of the generated noise
+    f0 : float
+        fundamental frequency
+    m : int
+        maximum number of the waves, which determines the highest frequency of the components in the synthetic noise
+
+    Returns
+    -------
+
+    y : array
+        the generated 1/f^alpha noise
+
+    References
+    ----------
+
+     Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
+         Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+    '''
+    n = np.size(t)  # number of time points
+    y = np.zeros(n)
+
+    if f0 is None:
+        f0 = 1/n  # fundamental frequency
+    if m is None:
+        m = n//2  # so the aliasing is limited
+
+    k = np.arange(m) + 1  # wave numbers
+
+    if seed is not None:
+        np.random.seed(seed)
+
+    theta = np.random.rand(int(m))*2*np.pi  # random phase
+
+    f_vec = k*f0
+    regime1= k*f0>=f_break
+    regime2= k*f0<=f_break
+    f_vec1 = f_vec[regime1]
+    f_vec2 = f_vec[regime2]
+    s = np.exp(alpha1/alpha2*np.log(f_vec1[0])) / f_vec2[-1]
+
+    for j in range(n):
+        coeff = np.ndarray((np.size(f_vec)))
+        coeff[regime1] = f_vec1**(-alpha1/2)
+        coeff[regime2] = (s*f_vec2)**(-alpha2/2)
+        sin_func = np.sin(2*np.pi*k*f0*t[j] + theta)
+        y[j] = np.sum(coeff*sin_func)
+
+    return y
