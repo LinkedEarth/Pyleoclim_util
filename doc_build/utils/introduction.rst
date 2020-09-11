@@ -33,11 +33,26 @@
    tsmodel/ar1_sim.rst
    tsmodel/colored_noise.rst
    tsmodel/colored_noise_2regimes.rst
+   tsutils/simple_stats.rst
+   tsutils/bin_values.rst
+   tsutils/interp.rst
+   tsutils/on_common_axis.rst
+   tsutils/standardize.rst
+   tsutils/ts2segments.rst
+   tsutils/clean_ts.rst
+   tsutils/annualize.rst
+   tsutils/gaussianize.rst
+   tsutils/gaussianize_single.rst
+   tsutils/detrend.rst
+   tsutils/detect_outliers.rst
+   tsutils/remove_outliers.rst
+   tsutils/is_evenly_spaced.rst
+
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
 
-Pyleoclim makes extensive use of functions from `Numpy <https://numpy.org>`_, `Pandas <https://pandas.pydata.org>`_, `Scipy <https://www.scipy.org>`_, and `scikit-learn <https://scikit-learn.org/stable/>`_. Please note that some default parameter values for these functions have been changed to more appropriate values for paleoclimate datasets.
+Pyleoclim makes extensive use of functions from `numpy <https://numpy.org>`_, `Pandas <https://pandas.pydata.org>`_, `Scipy <https://www.scipy.org>`_, and `scikit-learn <https://scikit-learn.org/stable/>`_. Please note that some default parameter values for these functions have been changed to more appropriate values for paleoclimate datasets.
 
 Causality
 ---------
@@ -66,12 +81,14 @@ Correlation
 Decomposition
 -------------
 
+Methods used for decomposition.
+
 .. list-table::
    :widths: 30 70
    :header-rows: 0
 
    * - :ref:`pca <utils_pca>`
-     - Principal Component Analysis
+     - Principal Component Analysis (PCA, aka EOF)
    * - :ref:`ssa <utils_ssa>`
      - Singular Spectrum Analysis
    * - :ref:`MSSA <utils_mssa>`
@@ -79,6 +96,8 @@ Decomposition
 
 Filter
 ------
+
+Filtering functions
 
 .. list-table::
    :widths: 30 70
@@ -91,6 +110,9 @@ Filter
 
 Mapping
 -------
+
+This module contains mapping function based on `cartopy <https://scitools.org.uk/cartopy/docs/latest/>_`
+
 .. list-table::
    :widths: 30 70
    :header-rows: 0
@@ -118,6 +140,9 @@ However, the following functions can be used to manipulate the default style and
 
 Spectral
 --------
+
+This modules contains several spectral methods applicable to paleoclimate data
+
 .. list-table::
    :widths: 30 70
    :header-rows: 0
@@ -154,6 +179,41 @@ Wavelet
 
 Tsutils
 -------
+
+This modules contain pre-processing functions for time series analysis.
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`simple_stats <utils_simple_stats>`
+     - Computes the mean, median, min, max, standard deviation and interquartile range of a timeseries
+   * - :ref:`bin_values <utils_bin_values>`
+     - Bin the values into evenly-spaced bins
+   * - :ref:`interp <utils_interp>`
+     - Interpolation function based on `scipy.interpolate.interp1d <https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html>_`
+   * - :ref:`on_common_axis <utils_on_common_axis>`
+     - Places two timeseries on a common axis
+   * - :ref:`standardize <utils_standardize>`
+     - Standardizes a timeseries
+   * - :ref:`ts2segments <utils_ts2segments>`
+     - Chop a timeseries into several segments based on gap detection
+   * - :ref:`clean_ts <utils_clean_ts>`
+     - Remove NaNs in the time series and sort it in ascending time order
+   * - :ref:`annualize <utils_annualize>`
+     - Annualize a time series whose time resolution is finer than 1 year
+   * - :ref:`gaussianize <utils_gaussianize>`
+     - Transforms a (proxy) timeseries to a Gaussian distribution
+   * - :ref:`gaussianize_single <utils_gaussianize_single>`
+     - Transforms a single (proxy) timeseries to a Gaussian distribution
+   * - :ref:`detrend <utils_detrend>`
+     - Applies linear, contant, low-pass filter, or decomposition-based detrending
+   * - :ref:`detect_outliers <utils_detect_outliers>`
+     - Detect outliers in a timeseries
+   * - :ref:`remove_outliers <utils_remove_outliers>`
+     - Remove outliers in a timeseries
+   * - :ref:`is_evenly_spaced <utils_is_evenly_spaced>`
+     - Detect whether a timeseries is evenly spaced in time
 
 Lipdutils
 ---------
