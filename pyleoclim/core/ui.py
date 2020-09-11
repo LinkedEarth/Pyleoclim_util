@@ -819,6 +819,47 @@ class PSD:
 
         return new
 
+    def beta_est(self, fmin=None, fmax=None):
+        ''' Estimate the scaling factor beta of the PSD in a log-log space
+
+        Parameters
+        ----------
+
+        fmin : float
+            the minimum frequency edge for beta estimation; the default is the minimum of the frequency vector of the PSD obj
+
+        fmax : float
+            the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
+
+
+        Returns
+        -------
+
+        res_dict : dictionary
+            - beta: the scaling factor
+            - std_err: the one standard deviation error of the scaling factor
+            - f_binned: the binned frequency series, used as X for linear regression
+            - psd_binned: the binned PSD series, used as Y for linear regression
+            - Y_reg: the predicted Y from linear regression, used with f_binned for the slope curve plotting
+
+        '''
+        if fmin is None:
+            fmin = np.min(self.frequency)
+
+        if fmax is None:
+            fmax = np.max(self.frequency)
+
+        res = waveutils.beta_estimation(self.amplitude, self.frequency, fmin=fmin, fmax=fmax)
+        res_dict = {
+            'beta': res.beta,
+            'std_err': res.std_err,
+            'f_binned': res.f_binned,
+            'psd_binned': res.psd_binned,
+            'Y_reg': res.Y_reg,
+        }
+
+        return res_dict
+
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='Amplitude', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
@@ -1515,6 +1556,50 @@ class MultiplePSD:
 
         psds = MultiplePSD(psd_list=psd_list)
         return psds
+
+    def beta_est(self, fmin=None, fmax=None):
+        ''' Estimate the scaling factor beta of the each PSD from the psd_list in a log-log space
+
+        Parameters
+        ----------
+
+        fmin : float
+            the minimum frequency edge for beta estimation; the default is the minimum of the frequency vector of the PSD obj
+
+        fmax : float
+            the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
+
+
+        Returns
+        -------
+
+        res_dict : dictionary
+            - beta: list of the scaling factors
+            - std_err: list of one standard deviation errors of the scaling factor
+            - f_binned: list of the binned frequency series, used as X for linear regression
+            - psd_binned: list of the binned PSD series, used as Y for linear regression
+            - Y_reg: list of the predicted Y from linear regression, used with f_binned for the slope curve plotting
+
+        See also
+        --------
+
+        core.ui.PSD.beta_est : beta estimation for on PSD object
+
+        '''
+
+        res_dict = {}
+        res_dict['beta'] = []
+        res_dict['std_err'] = []
+        res_dict['f_binned'] = []
+        res_dict['psd_binned'] = []
+        res_dict['Y_reg'] = []
+        for psd_obj in self.psd_list:
+            res = psd_obj.beta_est(fmin=fmin, fmax=fmax)
+            for k in res_dict.keys():
+                res_dict[k].append(res[k])
+
+        return res_dict
+
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
