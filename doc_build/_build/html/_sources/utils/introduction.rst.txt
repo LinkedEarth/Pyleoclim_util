@@ -47,26 +47,10 @@
    tsutils/detect_outliers.rst
    tsutils/remove_outliers.rst
    tsutils/is_evenly_spaced.rst
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
    wavelet/cwt.rst
    wavelet/wwz.rst
    wavelet/xwc.rst
    wavelet/private.rst
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -196,14 +180,6 @@ This module generates simulated time series that can be used for significance te
 Wavelet
 -------
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 Functions for wavelet analysis. Includes some pre-processing and post-processing functions for spectral and wavelet analysis described :ref:`here <wavelet_private>`.
 
 .. list-table::
@@ -218,13 +194,6 @@ Functions for wavelet analysis. Includes some pre-processing and post-processing
      - Cross-wavelet analysis for unevenly-spaced data.
 
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 Tsutils
 -------
 

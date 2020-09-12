@@ -1890,7 +1890,7 @@
 
     <span class="k">return</span> <span class="n">freq</span></div>
 
-<div class="viewcode-block" id="beta_estimation"><a class="viewcode-back" href="../../../utils/wavelet/beta_estimation.html#pyleoclim.utils.wavelet.beta_estimation">[docs]</a><span class="k">def</span> <span class="nf">beta_estimation</span><span class="p">(</span><span class="n">psd</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="beta_estimation"><a class="viewcode-back" href="../../../utils/wavelet/beta_estimation.html#pyleoclim.utils.wavelet.beta_estimation">[docs]</a><span class="k">def</span> <span class="nf">beta_estimation</span><span class="p">(</span><span class="n">psd</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">fmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Estimate the power slope of a 1/f^beta process.</span>
 
 <span class="sd">    Parameters</span>
@@ -1904,6 +1904,8 @@
 <span class="sd">        the min of frequency range for beta estimation</span>
 <span class="sd">    fmax : float</span>
 <span class="sd">        the max of frequency range for beta estimation</span>
+<span class="sd">    verbose : bool</span>
+<span class="sd">         if True, will print out debug information</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1931,9 +1933,10 @@
 
     <span class="n">Results</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Results&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span> <span class="s1">&#39;f_binned&#39;</span><span class="p">,</span> <span class="s1">&#39;psd_binned&#39;</span><span class="p">,</span> <span class="s1">&#39;Y_reg&#39;</span><span class="p">,</span> <span class="s1">&#39;std_err&#39;</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">fmax</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">fmin</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">freq</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WRONG&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">fmin</span><span class="p">,</span> <span class="n">fmax</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">freq</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WRONG&#39;</span><span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">Results</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">f_binned</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">psd_binned</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">Y_reg</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">std_err</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span>
 

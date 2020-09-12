@@ -1754,7 +1754,7 @@ def beta_estimation(psd, freq, fmin=None, fmax=None, verbose=False):
     fmax : float
         the max of frequency range for beta estimation
     verbose : bool
-        if True, will print out debug information
+         if True, will print out debug information
 
     Returns
     -------
