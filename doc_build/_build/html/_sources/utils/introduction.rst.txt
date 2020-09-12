@@ -48,12 +48,18 @@
    tsutils/remove_outliers.rst
    tsutils/is_evenly_spaced.rst
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 =======
+=======
+>>>>>>> Stashed changes
    wavelet/cwt.rst
    wavelet/wwz.rst
    wavelet/xwc.rst
    wavelet/private.rst
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 Pyleoclim Utilities (pyleoclim.utils)
@@ -185,7 +191,10 @@ Wavelet
 -------
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
 Functions for wavelet analysis. Includes some pre-processing and post-processing functions for spectral and wavelet analysis described :ref:`here <wavelet_private>`.
 
 .. list-table::
@@ -200,6 +209,9 @@ Functions for wavelet analysis. Includes some pre-processing and post-processing
      - Cross-wavelet analysis for unevenly-spaced data.
 
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 Tsutils
 -------
