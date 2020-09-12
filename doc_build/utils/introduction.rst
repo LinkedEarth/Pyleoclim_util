@@ -180,7 +180,19 @@ This module generates simulated time series that can be used for significance te
 Wavelet
 -------
 
-Functions for wavelet analysis. Includes some pre-processing and post-processing functions for spectral and wavelet analysis described :ref:`here <wavelet_private>`
+Functions for wavelet analysis. Includes some pre-processing and post-processing functions for spectral and wavelet analysis described :ref:`here <wavelet_private>`.
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`wwz <utils_wwz>`
+     - Weighted wavelet amplitude (WWA) for unevenly-spaced data
+   * - :ref:`cwt <utils_cwt>`
+     - Continous wavelet transform for evenly spaced data
+   * - :ref:`xwc <utils_xwc>`
+     - Cross-wavelet analysis for unevenly-spaced data.
+
 
 Tsutils
 -------

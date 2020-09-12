@@ -278,6 +278,20 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
     Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
     Nonlinear Processes in Geophysics 12, 345–352 (2005).
 
+    See also
+    --------
+    
+    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+
+    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+
+    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+
+    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+
+    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+
+    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
     assertPositiveInt(Neff)
@@ -342,8 +356,8 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=Fal
 
     Original method from Foster. Supports multiprocessing.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : array
         a time series
@@ -364,12 +378,9 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=Fal
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
         'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+    sg_kwargs : dict
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -386,6 +397,21 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=Fal
         the matrix of effective number of points in the time-scale coordinates
     coeff : array
         the wavelet transform coefficients (a0, a1, a2)
+        
+    See also
+    --------
+    
+    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+
+    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+
+    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+
+    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+
+    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+
+    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
     assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -463,8 +489,8 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
 
     Method modified by Kirchner. No multiprocessing.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : array
         a time series
@@ -485,12 +511,9 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
         'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+    sg_kwargs : dict
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -514,6 +537,21 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
     Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
     Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
     Nonlinear Processes in Geophysics 12, 345–352 (2005).
+    
+    See also
+    --------
+    
+    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+
+    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+
+    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+
+    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+
+    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+
+    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
@@ -593,8 +631,8 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend
 
     Method modified by kirchner. Supports multiprocessing.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : array
         a time series
@@ -615,12 +653,9 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
         'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+    sg_kwargs : dict
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -633,6 +668,21 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend
     phase (array): the weighted wavelet phase
     Neffs (array): the matrix of effective number of points in the time-scale coordinates
     coeff (array): the wavelet transform coefficients (a0, a1, a2)
+    
+    See also
+    --------
+    
+    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+
+    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+
+    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+
+    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+
+    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+
+    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
     assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -725,8 +775,8 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, s
 
     Using numba.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : array
         a time series
@@ -747,12 +797,9 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, s
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
         'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+    sg_kwargs : dict
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -776,6 +823,21 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, s
     Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
     Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
     Nonlinear Processes in Geophysics 12, 345–352 (2005).
+    
+    See also
+    --------
+    
+    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+
+    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+
+    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+
+    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+
+    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+
+    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
     assertPositiveInt(Neff)
@@ -860,12 +922,12 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, s
 
 def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
                   gaussianize=False, standardize=True):
-    ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
+    ''' Returns the weighted wavelet amplitude (WWA) modified by Kirchner.
 
     Fastest method. Calls Fortran libraries.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : array
         a time series
@@ -886,12 +948,9 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
         'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+    sg_kwargs : dict
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -908,6 +967,21 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=
         the matrix of effective number of points in the time-scale coordinates
     coeff : array
         the wavelet transform coefficients (a0, a1, a2)
+        
+    See also
+    --------
+    
+    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+
+    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+
+    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+
+    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+
+    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+
+    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
     from . import f2py_wwz as f2py
@@ -938,8 +1012,8 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=
 def make_coi(tau, Neff=3):
     ''' Return the cone of influence.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
@@ -982,8 +1056,8 @@ def make_coi(tau, Neff=3):
 def make_omega(ts, freq):
     ''' Return the angular frequency based on the time axis and given frequency vector
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : array
         a time series
@@ -1011,8 +1085,8 @@ def make_omega(ts, freq):
 def wwa2psd(wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
     """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
-    Args
-    ----
+    Parameters
+    ----------
 
     wwa : array
         the weighted wavelet amplitude.
@@ -1072,7 +1146,7 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
         nMC=200, nproc=8, detrend=False, sg_kwargs=None,
         gaussianize=False, standardize=True, method='default', len_bd=0,
         bc_mode='reflect', reflect_type='odd'):
-    ''' Return the weighted wavelet amplitude (WWA) with phase, AR1_q, and cone of influence, as well as WT coefficients
+    ''' Weighted wavelet amplitude (WWA) for unevenly-spaced data
 
     Parameters
     ----------
@@ -1097,18 +1171,14 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
         the number of Monte-Carlo simulations
     nproc : int
         the number of processes for multiprocessing
-    detrend : str
+    detrend : string
         None - the original time series is assumed to have no trend;
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay
-               filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+    sg_kwargs : dict
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
     method : string
         'Foster' - the original WWZ method;
         'Kirchner' - the method Kirchner adapted from Foster;
@@ -1142,7 +1212,25 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
         the matrix of effective number of points in the time-scale coordinates
     coeff : array
         the wavelet transform coefficents
+    
+    See also
+    --------
+    
+    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
+    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+
+    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+
+    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+
+    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+
+    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+
+    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.    
+    
+    make_freq_vector : Make frequency vector
     '''
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
 
@@ -1195,8 +1283,8 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         gaussianize=False, standardize=True, method='default'):
     ''' Return the cross-wavelet coherence of two time series.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys1 : array
         first of two time series
@@ -1222,14 +1310,10 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         None - the original time series is assumed to have no trend;
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay
-               filters and the resulting filtered series is subtracted from y.
-    params : list
-        The paramters for the Savitzky-Golay filters. The first parameter
-        corresponds to the window size (default it set to half of the data)
-        while the second parameter correspond to the order of the filter
-        (default is 4). The third parameter is the order of the derivative
-        (the default is zero, which means only smoothing.)
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+    sg_kwargs : dict
+        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -1245,7 +1329,26 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     res : dict
         contains the cross wavelet coherence, cross-wavelet phase,
         vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
+    
+    See also
+    --------
+    
+    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
+    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+
+    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+
+    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+
+    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+
+    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+
+    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.    
+    
+    make_freq_vector : Make frequency vector
+    
     '''
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
@@ -1261,7 +1364,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
 
     if freq is None:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        freq = make_freq_vector(ts_cut, method=freq_method, **freq_kwargs)
+        freq = make_freq_vector(ts1, method=freq_method, **freq_kwargs)
         print(f'Setting freq={freq[:3]}...{freq[-3:]}, nfreq={np.size(freq)}')
 
     ys1_cut, ts1_cut, freq1, tau1 = prepare_wwz(ys1, ts1, freq=freq, tau=tau)
@@ -1340,10 +1443,10 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
 
     return res
 def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
-    ''' Return the frequency vector based on the Lomb-Scargle algorithm.
+    ''' Return the frequency vector based on the REDFIT recommendation.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ts : array
         time axis of the time series
@@ -1371,6 +1474,19 @@ def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
 
     Trauth, M. H. MATLAB® Recipes for Earth Sciences. (Springer, 2015). pp 181.
 
+
+    See also
+    --------
+    
+    freq_vector_welch : Return the frequency vector based on the Welch's method.
+
+    freq_vector_nfft : Return the frequency vector based on NFFT
+
+    freq_vector_scale : Return the frequency vector based on scales
+
+    freq_vector_log : Return the frequency vector based on logspace 
+
+    make_freq_vector : Make frequency vector
     '''
     assert ofac >= 1 and hifac <= 1, "`ofac` should be >= 1, and `hifac` should be <= 1"
     
@@ -1390,8 +1506,8 @@ def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
 def freq_vector_welch(ts):
     ''' Return the frequency vector based on the Welch's method.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ts : array
         time axis of the time series
@@ -1406,6 +1522,20 @@ def freq_vector_welch(ts):
     ----------
 
     https://github.com/scipy/scipy/blob/v0.14.0/scipy/signal/Spectral.py
+    
+    See also
+    --------
+    
+    freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+        recommendation.
+
+    freq_vector_nfft : Return the frequency vector based on NFFT
+
+    freq_vector_scale : Return the frequency vector based on scales
+
+    freq_vector_log : Return the frequency vector based on logspace 
+
+    make_freq_vector : Make frequency vector
 
     '''
     nt = np.size(ts)
@@ -1423,8 +1553,8 @@ def freq_vector_welch(ts):
 def freq_vector_nfft(ts):
     ''' Return the frequency vector based on NFFT
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ts : array
         time axis of the time series
@@ -1434,6 +1564,20 @@ def freq_vector_nfft(ts):
 
     freq : array
         the frequency vector
+        
+    See also
+    --------
+    
+    freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+        recommendation.
+
+    freq_vector_welch : Return the frequency vector based on the Welch's method.
+
+    freq_vector_scale : Return the frequency vector based on scales
+
+    freq_vector_log : Return the frequency vector based on logspace 
+
+    make_freq_vector : Make frequency vector
 
     '''
     nt = np.size(ts)
@@ -1448,8 +1592,8 @@ def freq_vector_nfft(ts):
 def freq_vector_scale(ts, nv=12):
     ''' Return the frequency vector based on scales
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ts : array
         time axis of the time series
@@ -1462,6 +1606,20 @@ def freq_vector_scale(ts, nv=12):
 
     freq : array
         the frequency vector
+        
+    See also
+    --------
+    
+    freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+        recommendation.
+
+    freq_vector_welch : Return the frequency vector based on the Welch's method.
+
+    freq_vector_nfft : Return the frequency vector based on NFFT
+
+    freq_vector_log : Return the frequency vector based on logspace 
+
+    make_freq_vector : Make frequency vector
 
     '''
 
@@ -1476,8 +1634,8 @@ def freq_vector_scale(ts, nv=12):
 def freq_vector_log(ts, nfreq=None):
     ''' Return the frequency vector based on logspace
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ts : array
         time axis of the time series
@@ -1490,7 +1648,20 @@ def freq_vector_log(ts, nfreq=None):
 
     freq : array
         the frequency vector
+    
+    See also
+    --------
+    
+    freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+        recommendation.
 
+    freq_vector_welch : Return the frequency vector based on the Welch's method.
+
+    freq_vector_nfft : Return the frequency vector based on NFFT
+
+    freq_vector_scale : Return the frequency vector based on scales
+
+    make_freq_vector : Make frequency vector
     '''
 
     nt = np.size(ts)
@@ -1509,13 +1680,13 @@ def freq_vector_log(ts, nfreq=None):
     return freq
 
 def make_freq_vector(ts, method='log', **kwargs):
-    ''' Make frequency vector- Selector function.
+    ''' Make frequency vector
 
-    This function selects among various methods to obtain the frequency
+    This function selects among five methods to obtain the frequency
     vector.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ts : array
         Time axis of the time series
@@ -1535,6 +1706,20 @@ def make_freq_vector(ts, method='log', **kwargs):
 
     freq : array
         the frequency vector
+    
+    See also
+    --------
+    
+    freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+        recommendation.
+
+    freq_vector_welch : Return the frequency vector based on the Welch's method.
+
+    freq_vector_nfft : Return the frequency vector based on NFFT
+
+    freq_vector_scale : Return the frequency vector based on scales
+
+    freq_vector_log : Return the frequency vector based on logspace 
 
     '''
 
@@ -1557,8 +1742,8 @@ def make_freq_vector(ts, method='log', **kwargs):
 def beta_estimation(psd, freq, fmin=None, fmax=None, verbose=False):
     ''' Estimate the power slope of a 1/f^beta process.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     psd : array
         the power spectral density
@@ -1660,8 +1845,8 @@ def beta_estimation(psd, freq, fmin=None, fmax=None, verbose=False):
 def beta2HurstIndex(beta):
     ''' Translate psd slope to Hurst index
 
-    Args
-    ----
+    Parameters
+    ----------
 
     beta : float
         the estimated slope of a power spectral density curve
@@ -1685,8 +1870,8 @@ def beta2HurstIndex(beta):
 def psd_ar(var_noise, freq, ar_params, f_sampling):
     ''' Return the theoretical power spectral density (PSD) of an autoregressive model
 
-    Args
-    ----
+    Parameters
+    ----------
 
     var_noise : float
         the variance of the noise of the AR process
@@ -1717,8 +1902,8 @@ def psd_ar(var_noise, freq, ar_params, f_sampling):
 def fBMsim(N=128, H=0.25):
     '''Simple method to generate fractional Brownian Motion
 
-    Args
-    ----
+    Parameters
+    ----------
 
     N : int
         the length of the simulated time series
@@ -1773,8 +1958,8 @@ def fBMsim(N=128, H=0.25):
 def psd_fBM(freq, ts, H):
     ''' Return the theoretical psd of a fBM
 
-    Args
-    ----
+    Parameters
+    ----------
 
     freq : array
         vector of frequency
@@ -1853,8 +2038,8 @@ def get_wwz_func(nproc, method):
 def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None, len_bd=0, bc_mode='reflect', reflect_type='odd', **kwargs):
     ''' Return the truncated time series with NaNs deleted and estimate frequency vector and tau
 
-    Args
-    ----
+    Parameters
+    ----------
 
     ys : array
         a time series, NaNs will be deleted automatically
@@ -1956,8 +2141,8 @@ def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None
 def cross_wt(coeff1, coeff2):
     ''' Return the cross wavelet transform.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     coeff1 : array
         the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
@@ -1992,8 +2177,8 @@ def cross_wt(coeff1, coeff2):
 def wavelet_coherence(coeff1, coeff2, freq, tau, smooth_factor=0.25):
     ''' Return the cross wavelet coherence.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     coeff1 : array
         the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
@@ -2113,8 +2298,8 @@ def wavelet_coherence(coeff1, coeff2, freq, tau, smooth_factor=0.25):
 def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
     ''' Reconstruct the normalized time series from the wavelet coefficients.
 
-    Args
-    ----
+    Parameters
+    ----------
 
     coeff : array
         the coefficients of the corresponding basis functions (a0, a1, a2)

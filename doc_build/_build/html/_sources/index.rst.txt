@@ -38,6 +38,11 @@ There are many ways to get involved in the development of Pyleoclim:
   * Contribute bug fixes
   * Contribute enhancements and new features
 
+<<<<<<< Updated upstream
+=======
+Search Pyleoclim
+================
+>>>>>>> Stashed changes
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
