@@ -40,6 +40,11 @@ There are many ways to get involved in the development of Pyleoclim:
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+Search Pyleoclim
+================
+>>>>>>> Stashed changes
 =======
 Search Pyleoclim
 ================
