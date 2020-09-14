@@ -1,3 +1,5 @@
+.. _core_ui:
+
 Series
 =====================================
 .. currentmodules:: pyleoclim.core.ui
@@ -10,7 +12,7 @@ Constructor
 
     Series
 
-    
+
 
 Attributes
 ----------
@@ -20,7 +22,7 @@ Attributes
     Series.time
     Series.value
 
-    
+
 Methods
 -------
 .. autosummary::
