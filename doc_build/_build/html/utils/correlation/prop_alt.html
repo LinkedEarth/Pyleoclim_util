@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>prop_alt (pyleoclim.utils.correlation.prop_alt) &mdash; Pyleoclim 0.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../core/ui.html">Series (pyleoclim.Series)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>prop_alt (pyleoclim.utils.correlation.prop_alt)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/utils/correlation/prop_alt.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="prop-alt-pyleoclim-utils-correlation-prop-alt">
+<span id="utils-correlation-prop-alt"></span><h1>prop_alt (pyleoclim.utils.correlation.prop_alt)<a class="headerlink" href="#prop-alt-pyleoclim-utils-correlation-prop-alt" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="pyleoclim.utils.correlation.prop_alt">
+<code class="sig-prename descclassname">pyleoclim.utils.correlation.</code><code class="sig-name descname">prop_alt</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pvals</span></em>, <em class="sig-param"><span class="n">adj_method</span><span class="o">=</span><span class="default_value">'mean'</span></em>, <em class="sig-param"><span class="n">adj_args</span><span class="o">=</span><span class="default_value">{'edf_lower': 0.8, 'num_steps': 20}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/correlation.html#prop_alt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.correlation.prop_alt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate an estimate of a, the proportion of alternative hypotheses, using one of several methods</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pvals</strong> (<em>list</em><em> or </em><em>array</em>) – A vector of p-values on which to estimate a</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>adj_method: {‘mean’, ‘storey’, ‘two-stage’}</dt><dd><p>Method for increasing the power of the procedure by estimating the proportion of alternative p-values.
+- ‘mean’, the modified Storey estimator that we suggest in Ventura et al. (2004)
+- ‘storey’, the method of Storey (2002)
+- ‘two-stage’, the iterative approach of Benjamini et al. (2001)</p>
+</dd>
+<dt>adj_args<span class="classifier">dict</span></dt><dd><ul class="simple">
+<li><p>for “mean”, specify “edf_lower”, the smallest quantile at which to estimate a, and “num_steps”, the number of quantiles to use
+the approach uses the average of the Storey (2002) estimator for the num_steps quantiles starting at “edf_lower” and finishing just less than 1</p></li>
+<li><p>for “storey”, specify “edf_quantile”, the quantile at which to calculate the estimator</p></li>
+<li><p>for “two-stage”, the method uses a standard FDR approach to estimate which p-values are significant
+this number is the estimate of a; therefore the method requires specification of qlevel,
+the proportion of false positives and “fdr_method” (‘original’ or ‘general’), the FDR method to be used.
+We do not recommend ‘general’ as this is very conservative and will underestimate a.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>a</strong> – estimate of a, the number of alternative hypotheses</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<ul class="simple">
+<li><p>Storey, J.D. (2002). A direct approach to False Discovery Rates. Journal of the Royal Statistical Society, Series B, 64, 3, 479-498</p></li>
+<li><p>Benjamini, Yoav; Yekutieli, Daniel (2001). “The control of the false discovery rate in multiple testing under dependency”. Annals of Statistics. 29 (4): 1165–1188. doi:10.1214/aos/1013699998</p></li>
+<li><p>Ventura, V., Paciorek, C., Risbey, J.S. (2004). Controlling the proportion of falsely rejected hypotheses when conducting multiple tests with climatological data. Journal of climate, 17, 4343-4356</p></li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

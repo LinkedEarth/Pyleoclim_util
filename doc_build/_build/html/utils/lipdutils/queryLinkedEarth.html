@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>queryLinkedEarth (pyleoclim.utils.queryLinkedEarth) &mdash; Pyleoclim 0.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../core/ui.html">Series (pyleoclim.Series)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>queryLinkedEarth (pyleoclim.utils.queryLinkedEarth)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/utils/lipdutils/queryLinkedEarth.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="querylinkedearth-pyleoclim-utils-querylinkedearth">
+<span id="utils-querylinkedearth"></span><h1>queryLinkedEarth (pyleoclim.utils.queryLinkedEarth)<a class="headerlink" href="#querylinkedearth-pyleoclim-utils-querylinkedearth" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="pyleoclim.utils.queryLinkedEarth">
+<code class="sig-prename descclassname">pyleoclim.utils.</code><code class="sig-name descname">queryLinkedEarth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">archiveType</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">proxyObsType</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">infVarType</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">sensorGenus</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">sensorSpecies</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">interpName</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">interpDetail</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">ageUnits</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">ageBound</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">ageBoundType</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">recordLength</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">resolution</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">lat</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">lon</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">alt</span><span class="o">=</span><span class="default_value">[]</span></em>, <em class="sig-param"><span class="n">print_response</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">download_lipd</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">download_folder</span><span class="o">=</span><span class="default_value">'default'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/lipdutils.html#queryLinkedEarth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.queryLinkedEarth" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function allows to query the LinkedEarth wiki for records.</p>
+<p>This function allows to query the LinkedEarth wiki for specific catagories.
+If you have more than one keyword per catagory, enter them in a list. If you don’t
+wish to use a particular terms, leave a blank in-between the brackets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>archiveType</strong> (<em>list of strings</em>) – The type of archive (enter all query terms, separated by a comma)</p></li>
+<li><p><strong>proxyObsType</strong> (<em>list of strings</em>) – The type of proxy observation (enter all query terms, separated by a comma)</p></li>
+<li><p><strong>infVarType</strong> (<em>list of strings</em>) – The type of inferred variable (enter all query terms, separated by a comma)</p></li>
+<li><p><strong>sensorGenus</strong> (<em>list of strings</em>) – The Genus of the sensor (enter all query terms, separated by a comma)</p></li>
+<li><p><strong>sensorSpecies</strong> (<em>list of strings</em>) – The Species of the sensor (enter all query terms, separated by a comma)</p></li>
+<li><p><strong>interpName</strong> (<em>list of strings</em>) – The name of the interpretation (enter all query terms, separated by a comma)</p></li>
+<li><p><strong>interpDetail</strong> (<em>list of strings</em>) – The detail of the interpretation (enter all query terms, separated by a comma)</p></li>
+<li><p><strong>ageUnits</strong> (<em>list of strings</em>) – The units of in which the age (year) is expressed in.
+Warning: Separate each query if need to run across multiple age queries (i.e., yr B.P. vs kyr B.P.). If the units are different but the meaning is the same (e.g., yr B.P. vs yr BP, enter all search terms separated by a comma).</p></li>
+<li><p><strong>ageBound</strong> (<em>list of floats</em>) – Enter the minimum and maximum age value to search for.
+Warning: You MUST enter a minimum AND maximum value. If you wish to perform a query such as “all ages before 2000 A.D.”, enter a minimum value of -99999 to cover all bases.</p></li>
+<li><p><strong>ageBoundType</strong> (<em>list of strings</em>) – The type of querying to perform. Possible values include: “any”, “entire”, and “entirely”.
+- any: Overlap any portions of matching datasets (default)
+- entirely: are entirely overlapped by matching datasets
+- entire: overlap entire matching datasets but dataset can be shorter than the bounds</p></li>
+<li><p><strong>recordLength</strong> (<em>list of floats</em>) – The minimum length the record needs to have while matching the ageBound criteria. For instance, “look for all records between 3000 and 6000 year BP with a record length of at least 1500 year”.</p></li>
+<li><p><strong>resolution</strong> (<em>list of floats</em>) – The maximum resolution of the resord. Resolution has the same units as age/year. For instance, “look for all records with a resolution of at least 100 years”.
+Warning: Resolution applies to specific variables rather than an entire dataset. Imagine the case where some measurements are made every cm while others are made every 5cm. If you require a specific variable to have the needed resolution, make sure that either the proxyObservationType, inferredVariableType, and/or Interpretation fields are completed.</p></li>
+<li><p><strong>lat</strong> (<em>list of floats</em>) – The minimum and maximum latitude. South is expressed with negative numbers.
+Warning: You MUST enter a minimum AND maximum value. If you wish to perform a query looking for records from the Northern Hemisphere, enter [0,90].</p></li>
+<li><p><strong>lon</strong> (<em>list of floats</em>) – The minimum and maximum longitude. West is expressed with negative numbers.
+Warning: You MUST enter a minimum AND a maximum value. If you wish to perform a query looking for records from the Western Hemisphere, enter [-180,0].</p></li>
+<li><p><strong>alt</strong> (<em>list of floats</em>) – The minimum and maximum altitude. Depth below sea level is expressed as negative numbers.
+Warning: You MUST enter a minimum AND a maximum value. If you wish to perform a query looking for records below a certain depth (e.g., 500), enter [-99999,-500].</p></li>
+<li><p><strong>print_response</strong> (<em>bool</em>) – If True, prints the URLs to the matching LiPD files</p></li>
+<li><p><strong>download_lipd</strong> (<em>bool</em>) – If True, download the matching LiPD files</p></li>
+<li><p><strong>download_folder</strong> (<em>string</em>) – Location to download the LiPD files. If “default”, will download in the current directory.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>res</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>the response to the query</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyleoclim</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># variables and parameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">archiveType</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;marine sediment&quot;</span><span class="p">,</span><span class="s2">&quot;Marine Sediment&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">proxyObsType</span><span class="o">=</span><span class="p">[</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">infVarType</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Sea Surface Temperature&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sensorGenus</span><span class="o">=</span><span class="p">[</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sensorSpecies</span><span class="o">=</span><span class="p">[</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">interpName</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span><span class="s2">&quot;Temperature&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">interpDetail</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sea surface&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ageUnits</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;kyr BP&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ageBound</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ageBoundType</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;any&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recordLength</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">resolution</span><span class="o">=</span><span class="p">[</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lat</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">14</span><span class="p">,</span><span class="mf">1.5</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lon</span><span class="o">=</span><span class="p">[</span><span class="mi">110</span><span class="p">,</span><span class="mi">135</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">alt</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">10000</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">queryLinkedEarth</span><span class="p">(</span><span class="n">archiveType</span><span class="o">=</span><span class="n">archiveType</span><span class="p">,</span> <span class="n">proxyObsType</span><span class="o">=</span><span class="n">proxyObsType</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">infVarType</span> <span class="o">=</span> <span class="n">infVarType</span><span class="p">,</span> <span class="n">sensorGenus</span><span class="o">=</span><span class="n">sensorGenus</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">sensorSpecies</span><span class="o">=</span><span class="n">sensorSpecies</span><span class="p">,</span> <span class="n">interpName</span><span class="o">=</span><span class="n">interpName</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">interpDetail</span> <span class="o">=</span><span class="n">interpDetail</span><span class="p">,</span> <span class="n">ageUnits</span> <span class="o">=</span> <span class="n">ageUnits</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">ageBound</span> <span class="o">=</span> <span class="n">ageBound</span><span class="p">,</span> <span class="n">ageBoundType</span> <span class="o">=</span> <span class="n">ageBoundType</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">recordLength</span> <span class="o">=</span> <span class="n">recordLength</span><span class="p">,</span> <span class="n">resolution</span> <span class="o">=</span> <span class="n">resolution</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">lat</span> <span class="o">=</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="o">=</span> <span class="n">lon</span><span class="p">,</span> <span class="n">alt</span> <span class="o">=</span> <span class="n">alt</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">print_response</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">download_lipd</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>                    <span class="n">download_folder</span> <span class="o">=</span> <span class="s1">&#39;./lipd&#39;</span><span class="p">)</span>
+<span class="go">http://wiki.linked.earth/Special:URIResolver/MD01-2D2378.Xu.2008</span>
+<span class="go">http://wiki.linked.earth/Special:URIResolver/GeoB10069-2D3.Gibbons.2014</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

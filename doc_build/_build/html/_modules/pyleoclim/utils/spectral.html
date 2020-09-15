@@ -1,0 +1,1026 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyleoclim.utils.spectral &mdash; Pyleoclim 0.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/ui.html">Series (pyleoclim.Series)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils/introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyleoclim.utils.spectral</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyleoclim.utils.spectral</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Tue Feb 25 09:23:29 2020</span>
+
+<span class="sd">@author: deborahkhider</span>
+
+<span class="sd">Sectral analysis functions</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+<span class="kn">import</span> <span class="nn">nitime.algorithms</span> <span class="k">as</span> <span class="nn">nialg</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;wwz_psd&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mtm&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;lomb_scargle&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;welch&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;periodogram&#39;</span>
+<span class="p">]</span>
+
+<span class="kn">from</span> <span class="nn">.tsutils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">is_evenly_spaced</span><span class="p">,</span>
+    <span class="n">preprocess</span><span class="p">,</span>
+    <span class="n">clean_ts</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">.wavelet</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">make_freq_vector</span><span class="p">,</span>
+    <span class="n">prepare_wwz</span><span class="p">,</span>
+    <span class="n">wwz</span><span class="p">,</span>
+    <span class="n">wwa2psd</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1">#from .tsutils import clean_ts, interp, bin_values</span>
+
+<span class="c1">#-----------</span>
+<span class="c1">#Wrapper</span>
+<span class="c1">#-----------</span>
+
+<span class="c1">#---------</span>
+<span class="c1">#Main functions</span>
+<span class="c1">#---------</span>
+
+
+<div class="viewcode-block" id="welch"><a class="viewcode-back" href="../../../utils/spectral/welch.html#pyleoclim.utils.welch">[docs]</a><span class="k">def</span> <span class="nf">welch</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hann&#39;</span><span class="p">,</span><span class="n">nperseg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+           <span class="n">return_onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sg_kwargs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+           <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+           <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;density&#39;</span><span class="p">,</span> <span class="n">average</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Estimate power spectral density using Welch&#39;s method</span>
+
+<span class="sd">    Wrapper for the function implemented in scipy.signal.welch</span>
+<span class="sd">    See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html for details.</span>
+
+<span class="sd">    Welch&#39;s method is an approach for spectral density estimation. It computes an estimate of the power spectral density by dividing the data into overlapping segments, computing a modified periodogram for each segment and averaging the periodograms.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    ys : array</span>
+<span class="sd">        a time series</span>
+<span class="sd">    ts : array</span>
+<span class="sd">        time axis of the time series</span>
+<span class="sd">    window : string or tuple</span>
+<span class="sd">        Desired window to use. Possible values:</span>
+<span class="sd">            - boxcar</span>
+<span class="sd">            - triang</span>
+<span class="sd">            - blackman</span>
+<span class="sd">            - hamming</span>
+<span class="sd">            - hann (default)</span>
+<span class="sd">            - bartlett</span>
+<span class="sd">            - flattop</span>
+<span class="sd">            - parzen</span>
+<span class="sd">            - bohman</span>
+<span class="sd">            - blackmanharris</span>
+<span class="sd">            - nuttail</span>
+<span class="sd">            - barthann</span>
+<span class="sd">            - kaiser (needs beta)</span>
+<span class="sd">            - gaussian (needs standard deviation)</span>
+<span class="sd">            - general_gaussian (needs power, width)</span>
+<span class="sd">            - slepian (needs width)</span>
+<span class="sd">            - dpss (needs normalized half-bandwidth)</span>
+<span class="sd">            - chebwin (needs attenuation)</span>
+<span class="sd">            - exponential (needs decay scale)</span>
+<span class="sd">            - tukey (needs taper fraction)</span>
+<span class="sd">        If the window requires no parameters, then window can be a string.</span>
+<span class="sd">        If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.</span>
+<span class="sd">        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.</span>
+<span class="sd">      nperseg : int</span>
+<span class="sd">          Length of each segment. If none, nperseg=len(ys)/2. Default to None This will give three segments with 50% overlap</span>
+<span class="sd">      noverlap : int</span>
+<span class="sd">          Number of points to overlap. If None, noverlap=nperseg//2. Defaults to None, represents 50% overlap</span>
+<span class="sd">      nfft: int</span>
+<span class="sd">          Length of the FFT used, if a zero padded FFT is desired. If None, the FFT length is nperseg</span>
+<span class="sd">      return_onesided : bool</span>
+<span class="sd">          If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Defaults to True, but for complex data, a two-sided spectrum is always returned.</span>
+<span class="sd">      detrend : str</span>
+<span class="sd">          If None, no detrending is applied. Available detrending methods:</span>
+<span class="sd">              - None - no detrending will be applied (default);</span>
+<span class="sd">              - linear - a linear least-squares fit to `ys` is subtracted;</span>
+<span class="sd">              - constant - the mean of `ys` is subtracted</span>
+<span class="sd">              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.</span>
+<span class="sd">              - emd - Empirical mode decomposition</span>
+<span class="sd">      sg_kwargs : dict</span>
+<span class="sd">          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</span>
+<span class="sd">      gaussianize : bool</span>
+<span class="sd">          If True, gaussianizes the timeseries</span>
+<span class="sd">      standardize : bool</span>
+<span class="sd">          If True, standardizes the timeseries</span>
+<span class="sd">      scaling : {&quot;density,&quot;spectrum}</span>
+<span class="sd">          Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density&#39;</span>
+<span class="sd">      average : {&#39;mean&#39;,&#39;median&#39;}</span>
+<span class="sd">          Method to use when averaging periodograms. Defaults to ‘mean’.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res_dict : dict</span>
+<span class="sd">        the result dictionary, including</span>
+<span class="sd">        - freq (array): the frequency vector</span>
+<span class="sd">        - psd (array): the spectral density vector</span>
+
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    periodogram : Estimate power spectral density using a periodogram</span>
+<span class="sd">    mtm : Retuns spectral density using a multi-taper method</span>
+<span class="sd">    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm</span>
+<span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method.</span>
+<span class="sd">    utils.filter.savitzy_golay : Filtering using Savitzy-Golay</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    P. Welch, “The use of the fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms”, IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. plot::</span>
+<span class="sd">        :context: close-figs</span>
+
+<span class="sd">        &gt;&gt;&gt; from pyleoclim import utils</span>
+<span class="sd">        &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; # Create a signal</span>
+<span class="sd">        &gt;&gt;&gt; time = np.arange(2001)</span>
+<span class="sd">        &gt;&gt;&gt; f = 1/50</span>
+<span class="sd">        &gt;&gt;&gt; signal = np.cos(2*np.pi*f*time)</span>
+<span class="sd">        &gt;&gt;&gt; # Spectral Analysis</span>
+<span class="sd">        &gt;&gt;&gt; res = utils.welch(signal, time)</span>
+<span class="sd">        &gt;&gt;&gt; # plot</span>
+<span class="sd">        &gt;&gt;&gt; fig = plt.loglog(</span>
+<span class="sd">        ...           res[&#39;freq&#39;],</span>
+<span class="sd">        ...           res[&#39;psd&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; plt.xlabel(&#39;Frequency&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.ylabel(&#39;PSD&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.show()</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ys</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Time and value axis should be the same length&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">nperseg</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">nperseg</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ys</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># remove NaNs</span>
+    <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">clean_ts</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span><span class="n">ts</span><span class="p">)</span>
+    <span class="c1"># check for evenly-spaced</span>
+    <span class="n">check</span> <span class="o">=</span> <span class="n">is_evenly_spaced</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">check</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For the Welch method, data should be evenly spaced&#39;</span><span class="p">)</span>
+    <span class="c1"># preprocessing</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="n">sg_kwargs</span><span class="p">,</span>
+               <span class="n">gaussianize</span><span class="o">=</span><span class="n">gaussianize</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="n">standardize</span><span class="p">)</span>
+
+
+    <span class="c1"># calculate sampling frequency fs</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts</span><span class="p">))</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dt</span>
+
+    <span class="c1"># spectral analysis with scipy welch</span>
+    <span class="n">freq</span><span class="p">,</span> <span class="n">psd</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">welch</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span><span class="n">nperseg</span><span class="o">=</span><span class="n">nperseg</span><span class="p">,</span><span class="n">noverlap</span><span class="o">=</span><span class="n">noverlap</span><span class="p">,</span>
+                             <span class="n">nfft</span><span class="o">=</span><span class="n">nfft</span><span class="p">,</span> <span class="n">return_onesided</span><span class="o">=</span><span class="n">return_onesided</span><span class="p">,</span> <span class="n">scaling</span><span class="o">=</span><span class="n">scaling</span><span class="p">,</span>
+                             <span class="n">average</span><span class="o">=</span><span class="n">average</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># fix zero frequency point</span>
+    <span class="k">if</span> <span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">psd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="c1"># output result</span>
+    <span class="n">res_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;freq&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span>
+        <span class="s1">&#39;psd&#39;</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">psd</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">res_dict</span></div>
+
+
+<div class="viewcode-block" id="mtm"><a class="viewcode-back" href="../../../utils/spectral/mtm.html#pyleoclim.utils.mtm">[docs]</a><span class="k">def</span> <span class="nf">mtm</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">NW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">BW</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+           <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">adaptive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">jackknife</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+           <span class="n">low_bias</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sides</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Retuns spectral density using a multi-taper method.</span>
+
+
+<span class="sd">    Based on the function in the time series analysis for neuroscience toolbox: http://nipy.org/nitime/api/generated/nitime.algorithms.spectral.html</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    ys : array</span>
+<span class="sd">        a time series</span>
+<span class="sd">    ts : array</span>
+<span class="sd">        time axis of the time series</span>
+<span class="sd">    NW : float</span>
+<span class="sd">        The normalized half-bandwidth of the data tapers, indicating a</span>
+<span class="sd">        multiple of the fundamental frequency of the DFT (Fs/N).</span>
+<span class="sd">        Common choices are n/2, for n &gt;= 4.</span>
+<span class="sd">    BW : float</span>
+<span class="sd">        The sampling-relative bandwidth of the data tapers</span>
+<span class="sd">    detrend : str</span>
+<span class="sd">          If None, no detrending is applied. Available detrending methods:</span>
+<span class="sd">              - None - no detrending will be applied (default);</span>
+<span class="sd">              - linear - a linear least-squares fit to `ys` is subtracted;</span>
+<span class="sd">              - constant - the mean of `ys` is subtracted</span>
+<span class="sd">              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.</span>
+<span class="sd">              - emd - Empirical mode decomposition</span>
+<span class="sd">      sg_kwargs : dict</span>
+<span class="sd">          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</span>
+<span class="sd">      gaussianize : bool</span>
+<span class="sd">          If True, gaussianizes the timeseries</span>
+<span class="sd">      standardize : bool</span>
+<span class="sd">          If True, standardizes the timeseries</span>
+<span class="sd">      adaptive : {True/False}</span>
+<span class="sd">          Use an adaptive weighting routine to combine the PSD estimates of</span>
+<span class="sd">          different tapers.</span>
+<span class="sd">      jackknife : {True/False}</span>
+<span class="sd">          Use the jackknife method to make an estimate of the PSD variance</span>
+<span class="sd">          at each point.</span>
+<span class="sd">      low_bias : {True/False}</span>
+<span class="sd">          Rather than use 2NW tapers, only use the tapers that have better than</span>
+<span class="sd">          90% spectral concentration within the bandwidth (still using</span>
+<span class="sd">          a maximum of 2NW tapers)</span>
+<span class="sd">      sides : str (optional)   [ &#39;default&#39; | &#39;onesided&#39; | &#39;twosided&#39; ]</span>
+<span class="sd">          This determines which sides of the spectrum to return.</span>
+<span class="sd">          For complex-valued inputs, the default is two-sided, for real-valued</span>
+<span class="sd">          inputs, default is one-sided Indicates whether to return a one-sided</span>
+<span class="sd">          or two-sided</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    res_dict : dict</span>
+<span class="sd">        the result dictionary, including</span>
+<span class="sd">        - freq (array): the frequency vector</span>
+<span class="sd">        - psd (array): the spectral density vector</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    periodogram : Estimate power spectral density using a periodogram</span>
+<span class="sd">    welch : Retuns spectral density using the welch method</span>
+<span class="sd">    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm</span>
+<span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method.</span>
+<span class="sd">    utils.filter.savitzy_golay : Filtering using Savitzy-Golay</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. plot::</span>
+<span class="sd">        :context: close-figs</span>
+
+<span class="sd">        &gt;&gt;&gt; from pyleoclim import utils</span>
+<span class="sd">        &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; # Create a signal</span>
+<span class="sd">        &gt;&gt;&gt; time = np.arange(2001)</span>
+<span class="sd">        &gt;&gt;&gt; f = 1/50</span>
+<span class="sd">        &gt;&gt;&gt; signal = np.cos(2*np.pi*f*time)</span>
+<span class="sd">        &gt;&gt;&gt; # Spectral Analysis</span>
+<span class="sd">        &gt;&gt;&gt; res = utils.mtm(signal, time)</span>
+<span class="sd">        &gt;&gt;&gt; # plot</span>
+<span class="sd">        &gt;&gt;&gt; fig = plt.loglog(</span>
+<span class="sd">        ...           res[&#39;freq&#39;],</span>
+<span class="sd">        ...           res[&#39;psd&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; plt.xlabel(&#39;Frequency&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.ylabel(&#39;PSD&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.show()</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># preprocessing</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ys</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Time and value axis should be the same length&#39;</span><span class="p">)</span>
+
+    <span class="c1"># remove NaNs</span>
+    <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">clean_ts</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span><span class="n">ts</span><span class="p">)</span>
+    <span class="c1"># check for evenly-spaced</span>
+    <span class="n">check</span> <span class="o">=</span> <span class="n">is_evenly_spaced</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">check</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For the MTM method, data should be evenly spaced&#39;</span><span class="p">)</span>
+    <span class="c1"># preprocessing</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="n">sg_kwargs</span><span class="p">,</span>
+               <span class="n">gaussianize</span><span class="o">=</span><span class="n">gaussianize</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="n">standardize</span><span class="p">)</span>
+
+
+    <span class="c1"># calculate sampling frequency fs</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts</span><span class="p">))</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dt</span>
+
+    <span class="c1"># spectral analysis</span>
+    <span class="n">freq</span><span class="p">,</span> <span class="n">psd</span><span class="p">,</span> <span class="n">nu</span> <span class="o">=</span> <span class="n">nialg</span><span class="o">.</span><span class="n">multi_taper_psd</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">Fs</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span> <span class="n">NW</span><span class="o">=</span><span class="n">NW</span><span class="p">,</span> <span class="n">BW</span><span class="o">=</span><span class="n">BW</span><span class="p">,</span><span class="n">adaptive</span><span class="o">=</span><span class="n">adaptive</span><span class="p">,</span>
+                                          <span class="n">jackknife</span><span class="o">=</span><span class="n">jackknife</span><span class="p">,</span> <span class="n">low_bias</span><span class="o">=</span><span class="n">low_bias</span><span class="p">,</span>
+                                          <span class="n">sides</span><span class="o">=</span><span class="n">sides</span><span class="p">,</span><span class="n">NFFT</span><span class="o">=</span><span class="n">nfft</span><span class="p">)</span>  <span class="c1"># call nitime func</span>
+
+    <span class="c1"># fix the zero frequency point</span>
+    <span class="k">if</span> <span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">psd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="c1"># output result</span>
+    <span class="n">res_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;freq&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span>
+        <span class="s1">&#39;psd&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">psd</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">res_dict</span></div>
+
+
+<div class="viewcode-block" id="lomb_scargle"><a class="viewcode-back" href="../../../utils/spectral/lombscargle.html#pyleoclim.utils.lomb_scargle">[docs]</a><span class="k">def</span> <span class="nf">lomb_scargle</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_method</span><span class="o">=</span><span class="s1">&#39;lomb-scargle&#39;</span><span class="p">,</span>
+                 <span class="n">freq_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n50</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hann&#39;</span><span class="p">,</span>
+                 <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">average</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Return the computed periodogram using lomb-scargle algorithm</span>
+
+<span class="sd">    Uses the lombscargle implementation from scipy.signal: https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    ys : array</span>
+<span class="sd">        a time series</span>
+<span class="sd">    ts : array</span>
+<span class="sd">        time axis of the time series</span>
+<span class="sd">    freq : str or array</span>
+<span class="sd">        vector of frequency.</span>
+<span class="sd">        If string, uses the following method:</span>
+<span class="sd">    freq_method : str</span>
+<span class="sd">        Method to generate the frequency vector if not set directly. The following options are avialable:</span>
+<span class="sd">            - log</span>
+<span class="sd">            - lomb-scargle (default)</span>
+<span class="sd">            - welch</span>
+<span class="sd">            - scale</span>
+<span class="sd">            - nfft</span>
+<span class="sd">        See utils.wavelet.make_freq_vector for details</span>
+<span class="sd">    freq_kwargs : dict</span>
+<span class="sd">        Arguments for the method chosen in freq_method. See specific functions in utils.wavelet for details</span>
+<span class="sd">        By default, uses dt=median(ts), ofac=4 and hifac=1 for Lomb-Scargle</span>
+<span class="sd">    n50: int</span>
+<span class="sd">        The number of 50% overlapping segment to apply</span>
+<span class="sd">    window : str or tuple</span>
+<span class="sd">        Desired window to use. Possible values:</span>
+<span class="sd">            - boxcar</span>
+<span class="sd">            - triang</span>
+<span class="sd">            - blackman</span>
+<span class="sd">            - hamming</span>
+<span class="sd">            - hann (default)</span>
+<span class="sd">            - bartlett</span>
+<span class="sd">            - flattop</span>
+<span class="sd">            - parzen</span>
+<span class="sd">            - bohman</span>
+<span class="sd">            - blackmanharris</span>
+<span class="sd">            - nuttail</span>
+<span class="sd">            - barthann</span>
+<span class="sd">            - kaiser (needs beta)</span>
+<span class="sd">            - gaussian (needs standard deviation)</span>
+<span class="sd">            - general_gaussian (needs power, width)</span>
+<span class="sd">            - slepian (needs width)</span>
+<span class="sd">            - dpss (needs normalized half-bandwidth)</span>
+<span class="sd">            - chebwin (needs attenuation)</span>
+<span class="sd">            - exponential (needs decay scale)</span>
+<span class="sd">            - tukey (needs taper fraction)</span>
+<span class="sd">        If the window requires no parameters, then window can be a string.</span>
+<span class="sd">        If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.</span>
+<span class="sd">        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.</span>
+<span class="sd">     detrend : str</span>
+<span class="sd">          If None, no detrending is applied. Available detrending methods:</span>
+<span class="sd">              - None - no detrending will be applied (default);</span>
+<span class="sd">              - linear - a linear least-squares fit to `ys` is subtracted;</span>
+<span class="sd">              - constant - the mean of `ys` is subtracted</span>
+<span class="sd">              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.</span>
+<span class="sd">              - emd - Empirical mode decomposition</span>
+<span class="sd">      sg_kwargs : dict</span>
+<span class="sd">          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</span>
+<span class="sd">      gaussianize : bool</span>
+<span class="sd">          If True, gaussianizes the timeseries</span>
+<span class="sd">      standardize : bool</span>
+<span class="sd">          If True, standardizes the timeseriesprep_args : dict</span>
+<span class="sd">      average : {&#39;mean&#39;,&#39;median&#39;}</span>
+<span class="sd">          Method to use when averaging periodograms. Defaults to ‘mean’.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    res_dict : dict</span>
+<span class="sd">        the result dictionary, including</span>
+<span class="sd">        - freq (array): the frequency vector</span>
+<span class="sd">        - psd (array): the spectral density vector</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    periodogram : Estimate power spectral density using a periodogram</span>
+<span class="sd">    mtm : Retuns spectral density using a multi-taper method</span>
+<span class="sd">    welch : Returns power spectral density using the Welch method</span>
+<span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method.</span>
+<span class="sd">    utils.filter.savitzy_golay : Filtering using Savitzy-Golay</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Lomb, N. R. (1976). Least-squares frequency analysis of unequally spaced data. Astrophysics and Space Science 39, 447-462.</span>
+
+<span class="sd">    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.</span>
+
+<span class="sd">    Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. plot::</span>
+<span class="sd">        :context: close-figs</span>
+
+<span class="sd">        &gt;&gt;&gt; from pyleoclim import utils</span>
+<span class="sd">        &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; # Create a signal</span>
+<span class="sd">        &gt;&gt;&gt; time = np.arange(2001)</span>
+<span class="sd">        &gt;&gt;&gt; f = 1/50</span>
+<span class="sd">        &gt;&gt;&gt; signal = np.cos(2*np.pi*f*time)</span>
+<span class="sd">        &gt;&gt;&gt; # Spectral Analysis</span>
+<span class="sd">        &gt;&gt;&gt; res = utils.lomb_scargle(signal, time)</span>
+<span class="sd">        &gt;&gt;&gt; # plot</span>
+<span class="sd">        &gt;&gt;&gt; fig = plt.loglog(</span>
+<span class="sd">        ...           res[&#39;freq&#39;],</span>
+<span class="sd">        ...           res[&#39;psd&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; plt.xlabel(&#39;Frequency&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.ylabel(&#39;PSD&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.show()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ys</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Time and value axis should be the same length&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">n50</span><span class="o">&lt;=</span><span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Number of overlapping segments should be greater than 1&#39;</span><span class="p">)</span>
+
+    <span class="c1"># remove NaNs</span>
+    <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">clean_ts</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span><span class="n">ts</span><span class="p">)</span>
+
+    <span class="c1"># preprocessing</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="n">sg_kwargs</span><span class="p">,</span>
+               <span class="n">gaussianize</span><span class="o">=</span><span class="n">gaussianize</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="n">standardize</span><span class="p">)</span>
+
+    <span class="c1"># divide into segments</span>
+    <span class="n">nseg</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">n50</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">),</span><span class="n">nseg</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="c1">#make it ends at the time series</span>
+
+    <span class="n">ts_seg</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">ys_seg</span><span class="o">=</span><span class="p">[]</span>
+
+
+    <span class="k">if</span> <span class="n">n50</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="n">ts_seg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">2</span><span class="p">]])</span>
+            <span class="n">ys_seg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ys</span><span class="p">[</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="p">]:</span><span class="n">index</span><span class="p">[</span><span class="n">idx</span><span class="o">+</span><span class="mi">2</span><span class="p">]])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ts_seg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+        <span class="n">ys_seg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
+        
+    <span class="c1"># calculate the frequency vector if needed</span>
+    <span class="k">if</span> <span class="n">freq</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">freq_kwargs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">freq_kwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">freq_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s1">&#39;dt&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">freq_kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts</span><span class="p">))</span>
+            <span class="n">freq_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;dt&#39;</span><span class="p">:</span><span class="n">dt</span><span class="p">})</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="n">make_freq_vector</span><span class="p">(</span><span class="n">ts_seg</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                <span class="n">method</span><span class="o">=</span><span class="n">freq_method</span><span class="p">,</span>
+                                <span class="o">**</span><span class="n">freq_kwargs</span><span class="p">)</span>
+
+    <span class="n">freq_angular</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">freq</span>
+
+    <span class="c1"># fix the zero frequency point</span>
+    <span class="c1">#if freq[0] == 0:</span>
+        <span class="c1">#freq_copy = freq[1:]</span>
+        <span class="c1">#freq_angular = 2 * np.pi * freq_copy</span>
+
+    <span class="n">psd_seg</span><span class="o">=</span><span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ys_seg</span><span class="p">):</span>
+        <span class="n">psd_seg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">lombscargle</span><span class="p">(</span><span class="n">ts_seg</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                                          <span class="n">item</span><span class="o">*</span><span class="n">signal</span><span class="o">.</span><span class="n">get_window</span><span class="p">(</span><span class="n">window</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">ts_seg</span><span class="p">[</span><span class="n">idx</span><span class="p">])),</span>
+                                          <span class="n">freq_angular</span><span class="p">))</span>
+
+    <span class="c1"># average them up</span>
+    <span class="k">if</span> <span class="n">average</span><span class="o">==</span><span class="s1">&#39;mean&#39;</span><span class="p">:</span>
+        <span class="n">psd</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">psd_seg</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">average</span><span class="o">==</span><span class="s1">&#39;median&#39;</span><span class="p">:</span>
+        <span class="n">psd</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">psd_seg</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Average should either be set to mean or median&#39;</span><span class="p">)</span>
+
+    <span class="c1">#if freq[0] == 0:</span>
+        <span class="c1">#psd = np.insert(psd, 0, np.nan)</span>
+
+    <span class="c1"># output result</span>
+    <span class="n">res_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;freq&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span>
+        <span class="s1">&#39;psd&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">psd</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">res_dict</span></div>
+
+
+<div class="viewcode-block" id="periodogram"><a class="viewcode-back" href="../../../utils/spectral/periodogram.html#pyleoclim.utils.periodogram">[docs]</a><span class="k">def</span> <span class="nf">periodogram</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="s1">&#39;hann&#39;</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+           <span class="n">return_onesided</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">detrend</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+           <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+           <span class="n">scaling</span><span class="o">=</span><span class="s1">&#39;density&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Estimate power spectral density using a periodogram</span>
+
+<span class="sd">    Based on the function from scipy: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.periodogram.html</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    ys : array</span>
+<span class="sd">        a time series</span>
+<span class="sd">    ts : array</span>
+<span class="sd">        time axis of the time series</span>
+<span class="sd">    window : string or tuple</span>
+<span class="sd">        Desired window to use. Possible values:</span>
+<span class="sd">            - boxcar (default)</span>
+<span class="sd">            - triang</span>
+<span class="sd">            - blackman</span>
+<span class="sd">            - hamming</span>
+<span class="sd">            - hann</span>
+<span class="sd">            - bartlett</span>
+<span class="sd">            - flattop</span>
+<span class="sd">            - parzen</span>
+<span class="sd">            - bohman</span>
+<span class="sd">            - blackmanharris</span>
+<span class="sd">            - nuttail</span>
+<span class="sd">            - barthann</span>
+<span class="sd">            - kaiser (needs beta)</span>
+<span class="sd">            - gaussian (needs standard deviation)</span>
+<span class="sd">            - general_gaussian (needs power, width)</span>
+<span class="sd">            - slepian (needs width)</span>
+<span class="sd">            - dpss (needs normalized half-bandwidth)</span>
+<span class="sd">            - chebwin (needs attenuation)</span>
+<span class="sd">            - exponential (needs decay scale)</span>
+<span class="sd">            - tukey (needs taper fraction)</span>
+<span class="sd">        If the window requires no parameters, then window can be a string.</span>
+<span class="sd">        If the window requires parameters, then window must be a tuple with the first argument the string name of the window, and the next arguments the needed parameters.</span>
+<span class="sd">        If window is a floating point number, it is interpreted as the beta parameter of the kaiser window.</span>
+<span class="sd">      nfft: int</span>
+<span class="sd">          Length of the FFT used, if a zero padded FFT is desired. If None, the FFT length is nperseg</span>
+<span class="sd">      return_onesided : bool</span>
+<span class="sd">          If True, return a one-sided spectrum for real data. If False return a two-sided spectrum. Defaults to True, but for complex data, a two-sided spectrum is always returned.</span>
+<span class="sd">      detrend : str</span>
+<span class="sd">          If None, no detrending is applied. Available detrending methods:</span>
+<span class="sd">              - None - no detrending will be applied (default);</span>
+<span class="sd">              - linear - a linear least-squares fit to `ys` is subtracted;</span>
+<span class="sd">              - constant - the mean of `ys` is subtracted</span>
+<span class="sd">              - savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.</span>
+<span class="sd">              - emd - Empirical mode decomposition</span>
+<span class="sd">      sg_kwargs : dict</span>
+<span class="sd">          The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</span>
+<span class="sd">      gaussianize : bool</span>
+<span class="sd">          If True, gaussianizes the timeseries</span>
+<span class="sd">      standardize : bool</span>
+<span class="sd">          If True, standardizes the timeseries</span>
+<span class="sd">      scaling : {&quot;density,&quot;spectrum}</span>
+<span class="sd">          Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density&#39;</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    res_dict : dict</span>
+<span class="sd">        the result dictionary, including</span>
+<span class="sd">        - freq (array): the frequency vector</span>
+<span class="sd">        - psd (array): the spectral density vector</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    welch : Estimate power spectral density using the welch method</span>
+<span class="sd">    mtm : Retuns spectral density using a multi-taper method</span>
+<span class="sd">    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm</span>
+<span class="sd">    wwz_psd : Return the psd of a timeseries using wwz method.</span>
+<span class="sd">    utils.filter.savitzy_golay : Filtering using Savitzy-Golay</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. plot::</span>
+<span class="sd">        :context: close-figs</span>
+
+<span class="sd">        &gt;&gt;&gt; from pyleoclim import utils</span>
+<span class="sd">        &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; # Create a signal</span>
+<span class="sd">        &gt;&gt;&gt; time = np.arange(2001)</span>
+<span class="sd">        &gt;&gt;&gt; f = 1/50</span>
+<span class="sd">        &gt;&gt;&gt; signal = np.cos(2*np.pi*f*time)</span>
+<span class="sd">        &gt;&gt;&gt; # Spectral Analysis</span>
+<span class="sd">        &gt;&gt;&gt; res = utils.periodogram(signal, time)</span>
+<span class="sd">        &gt;&gt;&gt; # plot</span>
+<span class="sd">        &gt;&gt;&gt; fig = plt.loglog(</span>
+<span class="sd">        ...           res[&#39;freq&#39;],</span>
+<span class="sd">        ...           res[&#39;psd&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; plt.xlabel(&#39;Frequency&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.ylabel(&#39;PSD&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.show()</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ys</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Time and value axis should be the same length&#39;</span><span class="p">)</span>
+
+        <span class="c1"># remove NaNs</span>
+    <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">clean_ts</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span><span class="n">ts</span><span class="p">)</span>
+    <span class="c1"># check for evenly-spaced</span>
+    <span class="n">check</span> <span class="o">=</span> <span class="n">is_evenly_spaced</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">check</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;For the Periodogram method, data should be evenly spaced&#39;</span><span class="p">)</span>
+    <span class="c1"># preprocessing</span>
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">preprocess</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="n">sg_kwargs</span><span class="p">,</span>
+               <span class="n">gaussianize</span><span class="o">=</span><span class="n">gaussianize</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="n">standardize</span><span class="p">)</span>
+
+    <span class="c1"># calculate sampling frequency fs</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts</span><span class="p">))</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dt</span>
+
+    <span class="c1"># spectral analysis</span>
+    <span class="n">freq</span><span class="p">,</span> <span class="n">psd</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">periodogram</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="n">nfft</span><span class="p">,</span>
+                                   <span class="n">detrend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_onesided</span><span class="o">=</span><span class="n">return_onesided</span><span class="p">,</span>
+                                   <span class="n">scaling</span><span class="o">=</span><span class="n">scaling</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># fix the zero frequency point</span>
+    <span class="k">if</span> <span class="n">freq</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">psd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="c1"># output result</span>
+    <span class="n">res_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;freq&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">freq</span><span class="p">),</span>
+        <span class="s1">&#39;psd&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">psd</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">res_dict</span></div>
+
+
+<div class="viewcode-block" id="wwz_psd"><a class="viewcode-back" href="../../../utils/spectral/wwz_psd.html#pyleoclim.utils.wwz_psd">[docs]</a><span class="k">def</span> <span class="nf">wwz_psd</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_method</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">freq_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">nproc</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+            <span class="n">detrend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">standardize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">Neff</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">anti_alias</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">avgs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Return the psd of a timeseries using wwz method.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    ys : array</span>
+<span class="sd">        a time series, NaNs will be deleted automatically</span>
+<span class="sd">    ts : array</span>
+<span class="sd">        the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly</span>
+<span class="sd">    freq : array</span>
+<span class="sd">        vector of frequency</span>
+<span class="sd">    freq_method : str</span>
+<span class="sd">        Method to generate the frequency vector if not set directly. The following options are avialable:</span>
+<span class="sd">            - log (default)</span>
+<span class="sd">            - lomb-scargle</span>
+<span class="sd">            - welch</span>
+<span class="sd">            - scale</span>
+<span class="sd">            - nfft</span>
+<span class="sd">        See utils.wavelet.make_freq_vector for details</span>
+<span class="sd">    freq_kwargs : dict</span>
+<span class="sd">        Arguments for the method chosen in freq_method. See specific functions in utils.wavelet for details</span>
+<span class="sd">    tau : array</span>
+<span class="sd">        the evenly-spaced time points, namely the time shift for wavelet analysis</span>
+<span class="sd">    c : float</span>
+<span class="sd">        the decay constant, the default value 1e-3 is good for most of the cases</span>
+<span class="sd">    nproc : int</span>
+<span class="sd">        the number of processes for multiprocessing</span>
+<span class="sd">    detrend : str</span>
+<span class="sd">        None - the original time series is assumed to have no trend;</span>
+<span class="sd">        &#39;linear&#39; - a linear least-squares fit to `ys` is subtracted;</span>
+<span class="sd">        &#39;constant&#39; - the mean of `ys` is subtracted</span>
+<span class="sd">        &#39;savitzy-golay&#39; - ys is filtered using the Savitzky-Golay</span>
+<span class="sd">               filters and the resulting filtered series is subtracted from y.</span>
+<span class="sd">    sg_kwargs : dict</span>
+<span class="sd">        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</span>
+<span class="sd">    gaussianize : bool</span>
+<span class="sd">        If True, gaussianizes the timeseries</span>
+<span class="sd">    standardize : bool</span>
+<span class="sd">        If True, standardizes the timeseries</span>
+<span class="sd">    method : string</span>
+<span class="sd">        &#39;Foster&#39; - the original WWZ method;</span>
+<span class="sd">        &#39;Kirchner&#39; - the method Kirchner adapted from Foster;</span>
+<span class="sd">        &#39;Kirchner_f2py&#39; - the method Kirchner adapted from Foster with f2py</span>
+<span class="sd">        &#39;default&#39; - the Numba version of the Kirchner algorithm will be called. Defaults to default</span>
+<span class="sd">    Neff : int</span>
+<span class="sd">        effective number of points</span>
+<span class="sd">    anti_alias : bool</span>
+<span class="sd">        If True, uses anti-aliasing</span>
+<span class="sd">    avgs : int</span>
+<span class="sd">        flag for whether spectrum is derived from instantaneous point measurements (avgs&lt;&gt;1)</span>
+<span class="sd">        OR from measurements averaged over each sampling interval (avgs==1)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    psd : array</span>
+<span class="sd">        power spectral density</span>
+<span class="sd">    freq : array</span>
+<span class="sd">        vector of frequency</span>
+<span class="sd">    psd_ar1_q95 : array</span>
+<span class="sd">        the 95% quantile of the psds of AR1 processes</span>
+<span class="sd">    psd_ar1 : array</span>
+<span class="sd">        the psds of AR1 processes</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    periodogram : Estimate power spectral density using a periodogram</span>
+<span class="sd">    mtm : Retuns spectral density using a multi-taper method</span>
+<span class="sd">    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm</span>
+<span class="sd">    welch : Estimate power spectral density using the Welch method</span>
+<span class="sd">    utils.filter.savitzy_golay : Filtering using Savitzy-Golay</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Foster, G. (1996). Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112(4), 1709-1729.</span>
+<span class="sd">    Kirchner, J. W. (2005). Aliasin in 1/f(alpha) noise spectra: origins, consequences, and remedies. Physical Review E covering statistical, nonlinear, biological, and soft matter physics, 71, 66110.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    .. plot::</span>
+<span class="sd">        :context: close-figs</span>
+
+<span class="sd">        &gt;&gt;&gt; from pyleoclim import utils</span>
+<span class="sd">        &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; # Create a signal</span>
+<span class="sd">        &gt;&gt;&gt; time = np.arange(2001)</span>
+<span class="sd">        &gt;&gt;&gt; f = 1/50</span>
+<span class="sd">        &gt;&gt;&gt; signal = np.cos(2*np.pi*f*time)</span>
+<span class="sd">        &gt;&gt;&gt; # Spectral Analysis</span>
+<span class="sd">        &gt;&gt;&gt; res = utils.wwz_psd(signal, time)</span>
+<span class="sd">        &gt;&gt;&gt; # plot</span>
+<span class="sd">        &gt;&gt;&gt; fig = plt.loglog(</span>
+<span class="sd">        ...           res[&#39;freq&#39;],</span>
+<span class="sd">        ...           res[&#39;psd&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; plt.xlabel(&#39;Frequency&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.ylabel(&#39;PSD&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; plt.show()</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">ys_cut</span><span class="p">,</span> <span class="n">ts_cut</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">tau</span> <span class="o">=</span> <span class="n">prepare_wwz</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span>
+                                            <span class="n">freq_method</span><span class="o">=</span><span class="n">freq_method</span><span class="p">,</span>
+                                            <span class="n">freq_kwargs</span><span class="o">=</span><span class="n">freq_kwargs</span><span class="p">,</span><span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
+
+    <span class="c1"># get wwa but AR1_q is not needed here so set nMC=0</span>
+    <span class="c1">#  wwa, _, _, coi, freq, _, Neffs, _ = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,</span>
+    <span class="n">res_wwz</span> <span class="o">=</span> <span class="n">wwz</span><span class="p">(</span><span class="n">ys_cut</span><span class="p">,</span> <span class="n">ts_cut</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">,</span> <span class="n">nproc</span><span class="o">=</span><span class="n">nproc</span><span class="p">,</span> <span class="n">nMC</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+              <span class="n">detrend</span><span class="o">=</span><span class="n">detrend</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="n">sg_kwargs</span><span class="p">,</span>
+              <span class="n">gaussianize</span><span class="o">=</span><span class="n">gaussianize</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="n">standardize</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+
+    <span class="n">psd</span> <span class="o">=</span> <span class="n">wwa2psd</span><span class="p">(</span><span class="n">res_wwz</span><span class="o">.</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">ts_cut</span><span class="p">,</span> <span class="n">res_wwz</span><span class="o">.</span><span class="n">Neffs</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">res_wwz</span><span class="o">.</span><span class="n">freq</span><span class="p">,</span> <span class="n">Neff</span><span class="o">=</span><span class="n">Neff</span><span class="p">,</span> <span class="n">anti_alias</span><span class="o">=</span><span class="n">anti_alias</span><span class="p">,</span> <span class="n">avgs</span><span class="o">=</span><span class="n">avgs</span><span class="p">)</span>
+    <span class="c1">#  psd[1/freqs &gt; np.max(coi)] = np.nan  # cut off the unreliable part out of the coi</span>
+    <span class="c1">#  psd = psd[1/freqs &lt;= np.max(coi)] # cut off the unreliable part out of the coi</span>
+    <span class="c1">#  freqs = freqs[1/freqs &lt;= np.max(coi)]</span>
+
+    <span class="c1"># Monte-Carlo simulations of AR1 process</span>
+    <span class="c1">#nf = np.size(freq)</span>
+
+    <span class="c1">#  psd_ar1 = np.ndarray(shape=(nMC, nf))</span>
+
+    <span class="c1">#  if nMC &gt;= 1:</span>
+        <span class="c1">#  #  tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)</span>
+
+        <span class="c1">#  for i in tqdm(range(nMC), desc=&#39;Monte-Carlo simulations&#39;):</span>
+            <span class="c1">#  #  r = wa.ar1_model(ts_cut, tauest)</span>
+            <span class="c1">#  r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)</span>
+            <span class="c1">#  res_red = wwz(r, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,</span>
+                                                                     <span class="c1">#  detrend=detrend, params=params,</span>
+                                                                     <span class="c1">#  gaussianize=gaussianize, standardize=standardize,</span>
+                                                                     <span class="c1">#  method=method)</span>
+            <span class="c1">#  psd_ar1[i, :] = wa.wwa2psd(res_red.wwa, ts_cut, res_red.Neffs,</span>
+                                       <span class="c1">#  freq=res_red.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)</span>
+            <span class="c1">#  #  psd_ar1[i, 1/freqs_red &gt; np.max(coi_red)] = np.nan  # cut off the unreliable part out of the coi</span>
+            <span class="c1">#  #  psd_ar1 = psd_ar1[1/freqs_red &lt;= np.max(coi_red)] # cut off the unreliable part out of the coi</span>
+
+        <span class="c1">#  psd_ar1_q95 = mquantiles(psd_ar1, 0.95, axis=0)[0]</span>
+
+    <span class="c1">#  else:</span>
+        <span class="c1">#  psd_ar1_q95 = None</span>
+
+    <span class="n">psd_ar1_q95</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">psd_ar1</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">Results</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Results&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;psd&#39;</span><span class="p">,</span> <span class="s1">&#39;freq&#39;</span><span class="p">,</span> <span class="s1">&#39;psd_ar1_q95&#39;</span><span class="p">,</span> <span class="s1">&#39;psd_ar1&#39;</span><span class="p">])</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">Results</span><span class="p">(</span><span class="n">psd</span><span class="o">=</span><span class="n">psd</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">psd_ar1_q95</span><span class="o">=</span><span class="n">psd_ar1_q95</span><span class="p">,</span> <span class="n">psd_ar1</span><span class="o">=</span><span class="n">psd_ar1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

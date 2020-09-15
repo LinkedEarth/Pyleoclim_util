@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Wavelet and spectral preprocessing functions (pyleoclim.utils.wavelet) &mdash; Pyleoclim 0.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../core/ui.html">Series (pyleoclim.Series)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Wavelet and spectral preprocessing functions (pyleoclim.utils.wavelet)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/utils/wavelet/private.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="wavelet-and-spectral-preprocessing-functions-pyleoclim-utils-wavelet">
+<h1>Wavelet and spectral preprocessing functions (pyleoclim.utils.wavelet)<a class="headerlink" href="#wavelet-and-spectral-preprocessing-functions-pyleoclim-utils-wavelet" title="Permalink to this headline">¶</a></h1>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 70%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="AliasFilter.html#wavelet-aliasfilter"><span class="std std-ref">AliasFilter</span></a></p></td>
+<td><p>Performs anti-alis filter on a PSD. Experimental</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="assertPositiveInt.html#wavelet-assertpositiveint"><span class="std std-ref">assertPositiveInt</span></a></p></td>
+<td><p>Asserts that the arguments are all positive integers</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="wwz_basic.html#wavelet-wwz-basic"><span class="std std-ref">wwz_basic</span></a></p></td>
+<td><p>Returns the weighted wavelet amplitude estimated from the original Foster method. No multiprocessing</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="wwz_nproc.html#wavelet-wwz-nproc"><span class="std std-ref">wwz_nproc</span></a></p></td>
+<td><p>Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="kirchner_basic.html#wavelet-kirchner-basic"><span class="std std-ref">kirchner_basic</span></a></p></td>
+<td><p>Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="kirchner_nproc.html#wavelet-kirchner-nproc"><span class="std std-ref">kirchner_nproc</span></a></p></td>
+<td><p>Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="kirchner_numba.html#wavelet-kirchner-numba"><span class="std std-ref">kirchner_numba</span></a></p></td>
+<td><p>Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="kirchner_f2py.html#wavelet-kirchner-f2py"><span class="std std-ref">kirchner_f2py</span></a></p></td>
+<td><p>Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="make_coi.html#wavelet-make-coi"><span class="std std-ref">make_coi</span></a></p></td>
+<td><p>Return the cone of influence.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="make_omega.html#wavelet-make-omega"><span class="std std-ref">make_omega</span></a></p></td>
+<td><p>Return the angular frequency based on the time axis and given frequency vector</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="wwa2psd.html#wavelet-wwa2psd"><span class="std std-ref">wwa2psd</span></a></p></td>
+<td><p>Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="freq_vector_lomb_scargle.html#wavelet-freq-vector-lomb-scargle"><span class="std std-ref">freq_vector_lomb_scargle</span></a></p></td>
+<td><p>Return the frequency vector based on the REDFIT recommendation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="freq_vector_welch.html#wavelet-freq-vector-welch"><span class="std std-ref">freq_vector_welch</span></a></p></td>
+<td><p>Return the frequency vector based on the Welch’s method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="freq_vector_nfft.html#wavelet-freq-vector-nfft"><span class="std std-ref">freq_vector_nfft</span></a></p></td>
+<td><p>Return the frequency vector based on NFFT</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="freq_vector_scale.html#wavelet-freq-vector-scale"><span class="std std-ref">freq_vector_scale</span></a></p></td>
+<td><p>Return the frequency vector based on scales</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="freq_vector_log.html#wavelet-freq-vector-log"><span class="std std-ref">freq_vector_log</span></a></p></td>
+<td><p>Return the frequency vector based on logspace</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="make_freq_vector.html#wavelet-make-freq-vector"><span class="std std-ref">make_freq_vector</span></a></p></td>
+<td><p>Make frequency vector</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="beta_estimation.html#wavelet-beta-estimation"><span class="std std-ref">beta_estimation</span></a></p></td>
+<td><p>Estimate the power slope of a 1/f^beta process.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="beta2HurstIndex.html#wavelet-beta2hurstindex"><span class="std std-ref">beta2HurstIndex</span></a></p></td>
+<td><p>Translate psd slope to Hurst index</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="psd_ar.html#wavelet-psd-ar"><span class="std std-ref">psd_ar</span></a></p></td>
+<td><p>Return the theoretical power spectral density (PSD) of an autoregressive model</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="fBMsim.html#wavelet-fbmsim"><span class="std std-ref">fBMsim</span></a></p></td>
+<td><p>Select an ensemble table from a list</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="psd_fBm.html#wavelet-psd-fbm"><span class="std std-ref">psd_fBM</span></a></p></td>
+<td><p>Return the theoretical psd of a fBM</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="get_wwz_func.html#wavelet-get-wwz-func"><span class="std std-ref">get_wwz_func</span></a></p></td>
+<td><p>Return the wwz function to use.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="prepare_wwz.html#wavelet-prepare-wwz"><span class="std std-ref">prepare_wwz</span></a></p></td>
+<td><p>Return the truncated time series with NaNs deleted and estimate frequency vector and tau</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="cross_wt.html#wavelet-cross-wt"><span class="std std-ref">cross_wt</span></a></p></td>
+<td><p>Return the cross wavelet transform.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="wavelet_coherence.html#wavelet-wavelet-coherence"><span class="std std-ref">wavelet_coherence</span></a></p></td>
+<td><p>Return the cross wavelet coherence.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="reconstruct_ts.html#wavelet-reconstruct-ts"><span class="std std-ref">reconstruct_ts</span></a></p></td>
+<td><p>Reconstruct the normalized time series from the wavelet coefficients.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

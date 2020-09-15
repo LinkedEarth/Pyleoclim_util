@@ -271,7 +271,8 @@ def ssa(ys, M=None, nMC=0, f=0.5):
         Number of iteration in the Monte-Carlo process (default nMC=0, bypasses Monte Carlo SSA)
         Note: currently only supported for evenly-spaced, gap-free data.
 
-    f : maximum allowable fraction of missing values.
+    f : float
+        maximum allowable fraction of missing values.
 
     Returns
     -------
@@ -280,6 +281,8 @@ def ssa(ys, M=None, nMC=0, f=0.5):
         Containing:
 
         - eig_val : (M, 1) array of eigenvalue spectrum
+        
+        - eig_vec : Matrix of temporal eigenvectors
 
         - PC : (N - M + 1, M) array of principal components
 
@@ -367,7 +370,7 @@ def ssa(ys, M=None, nMC=0, f=0.5):
     if nMC > 0: # If Monte-Carlo SSA is requested.
         # TODO: translate and use https://github.com/SMAC-Group/uAR1 here
 
-        noise = ar1_sim(ys, n=N, p=nMC)  # generate MC AR(1) surrogates of y
+        noise = ar1_sim(ys, nMC)  # generate MC AR(1) surrogates of y
 
         eig_val_R = np.zeros((M,nMC)) # define eigenvalue matrix
 

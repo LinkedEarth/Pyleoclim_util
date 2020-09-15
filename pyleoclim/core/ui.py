@@ -75,7 +75,7 @@ class Series:
     Examples
     --------
     
-    In this example, we import the Nino 3.4 index into a pandas dataframe and create a PyleoSeries object. 
+    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a PyleoSeries object. 
 
     .. ipython:: python
         
@@ -93,8 +93,6 @@ class Series:
         )
         ts
         ts.__dict__.keys()
-        @savefig ts_plot.png
-        fig, ax = ts.plot()
     '''
 
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True):
@@ -181,21 +179,15 @@ class Series:
         
         Compute basic statistics for the SOI series
         
-        .. code-block::
-            
-                >>> import pyleoclim as pyleo
-                >>> import pandas as pd
-                >>> data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-                >>> time=data.iloc[:,1]
-                >>> value=data.iloc[:,2]
-                >>> ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
-                >>> ts.stats
-          {'mean': 0.11992753623188407,
-           'median': 0.1,
-           'min': -3.6,
-           'max': 2.9,
-           'std': 0.9380195472790024,
-           'IQR': 1.3}  
+        .. ipython:: python
+        
+            import pyleoclim as pyleo
+            import pandas as pd
+            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time=data.iloc[:,1]
+            value=data.iloc[:,2]
+            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            ts.stats()
         """
         mean, median, min_, max_, std, IQR = tsutils.simple_stats(self.value)
         res={'mean':mean,
@@ -303,19 +295,33 @@ class Series:
         
         Plot the SOI record
         
-            .. plot::
-                :context: close-figs
-
-                >>> import pyleoclim as pyleo
-                >>> import pandas as pd
-                >>> data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-                >>> time=data.iloc[:,1]
-                >>> value=data.iloc[:,2]
-                >>> ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
-                >>> fig,ax = ts.plot()
-                >>> pyleo.showfig(fig)
+            .. ipython:: python
+            
+                import pyleoclim as pyleo
+                import pandas as pd
+                data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+                time=data.iloc[:,1]
+                value=data.iloc[:,2]
+                ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+                @savefig ts_plot.png
+                fig,ax = ts.plot()
         
-
+        Change the line color
+        
+            .. ipython:: python
+            
+                @savefig ts_plot2.png
+                fig, ax = ts.plot(color='r')
+        
+        Save the figure. Two options available:
+            * Within the plotting command
+            * After the figure has been generated
+        
+            .. ipython:: python
+            
+                #@savefig ts_plot3.png 
+                fig,ax = ts.plot(color='k',savefig_settings={'path':'ts_plot3.png'})
+                pyleo.savefig(fig,path='ts_plot3.png')
         '''
         # generate default axis labels
         time_label, value_label = self.make_labels()
@@ -366,17 +372,150 @@ class Series:
 
         return res
 
-    def ssa(self, M=None, MC=0, f=0.3):
+    def ssa(self, M=None, nMC=0, f=0.5):
+        ''' Singular Spectrum Analysis
+        
+        Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
+        This implementation  uses the method of [1], with applications presented in [2]
+        Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
+        The method expects regular spacing, but is tolerant to missing values, up to a fraction 0<f<1 (see [4]).
 
-        res = decomposition.ssa(self.value, M=M, MC=MC, f=f)
+        Parameters
+        ----------
+        M : int, optional
+            window size. The default is None (10% of the length of the series).
+        MC : int, optional
+            Number of iteration in the Monte-Carlo process. The default is 0.
+        f : float, optional
+            maximum allowable fraction of missing values. The default is 0.5.
+
+        Returns
+        -------
+        res : dict
+            Containing:
+
+            - eig_val : (M, 1) array of eigenvalue spectrum of length r, the number of SSA modes. As in Principal Component Analysis, eigenvaluesare closely related to the fraction of variance accounted for ("explained", a common but not-so-helpful term) by each mode.
+            
+            - eig_vec : is a matrix of the temporal eigenvectors (T-EOFs), i.e. the temporal patterns that explain most of the variations in the original series.
+                
+            - PC : (N - M + 1, M) array of principal components, i.e. the loadings that, convolved with the T-EOFs, produce the reconstructed components, or RCs
+
+            - RC : (N,  M) array of reconstructed components, One can think of each RC as the contribution of each mode to the timeseries, weighted by their eigenvalue (loosely speaking, their "amplitude"). Summing over all columns of RC recovers the original series. (synthesis, the reciprocal operation of analysis).
+
+            - eig_val_q : (M, 2) array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC >0 ]
+        
+        Examples
+        --------
+        
+        SSA with SOI
+        
+        .. ipython:: python
+            
+            import pyleoclim as pyleo
+            import pandas as pd
+            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time=data.iloc[:,1]
+            value=data.iloc[:,2]
+            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            #plot
+            @savefig ts_plot.png
+            fig,ax = ts.plot()
+            #SSA
+            nino_ssa = ts.ssa(M=60)
+        
+        Let us now see how to make use of all these arrays. The first step is too inspect the eigenvalue spectrum ("scree plot") to identify remarkable modes. Let us restrict ourselves to the first 40, so we can see something:
+            
+        .. ipython:: python
+        
+            import matplotlib.pyplot as plt
+            import matplotlib.gridspec as gridspec
+            import numpy as np
+            
+            d  = nino_ssa['eig_val'] # extract eigenvalue vector
+            M  = len(d)  # infer window size
+            de = d*np.sqrt(2/(M-1))
+            var_pct = d**2/np.sum(d**2)*100  # extract the fraction of variance attributable to each mode
+
+            # plot eigenvalues
+            r = 20
+            rk = np.arange(0,r)+1
+            fig,ax = plt.subplots()
+            ax.errorbar(rk,d[:r],yerr=de[:r],label='SSA eigenvalues w/ 95% CI')
+            ax.set_title('Scree plot of SSA eigenvalues')
+            ax.set_xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
+            ax.legend(loc='upper right')   
+            @savefig scree_plot.png
+            pyleo.showfig(fig)
+        
+        This highlights a few common phenomena with SSA:
+            * the eigenvalues are in descending order
+            * their uncertainties are proportional to the eigenvalues themselves
+            * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered within uncertainties . (5,6) looks like another doublet 
+            * around i=15, the eigenvalues appear to reach a floor, and all subsequent eigenvalues explain a very small amount of variance.
+        
+        So, summing the variance of all modes higher than 19, we get:
+            
+        .. ipython:: python
+            
+            print(var_pct[15:].sum()*100)
+        
+        That is, over 95% of the variance is in the first 15 modes. That is a typical result for a "warm-colored" timeseries, which is most geophysical timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
+        
+        .. ipython:: python
+        
+            RCk = nino_ssa['RC'][:,:14].sum(axis=1)
+            fig, ax = ts.plot(title='ONI',mute=True) # we mute the first call to only get the plot with 2 lines
+            ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
+            ax.legend()
+            @savefig ssa_recon.png
+            pyleo.showfig(fig) 
+        
+        Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
+            * there was not much rhyme or reason for picking 15 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
+            * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies, you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves features and excludes others (i.e, a filter).
+            * as with all orthgonal decompositions, summing over all RCs will recover the original signal within numerical precision.
+        
+        Monte-Carlo SSA
+        
+        Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, introduced by Allen & Smith, (1996) to identiy SSA modes that rise above what one would expect from "red noise", specifically an AR(1) process_process). To run it, simply provide the parameter MC, ideally with a number of iterations sufficient to get decent statistics. Here's let's use MC = 1000. The result will be stored in the eig_val_q array, which has the same length as eig_val, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
+        
+        .. ipython:: python
+        
+           nino_mcssa = ts.ssa(M = 60, nMC=1000)
+        
+        Now let's look at the result:
+            
+        .. ipython:: python
+        
+            d  = nino_mcssa['eig_val'] # extract eigenvalue vector
+            de = d*np.sqrt(2/(M-1))
+            du = nino_mcssa['eig_val_q'][:,0]  # extract upper quantile of MC-SSA eigenvalues
+            dl = nino_mcssa['eig_val_q'][:,1]  # extract lower quantile of MC-SSA eigenvalues
+
+            # plot eigenvalues
+            rk = np.arange(0,20)+1
+            fig=plt.figure()
+            plt.fill_between(rk,dl[:20],du[:20],color='silver',alpha=0.5,label='MC-SSA 95% CI')
+            plt.errorbar(rk,d[:20],yerr=de[:20],label='SSA eigenvalues w/ 95% CI')
+            plt.title('Scree plot of SSA eigenvalues, w/ MC-SSA bounds')
+            plt.xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
+            plt.legend(loc='upper right')
+            @savefig scree_nmc.png
+            pyleo.showfig(fig)
+    
+        This suggests that modes 1-5 fall above the red noise benchmark.
+        
+        '''
+
+        res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f)
         return res
 
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                  ax=None, ylabel='KDE', mute=False, **plot_kwargs):
         ''' Plot the distribution of the timeseries values
 
-        Args
-        ----
+        Parameters
+        ----------
 
         figsize : list
             a list of two integers indicating the figure size
@@ -389,6 +528,26 @@ class Series:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
+        
+        Examples
+        --------
+        
+        Distribution of the SOI record
+        
+        .. ipython:: python
+            
+            import pyleoclim as pyleo
+            import pandas as pd
+            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time=data.iloc[:,1]
+            value=data.iloc[:,2]
+            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            @savefig ts_plot.png
+            fig,ax = ts.plot()
+            @savefig ts_dist.png
+            fig,ax = ts.distplot()
+        
+        
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         if ax is None:
