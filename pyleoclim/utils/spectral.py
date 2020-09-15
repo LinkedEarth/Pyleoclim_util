@@ -149,7 +149,9 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
         >>> # Spectral Analysis
         >>> res = utils.welch(signal, time)
         >>> # plot
-        >>> fig = plt.loglog(res['freq'], res['psd'])
+        >>> fig = plt.loglog(
+        ...           res['freq'],
+        ...           res['psd'])
         >>> plt.xlabel('Frequency')
         >>> plt.ylabel('PSD')
         >>> plt.show()
@@ -328,7 +330,7 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
     return res_dict
 
 
-def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
+def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
                  freq_kwargs=None, n50=3, window='hann',
                  detrend = None, sg_kwargs=None,
                  gaussianize=False,
@@ -351,7 +353,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb-scargle',
     freq_method : str
         Method to generate the frequency vector if not set directly. The following options are avialable:
             - log
-            - lomb-scargle (default)
+            - lomb_scargle (default)
             - welch
             - scale
             - nfft
@@ -683,7 +685,7 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     freq_method : str
         Method to generate the frequency vector if not set directly. The following options are avialable:
             - log (default)
-            - lomb-scargle
+            - lomb_scargle
             - welch
             - scale
             - nfft

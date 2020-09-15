@@ -1691,7 +1691,7 @@ def make_freq_vector(ts, method='log', **kwargs):
     ts : array
         Time axis of the time series
     method : string
-        The method to use. Options are 'log' (default), 'nfft', 'lomb-scargle', 'welch', and 'scale'
+        The method to use. Options are 'log' (default), 'nfft', 'lomb_scargle', 'welch', and 'scale'
     kwargs : dict, optional
             For Lomb_Scargle, additional parameters may be passed:
             - nf (int): number of frequency points
@@ -1723,7 +1723,7 @@ def make_freq_vector(ts, method='log', **kwargs):
 
     '''
 
-    if method == 'lomb-scargle':
+    if method == 'lomb_scargle':
         freq = freq_vector_lomb_scargle(ts,**kwargs)
     elif method == 'welch':
         freq = freq_vector_welch(ts)
