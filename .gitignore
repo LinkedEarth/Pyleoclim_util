@@ -10,4 +10,5 @@ benchmark.log
 __pycache__
 
 ./example_notebooks/debug.log
-./doc_build/_build
+./example_notebooks/benchmark.log
+./doc_build/_build/*
