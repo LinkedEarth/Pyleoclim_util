@@ -1,29 +1,8 @@
-Series
-=====================================
+.. _core_ui:
+
 .. currentmodules:: pyleoclim.core.ui
 
+Series (pyleoclim.Series)
+=========================
 
-Constructor
------------
-.. autosummary::
-    :toctree: api/
-
-    Series
-
-    
-
-Attributes
-----------
-.. autosummary::
-    :toctree: api/
-
-    Series.time
-    Series.value
-
-    
-Methods
--------
-.. autosummary::
-    :toctree: api/
-
-    Series.slice
+.. autoclass:: pyleoclim.core.ui.Series

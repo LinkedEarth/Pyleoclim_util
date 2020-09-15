@@ -40,40 +40,60 @@ def dict2namedtuple(d):
     return tupletype(**d)
 
 class Series:
+    ''' Create a pyleoSeries object
+
+    Parameters
+    ----------
+
+    time : list or numpy.array
+        Time values for the time series
+
+    value : list of numpy.array
+        ordinate values for the time series
+
+    time_name : string
+        Name of the time vector (e.g., 'Age').
+        Default is None. This is used to label the time axis on plots
+
+    time_unit : string
+        Units for the time vector (e.g., 'yr B.P.').
+        Default is None
+
+    value_name : string
+        Name of the value vector (e.g., 'temperature')
+        Default is None
+
+    value_unit : string
+        Units for the value vector (e.g., 'deg C')
+
+    label : string
+        Name of the time series (e.g., 'Nino 3.4')
+
+    clean_ts : bool
+        remove the NaNs and let the time axis to be increasing if True
+    
+    Examples
+    --------
+    
+    In this example, we import the Nino 3.4 index into a pandas dataframe and create a PyleoSeries object. 
+
+        .. code-block::
+        
+            >>> import pyleoclim as pyleo
+            >>> import pandas as pd
+            >>> data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            >>> time=data.iloc[:,1]
+            >>> value=data.iloc[:,2]
+            >>> ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            >>> ts
+            <pyleoclim.core.ui.Series at 0x7f90a3451970>
+            >>> ts.__dict__.keys()
+            dict_keys(['time', 'value', 'time_name', 'time_unit', 'value_name', 'value_unit', 'label'])
+    '''
+
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True):
-        """Create a pyleoSeries object
-
-        Args
-        ----
-
-        time : list or numpy.array
-            Time values for the time series
-
-        value : list of numpy.array
-            ordinate values for the time series
-
-        time_name : string
-            Name of the time vector (e.g., 'Age').
-            Default is None. This is used to label the time axis on plots
-
-        time_unit : string
-            Units for the time vector (e.g., 'yr B.P.').
-            Default is None
-
-        value_name : string
-            Name of the value vector (e.g., 'temperature')
-            Default is None
-
-        value_unit : string
-            Units for the value vector (e.g., 'deg C')
-
-        label : string
-            Name of the time series (e.g., 'Nino 3.4')
-
-        clean_ts : bool
-            remove the NaNs and let the time axis to be increasing if True
-        """
-        if clean_ts:
+        
+        if clean_ts==True:
             value, time = tsutils.clean_ts(np.array(value), np.array(time))
 
         self.time = time
@@ -85,6 +105,17 @@ class Series:
         self.label = label
 
     def make_labels(self):
+        '''
+        Initialization of labels
+
+        Returns
+        -------
+        time_header : str
+            Label for the time axis
+        value_header : str
+            Label for the value axis
+
+        '''
         if self.time_name is not None:
             time_name_str = self.time_name
         else:
@@ -108,6 +139,15 @@ class Series:
         return time_header, value_header
 
     def __str__(self):
+        '''
+        Prints out the series in a table format and length of the series
+
+        Returns
+        -------
+        str
+            length of the timeseries.
+
+        '''
         time_label, value_label = self.make_labels()
 
         table = {
@@ -120,11 +160,8 @@ class Series:
 
     def stats(self):
         """ Compute basic statistics for the time series
-
-        Args
-        ----
-
-        ts: pyleoclim Series Object
+        
+        Computes the mean, median, min, max, standard deviation, and interquartile range of a numpy array y, ignoring NaNs.
 
         Returns
         -------
@@ -132,7 +169,27 @@ class Series:
         res : dictionary
             Contains the mean, median, minimum value, maximum value, standard
             deviation, and interquartile range for the Series.
-
+        
+        Examples
+        --------
+        
+        Compute basic statistics for the SOI series
+        
+        .. code-block::
+            
+                >>> import pyleoclim as pyleo
+                >>> import pandas as pd
+                >>> data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+                >>> time=data.iloc[:,1]
+                >>> value=data.iloc[:,2]
+                >>> ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+                >>> ts.stats
+          {'mean': 0.11992753623188407,
+           'median': 0.1,
+           'min': -3.6,
+           'max': 2.9,
+           'std': 0.9380195472790024,
+           'IQR': 1.3}  
         """
         mean, median, min_, max_, std, IQR = tsutils.simple_stats(self.value)
         res={'mean':mean,
@@ -151,8 +208,8 @@ class Series:
              savefig_settings=None, ax=None, mute=False):
         ''' Plot the timeseries
 
-        Args
-        ----
+        Parameters
+        ----------
 
         figsize : list
             a list of two integers indicating the figure size
@@ -163,6 +220,11 @@ class Series:
 
         markersize : float
             the size of the marker
+        
+        color : str, list
+            the color for the line plot
+            e.g., 'r' for red
+            See [matplotlib colors] (https://matplotlib.org/3.2.1/tutorials/colors/colors.html) for details
 
         linestyle : str
             e.g., '--' for dashed line
@@ -182,6 +244,9 @@ class Series:
 
         title : str
             the title for the figure
+        
+        zorder : int
+            The default drawing order for all lines on the plot
 
         legend : {True, False}
             plot legend or not
@@ -193,6 +258,9 @@ class Series:
         lgd_kwargs : dict
             the dictionary of keyword arguments for ax.legend()
             See [matplotlib.pyplot.legend](https://matplotlib.org/3.1.3/api/_as_gen/matplotlib.pyplot.legend.html) for details
+            
+        alpha : float
+            Transparency setting
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
@@ -203,6 +271,10 @@ class Series:
         ax : matplotlib.axis, optional
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+        
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
 
         Returns
         -------
@@ -219,6 +291,24 @@ class Series:
         -----
 
         When `ax` is passed, the return will be `ax` only; otherwise, both `fig` and `ax` will be returned.
+        
+        Examples
+        --------
+        
+        Plot the SOI record
+        
+            .. plot::
+                :context: close-figs
+
+                >>> import pyleoclim as pyleo
+                >>> import pandas as pd
+                >>> data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+                >>> time=data.iloc[:,1]
+                >>> value=data.iloc[:,2]
+                >>> ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+                >>> fig,ax = ts.plot()
+                >>> pyleo.showfig(fig)
+        
 
         '''
         # generate default axis labels

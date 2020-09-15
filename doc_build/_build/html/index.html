@@ -36,7 +36,8 @@
 
     
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -85,14 +86,13 @@
               
             
             
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Introduction</a></li>
-<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
-<li><a class="reference internal" href="#getting-involved">Getting Involved</a></li>
-<li><a class="reference internal" href="#search-pyleoclim">Search Pyleoclim</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core/ui.html">Series (pyleoclim.Series)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils/introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
 </ul>
-</div>
+
             
           
         </div>
@@ -180,16 +180,47 @@
     text-align: unset;
 }
 </style>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-anaconda-or-miniconda">Installing Anaconda or Miniconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#creating-a-new-anaconda-environment">Creating a new Anaconda environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#installing-pyleoclim">Installing Pyleoclim</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#building-from-source-for-the-f2py-feature-of-wwz">Building from source for the f2py feature of WWZ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">Citing Pyleoclim</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="citation.html#bibtex-entry">BibTeX entry</a></li>
+<li class="toctree-l2"><a class="reference internal" href="citation.html#agu-style-entry">AGU style entry</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="core/ui.html">Series (pyleoclim.Series)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils/introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils/introduction.html#causality">Causality</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/introduction.html#correlation">Correlation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/introduction.html#decomposition">Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/introduction.html#filter">Filter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/introduction.html#mapping">Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/introduction.html#plotting">Plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/introduction.html#spectral">Spectral</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/introduction.html#tsmodel">Tsmodel</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/introduction.html#wavelet">Wavelet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/introduction.html#tsutils">Tsutils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils/introduction.html#lipdutils">Lipdutils</a></li>
+</ul>
+</li>
+</ul>
+</div>
 <div class="section" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>Pyleoclim is a Python package designed for the analysis of paleoclimate data.</p>
 <p>Pyleoclim makes use of various data science libraries (numpy, pandas, scikit-learn) for time series analysis and Matplotlib and Cartopy for the creation of publication quality figures.</p>
-<p>Key features of Pyleoclim are its object-oriented <a class="reference internal" href="core/introduction.html#ui-introduction"><span class="std std-ref">Series</span></a> which can be directly manipulated for plotting, spectral and wavelet analysis, and other time series-appropriate operations as well as its ability to manipulate <a class="reference external" href="http://lipd.net">LiPD</a> files directly, handling most of the data transformations internally.</p>
+<p>Key features of Pyleoclim are its object-oriented <a class="reference internal" href="core/ui.html#core-ui"><span class="std std-ref">Series</span></a> which can be directly manipulated for plotting, spectral and wavelet analysis, and other time series-appropriate operations as well as its ability to manipulate <a class="reference external" href="http://lipd.net">LiPD</a> files directly, handling most of the data transformations internally.</p>
 <p>The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses. Age ensembles can be obtained through the <a class="reference external" href="http://nickmckay.github.io/GeoChronR/">GeoChronR</a> package.</p>
 </div>
 <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<p>The <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation guide</span></a> provides information on getting up and running. The main Pyleoclim’s function are available through its objected-oriented <a class="reference internal" href="core/introduction.html#ui-introduction"><span class="std std-ref">interface</span></a> and documented in the form of a user guide, available online and in PDF format from GitHub.</p>
+<p>The <a class="reference internal" href="installation.html#installation"><span class="std std-ref">installation guide</span></a> provides information on getting up and running. The main Pyleoclim’s function are available through its objected-oriented <span class="xref std std-ref">interface</span> and documented in the form of a user guide, available online and in PDF format from GitHub.</p>
 </div>
 <div class="section" id="getting-involved">
 <h1>Getting Involved<a class="headerlink" href="#getting-involved" title="Permalink to this headline">¶</a></h1>
@@ -218,6 +249,13 @@
            
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+    </div>
   
 
   <hr/>
