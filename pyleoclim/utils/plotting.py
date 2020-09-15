@@ -369,7 +369,6 @@ def showfig(fig):
         except ImportError:
             pass
 
-        plt.close()
         display(fig)
 
     else:

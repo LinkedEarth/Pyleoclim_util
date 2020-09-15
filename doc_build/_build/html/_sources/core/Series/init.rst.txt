@@ -1,5 +1,0 @@
-.. _series_init:
-
-Series (pyleoclim.core.Series)
-==============================
-.. autofunction:: pyleoclim.core.Series

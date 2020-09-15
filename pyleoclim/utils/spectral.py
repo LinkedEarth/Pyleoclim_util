@@ -149,9 +149,7 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
         >>> # Spectral Analysis
         >>> res = utils.welch(signal, time)
         >>> # plot
-        >>> fig = plt.loglog(
-        ...           res['freq'],
-        ...           res['psd'])
+        >>> fig = plt.loglog(res['freq'], res['psd'])
         >>> plt.xlabel('Frequency')
         >>> plt.ylabel('PSD')
         >>> plt.show()

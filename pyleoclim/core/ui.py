@@ -77,18 +77,24 @@ class Series:
     
     In this example, we import the Nino 3.4 index into a pandas dataframe and create a PyleoSeries object. 
 
-        .. code-block::
+    .. ipython:: python
         
-            >>> import pyleoclim as pyleo
-            >>> import pandas as pd
-            >>> data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            >>> time=data.iloc[:,1]
-            >>> value=data.iloc[:,2]
-            >>> ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
-            >>> ts
-            <pyleoclim.core.ui.Series at 0x7f90a3451970>
-            >>> ts.__dict__.keys()
-            dict_keys(['time', 'value', 'time_name', 'time_unit', 'value_name', 'value_unit', 'label'])
+        import pyleoclim as pyleo
+        import pandas as pd
+        data=pd.read_csv(
+            'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+            skiprows=0, header=1
+        )
+        time=data.iloc[:,1]
+        value=data.iloc[:,2]
+        ts=pyleo.Series(
+            time=time, value=value,
+            time_name='Year (CE)', value_name='SOI', label='SOI'
+        )
+        ts
+        ts.__dict__.keys()
+        @savefig ts_plot.png
+        fig, ax = ts.plot()
     '''
 
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True):
