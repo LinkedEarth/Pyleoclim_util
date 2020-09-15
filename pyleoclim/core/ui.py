@@ -1366,7 +1366,7 @@ class Scalogram:
             if ylabel is None:
                 ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
 
-        if xlabel is None:
+        if xlabel is None and self.time_label is not None:
             xlabel = self.time_label
 
         cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
@@ -1575,7 +1575,7 @@ class Coherence:
         # plot phase
         yaxis_range = np.max(y_axis) - np.min(y_axis)
         xaxis_range = np.max(self.time) - np.min(self.time)
-        phase_args = {'pt': 0.5, 'skip_x': int(xaxis_range//10), 'skip_y': int(yaxis_range//50), 'scale': 30, 'width': 0.004}
+        phase_args = {'pt': 0.5, 'skip_x': int(xaxis_range//5), 'skip_y': int(yaxis_range//5), 'scale': 30, 'width': 0.004}
         phase_args.update(phase_style)
 
         pt = phase_args['pt']
