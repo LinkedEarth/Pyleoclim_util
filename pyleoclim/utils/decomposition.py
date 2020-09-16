@@ -172,7 +172,7 @@ def mssa(ys, M=None, nMC=0, f=0.3):
     See Also
     --------
 
-    ssa : Singular Spectrum Analysis (one channel)
+    pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis (one channel)
 
     '''
     N = len(ys[:, 0])
@@ -310,7 +310,7 @@ def ssa(ys, M=None, nMC=0, f=0.5):
     See Also
     --------
 
-    mssa : Multi-channel SSA
+    pyleoclim.utils.decomposition.mssa : Multi-channel SSA
 
     '''
 

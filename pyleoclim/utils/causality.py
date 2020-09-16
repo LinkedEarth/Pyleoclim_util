@@ -37,11 +37,11 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
 
     y1, y2: array
         vectors of (real) numbers with identical length, no NaNs allowed
-    maxlag : int or int iterable
+    maxlag : int or int iterable, optional
         If an integer, computes the test for all lags up to maxlag. If an iterable, computes the tests only for the lags in maxlag.
-    addconst : bool
+    addconst : bool, optional
         Include a constant in the model.
-    verbose : bool
+    verbose : bool, optional
         Print results
 
     Returns
@@ -64,7 +64,7 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
     
     See Also
     --------
-    liang_causality : information flow estimated using the Liang algorithm
+    pyleoclim.utils.causality.liang_causality : information flow estimated using the Liang algorithm
     
     References
     ----------
@@ -128,9 +128,9 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
     
     See Also
     --------
-    granger_causality : information flow estimated using the Granger algorithm
-    causality.signif_isopersist : significance test with AR(1) with same persistence
-    causality.signif_isospec : significance test with surrogates with randomized phases
+    pyleoclim.utils.causality.granger_causality : information flow estimated using the Granger algorithm
+    pyleoclim.utils.causality.signif_isopersist : significance test with AR(1) with same persistence
+    pyleoclim.utils.causality.causality.signif_isospec : significance test with surrogates with randomized phases
     
     References
     ----------
@@ -263,9 +263,9 @@ def liang(y1, y2, npt=1):
             
     See Also
     --------
-    liang_causality : information flow estimated using the Granger algorithm
-    signif_isopersist : significance test with AR(1) with same persistence
-    signif_isospec : significance test with surrogates with randomized phases
+    pyleoclim.utils.causality.liang_causality : information flow estimated using the Granger algorithm
+    pyleoclim.utils.causality.signif_isopersist : significance test with AR(1) with same persistence
+    pyleoclim.utils.causality.signif_isospec : significance test with surrogates with randomized phases
     
     References
     ----------

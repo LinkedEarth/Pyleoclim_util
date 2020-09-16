@@ -1,6 +1,6 @@
 .. _utils_cwt:
 
-cwt (pyleoclim.utils.cwt)
+cwt (pyleoclim.utils.wavelet.cwt)
 =========================
 
-.. autofunction:: pyleoclim.utils.cwt
+.. autofunction:: pyleoclim.utils.wavelet.cwt

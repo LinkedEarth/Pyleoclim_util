@@ -1,6 +1,6 @@
 .. _utils_pca:
 
-pca (pyleoclim.utils.pca)
+pca (pyleoclim.utils.decomposition.pca)
 =====================================
 
-.. autofunction:: pyleoclim.utils.pca
+.. autofunction:: pyleoclim.utils.decomposition.pca

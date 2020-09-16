@@ -1,6 +1,6 @@
 .. _utils_lombscargle:
 
-lomb_scargle (pyleoclim.utils.lomb_scargle)
+lomb_scargle (pyleoclim.utils.spectral.lomb_scargle)
 =====================================
 
-.. autofunction:: pyleoclim.utils.lomb_scargle
+.. autofunction:: pyleoclim.utils.spectral.lomb_scargle

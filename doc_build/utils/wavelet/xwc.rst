@@ -1,6 +1,6 @@
 .. _utils_xwc:
 
-xwc (pyleoclim.utils.xwc)
+xwc (pyleoclim.utils.wavelet.xwc)
 =========================
 
-.. autofunction:: pyleoclim.utils.xwc
+.. autofunction:: pyleoclim.utils.wavelet.xwc

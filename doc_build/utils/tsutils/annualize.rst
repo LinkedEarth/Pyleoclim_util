@@ -1,6 +1,6 @@
 .. _utils_annualize:
 
-annualize (pyleoclim.utils.annualize)
+annualize (pyleoclim.utils.tsutils.annualize)
 =====================================
 
-.. autofunction:: pyleoclim.utils.annualize
+.. autofunction:: pyleoclim.utils.tsutils.annualize

@@ -1,6 +1,6 @@
 .. _utils_queryLinkedEarth:
 
-queryLinkedEarth (pyleoclim.utils.queryLinkedEarth)
+queryLinkedEarth (pyleoclim.utils.lipdutils.queryLinkedEarth)
 ===============================================
 
-.. autofunction:: pyleoclim.utils.queryLinkedEarth
+.. autofunction:: pyleoclim.utils.lipdutils.queryLinkedEarth

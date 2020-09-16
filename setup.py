@@ -30,7 +30,7 @@ setup(
         "LiPD>=0.2.8",
         "pandas>=1.0.5",
         "numpy>=1.18.5",
-        "matplotlib>=3.2.2",
+        "matplotlib>=3.3.1",
         "scipy>=1.5.0",
         "statsmodels>=0.11.1",
         "seaborn>=0.10.1",

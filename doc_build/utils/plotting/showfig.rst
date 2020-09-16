@@ -1,6 +1,6 @@
 .. _utils_showfig:
 
-showfig (pyleoclim.utils.showfig)
+showfig (pyleoclim.utils.plotting.showfig)
 =================================
 
-.. autofunction:: pyleoclim.utils.showfig
+.. autofunction:: pyleoclim.utils.plotting.showfig

@@ -45,7 +45,7 @@ def set_proj(projection='Robinson', proj_default = True):
         
     See Also
     --------
-    map_all : mapping function making use of the projection
+    pyleoclim.utils.mapping.map_all : mapping function making use of the projection
     
     """
     if proj_default is not True and type(proj_default) is not dict:
@@ -290,7 +290,7 @@ def map_all(lat, lon, criteria, marker=None, color =None,
 
     See Also
     --------
-    mapping.set_proj : Set the projection for Cartopy-based maps
+    pyleoclim.utils.mapping.set_proj : Set the projection for Cartopy-based maps
     """
     
     #Check that the lists have the same length and convert to numpy arrays

@@ -1,6 +1,6 @@
 .. _utils_whatProxySensors:
 
-whatproxySensors (pyleoclim.utils.whatProxySensors)
+whatproxySensors (pyleoclim.utils.lipdutils.whatProxySensors)
 ===================================================
 
-.. autofunction:: pyleoclim.utils.whatProxySensors
+.. autofunction:: pyleoclim.utils.lipdutils.whatProxySensors

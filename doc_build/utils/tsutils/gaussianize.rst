@@ -1,6 +1,6 @@
 .. _utils_gaussianize:
 
-gaussianize (pyleoclim.utils.gaussianize)
+gaussianize (pyleoclim.utils.tsutils.gaussianize)
 =========================================
 
-.. autofunction:: pyleoclim.utils.gaussianize
+.. autofunction:: pyleoclim.utils.tsutils.gaussianize

@@ -1,6 +1,6 @@
 .. _utils_whatProxyObservations:
 
-whatProxyObservations (pyleoclim.utils.whatProxyObservations)
+whatProxyObservations (pyleoclim.utils.lipdutils.whatProxyObservations)
 =============================================================
 
-.. autofunction:: pyleoclim.utils.whatProxyObservations
+.. autofunction:: pyleoclim.utils.lipdutils.whatProxyObservations

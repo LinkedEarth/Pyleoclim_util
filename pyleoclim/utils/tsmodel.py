@@ -104,13 +104,13 @@ def ar1_sim(y, p, t=None):
     See Also
     --------
     
-    tsmodel.ar1_model : Simulates a (possibly irregularly-sampled) AR(1) process with given decay constant tau, à la REDFIT.
+    pyleoclim.utils.tsmodel.ar1_model : Simulates a (possibly irregularly-sampled) AR(1) process with given decay constant tau, à la REDFIT.
 
-    tsmodel.ar1_fit : Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
+    pyleoclim.utils.tsmodel.ar1_fit : Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
     
-    tsmodel.ar1_fit_evenly : Returns the lag-1 autocorrelation from AR(1) fit.
+    pyleoclim.utils.tsmodel.ar1_fit_evenly : Returns the lag-1 autocorrelation from AR(1) fit.
     
-    tsmodel.tau_estimation : Estimates the  temporal decay scale of an (un)evenly spaced time series.
+    pyleoclim.utils.tsmodel.tau_estimation : Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
     '''
     n = np.size(y)
@@ -244,7 +244,7 @@ def colored_noise(alpha, t, f0=None, m=None, seed=None):
     ----------
 
     Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
-    Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+        Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
     '''
     n = np.size(t)  # number of time points
     y = np.zeros(n)
@@ -295,8 +295,8 @@ def colored_noise_2regimes(alpha1, alpha2, f_break, t, f0=None, m=None, seed=Non
     References
     ----------
 
-    Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
-    Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+     Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
+         Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
     '''
     n = np.size(t)  # number of time points
     y = np.zeros(n)

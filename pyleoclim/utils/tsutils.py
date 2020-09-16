@@ -331,7 +331,7 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     See also
     --------
     
-    tsutils.preprocess : pre-processes a times series using standardization and detrending. 
+    pyleoclim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending. 
 
     """
     x = np.asanyarray(x)
@@ -583,9 +583,9 @@ def detrend(y, x = None, method = "emd", sg_kwargs = None):
     See also
     --------
 
-    .filter.savitzky_golay : Filtering using Savitzy-Golay
+    pylecolim.utils.filter.savitzky_golay : Filtering using Savitzy-Golay
     
-    tsutils.preprocess : pre-processes a times series using standardization and detrending. 
+    pylecolim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending. 
 
     """
     y = np.array(y)
@@ -709,11 +709,11 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
        See also
        --------
        
-       tsutils.distance_neighbors : Finds Distance of each point in the timeseries from its 4 nearest neighbors
+       pylecolim.utils.tsutils.distance_neighbors : Finds Distance of each point in the timeseries from its 4 nearest neighbors
        
-       tsustils.find_knee : Finds knee point automatically in a given array sorted in decreasing order  
+       pylecolim.utils.tsustils.find_knee : Finds knee point automatically in a given array sorted in decreasing order  
        
-       remove_outliers : Removes outliers from a timeseries
+       pylecolim.utils.tsutils.remove_outliers : Removes outliers from a timeseries
        
        '''
     #Take care of arguments for the knee plot
@@ -801,7 +801,7 @@ def remove_outliers(ts,ys,outlier_points):
     See also
     --------
     
-    detect_outliers : Function to detect outliers in the given timeseries
+    pylecolim.utils.tsutils.detect_outliers : Function to detect outliers in the given timeseries
     '''
 
     ys = np.delete(ys,outlier_points)
@@ -875,7 +875,7 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
     See also
     --------
 
-    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
 
     '''
 

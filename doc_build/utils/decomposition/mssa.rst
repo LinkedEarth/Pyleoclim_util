@@ -1,6 +1,6 @@
 .. _utils_mssa:
 
-mssa (pyleoclim.utils.mssa)
+mssa (pyleoclim.utils.decomposition.mssa)
 =====================================
 
-.. autofunction:: pyleoclim.utils.mssa
+.. autofunction:: pyleoclim.utils.decomposition.mssa

@@ -1,6 +1,6 @@
 .. _utils_savefig:
 
-savefig (pyleoclim.utils.savefig)
+savefig (pyleoclim.utils.plotting.savefig)
 =================================
 
-.. autofunction:: pyleoclim.utils.savefig
+.. autofunction:: pyleoclim.utils.plotting.savefig

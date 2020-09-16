@@ -1,6 +1,6 @@
 .. _utils_whatArchives:
 
-whatArchives (pyleoclim.utils.whatArchives)
+whatArchives (pyleoclim.utils.lipdutils.whatArchives)
 ===========================================
 
-.. autofunction:: pyleoclim.utils.whatArchives
+.. autofunction:: pyleoclim.utils.lipdutils.whatArchives

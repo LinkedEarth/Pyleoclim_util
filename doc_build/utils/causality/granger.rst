@@ -1,6 +1,6 @@
 .. _utils_granger:
 
-granger_causality (pyleoclim.utils.granger_causality)
+granger_causality (pyleoclim.utils.causality.granger_causality)
 =====================================
 
-.. autofunction:: pyleoclim.utils.granger_causality
+.. autofunction:: pyleoclim.utils.causality.granger_causality

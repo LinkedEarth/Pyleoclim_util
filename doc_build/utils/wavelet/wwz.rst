@@ -1,6 +1,6 @@
 .. _utils_wwz:
 
-wwz (pyleoclim.utils.wwz)
+wwz (pyleoclim.utils.wavelet.wwz)
 =========================
 
-.. autofunction:: pyleoclim.utils.wwz
+.. autofunction:: pyleoclim.utils.wavelet.wwz

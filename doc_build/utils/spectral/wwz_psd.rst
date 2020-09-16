@@ -1,6 +1,6 @@
 .. _utils_wwzpsd:
 
-wwz_psd (pyleoclim.utils.wwz_psd)
+wwz_psd (pyleoclim.utils.spectral.wwz_psd)
 =====================================
 
-.. autofunction:: pyleoclim.utils.wwz_psd
+.. autofunction:: pyleoclim.utils.spectral.wwz_psd

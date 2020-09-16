@@ -123,11 +123,12 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
 
     See also
     --------
-    periodogram : Estimate power spectral density using a periodogram
-    mtm : Retuns spectral density using a multi-taper method
-    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
-    wwz_psd : Return the psd of a timeseries using wwz method.
-    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.spectral.periodogram : Estimate power spectral density using a periodogram
+    pyleoclim.utils.spectral.mtm : Retuns spectral density using a multi-taper method
+    pyleoclim.utils.spectral.lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
+    pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
+    pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.tsutils.detrend : Detrending method
 
     References
     ----------
@@ -260,11 +261,12 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
 
     See Also
     --------
-    periodogram : Estimate power spectral density using a periodogram
-    welch : Retuns spectral density using the welch method
-    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
-    wwz_psd : Return the psd of a timeseries using wwz method.
-    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.spectral.periodogram : Estimate power spectral density using a periodogram
+    pyleoclim.utils.spectral.welch : Retuns spectral density using the welch method
+    pyleoclim.utils.spectral.lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
+    pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
+    pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.tsutils.detrend : Detrending method
 
     Examples
     --------
@@ -414,11 +416,12 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
     See Also
     --------
-    periodogram : Estimate power spectral density using a periodogram
-    mtm : Retuns spectral density using a multi-taper method
-    welch : Returns power spectral density using the Welch method
-    wwz_psd : Return the psd of a timeseries using wwz method.
-    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.spectral.periodogram : Estimate power spectral density using a periodogram
+    pyleoclim.utils.spectral.mtm : Retuns spectral density using a multi-taper method
+    pyleoclim.utils.spectral.welch : Returns power spectral density using the Welch method
+    pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
+    pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.tsutils.detrend : Detrending method
 
     References
     ----------
@@ -598,11 +601,12 @@ def periodogram(ys, ts, window='hann', nfft=None,
 
     See Also
     --------
-    welch : Estimate power spectral density using the welch method
-    mtm : Retuns spectral density using a multi-taper method
-    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
-    wwz_psd : Return the psd of a timeseries using wwz method.
-    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.spectral.welch : Estimate power spectral density using the welch method
+    pyleoclim.utils.spectral.mtm : Retuns spectral density using a multi-taper method
+    pyleoclim.utils.spectral.lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
+    pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
+    pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.tsutils.detrend : Detrending method
 
     Examples
     --------
@@ -737,11 +741,12 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
 
     See Also
     --------
-    periodogram : Estimate power spectral density using a periodogram
-    mtm : Retuns spectral density using a multi-taper method
-    lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
-    welch : Estimate power spectral density using the Welch method
-    utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.spectral.periodogram : Estimate power spectral density using a periodogram
+    pyleoclim.utils.spectral.mtm : Retuns spectral density using a multi-taper method
+    pyleoclim.utils.spectral.lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
+    pyleoclim.utils.spectral.welch : Estimate power spectral density using the Welch method
+    pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.tsutils.detrend : Detrending method
 
     References
     ----------

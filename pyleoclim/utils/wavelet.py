@@ -281,17 +281,17 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
     See also
     --------
     
-    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
 
-    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
 
-    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
 
-    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+    pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
 
-    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
     assertPositiveInt(Neff)
@@ -401,17 +401,17 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=Fal
     See also
     --------
     
-    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
-    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
 
-    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
 
-    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+    pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
 
-    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
     assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -541,17 +541,17 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
     See also
     --------
     
-    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
-    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
 
-    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
 
-    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+    pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
 
-    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
@@ -672,17 +672,17 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend
     See also
     --------
     
-    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
-    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
 
-    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
 
-    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+    pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
 
-    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
     assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -827,17 +827,17 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, s
     See also
     --------
     
-    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
-    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
 
-    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
 
-    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
 
-    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
 
-    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
     assertPositiveInt(Neff)
@@ -971,17 +971,17 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=
     See also
     --------
     
-    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
-    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
 
-    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
 
-    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
 
-    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+    pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
     from . import f2py_wwz as f2py
@@ -1216,21 +1216,21 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
     See also
     --------
     
-    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
-    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
 
-    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
 
-    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
 
-    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+    pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
 
-    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.    
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.    
     
-    make_freq_vector : Make frequency vector
+    pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
     '''
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
 
@@ -1333,21 +1333,21 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     See also
     --------
     
-    wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
-    wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
 
-    kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
 
-    kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
 
-    kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+    pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
 
-    utils.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.    
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.    
     
-    make_freq_vector : Make frequency vector
+    pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
     
     '''
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
@@ -1478,15 +1478,15 @@ def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
     See also
     --------
     
-    freq_vector_welch : Return the frequency vector based on the Welch's method.
+    pyleoclim.utils.wavelet.freq_vector_welch : Return the frequency vector based on the Welch's method.
 
-    freq_vector_nfft : Return the frequency vector based on NFFT
+    pyleoclim.utils.wavelet.freq_vector_nfft : Return the frequency vector based on NFFT
 
-    freq_vector_scale : Return the frequency vector based on scales
+    pyleoclim.utils.wavelet.freq_vector_scale : Return the frequency vector based on scales
 
-    freq_vector_log : Return the frequency vector based on logspace 
+    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace 
 
-    make_freq_vector : Make frequency vector
+    pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
     '''
     assert ofac >= 1 and hifac <= 1, "`ofac` should be >= 1, and `hifac` should be <= 1"
     
@@ -1526,16 +1526,16 @@ def freq_vector_welch(ts):
     See also
     --------
     
-    freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
         recommendation.
 
-    freq_vector_nfft : Return the frequency vector based on NFFT
+    pyleoclim.utils.wavelet.freq_vector_nfft : Return the frequency vector based on NFFT
 
-    freq_vector_scale : Return the frequency vector based on scales
+    pyleoclim.utils.wavelet.freq_vector_scale : Return the frequency vector based on scales
 
-    freq_vector_log : Return the frequency vector based on logspace 
+    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace 
 
-    make_freq_vector : Make frequency vector
+    pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
 
     '''
     nt = np.size(ts)
@@ -1568,16 +1568,16 @@ def freq_vector_nfft(ts):
     See also
     --------
     
-    freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
         recommendation.
 
-    freq_vector_welch : Return the frequency vector based on the Welch's method.
+    pyleoclim.utils.wavelet.freq_vector_welch : Return the frequency vector based on the Welch's method.
 
-    freq_vector_scale : Return the frequency vector based on scales
+    pyleoclim.utils.wavelet.freq_vector_scale : Return the frequency vector based on scales
 
-    freq_vector_log : Return the frequency vector based on logspace 
+    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace 
 
-    make_freq_vector : Make frequency vector
+    pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
 
     '''
     nt = np.size(ts)
@@ -1610,16 +1610,16 @@ def freq_vector_scale(ts, nv=12):
     See also
     --------
     
-    freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
         recommendation.
 
-    freq_vector_welch : Return the frequency vector based on the Welch's method.
+    pyleoclim.utils.wavelet.freq_vector_welch : Return the frequency vector based on the Welch's method.
 
-    freq_vector_nfft : Return the frequency vector based on NFFT
+    pyleoclim.utils.wavelet.freq_vector_nfft : Return the frequency vector based on NFFT
 
-    freq_vector_log : Return the frequency vector based on logspace 
+    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace 
 
-    make_freq_vector : Make frequency vector
+    pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
 
     '''
 
@@ -1652,16 +1652,16 @@ def freq_vector_log(ts, nfreq=None):
     See also
     --------
     
-    freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
         recommendation.
 
-    freq_vector_welch : Return the frequency vector based on the Welch's method.
+    pyleoclim.utils.wavelet.freq_vector_welch : Return the frequency vector based on the Welch's method.
 
-    freq_vector_nfft : Return the frequency vector based on NFFT
+    pyleoclim.utils.wavelet.freq_vector_nfft : Return the frequency vector based on NFFT
 
-    freq_vector_scale : Return the frequency vector based on scales
+    pyleoclim.utils.wavelet.freq_vector_scale : Return the frequency vector based on scales
 
-    make_freq_vector : Make frequency vector
+    pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
     '''
 
     nt = np.size(ts)
@@ -1710,16 +1710,16 @@ def make_freq_vector(ts, method='log', **kwargs):
     See also
     --------
     
-    freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
         recommendation.
 
-    freq_vector_welch : Return the frequency vector based on the Welch's method.
+    pyleoclim.utils.wavelet.freq_vector_welch : Return the frequency vector based on the Welch's method.
 
-    freq_vector_nfft : Return the frequency vector based on NFFT
+    pyleoclim.utils.wavelet.freq_vector_nfft : Return the frequency vector based on NFFT
 
-    freq_vector_scale : Return the frequency vector based on scales
+    pyleoclim.utils.wavelet.freq_vector_scale : Return the frequency vector based on scales
 
-    freq_vector_log : Return the frequency vector based on logspace 
+    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace 
 
     '''
 

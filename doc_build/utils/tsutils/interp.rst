@@ -1,6 +1,6 @@
 .. _utils_interp:
 
-interp (pyleoclim.utils.interp)
+interp (pyleoclim.utils.tsutils.interp)
 ===============================
 
-.. autofunction:: pyleoclim.utils.interp
+.. autofunction:: pyleoclim.utils.tsutils.interp

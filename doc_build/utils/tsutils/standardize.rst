@@ -1,6 +1,6 @@
 .. _utils_standardize:
 
-standardize (pyleoclim.utils.standardize)
+standardize (pyleoclim.utils.tsutils.standardize)
 =========================================
 
-.. autofunction:: pyleoclim.utils.standardize
+.. autofunction:: pyleoclim.utils.tsutils.standardize

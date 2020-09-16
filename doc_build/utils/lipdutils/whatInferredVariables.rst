@@ -1,6 +1,6 @@
 .. _utils_whatInferredVariables:
 
-whatInferredVariables (pyleoclim.utils.whatInferredVariables)
+whatInferredVariables (pyleoclim.utils.lipdutils.whatInferredVariables)
 =============================================================
 
-.. autofunction:: pyleoclim.utils.whatInferedVariables
+.. autofunction:: pyleoclim.utils.lipdutils.whatInferedVariables

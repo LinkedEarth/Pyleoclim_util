@@ -73,9 +73,9 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
     See Also
     -------- 
     
-    set_style : set different styles for the figures. Should be set before invoking the plotting functions
-    savefig : save figures
-    showfig : equivalent to plt.show(). Platform-dependent
+    pyleoclim.utils.plotting.set_style : set different styles for the figures. Should be set before invoking the plotting functions
+    pyleoclim.utils.plotting.savefig : save figures
+    pyleoclim.utils.plotting.showfig : equivalent to plt.show(). Platform-dependent
     
     '''
     # handle dict defaults
@@ -168,9 +168,9 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     See Also
     --------
     
-    set_style : set different styles for the figures. Should be set before invoking the plotting functions
-    savefig : save figures
-    showfig : equivalent to plt.show(). Platform-dependent
+    pyleoclim.utils.plotting.set_style : set different styles for the figures. Should be set before invoking the plotting functions
+    pyleoclim.utils.plotting.savefig : save figures
+    pyleoclim.utils.plotting.showfig : equivalent to plt.show(). Platform-dependent
         
     '''
     # handle dict defaults
@@ -258,9 +258,9 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
     See Also
     --------
     
-    set_style : set different styles for the figures. Should be set before invoking the plotting functions
-    savefig : save figures
-    showfig : equivalent to plt.show(). Platform-dependent
+    pyleoclim.utils.plotting.set_style : set different styles for the figures. Should be set before invoking the plotting functions
+    pyleoclim.utils.plotting.savefig : save figures
+    pyleoclim.utils.plotting.showfig : equivalent to plt.show(). Platform-dependent
     
       '''
 
@@ -359,8 +359,8 @@ def showfig(fig):
     
     See Also
     --------
-    savefig : saves a figure to a specific path
-    plotting.in_notebook: Functions to sense a notebook environment
+    pyleoclim.utils.plotting.savefig : saves a figure to a specific path
+    pyleoclim.utils.plotting.in_notebook: Functions to sense a notebook environment
 
     '''
     if in_notebook:
@@ -394,7 +394,7 @@ def savefig(fig, path=None, settings={}, verbose=True):
     See Also
     --------
     
-    showfig : returns a visual of the figure. 
+    pyleoclim.utils.plotting.showfig : returns a visual of the figure. 
     '''
     if path is None and 'path' not in settings:
         raise ValueError('"path" must be specified, either with the keyword argument or be specified in `settings`!')
