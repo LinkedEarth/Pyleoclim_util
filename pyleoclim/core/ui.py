@@ -290,6 +290,11 @@ class Series:
 
         When `ax` is passed, the return will be `ax` only; otherwise, both `fig` and `ax` will be returned.
         
+        See also
+        --------
+        
+        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+        
         Examples
         --------
         
@@ -373,10 +378,10 @@ class Series:
         return res
 
     def ssa(self, M=None, nMC=0, f=0.5):
-        ''' Singular Spectrum Analysis
+        '''Singular Spectrum Analysis
         
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
-        This implementation  uses the method of [1], with applications presented in [2]
+        This implementation  uses the method of [1], with applications presented in [2].
         Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
         The method expects regular spacing, but is tolerant to missing values, up to a fraction 0<f<1 (see [4]).
 
@@ -525,9 +530,15 @@ class Series:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
-              with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
+                
+                - "path" must be specified; it can be any existed or non-existed path,
+                with or without a suffix; if the suffix is not given in "path", it will follow "format"
+              - "format" can be one of {"pdf", "eps", "png", "ps"}
+        
+        See also
+        --------
+        
+        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
         
         Examples
         --------
@@ -576,16 +587,16 @@ class Series:
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
                     time_label=None, value_label=None, period_label=None, psd_label=None):
-        ''' Generate summary plot of spectral and wavelet analysis on a timeseries
+        ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. 
 
-        Args
-        ----
+        Parameters
+        ----------
 
         psd : PSD
-            the PSD object of a Series
+            the PSD object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
 
         scalogram : Scalogram
-            the Scalogram object of a Series
+            the Scalogram object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
 
         figsize : list
             a list of two integers indicating the figure size
@@ -604,6 +615,9 @@ class Series:
 
         psd_lim : list or tuple
             the limitation of the psd axis
+        
+        n_signif_test=100 : int
+            Number of Monte-Carlo simulations to perform for significance testing. Used when psd=None or scalogram=None
 
         time_label : str
             the label for the time axis
@@ -622,6 +636,49 @@ class Series:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
+        
+        See also
+        --------
+        
+        pyleoclim.core.ui.Series.spectral : Spectral analysis for a timeseries
+        
+        pyleoclim.core.ui.Series.wavelet : Wavelet analysis for a timeseries
+        
+        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim        
+        
+        Examples
+        --------
+        
+        Create a summary plot for the SOI dataset. Note: because the wwz method can be slow, only 10 AR1 models are generated in this example. For normal applications, we recommend at least 200. 
+        
+        .. ipython:: python
+            
+            import pyleoclim as pyleo
+            import pandas as pd
+            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time=data.iloc[:,1]
+            value=data.iloc[:,2]
+            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            #Perform spectral analysis
+            psd=ts.spectral()
+            # Significance testing
+            psd_signif=psd.signif_test(number=10)
+            # Perform wavelet analysis
+            scal=ts.wavelet()
+            # Significance testing
+            scal_signif = scal.signif_test(number=10)
+            @savefig ts_summary_plot.png
+            fig, ax = ts.summary_plot(
+                        scalogram=scal_signif, psd=psd_signif,
+                        psd_lim=[1e-2, 1e2],
+                        period_lim=[0.2, 50],
+                        value_label='SOI [K]',
+                        period_label='Period [yrs]',
+                        time_label='Year (CE)',
+                        psd_label='PSD',
+                        title='Summary of SOI timeseries'
+                        )
+        
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         fig = plt.figure(figsize=figsize)
@@ -679,10 +736,24 @@ class Series:
         return fig, ax
 
     def copy(self):
+        '''Make a copy of the Series object
+
+        Returns
+        -------
+        Series
+            A copy of the Series object
+
+        '''
         return deepcopy(self)
 
     def clean(self):
         ''' Clean up the timeseries by removing NaNs and sort with increasing time points
+        
+        Returns
+        -------
+        Series
+            Series object with removed NaNs and sorting
+        
         '''
         new = self.copy()
         v_mod, t_mod = tsutils.clean_ts(self.value, self.time)
@@ -691,12 +762,28 @@ class Series:
         return new
 
     def gaussianize(self):
+        ''' Gaussianizes the timeseries
+        
+        Returns
+        -------
+        new : pyleoclim.Series
+            The Gaussianized series object
+
+        '''
         new = self.copy()
         v_mod = tsutils.gaussianize(self.value)
         new.value = v_mod
         return new
 
     def standardize(self):
+        '''Standardizes the time series
+
+        Returns
+        -------
+        new : pyleoclim.Series
+            The standardized series object
+
+        '''
         new = self.copy()
         v_mod = tsutils.standardize(self.value)[0]
         new.value = v_mod
@@ -711,8 +798,8 @@ class Series:
             we think that the change of dts (or the gradient) is too large, and we regard it as a breaking point
             and divide the time series into two segments here
 
-        Args
-        ----
+        Parameters
+        ----------
 
         ts : pyleoclim Series
 
@@ -745,8 +832,8 @@ class Series:
     def slice(self, timespan):
         ''' Slicing the timeseries with a timespan (tuple or list)
 
-        Args
-        ----
+        Parameters
+        ----------
 
         timespan : tuple or list
             The list of time points for slicing, whose length must be even.
@@ -776,6 +863,78 @@ class Series:
         return new
 
     def detrend(self, method='emd', **kwargs):
+        '''Detrend Series object        
+
+        Parameters
+        ----------
+        method : str, optional
+            The method for detrending. The default is 'emd'.
+            Options include:
+                * linear: the result of a linear least-squares fit to y is subtracted from y.
+                * constant: only the mean of data is subtrated.
+                * "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+                * "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+        **kwargs : dict
+            Relevant arguments for each of the methods.
+
+        Returns
+        -------
+        new : pyleoclim.Series
+            Detrended Series object
+        
+        See also
+        --------
+        pyleoclim.utils.tsutils.detrend : detrending wrapper functions
+        
+        Examples
+        --------
+        
+        We will generate a random signal and use the different detrending functions
+        
+        .. ipython:: python
+            
+            import pyleoclim as pyleo
+            import numpy as np
+            
+            # Generate a mixed signal with known frequencies
+            freqs=[1/20,1/80]
+            time=np.arange(2001)
+            signals=[]
+            for freq in freqs:
+                signals.append(np.cos(2*np.pi*freq*time))
+            signal=sum(signals)
+            
+            # Add a non-linear trend
+            slope = 1e-5
+            intercept = -1
+            nonlinear_trend = slope*time**2 + intercept
+            signal_trend = signal + nonlinear_trend
+
+            #Add white noise
+            sig_var = np.var(signal)
+            noise_var = sig_var / 2 #signal is twice the size of noise
+            white_noise = np.random.normal(0, np.sqrt(noise_var), size=np.size(signal))
+            signal_noise = signal_trend + white_noise
+            
+            #Create a series object
+            ts=pyleo.Series(time=time,value=signal_noise)
+            @savefig random_series.png
+            fig,ax = ts.plot(title='Timeseries with nonlinear trend')
+            
+            #Standardize
+            ts_std=ts.standardize()
+            
+            #Detrend using EMD 
+            ts_emd = ts_std.detrend()
+            @savefig ts_emd.png
+            fig,ax=ts_emd.plot(title='Detrended with EMD method')
+            
+            #Detrend using Savitzky-Golay filter
+            ts_sg = ts_std.detrend(method='savitzky-golay')
+            @savefig ts_sg.png
+            fig,ax=ts_sg.plot(title='Detrended with Savitzky-Golay filter')
+
+        '''
         new = self.copy()
         v_mod = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
         new.value = v_mod
@@ -784,12 +943,93 @@ class Series:
     def spectral(self, method='wwz', freq_method='log', freq_kwargs=None, settings=None, label=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
-        Args
-        ----
+        Parameters
+        ----------
+        
+        method : str
+            {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram'}
 
         freq_method : str
-            {'scale', 'nfft', 'Lomb-Scargle', 'Welch'}
-
+            {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
+        
+        freq_kwargs : dict
+            Arguments for frequency vector
+        
+        settings : dict
+            Arguments for the specific spectral method
+        
+        label : str
+            Label for the PSD object
+        
+        verbose : {True, False}
+        
+        Returns
+        -------
+        
+        psd : pyleoclim.Psd
+            A PSD object
+            
+        See also
+        --------
+        pyleoclim.utils.spectral.mtm : Spectral analysis using the Multitaper approach
+        
+        pyleoclim.utils.spectral.lomb_scargle : Spectral analysis using the Lomb-Scargle method
+        
+        pyleoclim.utils.spectral.welch: Spectral analysis using the Welch segement approach
+        
+        pyleoclim.utils.spectral.periodogram: Spectral anaysis using the basic Fourier transform
+        
+        pyleoclim.utils.spectral.wwz_psd : Spectral analysis using the Wavelet Weighted Z transform
+        
+        pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
+        
+        pyleoclim.utils.tsutils.detrend : Detrending function
+        
+        
+        Examples
+        --------
+        
+        Calculate the spectrum of SOI using the various methods and compute significance
+        
+        .. ipython:: python
+        
+            import pyleoclim as pyleo
+            import pandas as pd
+            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time=data.iloc[:,1]
+            value=data.iloc[:,2]
+            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            # Standardize the time series
+            ts_std=ts.standardize()
+            # WWZ
+            psd_wwz=ts_std.spectral()
+            psd_wwz_signif=psd_wwz.signif_test(number=10)
+            @savefig spec_wwz.png
+            fig,ax=psd_wwz_signif.plot(title='PSD using WWZ method')
+            #Periodogram
+            ts_interp = ts_std.interp()
+            psd_perio=ts_interp.spectral(method='periodogram')
+            psd_perio_signif=psd_perio.signif_test()
+            @savefig spec_perio.png
+            fig,ax=psd_perio_signif.plot(title='PSD using Periodogram method')
+            #Welch
+            ts_interp = ts_std.interp()
+            psd_welch=ts_interp.spectral(method='welch')
+            psd_welch_signif=psd_welch.signif_test()
+            @savefig spec_welch.png
+            fig,ax=psd_welch_signif.plot(title='PSD using Welch method')
+            #MTM
+            ts_interp = ts_std.interp()
+            psd_mtm=ts_interp.spectral(method='mtm')
+            psd_mtm_signif=psd_mtm.signif_test()
+            @savefig spec_mtm.png
+            fig,ax=psd_mtm_signif.plot(title='PSD using MTM method')
+            #Lomb-Scargle
+            psd_ls=ts_std.spectral(method='lomb_scargle')
+            psd_ls_signif=psd_ls.signif_test()
+            @savefig spec_ls.png
+            fig,ax=psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
+        
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -834,6 +1074,35 @@ class Series:
         ''' Perform wavelet analysis on the timeseries
 
         cwt wavelets documented on https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
+        
+        Parameters
+        ----------
+        
+        method : {wwz,cwt}
+            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
+            
+        freq_method : str
+            {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
+        
+        freq_kwargs : dict
+            Arguments for frequency vector
+        
+        settings : dict
+            Arguments for the specific spectral method
+        
+        verbose : {True, False}
+        
+        Returns
+        -------
+        
+        See also
+        --------
+        
+        Examples
+        --------
+        
+        Wavelet analysis on the SOI record. 
+        
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -1366,11 +1635,11 @@ class Scalogram:
             if ylabel is None:
                 ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
 
-        if xlabel is None and self.time_label is not None:
+        if xlabel is None:
             xlabel = self.time_label
 
         cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
-        ax.set_yscale('log', nonposy='clip')
+        ax.set_yscale('log', nonpositive='clip')
 
         # plot colorbar
         cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
@@ -1575,7 +1844,7 @@ class Coherence:
         # plot phase
         yaxis_range = np.max(y_axis) - np.min(y_axis)
         xaxis_range = np.max(self.time) - np.min(self.time)
-        phase_args = {'pt': 0.5, 'skip_x': int(xaxis_range//5), 'skip_y': int(yaxis_range//5), 'scale': 30, 'width': 0.004}
+        phase_args = {'pt': 0.5, 'skip_x': int(xaxis_range//10), 'skip_y': int(yaxis_range//50), 'scale': 30, 'width': 0.004}
         phase_args.update(phase_style)
 
         pt = phase_args['pt']
@@ -1848,7 +2117,7 @@ class MultiplePSD:
         See also
         --------
 
-        core.ui.PSD.beta_est : beta estimation for on PSD object
+        pyleoclim.core.ui.PSD.beta_est : beta estimation for on PSD object
 
         '''
 
