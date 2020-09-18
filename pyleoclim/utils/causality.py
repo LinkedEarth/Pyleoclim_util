@@ -79,7 +79,7 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
     if len(y1)!=len(y2):
         raise ValueError('Timeseries must be of same length')
 
-    x=np.matrix([y1,y2]).T
+    x=np.array([y1,y2]).T
     res = grangercausalitytests(x,maxlag=maxlag,addconst=addconst,verbose=verbose)
     return res
 

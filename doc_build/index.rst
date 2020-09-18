@@ -4,6 +4,7 @@
    contain the root `toctree` directive.
 
 .. toctree::
+  :hidden:    
    installation.rst
    citation.rst
    core/ui.rst

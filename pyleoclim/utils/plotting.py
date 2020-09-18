@@ -215,8 +215,8 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 
 def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, 
               xlim=None, ylim=None, title=None,
-            savefig_settings=None, ax=None, set_style=None, 
-            plot_kwargs=None, mute=False,color=None):
+              savefig_settings=None, ax=None, style=None, 
+              plot_kwargs=None, mute=False,color=None):
     ''' Stack plot of timeseries
     
     Please not that this function uses a different default style than the Pyleoclim package.
@@ -242,6 +242,8 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
         the title for the figure
     ax : pyplot.axis
         the pyplot.axis object
+    style : str
+        style of the plot. See set_style
     plot_kwargs : dict
         the keyword arguments for ax.plot()
     mute : bool
@@ -269,7 +271,7 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
        
     min_x = min([a for i in x for a in i])
     max_x = max([a for i in x for a in i])
-    if set_style is None:
+    if style is None:
         set_style('journal_spines')
 
     if ax is None:

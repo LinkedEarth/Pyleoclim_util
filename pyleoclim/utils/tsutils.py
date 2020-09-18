@@ -168,8 +168,10 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **ar
        The x-axis
     y : array
        The y-axis
+    interp_type : {‘linear’, ‘nearest’, ‘zero’, ‘slinear’, ‘quadratic’, ‘cubic’, ‘previous’, ‘next’}
+        where ‘zero’, ‘slinear’, ‘quadratic’ and ‘cubic’ refer to a spline interpolation of zeroth, first, second or third order; ‘previous’ and ‘next’ simply return the previous or next value of the point) or as an integer specifying the order of the spline interpolator to use. Default is ‘linear’.
     interp_step : float
-                 The interpolation step. Default is mean resolution.
+            The interpolation step. Default is mean resolution.
     start : float
            where/when to start the interpolation. Default is min..
     end : float
