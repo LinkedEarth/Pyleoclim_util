@@ -3208,6 +3208,7 @@ class Lipd:
     
     usr_path : str
         path to the Lipd file(s). Can be URL (LiPD utilities only support loading one file at a time from a URL)
+        If it's a URL, it must start with "http", "https", or "ftp.
     
     lidp_dict : dict
         LiPD files already loaded into Python through the LiPD utilities
@@ -3369,9 +3370,16 @@ class Lipd:
             # since readLipd() takes only absolute path and it will change the current working directory (CWD) without turning back,
             # we need to record CWD manually and turn back after the data loading is finished
             cwd = os.getcwd()
-            abs_path = os.path.abspath(usr_path)
-            D_path = lpd.readLipd(abs_path)
+            if usr_path[:4] == 'http' or usr_path[:3] == 'ftp':
+                # URL
+                D_path = lpd.readLipd(usr_path)
+            else:
+                # local path
+                abs_path = os.path.abspath(usr_path)
+                D_path = lpd.readLipd(abs_path)
+
             os.chdir(cwd)
+
             #make sure that it's more than one
             if 'archiveType' in D_path.keys():
                 D_path={D_path['dataSetName']:D_path}
