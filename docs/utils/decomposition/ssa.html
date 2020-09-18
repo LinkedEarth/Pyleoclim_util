@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ssa (pyleoclim.utils.decompoition.ssa) &mdash; Pyleoclim 0.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">ssa (pyleoclim.utils.decompoition.ssa)</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>ssa (pyleoclim.utils.decompoition.ssa)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/utils/decomposition/ssa.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="ssa-pyleoclim-utils-decompoition-ssa">
+<span id="utils-ssa"></span><h1>ssa (pyleoclim.utils.decompoition.ssa)<a class="headerlink" href="#ssa-pyleoclim-utils-decompoition-ssa" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="pyleoclim.utils.decomposition.ssa">
+<code class="sig-prename descclassname">pyleoclim.utils.decomposition.</code><code class="sig-name descname">ssa</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ys</span></em>, <em class="sig-param"><span class="n">M</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nMC</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">f</span><span class="o">=</span><span class="default_value">0.5</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/decomposition.html#ssa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.decomposition.ssa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Singular spectrum analysis</p>
+<p>Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
+This implementation  uses the method of [1], with applications presented in [2]
+Optionally (MC&gt;0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
+The method expects regular spacing, but is tolerant to missing values, up to a fraction 0&lt;f&lt;1 (see [4]).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ys</strong> (<em>array of length N</em>) – time series (evenly-spaced, possibly with with up to f*N NaNs)</p></li>
+<li><p><strong>M</strong> (<em>int</em>) – window size (default: 10% of the length of the series)</p></li>
+<li><p><strong>nMC</strong> (<em>int</em>) – Number of iteration in the Monte-Carlo process (default nMC=0, bypasses Monte Carlo SSA)
+Note: currently only supported for evenly-spaced, gap-free data.</p></li>
+<li><p><strong>f</strong> (<em>float</em>) – maximum allowable fraction of missing values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>res</strong> – Containing:</p>
+<ul class="simple">
+<li><p>eig_val : (M, 1) array of eigenvalue spectrum</p></li>
+<li><p>eig_vec : Matrix of temporal eigenvectors</p></li>
+<li><p>PC : (N - M + 1, M) array of principal components</p></li>
+<li><p>RC : (N,  M) array of reconstructed components</p></li>
+<li><p>eig_val_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC &gt;0 ]</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p><a href="#id5"><span class="problematic" id="id1">[1]_</span></a> Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
+dynamics, with applications to paleoclimatic time series, Physica D, 35,
+395–424.</p>
+<p><a href="#id6"><span class="problematic" id="id2">[2]_</span></a> Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
+A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002),
+Advanced spectral methods for climatic time series, Rev. Geophys., 40(1),
+1003–1052, doi:10.1029/2000RG000092.</p>
+<p><a href="#id7"><span class="problematic" id="id3">[3]_</span></a> Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
+oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.</p>
+<p><a href="#id8"><span class="problematic" id="id4">[4]_</span></a> Schoellhamer, D. H. (2001), Singular spectrum analysis for time series with
+missing data, Geophysical Research Letters, 28(16), 3187–3190, doi:10.1029/2000GL012698.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="mssa.html#pyleoclim.utils.decomposition.mssa" title="pyleoclim.utils.decomposition.mssa"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyleoclim.utils.decomposition.mssa()</span></code></a></dt><dd><p>Multi-channel SSA</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
