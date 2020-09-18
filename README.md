@@ -1,5 +1,5 @@
 <!---[![PyPI](https://img.shields.io/pypi/dm/pyleoclim.svg)](https://pypi.python.org/pypi/Pyleoclim)-->
-[![PyPI](https://img.shields.io/pypi/v/pyleoclim.svg)]()
+[![PyPI version](https://badge.fury.io/py/pyleoclim.svg)](https://badge.fury.io/py/pyleoclim)
 [![PyPI](https://img.shields.io/badge/python-3.8-yellow.svg)]()
 [![license](https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg)]()
 [![DOI](https://zenodo.org/badge/59611213.svg)](https://zenodo.org/badge/latestdoi/59611213)
