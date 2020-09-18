@@ -116,71 +116,71 @@ class TestUiSeriesSpectral:
     '''
 
     @pytest.mark.parametrize('spec_method', ['wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram'])
-    def test_spectral_t0(self, spec_method, eps=0.2):
+    def test_spectral_t0(self, spec_method, eps=0.3):
         ''' Test Series.spectral() with available methods using default arguments
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         alpha = 1
-        t, v = gen_colored_noise(alpha=alpha)
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method=spec_method)
         beta = psd.beta_est()['beta']
         assert np.abs(beta-alpha) < eps
         
     @pytest.mark.parametrize('freq_method', ['log', 'scale', 'nfft', 'lomb_scargle', 'welch'])
-    def test_spectral_t1(self, freq_method, eps=0.2):
+    def test_spectral_t1(self, freq_method, eps=0.3):
         ''' Test Series.spectral() with MTM using available `freq_method` options with other arguments being default
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         alpha = 1
-        t, v = gen_colored_noise(alpha=alpha)
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method=freq_method)
         beta = psd.beta_est()['beta']
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('nfreq', [10, 20, 30])
-    def test_spectral_t2(self, nfreq, eps=0.2):
+    def test_spectral_t2(self, nfreq, eps=0.3):
         ''' Test Series.spectral() with MTM using `freq_method='log'` with different values for its keyword argument `nfreq`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         alpha = 1
-        t, v = gen_colored_noise(alpha=alpha)
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method='log', freq_kwargs={'nfreq': nfreq})
         beta = psd.beta_est()['beta']
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('nv', [10, 20, 30])
-    def test_spectral_t3(self, nv, eps=0.2):
+    def test_spectral_t3(self, nv, eps=0.3):
         ''' Test Series.spectral() with MTM using `freq_method='scale'` with different values for its keyword argument `nv`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         alpha = 1
-        t, v = gen_colored_noise(alpha=alpha)
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method='scale', freq_kwargs={'nv': nv})
         beta = psd.beta_est()['beta']
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('dt, nf, ofac, hifac', [(None, 20, 1, 1), (None, None, 2, 0.5)])
-    def test_spectral_t4(self, dt, nf, ofac, hifac, eps=0.2):
+    def test_spectral_t4(self, dt, nf, ofac, hifac, eps=0.5):
         ''' Test Series.spectral() with MTM using `freq_method=lomb_scargle` with different values for its keyword arguments
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         alpha = 1
-        t, v = gen_colored_noise(alpha=alpha)
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method='lomb_scargle', freq_kwargs={'dt': dt, 'nf': nf, 'ofac': ofac, 'hifac': hifac})
         beta = psd.beta_est()['beta']
         assert np.abs(beta-alpha) < eps
 
-    def test_spectral_t5(self, eps=0.2):
+    def test_spectral_t5(self, eps=0.3):
         ''' Test Series.spectral() with WWZ with specified frequency vector passed via `settings`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
@@ -188,24 +188,24 @@ class TestUiSeriesSpectral:
         Also, we give `label` a test.
         '''
         alpha = 1
-        t, v = gen_colored_noise(alpha=alpha)
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
-        freq = np.arange(1/50, 1/2, 0.1)
+        freq = np.linspace(1/500, 1/2, 20)
         psd = ts.spectral(method='wwz', settings={'freq': freq}, label='WWZ')
         beta = psd.beta_est()['beta']
         assert_array_equal(psd.frequency, freq)
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('spec_method', ['wwz', 'lomb_scargle'])
-    def test_spectral_t6(self, spec_method, eps=0.2):
+    def test_spectral_t6(self, spec_method, eps=0.3):
         ''' Test Series.spectral() with WWZ and Lomb Scargle on unevenly-spaced data with default arguments
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         alpha = 1
-        t, v = gen_colored_noise(nt=110, alpha=alpha)
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
         # randomly remove some data pts
-        n_del = 10
+        n_del = 50
         deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
         t_unevenly =  np.delete(t, deleted_idx)
         v_unevenly =  np.delete(v, deleted_idx)
