@@ -2,41 +2,13 @@ import os
 import sys
 import io
 
-#  from setuptools import setup, find_packages
-from setuptools import find_packages
-from numpy.distutils.core import Extension
-from numpy.distutils.core import setup
+from setuptools import setup, find_packages
 
-version = '0.4.10'
+version = '0.5.0'
 
 # Read the readme file contents into variable
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
-# Publish the package to the live server
-if sys.argv[-1] == 'publish':
-    # Register the tarball, upload it, and trash the temp readme rst file
-    #os.system('python3 setup.py register -r pypi')
-    os.system('python3 setup.py sdist')
-    os.system('twine upload dist/pyleoclim-'+version+'tar.gz')
-    sys.exit()
-
-# Publish the package to the test server
-elif sys.argv[-1] == 'publishtest':
-    # Create dist tarball, register it to test site, upload tarball, and remove temp readme file
-    #os.system('python3 setup.py register -r pypitest')
-    os.system('python3 setup.py sdist')
-    os.system('twine upload --repository-url https://test.pypi.org/legacy/ dist/pyleoclim-'+version+'tar.gz')
-
-    sys.exit()
-
-f2py_wwz = Extension(
-    name='pyleoclim.f2py_wwz',
-    extra_compile_args=['-O3'],
-    extra_f90_compile_args=['-fopenmp', '-O3'],  # compiling with gfortran
-    #  extra_f90_compile_args=['-qopenmp', '-O3', '-mkl=parallel'],  # compiling with ifort
-    sources=['pyleoclim/src/f2py_wwz.f90']
-)
 
 setup(
     name='pyleoclim',
@@ -44,28 +16,35 @@ setup(
     include_package_data=True,
     zip_safe=False,
     version=version,
-    license='GNU Public',
+    license='GPL-3.0 License',
     description='A Python package for paleoclimate data analysis',
     long_description=read("README.md"),
     long_description_content_type = 'text/markdown',
-    author='Deborah Khider',
+    author='Deborah Khider, Feng Zhu, Julien Emile-Geay',
     author_email='khider@usc.edu',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
     download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/'+version,
-    keywords=['Paleoclimate, Data Analysis'],
+    keywords=['Paleoclimate, Data Analysis, LiPD'],
     classifiers=[],
-    ext_modules=[f2py_wwz],
     install_requires=[
-        "LiPD>=0.2.7",
-        "pandas>=0.25.0",
-        "numpy>=1.16.4",
-        "matplotlib>=3.1.0",
-        "scipy>=1.3.1",
-        "statsmodels>=0.8.0",
-        "seaborn>=0.9.0",
-        "scikit-learn>=0.21.3",
-        "pathos>=0.2.4",
-        "tqdm>=4.33.0",
-        "rpy2>=3.0.5"],
-    python_requires=">=3.6.0"
+        "LiPD>=0.2.8",
+        "pandas>=1.0.5",
+        "numpy>=1.18.5",
+        "matplotlib>=3.3.1",
+        "scipy>=1.5.0",
+        "statsmodels>=0.11.1",
+        "seaborn>=0.10.1",
+        "scikit-learn>=0.23.1",
+        "pathos>=0.2.6",
+        "tqdm>=4.47.0",
+        "tftb>=0.1.1",
+        "pyhht>=0.1.0",
+        "wget>=3.2",
+        "numba>=0.50.1",
+        "nitime>=0.8.1",
+        "tabulate>=0.8.7",
+        "PyWavelets>=1.1.1",
+        "Unidecode>=1.1.1"
+    ],
+    python_requires=">=3.8.0"
 )

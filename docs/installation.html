@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation &mdash; Pyleoclim 0.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Installation</a><ul>
+<li><a class="reference internal" href="#installing-anaconda-or-miniconda">Installing Anaconda or Miniconda</a></li>
+<li><a class="reference internal" href="#creating-a-new-anaconda-environment">Creating a new Anaconda environment</a></li>
+<li><a class="reference internal" href="#installing-pyleoclim">Installing Pyleoclim</a></li>
+<li><a class="reference internal" href="#building-from-source-for-the-f2py-feature-of-wwz">Building from source for the f2py feature of WWZ</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Installation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pyleoclim requires the use of Python 3.8.</p>
+</div>
+<div class="section" id="id1">
+<h1>Installation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>We recommend the use of Anaconda or Miniconda, with Pyleoclim setup in
+its own environment. Some default packages shipping with the full Anaconda distribution are known to cause conflicts with the required Pyleoclim packages.</p>
+<div class="section" id="installing-anaconda-or-miniconda">
+<h2>Installing Anaconda or Miniconda<a class="headerlink" href="#installing-anaconda-or-miniconda" title="Permalink to this headline">¶</a></h2>
+<p>To install Anaconda or Miniconda on your platform, follow the instructions from <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">this page</a>.</p>
+<p>Click <a class="reference internal" href="anaconda_install.html#anaconda-installation"><span class="std std-ref">here</span></a> for a quick tutorial on MacOs and Linux systems.</p>
+</div>
+<div class="section" id="creating-a-new-anaconda-environment">
+<h2>Creating a new Anaconda environment<a class="headerlink" href="#creating-a-new-anaconda-environment" title="Permalink to this headline">¶</a></h2>
+<p>To create a new environment using Python 3.8 via command line:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -n pyleoenv <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8
+</pre></div>
+</div>
+<p>To view a list of available environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda env list
+</pre></div>
+</div>
+<p>To activate your new environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate pyleoenv
+</pre></div>
+</div>
+<p>To view the list of packages in your environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda list
+</pre></div>
+</div>
+<p>To remove the environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda remove --name pyleoenv --all
+</pre></div>
+</div>
+<p>More information about managing conda environments can be found <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#">here</a>.</p>
+</div>
+<div class="section" id="installing-pyleoclim">
+<h2>Installing Pyleoclim<a class="headerlink" href="#installing-pyleoclim" title="Permalink to this headline">¶</a></h2>
+<p>Make sure that the pyleoenv environment is activated.</p>
+<p><strong>First</strong> install numpy and Cartopy:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install numpy
+conda install -c conda-forge cartopy
+</pre></div>
+</div>
+<p>Install Pyleoclim through Pypi</p>
+<p>The Pypi release contains the most stable version of Pyleoclim.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pyleoclim
+</pre></div>
+</div>
+<p>To install the development version, which contains the most up-to-date features:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
+</pre></div>
+</div>
+<p>If you would like to use Jupyter Notebooks or Spyder for code development, install these packages in your environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install spyder
+conda install jupyter
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The GUI framework used by the LiPD packages may cause a known conflict with the GUI framework for spyder. If this is the case it is safe to downgrade the conflicting packages.</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="s1">&#39;pyqt5&lt;5.13&#39;</span>
+pip install <span class="s1">&#39;pyqtwebengine&lt;5.13&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="building-from-source-for-the-f2py-feature-of-wwz">
+<h2>Building from source for the f2py feature of WWZ<a class="headerlink" href="#building-from-source-for-the-f2py-feature-of-wwz" title="Permalink to this headline">¶</a></h2>
+<p>The default version of WWZ that comes with the installation steps mentioned above is relying on <a class="reference external" href="http://numba.pydata.org/">Numba</a>.
+It is fast enough for lightweight spectral &amp; wavelet analysis tasks, in which case we recommend using the default installation.</p>
+<p>However, it could be slow for heavy use (e.g. performing it for hundreds of times on timeseries with length longer than 1000 points), in which case we recommend activating the f2py feature to achieve an acceleration of around 50% (see a loose benchmark notebook <a class="reference external" href="https://github.com/LinkedEarth/Pyleoclim_util/blob/Development/example_notebooks/WWZ_numba.ipynb">here</a>).</p>
+<p>To do that, a Fortran compiler (e.g. <code class="code docutils literal notranslate"><span class="pre">gfortran</span></code> or <code class="code docutils literal notranslate"><span class="pre">ifort</span></code>) is required on your local machine, and the related Fortran source code should be compiled locally following the steps below:</p>
+<ul class="simple">
+<li><p>download the source code, either via git clone or just download the .zip file from the <a class="reference external" href="https://github.com/LinkedEarth/Pyleoclim_util">Github repo</a></p></li>
+<li><p>go to the directory <code class="code docutils literal notranslate"><span class="pre">Pyleoclim_util/pyleoclim/f2py</span></code>, and then type <code class="code docutils literal notranslate"><span class="pre">make</span></code> to compile the .f90 source code with <code class="code docutils literal notranslate"><span class="pre">gfortran</span></code></p></li>
+<li><p>one may also edit the <code class="code docutils literal notranslate"><span class="pre">Makefile</span></code> to use <code class="code docutils literal notranslate"><span class="pre">ifort</span></code> as the compiler to achieve further acceleration; just comment out the line for <code class="code docutils literal notranslate"><span class="pre">gfortran</span></code> and use the line for <code class="code docutils literal notranslate"><span class="pre">ifort</span></code> below</p></li>
+<li><p>a <code class="code docutils literal notranslate"><span class="pre">.so</span></code> file will be generated if the compilation is successful</p></li>
+<li><p>copy the <code class="code docutils literal notranslate"><span class="pre">.so</span></code> file into the directory <code class="code docutils literal notranslate"><span class="pre">Pyleoclim_util/pyleoclim/utils</span></code> where Pyleoclim is installed on your machine. To find out the location, one may import the package in Python and “print” it:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyleoclim</span> <span class="k">as</span> <span class="nn">pyleo</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pyleo</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Again, unless you are planning to make heavy use of the WWZ functionality, we recommend using the default installation.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

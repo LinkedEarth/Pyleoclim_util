@@ -1,0 +1,8 @@
+.. _utils_mod:
+
+.. automodule:: pyleoclim.utils.causality
+  :members:
+
+.. automodule:: pyleoclim.utils.lipdutils
+  :members:
+  :private-members:

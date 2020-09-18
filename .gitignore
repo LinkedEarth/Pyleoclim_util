@@ -3,3 +3,12 @@ pyleoclim.egg-info
 .ipynb_checkpoints
 .ropeproject/
 .DS_Store
+.vscode
+.idea
+debug.log
+benchmark.log
+__pycache__
+
+./example_notebooks/debug.log
+./example_notebooks/benchmark.log
+./doc_build/_build/*
