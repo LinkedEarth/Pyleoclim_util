@@ -9,6 +9,6 @@ debug.log
 benchmark.log
 __pycache__
 
-./example_notebooks/debug.log
-./example_notebooks/benchmark.log
+./**/debug.log
+./**/benchmark.log
 ./doc_build/_build/*
