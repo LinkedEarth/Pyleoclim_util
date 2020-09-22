@@ -11,7 +11,7 @@ Installation
 ============
 
 We recommend the use of Anaconda or Miniconda, with Pyleoclim setup in
-its own environment. Some default packages shipping with the full Anaconda distribution are known to cause conflicts with the required Pyleoclim packages.
+its own `conda` environment. Some default packages shipping with the full Anaconda distribution are known to cause conflicts with the required Pyleoclim packages, so we recommend Miniconda, especially for beginners.
 
 Installing Anaconda or Miniconda
 """""""""""""""""""""""""""""""""

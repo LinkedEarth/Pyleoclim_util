@@ -3,7 +3,7 @@
 Citing Pyleoclim
 ================
 
-If Pyleoclim played an important part in your research the please add us to the reference list by using one of the recommendations below.
+If Pyleoclim played an important part in your research, please add us to your reference list by using one of the citations below.
 
 ************
 BibTeX entry

@@ -1,5 +1,8 @@
 .. _anaconda_installation:
 
+Anaconda is a very large install, containing not only Python, but also R, and a host of other things that are not necessary to run pyleoclim.
+Users may find it preferable to install the more minimalist "miniconda" package.
+
 Step 1: Download the installation script for miniconda3
 ======================================================
 
@@ -36,6 +39,6 @@ Step 3: Test your Installation
 
 .. code-block:: bash
 
-  source ~/.bashrc  # assume you are using Bash
+  source ~/.bashrc  # assume you are using Bash shell
   which python  # should return a path under <base-path>
   which conda  # should return a path under <base-path>
