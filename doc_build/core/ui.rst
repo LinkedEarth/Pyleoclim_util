@@ -5,7 +5,7 @@
 Series (pyleoclim.Series)
 =========================
 
-The Series class allows to manipulate Series objects which are basic representations of time and values.
+The Series class allows to manipulate Series objects, which are basic representations of timeseries, containing a time axis, values, and some basic metadata about both axes. 
 
 .. autoclass:: pyleoclim.core.ui.Series
 

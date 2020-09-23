@@ -76,22 +76,22 @@ Correlation
    :header-rows: 0
 
    * - :ref:`corr_sig <utils_corr_sig>`
-     - Estimates the Pearson's correlation and associated significance between two non IID time series.
+     - Estimates the Pearson's correlation and associated significance between two time series, applicable to cases where the standard assumption of independence breaks down. Three methods are currently implemented: t test with a heuristic correction for the degrees of freedom, Monte Carlo simulations based on an AR(1) model (`isopersist`), and phase randomization (`isospectral`).
    * - :ref:`fdr <utils_fdr>`
-     - False Discovery Rate
+     - False Discovery Rate, as per the method of Benjamini and Hochberg [1995]
 
 
 Decomposition
 -------------
 
-Methods used for decomposition.
+Methods used for decomposing timeseries into orthogonal components.
 
 .. list-table::
    :widths: 30 70
    :header-rows: 0
 
    * - :ref:`pca <utils_pca>`
-     - Principal Component Analysis (PCA, aka EOF)
+     - Principal Component Analysis (PCA, sometimes known as EOF analysis)
    * - :ref:`ssa <utils_ssa>`
      - Singular Spectrum Analysis
    * - :ref:`MSSA <utils_mssa>`
@@ -107,7 +107,7 @@ Filtering functions
    :header-rows: 0
 
    * - :ref:`Savitzky-Golay filter <utils_savitzky_golay>`
-     - Smooth (and optionally differentiate) data with a Savitzky-Golay filter
+     - Smoothe (and optionally differentiate) data with a Savitzky-Golay filter
    * - :ref:`Butterworth filter <utils_butterworth>`
      - Applies a Butterworth filter with frequency fc, with optional padding
 
@@ -210,7 +210,7 @@ This modules contain pre-processing functions for time series analysis.
    * - :ref:`interp <utils_interp>`
      - Interpolation function based on `scipy.interpolate.interp1d <https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html>_`
    * - :ref:`on_common_axis <utils_on_common_axis>`
-     - Places two timeseries on a common axis
+     - Places two timeseries on a common time axis
    * - :ref:`standardize <utils_standardize>`
      - Standardizes a timeseries
    * - :ref:`ts2segments <utils_ts2segments>`
@@ -220,11 +220,11 @@ This modules contain pre-processing functions for time series analysis.
    * - :ref:`annualize <utils_annualize>`
      - Annualize a time series whose time resolution is finer than 1 year
    * - :ref:`gaussianize <utils_gaussianize>`
-     - Transforms a (proxy) timeseries to a Gaussian distribution
+     - Maps a (proxy) timeseries to a Gaussian distribution
    * - :ref:`gaussianize_single <utils_gaussianize_single>`
      - Transforms a single (proxy) timeseries to a Gaussian distribution
    * - :ref:`detrend <utils_detrend>`
-     - Applies linear, contant, low-pass filter, or decomposition-based detrending
+     - Applies linear, constant, low-pass filter, or decomposition-based detrending
    * - :ref:`detect_outliers <utils_detect_outliers>`
      - Detect outliers in a timeseries
    * - :ref:`remove_outliers <utils_remove_outliers>`
