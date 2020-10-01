@@ -21,7 +21,7 @@ New in version 0.5.0:
 - [user interface](https://github.com/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb) allowing succinct, expressive calls
 - expanded repertoire of spectral and wavelet methods
 - inclusion of singular spectral analysis, permitting missing data
-- Sphinx [documentation](https://pyleoclim-util.readthedocs.io/en/latest/) for all functions
+- Sphinx [documentation](http://linkedearth.github.io/Pyleoclim_util/) for all functions
 - clean, additive [plot styles](https://github.com/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/plot_styles.ipynb) inspired by Matplotlib [style sheets](https://matplotlib.org/3.3.1/gallery/style_sheets/style_sheets_reference.html).  
 
 
