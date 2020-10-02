@@ -1,14 +1,7 @@
 language: python
+python:
+  - '3.8'
 
-dist: xenial
-services:
-  - xvfb
-
-env:
-  - PYTHON=3.7 DEPS=latest MPLBACKEND=agg DOCTESTS=true
-  - PYTHON=3.8 DEPS=latest MPLBACKEND=agg DOCTESTS=true
-  - PYTHON=3.8 DEPS=latest MPLBACKEND=qt5agg DOCTESTS=true
-  - PYTHON=3.8 DEPS=minimal MPLBACKEND=agg DOCTESTS=false
 
 before_install:
   - sudo apt-get update -yq
@@ -22,22 +15,13 @@ before_install:
   - conda info -a
 
 install:
-  - conda create -n pyleoenv python=$PYTHON
-  - conda activate pyleoenv
+  - conda create -n pyleoenv python=3.8
+  - source activate pyleoenv
   - conda install numpy
   - conda install -c conda-forge cartopy
+  - pip install -r requirements.txt
   - pip install .
-
-before_script:
 
 
 script:
-  - make lint
-  - if [ $DOCTESTS == 'true' ];
-  then make test;
-  else make unittests;
-  fi
-
-after_success:
-  - pip install codecov
-  - codecov
+  - pytest
