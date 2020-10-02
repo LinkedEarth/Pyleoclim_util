@@ -18,7 +18,10 @@ sphinx:
   # - pdf
 
 # Optionally set the version of Python and requirements required to build your docs
-python:
-  version: 3.8
-  install:
-    - requirements: doc_build/requirements.txt
+# python:
+#   version: 3.8
+#   install:
+#     - requirements: doc_build/requirements.txt
+
+conda:
+  environment: doc_build/rtd_env.yml
