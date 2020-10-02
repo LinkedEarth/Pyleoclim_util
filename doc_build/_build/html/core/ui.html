@@ -1,0 +1,785 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Series (pyleoclim.Series) &mdash; Pyleoclim 0.5.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Series (pyleoclim.Series)</a></li>
+<li><a class="reference internal" href="#multipleseries-pyleoclim-multipleseries">MultipleSeries (pyleoclim.MultipleSeries)</a></li>
+<li><a class="reference internal" href="#lipd-pyleoclim-lipd">Lipd (pyleoclim.Lipd)</a></li>
+<li><a class="reference internal" href="#lipdseries-pyleoclim-lipdseries">LipdSeries (pyleoclim.LipdSeries)</a></li>
+<li><a class="reference internal" href="#psd-pyleoclim-psd">PSD (pyleoclim.PSD)</a></li>
+<li><a class="reference internal" href="#scalogram-pyleoclim-scalogram">Scalogram (pyleoclim.Scalogram)</a></li>
+<li><a class="reference internal" href="#coherence-pyleoclim-coherence">Coherence (pyleoclim.Coherence)</a></li>
+<li><a class="reference internal" href="#surrogateseries-pyleoclim-surrogateseries">SurrogateSeries (pyleoclim.SurrogateSeries)</a></li>
+<li><a class="reference internal" href="#multiplepsd-pyleoclim-multiplepsd">MultiplePSD (pyleoclim.MultiplePSD)</a></li>
+<li><a class="reference internal" href="#multiplescalogram-pyleoclim-multiplescalogram">MultipleScalogram (pyleoclim.MultipleScalogram)</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Series (pyleoclim.Series)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/core/ui.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="series-pyleoclim-series">
+<h1>Series (pyleoclim.Series)<a class="headerlink" href="#series-pyleoclim-series" title="Permalink to this headline">¶</a></h1>
+<p>The Series class allows to manipulate Series objects, which are basic representations of timeseries, containing a time axis, values, and some basic metadata about both axes.</p>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.Series">
+<em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">Series</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">time</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">time_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">time_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">clean_ts</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Series"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.Series" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a pyleoSeries object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<em>list</em><em> or </em><em>numpy.array</em>) – Time values for the time series</p></li>
+<li><p><strong>value</strong> (<em>list of numpy.array</em>) – ordinate values for the time series</p></li>
+<li><p><strong>time_name</strong> (<em>string</em>) – Name of the time vector (e.g., ‘Age’).
+Default is None. This is used to label the time axis on plots</p></li>
+<li><p><strong>time_unit</strong> (<em>string</em>) – Units for the time vector (e.g., ‘yr B.P.’).
+Default is None</p></li>
+<li><p><strong>value_name</strong> (<em>string</em>) – Name of the value vector (e.g., ‘temperature’)
+Default is None</p></li>
+<li><p><strong>value_unit</strong> (<em>string</em>) – Units for the value vector (e.g., ‘deg C’)</p></li>
+<li><p><strong>label</strong> (<em>string</em>) – Name of the time series (e.g., ‘Nino 3.4’)</p></li>
+<li><p><strong>clean_ts</strong> (<em>bool</em>) – remove the NaNs and let the time axis to be increasing if True</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a PyleoSeries object.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">pyleoclim</span> <span class="k">as</span> <span class="nn">pyleo</span>
+
+<span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="gp">In [3]: </span><span class="n">data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+<span class="gp">   ...: </span>    <span class="s1">&#39;https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv&#39;</span><span class="p">,</span>
+<span class="gp">   ...: </span>    <span class="n">skiprows</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">1</span>
+<span class="gp">   ...: </span><span class="p">)</span>
+<span class="gp">   ...: </span>
+
+<span class="gp">In [4]: </span><span class="n">time</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="gp">In [5]: </span><span class="n">value</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="gp">In [6]: </span><span class="n">ts</span><span class="o">=</span><span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+<span class="gp">   ...: </span>    <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span>
+<span class="gp">   ...: </span>    <span class="n">time_name</span><span class="o">=</span><span class="s1">&#39;Year (CE)&#39;</span><span class="p">,</span> <span class="n">value_name</span><span class="o">=</span><span class="s1">&#39;SOI&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SOI&#39;</span>
+<span class="gp">   ...: </span><span class="p">)</span>
+<span class="gp">   ...: </span>
+
+<span class="gp">In [7]: </span><span class="n">ts</span>
+<span class="gh">Out[7]: </span><span class="go">&lt;pyleoclim.core.ui.Series at 0x175bac2e0&gt;</span>
+
+<span class="gp">In [8]: </span><span class="n">ts</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="gh">Out[8]: </span><span class="go">dict_keys([&#39;time&#39;, &#39;value&#39;, &#39;time_name&#39;, &#39;time_unit&#39;, &#39;value_name&#39;, &#39;value_unit&#39;, &#39;label&#39;])</span>
+</pre></div>
+</div>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="Series/bin.html#pyleoclim.core.ui.Series.bin" title="pyleoclim.core.ui.Series.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin</span></code></a>(**kwargs)</p></td>
+<td><p>Bin values in a time series</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Series/causality.html#pyleoclim.core.ui.Series.causality" title="pyleoclim.core.ui.Series.causality"><code class="xref py py-obj docutils literal notranslate"><span class="pre">causality</span></code></a>(target_series[, method, settings])</p></td>
+<td><p>Perform causality analysis with the target timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Series/clean.html#pyleoclim.core.ui.Series.clean" title="pyleoclim.core.ui.Series.clean"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clean</span></code></a>()</p></td>
+<td><p>Clean up the timeseries by removing NaNs and sort with increasing time points</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Series/copy.html#pyleoclim.core.ui.Series.copy" title="pyleoclim.core.ui.Series.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p>Make a copy of the Series object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Series/correlation.html#pyleoclim.core.ui.Series.correlation" title="pyleoclim.core.ui.Series.correlation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">correlation</span></code></a>(target_series[, timespan, settings])</p></td>
+<td><p>Estimates the Pearson’s correlation and associated significance between two non IID time series</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Series/detrend.html#pyleoclim.core.ui.Series.detrend" title="pyleoclim.core.ui.Series.detrend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detrend</span></code></a>([method])</p></td>
+<td><p>Detrend Series object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Series/distplot.html#pyleoclim.core.ui.Series.distplot" title="pyleoclim.core.ui.Series.distplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">distplot</span></code></a>([figsize, title, savefig_settings, …])</p></td>
+<td><p>Plot the distribution of the timeseries values</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Series/gaussianize.html#pyleoclim.core.ui.Series.gaussianize" title="pyleoclim.core.ui.Series.gaussianize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussianize</span></code></a>()</p></td>
+<td><p>Gaussianizes the timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Series/interp.html#pyleoclim.core.ui.Series.interp" title="pyleoclim.core.ui.Series.interp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code></a>([method])</p></td>
+<td><p>Interpolate a time series onto  a new  time axis</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code>()</p></td>
+<td><p>Initialization of labels</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Series/outliers.html#pyleoclim.core.ui.Series.outliers" title="pyleoclim.core.ui.Series.outliers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">outliers</span></code></a>([auto, remove, fig_outliers, …])</p></td>
+<td><p>Detects outliers in a timeseries and removes if specified</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Series/plot.html#pyleoclim.core.ui.Series.plot" title="pyleoclim.core.ui.Series.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([figsize, marker, markersize, color, …])</p></td>
+<td><p>Plot the timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Series/segment.html#pyleoclim.core.ui.Series.segment" title="pyleoclim.core.ui.Series.segment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">segment</span></code></a>([factor])</p></td>
+<td><p>Gap detection</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Series/slice.html#pyleoclim.core.ui.Series.slice" title="pyleoclim.core.ui.Series.slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slice</span></code></a>(timespan)</p></td>
+<td><p>Slicing the timeseries with a timespan (tuple or list)</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Series/spectral.html#pyleoclim.core.ui.Series.spectral" title="pyleoclim.core.ui.Series.spectral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral</span></code></a>([method, freq_method, freq_kwargs, …])</p></td>
+<td><p>Perform spectral analysis on the timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Series/ssa.html#pyleoclim.core.ui.Series.ssa" title="pyleoclim.core.ui.Series.ssa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ssa</span></code></a>([M, nMC, f])</p></td>
+<td><p>Singular Spectrum Analysis</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Series/standardize.html#pyleoclim.core.ui.Series.standardize" title="pyleoclim.core.ui.Series.standardize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code></a>()</p></td>
+<td><p>Standardizes the time series</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Series/stats.html#pyleoclim.core.ui.Series.stats" title="pyleoclim.core.ui.Series.stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stats</span></code></a>()</p></td>
+<td><p>Compute basic statistics for the time series</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Series/summary_plot.html#pyleoclim.core.ui.Series.summary_plot" title="pyleoclim.core.ui.Series.summary_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary_plot</span></code></a>([psd, scalogram, figsize, …])</p></td>
+<td><p>Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Series/surrogates.html#pyleoclim.core.ui.Series.surrogates" title="pyleoclim.core.ui.Series.surrogates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">surrogates</span></code></a>([method, number, length, seed, …])</p></td>
+<td><p>Generate surrogates with increasing time axis</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Series/wavelet.html#pyleoclim.core.ui.Series.wavelet" title="pyleoclim.core.ui.Series.wavelet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code></a>([method, settings, freq_method, …])</p></td>
+<td><p>Perform wavelet analysis on the timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Series/wavelet_coherence.html#pyleoclim.core.ui.Series.wavelet_coherence" title="pyleoclim.core.ui.Series.wavelet_coherence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet_coherence</span></code></a>(target_series[, method, …])</p></td>
+<td><p>Perform wavelet coherence analysis with the target timeseries</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="multipleseries-pyleoclim-multipleseries">
+<h1>MultipleSeries (pyleoclim.MultipleSeries)<a class="headerlink" href="#multipleseries-pyleoclim-multipleseries" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.MultipleSeries">
+<em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">MultipleSeries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">series_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleSeries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define a multiple series object.</p>
+<p>This is useful for ensembling or working with multiple timeseries in the same workflow</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>series_list</strong> (<em>list</em>) – a list of pyleoclim.Series objects</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Create a MultipleSeries object for the Nino and All Indian Rainfall indices</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">pyleoclim</span> <span class="k">as</span> <span class="nn">pyleo</span>
+
+<span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="gp">In [3]: </span><span class="n">data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv&#39;</span><span class="p">)</span>
+
+<span class="gp">In [4]: </span><span class="n">t</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="gp">In [5]: </span><span class="n">air</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="gp">In [6]: </span><span class="n">nino</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="gp">In [7]: </span><span class="n">ts_nino</span><span class="o">=</span><span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="n">nino</span><span class="p">)</span>
+
+<span class="gp">In [8]: </span><span class="n">ts_air</span><span class="o">=</span><span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="n">air</span><span class="p">)</span>
+
+<span class="gp">In [9]: </span><span class="n">series_list</span><span class="o">=</span><span class="p">[</span><span class="n">ts_nino</span><span class="p">,</span><span class="n">ts_air</span><span class="p">]</span>
+
+<span class="gp">In [10]: </span><span class="n">ts_all</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">MultipleSeries</span><span class="p">(</span><span class="n">series_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy the object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="MultipleSeries/detrend.html#pyleoclim.core.ui.MultipleSeries.detrend" title="pyleoclim.core.ui.MultipleSeries.detrend"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detrend</span></code></a>([method])</p></td>
+<td><p>Detrend timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="MultipleSeries/plot.html#pyleoclim.core.ui.MultipleSeries.plot" title="pyleoclim.core.ui.MultipleSeries.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([figsize, marker, markersize, color, …])</p></td>
+<td><p>Plot multiple timeseries on the same axis</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="MultipleSeries/spectral.html#pyleoclim.core.ui.MultipleSeries.spectral" title="pyleoclim.core.ui.MultipleSeries.spectral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral</span></code></a>([method, settings, mute_pbar, …])</p></td>
+<td><p>Perform spectral analysis on the timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="MultipleSeries/standardize.html#pyleoclim.core.ui.MultipleSeries.standardize" title="pyleoclim.core.ui.MultipleSeries.standardize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code></a>()</p></td>
+<td><p>Standardize each series object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="MultipleSeries/wavelet.html#pyleoclim.core.ui.MultipleSeries.wavelet" title="pyleoclim.core.ui.MultipleSeries.wavelet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code></a>([method, settings, mute_pbar])</p></td>
+<td><p>Wavelet analysis</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="lipd-pyleoclim-lipd">
+<h1>Lipd (pyleoclim.Lipd)<a class="headerlink" href="#lipd-pyleoclim-lipd" title="Permalink to this headline">¶</a></h1>
+<p>This class allows to manipulate LiPD objects</p>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.Lipd">
+<em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">Lipd</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">query_args</span><span class="o">=</span><span class="default_value">{}</span></em>, <em class="sig-param"><span class="n">usr_path</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">lipd_dict</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Lipd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.Lipd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Lipd object from Lipd Files</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>usr_path</strong> (<em>str</em>) – path to the Lipd file(s). Can be URL (LiPD utilities only support loading one file at a time from a URL)
+If it’s a URL, it must start with “http”, “https”, or “ftp.</p></li>
+<li><p><strong>lidp_dict</strong> (<em>dict</em>) – LiPD files already loaded into Python through the LiPD utilities</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">pyleoclim</span> <span class="k">as</span> <span class="nn">pyleo</span>
+
+<span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">lipd</span> <span class="k">as</span> <span class="nn">lpd</span>
+
+<span class="gp">In [3]: </span><span class="n">d1</span><span class="o">=</span><span class="n">lpd</span><span class="o">.</span><span class="n">readLipd</span><span class="p">(</span><span class="s1">&#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span><span class="p">)</span>
+<span class="go">Disclaimer: LiPD files may be updated and modified to adhere to standards</span>
+
+<span class="go">reading: MD982176.Stott.2004.lpd</span>
+<span class="go">Finished read: 1 record</span>
+
+<span class="gp">In [4]: </span><span class="n">d</span><span class="o">=</span><span class="n">pyleo</span><span class="o">.</span><span class="n">Lipd</span><span class="p">(</span><span class="n">lipd_dict</span><span class="o">=</span><span class="n">d1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy the object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Lipd/extract.html#pyleoclim.core.ui.Lipd.extract" title="pyleoclim.core.ui.Lipd.extract"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract</span></code></a>(dataSetName)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">param dataSetName</dt>
+<dd class="field-odd"><p>Extract a particular dataset</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Lipd/mapAllArchive.html#pyleoclim.core.ui.Lipd.mapAllArchive" title="pyleoclim.core.ui.Lipd.mapAllArchive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapAllArchive</span></code></a>([projection, proj_default, …])</p></td>
+<td><p>Map the records contained in LiPD files by archive type</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Lipd/to_tso.html#pyleoclim.core.ui.Lipd.to_tso" title="pyleoclim.core.ui.Lipd.to_tso"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_tso</span></code></a>()</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">returns</dt>
+<dd class="field-odd"><p><strong>ts_list</strong> – List of Lipd timeseries objects</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="lipdseries-pyleoclim-lipdseries">
+<h1>LipdSeries (pyleoclim.LipdSeries)<a class="headerlink" href="#lipdseries-pyleoclim-lipdseries" title="Permalink to this headline">¶</a></h1>
+<p>This class allows to manipulate LiPD timeseries objects. This is a subclass of Series. See applicable methods there.</p>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.LipdSeries">
+<em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">LipdSeries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tso</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#LipdSeries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.LipdSeries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lipd time series object</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin</span></code>(**kwargs)</p></td>
+<td><p>Bin values in a time series</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">causality</span></code>(target_series[, method, settings])</p></td>
+<td><p>Perform causality analysis with the target timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="LipdSeries/chronEnsembleToPaleo.html#pyleoclim.core.ui.LipdSeries.chronEnsembleToPaleo" title="pyleoclim.core.ui.LipdSeries.chronEnsembleToPaleo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chronEnsembleToPaleo</span></code></a>(D[, modelNumber, …])</p></td>
+<td><p>Fetch chron ensembles from a lipd object and return the ensemble as MultipleSeries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">clean</span></code>()</p></td>
+<td><p>Clean up the timeseries by removing NaNs and sort with increasing time points</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">correlation</span></code>(target_series[, timespan, settings])</p></td>
+<td><p>Estimates the Pearson’s correlation and associated significance between two non IID time series</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">detrend</span></code>([method])</p></td>
+<td><p>Detrend Series object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">distplot</span></code>([figsize, title, savefig_settings, …])</p></td>
+<td><p>Plot the distribution of the timeseries values</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussianize</span></code>()</p></td>
+<td><p>Gaussianizes the timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>([method])</p></td>
+<td><p>Interpolate a time series onto  a new  time axis</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code>()</p></td>
+<td><p>Initialization of labels</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="LipdSeries/map.html#pyleoclim.core.ui.LipdSeries.map" title="pyleoclim.core.ui.LipdSeries.map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map</span></code></a>([projection, proj_default, background, …])</p></td>
+<td><p>Map the location of the record</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">outliers</span></code>([auto, remove, fig_outliers, …])</p></td>
+<td><p>Detects outliers in a timeseries and removes if specified</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>([figsize, marker, markersize, color, …])</p></td>
+<td><p>Plot the timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">segment</span></code>([factor])</p></td>
+<td><p>Gap detection</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">slice</span></code>(timespan)</p></td>
+<td><p>Slicing the timeseries with a timespan (tuple or list)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral</span></code>([method, freq_method, freq_kwargs, …])</p></td>
+<td><p>Perform spectral analysis on the timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ssa</span></code>([M, nMC, f])</p></td>
+<td><p>Singular Spectrum Analysis</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code>()</p></td>
+<td><p>Standardizes the time series</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stats</span></code>()</p></td>
+<td><p>Compute basic statistics for the time series</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary_plot</span></code>([psd, scalogram, figsize, …])</p></td>
+<td><p>Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">surrogates</span></code>([method, number, length, seed, …])</p></td>
+<td><p>Generate surrogates with increasing time axis</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code>([method, settings, freq_method, …])</p></td>
+<td><p>Perform wavelet analysis on the timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet_coherence</span></code>(target_series[, method, …])</p></td>
+<td><p>Perform wavelet coherence analysis with the target timeseries</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="psd-pyleoclim-psd">
+<h1>PSD (pyleoclim.PSD)<a class="headerlink" href="#psd-pyleoclim-psd" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.PSD">
+<em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">PSD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em>, <em class="sig-param"><span class="n">amplitude</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">timeseries</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">plot_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">spec_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">spec_args</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_qs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">period_unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#PSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.PSD" title="Permalink to this definition">¶</a></dt>
+<dd><p>PSD object obtained from spectral analysis.</p>
+<p>See examples in pyleoclim.core.ui.Series.spectral to see how to create and manipulate these objects</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="Series/spectral.html#pyleoclim.core.ui.Series.spectral" title="pyleoclim.core.ui.Series.spectral"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.spectral</span></code></a></dt><dd><p>spectral analysis</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="PSD/beta_est.html#pyleoclim.core.ui.PSD.beta_est" title="pyleoclim.core.ui.PSD.beta_est"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beta_est</span></code></a>([fmin, fmax, verbose])</p></td>
+<td><p>Estimate the scaling factor beta of the PSD in a log-log space</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="PSD/plot.html#pyleoclim.core.ui.PSD.plot" title="pyleoclim.core.ui.PSD.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([in_loglog, in_period, label, xlabel, …])</p></td>
+<td><p>Plots the PSD estimates and signif level if included</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="PSD/signif_test.html#pyleoclim.core.ui.PSD.signif_test" title="pyleoclim.core.ui.PSD.signif_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signif_test</span></code></a>([number, method, seed, qs, settings])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">param number</dt>
+<dd class="field-odd"><p>Number of surrogate series to generate for significance testing. The default is 200.</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="scalogram-pyleoclim-scalogram">
+<h1>Scalogram (pyleoclim.Scalogram)<a class="headerlink" href="#scalogram-pyleoclim-scalogram" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.Scalogram">
+<em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">Scalogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em>, <em class="sig-param"><span class="n">time</span></em>, <em class="sig-param"><span class="n">amplitude</span></em>, <em class="sig-param"><span class="n">coi</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">Neff</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">timeseries</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">wave_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">wave_args</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_qs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">period_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">time_label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Scalogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.Scalogram" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Scalogram/plot.html#pyleoclim.core.ui.Scalogram.plot" title="pyleoclim.core.ui.Scalogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([in_period, xlabel, ylabel, title, …])</p></td>
+<td><p>Plot the scalogram</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Scalogram/signif_test.html#pyleoclim.core.ui.Scalogram.signif_test" title="pyleoclim.core.ui.Scalogram.signif_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signif_test</span></code></a>([number, method, seed, qs, settings])</p></td>
+<td><p>Significance test for wavelet analysis</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="coherence-pyleoclim-coherence">
+<h1>Coherence (pyleoclim.Coherence)<a class="headerlink" href="#coherence-pyleoclim-coherence" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.Coherence">
+<em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">Coherence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em>, <em class="sig-param"><span class="n">time</span></em>, <em class="sig-param"><span class="n">coherence</span></em>, <em class="sig-param"><span class="n">phase</span></em>, <em class="sig-param"><span class="n">coi</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">timeseries1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">timeseries2</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_qs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">Neff</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">period_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">time_label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Coherence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.Coherence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coherence object</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="Series/wavelet_coherence.html#pyleoclim.core.ui.Series.wavelet_coherence" title="pyleoclim.core.ui.Series.wavelet_coherence"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.wavelet_coherence</span></code></a></dt><dd><p>Wavelet coherence</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="Coherence/plot.html#pyleoclim.core.ui.Coherence.plot" title="pyleoclim.core.ui.Coherence.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([xlabel, ylabel, title, figsize, ylim, …])</p></td>
+<td><p>Plot the cross-wavelet results</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="Coherence/signif_test.html#pyleoclim.core.ui.Coherence.signif_test" title="pyleoclim.core.ui.Coherence.signif_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signif_test</span></code></a>([number, method, seed, qs, …])</p></td>
+<td><p>Significance testing</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="surrogateseries-pyleoclim-surrogateseries">
+<h1>SurrogateSeries (pyleoclim.SurrogateSeries)<a class="headerlink" href="#surrogateseries-pyleoclim-surrogateseries" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.SurrogateSeries">
+<em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">SurrogateSeries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">series_list</span></em>, <em class="sig-param"><span class="n">surrogate_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">surrogate_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SurrogateSeries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.SurrogateSeries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object containing surrogate timeseries</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">detrend</span></code>([method])</p></td>
+<td><p>Detrend timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>([figsize, marker, markersize, color, …])</p></td>
+<td><p>Plot multiple timeseries on the same axis</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral</span></code>([method, settings, mute_pbar, …])</p></td>
+<td><p>Perform spectral analysis on the timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code>()</p></td>
+<td><p>Standardize each series object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code>([method, settings, mute_pbar])</p></td>
+<td><p>Wavelet analysis</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="multiplepsd-pyleoclim-multiplepsd">
+<h1>MultiplePSD (pyleoclim.MultiplePSD)<a class="headerlink" href="#multiplepsd-pyleoclim-multiplepsd" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.MultiplePSD">
+<em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">MultiplePSD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psd_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultiplePSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.MultiplePSD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object for multiple PSD.</p>
+<p>Used for significance level</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="MultiplePSD/beta_est.html#pyleoclim.core.ui.MultiplePSD.beta_est" title="pyleoclim.core.ui.MultiplePSD.beta_est"><code class="xref py py-obj docutils literal notranslate"><span class="pre">beta_est</span></code></a>([fmin, fmax, verbose])</p></td>
+<td><p>Estimate the scaling factor beta of the each PSD from the psd_list in a log-log space</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy object</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="MultiplePSD/plot.html#pyleoclim.core.ui.MultiplePSD.plot" title="pyleoclim.core.ui.MultiplePSD.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([figsize, in_loglog, in_period, …])</p></td>
+<td><p>Plot multiple PSD on the same plot</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="MultiplePSD/plot_envelope.html#pyleoclim.core.ui.MultiplePSD.plot_envelope" title="pyleoclim.core.ui.MultiplePSD.plot_envelope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_envelope</span></code></a>([figsize, qs, in_loglog, …])</p></td>
+<td><p>Plot mutiple PSD as an envelope.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="MultiplePSD/quantiles.html#pyleoclim.core.ui.MultiplePSD.quantiles" title="pyleoclim.core.ui.MultiplePSD.quantiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantiles</span></code></a>([qs, lw])</p></td>
+<td><p>Calculate quantiles</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="multiplescalogram-pyleoclim-multiplescalogram">
+<h1>MultipleScalogram (pyleoclim.MultipleScalogram)<a class="headerlink" href="#multiplescalogram-pyleoclim-multiplescalogram" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.MultipleScalogram">
+<em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">MultipleScalogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scalogram_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleScalogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleScalogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiple Scalogram objects</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy the object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="MultipleScalogram/quantiles.html#pyleoclim.core.ui.MultipleScalogram.quantiles" title="pyleoclim.core.ui.MultipleScalogram.quantiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantiles</span></code></a>([qs])</p></td>
+<td><p>Calculate quantiles</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
