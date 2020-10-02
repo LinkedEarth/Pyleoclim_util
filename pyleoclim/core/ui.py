@@ -1638,7 +1638,7 @@ class Series:
                 
         '''
         new=self.copy()
-        x_mod, v_mod = tsutils.bin_values(self.time,self.value,**kwargs)
+        x_mod, v_mod, n, error = tsutils.bin_values(self.time,self.value,**kwargs)
         new.time = x_mod
         new.value = v_mod
         return new
