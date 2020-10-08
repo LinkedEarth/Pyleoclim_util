@@ -19,7 +19,7 @@ __all__ = [
 def ar1_model(t, tau, output_sigma=1):
     ''' Simulate a (possibly irregularly-sampled) AR(1) process with given decay
         constant tau, à la REDFIT.
-    
+
     Parameters
     ----------
 
@@ -53,7 +53,7 @@ def ar1_model(t, tau, output_sigma=1):
 
     return y
 
-    
+
 def ar1_fit(y, t=None):
     ''' Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
 
@@ -100,16 +100,16 @@ def ar1_sim(y, p, t=None):
 
     Yr : array
         n by p matrix of simulated AR(1) vector
-        
+
     See Also
     --------
-    
+
     pyleoclim.utils.tsmodel.ar1_model : Simulates a (possibly irregularly-sampled) AR(1) process with given decay constant tau, à la REDFIT.
 
     pyleoclim.utils.tsmodel.ar1_fit : Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
-    
-    pyleoclim.utils.tsmodel.ar1_fit_evenly : Returns the lag-1 autocorrelation from AR(1) fit.
-    
+
+    pyleoclim.utils.tsmodel.ar1_fit_evenly : Returns the lag-1 autocorrelation from AR(1) fit assuming even temporal spacing.
+
     pyleoclim.utils.tsmodel.tau_estimation : Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
     '''
@@ -118,8 +118,7 @@ def ar1_sim(y, p, t=None):
 
     sig = np.std(y)
     if is_evenly_spaced(t):
-        #  g = ar1_fit(y, t=t, detrend=detrend, params=params)
-        g = ar1_fit(y, t=t)
+        g = ar1_fit_evenly(y, t=t)
 
         # specify model parameters (statmodel want lag0 coefficent as unity)
         ar = np.r_[1, -g]  # AR model parameter
