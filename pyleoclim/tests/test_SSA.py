@@ -47,7 +47,7 @@ assert np.abs(var_pct[15:].sum()*100-4.825612144779388) < 1e-6
 # pyleo.showfig(fig)
 
 # 2. test Monte Carlo SSA
-nino_mcssa = ts_n.ssa(M = 60, nMC=1000)
+nino_mcssa = ts_n.ssa(M = 60, nMC=10)
 # for now, just testing that it works
 
 # 3. test  SSA with missing values
@@ -62,7 +62,7 @@ RCmiss = miss_ssa['RC'][:,:19].sum(axis=1)
 
 # check that it approximates ts_n quite well in a least squares sense.
 MSE = metrics.mean_squared_error(nino, RCmiss)
-assert MSE < 0.1
+assert MSE < 0.2
 
 ## DEBUG only
 #fig, ax = ts_nino.plot(title=r'SSA reconstruction with '+ str(fm*100) +'% missing values',mute=True,label='monthly NINO3')
