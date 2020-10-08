@@ -690,13 +690,11 @@ class Series:
             #Perform spectral analysis
             psd=ts.spectral()
             # Significance testing
-            # we use number=1 as an example; in practice, the larger the number the better
-            psd_signif=psd.signif_test(number=1)
+            psd_signif=psd.signif_test(number=10)
             # Perform wavelet analysis
             scal=ts.wavelet()
             # Significance testing
-            # we use number=1 as an example; in practice, the larger the number the better
-            scal_signif = scal.signif_test(number=1)
+            scal_signif = scal.signif_test(number=10)
             @savefig ts_summary_plot.png
             fig, ax = ts.summary_plot(
                         scalogram=scal_signif, psd=psd_signif,
@@ -1045,8 +1043,7 @@ class Series:
             ts_std=ts.standardize()
             # WWZ
             psd_wwz=ts_std.spectral()
-            # we use number=1 as an example; in practice, the larger the number the better
-            psd_wwz_signif=psd_wwz.signif_test(number=1)
+            psd_wwz_signif=psd_wwz.signif_test(number=10)
             @savefig spec_wwz.png
             fig,ax=psd_wwz_signif.plot(title='PSD using WWZ method')
             plt.close(fig)
@@ -1177,8 +1174,7 @@ class Series:
             ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
             #WWZ
             scal = ts.wavelet()
-            # we use number=1 as an example; in practice, the larger the number the better
-            scal_signif = scal.signif_test(number=1)
+            scal_signif = scal.signif_test(number=10)
             @savefig wave_wwz.png
             fig,ax=scal_signif.plot()
             plt.close(fig)
@@ -1282,8 +1278,7 @@ class Series:
             ts_air_std=ts_air.standardize()
             ts_nino_std=ts_nino.standardize()
             coh = ts_nino.wavelet_coherence(ts_air)
-            # we use number=1 as an example; in practice, the larger the number the better
-            coh_signif = coh.signif_test(number=1, qs=[0.99])
+            coh_signif = coh.signif_test(number=10, qs=[0.99])
             @savefig coh_plot.png
             fig, ax = coh_signif.plot(phase_style={'skip_x': 50, 'skip_y': 10}) 
             plt.close(fig)
