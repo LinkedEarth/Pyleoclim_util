@@ -2,6 +2,7 @@
 '''
 
 import numpy as np
+# new for statsmodels v0.12
 from statsmodels.tsa.arima_process import arma_generate_sample
 from statsmodels.tsa.arima.model import ARIMA
 
