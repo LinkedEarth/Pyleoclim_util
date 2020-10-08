@@ -1,8 +1,10 @@
-''' The module for timeseries models
+''' Module for timeseries modeling
 '''
 
 import numpy as np
-import statsmodels.api as sm
+from statsmodels.tsa.arima_process import arma_generate_sample
+from statsmodels.tsa.arima.model import ARIMA
+
 from .tsutils import (
     is_evenly_spaced,
     #clean_ts,
@@ -128,13 +130,14 @@ def ar1_sim(y, p, t=None):
         # simulate AR(1) model for each column
         for i in np.arange(p):
             #Yr[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n) # old statsmodels syntax
-            Yr[:, i] = sm.tsa.ArmaProcess(ar, ma).generate_sample(nsample=n, scale=sig_n, burnin=50) # statsmodels v0.11.1-?
+            #Yr[:, i] = sm.tsa.ArmaProcess(ar, ma).generate_sample(nsample=n, scale=sig_n, burnin=50) # statsmodels v0.11.1-?
+            Yr[:, i] = arma_generate_sample(ar, ma, nsample=n, scale=sig_n, burnin=50) # statsmodels v0.12+
     else:
         #  tau_est = ar1_fit(y, t=t, detrend=detrend, params=params)
         tau_est = tau_estimation(y, t)
         for i in np.arange(p):
-            # the output of ar1_model is unit variance,
-            # multiply by sig to be consistent with the original tinput timeseries
+            # the output of ar1_model has unit variance,
+            # multiply by sig to be consistent with the original input timeseries
             Yr[:, i] = ar1_model(t, tau_est, output_sigma=sig)
 
     if p == 1:
@@ -143,7 +146,6 @@ def ar1_sim(y, p, t=None):
     return Yr
 
 def ar1_fit_evenly(y, t):
-#  def ar1_fit_evenly(y, t, detrend=False, params=["default", 4, 0, 1], gaussianize=False):
     ''' Returns the lag-1 autocorrelation from AR(1) fit.
 
     Parameters
@@ -159,13 +161,10 @@ def ar1_fit_evenly(y, t):
         lag-1 autocorrelation coefficient
 
     '''
-    #  pd_y = preprocess(y, t, detrend=detrend, params=params, gaussianize=gaussianize)
-    #  ar1_mod = sm.tsa.AR(pd_y, missing='drop').fit(maxlag=1)
-    #ar1_mod = sm.tsa.AR(y, missing='drop').fit(maxlag=1)
-    #g = ar1_mod.params[1]
-
     # syntax compatible with statsmodels v0.11.1
-    ar1_mod = sm.tsa.ARMA(y, (1, 0), missing='drop').fit(trend='nc', disp=0)
+    #ar1_mod = sm.tsa.ARMA(y, (1, 0), missing='drop').fit(trend='nc', disp=0)
+    # syntax compatible with statsmodels v0.12
+    ar1_mod = ARIMA(y, order = (1, 0, 0), missing='drop',trend='ct').fit()
     g = ar1_mod.params[0]
 
     if g > 1:
