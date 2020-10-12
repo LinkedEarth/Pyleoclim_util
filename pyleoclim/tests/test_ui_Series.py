@@ -127,7 +127,7 @@ class TestUiSeriesSpectral:
         psd = ts.spectral(method=spec_method)
         beta = psd.beta_est()['beta']
         assert np.abs(beta-alpha) < eps
-        
+
     @pytest.mark.parametrize('freq_method', ['log', 'scale', 'nfft', 'lomb_scargle', 'welch'])
     def test_spectral_t1(self, freq_method, eps=0.3):
         ''' Test Series.spectral() with MTM using available `freq_method` options with other arguments being default
