@@ -116,7 +116,7 @@ class TestUiSeriesSpectral:
     '''
 
     @pytest.mark.parametrize('spec_method', ['wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram'])
-    def test_spectral_t0(self, spec_method, eps=0.3):
+    def test_spectral_t0(self, spec_method, eps=0.5):
         ''' Test Series.spectral() with available methods using default arguments
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
@@ -214,3 +214,136 @@ class TestUiSeriesSpectral:
         psd = ts.spectral(method=spec_method)
         beta = psd.beta_est()['beta']
         assert np.abs(beta-alpha) < eps
+
+class TestUiSeriesStats:
+    '''Test for Series.stats()
+
+    Since Series.stats() is a numpy wrapper we will test it against known values,
+    and ensure that it is returning the appropriate data format (dict).'''
+
+    def test_stats(self):
+        '''Run test_stats against known dataset'''
+
+        #Generate data
+        t = np.arange(10)
+        v = np.arange(10)
+
+        #Create time series object
+        ts = pyleo.Series(time=t,value=v)
+
+        #Call target function for testing
+        stats = ts.stats()
+
+        #Generate answer key
+        key = {'mean': 4.5,'median': 4.5,'min': 0.0,'max': 9.0,'std': np.std(t),'IQR': 4.5}
+
+        assert type(stats) == dict
+        assert stats == key
+
+class TestUiSeriesStandardize:
+    '''Test for Series.standardize()
+
+    Standardize normalizes the series object, so we'll simply test maximum and minimum values'''
+
+    def test_standardize(self):
+        #Generate sample data
+        t, v = gen_colored_noise()
+
+        #Create time series with sample data
+        ts = pyleo.Series(time = t, value = v)
+
+        #Call function to be tested
+        ts_std = ts.standardize()
+
+        #Compare maximum and minimum values
+        value = ts.__dict__['value']
+        value_std = ts_std.__dict__['value']
+
+        assert max(value) > max(value_std)
+        assert min(value) < min(value_std)
+
+class TestUiSeriesClean:
+    '''Test for Series.clean()
+
+    Since Series.clean() is intended to order the time axis,
+    we will test the first and last values on the time axis and ensure that the length
+    of the time and value sections are equivalent'''
+
+    def test_clean(self):
+
+        #Generate data
+        t, v = gen_normal()
+
+        #Create time series object
+        ts = pyleo.Series(time=t,value=v)
+
+        #Call function for testing
+        ts_clean = ts.clean()
+
+        #Isolate time and value components
+        time = ts_clean.__dict__['time']
+        value = ts_clean.__dict__['value']
+
+        assert time[len(time) - 1] >= time[0]
+        assert len(time) == len(value)
+
+class TestUiSeriesGaussianize:
+    '''Test for Series.gaussianize()
+
+    Gaussianize normalizes the series object, so we'll simply test maximum and minimum values'''
+    def test_gaussianize(self):
+        t, v = gen_colored_noise()
+
+        ts = pyleo.Series(time = t, value = v)
+
+        ts_gauss = ts.gaussianize()
+
+        value = ts.__dict__['value']
+        value_std = ts_gauss.__dict__['value']
+
+        assert max(value) > max(value_std)
+        assert min(value) < min(value_std)
+
+class TestUiSeriesSegment:
+    '''Tests for Series.segment()
+
+    Segment has an if and elif statement, so we will test each in turn'''
+
+    def test_segment_t0(self):
+        '''Test that in the case of segmentation, segment returns a Multiple Series object'''
+        t = (1,2,3000)
+        v = (1,2,3)
+
+        ts = pyleo.Series(time = t, value = v)
+
+        ts_seg = ts.segment()
+
+        assert str(type(ts_seg)) == "<class 'pyleoclim.core.ui.MultipleSeries'>"
+
+    def test_segment_t1(self):
+        '''Test that in the case of no segmentation, segment and original time series
+        are the some object type'''
+        t, v = gen_normal()
+
+        ts = pyleo.Series(time = t, value = v)
+
+        ts_seg = ts.segment()
+
+        assert type(ts_seg) == type(ts)
+
+class TestUiSeriesSlice:
+    '''Test for Series.slice()
+
+    We commit slices at known time intervals and check minimum and maximum values'''
+
+    def test_slice(self):
+        t, v = gen_normal()
+
+        ts = pyleo.Series(time = t, value = v)
+
+        ts_slice = ts.slice(timespan = (10, 50, 80, 90))
+
+        times = ts_slice.__dict__['time']
+
+        assert min(times) == 10
+        assert max(times) == 90
