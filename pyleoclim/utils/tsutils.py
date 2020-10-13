@@ -155,7 +155,14 @@ def bin_values(x, y, bin_size=None, start=None, end=None):
             n.append(y[idx].size)
             error.append(np.nanstd(y[idx]))
 
-    return bins, binned_values, n, error
+    res_dict = {
+        'bins': bins,
+        'binned_values': binned_values,
+        'n': n,
+        'error': error,
+    }
+
+    return  res_dict
 
 
 def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **args):

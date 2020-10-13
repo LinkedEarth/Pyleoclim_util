@@ -1638,9 +1638,9 @@ class Series:
                 
         '''
         new=self.copy()
-        x_mod, v_mod = tsutils.bin_values(self.time,self.value,**kwargs)
-        new.time = x_mod
-        new.value = v_mod
+        res_dict = tsutils.bin_values(self.time,self.value,**kwargs)
+        new.time = res_dict['bins']
+        new.value = res_dict['binned_values']
         return new
 
 class PSD:
