@@ -506,4 +506,49 @@ class TestUISeriesOutliers:
         ts_out = ts.outliers(remove=remove_outliers)
         
     
+class TestUISeriesInterp():
+    ''' Unit tests for the interpolation function
+    '''
+
+    def test_interp_t1(self):
+        ''' Test the interp function with default parameter values'''
+        alpha = 1
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        # randomly remove some data pts
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts_interp=ts.interp()
     
+    def test_bin_t2(self):
+        ''' Test the bin function by passing arguments'''
+        alpha = 1
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        # randomly remove some data pts
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+        start_date= np.min(t_unevenly)
+        end_date = np.max(t_unevenly)
+        bin_size=np.mean(np.diff(t_unevenly))
+        
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts_interp=ts.interp(start=start_date,interp_step=bin_size,end=end_date)
+        
+    @pytest.mark.parametrize('interp_method', ['linear', 'nearest', 'zero', 'slinear', 'quadratic', 'cubic', 'previous', 'next'])
+    def test_interp_t3(self,interp_method):
+        ''' Test the interp function with default parameter values'''
+        alpha = 1
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        # randomly remove some data pts
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts_interp=ts.interp(method=interp_method)
