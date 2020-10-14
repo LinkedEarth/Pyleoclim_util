@@ -482,3 +482,28 @@ class TestUiSeriesCausality:
         ts2 = pyleo.Series(time=t, value=v2)
 
         causal_res = ts1.causality(ts2, method=method)
+class TestUISeriesOutliers:
+    ''' Tests for Series.outliers()
+    
+    Remove outliers from a timeseries. Note that for CI purposes only, the automated version can be tested
+    '''
+    @pytest.mark.parametrize('remove_outliers', [True,False])
+    def test_outliers(self,remove_outliers):
+        
+        #Generate data
+        t, v = gen_colored_noise()
+        #Add outliers
+        outliers_start = np.mean(v)+5*np.std(v)
+        outliers_end = np.mean(v)+7*np.std(v)
+        outlier_values = np.arange(outliers_start,outliers_end,0.1)
+        index = np.random.randint(0,len(v),6)
+        v_out = v
+        for i,ind in enumerate(index):
+            v_out[ind] = outlier_values[i]
+        # Get a series object
+        ts = pyleo.Series(time = t, value = v_out) 
+        # Remove outliers
+        ts_out = ts.outliers(remove=remove_outliers)
+        
+    
+    
