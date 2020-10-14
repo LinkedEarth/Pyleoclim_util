@@ -44,3 +44,59 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
 
 
 # Tests below
+class TestUiMultiplePsdBetaEst:
+    ''' Tests for MultiplePSD.beta_est()
+    '''
+
+    def test_beta_est_t0(self, eps=0.3):
+        ''' Test MultiplePSD.beta_est() of a list of colored noise
+        '''
+        alphas = np.arange(0.5, 1.5, 0.1)
+        t, v = {}, {}
+        series_list = []
+        for idx, alpha in enumerate(alphas):
+            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=alpha)
+            series_list.append(pyleo.Series(time=t[idx], value=v[idx]))
+
+        ts_surrs = pyleo.MultipleSeries(series_list=series_list)
+        psds = ts_surrs.spectral(method='mtm')
+        betas = psds.beta_est()['beta']
+        for idx, beta in enumerate(betas):
+            assert np.abs(beta-alphas[idx]) < eps
+
+class TestUiMultiplePsdPlot:
+    ''' Tests for MultiplePSD.plot()
+    '''
+
+    def test_plot_t0(self):
+        ''' Test MultiplePSD.plot() of a list of colored noise
+        '''
+        alphas = np.arange(0.5, 1.5, 0.1)
+        t, v = {}, {}
+        series_list = []
+        for idx, alpha in enumerate(alphas):
+            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=alpha)
+            series_list.append(pyleo.Series(time=t[idx], value=v[idx]))
+
+        ts_surrs = pyleo.MultipleSeries(series_list=series_list)
+        psds = ts_surrs.spectral(method='mtm')
+        fig, ax = psds.plot()
+
+
+class TestUiMultiplePsdPlotEnvelope:
+    ''' Tests for MultiplePSD.plot()
+    '''
+
+    def test_plot_envelope_t0(self):
+        ''' Test MultiplePSD.plot() of a list of colored noise
+        '''
+        alphas = np.arange(0.5, 1.5, 0.1)
+        t, v = {}, {}
+        series_list = []
+        for idx, alpha in enumerate(alphas):
+            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=alpha)
+            series_list.append(pyleo.Series(time=t[idx], value=v[idx]))
+
+        ts_surrs = pyleo.MultipleSeries(series_list=series_list)
+        psds = ts_surrs.spectral(method='mtm')
+        fig, ax = psds.plot_envelope()

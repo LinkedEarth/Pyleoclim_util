@@ -44,3 +44,15 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
 
 
 # Tests below
+class TestUiScalogramSignifTest:
+    ''' Tests for Scalogram.signif_test()
+    '''
+
+    def test_plot_t0(self):
+        ''' Test PSD.plot() with default parameters
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=100, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        scal = ts.wavelet()
+        scal_signif = scal.signif_test(number=1)

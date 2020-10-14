@@ -23,8 +23,11 @@ import pytest
 import pyleoclim as pyleo
 from pyleoclim.utils.tsmodel import (
     ar1_sim,
+    ar1_fit,
     colored_noise,
 )
+
+from statsmodels.tsa.arima_process import arma_generate_sample 
 
 # a collection of useful functions
 
@@ -382,3 +385,100 @@ class TestUiSeriesSlice:
 
         assert min(times) == 10
         assert max(times) == 90
+
+
+class TestUiSeriesSurrogates:
+    ''' Test Series.surrogates()
+    '''
+    def test_surrogates_t0(self, eps=0.1):
+        ''' Generate AR(1) surrogates based on a AR(1) series with certain parameters,
+        and then evaluate and assert the parameters of the surrogates are correct
+        '''
+        g = 0.5  # persistence
+        ar = [1, -g]
+        ma = [1, 0]
+        n = 1000
+        ar1 = arma_generate_sample(ar, ma, nsample=n, scale=1)
+        ts = pyleo.Series(time=np.arange(1000), value=ar1)
+
+        ts_surrs = ts.surrogates(number=1)
+        for ts_surr in ts_surrs.series_list:
+            g_surr = ar1_fit(ts_surr.value)
+            assert np.abs(g_surr-g) < eps
+
+class TestUiSeriesSummaryPlot:
+    ''' Test Series.summary_plot()
+    '''
+    def test_summary_plot_t0(self):
+        ''' Generate a colored noise and run the summary_plot() function.
+        Note that we should avoid pyleo.showfig() in tests.
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=100, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        psd = ts.spectral()
+        scal = ts.wavelet()
+        fig, ax = ts.summary_plot(
+            psd=psd, scalogram=scal, figsize=[4, 5], title='Test',
+            period_label='Period', psd_label='PSD',
+            value_label='Value', time_label='Time',
+        )
+
+
+class TestUiSeriesCorrelation:
+    ''' Test Series.correlation()
+    '''
+    @pytest.mark.parametrize('corr_method', ['ttest', 'isopersistent', 'isospectral'])
+    def test_correlation_t0(self, corr_method, eps=0.1):
+        ''' Generate two series from a same basic series and calculate their correlation
+        '''
+        alpha = 1
+        nt = 100
+        t, v = gen_colored_noise(nt=nt, alpha=alpha)
+        v1 = v + np.random.normal(loc=0, scale=1, size=nt)
+        v2 = v + np.random.normal(loc=0, scale=2, size=nt)
+
+        ts1 = pyleo.Series(time=t, value=v1)
+        ts2 = pyleo.Series(time=t, value=v2)
+
+        corr_res = ts1.correlation(ts2, settings={'method': corr_method})
+        r = corr_res['r']
+        assert np.abs(r-1) < eps
+
+    @pytest.mark.parametrize('corr_method', ['ttest', 'isopersistent', 'isospectral'])
+    def test_correlation_t1(self, corr_method, eps=0.1):
+        ''' Generate two colored noise series calculate their correlation
+        '''
+        alpha = 1
+        nt = 1000
+        t = np.arange(nt)
+        v1 = np.random.normal(loc=0, scale=1, size=nt)
+        v2 = np.random.normal(loc=0, scale=1, size=nt)
+
+        ts1 = pyleo.Series(time=t, value=v1)
+        ts2 = pyleo.Series(time=t, value=v2)
+
+        corr_res = ts1.correlation(ts2, settings={'method': corr_method})
+        r = corr_res['r']
+        assert np.abs(r-0) < eps
+
+
+class TestUiSeriesCausality:
+    ''' Test Series.causality()
+    '''
+    @pytest.mark.parametrize('method', ['liang', 'granger'])
+    def test_causality_t0(self, method, eps=0.1):
+        ''' Generate two series from a same basic series and calculate their correlation
+
+        Note: NO assert statements for this test yet
+        '''
+        alpha = 1
+        nt = 100
+        t, v = gen_colored_noise(nt=nt, alpha=alpha)
+        v1 = v + np.random.normal(loc=0, scale=1, size=nt)
+        v2 = v + np.random.normal(loc=0, scale=2, size=nt)
+
+        ts1 = pyleo.Series(time=t, value=v1)
+        ts2 = pyleo.Series(time=t, value=v2)
+
+        causal_res = ts1.causality(ts2, method=method)

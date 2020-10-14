@@ -47,7 +47,7 @@ assert np.abs(var_pct[15:].sum()*100-4.825612144779388) < 1e-6
 # pyleo.showfig(fig)
 
 # 2. test Monte Carlo SSA
-nino_mcssa = ts_n.ssa(M = 60, nMC=10)
+nino_mcssa = ts_n.ssa(M = 60, nMC=200)
 # for now, just testing that it works
 
 # 3. test  SSA with missing values
