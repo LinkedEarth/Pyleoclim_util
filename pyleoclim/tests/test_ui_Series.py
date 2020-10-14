@@ -504,7 +504,7 @@ class TestUISeriesOutliers:
         # Get a series object
         ts = pyleo.Series(time = t, value = v_out) 
         # Remove outliers
-        ts_out = ts.outliers(remove=remove_outliers)
+        ts_out = ts.outliers(remove=remove_outliers, mute=True)
         
     
 class TestUISeriesInterp():
