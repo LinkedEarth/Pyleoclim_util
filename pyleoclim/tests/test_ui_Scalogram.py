@@ -48,8 +48,8 @@ class TestUiScalogramSignifTest:
     ''' Tests for Scalogram.signif_test()
     '''
 
-    def test_plot_t0(self):
-        ''' Test PSD.plot() with default parameters
+    def test_signif_test_t0(self):
+        ''' Test scalogram.signif_test() with default parameters
         '''
         alpha = 1
         t, v = gen_colored_noise(nt=100, alpha=alpha)

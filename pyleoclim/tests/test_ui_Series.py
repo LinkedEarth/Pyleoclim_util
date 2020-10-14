@@ -422,6 +422,7 @@ class TestUiSeriesSummaryPlot:
             psd=psd, scalogram=scal, figsize=[4, 5], title='Test',
             period_label='Period', psd_label='PSD',
             value_label='Value', time_label='Time',
+            mute=True,
         )
 
 

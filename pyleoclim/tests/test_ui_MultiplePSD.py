@@ -80,7 +80,7 @@ class TestUiMultiplePsdPlot:
 
         ts_surrs = pyleo.MultipleSeries(series_list=series_list)
         psds = ts_surrs.spectral(method='mtm')
-        fig, ax = psds.plot()
+        fig, ax = psds.plot(mute=True)
 
 
 class TestUiMultiplePsdPlotEnvelope:
@@ -99,4 +99,4 @@ class TestUiMultiplePsdPlotEnvelope:
 
         ts_surrs = pyleo.MultipleSeries(series_list=series_list)
         psds = ts_surrs.spectral(method='mtm')
-        fig, ax = psds.plot_envelope()
+        fig, ax = psds.plot_envelope(mute=True)

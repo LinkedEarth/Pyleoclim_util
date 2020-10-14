@@ -55,10 +55,10 @@ class TestUiPsdPlot:
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm')
-        fig, ax = psd.plot()
+        fig, ax = psd.plot(mute=True)
 
 class TestUiPsdSignifTest:
-    ''' Tests for PSD.plot()
+    ''' Tests for PSD.signif_test()
     '''
 
     def test_signif_test_t0(self):
