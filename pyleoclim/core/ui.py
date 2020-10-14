@@ -608,7 +608,7 @@ class Series:
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
-                    time_label=None, value_label=None, period_label=None, psd_label=None):
+                    time_label=None, value_label=None, period_label=None, psd_label=None, mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. 
 
         Parameters
@@ -658,6 +658,10 @@ class Series:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
         
         See also
         --------
@@ -761,7 +765,9 @@ class Series:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-
+        else:
+            if not mute:
+                plotting.showfig(fig)
         return fig, ax
 
     def copy(self):
