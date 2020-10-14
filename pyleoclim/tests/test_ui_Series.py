@@ -523,7 +523,7 @@ class TestUISeriesInterp():
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts_interp=ts.interp()
     
-    def test_bin_t2(self):
+    def test_interp_t2(self):
         ''' Test the bin function by passing arguments'''
         alpha = 1
         t, v = gen_colored_noise(nt=550, alpha=alpha)
@@ -552,3 +552,23 @@ class TestUISeriesInterp():
 
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts_interp=ts.interp(method=interp_method)
+
+
+class TestUISeriesDetrend():
+    ''' Unit tests for the detrending function
+    '''
+    
+    @pytest.mark.parametrize('detrend_method',['linear','constant','savitzky-golay','emd'])    
+    def test_detrend_t1(self,detrend_method):
+        #Generate data
+        alpha=1
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        #Add a trend
+        slope = 1e-5
+        intercept = -1
+        nonlinear_trend = slope*t**2 + intercept
+        v_trend = v + nonlinear_trend
+        #create a timeseries object
+        ts = pyleo.Series(time=t, value=v_trend)
+        ts_detrend=ts.detrend(method=detrend_method)
+    
