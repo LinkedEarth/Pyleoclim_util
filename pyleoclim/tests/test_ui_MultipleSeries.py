@@ -45,7 +45,7 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
 
 # Tests below
 class TestUIMultipleSeriesDetrend():
-    @pytest.mark.parametrize('detrend_method',['linear','constant','savitzky-golay','emd'])    
+    @pytest.mark.parametrize('detrend_method',['linear','constant','savitzky-golay','emd'])
     def test_detrend_t1(self, detrend_method):
         alpha=1
         t, v = gen_colored_noise(nt=550, alpha=alpha)
@@ -57,12 +57,82 @@ class TestUIMultipleSeriesDetrend():
         nonlinear_trend1 = slope1*t**2 + intercept
         v_trend = v + nonlinear_trend
         v_trend1 = v + nonlinear_trend1
-        
+
         #create series object
         ts=pyleo.Series(time=t,value=v_trend)
         ts1=pyleo.Series(time=t,value=v_trend1)
-        
+
         # Create a multiple series object
         ts_all= pyleo.MultipleSeries([ts,ts1])
         ts_detrend=ts_all.detrend(method=detrend_method)
-        
+
+class TestMultipleSeriesPlot:
+    '''Test for MultipleSeries.plot()
+
+    MultipleSeries.plot outputs a matplotlib figure and axis object with two datasets,
+    so we will compare the time axis of the axis object to the time arrays we generate,
+    and the value axis with the value arrays we generate'''
+
+    def test_plot(self):
+
+        #Generate time and value arrays
+        t_0, v_0 = gen_normal()
+        t_1, v_1 = gen_normal()
+
+        #Create series objects
+        ts_0 = pyleo.Series(time = t_0, value = v_0)
+        ts_1 = pyleo.Series(time = t_1, value = v_1)
+
+        #Create a list of series objects
+        serieslist = [ts_0, ts_1]
+
+        #Turn this list into a multiple series object
+        ts_M = pyleo.MultipleSeries(serieslist)
+
+        fig, ax = ts_M.plot()
+
+        lines_0 = ax.lines[0]
+        lines_1 = ax.lines[1]
+
+        x_plot_0 = lines_0.get_xdata()
+        y_plot_0 = lines_0.get_ydata()
+
+        x_plot_1 = lines_1.get_xdata()
+        y_plot_1 = lines_1.get_ydata()
+
+        assert_array_equal(t_0, x_plot_0)
+        assert_array_equal(t_1, x_plot_1)
+        assert_array_equal(v_0, y_plot_0)
+        assert_array_equal(v_1, y_plot_1)
+
+
+class TestMultipleSeriesStandardize:
+    '''Test for MultipleSeries.standardize()
+
+    Standardize normalizes the multiple series object, so we'll simply test maximum and minimum values,
+    only now we are running the test on series in a MultipleSeries object'''
+
+    def test_standardize(self):
+        t_0, v_0 = gen_colored_noise()
+        t_1, v_1 = gen_colored_noise()
+
+        ts_0 = pyleo.Series(time = t_0, value = v_0)
+        ts_1 = pyleo.Series(time = t_1, value = v_1)
+
+        serieslist = [ts_0, ts_1]
+
+        ts_M = pyleo.MultipleSeries(serieslist)
+
+        ts_M_std = ts_M.standardize()
+
+        x_axis_0 = ts_M_std.series_list[0].__dict__['time']
+        x_axis_1 = ts_M_std.series_list[1].__dict__['time']
+
+        y_axis_0 = ts_M_std.series_list[0].__dict__['value']
+        y_axis_1 = ts_M_std.series_list[1].__dict__['value']
+
+        assert_array_equal(x_axis_0, t_0)
+        assert_array_equal(x_axis_1, t_1)
+
+        assert max(v_0) > max(y_axis_0)
+        assert max(v_1) > max(y_axis_1)
