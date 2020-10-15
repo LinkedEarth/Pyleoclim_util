@@ -27,7 +27,7 @@ from pyleoclim.utils.tsmodel import (
     colored_noise,
 )
 
-from statsmodels.tsa.arima_process import arma_generate_sample 
+from statsmodels.tsa.arima_process import arma_generate_sample
 
 # a collection of useful functions
 
@@ -223,7 +223,7 @@ class TestUiSeriesBin:
 
     Functions to test the various kwargs arguments for binning a timeseries
     '''
-    
+
     def test_bin_t1(self):
         ''' Test the bin function with default parameter values'''
         alpha = 1
@@ -233,10 +233,10 @@ class TestUiSeriesBin:
         deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
         t_unevenly =  np.delete(t, deleted_idx)
         v_unevenly =  np.delete(v, deleted_idx)
-        
+
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts_bin=ts.bin()
-    
+
     def test_bin_t2(self):
         ''' Test the bin function by passing arguments'''
         alpha = 1
@@ -249,15 +249,14 @@ class TestUiSeriesBin:
         start_date= np.min(t_unevenly)
         end_date = np.max(t_unevenly)
         bin_size=np.mean(np.diff(t_unevenly))
-        
+
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts_bin=ts.bin(start=start_date,bin_size=bin_size,end=end_date)
-        
+
 class TestUiSeriesStats:
     '''Test for Series.stats()
 
-    Since Series.stats() is a numpy wrapper we will test it against known values,
-    and ensure that it is returning the appropriate data format (dict).'''
+    Since Series.stats() is a numpy wrapper we will test it against known values'''
 
     def test_stats(self):
         '''Run test_stats against known dataset'''
@@ -275,7 +274,6 @@ class TestUiSeriesStats:
         #Generate answer key
         key = {'mean': 4.5,'median': 4.5,'min': 0.0,'max': 9.0,'std': np.std(t),'IQR': 4.5}
 
-        assert type(stats) == dict
         assert stats == key
 
 class TestUiSeriesStandardize:
@@ -386,7 +384,6 @@ class TestUiSeriesSlice:
         assert min(times) == 10
         assert max(times) == 90
 
-
 class TestUiSeriesSurrogates:
     ''' Test Series.surrogates()
     '''
@@ -485,12 +482,12 @@ class TestUiSeriesCausality:
         causal_res = ts1.causality(ts2, method=method)
 class TestUISeriesOutliers:
     ''' Tests for Series.outliers()
-    
+
     Remove outliers from a timeseries. Note that for CI purposes only, the automated version can be tested
     '''
     @pytest.mark.parametrize('remove_outliers', [True,False])
     def test_outliers(self,remove_outliers):
-        
+
         #Generate data
         t, v = gen_colored_noise()
         #Add outliers
@@ -502,11 +499,11 @@ class TestUISeriesOutliers:
         for i,ind in enumerate(index):
             v_out[ind] = outlier_values[i]
         # Get a series object
-        ts = pyleo.Series(time = t, value = v_out) 
+        ts = pyleo.Series(time = t, value = v_out)
         # Remove outliers
         ts_out = ts.outliers(remove=remove_outliers, mute=True)
-        
-    
+
+
 class TestUISeriesInterp():
     ''' Unit tests for the interpolation function
     '''
@@ -523,7 +520,7 @@ class TestUISeriesInterp():
 
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts_interp=ts.interp()
-    
+
     def test_interp_t2(self):
         ''' Test the bin function by passing arguments'''
         alpha = 1
@@ -536,10 +533,10 @@ class TestUISeriesInterp():
         start_date= np.min(t_unevenly)
         end_date = np.max(t_unevenly)
         bin_size=np.mean(np.diff(t_unevenly))
-        
+
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts_interp=ts.interp(start=start_date,interp_step=bin_size,end=end_date)
-        
+
     @pytest.mark.parametrize('interp_method', ['linear', 'nearest', 'zero', 'slinear', 'quadratic', 'cubic', 'previous', 'next'])
     def test_interp_t3(self,interp_method):
         ''' Test the interp function with default parameter values'''
@@ -558,8 +555,8 @@ class TestUISeriesInterp():
 class TestUISeriesDetrend():
     ''' Unit tests for the detrending function
     '''
-    
-    @pytest.mark.parametrize('detrend_method',['linear','constant','savitzky-golay','emd'])    
+
+    @pytest.mark.parametrize('detrend_method',['linear','constant','savitzky-golay','emd'])
     def test_detrend_t1(self,detrend_method):
         #Generate data
         alpha=1
@@ -576,7 +573,7 @@ class TestUISeriesDetrend():
 class TestUISeriesWaveletCoherence():
     ''' Test the wavelet coherence
     '''
-    @pytest.mark.parametrize('xwave_method',['wwz']) 
+    @pytest.mark.parametrize('xwave_method',['wwz'])
     def test_xwave_t0(self, xwave_method):
         ''' Test Series.wavelet_coherence() with available methods using default arguments
         Note: this function will expand as more methods become available for testing
@@ -587,7 +584,7 @@ class TestUISeriesWaveletCoherence():
         ts = pyleo.Series(time=t, value=v)
         ts1 = pyleo.Series(time=t1, value=v1)
         scal = ts.wavelet_coherence(ts1,method=xwave_method)
-    
+
     def test_xwave_t1(self):
         ''' Test Series.wavelet_coherence() with WWZ with specified frequency vector passed via `settings`
         '''
@@ -598,7 +595,7 @@ class TestUISeriesWaveletCoherence():
         ts1 = pyleo.Series(time=t1, value=v1)
         freq = np.linspace(1/500, 1/2, 20)
         scal = ts.wavelet_coherence(ts1,method='wwz',settings={'freq':freq})
-    
+
     def test_xwave_t3(self):
         ''' Test Series.wavelet_coherence() with WWZ on unevenly spaced data
         '''
@@ -616,12 +613,12 @@ class TestUISeriesWaveletCoherence():
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts1 = pyleo.Series(time=t1_unevenly, value=v1_unevenly)
         scal = ts.wavelet_coherence(ts1,method='wwz')
-        
+
 class TestUISeriesWavelet():
     ''' Test the wavelet functionalities
-    ''' 
+    '''
 
-    @pytest.mark.parametrize('wave_method',['wwz','cwt']) 
+    @pytest.mark.parametrize('wave_method',['wwz','cwt'])
     def test_wave_t0(self, wave_method):
         ''' Test Series.wavelet() with available methods using default arguments
         '''
@@ -629,16 +626,54 @@ class TestUISeriesWavelet():
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         scal = ts.wavelet(method=wave_method)
-        
-    @pytest.mark.parametrize('wave_method',['wwz','cwt']) 
+
+    @pytest.mark.parametrize('wave_method',['wwz','cwt'])
     def test_wave_t1(self,wave_method):
         '''Test Series.spectral() with WWZ/cwt with specified frequency vector passed via `settings`
         '''
-        
+
         alpha = 1
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 20)
         scal = ts.wavelet(method=wave_method, settings={'freq': freq})
-    
-    
+
+
+class TestUiSeriesPlot:
+    '''Test for Series.plot()
+
+    Series.plot outputs a matplotlib figure and axis object, so we will compare the time axis
+    of the axis object to the time array.'''
+
+    def test_plot(self):
+
+        t, v = gen_normal()
+
+        ts = pyleo.Series(time = t, value = v)
+
+        fig, ax = ts.plot()
+
+        line = ax.lines[0]
+
+        x_plot = line.get_xdata()
+        y_plot = line.get_ydata()
+
+        assert_array_equal(t, x_plot)
+        assert_array_equal(v, y_plot)
+
+class TestSeriesDistplot:
+    '''Test for Series.distplot()'''
+
+    def test_distplot(self, max_axis = 5):
+        t, v = gen_normal()
+
+        ts = pyleo.Series(time = t, value = v)
+
+        fig, ax = ts.distplot()
+
+        line = ax.lines[0]
+
+        x_plot = line.get_xdata()
+        y_plot = line.get_ydata()
+
+        assert max(x_plot) < max_axis
