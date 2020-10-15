@@ -1,7 +1,7 @@
 ''' Tests for pyleoclim.core.ui.Scalogram
 
 Naming rules:
-1. classe: Test{filename}{Class}{method} with appropriate camel case
+1. class: Test{filename}{Class}{method} with appropriate camel case
 2. function: test_{method}_t{test_id}
 
 Notes on how to test:
@@ -48,8 +48,8 @@ class TestUiScalogramSignifTest:
     ''' Tests for Scalogram.signif_test()
     '''
 
-    def test_plot_t0(self):
-        ''' Test PSD.plot() with default parameters
+    def test_signif_test_t0(self):
+        ''' Test scalogram.signif_test() with default parameters
         '''
         alpha = 1
         t, v = gen_colored_noise(nt=100, alpha=alpha)

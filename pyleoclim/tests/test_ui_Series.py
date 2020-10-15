@@ -1,7 +1,7 @@
 ''' Tests for pyleoclim.core.ui.Series
 
 Naming rules:
-1. classe: Test{filename}{Class}{method} with appropriate camel case
+1. class: Test{filename}{Class}{method} with appropriate camel case
 2. function: test_{method}_t{test_id}
 
 Notes on how to test:
@@ -422,6 +422,7 @@ class TestUiSeriesSummaryPlot:
             psd=psd, scalogram=scal, figsize=[4, 5], title='Test',
             period_label='Period', psd_label='PSD',
             value_label='Value', time_label='Time',
+            mute=True,
         )
 
 
@@ -503,7 +504,7 @@ class TestUISeriesOutliers:
         # Get a series object
         ts = pyleo.Series(time = t, value = v_out) 
         # Remove outliers
-        ts_out = ts.outliers(remove=remove_outliers)
+        ts_out = ts.outliers(remove=remove_outliers, mute=True)
         
     
 class TestUISeriesInterp():

@@ -608,7 +608,7 @@ class Series:
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
-                    time_label=None, value_label=None, period_label=None, psd_label=None):
+                    time_label=None, value_label=None, period_label=None, psd_label=None, mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. 
 
         Parameters
@@ -658,6 +658,10 @@ class Series:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
         
         See also
         --------
@@ -761,7 +765,9 @@ class Series:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-
+        else:
+            if not mute:
+                plotting.showfig(fig)
         return fig, ax
 
     def copy(self):
@@ -1534,7 +1540,7 @@ class Series:
 
     def outliers(self, auto=True, remove=True, fig_outliers=True,fig_knee=True,
                  plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],
-                 saveknee_settings=None,saveoutliers_settings=None):
+                 saveknee_settings=None,saveoutliers_settings=None, mute=False):
         '''
         Detects outliers in a timeseries and removes if specified
         
@@ -1559,6 +1565,9 @@ class Series:
             arguments for the outliers plot
         figsize : list
             by default [10,4]
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
      
         Returns
         -------
@@ -1579,8 +1588,11 @@ class Series:
 
         #outlier_indices,fig1,ax1,fig2,ax2 = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
         #                                                   figsize=figsize,save_knee=save_knee,save_outliers=save_outliers,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
-        outlier_indices = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
-                                                           figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
+        outlier_indices = tsutils.detect_outliers(
+            self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,
+            figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,
+            plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs, mute=mute,
+        )
         outlier_indices = np.asarray(outlier_indices)
         if remove == True:
             new = self.copy()

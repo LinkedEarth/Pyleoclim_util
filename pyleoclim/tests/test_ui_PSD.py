@@ -1,7 +1,7 @@
 ''' Tests for pyleoclim.core.ui.PSD
 
 Naming rules:
-1. classe: Test{filename}{Class}{method} with appropriate camel case
+1. class: Test{filename}{Class}{method} with appropriate camel case
 2. function: test_{method}_t{test_id}
 
 Notes on how to test:
@@ -55,10 +55,10 @@ class TestUiPsdPlot:
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm')
-        fig, ax = psd.plot()
+        fig, ax = psd.plot(mute=True)
 
 class TestUiPsdSignifTest:
-    ''' Tests for PSD.plot()
+    ''' Tests for PSD.signif_test()
     '''
 
     def test_signif_test_t0(self):

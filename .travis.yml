@@ -24,4 +24,4 @@ install:
 
 
 script:
-  - pytest
+  - pytest pyleoclim/tests

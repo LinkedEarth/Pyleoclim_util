@@ -1,7 +1,7 @@
 ''' Tests for pyleoclim.core.ui.MultiplePSD
 
 Naming rules:
-1. classe: Test{filename}{Class}{method} with appropriate camel case
+1. class: Test{filename}{Class}{method} with appropriate camel case
 2. function: test_{method}_t{test_id}
 
 Notes on how to test:
@@ -80,7 +80,7 @@ class TestUiMultiplePsdPlot:
 
         ts_surrs = pyleo.MultipleSeries(series_list=series_list)
         psds = ts_surrs.spectral(method='mtm')
-        fig, ax = psds.plot()
+        fig, ax = psds.plot(mute=True)
 
 
 class TestUiMultiplePsdPlotEnvelope:
@@ -99,4 +99,4 @@ class TestUiMultiplePsdPlotEnvelope:
 
         ts_surrs = pyleo.MultipleSeries(series_list=series_list)
         psds = ts_surrs.spectral(method='mtm')
-        fig, ax = psds.plot_envelope()
+        fig, ax = psds.plot_envelope(mute=True)

@@ -1,7 +1,7 @@
 ''' Tests for pyleoclim.ssa
 
 Naming rules:
-1. classe: Test{filename}{Class}{method} with appropriate camel case
+1. class: Test{filename}{Class}{method} with appropriate camel case
 2. function: test_{method}_t{test_id}
 
 Notes on how to test:
@@ -62,7 +62,7 @@ RCmiss = miss_ssa['RC'][:,:19].sum(axis=1)
 
 # check that it approximates ts_n quite well in a least squares sense.
 MSE = metrics.mean_squared_error(nino, RCmiss)
-assert MSE < 0.2
+assert MSE < 0.3
 
 ## DEBUG only
 #fig, ax = ts_nino.plot(title=r'SSA reconstruction with '+ str(fm*100) +'% missing values',mute=True,label='monthly NINO3')
