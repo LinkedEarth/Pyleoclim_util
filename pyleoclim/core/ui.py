@@ -1188,6 +1188,11 @@ class Series:
             'wwz': waveutils.wwz,
             'cwt': waveutils.cwt,
         }
+        
+        if method == 'cwt' and 'freq' in settings.keys():
+            scales=1/np.array(settings['freq'])
+            settings.update({'scales':scales})
+            del settings['freq']
 
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
@@ -1195,7 +1200,7 @@ class Series:
         args = {}
 
         args['wwz'] = {'tau': self.time, 'freq': freq}
-        args['cwt'] = {'wavelet' : 'morl'}
+        args['cwt'] = {'wavelet' : 'morl', 'scales':1/freq}
 
 
         args[method].update(settings)
@@ -1496,7 +1501,7 @@ class Series:
         
         Returns
         -------
-        surr : MultipleSeries
+        surr : pyleoclim SurrogateSeries
         
         See also
         --------
@@ -1669,8 +1674,6 @@ class PSD:
             self.period_unit = period_unit
         elif timeseries is not None:
             self.period_unit = f'{timeseries.time_unit}s'
-        else:
-            self.period_unit = None
 
     def copy(self):
         '''Copy object
@@ -2879,7 +2882,7 @@ class MultiplePSD:
 
         psd_list = []
         for i, amp in enumerate(amp_qs):
-            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'linewidth': lw[i]}, period_unit=period_unit)
+            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'lw': lw[i]}, period_unit=period_unit)
             psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)

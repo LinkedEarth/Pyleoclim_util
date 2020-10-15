@@ -172,7 +172,7 @@ class TestUiSeriesSpectral:
 
     @pytest.mark.parametrize('dt, nf, ofac, hifac', [(None, 20, 1, 1), (None, None, 2, 0.5)])
     def test_spectral_t4(self, dt, nf, ofac, hifac, eps=0.5):
-        ''' Test Series.spectral() with MTM using `freq_method=lomb_scargle` with different values for its keyword arguments
+        ''' Test Series.spectral() with Lomb_Scargle using `freq_method=lomb_scargle` with different values for its keyword arguments
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
@@ -571,4 +571,73 @@ class TestUISeriesDetrend():
         #create a timeseries object
         ts = pyleo.Series(time=t, value=v_trend)
         ts_detrend=ts.detrend(method=detrend_method)
+
+class TestUISeriesWaveletCoherence():
+    ''' Test the wavelet coherence
+    '''
+    @pytest.mark.parametrize('xwave_method',['wwz']) 
+    def test_xwave_t0(self, xwave_method):
+        ''' Test Series.wavelet_coherence() with available methods using default arguments
+        Note: this function will expand as more methods become available for testing
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
+        t1, v1 = gen_colored_noise(nt=500, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        ts1 = pyleo.Series(time=t1, value=v1)
+        scal = ts.wavelet_coherence(ts1,method=xwave_method)
+    
+    def test_xwave_t1(self):
+        ''' Test Series.wavelet_coherence() with WWZ with specified frequency vector passed via `settings`
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
+        t1, v1 = gen_colored_noise(nt=500, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        ts1 = pyleo.Series(time=t1, value=v1)
+        freq = np.linspace(1/500, 1/2, 20)
+        scal = ts.wavelet_coherence(ts1,method='wwz',settings={'freq':freq})
+    
+    def test_xwave_t3(self):
+        ''' Test Series.wavelet_coherence() with WWZ on unevenly spaced data
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        t1, v1 = gen_colored_noise(nt=550, alpha=alpha)
+        #remove points
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        deleted_idx1 = np.random.choice(range(np.size(t1)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+        t1_unevenly =  np.delete(t1, deleted_idx1)
+        v1_unevenly =  np.delete(v1, deleted_idx1)
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts1 = pyleo.Series(time=t1_unevenly, value=v1_unevenly)
+        scal = ts.wavelet_coherence(ts1,method='wwz')
+        
+class TestUISeriesWavelet():
+    ''' Test the wavelet functionalities
+    ''' 
+
+    @pytest.mark.parametrize('wave_method',['wwz','cwt']) 
+    def test_wave_t0(self, wave_method):
+        ''' Test Series.wavelet() with available methods using default arguments
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        scal = ts.wavelet(method=wave_method)
+        
+    @pytest.mark.parametrize('wave_method',['wwz','cwt']) 
+    def test_wave_t1(self,wave_method):
+        '''Test Series.spectral() with WWZ/cwt with specified frequency vector passed via `settings`
+        '''
+        
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        freq = np.linspace(1/500, 1/2, 20)
+        scal = ts.wavelet(method=wave_method, settings={'freq': freq})
+    
     
