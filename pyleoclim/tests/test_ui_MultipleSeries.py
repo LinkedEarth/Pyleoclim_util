@@ -1,7 +1,7 @@
 ''' Tests for pyleoclim.core.ui.MultipleSeries
 
 Naming rules:
-1. classe: Test{filename}{Class}{method} with appropriate camel case
+1. class: Test{filename}{Class}{method} with appropriate camel case
 2. function: test_{method}_t{test_id}
 
 Notes on how to test:
@@ -44,3 +44,25 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
 
 
 # Tests below
+class TestUIMultipleSeriesDetrend():
+    @pytest.mark.parametrize('detrend_method',['linear','constant','savitzky-golay','emd'])    
+    def test_detrend_t1(self, detrend_method):
+        alpha=1
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        #Trends
+        slope = 1e-5
+        slope1= 2e-5
+        intercept = -1
+        nonlinear_trend = slope*t**2 + intercept
+        nonlinear_trend1 = slope1*t**2 + intercept
+        v_trend = v + nonlinear_trend
+        v_trend1 = v + nonlinear_trend1
+        
+        #create series object
+        ts=pyleo.Series(time=t,value=v_trend)
+        ts1=pyleo.Series(time=t,value=v_trend1)
+        
+        # Create a multiple series object
+        ts_all= pyleo.MultipleSeries([ts,ts1])
+        ts_detrend=ts_all.detrend(method=detrend_method)
+        

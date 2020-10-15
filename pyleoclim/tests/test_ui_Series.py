@@ -1,7 +1,7 @@
 ''' Tests for pyleoclim.core.ui.Series
 
 Naming rules:
-1. classe: Test{filename}{Class}{method} with appropriate camel case
+1. class: Test{filename}{Class}{method} with appropriate camel case
 2. function: test_{method}_t{test_id}
 
 Notes on how to test:
@@ -23,8 +23,11 @@ import pytest
 import pyleoclim as pyleo
 from pyleoclim.utils.tsmodel import (
     ar1_sim,
+    ar1_fit,
     colored_noise,
 )
+
+from statsmodels.tsa.arima_process import arma_generate_sample 
 
 # a collection of useful functions
 
@@ -169,7 +172,7 @@ class TestUiSeriesSpectral:
 
     @pytest.mark.parametrize('dt, nf, ofac, hifac', [(None, 20, 1, 1), (None, None, 2, 0.5)])
     def test_spectral_t4(self, dt, nf, ofac, hifac, eps=0.5):
-        ''' Test Series.spectral() with MTM using `freq_method=lomb_scargle` with different values for its keyword arguments
+        ''' Test Series.spectral() with Lomb_Scargle using `freq_method=lomb_scargle` with different values for its keyword arguments
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
@@ -382,3 +385,260 @@ class TestUiSeriesSlice:
 
         assert min(times) == 10
         assert max(times) == 90
+
+
+class TestUiSeriesSurrogates:
+    ''' Test Series.surrogates()
+    '''
+    def test_surrogates_t0(self, eps=0.1):
+        ''' Generate AR(1) surrogates based on a AR(1) series with certain parameters,
+        and then evaluate and assert the parameters of the surrogates are correct
+        '''
+        g = 0.5  # persistence
+        ar = [1, -g]
+        ma = [1, 0]
+        n = 1000
+        ar1 = arma_generate_sample(ar, ma, nsample=n, scale=1)
+        ts = pyleo.Series(time=np.arange(1000), value=ar1)
+
+        ts_surrs = ts.surrogates(number=1)
+        for ts_surr in ts_surrs.series_list:
+            g_surr = ar1_fit(ts_surr.value)
+            assert np.abs(g_surr-g) < eps
+
+class TestUiSeriesSummaryPlot:
+    ''' Test Series.summary_plot()
+    '''
+    def test_summary_plot_t0(self):
+        ''' Generate a colored noise and run the summary_plot() function.
+        Note that we should avoid pyleo.showfig() in tests.
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=100, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        psd = ts.spectral()
+        scal = ts.wavelet()
+        fig, ax = ts.summary_plot(
+            psd=psd, scalogram=scal, figsize=[4, 5], title='Test',
+            period_label='Period', psd_label='PSD',
+            value_label='Value', time_label='Time',
+            mute=True,
+        )
+
+
+class TestUiSeriesCorrelation:
+    ''' Test Series.correlation()
+    '''
+    @pytest.mark.parametrize('corr_method', ['ttest', 'isopersistent', 'isospectral'])
+    def test_correlation_t0(self, corr_method, eps=0.1):
+        ''' Generate two series from a same basic series and calculate their correlation
+        '''
+        alpha = 1
+        nt = 100
+        t, v = gen_colored_noise(nt=nt, alpha=alpha)
+        v1 = v + np.random.normal(loc=0, scale=1, size=nt)
+        v2 = v + np.random.normal(loc=0, scale=2, size=nt)
+
+        ts1 = pyleo.Series(time=t, value=v1)
+        ts2 = pyleo.Series(time=t, value=v2)
+
+        corr_res = ts1.correlation(ts2, settings={'method': corr_method})
+        r = corr_res['r']
+        assert np.abs(r-1) < eps
+
+    @pytest.mark.parametrize('corr_method', ['ttest', 'isopersistent', 'isospectral'])
+    def test_correlation_t1(self, corr_method, eps=0.1):
+        ''' Generate two colored noise series calculate their correlation
+        '''
+        alpha = 1
+        nt = 1000
+        t = np.arange(nt)
+        v1 = np.random.normal(loc=0, scale=1, size=nt)
+        v2 = np.random.normal(loc=0, scale=1, size=nt)
+
+        ts1 = pyleo.Series(time=t, value=v1)
+        ts2 = pyleo.Series(time=t, value=v2)
+
+        corr_res = ts1.correlation(ts2, settings={'method': corr_method})
+        r = corr_res['r']
+        assert np.abs(r-0) < eps
+
+
+class TestUiSeriesCausality:
+    ''' Test Series.causality()
+    '''
+    @pytest.mark.parametrize('method', ['liang', 'granger'])
+    def test_causality_t0(self, method, eps=0.1):
+        ''' Generate two series from a same basic series and calculate their correlation
+
+        Note: NO assert statements for this test yet
+        '''
+        alpha = 1
+        nt = 100
+        t, v = gen_colored_noise(nt=nt, alpha=alpha)
+        v1 = v + np.random.normal(loc=0, scale=1, size=nt)
+        v2 = v + np.random.normal(loc=0, scale=2, size=nt)
+
+        ts1 = pyleo.Series(time=t, value=v1)
+        ts2 = pyleo.Series(time=t, value=v2)
+
+        causal_res = ts1.causality(ts2, method=method)
+class TestUISeriesOutliers:
+    ''' Tests for Series.outliers()
+    
+    Remove outliers from a timeseries. Note that for CI purposes only, the automated version can be tested
+    '''
+    @pytest.mark.parametrize('remove_outliers', [True,False])
+    def test_outliers(self,remove_outliers):
+        
+        #Generate data
+        t, v = gen_colored_noise()
+        #Add outliers
+        outliers_start = np.mean(v)+5*np.std(v)
+        outliers_end = np.mean(v)+7*np.std(v)
+        outlier_values = np.arange(outliers_start,outliers_end,0.1)
+        index = np.random.randint(0,len(v),6)
+        v_out = v
+        for i,ind in enumerate(index):
+            v_out[ind] = outlier_values[i]
+        # Get a series object
+        ts = pyleo.Series(time = t, value = v_out) 
+        # Remove outliers
+        ts_out = ts.outliers(remove=remove_outliers, mute=True)
+        
+    
+class TestUISeriesInterp():
+    ''' Unit tests for the interpolation function
+    '''
+
+    def test_interp_t1(self):
+        ''' Test the interp function with default parameter values'''
+        alpha = 1
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        # randomly remove some data pts
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts_interp=ts.interp()
+    
+    def test_interp_t2(self):
+        ''' Test the bin function by passing arguments'''
+        alpha = 1
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        # randomly remove some data pts
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+        start_date= np.min(t_unevenly)
+        end_date = np.max(t_unevenly)
+        bin_size=np.mean(np.diff(t_unevenly))
+        
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts_interp=ts.interp(start=start_date,interp_step=bin_size,end=end_date)
+        
+    @pytest.mark.parametrize('interp_method', ['linear', 'nearest', 'zero', 'slinear', 'quadratic', 'cubic', 'previous', 'next'])
+    def test_interp_t3(self,interp_method):
+        ''' Test the interp function with default parameter values'''
+        alpha = 1
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        # randomly remove some data pts
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts_interp=ts.interp(method=interp_method)
+
+
+class TestUISeriesDetrend():
+    ''' Unit tests for the detrending function
+    '''
+    
+    @pytest.mark.parametrize('detrend_method',['linear','constant','savitzky-golay','emd'])    
+    def test_detrend_t1(self,detrend_method):
+        #Generate data
+        alpha=1
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        #Add a trend
+        slope = 1e-5
+        intercept = -1
+        nonlinear_trend = slope*t**2 + intercept
+        v_trend = v + nonlinear_trend
+        #create a timeseries object
+        ts = pyleo.Series(time=t, value=v_trend)
+        ts_detrend=ts.detrend(method=detrend_method)
+
+class TestUISeriesWaveletCoherence():
+    ''' Test the wavelet coherence
+    '''
+    @pytest.mark.parametrize('xwave_method',['wwz']) 
+    def test_xwave_t0(self, xwave_method):
+        ''' Test Series.wavelet_coherence() with available methods using default arguments
+        Note: this function will expand as more methods become available for testing
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
+        t1, v1 = gen_colored_noise(nt=500, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        ts1 = pyleo.Series(time=t1, value=v1)
+        scal = ts.wavelet_coherence(ts1,method=xwave_method)
+    
+    def test_xwave_t1(self):
+        ''' Test Series.wavelet_coherence() with WWZ with specified frequency vector passed via `settings`
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
+        t1, v1 = gen_colored_noise(nt=500, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        ts1 = pyleo.Series(time=t1, value=v1)
+        freq = np.linspace(1/500, 1/2, 20)
+        scal = ts.wavelet_coherence(ts1,method='wwz',settings={'freq':freq})
+    
+    def test_xwave_t3(self):
+        ''' Test Series.wavelet_coherence() with WWZ on unevenly spaced data
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=550, alpha=alpha)
+        t1, v1 = gen_colored_noise(nt=550, alpha=alpha)
+        #remove points
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        deleted_idx1 = np.random.choice(range(np.size(t1)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+        t1_unevenly =  np.delete(t1, deleted_idx1)
+        v1_unevenly =  np.delete(v1, deleted_idx1)
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts1 = pyleo.Series(time=t1_unevenly, value=v1_unevenly)
+        scal = ts.wavelet_coherence(ts1,method='wwz')
+        
+class TestUISeriesWavelet():
+    ''' Test the wavelet functionalities
+    ''' 
+
+    @pytest.mark.parametrize('wave_method',['wwz','cwt']) 
+    def test_wave_t0(self, wave_method):
+        ''' Test Series.wavelet() with available methods using default arguments
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        scal = ts.wavelet(method=wave_method)
+        
+    @pytest.mark.parametrize('wave_method',['wwz','cwt']) 
+    def test_wave_t1(self,wave_method):
+        '''Test Series.spectral() with WWZ/cwt with specified frequency vector passed via `settings`
+        '''
+        
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        freq = np.linspace(1/500, 1/2, 20)
+        scal = ts.wavelet(method=wave_method, settings={'freq': freq})
+    
+    
