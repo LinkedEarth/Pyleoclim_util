@@ -1686,6 +1686,8 @@ class PSD:
             self.period_unit = period_unit
         elif timeseries is not None:
             self.period_unit = f'{timeseries.time_unit}s'
+        else:
+            self.period_unit = None
 
     def copy(self):
         '''Copy object
@@ -2894,7 +2896,7 @@ class MultiplePSD:
 
         psd_list = []
         for i, amp in enumerate(amp_qs):
-            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'lw': lw[i]}, period_unit=period_unit)
+            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'linewidth': lw[i]}, period_unit=period_unit)
             psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)
