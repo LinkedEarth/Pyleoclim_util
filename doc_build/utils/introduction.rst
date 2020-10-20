@@ -51,6 +51,10 @@
    wavelet/wwz.rst
    wavelet/xwc.rst
    wavelet/private.rst
+   jsonutils/json_to_PSD.rst
+   jsonutils/json_to_Scalogram.rst
+   jsonutils/json_to_Series.rst
+   jsonutils/PyleoObj_to_json.rst
 
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
@@ -254,3 +258,21 @@ The most relevant functions concern querying the LinkedEarth wiki. The first 5 f
      - Query the names of all Interpretations from the LinkedEarth Ontology.
    * - :ref:`queryLinkedEarth <utils_queryLinkedEarth>`
      - Query the LinkedEarth wiki for datasets.
+
+jsonutils
+----------
+
+This module converts Pyleoclim objects to and from JSON files. Useful for obtaining a human-readable output and keeping the results of an analysis.
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`PyleoObj_to_json <utils_PyleoObj_to_json>`
+     - Saves a Pyleoclim Object (e.g., Series, PSD, Scalogram) to a json file
+   * - :ref:`json_to_Series <utils_json_to_Series>`
+     - Load a pyleoclim Series object from a JSON file
+   * - :ref:`json_to_PSD <utils_json_to_PSD>`
+     - Load a pyleoclim PSD object from a JSON file
+   * - :ref:`json_to_Scalogram <utils_json_to_Scalogram>`
+     - Load a pyleoclim Scalogram object from a JSON file

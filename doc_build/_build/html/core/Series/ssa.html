@@ -269,7 +269,7 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 <span class="gh">Out[23]: </span><span class="go">Text(0, 0.5, &#39;$\\lambda_i$&#39;)</span>
 
 <span class="gp">In [24]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
-<span class="gh">Out[24]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x163fdbe50&gt;</span>
+<span class="gh">Out[24]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fa3c5e63100&gt;</span>
 
 <span class="gp">In [25]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 640x480 with 1 Axes&gt;</span>
@@ -289,7 +289,7 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 </dl>
 <p>So, summing the variance of all modes higher than 19, we get:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [27]: </span><span class="nb">print</span><span class="p">(</span><span class="n">var_pct</span><span class="p">[</span><span class="mi">15</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
-<span class="go">282.301930950568</span>
+<span class="go">282.3019309505682</span>
 </pre></div>
 </div>
 <p>That is, over 95% of the variance is in the first 15 modes. That is a typical result for a “warm-colored” timeseries, which is most geophysical timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let’s use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:</p>
@@ -298,10 +298,10 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 <span class="gp">In [29]: </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;ONI&#39;</span><span class="p">,</span><span class="n">mute</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># we mute the first call to only get the plot with 2 lines</span>
 
 <span class="gp">In [30]: </span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">RCk</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;SSA reconstruction, 14 modes&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
-<span class="gh">Out[30]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x161f38700&gt;]</span>
+<span class="gh">Out[30]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x7fa3a9d27d00&gt;]</span>
 
 <span class="gp">In [31]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="gh">Out[31]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x161f2da30&gt;</span>
+<span class="gh">Out[31]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fa3a7664f70&gt;</span>
 
 <span class="gp">In [32]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
@@ -338,7 +338,7 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 <span class="gp">In [40]: </span><span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
 
 <span class="gp">In [41]: </span><span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">rk</span><span class="p">,</span><span class="n">dl</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span><span class="n">du</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;silver&#39;</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;MC-SSA 95% CI&#39;</span><span class="p">)</span>
-<span class="gh">Out[41]: </span><span class="go">&lt;matplotlib.collections.PolyCollection at 0x1624d3b80&gt;</span>
+<span class="gh">Out[41]: </span><span class="go">&lt;matplotlib.collections.PolyCollection at 0x7fa3aad234c0&gt;</span>
 
 <span class="gp">In [42]: </span><span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">rk</span><span class="p">,</span><span class="n">d</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span><span class="n">yerr</span><span class="o">=</span><span class="n">de</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;SSA eigenvalues w/ 95% CI&#39;</span><span class="p">)</span>
 <span class="gh">Out[42]: </span><span class="go">&lt;ErrorbarContainer object of 3 artists&gt;</span>
@@ -350,7 +350,7 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 <span class="gh">Out[44]: </span><span class="go">Text(0, 0.5, &#39;$\\lambda_i$&#39;)</span>
 
 <span class="gp">In [45]: </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
-<span class="gh">Out[45]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x1624d3a30&gt;</span>
+<span class="gh">Out[45]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fa3a7568820&gt;</span>
 
 <span class="gp">In [46]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 640x480 with 1 Axes&gt;</span>

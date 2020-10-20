@@ -759,7 +759,7 @@
 
     <span class="k">def</span> <span class="nf">summary_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">psd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scalogram</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savefig_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                     <span class="n">time_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">period_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">psd_lim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_signif_test</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-                    <span class="n">time_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">period_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">psd_label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                    <span class="n">time_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">period_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">psd_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mute</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. </span>
 
 <span class="sd">        Parameters</span>
@@ -809,6 +809,10 @@
 <span class="sd">            - &quot;path&quot; must be specified; it can be any existed or non-existed path,</span>
 <span class="sd">              with or without a suffix; if the suffix is not given in &quot;path&quot;, it will follow &quot;format&quot;</span>
 <span class="sd">            - &quot;format&quot; can be one of {&quot;pdf&quot;, &quot;eps&quot;, &quot;png&quot;, &quot;ps&quot;}</span>
+
+<span class="sd">        mute : {True,False}</span>
+<span class="sd">            if True, the plot will not show;</span>
+<span class="sd">            recommend to turn on when more modifications are going to be made on ax</span>
 <span class="sd">        </span>
 <span class="sd">        See also</span>
 <span class="sd">        --------</span>
@@ -912,7 +916,9 @@
 
         <span class="k">if</span> <span class="s1">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">savefig_settings</span><span class="p">:</span>
             <span class="n">plotting</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">savefig_settings</span><span class="p">)</span>
-
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mute</span><span class="p">:</span>
+                <span class="n">plotting</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
 
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1339,6 +1345,11 @@
             <span class="s1">&#39;wwz&#39;</span><span class="p">:</span> <span class="n">waveutils</span><span class="o">.</span><span class="n">wwz</span><span class="p">,</span>
             <span class="s1">&#39;cwt&#39;</span><span class="p">:</span> <span class="n">waveutils</span><span class="o">.</span><span class="n">cwt</span><span class="p">,</span>
         <span class="p">}</span>
+        
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;cwt&#39;</span> <span class="ow">and</span> <span class="s1">&#39;freq&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">scales</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">])</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;scales&#39;</span><span class="p">:</span><span class="n">scales</span><span class="p">})</span>
+            <span class="k">del</span> <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span>
 
         <span class="n">freq_kwargs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">freq_kwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">freq_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">freq</span> <span class="o">=</span> <span class="n">waveutils</span><span class="o">.</span><span class="n">make_freq_vector</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">freq_method</span><span class="p">,</span> <span class="o">**</span><span class="n">freq_kwargs</span><span class="p">)</span>
@@ -1346,7 +1357,7 @@
         <span class="n">args</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="n">args</span><span class="p">[</span><span class="s1">&#39;wwz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;tau&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="s1">&#39;freq&#39;</span><span class="p">:</span> <span class="n">freq</span><span class="p">}</span>
-        <span class="n">args</span><span class="p">[</span><span class="s1">&#39;cwt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;wavelet&#39;</span> <span class="p">:</span> <span class="s1">&#39;morl&#39;</span><span class="p">}</span>
+        <span class="n">args</span><span class="p">[</span><span class="s1">&#39;cwt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;wavelet&#39;</span> <span class="p">:</span> <span class="s1">&#39;morl&#39;</span><span class="p">,</span> <span class="s1">&#39;scales&#39;</span><span class="p">:</span><span class="mi">1</span><span class="o">/</span><span class="n">freq</span><span class="p">}</span>
 
 
         <span class="n">args</span><span class="p">[</span><span class="n">method</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
@@ -1680,7 +1691,7 @@
 
     <span class="k">def</span> <span class="nf">outliers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auto</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fig_outliers</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">fig_knee</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                  <span class="n">plot_outliers_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">plot_knee_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span>
-                 <span class="n">saveknee_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">saveoutliers_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                 <span class="n">saveknee_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">saveoutliers_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mute</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Detects outliers in a timeseries and removes if specified</span>
 <span class="sd">        </span>
@@ -1705,6 +1716,9 @@
 <span class="sd">            arguments for the outliers plot</span>
 <span class="sd">        figsize : list</span>
 <span class="sd">            by default [10,4]</span>
+<span class="sd">        mute : {True,False}</span>
+<span class="sd">            if True, the plot will not show;</span>
+<span class="sd">            recommend to turn on when more modifications are going to be made on ax</span>
 <span class="sd">     </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1725,8 +1739,11 @@
 
         <span class="c1">#outlier_indices,fig1,ax1,fig2,ax2 = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\</span>
         <span class="c1">#                                                   figsize=figsize,save_knee=save_knee,save_outliers=save_outliers,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)</span>
-        <span class="n">outlier_indices</span> <span class="o">=</span> <span class="n">tsutils</span><span class="o">.</span><span class="n">detect_outliers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">auto</span><span class="o">=</span><span class="n">auto</span><span class="p">,</span> <span class="n">plot_knee</span><span class="o">=</span><span class="n">fig_knee</span><span class="p">,</span><span class="n">plot_outliers</span><span class="o">=</span><span class="n">fig_outliers</span><span class="p">,</span>\
-                                                           <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span><span class="n">saveknee_settings</span><span class="o">=</span><span class="n">saveknee_settings</span><span class="p">,</span><span class="n">saveoutliers_settings</span><span class="o">=</span><span class="n">saveoutliers_settings</span><span class="p">,</span><span class="n">plot_outliers_kwargs</span><span class="o">=</span><span class="n">plot_outliers_kwargs</span><span class="p">,</span><span class="n">plot_knee_kwargs</span><span class="o">=</span><span class="n">plot_knee_kwargs</span><span class="p">)</span>
+        <span class="n">outlier_indices</span> <span class="o">=</span> <span class="n">tsutils</span><span class="o">.</span><span class="n">detect_outliers</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">auto</span><span class="o">=</span><span class="n">auto</span><span class="p">,</span> <span class="n">plot_knee</span><span class="o">=</span><span class="n">fig_knee</span><span class="p">,</span><span class="n">plot_outliers</span><span class="o">=</span><span class="n">fig_outliers</span><span class="p">,</span>
+            <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span><span class="n">saveknee_settings</span><span class="o">=</span><span class="n">saveknee_settings</span><span class="p">,</span><span class="n">saveoutliers_settings</span><span class="o">=</span><span class="n">saveoutliers_settings</span><span class="p">,</span>
+            <span class="n">plot_outliers_kwargs</span><span class="o">=</span><span class="n">plot_outliers_kwargs</span><span class="p">,</span><span class="n">plot_knee_kwargs</span><span class="o">=</span><span class="n">plot_knee_kwargs</span><span class="p">,</span> <span class="n">mute</span><span class="o">=</span><span class="n">mute</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="n">outlier_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">outlier_indices</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">remove</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -1789,9 +1806,9 @@
 <span class="sd">                </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">new</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">x_mod</span><span class="p">,</span> <span class="n">v_mod</span> <span class="o">=</span> <span class="n">tsutils</span><span class="o">.</span><span class="n">bin_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">new</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">x_mod</span>
-        <span class="n">new</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">v_mod</span>
+        <span class="n">res_dict</span> <span class="o">=</span> <span class="n">tsutils</span><span class="o">.</span><span class="n">bin_values</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">res_dict</span><span class="p">[</span><span class="s1">&#39;bins&#39;</span><span class="p">]</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">res_dict</span><span class="p">[</span><span class="s1">&#39;binned_values&#39;</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">new</span></div>
 
 <div class="viewcode-block" id="PSD"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.PSD">[docs]</a><span class="k">class</span> <span class="nc">PSD</span><span class="p">:</span>
@@ -1820,6 +1837,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">period_unit</span> <span class="o">=</span> <span class="n">period_unit</span>
         <span class="k">elif</span> <span class="n">timeseries</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">period_unit</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">timeseries</span><span class="o">.</span><span class="n">time_unit</span><span class="si">}</span><span class="s1">s&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">period_unit</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Copy object</span>
@@ -3028,7 +3047,7 @@
 
         <span class="n">psd_list</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">amp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">amp_qs</span><span class="p">):</span>
-            <span class="n">psd_tmp</span> <span class="o">=</span> <span class="n">PSD</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="n">amp</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">qs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s1">g</span><span class="si">}</span><span class="s1">%&#39;</span><span class="p">,</span> <span class="n">plot_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="s1">&#39;lw&#39;</span><span class="p">:</span> <span class="n">lw</span><span class="p">[</span><span class="n">i</span><span class="p">]},</span> <span class="n">period_unit</span><span class="o">=</span><span class="n">period_unit</span><span class="p">)</span>
+            <span class="n">psd_tmp</span> <span class="o">=</span> <span class="n">PSD</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">amplitude</span><span class="o">=</span><span class="n">amp</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">qs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s1">g</span><span class="si">}</span><span class="s1">%&#39;</span><span class="p">,</span> <span class="n">plot_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="s1">&#39;linewidth&#39;</span><span class="p">:</span> <span class="n">lw</span><span class="p">[</span><span class="n">i</span><span class="p">]},</span> <span class="n">period_unit</span><span class="o">=</span><span class="n">period_unit</span><span class="p">)</span>
             <span class="n">psd_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">psd_tmp</span><span class="p">)</span>
 
         <span class="n">psds</span> <span class="o">=</span> <span class="n">MultiplePSD</span><span class="p">(</span><span class="n">psd_list</span><span class="o">=</span><span class="n">psd_list</span><span class="p">)</span>

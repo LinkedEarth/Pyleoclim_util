@@ -306,7 +306,14 @@
             <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
             <span class="n">error</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanstd</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span>
 
-    <span class="k">return</span> <span class="n">bins</span><span class="p">,</span> <span class="n">binned_values</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">error</span></div>
+    <span class="n">res_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;bins&#39;</span><span class="p">:</span> <span class="n">bins</span><span class="p">,</span>
+        <span class="s1">&#39;binned_values&#39;</span><span class="p">:</span> <span class="n">binned_values</span><span class="p">,</span>
+        <span class="s1">&#39;n&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+        <span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="n">error</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span>  <span class="n">res_dict</span></div>
 
 
 <div class="viewcode-block" id="interp"><a class="viewcode-back" href="../../../utils/tsutils/interp.html#pyleoclim.utils.tsutils.interp">[docs]</a><span class="k">def</span> <span class="nf">interp</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span> <span class="n">interp_type</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">interp_step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">):</span>
@@ -851,7 +858,11 @@
 <span class="sd">             true by default, plots the outliers using a scatter plot</span>
 <span class="sd">       auto : boolean</span>
 <span class="sd">             true by default, if false the user manually selects the knee point</span>
+<span class="sd">       mute : bool, optional</span>
+<span class="sd">            if True, the plot will not show;</span>
+<span class="sd">            recommend to turn on when more modifications are going to be made on ax</span>
 <span class="sd">       plot_kwargs : dict</span>
+<span class="sd">            keyword arguments for ax.plot()</span>
 
 <span class="sd">       Returns</span>
 <span class="sd">       -------</span>
@@ -913,12 +924,13 @@
             <span class="k">if</span> <span class="s1">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">saveknee_settings</span><span class="p">:</span>
                 <span class="n">savefig</span><span class="p">(</span><span class="n">fig1</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">saveknee_settings</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">showfig</span><span class="p">(</span><span class="n">fig1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">mute</span><span class="p">:</span>
+                    <span class="n">showfig</span><span class="p">(</span><span class="n">fig1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">plot_outliers</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
             <span class="n">x2</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">outliers</span><span class="p">]</span>
             <span class="n">y2</span> <span class="o">=</span> <span class="n">ys</span><span class="p">[</span><span class="n">outliers</span><span class="p">]</span>
-            <span class="n">plot_scatter_xy</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="n">ys</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span><span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">,</span><span class="n">savefig_settings</span><span class="o">=</span><span class="n">saveoutliers_settings</span><span class="p">,</span><span class="n">plot_kwargs</span><span class="o">=</span><span class="n">plot_outliers_kwargs</span><span class="p">)</span>
+            <span class="n">plot_scatter_xy</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="n">ys</span><span class="p">,</span><span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span><span class="n">xlabel</span><span class="o">=</span><span class="s1">&#39;time&#39;</span><span class="p">,</span><span class="n">ylabel</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">,</span><span class="n">savefig_settings</span><span class="o">=</span><span class="n">saveoutliers_settings</span><span class="p">,</span><span class="n">plot_kwargs</span><span class="o">=</span><span class="n">plot_outliers_kwargs</span><span class="p">,</span> <span class="n">mute</span><span class="o">=</span><span class="n">mute</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">outliers</span>
 
