@@ -18,7 +18,9 @@ The package is aware of age ensembles stored via LiPD and uses them for time-unc
 
 ### Documentation
 
-Online documentation is available on our [GitHub page](http://linkedearth.github.io/Pyleoclim_util/)
+Online documentation is available through readthedocs:
+- [Stable version](https://pyleoclim-util.readthedocs.io/en/stable/) (available through Pypi
+- [Latest version](https://pyleoclim-util.readthedocs.io/en/latest/) (from the development branch)
 
 ### Dependencies
 
@@ -26,15 +28,13 @@ Pyleoclim supports Python 3.8
 
 ### Installation
 
-See our [documentation](http://linkedearth.github.io/Pyleoclim_util/installation.html#installation) for details
-
-The latest stable release is available through Pypi
+The latest stable release is available through Pypi. We recommend using Anaconda or Miniconda with a dedicated environment.
  
- pip install pyleoclim
+ `pip install pyleoclim`
 
 You may also want to use the Development version from GitHub to access the latest functionalities
  
- git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
+ `git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development`
 
 ### Development
 
