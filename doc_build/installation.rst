@@ -1,14 +1,11 @@
 .. _installation:
 
-.. toctree::
-   :hidden:
-   anaconda_installation.rst
-
 .. note::
-  Pyleoclim requires the use of Python 3.8.
 
-Installation
-============
+   Pyleoclim requires the use of Python 3.8.
+
+Installing Pyleoclim
+====================
 
 We recommend the use of Anaconda or Miniconda, with Pyleoclim setup in
 its own `conda` environment. Some default packages shipping with the full Anaconda distribution are known to cause conflicts with the required Pyleoclim packages, so we recommend Miniconda, especially for beginners.
@@ -20,7 +17,7 @@ To install Anaconda or Miniconda on your platform, follow the instructions from 
 
 Click :ref:`here <anaconda_installation>` for a quick tutorial on MacOs and Linux systems.
 
-Creating a new Anaconda environment
+Creating a new conda environment
 """""""""""""""""""""""""""""""""""
 
 To create a new environment using Python 3.8 via command line:
@@ -101,7 +98,7 @@ Building from source for the f2py feature of WWZ
 The default version of WWZ that comes with the installation steps mentioned above is relying on `Numba <http://numba.pydata.org/>`_.
 It is fast enough for lightweight spectral & wavelet analysis tasks, in which case we recommend using the default installation.
 
-However, it could be slow for heavy use (e.g. performing it for hundreds of times on timeseries with length longer than 1000 points), in which case we recommend activating the f2py feature to achieve an acceleration of around 50% (see a loose benchmark notebook `here <https://github.com/LinkedEarth/Pyleoclim_util/blob/Development/example_notebooks/WWZ_numba.ipynb>`_).
+However, it could be slow for heavy use (e.g. performing it for hundreds of times on timeseries with length longer than 1000 points), in which case we recommend activating the f2py feature to achieve an acceleration of around 50%.
 
 To do that, a Fortran compiler (e.g. :code:`gfortran` or :code:`ifort`) is required on your local machine, and the related Fortran source code should be compiled locally following the steps below:
 

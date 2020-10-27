@@ -1,68 +1,12 @@
 .. _utils_introduction:
 
-.. toctree::
-   :hidden:
-   spectral/welch.rst
-   spectral/periodogram.rst
-   spectral/mtm.rst
-   spectral/lombscargle.rst
-   spectral/wwz_psd.rst
-   causality/granger.rst
-   causality/liang.rst
-   mapping/map_all.rst
-   mapping/set_proj.rst
-   filter/savitzky_golay.rst
-   filter/ts_pad.rst
-   filter/butterworth.rst
-   decomposition/pca.rst
-   decomposition/mssa.rst
-   decomposition/ssa.rst
-   correlation/corr_sig.rst
-   correlation/fdr.rst
-   lipdutils/private.rst
-   lipdutils/whatArchives.rst
-   lipdutils/whatProxyObservations.rst
-   lipdutils/whatProxySensors.rst
-   lipdutils/whatInferredVariables.rst
-   lipdutils/whatInterpretations.rst
-   lipdutils/queryLinkedEarth.rst
-   plotting/private.rst
-   plotting/showfig.rst
-   plotting/savefig.rst
-   plotting/set_style.rst
-   tsmodel/ar1_sim.rst
-   tsmodel/colored_noise.rst
-   tsmodel/colored_noise_2regimes.rst
-   tsutils/simple_stats.rst
-   tsutils/bin_values.rst
-   tsutils/interp.rst
-   tsutils/on_common_axis.rst
-   tsutils/standardize.rst
-   tsutils/ts2segments.rst
-   tsutils/clean_ts.rst
-   tsutils/annualize.rst
-   tsutils/gaussianize.rst
-   tsutils/gaussianize_single.rst
-   tsutils/detrend.rst
-   tsutils/detect_outliers.rst
-   tsutils/remove_outliers.rst
-   tsutils/is_evenly_spaced.rst
-   wavelet/cwt.rst
-   wavelet/wwz.rst
-   wavelet/xwc.rst
-   wavelet/private.rst
-   jsonutils/json_to_PSD.rst
-   jsonutils/json_to_Scalogram.rst
-   jsonutils/json_to_Series.rst
-   jsonutils/PyleoObj_to_json.rst
-
 Pyleoclim Utilities (pyleoclim.utils)
 =====================================
 
 Pyleoclim makes extensive use of functions from `numpy <https://numpy.org>`_, `Pandas <https://pandas.pydata.org>`_, `Scipy <https://www.scipy.org>`_, and `scikit-learn <https://scikit-learn.org/stable/>`_. Please note that some default parameter values for these functions have been changed to more appropriate values for paleoclimate datasets.
 
 Causality
----------
+"""""""""
 .. list-table::
    :widths: 30 70
    :header-rows: 0
@@ -73,7 +17,7 @@ Causality
      - Estimate Liang causality
 
 Correlation
------------
+"""""""""""
 
 .. list-table::
    :widths: 30 70
@@ -86,7 +30,7 @@ Correlation
 
 
 Decomposition
--------------
+"""""""""""""
 
 Methods used for decomposing timeseries into orthogonal components.
 
@@ -102,7 +46,7 @@ Methods used for decomposing timeseries into orthogonal components.
      - Multi Channel Singular Spectrum Analysis.
 
 Filter
-------
+""""""
 
 Filtering functions
 
@@ -116,7 +60,7 @@ Filtering functions
      - Applies a Butterworth filter with frequency fc, with optional padding
 
 Mapping
--------
+"""""""
 
 This module contains mapping function based on `cartopy <https://scitools.org.uk/cartopy/docs/latest/>_`
 
@@ -128,7 +72,7 @@ This module contains mapping function based on `cartopy <https://scitools.org.uk
      - Maps records according to some criteria (e.g, proxy type, interpretation)
 
 Plotting
---------
+""""""""
 
 The functions contained in this module rely heavily on `matplotlib <https://matplotlib.org>_`. See :ref:`here <plotting_private>` for details. If considering plotting without making use of the functions in the ui module, we recommend using matplotlib directly.
 
@@ -146,7 +90,7 @@ However, the following functions can be used to manipulate the default style and
      - Modifies the visualization style
 
 Spectral
---------
+""""""""
 
 This modules contains several spectral methods applicable to paleoclimate data
 
@@ -166,7 +110,7 @@ This modules contains several spectral methods applicable to paleoclimate data
      - Estimate power spectral density using the Weighted Z-Transform wavelet method
 
 Tsmodel
--------
+"""""""
 
 This module generates simulated time series that can be used for significance testing.
 
@@ -182,7 +126,7 @@ This module generates simulated time series that can be used for significance te
      - Generate a colored noise with two regimes given scaling factors `alpha1` and `alpha2`
 
 Wavelet
--------
+"""""""
 
 Functions for wavelet analysis. Includes some pre-processing and post-processing functions for spectral and wavelet analysis described :ref:`here <wavelet_private>`.
 
@@ -199,7 +143,7 @@ Functions for wavelet analysis. Includes some pre-processing and post-processing
 
 
 Tsutils
--------
+"""""""
 
 This modules contain pre-processing functions for time series analysis.
 
@@ -237,7 +181,7 @@ This modules contain pre-processing functions for time series analysis.
      - Detect whether a timeseries is evenly spaced in time
 
 Lipdutils
----------
+"""""""""
 This module contains functions to manipulate LiPD files and automate data transformation whenever possible. These functions are used throughout Pyleoclim but are not meant for direct interactions. A list of these functions can be found :ref:`here <lipdutils_private>`.
 
 The most relevant functions concern querying the LinkedEarth wiki. The first 5 functions can be used to get relevant query terms.
@@ -260,7 +204,7 @@ The most relevant functions concern querying the LinkedEarth wiki. The first 5 f
      - Query the LinkedEarth wiki for datasets.
 
 jsonutils
-----------
+"""""""""
 
 This module converts Pyleoclim objects to and from JSON files. Useful for obtaining a human-readable output and keeping the results of an analysis.
 

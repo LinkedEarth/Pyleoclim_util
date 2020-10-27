@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Series (pyleoclim.Series) &mdash; Pyleoclim 0.5.0 documentation</title>
+  <title>Using the Pyleoclim UI &mdash; Pyleoclim 0.5.1 documentation</title>
   
 
   
@@ -36,7 +36,9 @@
 
     
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" /> 
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Tutorials" href="../tutorials.html" />
+    <link rel="prev" title="Installing Pyleoclim" href="../installation.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -60,7 +62,7 @@
             
             
               <div class="version">
-                0.5.0
+                0.5.1
               </div>
             
           
@@ -85,20 +87,33 @@
               
             
             
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Series (pyleoclim.Series)</a></li>
-<li><a class="reference internal" href="#multipleseries-pyleoclim-multipleseries">MultipleSeries (pyleoclim.MultipleSeries)</a></li>
-<li><a class="reference internal" href="#lipd-pyleoclim-lipd">Lipd (pyleoclim.Lipd)</a></li>
-<li><a class="reference internal" href="#lipdseries-pyleoclim-lipdseries">LipdSeries (pyleoclim.LipdSeries)</a></li>
-<li><a class="reference internal" href="#psd-pyleoclim-psd">PSD (pyleoclim.PSD)</a></li>
-<li><a class="reference internal" href="#scalogram-pyleoclim-scalogram">Scalogram (pyleoclim.Scalogram)</a></li>
-<li><a class="reference internal" href="#coherence-pyleoclim-coherence">Coherence (pyleoclim.Coherence)</a></li>
-<li><a class="reference internal" href="#surrogateseries-pyleoclim-surrogateseries">SurrogateSeries (pyleoclim.SurrogateSeries)</a></li>
-<li><a class="reference internal" href="#multiplepsd-pyleoclim-multiplepsd">MultiplePSD (pyleoclim.MultiplePSD)</a></li>
-<li><a class="reference internal" href="#multiplescalogram-pyleoclim-multiplescalogram">MultipleScalogram (pyleoclim.MultipleScalogram)</a></li>
+              <p class="caption"><span class="caption-text">Working with Pyleoclim</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing Pyleoclim</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Using the Pyleoclim UI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#series-pyleoclim-series">Series (pyleoclim.Series)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multipleseries-pyleoclim-multipleseries">MultipleSeries (pyleoclim.MultipleSeries)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lipd-pyleoclim-lipd">Lipd (pyleoclim.Lipd)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lipdseries-pyleoclim-lipdseries">LipdSeries (pyleoclim.LipdSeries)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#psd-pyleoclim-psd">PSD (pyleoclim.PSD)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scalogram-pyleoclim-scalogram">Scalogram (pyleoclim.Scalogram)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coherence-pyleoclim-coherence">Coherence (pyleoclim.Coherence)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#surrogateseries-pyleoclim-surrogateseries">SurrogateSeries (pyleoclim.SurrogateSeries)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multiplepsd-pyleoclim-multiplepsd">MultiplePSD (pyleoclim.MultiplePSD)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#multiplescalogram-pyleoclim-multiplescalogram">MultipleScalogram (pyleoclim.MultipleScalogram)</a></li>
 </ul>
-</div>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced functionalities</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../utils/introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting Involved</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../citation.html">Citing Pyleoclim</a></li>
+</ul>
+
             
           
         </div>
@@ -143,7 +158,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Series (pyleoclim.Series)</li>
+      <li>Using the Pyleoclim UI</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -186,8 +201,10 @@
     text-align: unset;
 }
 </style>
+<div class="section" id="using-the-pyleoclim-ui">
+<h1>Using the Pyleoclim UI<a class="headerlink" href="#using-the-pyleoclim-ui" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="series-pyleoclim-series">
-<h1>Series (pyleoclim.Series)<a class="headerlink" href="#series-pyleoclim-series" title="Permalink to this headline">¶</a></h1>
+<h2>Series (pyleoclim.Series)<a class="headerlink" href="#series-pyleoclim-series" title="Permalink to this headline">¶</a></h2>
 <p>The Series class allows to manipulate Series objects, which are basic representations of timeseries, containing a time axis, values, and some basic metadata about both axes.</p>
 <dl class="py class">
 <dt id="pyleoclim.core.ui.Series">
@@ -233,7 +250,7 @@ Default is None</p></li>
 <span class="gp">   ...: </span>
 
 <span class="gp">In [7]: </span><span class="n">ts</span>
-<span class="gh">Out[7]: </span><span class="go">&lt;pyleoclim.core.ui.Series at 0x7fa39b1626d0&gt;</span>
+<span class="gh">Out[7]: </span><span class="go">&lt;pyleoclim.core.ui.Series at 0x7fe320534340&gt;</span>
 
 <span class="gp">In [8]: </span><span class="n">ts</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 <span class="gh">Out[8]: </span><span class="go">dict_keys([&#39;time&#39;, &#39;value&#39;, &#39;time_name&#39;, &#39;time_unit&#39;, &#39;value_name&#39;, &#39;value_unit&#39;, &#39;label&#39;])</span>
@@ -318,7 +335,7 @@ Default is None</p></li>
 
 </div>
 <div class="section" id="multipleseries-pyleoclim-multipleseries">
-<h1>MultipleSeries (pyleoclim.MultipleSeries)<a class="headerlink" href="#multipleseries-pyleoclim-multipleseries" title="Permalink to this headline">¶</a></h1>
+<h2>MultipleSeries (pyleoclim.MultipleSeries)<a class="headerlink" href="#multipleseries-pyleoclim-multipleseries" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="pyleoclim.core.ui.MultipleSeries">
 <em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">MultipleSeries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">series_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleSeries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries" title="Permalink to this definition">¶</a></dt>
@@ -383,7 +400,7 @@ Default is None</p></li>
 
 </div>
 <div class="section" id="lipd-pyleoclim-lipd">
-<h1>Lipd (pyleoclim.Lipd)<a class="headerlink" href="#lipd-pyleoclim-lipd" title="Permalink to this headline">¶</a></h1>
+<h2>Lipd (pyleoclim.Lipd)<a class="headerlink" href="#lipd-pyleoclim-lipd" title="Permalink to this headline">¶</a></h2>
 <p>This class allows to manipulate LiPD objects</p>
 <dl class="py class">
 <dt id="pyleoclim.core.ui.Lipd">
@@ -406,8 +423,8 @@ If it’s a URL, it must start with “http”, “https”, or “ftp.</p></li>
 <span class="gp">In [3]: </span><span class="n">d1</span><span class="o">=</span><span class="n">lpd</span><span class="o">.</span><span class="n">readLipd</span><span class="p">(</span><span class="s1">&#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span><span class="p">)</span>
 <span class="go">Disclaimer: LiPD files may be updated and modified to adhere to standards</span>
 
-<span class="go">reading: MD982176.Stott.2004.lpd</span>
-<span class="go">Finished read: 1 record</span>
+<span class="go">Error: unable to download from url: &lt;urlopen error [Errno 8] nodename nor servname provided, or not known&gt;</span>
+<span class="go">Finished read: 0 records</span>
 
 <span class="gp">In [4]: </span><span class="n">d</span><span class="o">=</span><span class="n">pyleo</span><span class="o">.</span><span class="n">Lipd</span><span class="p">(</span><span class="n">lipd_dict</span><span class="o">=</span><span class="n">d1</span><span class="p">)</span>
 </pre></div>
@@ -447,7 +464,7 @@ If it’s a URL, it must start with “http”, “https”, or “ftp.</p></li>
 
 </div>
 <div class="section" id="lipdseries-pyleoclim-lipdseries">
-<h1>LipdSeries (pyleoclim.LipdSeries)<a class="headerlink" href="#lipdseries-pyleoclim-lipdseries" title="Permalink to this headline">¶</a></h1>
+<h2>LipdSeries (pyleoclim.LipdSeries)<a class="headerlink" href="#lipdseries-pyleoclim-lipdseries" title="Permalink to this headline">¶</a></h2>
 <p>This class allows to manipulate LiPD timeseries objects. This is a subclass of Series. See applicable methods there.</p>
 <dl class="py class">
 <dt id="pyleoclim.core.ui.LipdSeries">
@@ -538,7 +555,7 @@ If it’s a URL, it must start with “http”, “https”, or “ftp.</p></li>
 
 </div>
 <div class="section" id="psd-pyleoclim-psd">
-<h1>PSD (pyleoclim.PSD)<a class="headerlink" href="#psd-pyleoclim-psd" title="Permalink to this headline">¶</a></h1>
+<h2>PSD (pyleoclim.PSD)<a class="headerlink" href="#psd-pyleoclim-psd" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="pyleoclim.core.ui.PSD">
 <em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">PSD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em>, <em class="sig-param"><span class="n">amplitude</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">timeseries</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">plot_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">spec_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">spec_args</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_qs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">period_unit</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#PSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.PSD" title="Permalink to this definition">¶</a></dt>
@@ -581,7 +598,7 @@ If it’s a URL, it must start with “http”, “https”, or “ftp.</p></li>
 
 </div>
 <div class="section" id="scalogram-pyleoclim-scalogram">
-<h1>Scalogram (pyleoclim.Scalogram)<a class="headerlink" href="#scalogram-pyleoclim-scalogram" title="Permalink to this headline">¶</a></h1>
+<h2>Scalogram (pyleoclim.Scalogram)<a class="headerlink" href="#scalogram-pyleoclim-scalogram" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="pyleoclim.core.ui.Scalogram">
 <em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">Scalogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em>, <em class="sig-param"><span class="n">time</span></em>, <em class="sig-param"><span class="n">amplitude</span></em>, <em class="sig-param"><span class="n">coi</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">label</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">Neff</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">timeseries</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">wave_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">wave_args</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_qs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">period_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">time_label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Scalogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.Scalogram" title="Permalink to this definition">¶</a></dt>
@@ -607,7 +624,7 @@ If it’s a URL, it must start with “http”, “https”, or “ftp.</p></li>
 
 </div>
 <div class="section" id="coherence-pyleoclim-coherence">
-<h1>Coherence (pyleoclim.Coherence)<a class="headerlink" href="#coherence-pyleoclim-coherence" title="Permalink to this headline">¶</a></h1>
+<h2>Coherence (pyleoclim.Coherence)<a class="headerlink" href="#coherence-pyleoclim-coherence" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="pyleoclim.core.ui.Coherence">
 <em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">Coherence</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frequency</span></em>, <em class="sig-param"><span class="n">time</span></em>, <em class="sig-param"><span class="n">coherence</span></em>, <em class="sig-param"><span class="n">phase</span></em>, <em class="sig-param"><span class="n">coi</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">timeseries1</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">timeseries2</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_qs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">signif_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">freq_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">Neff</span><span class="o">=</span><span class="default_value">3</span></em>, <em class="sig-param"><span class="n">period_unit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">time_label</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Coherence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.Coherence" title="Permalink to this definition">¶</a></dt>
@@ -641,7 +658,7 @@ If it’s a URL, it must start with “http”, “https”, or “ftp.</p></li>
 
 </div>
 <div class="section" id="surrogateseries-pyleoclim-surrogateseries">
-<h1>SurrogateSeries (pyleoclim.SurrogateSeries)<a class="headerlink" href="#surrogateseries-pyleoclim-surrogateseries" title="Permalink to this headline">¶</a></h1>
+<h2>SurrogateSeries (pyleoclim.SurrogateSeries)<a class="headerlink" href="#surrogateseries-pyleoclim-surrogateseries" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="pyleoclim.core.ui.SurrogateSeries">
 <em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">SurrogateSeries</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">series_list</span></em>, <em class="sig-param"><span class="n">surrogate_method</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">surrogate_args</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SurrogateSeries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.SurrogateSeries" title="Permalink to this definition">¶</a></dt>
@@ -677,7 +694,7 @@ If it’s a URL, it must start with “http”, “https”, or “ftp.</p></li>
 
 </div>
 <div class="section" id="multiplepsd-pyleoclim-multiplepsd">
-<h1>MultiplePSD (pyleoclim.MultiplePSD)<a class="headerlink" href="#multiplepsd-pyleoclim-multiplepsd" title="Permalink to this headline">¶</a></h1>
+<h2>MultiplePSD (pyleoclim.MultiplePSD)<a class="headerlink" href="#multiplepsd-pyleoclim-multiplepsd" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="pyleoclim.core.ui.MultiplePSD">
 <em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">MultiplePSD</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">psd_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultiplePSD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.MultiplePSD" title="Permalink to this definition">¶</a></dt>
@@ -711,7 +728,7 @@ If it’s a URL, it must start with “http”, “https”, or “ftp.</p></li>
 
 </div>
 <div class="section" id="multiplescalogram-pyleoclim-multiplescalogram">
-<h1>MultipleScalogram (pyleoclim.MultipleScalogram)<a class="headerlink" href="#multiplescalogram-pyleoclim-multiplescalogram" title="Permalink to this headline">¶</a></h1>
+<h2>MultipleScalogram (pyleoclim.MultipleScalogram)<a class="headerlink" href="#multiplescalogram-pyleoclim-multiplescalogram" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="pyleoclim.core.ui.MultipleScalogram">
 <em class="property">class </em><code class="sig-prename descclassname">pyleoclim.core.ui.</code><code class="sig-name descname">MultipleScalogram</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scalogram_list</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleScalogram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleScalogram" title="Permalink to this definition">¶</a></dt>
@@ -734,6 +751,7 @@ If it’s a URL, it must start with “http”, “https”, or “ftp.</p></li>
 </dd></dl>
 
 </div>
+</div>
 
 
            </div>
@@ -741,13 +759,22 @@ If it’s a URL, it must start with “http”, “https”, or “ftp.</p></li>
           </div>
           <footer>
   
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../tutorials.html" class="btn btn-neutral float-right" title="Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../installation.html" class="btn btn-neutral float-left" title="Installing Pyleoclim" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
         
-        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James
 
     </p>
   </div>

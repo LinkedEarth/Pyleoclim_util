@@ -1,26 +1,29 @@
 .. _anaconda_installation:
 
+Installing Miniconda (Mac, Linux)
+=================================
+
 Anaconda is a very large install, containing not only Python, but also R, and a host of other things that are not necessary to run pyleoclim.
 Users may find it preferable to install the more minimalist "miniconda" package.
 
 Step 1: Download the installation script for miniconda3
-======================================================
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-MacOs
-"""""
+MacOS
+-----
 
 .. code-block:: bash
 
   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
 
 Linux
-"""""
+-----
 .. code-block:: bash
 
   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 
 Step 2: Install Miniconda3
-=========================
+"""""""""""""""""""""""""""
 
 .. code-block:: bash
 
@@ -35,7 +38,7 @@ After the installation is done, we need to add the two lines into your shell env
   . <base-path>/etc/profile.d/conda.sh
 
 Step 3: Test your Installation
-==============================
+"""""""""""""""""""""""""""""""
 
 .. code-block:: bash
 
