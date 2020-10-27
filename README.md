@@ -4,7 +4,7 @@
 [![license](https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg)]()
 [![DOI](https://zenodo.org/badge/59611213.svg)](https://zenodo.org/badge/latestdoi/59611213)
 [![NSF-1541029](https://img.shields.io/badge/NSF-1541029-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1541029)
-[![Build Status](https://travis-ci.org/LinkedEarth/Pyleoclim_util.svg?branch=Development)](https://travis-ci.org/LinkedEarth/Pyleoclim_util)
+[![Build Status](https://travis-ci.org/LinkedEarth/Pyleoclim_util.svg?branch=master)](https://travis-ci.org/LinkedEarth/Pyleoclim_util)
 
 # Pyleoclim
 
@@ -16,6 +16,16 @@ High-level modules assume that data are stored in the Linked Paleo Data ([LiPD](
 
 The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses very much like [GeoChronR](http://nickmckay.github.io/GeoChronR/).
 
+New in version 0.5.0:
+
+- code design centered on timeseries objects
+- [user interface](https://github.com/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb) allowing succinct, expressive calls
+- expanded repertoire of spectral and wavelet methods
+- inclusion of singular spectral analysis, permitting missing data
+- Sphinx [documentation](http://linkedearth.github.io/Pyleoclim_util/) for all functions
+- clean, additive [plot styles](https://github.com/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/plot_styles.ipynb) inspired by Matplotlib [style sheets](https://matplotlib.org/3.3.1/gallery/style_sheets/style_sheets_reference.html).  
+
+
 ### Documentation
 
 Online documentation is available through readthedocs:
@@ -24,7 +34,7 @@ Online documentation is available through readthedocs:
 
 ### Dependencies
 
-Pyleoclim supports Python 3.8
+pyleoclim supports Python 3.8
 
 ### Installation
 
@@ -36,9 +46,10 @@ You may also want to use the Development version from GitHub to access the lates
  
  `git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development`
 
+
 ### Development
 
-Pyleoclim development takes place on GitHub: https://github.com/LinkedEarth/Pyleoclim_util 
+Pyleoclim development takes place on GitHub: https://github.com/LinkedEarth/Pyleoclim_util
 
 Please submit any reproducible bugs you encounter to the [issue tracker](https://github.com/LinkedEarth/Pyleoclim_util/issues)
 
@@ -52,4 +63,4 @@ If you use the code in publications, please credit the work using [this citation
 
 This material is based upon work supported by the National Science Foundation under Grant Number ICER-1541029. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the investigators and do not necessarily reflect the views of the National Science Foundation.
 
-This research is funded in part by JP Morgan Chase & Co. Any views or opinions expressed herein are solely those of the authors listed, and may differ from the views and opinions expressed by JP Morgan Chase & Co. or its affilitates. This material is not a product of the Research Department of J.P. Morgan Securities LLC. This material should not be construed as an individual recommendation of for any particular client and is not intended as a recommendation of particular securities, financial instruments or strategies for a particular client. This material does not constitute a solicitation or offer in any jurisdiction. 
+This research is funded in part by JP Morgan Chase & Co. Any views or opinions expressed herein are solely those of the authors listed, and may differ from the views and opinions expressed by JP Morgan Chase & Co. or its affilitates. This material is not a product of the Research Department of J.P. Morgan Securities LLC. This material should not be construed as an individual recommendation of for any particular client and is not intended as a recommendation of particular securities, financial instruments or strategies for a particular client. This material does not constitute a solicitation or offer in any jurisdiction.
