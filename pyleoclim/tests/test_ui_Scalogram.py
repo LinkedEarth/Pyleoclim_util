@@ -1,7 +1,7 @@
 ''' Tests for pyleoclim.core.ui.Scalogram
 
 Naming rules:
-1. classe: Test{filename}{Class}{method} with appropriate camel case
+1. class: Test{filename}{Class}{method} with appropriate camel case
 2. function: test_{method}_t{test_id}
 
 Notes on how to test:
@@ -44,3 +44,15 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
 
 
 # Tests below
+class TestUiScalogramSignifTest:
+    ''' Tests for Scalogram.signif_test()
+    '''
+
+    def test_signif_test_t0(self):
+        ''' Test scalogram.signif_test() with default parameters
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=100, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        scal = ts.wavelet()
+        scal_signif = scal.signif_test(number=1)

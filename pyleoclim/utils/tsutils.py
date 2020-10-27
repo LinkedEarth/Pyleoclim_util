@@ -155,7 +155,14 @@ def bin_values(x, y, bin_size=None, start=None, end=None):
             n.append(y[idx].size)
             error.append(np.nanstd(y[idx]))
 
-    return bins, binned_values, n, error
+    res_dict = {
+        'bins': bins,
+        'binned_values': binned_values,
+        'n': n,
+        'error': error,
+    }
+
+    return  res_dict
 
 
 def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **args):
@@ -700,7 +707,11 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
              true by default, plots the outliers using a scatter plot
        auto : boolean
              true by default, if false the user manually selects the knee point
+       mute : bool, optional
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
        plot_kwargs : dict
+            keyword arguments for ax.plot()
 
        Returns
        -------
@@ -762,12 +773,13 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
             if 'path' in saveknee_settings:
                 savefig(fig1, settings=saveknee_settings)
             else:
-                showfig(fig1)
+                if not mute:
+                    showfig(fig1)
 
         if plot_outliers==True:
             x2 = ts[outliers]
             y2 = ys[outliers]
-            plot_scatter_xy(ts,ys,x2,y2,figsize=figsize,xlabel='time',ylabel='value',savefig_settings=saveoutliers_settings,plot_kwargs=plot_outliers_kwargs)
+            plot_scatter_xy(ts,ys,x2,y2,figsize=figsize,xlabel='time',ylabel='value',savefig_settings=saveoutliers_settings,plot_kwargs=plot_outliers_kwargs, mute=mute)
 
         return outliers
 

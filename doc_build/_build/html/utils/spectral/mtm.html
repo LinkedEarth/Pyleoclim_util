@@ -1,0 +1,344 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mtm (pyleoclim.utils.spectral.mtm) &mdash; Pyleoclim 0.5.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Working with Pyleoclim</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../core/ui.html">Using the Pyleoclim UI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced functionalities</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting Involved</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../citation.html">Citing Pyleoclim</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>mtm (pyleoclim.utils.spectral.mtm)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/utils/spectral/mtm.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="mtm-pyleoclim-utils-spectral-mtm">
+<span id="utils-mtm"></span><h1>mtm (pyleoclim.utils.spectral.mtm)<a class="headerlink" href="#mtm-pyleoclim-utils-spectral-mtm" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="pyleoclim.utils.spectral.mtm">
+<code class="sig-prename descclassname">pyleoclim.utils.spectral.</code><code class="sig-name descname">mtm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ys</span></em>, <em class="sig-param"><span class="n">ts</span></em>, <em class="sig-param"><span class="n">NW</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">BW</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">detrend</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sg_kwargs</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">gaussianize</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">standardize</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">adaptive</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">jackknife</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">low_bias</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sides</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">nfft</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/spectral.html#mtm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyleoclim.utils.spectral.mtm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retuns spectral density using a multi-taper method.</p>
+<p>Based on the function in the time series analysis for neuroscience toolbox: <a class="reference external" href="http://nipy.org/nitime/api/generated/nitime.algorithms.spectral.html">http://nipy.org/nitime/api/generated/nitime.algorithms.spectral.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ys</strong> (<em>array</em>) – a time series</p></li>
+<li><p><strong>ts</strong> (<em>array</em>) – time axis of the time series</p></li>
+<li><p><strong>NW</strong> (<em>float</em>) – The normalized half-bandwidth of the data tapers, indicating a
+multiple of the fundamental frequency of the DFT (Fs/N).
+Common choices are n/2, for n &gt;= 4.</p></li>
+<li><p><strong>BW</strong> (<em>float</em>) – The sampling-relative bandwidth of the data tapers</p></li>
+<li><p><strong>detrend</strong> (<em>str</em>) – <blockquote>
+<div><dl class="simple">
+<dt>If None, no detrending is applied. Available detrending methods:</dt><dd><ul>
+<li><p>None - no detrending will be applied (default);</p></li>
+<li><p>linear - a linear least-squares fit to <cite>ys</cite> is subtracted;</p></li>
+<li><p>constant - the mean of <cite>ys</cite> is subtracted</p></li>
+<li><p>savitzy-golay - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.</p></li>
+<li><p>emd - Empirical mode decomposition</p></li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>sg_kwargs<span class="classifier">dict</span></dt><dd><p>The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</p>
+</dd>
+<dt>gaussianize<span class="classifier">bool</span></dt><dd><p>If True, gaussianizes the timeseries</p>
+</dd>
+<dt>standardize<span class="classifier">bool</span></dt><dd><p>If True, standardizes the timeseries</p>
+</dd>
+<dt>adaptive<span class="classifier">{True/False}</span></dt><dd><p>Use an adaptive weighting routine to combine the PSD estimates of
+different tapers.</p>
+</dd>
+<dt>jackknife<span class="classifier">{True/False}</span></dt><dd><p>Use the jackknife method to make an estimate of the PSD variance
+at each point.</p>
+</dd>
+<dt>low_bias<span class="classifier">{True/False}</span></dt><dd><p>Rather than use 2NW tapers, only use the tapers that have better than
+90% spectral concentration within the bandwidth (still using
+a maximum of 2NW tapers)</p>
+</dd>
+<dt>sides<span class="classifier">str (optional)   [ ‘default’ | ‘onesided’ | ‘twosided’ ]</span></dt><dd><p>This determines which sides of the spectrum to return.
+For complex-valued inputs, the default is two-sided, for real-valued
+inputs, default is one-sided Indicates whether to return a one-sided
+or two-sided</p>
+</dd>
+</dl>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>res_dict</strong> – the result dictionary, including
+- freq (array): the frequency vector
+- psd (array): the spectral density vector</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="periodogram.html#pyleoclim.utils.spectral.periodogram" title="pyleoclim.utils.spectral.periodogram"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyleoclim.utils.spectral.periodogram()</span></code></a></dt><dd><p>Estimate power spectral density using a periodogram</p>
+</dd>
+<dt><a class="reference internal" href="welch.html#pyleoclim.utils.spectral.welch" title="pyleoclim.utils.spectral.welch"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyleoclim.utils.spectral.welch()</span></code></a></dt><dd><p>Retuns spectral density using the welch method</p>
+</dd>
+<dt><a class="reference internal" href="lombscargle.html#pyleoclim.utils.spectral.lomb_scargle" title="pyleoclim.utils.spectral.lomb_scargle"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyleoclim.utils.spectral.lomb_scargle()</span></code></a></dt><dd><p>Return the computed periodogram using lomb-scargle algorithm</p>
+</dd>
+<dt><a class="reference internal" href="wwz_psd.html#pyleoclim.utils.spectral.wwz_psd" title="pyleoclim.utils.spectral.wwz_psd"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyleoclim.utils.spectral.wwz_psd()</span></code></a></dt><dd><p>Return the psd of a timeseries using wwz method.</p>
+</dd>
+<dt><code class="xref py py-func docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.savitzy_golay()</span></code></dt><dd><p>Filtering using Savitzy-Golay</p>
+</dd>
+<dt><a class="reference internal" href="../tsutils/detrend.html#pyleoclim.utils.tsutils.detrend" title="pyleoclim.utils.tsutils.detrend"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyleoclim.utils.tsutils.detrend()</span></code></a></dt><dd><p>Detrending method</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyleoclim</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a signal</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2001</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">50</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">f</span><span class="o">*</span><span class="n">time</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Spectral Analysis</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">mtm</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># plot</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">loglog</span><span class="p">(</span>
+<span class="gp">... </span>          <span class="n">res</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">],</span>
+<span class="gp">... </span>          <span class="n">res</span><span class="p">[</span><span class="s1">&#39;psd&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;PSD&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="../../utils/spectral/mtm-1.py">Source code</a>, <a class="reference external" href="../../utils/spectral/mtm-1.png">png</a>)</p>
+<div class="figure align-default">
+<img alt="../../_images/mtm-1.png" src="../../_images/mtm-1.png" />
+</div>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

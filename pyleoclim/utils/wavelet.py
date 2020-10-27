@@ -224,7 +224,7 @@ def assertPositiveInt(*args):
         assert isinstance(arg, int) and arg >= 1
 
 def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, sg_kwargs=None,
-              gaussianize=False, standardize=True):
+              gaussianize=False, standardize=False):
     ''' Return the weighted wavelet amplitude (WWA).
 
     Original method from Foster. Not multiprocessing.
@@ -351,7 +351,7 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
     return wwa, phase, Neffs, coeff
 
 def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=False, sg_kwargs=None,
-              gaussianize=False, standardize=True):
+              gaussianize=False, standardize=False):
     ''' Return the weighted wavelet amplitude (WWA).
 
     Original method from Foster. Supports multiprocessing.
@@ -484,7 +484,7 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=Fal
     return wwa, phase, Neffs, coeff
 
 def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, sg_kwargs=None,
-                   gaussianize=False, standardize=True):
+                   gaussianize=False, standardize=False):
     ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
     Method modified by Kirchner. No multiprocessing.
@@ -626,7 +626,7 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
     return wwa, phase, Neffs, coeff
 
 def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
-                   gaussianize=False, standardize=True):
+                   gaussianize=False, standardize=False):
     ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
     Method modified by kirchner. Supports multiprocessing.
@@ -770,7 +770,7 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend
     return wwa, phase, Neffs, coeff
 
 def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, sg_kwargs=None,
-                   gaussianize=False, standardize=True, nproc=1):
+                   gaussianize=False, standardize=False, nproc=1):
     ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
     Using numba.
@@ -921,7 +921,7 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, s
     return wwa, phase, Neffs, coeff
 
 def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
-                  gaussianize=False, standardize=True):
+                  gaussianize=False, standardize=False):
     ''' Returns the weighted wavelet amplitude (WWA) modified by Kirchner.
 
     Fastest method. Calls Fortran libraries.
@@ -1144,7 +1144,7 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
 
 def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
         nMC=200, nproc=8, detrend=False, sg_kwargs=None,
-        gaussianize=False, standardize=True, method='default', len_bd=0,
+        gaussianize=False, standardize=False, method='default', len_bd=0,
         bc_mode='reflect', reflect_type='odd'):
     ''' Weighted wavelet amplitude (WWA) for unevenly-spaced data
 
@@ -1280,7 +1280,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau=None, freq=None, freq_method='log', freq_kwargs=None,
         c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
         nMC=200,
-        gaussianize=False, standardize=True, method='default'):
+        gaussianize=False, standardize=False, method='default'):
     ''' Return the cross-wavelet coherence of two time series.
 
     Parameters
@@ -2344,7 +2344,7 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 
                 rec_ts += (a_0[j, k] + a_1[j, k]*phi_1 + a_2[j, k]*phi_2)
 
-    rec_ts = preprocess(rec_ts, t, detrend=False, gaussianize=False, standardize=True)
+    rec_ts = preprocess(rec_ts, t, detrend=False, gaussianize=False, standardize=False)
 
     return rec_ts, t
 

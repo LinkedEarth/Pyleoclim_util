@@ -1,0 +1,27 @@
+language: python
+python:
+  - '3.8'
+
+
+before_install:
+  - sudo apt-get update -yq
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no 
+  - conda update -q conda
+  - conda config --set channel_priority false
+  - conda info -a
+
+install:
+  - conda create -n pyleoenv python=3.8
+  - source activate pyleoenv
+  - conda install numpy
+  - conda install -c conda-forge cartopy
+  - pip install -r requirements.txt
+  - pip install .
+
+
+script:
+  - pytest pyleoclim/tests

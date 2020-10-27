@@ -395,7 +395,7 @@ def sm_ar1_sim(n, p, g, sig):
 
     # simulate AR(1) model for each column
     for i in np.arange(p):
-        red[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n)
+        red[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, scale=sig_n)
 
     return red
 

@@ -608,7 +608,7 @@ class Series:
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
-                    time_label=None, value_label=None, period_label=None, psd_label=None):
+                    time_label=None, value_label=None, period_label=None, psd_label=None, mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. 
 
         Parameters
@@ -658,6 +658,10 @@ class Series:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
         
         See also
         --------
@@ -761,7 +765,9 @@ class Series:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-
+        else:
+            if not mute:
+                plotting.showfig(fig)
         return fig, ax
 
     def copy(self):
@@ -1188,6 +1194,11 @@ class Series:
             'wwz': waveutils.wwz,
             'cwt': waveutils.cwt,
         }
+        
+        if method == 'cwt' and 'freq' in settings.keys():
+            scales=1/np.array(settings['freq'])
+            settings.update({'scales':scales})
+            del settings['freq']
 
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
@@ -1195,7 +1206,7 @@ class Series:
         args = {}
 
         args['wwz'] = {'tau': self.time, 'freq': freq}
-        args['cwt'] = {'wavelet' : 'morl'}
+        args['cwt'] = {'wavelet' : 'morl', 'scales':1/freq}
 
 
         args[method].update(settings)
@@ -1529,7 +1540,7 @@ class Series:
 
     def outliers(self, auto=True, remove=True, fig_outliers=True,fig_knee=True,
                  plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],
-                 saveknee_settings=None,saveoutliers_settings=None):
+                 saveknee_settings=None,saveoutliers_settings=None, mute=False):
         '''
         Detects outliers in a timeseries and removes if specified
         
@@ -1554,6 +1565,9 @@ class Series:
             arguments for the outliers plot
         figsize : list
             by default [10,4]
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
      
         Returns
         -------
@@ -1574,8 +1588,11 @@ class Series:
 
         #outlier_indices,fig1,ax1,fig2,ax2 = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
         #                                                   figsize=figsize,save_knee=save_knee,save_outliers=save_outliers,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
-        outlier_indices = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
-                                                           figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
+        outlier_indices = tsutils.detect_outliers(
+            self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,
+            figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,
+            plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs, mute=mute,
+        )
         outlier_indices = np.asarray(outlier_indices)
         if remove == True:
             new = self.copy()
@@ -1638,9 +1655,9 @@ class Series:
                 
         '''
         new=self.copy()
-        x_mod, v_mod = tsutils.bin_values(self.time,self.value,**kwargs)
-        new.time = x_mod
-        new.value = v_mod
+        res_dict = tsutils.bin_values(self.time,self.value,**kwargs)
+        new.time = res_dict['bins']
+        new.value = res_dict['binned_values']
         return new
 
 class PSD:
@@ -1669,6 +1686,8 @@ class PSD:
             self.period_unit = period_unit
         elif timeseries is not None:
             self.period_unit = f'{timeseries.time_unit}s'
+        else:
+            self.period_unit = None
 
     def copy(self):
         '''Copy object
@@ -2877,7 +2896,7 @@ class MultiplePSD:
 
         psd_list = []
         for i, amp in enumerate(amp_qs):
-            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'lw': lw[i]}, period_unit=period_unit)
+            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'linewidth': lw[i]}, period_unit=period_unit)
             psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)

@@ -1,0 +1,348 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Series.detrend (pyleoclim.core.ui.Series.detrend) &mdash; Pyleoclim 0.5.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Working with Pyleoclim</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ui.html">Using the Pyleoclim UI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced functionalities</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../utils/introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting Involved</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../citation.html">Citing Pyleoclim</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Series.detrend (pyleoclim.core.ui.Series.detrend)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/core/Series/detrend.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="series-detrend-pyleoclim-core-ui-series-detrend">
+<span id="series-detrend"></span><h1>Series.detrend (pyleoclim.core.ui.Series.detrend)<a class="headerlink" href="#series-detrend-pyleoclim-core-ui-series-detrend" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="pyleoclim.core.ui.Series.detrend">
+<code class="sig-prename descclassname">pyleoclim.core.ui.Series.</code><code class="sig-name descname">detrend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">self</span></em>, <em class="sig-param"><span class="n">method</span><span class="o">=</span><span class="default_value">'emd'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pyleoclim.core.ui.Series.detrend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Detrend Series object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>The method for detrending. The default is ‘emd’.
+Options include:</p>
+<blockquote>
+<div><ul>
+<li><p>linear: the result of a linear least-squares fit to y is subtracted from y.</p></li>
+<li><p>constant: only the mean of data is subtrated.</p></li>
+<li><p>”savitzky-golay”, y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.</p></li>
+<li><p>”emd” (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>**kwargs</strong> (<em>dict</em>) – Relevant arguments for each of the methods.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>new</strong> – Detrended Series object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pyleoclim.Series</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../../utils/tsutils/detrend.html#pyleoclim.utils.tsutils.detrend" title="pyleoclim.utils.tsutils.detrend"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyleoclim.utils.tsutils.detrend()</span></code></a></dt><dd><p>detrending wrapper functions</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<p>We will generate a random signal and use the different detrending functions</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">pyleoclim</span> <span class="k">as</span> <span class="nn">pyleo</span>
+
+<span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="gp">In [3]: </span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="go"># Generate a mixed signal with known frequencies</span>
+<span class="gp">In [4]: </span><span class="n">freqs</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">20</span><span class="p">,</span><span class="mi">1</span><span class="o">/</span><span class="mi">80</span><span class="p">]</span>
+
+<span class="gp">In [5]: </span><span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">2001</span><span class="p">)</span>
+
+<span class="gp">In [6]: </span><span class="n">signals</span><span class="o">=</span><span class="p">[]</span>
+
+<span class="gp">In [7]: </span><span class="k">for</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">freqs</span><span class="p">:</span>
+<span class="gp">   ...: </span>    <span class="n">signals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">freq</span><span class="o">*</span><span class="n">time</span><span class="p">))</span>
+<span class="gp">   ...: </span>
+
+<span class="gp">In [8]: </span><span class="n">signal</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">signals</span><span class="p">)</span>
+
+<span class="go"># Add a non-linear trend</span>
+<span class="gp">In [9]: </span><span class="n">slope</span> <span class="o">=</span> <span class="mf">1e-5</span>
+
+<span class="gp">In [10]: </span><span class="n">intercept</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+<span class="gp">In [11]: </span><span class="n">nonlinear_trend</span> <span class="o">=</span> <span class="n">slope</span><span class="o">*</span><span class="n">time</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">intercept</span>
+
+<span class="gp">In [12]: </span><span class="n">signal_trend</span> <span class="o">=</span> <span class="n">signal</span> <span class="o">+</span> <span class="n">nonlinear_trend</span>
+
+<span class="go">#Add white noise</span>
+<span class="gp">In [13]: </span><span class="n">sig_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
+
+<span class="gp">In [14]: </span><span class="n">noise_var</span> <span class="o">=</span> <span class="n">sig_var</span> <span class="o">/</span> <span class="mi">2</span> <span class="c1">#signal is twice the size of noise</span>
+
+<span class="gp">In [15]: </span><span class="n">white_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">noise_var</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">signal</span><span class="p">))</span>
+
+<span class="gp">In [16]: </span><span class="n">signal_noise</span> <span class="o">=</span> <span class="n">signal_trend</span> <span class="o">+</span> <span class="n">white_noise</span>
+
+<span class="go">#Create a series object</span>
+<span class="gp">In [17]: </span><span class="n">ts</span><span class="o">=</span><span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="n">signal_noise</span><span class="p">)</span>
+
+<span class="gp">In [18]: </span><span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Timeseries with nonlinear trend&#39;</span><span class="p">)</span>
+<span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
+
+<span class="gp">In [19]: </span><span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+<span class="go">#Standardize</span>
+<span class="gp">In [20]: </span><span class="n">ts_std</span><span class="o">=</span><span class="n">ts</span><span class="o">.</span><span class="n">standardize</span><span class="p">()</span>
+
+<span class="go">#Detrend using EMD</span>
+<span class="gp">In [21]: </span><span class="n">ts_emd</span> <span class="o">=</span> <span class="n">ts_std</span><span class="o">.</span><span class="n">detrend</span><span class="p">()</span>
+
+<span class="gp">In [22]: </span><span class="n">fig</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ts_emd</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Detrended with EMD method&#39;</span><span class="p">)</span>
+<span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
+
+<span class="gp">In [23]: </span><span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+<span class="go">#Detrend using Savitzky-Golay filter</span>
+<span class="gp">In [24]: </span><span class="n">ts_sg</span> <span class="o">=</span> <span class="n">ts_std</span><span class="o">.</span><span class="n">detrend</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;savitzky-golay&#39;</span><span class="p">)</span>
+
+<span class="gp">In [25]: </span><span class="n">fig</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ts_sg</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;Detrended with Savitzky-Golay filter&#39;</span><span class="p">)</span>
+<span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
+
+<span class="gp">In [26]: </span><span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../_images/random_series.png" src="../../_images/random_series.png" />
+<img alt="../../_images/ts_emd.png" src="../../_images/ts_emd.png" />
+<img alt="../../_images/ts_sg.png" src="../../_images/ts_sg.png" />
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

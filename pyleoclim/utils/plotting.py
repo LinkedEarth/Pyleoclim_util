@@ -368,8 +368,9 @@ def showfig(fig):
     if in_notebook:
         try:
             from IPython.display import display
-        except ImportError:
-            pass
+        except ImportError as error:
+            # Output expected ImportErrors.
+            print(f'{error.__class__.__name__}: {error.message}')
 
         display(fig)
 

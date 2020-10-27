@@ -1,8 +1,11 @@
-''' The module for timeseries models
+''' Module for timeseries modeling
 '''
 
 import numpy as np
-import statsmodels.api as sm
+# new for statsmodels v0.12
+from statsmodels.tsa.arima_process import arma_generate_sample
+from statsmodels.tsa.arima.model import ARIMA
+
 from .tsutils import (
     is_evenly_spaced,
     #clean_ts,
@@ -19,7 +22,7 @@ __all__ = [
 def ar1_model(t, tau, output_sigma=1):
     ''' Simulate a (possibly irregularly-sampled) AR(1) process with given decay
         constant tau, à la REDFIT.
-    
+
     Parameters
     ----------
 
@@ -53,7 +56,7 @@ def ar1_model(t, tau, output_sigma=1):
 
     return y
 
-    
+
 def ar1_fit(y, t=None):
     ''' Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
 
@@ -100,16 +103,16 @@ def ar1_sim(y, p, t=None):
 
     Yr : array
         n by p matrix of simulated AR(1) vector
-        
+
     See Also
     --------
-    
+
     pyleoclim.utils.tsmodel.ar1_model : Simulates a (possibly irregularly-sampled) AR(1) process with given decay constant tau, à la REDFIT.
 
     pyleoclim.utils.tsmodel.ar1_fit : Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
-    
-    pyleoclim.utils.tsmodel.ar1_fit_evenly : Returns the lag-1 autocorrelation from AR(1) fit.
-    
+
+    pyleoclim.utils.tsmodel.ar1_fit_evenly : Returns the lag-1 autocorrelation from AR(1) fit assuming even temporal spacing.
+
     pyleoclim.utils.tsmodel.tau_estimation : Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
     '''
@@ -118,8 +121,7 @@ def ar1_sim(y, p, t=None):
 
     sig = np.std(y)
     if is_evenly_spaced(t):
-        #  g = ar1_fit(y, t=t, detrend=detrend, params=params)
-        g = ar1_fit(y, t=t)
+        g = ar1_fit_evenly(y, t=t)
 
         # specify model parameters (statmodel want lag0 coefficent as unity)
         ar = np.r_[1, -g]  # AR model parameter
@@ -129,13 +131,14 @@ def ar1_sim(y, p, t=None):
         # simulate AR(1) model for each column
         for i in np.arange(p):
             #Yr[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n) # old statsmodels syntax
-            Yr[:, i] = sm.tsa.ArmaProcess(ar, ma).generate_sample(nsample=n, scale=sig_n, burnin=50) # statsmodels v0.11.1-?
+            #Yr[:, i] = sm.tsa.ArmaProcess(ar, ma).generate_sample(nsample=n, scale=sig_n, burnin=50) # statsmodels v0.11.1-?
+            Yr[:, i] = arma_generate_sample(ar, ma, nsample=n, scale=sig_n, burnin=50) # statsmodels v0.12+
     else:
         #  tau_est = ar1_fit(y, t=t, detrend=detrend, params=params)
         tau_est = tau_estimation(y, t)
         for i in np.arange(p):
-            # the output of ar1_model is unit variance,
-            # multiply by sig to be consistent with the original tinput timeseries
+            # the output of ar1_model has unit variance,
+            # multiply by sig to be consistent with the original input timeseries
             Yr[:, i] = ar1_model(t, tau_est, output_sigma=sig)
 
     if p == 1:
@@ -144,7 +147,6 @@ def ar1_sim(y, p, t=None):
     return Yr
 
 def ar1_fit_evenly(y, t):
-#  def ar1_fit_evenly(y, t, detrend=False, params=["default", 4, 0, 1], gaussianize=False):
     ''' Returns the lag-1 autocorrelation from AR(1) fit.
 
     Parameters
@@ -160,14 +162,11 @@ def ar1_fit_evenly(y, t):
         lag-1 autocorrelation coefficient
 
     '''
-    #  pd_y = preprocess(y, t, detrend=detrend, params=params, gaussianize=gaussianize)
-    #  ar1_mod = sm.tsa.AR(pd_y, missing='drop').fit(maxlag=1)
-    #ar1_mod = sm.tsa.AR(y, missing='drop').fit(maxlag=1)
-    #g = ar1_mod.params[1]
-
     # syntax compatible with statsmodels v0.11.1
-    ar1_mod = sm.tsa.ARMA(y, (1, 0), missing='drop').fit(trend='nc', disp=0)
-    g = ar1_mod.params[0]
+    #ar1_mod = sm.tsa.ARMA(y, (1, 0), missing='drop').fit(trend='nc', disp=0)
+    # syntax compatible with statsmodels v0.12
+    ar1_mod = ARIMA(y, order = (1, 0, 0), missing='drop',trend='ct').fit()
+    g = ar1_mod.params[2]
 
     if g > 1:
         print('Warning: AR(1) fitted autocorrelation greater than 1; setting to 1-eps^{1/4}')
