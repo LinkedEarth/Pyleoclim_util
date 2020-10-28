@@ -11,4 +11,4 @@ __pycache__
 
 ./**/debug.log
 ./**/benchmark.log
-./doc_build/_build/*
+./doc_build/_build/**
