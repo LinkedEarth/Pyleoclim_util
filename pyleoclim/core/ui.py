@@ -3246,10 +3246,8 @@ class Lipd:
         :okwarning:
         
         import pyleoclim as pyleo
-        import lipd as lpd
-        # d1=lpd.readLipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
-        # need to type the dataset name manually after the command above
-        # d=pyleo.Lipd(lipd_dict=d1)
+        url='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+        d=pyleo.Lipd(usr_path=url)
     '''
     
     def __init__(self, query=False, query_args={}, usr_path=None, lipd_dict=None):
