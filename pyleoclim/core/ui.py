@@ -694,11 +694,11 @@ class Series:
             #Perform spectral analysis
             psd=ts.spectral()
             # Significance testing
-            psd_signif=psd.signif_test(number=10)
+            psd_signif=psd.signif_test(number=1)
             # Perform wavelet analysis
             scal=ts.wavelet()
             # Significance testing
-            scal_signif = scal.signif_test(number=10)
+            scal_signif = scal.signif_test(number=1)
             @savefig ts_summary_plot.png
             fig, ax = ts.summary_plot(
                         scalogram=scal_signif, psd=psd_signif,
@@ -1049,7 +1049,7 @@ class Series:
             ts_std=ts.standardize()
             # WWZ
             psd_wwz=ts_std.spectral()
-            psd_wwz_signif=psd_wwz.signif_test(number=10)
+            psd_wwz_signif=psd_wwz.signif_test(number=1)  # for real work, should use number=200 or even larger
             @savefig spec_wwz.png
             fig,ax=psd_wwz_signif.plot(title='PSD using WWZ method')
             plt.close(fig)
@@ -1180,7 +1180,7 @@ class Series:
             ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
             #WWZ
             scal = ts.wavelet()
-            scal_signif = scal.signif_test(number=10)
+            scal_signif = scal.signif_test(number=1)  # for real work, should use number=200 or even larger
             @savefig wave_wwz.png
             fig,ax=scal_signif.plot()
             plt.close(fig)
@@ -1289,7 +1289,7 @@ class Series:
             ts_air_std=ts_air.standardize()
             ts_nino_std=ts_nino.standardize()
             coh = ts_nino.wavelet_coherence(ts_air)
-            coh_signif = coh.signif_test(number=10, qs=[0.99])
+            coh_signif = coh.signif_test(number=1, qs=[0.99])  # for real work, should use number=200 or even larger
             @savefig coh_plot.png
             fig, ax = coh_signif.plot(phase_style={'skip_x': 50, 'skip_y': 10}) 
             plt.close(fig)
@@ -1461,7 +1461,9 @@ class Series:
             @savefig ts_air.png
             fig, ax = ts_air.plot(title='Deasonalized All Indian Rainfall Index')
             plt.close(fig)
-            caus_res = ts_nino.causality(ts_air)
+            # we use the specific params below in ts_nino.causality() just to make the example less heavier;
+            # please drop the `settings` for real work
+            caus_res = ts_nino.causality(ts_air, settings={'nsim': 2, 'signif_test': 'isopersist'})
             print(caus_res)
         
         Granger causality
@@ -3236,7 +3238,7 @@ class Lipd:
     ----
     
     Support querying the LinkedEarth platform
-    
+
     Examples
     --------
     
@@ -3244,9 +3246,8 @@ class Lipd:
         :okwarning:
         
         import pyleoclim as pyleo
-        import lipd as lpd
-        d1=lpd.readLipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
-        d=pyleo.Lipd(lipd_dict=d1)
+        url='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+        d=pyleo.Lipd(usr_path=url)
     '''
     
     def __init__(self, query=False, query_args={}, usr_path=None, lipd_dict=None):
