@@ -2849,6 +2849,104 @@ class SurrogateSeries(MultipleSeries):
         self.surrogate_method = surrogate_method
         self.surrogate_args = surrogate_args
 
+class EnsembleSeries(MultipleSeries):
+    ''' Object containing ensemble timeseries
+    '''
+    def __init__(self, series_list):
+        self.series_list = series_list
+
+    def correlation(self, target, timespan=None, settings=None, apply_fdr=True, fdr_kwargs=None):
+        ''' Calculate the correlation between an ensemble series group to a target series
+
+        Parameters
+        ----------
+        target : pyleoclim.Series or pyleoclim.EnsembleSeries
+            A pyleoclim Series object or EnsembleSeries object.
+            When the target is also an EnsembleSeries object, then the calculation of correlation is performed in a one-to-one sense,
+            and the ourput list of correlation values and p-values will be the size of the series_list of the self object.
+            That is, if the self object contains n Series, and the target contains n+m Series,
+            then only the first n Series from the object will be used for the calculation;
+            otherwise, if the target contains only n-m Series, then the first m Series in the target will be used twice in sequence.
+        
+        timespan : tuple
+            The time interval over which to perform the calculation
+        
+        settings : dict
+            Parameters for the correlation function (singificance testing and number of simulation)
+
+        apply_fdr : bool
+            Determine significance based on the FDR approach 
+
+        fdr_kwargs : dict
+            Parameters for the FDR function
+            
+        Returns
+        -------
+        
+        res : dict
+            Containing a list of the Pearson's correlation coefficient, associated significance and p-value. 
+        
+        See also
+        --------
+        
+        pyleoclim.utils.correlation.corr_sig : Correlation function
+        pyleoclim.utils.correlation.fdr : FDR function
+
+        '''
+        settings = {} if settings is None else settings.copy()
+        args = {}
+        args.update(settings)
+
+        r_list = []
+        signif_list = []
+        p_list = []
+
+        for idx, ts in enumerate(self.series_list):
+            if timespan is None:
+                value1 = ts.value
+                if isinstance(target, Series):
+                    value2 = target.value
+                elif isinstance(target, EnsembleSeries): 
+                    value2 = target.series_list[idx].value
+            else:
+                value1 = ts.slice(timespan).value
+                if isinstance(target, Series):
+                    value2 = target.slice(timespan).value
+                elif isinstance(target, EnsembleSeries): 
+                    nEns = np.size(target.series_list)
+                    if idx < nEns:
+                        value2 = target.series_list[idx].slice(timespan).value
+                    else:
+                        value2 = target.series_list[idx-nEns].slice(timespan).value
+
+            corr_res = corrutils.corr_sig(value1, value2, **args)
+            r_list.append(corr_res['r'])
+            signif_list.append(corr_res['signif'])
+            p_list.append(corr_res['p'])
+
+        r_lsit = np.array(r_list)
+        p_lsit = np.array(p_list)
+
+        if apply_fdr:
+            fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
+            args = {}
+            args.update(fdr_kwargs)
+            for i in range(np.size(signif_list)):
+                signif_list[i] = False
+
+            fdr_res = corrutils.fdr(p_list, **fdr_kwargs)
+            if fdr_res is not None:
+                for i in fdr_res:
+                    signif_list[i] = True
+
+        corr_res = {
+            'r': r_list,
+            'signif': signif_list,
+            'p': p_list,
+        }
+
+        return corr_res
+
 class MultiplePSD:
     ''' Object for multiple PSD.
     
