@@ -337,6 +337,9 @@ class Series:
                 pyleo.savefig(fig,path='ts_plot3.png')
                 plt.close(fig)
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         # generate default axis labels
         time_label, value_label = self.make_labels()
 
@@ -582,6 +585,9 @@ class Series:
         
         
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
@@ -713,6 +719,9 @@ class Series:
             plt.close(fig)
         
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         fig = plt.figure(figsize=figsize)
         gs = gridspec.GridSpec(6, 12)
@@ -1869,6 +1878,9 @@ class PSD:
         pyleoclim.core.ui.Series.spectral : spectral analysis
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = self.plot_kwargs if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -2120,6 +2132,9 @@ class Scalogram:
         
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
 
@@ -2374,6 +2389,9 @@ class Coherence:
         pyleoclim.core.ui.Series.wavelet_coherence
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
@@ -2841,6 +2859,8 @@ class MultipleSeries:
         fig, ax
             
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
@@ -3135,8 +3155,12 @@ class MultiplePSD:
 
         Returns
         -------
-        fig,ax
+        fig, ax
+
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -3237,6 +3261,9 @@ class MultiplePSD:
         fig, ax
 
         '''
+
+        # Turn the interactive mode off.
+        plt.ioff()
         
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
