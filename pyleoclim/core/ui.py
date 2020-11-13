@@ -608,7 +608,7 @@ class Series:
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
-                    time_label=None, value_label=None, period_label=None, psd_label=None, mute=False):
+                    time_label=None, value_label=None, period_label=None, psd_label='PSD', mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. 
 
         Parameters
@@ -752,12 +752,16 @@ class Series:
             ax['ts'].set_title(title)
 
         if value_label is not None:
+            time_label, value_label = self.make_labels()
             ax['ts'].set_ylabel(value_label)
 
         if time_label is not None:
+            time_label, value_label = self.make_labels()
             ax['scal'].set_xlabel(time_label)
 
         if period_label is not None:
+            period_unit = f'{self.time_unit}s' if self.time_unit is not None else None
+            period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
             ax['scal'].set_ylabel(period_label)
 
         if psd_label is not None:
@@ -1684,10 +1688,11 @@ class PSD:
         self.signif_qs = signif_qs
         self.signif_method = signif_method
         self.plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = f'{timeseries.time_unit}s'
+            self.period_unit = f'{timeseries.time_unit}s' if timeseries.time_unit is not None else None
         else:
             self.period_unit = None
 
@@ -1782,7 +1787,7 @@ class PSD:
 
         return res_dict
 
-    def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='Amplitude', title=None,
+    def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
              plot_legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
@@ -1801,7 +1806,7 @@ class PSD:
         xlabel : str, optional
             Label for the x-axis. The default is None. Will guess based on Series
         ylabel : str, optional
-            Label for the y-axis. The default is 'Amplitude'. Will guess based on Series
+            Label for the y-axis. The default is 'PSD'.
         title : str, optional
             Plot title. The default is None.
         marker : str, optional
@@ -1964,8 +1969,8 @@ class PSD:
                 )
 
         if in_loglog:
-            ax.set_xscale('log', nonpositive='clip')
-            ax.set_yscale('log', nonpositive='clip')
+            ax.set_xscale('log')
+            ax.set_yscale('log')
 
         if xticks is not None:
             ax.set_xticks(xticks)
@@ -2028,14 +2033,24 @@ class Scalogram:
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
+
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = timeseries.time_unit
+            self.period_unit = f'{timeseries.time_unit}s' if timeseries.time_unit is not None else None
+        else:
+            self.period_unit = None
+
         if time_label is not None:
             self.time_label = time_label
         elif timeseries is not None:
-            self.time_label = f'{timeseries.time_name}'
+            if timeseries.time_unit is not None:
+                self.time_label = f'{timeseries.time_name} [{timeseries.time_unit}]'
+            else:
+                self.time_label = f'{timeseries.time_name}'
+        else:
+            self.time_label = None
+
 
     def copy(self):
         '''Copy object
@@ -2125,9 +2140,6 @@ class Scalogram:
             if ylabel is None:
                 ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
 
-        if xlabel is None:
-            xlabel = self.time_label
-
         cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
         ax.set_yscale('log', nonpositive='clip')
 
@@ -2168,8 +2180,14 @@ class Scalogram:
                 linewidths=signif_linewidths,
             )
 
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        if xlabel is None:
+            xlabel = self.time_label
+
+        if xlabel is not None:
+            ax.set_xlabel(xlabel)
+
+        if ylabel is not None:
+            ax.set_ylabel(ylabel)
 
         if xlim is not None:
             ax.set_xlim(xlim)
@@ -2261,14 +2279,30 @@ class Coherence:
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
+
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries1 is not None:
-            self.period_unit = timeseries1.time_unit
+            self.period_unit = f'{timeseries1.time_unit}s' if timeseries1.time_unit is not None else None
+        elif timeseries2 is not None:
+            self.period_unit = f'{timeseries2.time_unit}s' if timeseries2.time_unit is not None else None
+        else:
+            self.period_unit = None
+
         if time_label is not None:
             self.time_label = time_label
         elif timeseries1 is not None:
-            self.time_label = f'{timeseries1.time_name}'
+            if timeseries1.time_unit is not None:
+                self.time_label = f'{timeseries1.time_name} [{timeseries1.time_unit}]'
+            else:
+                self.time_label = f'{timeseries1.time_name}'
+        elif timeseries2 is not None:
+            if timeseries2.time_unit is not None:
+                self.time_label = f'{timeseries2.time_name} [{timeseries2.time_unit}]'
+            else:
+                self.time_label = f'{timeseries2.time_name}'
+        else:
+            self.time_label = None
 
     def copy(self):
         '''Copy object
@@ -2413,8 +2447,14 @@ class Coherence:
             ax.yaxis.set_major_formatter(ScalarFormatter())
             ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        if xlabel is None:
+            xlabel = self.time_label
+
+        if xlabel is not None:
+            ax.set_xlabel(xlabel)
+
+        if ylabel is not None:
+            ax.set_ylabel(ylabel)
 
         # plot phase
         yaxis_range = np.max(y_axis) - np.min(y_axis)
