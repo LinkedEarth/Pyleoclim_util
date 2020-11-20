@@ -586,7 +586,7 @@ class Series:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
-        ax = sns.histplot(self.value, ax=ax, **plot_kwargs)
+        ax = sns.histplot(self.value, ax=ax, **plot_kwargs, kde = True)
 
         time_label, value_label = self.make_labels()
 
