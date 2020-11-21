@@ -1,4 +1,4 @@
-LiPD>=0.2.8
+LiPD>=0.2.8,
 pandas>=1.0.5
 numpy>=1.18.5
 matplotlib>=3.3.1
@@ -16,5 +16,4 @@ nitime>=0.8.1
 tabulate>=0.8.7
 PyWavelets>=1.1.1
 Unidecode>=1.1.1
-IPython
-pytest
+cartopy>=0.18.0

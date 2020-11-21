@@ -87,7 +87,7 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
                     qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995]):
     '''
     Estimate the Liang information transfer from series y2 to series y1 with 
-    singificance estimates using either an AR(1) test with series with the same
+    significance estimates using either an AR(1) test with series with the same
     persistence or surrogates with randomized phases.
 
     Parameters

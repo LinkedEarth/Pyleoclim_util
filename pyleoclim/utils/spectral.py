@@ -46,7 +46,7 @@ from .wavelet import (
 
 def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
            return_onesided=True, detrend = None, sg_kwargs = None,
-           gaussianize=False, standardize=True,
+           gaussianize=False, standardize=False,
            scaling='density', average='mean'):
     '''Estimate power spectral density using Welch's method
 
@@ -202,7 +202,7 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
 
 
 def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
-           gaussianize=False, standardize=True, adaptive=False, jackknife=True,
+           gaussianize=False, standardize=False, adaptive=False, jackknife=True,
            low_bias=True, sides='default', nfft=None):
     ''' Retuns spectral density using a multi-taper method.
 
@@ -336,7 +336,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
                  freq_kwargs=None, n50=3, window='hann',
                  detrend = None, sg_kwargs=None,
                  gaussianize=False,
-                 standardize=True,
+                 standardize=False,
                  average='mean'):
     """ Return the computed periodogram using lomb-scargle algorithm
 
@@ -533,7 +533,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
 def periodogram(ys, ts, window='hann', nfft=None,
            return_onesided=True, detrend = None, sg_kwargs=None,
-           gaussianize=False, standardize=True,
+           gaussianize=False, standardize=False,
            scaling='density'):
     ''' Estimate power spectral density using a periodogram
 
@@ -673,7 +673,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
 def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             tau=None, c=1e-3, nproc=8,
             detrend=False, sg_kwargs=None, gaussianize=False,
-            standardize=True, Neff=3, anti_alias=False, avgs=2,
+            standardize=False, Neff=3, anti_alias=False, avgs=2,
             method='default'):
     ''' Return the psd of a timeseries using wwz method.
 

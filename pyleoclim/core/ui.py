@@ -337,6 +337,9 @@ class Series:
                 pyleo.savefig(fig,path='ts_plot3.png')
                 plt.close(fig)
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         # generate default axis labels
         time_label, value_label = self.make_labels()
 
@@ -582,6 +585,9 @@ class Series:
 
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
@@ -608,8 +614,13 @@ class Series:
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
+
+                    time_label=None, value_label=None, period_label=None, psd_label='PSD', mute=False):
+        ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. 
+
                     time_label=None, value_label=None, period_label=None, psd_label=None, mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
+
 
         Parameters
         ----------
@@ -694,11 +705,11 @@ class Series:
             #Perform spectral analysis
             psd=ts.spectral()
             # Significance testing
-            psd_signif=psd.signif_test(number=10)
+            psd_signif=psd.signif_test(number=1)
             # Perform wavelet analysis
             scal=ts.wavelet()
             # Significance testing
-            scal_signif = scal.signif_test(number=10)
+            scal_signif = scal.signif_test(number=1)
             @savefig ts_summary_plot.png
             fig, ax = ts.summary_plot(
                         scalogram=scal_signif, psd=psd_signif,
@@ -713,6 +724,9 @@ class Series:
             plt.close(fig)
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         fig = plt.figure(figsize=figsize)
         gs = gridspec.GridSpec(6, 12)
@@ -752,12 +766,16 @@ class Series:
             ax['ts'].set_title(title)
 
         if value_label is not None:
+            time_label, value_label = self.make_labels()
             ax['ts'].set_ylabel(value_label)
 
         if time_label is not None:
+            time_label, value_label = self.make_labels()
             ax['scal'].set_xlabel(time_label)
 
         if period_label is not None:
+            period_unit = f'{self.time_unit}s' if self.time_unit is not None else None
+            period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
             ax['scal'].set_ylabel(period_label)
 
         if psd_label is not None:
@@ -1049,7 +1067,7 @@ class Series:
             ts_std=ts.standardize()
             # WWZ
             psd_wwz=ts_std.spectral()
-            psd_wwz_signif=psd_wwz.signif_test(number=10)
+            psd_wwz_signif=psd_wwz.signif_test(number=1)  # for real work, should use number=200 or even larger
             @savefig spec_wwz.png
             fig,ax=psd_wwz_signif.plot(title='PSD using WWZ method')
             plt.close(fig)
@@ -1180,7 +1198,7 @@ class Series:
             ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
             #WWZ
             scal = ts.wavelet()
-            scal_signif = scal.signif_test(number=10)
+            scal_signif = scal.signif_test(number=1)  # for real work, should use number=200 or even larger
             @savefig wave_wwz.png
             fig,ax=scal_signif.plot()
             plt.close(fig)
@@ -1289,7 +1307,7 @@ class Series:
             ts_air_std=ts_air.standardize()
             ts_nino_std=ts_nino.standardize()
             coh = ts_nino.wavelet_coherence(ts_air)
-            coh_signif = coh.signif_test(number=10, qs=[0.99])
+            coh_signif = coh.signif_test(number=1, qs=[0.99])  # for real work, should use number=200 or even larger
             @savefig coh_plot.png
             fig, ax = coh_signif.plot(phase_style={'skip_x': 50, 'skip_y': 10})
             plt.close(fig)
@@ -1461,7 +1479,9 @@ class Series:
             @savefig ts_air.png
             fig, ax = ts_air.plot(title='Deasonalized All Indian Rainfall Index')
             plt.close(fig)
-            caus_res = ts_nino.causality(ts_air)
+            # we use the specific params below in ts_nino.causality() just to make the example less heavier;
+            # please drop the `settings` for real work
+            caus_res = ts_nino.causality(ts_air, settings={'nsim': 2, 'signif_test': 'isopersist'})
             print(caus_res)
 
         Granger causality
@@ -1682,10 +1702,13 @@ class PSD:
         self.signif_qs = signif_qs
         self.signif_method = signif_method
         self.plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = f'{timeseries.time_unit}s'
+            self.period_unit = f'{timeseries.time_unit}s' if timeseries.time_unit is not None else None
+        else:
+            self.period_unit = None
 
     def copy(self):
         '''Copy object
@@ -1778,7 +1801,7 @@ class PSD:
 
         return res_dict
 
-    def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='Amplitude', title=None,
+    def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
              plot_legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
@@ -1797,7 +1820,7 @@ class PSD:
         xlabel : str, optional
             Label for the x-axis. The default is None. Will guess based on Series
         ylabel : str, optional
-            Label for the y-axis. The default is 'Amplitude'. Will guess based on Series
+            Label for the y-axis. The default is 'PSD'.
         title : str, optional
             Plot title. The default is None.
         marker : str, optional
@@ -1860,6 +1883,9 @@ class PSD:
         pyleoclim.core.ui.Series.spectral : spectral analysis
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = self.plot_kwargs if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -1960,8 +1986,8 @@ class PSD:
                 )
 
         if in_loglog:
-            ax.set_xscale('log', nonpositive='clip')
-            ax.set_yscale('log', nonpositive='clip')
+            ax.set_xscale('log')
+            ax.set_yscale('log')
 
         if xticks is not None:
             ax.set_xticks(xticks)
@@ -2024,14 +2050,24 @@ class Scalogram:
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
+
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = timeseries.time_unit
+            self.period_unit = f'{timeseries.time_unit}s' if timeseries.time_unit is not None else None
+        else:
+            self.period_unit = None
+
         if time_label is not None:
             self.time_label = time_label
         elif timeseries is not None:
-            self.time_label = f'{timeseries.time_name}'
+            if timeseries.time_unit is not None:
+                self.time_label = f'{timeseries.time_name} [{timeseries.time_unit}]'
+            else:
+                self.time_label = f'{timeseries.time_name}'
+        else:
+            self.time_label = None
+
 
     def copy(self):
         '''Copy object
@@ -2101,6 +2137,9 @@ class Scalogram:
 
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
 
@@ -2120,9 +2159,6 @@ class Scalogram:
             y_axis = self.frequency
             if ylabel is None:
                 ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
-
-        if xlabel is None:
-            xlabel = self.time_label
 
         cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
         ax.set_yscale('log', nonpositive='clip')
@@ -2164,8 +2200,14 @@ class Scalogram:
                 linewidths=signif_linewidths,
             )
 
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        if xlabel is None:
+            xlabel = self.time_label
+
+        if xlabel is not None:
+            ax.set_xlabel(xlabel)
+
+        if ylabel is not None:
+            ax.set_ylabel(ylabel)
 
         if xlim is not None:
             ax.set_xlim(xlim)
@@ -2257,14 +2299,30 @@ class Coherence:
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
+
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries1 is not None:
-            self.period_unit = timeseries1.time_unit
+            self.period_unit = f'{timeseries1.time_unit}s' if timeseries1.time_unit is not None else None
+        elif timeseries2 is not None:
+            self.period_unit = f'{timeseries2.time_unit}s' if timeseries2.time_unit is not None else None
+        else:
+            self.period_unit = None
+
         if time_label is not None:
             self.time_label = time_label
         elif timeseries1 is not None:
-            self.time_label = f'{timeseries1.time_name}'
+            if timeseries1.time_unit is not None:
+                self.time_label = f'{timeseries1.time_name} [{timeseries1.time_unit}]'
+            else:
+                self.time_label = f'{timeseries1.time_name}'
+        elif timeseries2 is not None:
+            if timeseries2.time_unit is not None:
+                self.time_label = f'{timeseries2.time_name} [{timeseries2.time_unit}]'
+            else:
+                self.time_label = f'{timeseries2.time_name}'
+        else:
+            self.time_label = None
 
     def copy(self):
         '''Copy object
@@ -2336,6 +2394,9 @@ class Coherence:
         pyleoclim.core.ui.Series.wavelet_coherence
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
@@ -2409,8 +2470,14 @@ class Coherence:
             ax.yaxis.set_major_formatter(ScalarFormatter())
             ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        if xlabel is None:
+            xlabel = self.time_label
+
+        if xlabel is not None:
+            ax.set_xlabel(xlabel)
+
+        if ylabel is not None:
+            ax.set_ylabel(ylabel)
 
         # plot phase
         yaxis_range = np.max(y_axis) - np.min(y_axis)
@@ -2797,6 +2864,8 @@ class MultipleSeries:
         fig, ax
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
@@ -2844,6 +2913,104 @@ class SurrogateSeries(MultipleSeries):
         self.series_list = series_list
         self.surrogate_method = surrogate_method
         self.surrogate_args = surrogate_args
+
+class EnsembleSeries(MultipleSeries):
+    ''' Object containing ensemble timeseries
+    '''
+    def __init__(self, series_list):
+        self.series_list = series_list
+
+    def correlation(self, target, timespan=None, settings=None, apply_fdr=True, fdr_kwargs=None):
+        ''' Calculate the correlation between an ensemble series group to a target series
+
+        Parameters
+        ----------
+        target : pyleoclim.Series or pyleoclim.EnsembleSeries
+            A pyleoclim Series object or EnsembleSeries object.
+            When the target is also an EnsembleSeries object, then the calculation of correlation is performed in a one-to-one sense,
+            and the ourput list of correlation values and p-values will be the size of the series_list of the self object.
+            That is, if the self object contains n Series, and the target contains n+m Series,
+            then only the first n Series from the object will be used for the calculation;
+            otherwise, if the target contains only n-m Series, then the first m Series in the target will be used twice in sequence.
+        
+        timespan : tuple
+            The time interval over which to perform the calculation
+        
+        settings : dict
+            Parameters for the correlation function (singificance testing and number of simulation)
+
+        apply_fdr : bool
+            Determine significance based on the FDR approach 
+
+        fdr_kwargs : dict
+            Parameters for the FDR function
+            
+        Returns
+        -------
+        
+        res : dict
+            Containing a list of the Pearson's correlation coefficient, associated significance and p-value. 
+        
+        See also
+        --------
+        
+        pyleoclim.utils.correlation.corr_sig : Correlation function
+        pyleoclim.utils.correlation.fdr : FDR function
+
+        '''
+        settings = {} if settings is None else settings.copy()
+        args = {}
+        args.update(settings)
+
+        r_list = []
+        signif_list = []
+        p_list = []
+
+        for idx, ts in enumerate(self.series_list):
+            if timespan is None:
+                value1 = ts.value
+                if isinstance(target, Series):
+                    value2 = target.value
+                elif isinstance(target, EnsembleSeries): 
+                    value2 = target.series_list[idx].value
+            else:
+                value1 = ts.slice(timespan).value
+                if isinstance(target, Series):
+                    value2 = target.slice(timespan).value
+                elif isinstance(target, EnsembleSeries): 
+                    nEns = np.size(target.series_list)
+                    if idx < nEns:
+                        value2 = target.series_list[idx].slice(timespan).value
+                    else:
+                        value2 = target.series_list[idx-nEns].slice(timespan).value
+
+            corr_res = corrutils.corr_sig(value1, value2, **args)
+            r_list.append(corr_res['r'])
+            signif_list.append(corr_res['signif'])
+            p_list.append(corr_res['p'])
+
+        r_lsit = np.array(r_list)
+        p_lsit = np.array(p_list)
+
+        if apply_fdr:
+            fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
+            args = {}
+            args.update(fdr_kwargs)
+            for i in range(np.size(signif_list)):
+                signif_list[i] = False
+
+            fdr_res = corrutils.fdr(p_list, **fdr_kwargs)
+            if fdr_res is not None:
+                for i in fdr_res:
+                    signif_list[i] = True
+
+        corr_res = {
+            'r': r_list,
+            'signif': signif_list,
+            'p': p_list,
+        }
+
+        return corr_res
 
 class MultiplePSD:
     ''' Object for multiple PSD.
@@ -2894,7 +3061,7 @@ class MultiplePSD:
 
         psd_list = []
         for i, amp in enumerate(amp_qs):
-            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'lw': lw[i]}, period_unit=period_unit)
+            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'linewidth': lw[i]}, period_unit=period_unit)
             psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)
@@ -2993,8 +3160,12 @@ class MultiplePSD:
 
         Returns
         -------
-        fig,ax
+        fig, ax
+
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -3095,6 +3266,12 @@ class MultiplePSD:
         fig, ax
 
         '''
+
+
+        # Turn the interactive mode off.
+        plt.ioff()
+        
+
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -3242,9 +3419,8 @@ class Lipd:
         :okwarning:
 
         import pyleoclim as pyleo
-        import lipd as lpd
-        d1=lpd.readLipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
-        d=pyleo.Lipd(lipd_dict=d1)
+        url='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+        d=pyleo.Lipd(usr_path=url)
     '''
 
     def __init__(self, query=False, query_args={}, usr_path=None, lipd_dict=None):
