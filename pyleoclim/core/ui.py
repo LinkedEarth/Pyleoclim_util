@@ -618,10 +618,7 @@ class Series:
                     time_label=None, value_label=None, period_label=None, psd_label='PSD', mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. 
 
-                    time_label=None, value_label=None, period_label=None, psd_label=None, mute=False):
-        ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
-
-
+                   
         Parameters
         ----------
 
