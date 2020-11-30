@@ -2699,7 +2699,7 @@ class MultipleSeries:
             new.series_list[idx]=s
         return new
 
-    def spectral(self, method='wwz', settings={}, mute_pbar=False, freq_method='log', freq_kwargs=None):
+    def spectral(self, method='wwz', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -2716,6 +2716,11 @@ class MultipleSeries:
 
         settings : dict
             Arguments for the specific spectral method
+
+        label : str
+            Label for the PSD object
+
+        verbose : {True, False}
 
         mute_pbar : {True, False}
             Mute the progress bar. Default is False.
@@ -2749,20 +2754,10 @@ class MultipleSeries:
         pyleoclim.core.ui.MultiplePSD : Multiple PSD object
         '''
         settings = {} if settings is None else settings.copy()
-        if method in ['wwz', 'lomb_scargle'] and 'freq' not in settings.keys():
-            res=[]
-            for s in(self.series_list):
-                c=np.mean(np.diff(s.value))
-                res.append(c)
-            res=np.array(res)
-            idx = np.argmin(res)
-            ts=self.series_list[idx].time
-            freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-            freq=waveutils.make_freq_vector(ts, freq_method=freq_method, **freq_kwargs)
-            settings.update({'freq':freq})
+
         psd_list = []
         for s in tqdm(self.series_list, desc='Performing spectral analysis on surrogates', position=0, leave=True, disable=mute_pbar):
-            psd_tmp = s.spectral(method=method, settings=settings)
+            psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
             psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)
