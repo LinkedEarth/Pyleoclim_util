@@ -2699,7 +2699,7 @@ class MultipleSeries:
             new.series_list[idx]=s
         return new
 
-    def spectral(self, method='wwz', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None):
+    def spectral(self, method='wwz', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
