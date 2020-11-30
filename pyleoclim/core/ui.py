@@ -592,7 +592,7 @@ class Series:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
-        ax = sns.histplot(self.value, ax=ax, kde = True, **plot_kwargs)
+        ax = sns.histplot(self.value, ax=ax, kde=True, **plot_kwargs)
 
         time_label, value_label = self.make_labels()
 
@@ -1144,11 +1144,11 @@ class Series:
         Parameters
         ----------
 
-        method : {wwz,cwt}
+        method : {wwz, cwt}
             Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
 
         freq_method : str
-            {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
+            {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
 
         freq_kwargs : dict
             Arguments for frequency vector
@@ -2769,15 +2769,29 @@ class MultipleSeries:
 
         return psds
 
-    def wavelet(self, method='wwz', settings={}, mute_pbar=False):
+    def wavelet(self, method='wwz', settings={}, freq_method='log', freq_kwargs=None, verbose=False, mute_pbar=False):
         '''Wavelet analysis
 
         Parameters
         ----------
-        method : {'wwz'}, optional
-            Method for the wavelet analysis. The default is 'wwz'.
+        method : {wwz, cwt}
+            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
+
         settings : dict, optional
             Settings for the particular method. The default is {}.
+
+        freq_method : str
+            {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
+
+        freq_kwargs : dict
+            Arguments for frequency vector
+
+        settings : dict
+            Arguments for the specific spectral method
+
+        verbose : {True, False}
+
+
         mute_pbar : bool, optional
             Whether to mute the progress bar. The default is False.
 
@@ -2802,7 +2816,7 @@ class MultipleSeries:
 
         scal_list = []
         for s in tqdm(self.series_list, desc='Performing wavelet analysis on surrogates', position=0, leave=True, disable=mute_pbar):
-            scal_tmp = s.wavelet(method=method, settings=settings)
+            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose)
             scal_list.append(scal_tmp)
 
         scals = MultipleScalogram(scalogram_list=scal_list)
