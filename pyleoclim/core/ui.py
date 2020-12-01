@@ -36,8 +36,31 @@ import lipd as lpd
 
 
 def dict2namedtuple(d):
+    ''' Convert a dictionary to a namedtuple
+    '''
     tupletype = namedtuple('tupletype', sorted(d))
     return tupletype(**d)
+
+def infer_period_unit_from_time_unit(time_unit):
+    ''' infer a period unit based on the given time unit
+    '''
+    if time_unit is None:
+        period_unit = None
+    else:
+        unit_group = lipdutils.timeUnitsCheck(time_unit)
+        if unit_group != 'unknown':
+            if unit_group == 'kage_units':
+                period_unit = 'kyrs'
+            else:
+                period_unit = 'yrs'
+        else:
+            if time_unit[-1] == 's':
+                period_unit = time_unit
+            else:
+                period_unit = f'{time_unit}s'
+
+    return period_unit
+
 
 class Series:
     ''' Create a pyleoSeries object
@@ -771,7 +794,7 @@ class Series:
             ax['scal'].set_xlabel(time_label)
 
         if period_label is not None:
-            period_unit = f'{self.time_unit}s' if self.time_unit is not None else None
+            period_unit = infer_period_unit_from_time_unit(self.time_unit)
             period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
             ax['scal'].set_ylabel(period_label)
 
@@ -1703,7 +1726,7 @@ class PSD:
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = f'{timeseries.time_unit}s' if timeseries.time_unit is not None else None
+            self.period_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
         else:
             self.period_unit = None
 
@@ -2051,7 +2074,7 @@ class Scalogram:
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = f'{timeseries.time_unit}s' if timeseries.time_unit is not None else None
+            self.period_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
         else:
             self.period_unit = None
 
@@ -2300,9 +2323,9 @@ class Coherence:
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries1 is not None:
-            self.period_unit = f'{timeseries1.time_unit}s' if timeseries1.time_unit is not None else None
+            self.period_unit = infer_period_unit_from_time_unit(timeseries1.time_unit)
         elif timeseries2 is not None:
-            self.period_unit = f'{timeseries2.time_unit}s' if timeseries2.time_unit is not None else None
+            self.period_unit = infer_period_unit_from_time_unit(timeseries2.time_unit)
         else:
             self.period_unit = None
 
@@ -2962,6 +2985,34 @@ class EnsembleSeries(MultipleSeries):
         
         pyleoclim.utils.correlation.corr_sig : Correlation function
         pyleoclim.utils.correlation.fdr : FDR function
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            from pyleoclim.utils.tsmodel import colored_noise
+
+            nt = 100
+            t0 = np.arange(nt)
+            v0 = colored_noise(alpha=1, t=t0)
+            noise = np.random.normal(loc=0, scale=1, size=nt)
+
+            ts0 = pyleo.Series(time=t0, value=v0)
+            ts1 = pyleo.Series(time=t0, value=v0+noise)
+            ts2 = pyleo.Series(time=t0, value=v0+2*noise)
+            ts3 = pyleo.Series(time=t0, value=v0+1/2*noise)
+
+            ts_list1 = [ts0, ts1]
+            ts_list2 = [ts2, ts3]
+
+            ts_ens = pyleo.EnsembleSeries(ts_list1)
+            ts_target = pyleo.EnsembleSeries(ts_list2)
+
+            corr_res = ts_ens.correlation(ts_target)
+            print(corr_res)
 
         '''
         settings = {} if settings is None else settings.copy()

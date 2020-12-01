@@ -17,6 +17,14 @@ MultipleSeries (pyleoclim.MultipleSeries)
 
 .. autoclass:: pyleoclim.core.ui.MultipleSeries
 
+EnsembleSeries (pyleoclim.EnsembleSeries)
+"""""""""""""""""""""""""""""""""""""""""
+
+The EnsembleSeries class is a child of MultipleSeries, particularly designed for ensemble case.
+
+.. autoclass:: pyleoclim.core.ui.EnsembleSeries
+   :inherited-members:
+
 Lipd (pyleoclim.Lipd)
 """""""""""""""""""""
 
