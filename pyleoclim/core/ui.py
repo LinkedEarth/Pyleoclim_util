@@ -2558,6 +2558,20 @@ class MultipleSeries:
     def __init__(self, series_list):
         self.series_list = series_list
 
+    def append(self,ts):
+        '''Append timeseries ts to MultipleSeries object
+
+        Returns
+        -------
+        new : pyleoclim.MultipleSeries
+            The augmented object, ontaining the old one plus `ts`
+
+        '''
+        new = MultipleSeries(self.series_list.append(ts))
+        
+        return new
+    
+
     def copy(self):
         '''Copy the object 
         '''
