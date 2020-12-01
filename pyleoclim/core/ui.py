@@ -2567,11 +2567,12 @@ class MultipleSeries:
             The augmented object, ontaining the old one plus `ts`
 
         '''
-        new = MultipleSeries(self.series_list.append(ts))
-        
+        new = self.copy()
+        ts_list = deepcopy(new.series_list)
+        ts_list.append(ts)
+        new = MultipleSeries(ts_list)  
         return new
     
-
     def copy(self):
         '''Copy the object 
         '''
@@ -2592,6 +2593,58 @@ class MultipleSeries:
             v_mod=tsutils.standardize(item.value)[0]
             s.value=v_mod
             new.series_list[idx]=s
+        return new
+    
+    def alignTimeAxes(self,method='binning',**kwargs):
+        ''' Aligns the time axes with a MultipleSeries object, via either binning 
+        or interpolation. This is critical for workflows that need to assume a 
+        common time axis for  the series under consideration.  
+        
+        
+        The time axis is characterized by the following parameters:
+            
+        start : the latest start date of the bunch (maximin of the minima)
+        stop  : the earliest stop date of the bunch (minimum of the maxima)
+        step  : The representative spacing between consecutive values (mean of the median spacings)
+        
+        Optional arguments for binning or interpolation are those of the underling functions. 
+    
+        Parameters
+        ----------
+        method:  string
+            either 'binning' or 'interp'
+        
+        kwargs: tuple of arguments for the two methods     
+    
+        Returns
+        -------
+        new : pyleoclim.MultipleSeries
+            The MultipleSeries objects with all series aligned to the same time axis. 
+        '''
+
+        gp = np.empty((len(self.series_list),3)) # obtain grid parameters
+        for idx,item in enumerate(self.series_list):
+            gp[idx,:]  = tsutils.grid_properties(item.time)  
+
+        start = gp[:,0].max()
+        stop  = gp[:,1].min()
+        step  = gp[:,2].mean() 
+        
+        new = self.copy()
+        
+        if method == 'binning':
+            for idx,item in enumerate(self.series_list):    
+                ti, xi = tsutils.bin_values(item.time,item.value,bin_size=step, start=start, end=stop)
+                new[idx].time = ti
+                new[idx].value = xi
+        elif method == 'interp':
+            for idx,item in enumerate(self.series_list):    
+                ti, xi = tsutils.interp(item.time,item.value,interp_type='linear', interp_step=step, start=start, end=stop,**kwargs)
+                new[idx].time = ti
+                new[idx].value = xi
+        else:
+            raise NameError('Unknown methods; no action taken')
+        
         return new
 
     # def mssa(self, M, MC=0, f=0.5):

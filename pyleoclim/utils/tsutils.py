@@ -3,7 +3,7 @@
 """
 Created on Tue Feb 25 06:43:14 2020
 
-@author: deborahkhider, fzhu
+@author: deborahkhider, fzhu, jeg
 
 Utilities to manipulate timeseries
 """
@@ -12,6 +12,7 @@ __all__ = [
     'simple_stats',
     'bin_values',
     'interp',
+    'grid_properties',
     'on_common_axis',
     'standardize',
     'ts2segments',
@@ -163,6 +164,38 @@ def bin_values(x, y, bin_size=None, start=None, end=None):
     }
 
     return  res_dict
+
+def grid_properties(x,method='median'):
+    ''' Establishes the grid properties of a numerical array:
+        start, stop, and representative step. 
+             
+    Parameters
+    ----------
+    x : array
+    
+    method : str
+        Method to obtain a representative step if x is not evenly spaced.
+        Valid entries: 'median' [default] or 'mean'
+       
+    Returns
+    -------
+    start : float
+        min(x)
+    stop : float
+        max(x)
+    step : float
+        The representative spacing between consecutive values 
+    '''
+    start = np.nanmin(x)
+    stop = np.nanmax(x)
+    
+    delta = np.diff(x)
+    if method == 'mean':
+        step = delta.mean()
+    else:
+        step = np.median(delta)
+    
+    return start, stop, step
 
 
 def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **args):
