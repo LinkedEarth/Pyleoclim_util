@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-''' Tests for pyleoclim.align
+''' Tests for pyleoclim.common_time
 
 Naming rules:
 1. class: Test{filename}{Class}{method} with appropriate camel case
@@ -18,12 +18,14 @@ Notes on how to test:
 import pyleoclim as pyleo
 import scipy.io as sio
 import numpy as np
+import matplotlib.pyplot as plt
 #from sklearn import metrics
 pyleo.set_style('journal')
 
 # 0. load the data
 data = sio.loadmat('./example_data/wtc_test_data_nino.mat')
 nino = data['nino'][:, 0]
+air  = data['air'][:, 0]
 t = data['datayear'][:, 0]
 
 
@@ -32,7 +34,7 @@ t = data['datayear'][:, 0]
 n = len(t)
 p = 1  #just one series here
 ns = 10 # generate 10 simulations
-param = np.array([0.01,0.01]) # probability of missing/double-counted layers
+param = np.array([0.1,0.1]) # probability of missing/double-counted layers
 dt = 1.0/12
 delta = np.ones((n,p,ns))*dt  # modified time matrix
 ts = pyleo.Series(time=t,value=nino)
@@ -49,13 +51,17 @@ for nn in range(ns):
 
 yearCE = min(t) + np.cumsum(delta,axis=0)
 yearCE = yearCE.reshape((n,ns))
-
 # create case of year BP
 yearBP = 1950-yearCE
 
-#create multiple series object and append all these pterturbed time axes
+# creat BP timeseries object
+
+tsBP = ts.copy()
+tsBP.time = 1950-t
+
+#create multiple series object and append all these perturbed time axes
 mtsCE = pyleo.MultipleSeries([ts])
-mtsBP = pyleo.MultipleSeries([ts])
+mtsBP = pyleo.MultipleSeries([tsBP])
 
 for nn in range(ns):
     ts_a = pyleo.Series(time=yearCE[:,nn],value=nino,label='ensemble member '+str(nn))
@@ -64,36 +70,35 @@ for nn in range(ns):
     mtsBP = mtsBP.append(ts_a)
     
 # first work with yearCE: extract grid properties and define common axis
-mts = mtsCE.copy()
-gp = np.empty((len(mts.series_list),3))
-for idx,item in enumerate(mts.series_list):
-    gp[idx,:]  = grid_properties(item.time)  
+#mts = mtsCE.copy()
+#gp = np.empty((len(mts.series_list),3))
+#for idx,item in enumerate(mts.series_list):
+#    gp[idx,:]  = pyleo.tsutils.grid_properties(item.time)  
 
-start = gp[:,0].max()
-stop  = gp[:,1].min()
-step  = gp[:,2].mean() 
-
-commonAxis = np.arange(start,stop,step)
+#delta_t  = gp[:,2] 
 
 
 
+# test the binning method
+ms_bin = mtsCE.common_time(method = 'binning')   # VERY SLOW
+ms_bin.plot()
+plt.show()
 
-# expose in ui.py
-#  create method in MultipleSeries that returns common time
-# use within binTs, interpTs, Corr_sig
-
-# write test at MultipleSeries level
-
-
-
-    
-
-# write in ts_utils very broad  on numpy array or pandas df
-#  max(min), min(max), median spacing.
+# test the interpolation method
+ms_interp = mtsCE.common_time(method = 'interp')   # ACCEPTABLY FAST
+ms_interp.plot()
+plt.show()
 
 
+# combine CE and BP
+mts_joint = pyleo.MultipleSeries([*mtsCE.series_list, *mtsBP.series_list])
+mts_joint.plot(color='blue',plot_kwargs={'alpha': 0.1})
+plt.show()
 
-# now align the two
+# test the joint interpolation method
+ms_interp2 = mts_joint.common_time(method = 'interp')   
+ms_interp2.plot(color='gray',plot_kwargs={'alpha': 0.1})
+plt.show()   # FAIL
 
 
 #class Ensemble(MultipleSeries)

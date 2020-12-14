@@ -33,7 +33,7 @@ from .wavelet import (
     wwz,
     wwa2psd,
 )
-#from .tsutils import clean_ts, interp, bin_values
+#from .tsutils import clean_ts, interp, bin
 
 #-----------
 #Wrapper

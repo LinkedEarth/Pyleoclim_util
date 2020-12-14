@@ -10,7 +10,7 @@ Utilities to manipulate timeseries
 
 __all__ = [
     'simple_stats',
-    'bin_values',
+    'bin',
     'interp',
     'grid_properties',
     'on_common_axis',
@@ -93,7 +93,7 @@ def simple_stats(y, axis=None):
     return mean, median, min_, max_, std, IQR
 
 
-def bin_values(x, y, bin_size=None, start=None, end=None):
+def bin(x, y, bin_size=None, start=None, end=None):
     """ Bin the values
 
     Parameters
@@ -198,7 +198,7 @@ def grid_properties(x,method='median'):
     return start, stop, step
 
 
-def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **args):
+def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **kwargs):
     """ Interpolation onto a new x-axis
 
     Parameters
@@ -216,7 +216,7 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **ar
            where/when to start the interpolation. Default is min..
     end : float
          where/when to stop the interpolation. Default is max.
-    args :  args
+    kwargs :  kwargs
         Aguments specific to interpolate.interp1D. See scipy for details https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html
 
     Returns
@@ -250,7 +250,7 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **ar
 
     # Add arguments
 
-    interp_values = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**args)(xi)
+    interp_values = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**kwargs)(xi)
 
     return xi, interp_values
 
@@ -316,9 +316,9 @@ def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=No
         xi2, interp_values2 = interp(x2, y2, interp_step=step, start=start,
                                 end=end)
     elif method == 'bin':
-        xi1, interp_values1, n, error = bin_values(x1, y1, bin_size=step, start=start,
+        xi1, interp_values1, n, error = bin(x1, y1, bin_size=step, start=start,
                                 end=end)
-        xi2, interp_values2, n, error = bin_values(x2, y2, bin_size=step, start=start,
+        xi2, interp_values2, n, error = bin(x2, y2, bin_size=step, start=start,
                                 end=end)
     elif method == None:
         min_idx1 = np.where(x1>=start)[0][0]
