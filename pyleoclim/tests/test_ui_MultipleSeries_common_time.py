@@ -81,19 +81,18 @@ for nn in range(ns):
 
 # test the binning method
 ms_bin = mtsCE.common_time(method = 'binning')   # VERY SLOW
-ms_bin.plot()
-plt.show()
+#ms_bin.plot()
+#plt.show()
 
 # test the interpolation method
 ms_interp = mtsCE.common_time(method = 'interp')   # ACCEPTABLY FAST
-ms_interp.plot()
-plt.show()
-
+#ms_interp.plot()
+#plt.show()
 
 # combine CE and BP
 mts_joint = pyleo.MultipleSeries([*mtsCE.series_list, *mtsBP.series_list])
-mts_joint.plot(color='blue',plot_kwargs={'alpha': 0.1})
-plt.show()
+#mts_joint.plot(color='blue',plot_kwargs={'alpha': 0.1})
+#plt.show()
 
 # test the joint interpolation method
 ms_interp2 = mts_joint.common_time(method = 'interp')   
