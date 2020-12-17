@@ -153,7 +153,7 @@ This modules contain pre-processing functions for time series analysis.
 
    * - :ref:`simple_stats <utils_simple_stats>`
      - Computes the mean, median, min, max, standard deviation and interquartile range of a timeseries
-   * - :ref:`bin_values <utils_bin_values>`
+   * - :ref:`bin <utils_bin>`
      - Bin the values into evenly-spaced bins
    * - :ref:`interp <utils_interp>`
      - Interpolation function based on `scipy.interpolate.interp1d <https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html>_`

@@ -1,6 +1,6 @@
-.. _utils_bin_values:
+.. _utils_bin:
 
-bin_values (pyleoclim.utils.tsutils.bin_values)
+bin (pyleoclim.utils.tsutils.bin)
 =======================================
 
-.. autofunction:: pyleoclim.utils.tsutils.bin_values
+.. autofunction:: pyleoclim.utils.tsutils.bin

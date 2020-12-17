@@ -1679,9 +1679,10 @@ class Series:
         Parameters
         ----------
 
-        kwargs :
-            Arguments for binning function. See pyleoclim.utils.tsutils.bin_values for details
-
+        
+        kwargs : 
+            Arguments for binning function. See pyleoclim.utils.tsutils.bin for details
+        
         Returns
         -------
 
@@ -1691,11 +1692,12 @@ class Series:
         See also
         --------
 
-        pyleoclim.utils.tsutils.bin_values : bin the time series into evenly-spaced bins
-
+        
+        pyleoclim.utils.tsutils.bin : bin the time series into evenly-spaced bins
+                
         '''
         new=self.copy()
-        res_dict = tsutils.bin_values(self.time,self.value,**kwargs)
+        res_dict = tsutils.bin(self.time,self.value,**kwargs)
         new.time = res_dict['bins']
         new.value = res_dict['binned_values']
         return new
@@ -2641,6 +2643,21 @@ class MultipleSeries:
     def __init__(self, series_list):
         self.series_list = series_list
 
+    def append(self,ts):
+        '''Append timeseries ts to MultipleSeries object
+
+        Returns
+        -------
+        ms : pyleoclim.MultipleSeries
+            The augmented object, comprising the old one plus `ts`
+
+        '''
+        ms = self.copy()
+        ts_list = deepcopy(ms.series_list)
+        ts_list.append(ts)
+        ms = MultipleSeries(ts_list)  
+        return ms
+    
     def copy(self):
         '''Copy the object
         '''
@@ -2651,17 +2668,79 @@ class MultipleSeries:
 
         Returns
         -------
-        new : pyleoclim.MultipleSeries
+        ms : pyleoclim.MultipleSeries
             The standardized Series
 
         '''
-        new=self.copy()
-        for idx,item in enumerate(new.series_list):
+        ms=self.copy()
+        for idx,item in enumerate(ms.series_list):
             s=item.copy()
             v_mod=tsutils.standardize(item.value)[0]
             s.value=v_mod
-            new.series_list[idx]=s
-        return new
+            ms.series_list[idx]=s
+        return ms
+    
+    def common_time(self,method='binning',**kwargs):
+        ''' Aligns the time axes of a MultipleSeries object, via either binning 
+        or interpolation. This is critical for workflows that need to assume a 
+        common time axis for the group of series under consideration.  
+        
+        
+        The common time axis is characterized by the following parameters:
+            
+        start : the latest start date of the bunch (maximin of the minima)
+        stop  : the earliest stop date of the bunch (minimum of the maxima)
+        step  : The representative spacing between consecutive values (mean of the median spacings)
+        
+        Optional arguments for binning or interpolation are those of the underling functions. 
+    
+        Parameters
+        ----------
+        method:  string
+            either 'binning' or 'interp'
+        
+        kwargs: keyword arguments (dictionary) for the interpolation method    
+    
+        Returns
+        -------
+        ms : pyleoclim.MultipleSeries
+            The MultipleSeries objects with all series aligned to the same time axis. 
+        '''
+
+        gp = np.empty((len(self.series_list),3)) # obtain grid parameters
+        for idx,item in enumerate(self.series_list):
+            gp[idx,:] = tsutils.grid_properties(item.time)  
+            if gp[idx,2] < 0:  # flip time axis if retrograde
+                item.time  = item.time[::-1,...]  
+                item.value = item.value[::-1,...] 
+           
+        # define parameters for common time axis    
+        start = gp[:,0].max()
+        stop  = gp[:,1].min()
+        step  = gp[:,2].mean() 
+        
+        ms = self.copy()
+        
+        if method == 'binning':
+            for idx,item in enumerate(self.series_list):
+                ts = item.copy()
+                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop)                
+                ts.time  = d['bins']
+                ts.value = d['binned_values']
+                ms.series_list[idx] = ts
+
+        elif method == 'interp':
+            for idx,item in enumerate(self.series_list):  
+                ts = item.copy()
+                ti, xi = tsutils.interp(ts.time, ts.value, interp_type='linear', interp_step=step, start=start, end=stop,**kwargs)
+                ts.time  = ti
+                ts.value = xi
+                ms.series_list[idx] = ts
+
+        else:
+            raise NameError('Unknown methods; no action taken')
+        
+        return ms
 
     # def mssa(self, M, MC=0, f=0.5):
     #     data = []
@@ -2704,7 +2783,7 @@ class MultipleSeries:
 
         Returns
         -------
-        new : pyleoclim.MultipleSeries
+        ms : pyleoclim.MultipleSeries
             The detrended timeseries
 
         See also
@@ -2714,13 +2793,13 @@ class MultipleSeries:
         pyleoclim.utils.tsutils.detrend : Detrending function
 
         '''
-        new=self.copy()
-        for idx,item in enumerate(new.series_list):
+        ms=self.copy()
+        for idx,item in enumerate(ms.series_list):
             s=item.copy()
             v_mod=tsutils.detrend(item.value,x=item.time,method=method,**kwargs)
             s.value=v_mod
-            new.series_list[idx]=s
-        return new
+            ms.series_list[idx]=s
+        return ms
 
     def spectral(self, method='wwz', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
