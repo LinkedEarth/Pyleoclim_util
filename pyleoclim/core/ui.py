@@ -36,8 +36,31 @@ import lipd as lpd
 
 
 def dict2namedtuple(d):
+    ''' Convert a dictionary to a namedtuple
+    '''
     tupletype = namedtuple('tupletype', sorted(d))
     return tupletype(**d)
+
+def infer_period_unit_from_time_unit(time_unit):
+    ''' infer a period unit based on the given time unit
+    '''
+    if time_unit is None:
+        period_unit = None
+    else:
+        unit_group = lipdutils.timeUnitsCheck(time_unit)
+        if unit_group != 'unknown':
+            if unit_group == 'kage_units':
+                period_unit = 'kyrs'
+            else:
+                period_unit = 'yrs'
+        else:
+            if time_unit[-1] == 's':
+                period_unit = time_unit
+            else:
+                period_unit = f'{time_unit}s'
+
+    return period_unit
+
 
 class Series:
     ''' Create a pyleoSeries object
@@ -71,15 +94,15 @@ class Series:
 
     clean_ts : bool
         remove the NaNs and let the time axis to be increasing if True
-    
+
     Examples
     --------
-    
-    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a PyleoSeries object. 
+
+    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a PyleoSeries object.
 
     .. ipython:: python
         :okwarning:
-        
+
         import pyleoclim as pyleo
         import pandas as pd
         data=pd.read_csv(
@@ -97,7 +120,7 @@ class Series:
     '''
 
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True):
-        
+
         if clean_ts==True:
             value, time = tsutils.clean_ts(np.array(value), np.array(time))
 
@@ -165,7 +188,7 @@ class Series:
 
     def stats(self):
         """ Compute basic statistics for the time series
-        
+
         Computes the mean, median, min, max, standard deviation, and interquartile range of a numpy array y, ignoring NaNs.
 
         Returns
@@ -174,15 +197,15 @@ class Series:
         res : dictionary
             Contains the mean, median, minimum value, maximum value, standard
             deviation, and interquartile range for the Series.
-        
+
         Examples
         --------
-        
+
         Compute basic statistics for the SOI series
-        
+
         .. ipython:: python
             :okwarning:
-        
+
             import pyleoclim as pyleo
             import pandas as pd
             data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
@@ -220,7 +243,7 @@ class Series:
 
         markersize : float
             the size of the marker
-        
+
         color : str, list
             the color for the line plot
             e.g., 'r' for red
@@ -244,7 +267,7 @@ class Series:
 
         title : str
             the title for the figure
-        
+
         zorder : int
             The default drawing order for all lines on the plot
 
@@ -258,7 +281,7 @@ class Series:
         lgd_kwargs : dict
             the dictionary of keyword arguments for ax.legend()
             See [matplotlib.pyplot.legend](https://matplotlib.org/3.1.3/api/_as_gen/matplotlib.pyplot.legend.html) for details
-            
+
         alpha : float
             Transparency setting
 
@@ -271,7 +294,7 @@ class Series:
         ax : matplotlib.axis, optional
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
-        
+
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
@@ -291,20 +314,20 @@ class Series:
         -----
 
         When `ax` is passed, the return will be `ax` only; otherwise, both `fig` and `ax` will be returned.
-        
+
         See also
         --------
-        
+
         pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
-        
+
         Examples
         --------
-        
+
         Plot the SOI record
-        
+
             .. ipython:: python
                 :okwarning:
-                    
+
                 import pyleoclim as pyleo
                 import pandas as pd
                 from matplotlib import pyplot as plt
@@ -315,28 +338,31 @@ class Series:
                 @savefig ts_plot.png
                 fig,ax = ts.plot()
                 plt.close(fig)
-        
+
         Change the line color
-        
+
             .. ipython:: python
                 :okwarning:
-            
+
                 @savefig ts_plot2.png
                 fig, ax = ts.plot(color='r')
                 plt.close(fig)
-        
+
         Save the figure. Two options available:
             * Within the plotting command
             * After the figure has been generated
-        
+
             .. ipython:: python
                 :okwarning:
-            
-                #@savefig ts_plot3.png 
+
+                #@savefig ts_plot3.png
                 fig,ax = ts.plot(color='k',savefig_settings={'path':'ts_plot3.png'})
                 pyleo.savefig(fig,path='ts_plot3.png')
                 plt.close(fig)
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         # generate default axis labels
         time_label, value_label = self.make_labels()
 
@@ -388,7 +414,7 @@ class Series:
 
     def ssa(self, M=None, nMC=0, f=0.5):
         '''Singular Spectrum Analysis
-        
+
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
         This implementation  uses the method of [1], with applications presented in [2].
         Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
@@ -409,23 +435,23 @@ class Series:
             Containing:
 
             - eig_val : (M, 1) array of eigenvalue spectrum of length r, the number of SSA modes. As in Principal Component Analysis, eigenvaluesare closely related to the fraction of variance accounted for ("explained", a common but not-so-helpful term) by each mode.
-            
+
             - eig_vec : is a matrix of the temporal eigenvectors (T-EOFs), i.e. the temporal patterns that explain most of the variations in the original series.
-                
+
             - PC : (N - M + 1, M) array of principal components, i.e. the loadings that, convolved with the T-EOFs, produce the reconstructed components, or RCs
 
             - RC : (N,  M) array of reconstructed components, One can think of each RC as the contribution of each mode to the timeseries, weighted by their eigenvalue (loosely speaking, their "amplitude"). Summing over all columns of RC recovers the original series. (synthesis, the reciprocal operation of analysis).
 
             - eig_val_q : (M, 2) array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC >0 ]
-        
+
         Examples
         --------
-        
+
         SSA with SOI
-        
+
         .. ipython:: python
             :okwarning:
-            
+
             import pyleoclim as pyleo
             import pandas as pd
             from matplotlib import pyplot as plt
@@ -439,16 +465,16 @@ class Series:
             plt.close(fig)
             #SSA
             nino_ssa = ts.ssa(M=60)
-        
+
         Let us now see how to make use of all these arrays. The first step is too inspect the eigenvalue spectrum ("scree plot") to identify remarkable modes. Let us restrict ourselves to the first 40, so we can see something:
-            
+
         .. ipython:: python
             :okwarning:
-        
+
             import matplotlib.pyplot as plt
             import matplotlib.gridspec as gridspec
             import numpy as np
-            
+
             d  = nino_ssa['eig_val'] # extract eigenvalue vector
             M  = len(d)  # infer window size
             de = d*np.sqrt(2/(M-1))
@@ -461,56 +487,56 @@ class Series:
             ax.errorbar(rk,d[:r],yerr=de[:r],label='SSA eigenvalues w/ 95% CI')
             ax.set_title('Scree plot of SSA eigenvalues')
             ax.set_xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
-            ax.legend(loc='upper right')   
+            ax.legend(loc='upper right')
             @savefig scree_plot.png
             pyleo.showfig(fig)
             plt.close(fig)
-        
+
         This highlights a few common phenomena with SSA:
             * the eigenvalues are in descending order
             * their uncertainties are proportional to the eigenvalues themselves
-            * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered within uncertainties . (5,6) looks like another doublet 
+            * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered within uncertainties . (5,6) looks like another doublet
             * around i=15, the eigenvalues appear to reach a floor, and all subsequent eigenvalues explain a very small amount of variance.
-        
+
         So, summing the variance of all modes higher than 19, we get:
-            
+
         .. ipython:: python
             :okwarning:
-            
+
             print(var_pct[15:].sum()*100)
-        
+
         That is, over 95% of the variance is in the first 15 modes. That is a typical result for a "warm-colored" timeseries, which is most geophysical timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
-        
+
         .. ipython:: python
             :okwarning:
-        
+
             RCk = nino_ssa['RC'][:,:14].sum(axis=1)
             fig, ax = ts.plot(title='ONI',mute=True) # we mute the first call to only get the plot with 2 lines
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
             @savefig ssa_recon.png
-            pyleo.showfig(fig) 
+            pyleo.showfig(fig)
             plt.close(fig)
-        
+
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
             * there was not much rhyme or reason for picking 15 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
             * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies, you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves features and excludes others (i.e, a filter).
             * as with all orthgonal decompositions, summing over all RCs will recover the original signal within numerical precision.
-        
+
         Monte-Carlo SSA
-        
+
         Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, introduced by Allen & Smith, (1996) to identiy SSA modes that rise above what one would expect from "red noise", specifically an AR(1) process_process). To run it, simply provide the parameter MC, ideally with a number of iterations sufficient to get decent statistics. Here's let's use MC = 1000. The result will be stored in the eig_val_q array, which has the same length as eig_val, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
-        
+
         .. ipython:: python
             :okwarning:
-        
+
             nino_mcssa = ts.ssa(M = 60, nMC=1000)
-        
+
         Now let's look at the result:
-            
+
         .. ipython:: python
             :okwarning:
-        
+
             d  = nino_mcssa['eig_val'] # extract eigenvalue vector
             de = d*np.sqrt(2/(M-1))
             du = nino_mcssa['eig_val_q'][:,0]  # extract upper quantile of MC-SSA eigenvalues
@@ -527,9 +553,9 @@ class Series:
             @savefig scree_nmc.png
             pyleo.showfig(fig)
             plt.close(fig)
-    
+
         This suggests that modes 1-5 fall above the red noise benchmark.
-        
+
         '''
 
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f)
@@ -553,20 +579,20 @@ class Series:
               - "path" must be specified; it can be any existed or non-existed path,
                 with or without a suffix; if the suffix is not given in "path", it will follow "format"
               - "format" can be one of {"pdf", "eps", "png", "ps"}
-        
+
         See also
         --------
-        
+
         pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
-        
+
         Examples
         --------
-        
+
         Distribution of the SOI record
-        
+
         .. ipython:: python
             :okwarning:
-            
+
             import pyleoclim as pyleo
             import pandas as pd
             from matplotlib import pyplot as plt
@@ -579,14 +605,17 @@ class Series:
             @savefig ts_dist.png
             fig,ax = ts.distplot()
             plt.close(fig)
-        
-        
+
+
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
-        ax = sns.distplot(self.value, ax=ax, **plot_kwargs)
+        ax = sns.histplot(self.value, ax=ax, kde=True, **plot_kwargs)
 
         time_label, value_label = self.make_labels()
 
@@ -608,9 +637,11 @@ class Series:
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
-                    time_label=None, value_label=None, period_label=None, psd_label=None, mute=False):
+
+                    time_label=None, value_label=None, period_label=None, psd_label='PSD', mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. 
 
+                   
         Parameters
         ----------
 
@@ -637,7 +668,7 @@ class Series:
 
         psd_lim : list or tuple
             the limitation of the psd axis
-        
+
         n_signif_test=100 : int
             Number of Monte-Carlo simulations to perform for significance testing. Used when psd=None or scalogram=None
 
@@ -662,28 +693,28 @@ class Series:
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
-        
+
         See also
         --------
-        
+
         pyleoclim.core.ui.Series.spectral : Spectral analysis for a timeseries
-        
+
         pyleoclim.core.ui.Series.wavelet : Wavelet analysis for a timeseries
-        
-        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim 
-        
+
+        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+
         pyleoclim.core.ui.PSD : PSD object
-        
+
         pyleoclim.core.ui.MultiplePSD : Multiple PSD object
-        
+
         Examples
         --------
-        
-        Create a summary plot for the SOI dataset. Note: because the wwz method can be slow, only 10 AR1 models are generated in this example. For normal applications, we recommend at least 200. 
-        
+
+        Create a summary plot for the SOI dataset. Note: because the wwz method can be slow, only 10 AR1 models are generated in this example. For normal applications, we recommend at least 200.
+
         .. ipython:: python
             :okwarning:
-            
+
             import pyleoclim as pyleo
             import pandas as pd
             from matplotlib import pyplot as plt
@@ -711,8 +742,11 @@ class Series:
                         title='Summary of SOI timeseries'
                         )
             plt.close(fig)
-        
+
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         fig = plt.figure(figsize=figsize)
         gs = gridspec.GridSpec(6, 12)
@@ -752,12 +786,16 @@ class Series:
             ax['ts'].set_title(title)
 
         if value_label is not None:
+            time_label, value_label = self.make_labels()
             ax['ts'].set_ylabel(value_label)
 
         if time_label is not None:
+            time_label, value_label = self.make_labels()
             ax['scal'].set_xlabel(time_label)
 
         if period_label is not None:
+            period_unit = infer_period_unit_from_time_unit(self.time_unit)
+            period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
             ax['scal'].set_ylabel(period_label)
 
         if psd_label is not None:
@@ -783,12 +821,12 @@ class Series:
 
     def clean(self):
         ''' Clean up the timeseries by removing NaNs and sort with increasing time points
-        
+
         Returns
         -------
         Series
             Series object with removed NaNs and sorting
-        
+
         '''
         new = self.copy()
         v_mod, t_mod = tsutils.clean_ts(self.value, self.time)
@@ -798,7 +836,7 @@ class Series:
 
     def gaussianize(self):
         ''' Gaussianizes the timeseries
-        
+
         Returns
         -------
         new : pyleoclim.Series
@@ -898,7 +936,7 @@ class Series:
         return new
 
     def detrend(self, method='emd', **kwargs):
-        '''Detrend Series object        
+        '''Detrend Series object
 
         Parameters
         ----------
@@ -916,23 +954,23 @@ class Series:
         -------
         new : pyleoclim.Series
             Detrended Series object
-        
+
         See also
         --------
         pyleoclim.utils.tsutils.detrend : detrending wrapper functions
-        
+
         Examples
         --------
-        
+
         We will generate a random signal and use the different detrending functions
-        
+
         .. ipython:: python
             :okwarning:
-            
+
             import pyleoclim as pyleo
             import numpy as np
             from matplotlib import pyplot as plt
-            
+
             # Generate a mixed signal with known frequencies
             freqs=[1/20,1/80]
             time=np.arange(2001)
@@ -940,7 +978,7 @@ class Series:
             for freq in freqs:
                 signals.append(np.cos(2*np.pi*freq*time))
             signal=sum(signals)
-            
+
             # Add a non-linear trend
             slope = 1e-5
             intercept = -1
@@ -952,22 +990,22 @@ class Series:
             noise_var = sig_var / 2 #signal is twice the size of noise
             white_noise = np.random.normal(0, np.sqrt(noise_var), size=np.size(signal))
             signal_noise = signal_trend + white_noise
-            
+
             #Create a series object
             ts=pyleo.Series(time=time,value=signal_noise)
             @savefig random_series.png
             fig,ax = ts.plot(title='Timeseries with nonlinear trend')
             plt.close(fig)
-            
+
             #Standardize
             ts_std=ts.standardize()
-            
-            #Detrend using EMD 
+
+            #Detrend using EMD
             ts_emd = ts_std.detrend()
             @savefig ts_emd.png
             fig,ax=ts_emd.plot(title='Detrended with EMD method')
             plt.close(fig)
-            
+
             #Detrend using Savitzky-Golay filter
             ts_sg = ts_std.detrend(method='savitzky-golay')
             @savefig ts_sg.png
@@ -985,59 +1023,59 @@ class Series:
 
         Parameters
         ----------
-        
+
         method : str
             {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram'}
 
         freq_method : str
             {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
-        
+
         freq_kwargs : dict
             Arguments for frequency vector
-        
+
         settings : dict
             Arguments for the specific spectral method
-        
+
         label : str
             Label for the PSD object
-        
+
         verbose : {True, False}
-        
+
         Returns
         -------
-        
+
         psd : pyleoclim.Psd
             A PSD object
-            
+
         See also
         --------
         pyleoclim.utils.spectral.mtm : Spectral analysis using the Multitaper approach
-        
+
         pyleoclim.utils.spectral.lomb_scargle : Spectral analysis using the Lomb-Scargle method
-        
+
         pyleoclim.utils.spectral.welch: Spectral analysis using the Welch segement approach
-        
+
         pyleoclim.utils.spectral.periodogram: Spectral anaysis using the basic Fourier transform
-        
+
         pyleoclim.utils.spectral.wwz_psd : Spectral analysis using the Wavelet Weighted Z transform
-        
+
         pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
-        
+
         pyleoclim.utils.tsutils.detrend : Detrending function
-        
+
         pyleoclim.core.ui.PSD : PSD object
-        
+
         pyleoclim.core.ui.MultiplePSD : Multiple PSD object
-        
-        
+
+
         Examples
         --------
-        
+
         Calculate the spectrum of SOI using the various methods and compute significance
-        
+
         .. ipython:: python
             :okwarning:
-        
+
             import pyleoclim as pyleo
             import pandas as pd
             from matplotlib import pyplot as plt
@@ -1080,7 +1118,7 @@ class Series:
             @savefig spec_ls.png
             fig,ax=psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
             plt.close(fig)
-        
+
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -1125,52 +1163,52 @@ class Series:
         ''' Perform wavelet analysis on the timeseries
 
         cwt wavelets documented on https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
-        
+
         Parameters
         ----------
-        
-        method : {wwz,cwt}
+
+        method : {wwz, cwt}
             Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
-            
+
         freq_method : str
-            {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
-        
+            {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
+
         freq_kwargs : dict
             Arguments for frequency vector
-        
+
         settings : dict
             Arguments for the specific spectral method
-        
+
         verbose : {True, False}
-        
+
         Returns
         -------
-        
+
         scal : Series.Scalogram
-        
+
         See also
         --------
-        
+
         pyleoclim.utils.wavelet.wwz : wwz function
-        
+
         pyleoclim.utils.wavelet.cwt : cwt function
-        
+
         pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
-        
+
         pyleoclim.utils.tsutils.detrend : Detrending function
-        
+
         pyleoclim.core.ui.Scalogram : Scalogram object
-        
+
         pyleoclim.core.ui.MultipleScalogram : Multiple Scalogram object
-        
+
         Examples
         --------
-        
-        Wavelet analysis on the SOI record. 
-        
+
+        Wavelet analysis on the SOI record.
+
         .. ipython:: python
             :okwarning:
-        
+
             import pyleoclim as pyleo
             import pandas as pd
             from matplotlib import pyplot as plt
@@ -1184,7 +1222,7 @@ class Series:
             @savefig wave_wwz.png
             fig,ax=scal_signif.plot()
             plt.close(fig)
-        
+
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -1194,7 +1232,7 @@ class Series:
             'wwz': waveutils.wwz,
             'cwt': waveutils.cwt,
         }
-        
+
         if method == 'cwt' and 'freq' in settings.keys():
             scales=1/np.array(settings['freq'])
             settings.update({'scales':scales})
@@ -1228,40 +1266,40 @@ class Series:
 
     def wavelet_coherence(self, target_series, method='wwz', settings=None, freq_method='log', freq_kwargs=None, verbose=False):
         ''' Perform wavelet coherence analysis with the target timeseries
-        
+
         Parameters
         ----------
-        
+
         target_series : pyleoclim.Series
             A pyleoclim Series object on which to perform the coherence analysis
-        
+
         method : {'wwz'}
-        
+
         freq_method : str
             {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
-        
+
         freq_kwargs : dict
             Arguments for frequency vector
-        
+
         settings : dict
             Arguments for the specific spectral method
-        
+
         verbose : {True, False}
-        
+
         Returns
         -------
-        
+
         coh : pyleoclim.Coherence
-        
+
         See also
         --------
-        
+
         pyleoclim.utils.wavelet.xwt : Cross-wavelet analysis based on WWZ method
-        
+
         pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
-        
+
         pyleoclim.utils.tsutils.detrend : Detrending function
-        
+
         pyleoclim.core.ui.Coherence : Coherence object
 
         Examples
@@ -1269,7 +1307,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-        
+
             import pyleoclim as pyleo
             import pandas as pd
             from matplotlib import pyplot as plt
@@ -1291,9 +1329,9 @@ class Series:
             coh = ts_nino.wavelet_coherence(ts_air)
             coh_signif = coh.signif_test(number=1, qs=[0.99])  # for real work, should use number=200 or even larger
             @savefig coh_plot.png
-            fig, ax = coh_signif.plot(phase_style={'skip_x': 50, 'skip_y': 10}) 
+            fig, ax = coh_signif.plot(phase_style={'skip_x': 50, 'skip_y': 10})
             plt.close(fig)
-        
+
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -1333,49 +1371,49 @@ class Series:
 
     def correlation(self, target_series, timespan=None, settings=None):
         ''' Estimates the Pearson's correlation and associated significance between two non IID time series
-    
+
         The significance of the correlation is assessed using one of the following methods:
-        
+
         1) 'ttest': T-test adjusted for effective sample size.
         2) 'isopersistent': AR(1) modeling of x and y.
         3) 'isospectral': phase randomization of original inputs. (default)
-    
+
         The T-test is a parametric test, hence computationally cheap but can only be performed in idyllic circumstances.
         The others are non-parametric, but their computational requirements scales with nsim.
-        
+
         The choise of significance test and associated number of Monte-Carlo simulations are passed through the settings parameter.
-        
+
         Parameters
         ----------
-        
+
         target_series : pyleoclim.Series
             A pyleoclim Series object
-        
+
         timespan : tuple
             The time interval over which to perform the calculation
-        
+
         settings : dict
             Parameters for the correlation function (singificance testing and number of simulation)
-        
+
         Returns
         -------
-        
+
         res : dict
-            Containing the Pearson's correlation coefficient, associated significance and p-value. 
-        
+            Containing the Pearson's correlation coefficient, associated significance and p-value.
+
         See also
         --------
-        
+
         pyleoclim.utils.correlation.corr_sig : Correlation function
 
         Examples
         --------
 
         Correlation between the Nino3.4 index and the Deasonalized All Indian Rainfall Index
-        
+
         .. ipython:: python
             :okwarning:
-        
+
             import pyleoclim as pyleo
             import pandas as pd
             from matplotlib import pyplot as plt
@@ -1411,40 +1449,40 @@ class Series:
 
     def causality(self, target_series, method='liang', settings=None):
         ''' Perform causality analysis with the target timeseries
-        
+
         Parameters
         ----------
-        
+
         target_series : pyleoclim.Series
             A pyleoclim Series object on which to compute causality
-        
+
         method : {'liang', 'granger'}
             The causality method to use.
-        
+
         settings : dict
             Parameters associated with the causality methods  . Note that each method has different parameters. See individual methods for details
-        
+
         Returns
         -------
-        
+
         res : dict
             Dictionary containing the results of the the causality analysis. See indivudal methods for details
-        
+
         See also
         --------
-        
+
         pyleoclim.utils.causality.liang_causality : Liang causality
-        
+
         pyleoclim.utils.causality.granger_causality : Granger causality
-        
+
         Examples
         --------
-        
+
         Liang causality
-        
+
         .. ipython:: python
             :okwarning:
-        
+
             import pyleoclim as pyleo
             import pandas as pd
             from matplotlib import pyplot as plt
@@ -1465,15 +1503,15 @@ class Series:
             # please drop the `settings` for real work
             caus_res = ts_nino.causality(ts_air, settings={'nsim': 2, 'signif_test': 'isopersist'})
             print(caus_res)
-        
+
         Granger causality
-        
+
         .. ipython:: python
             :okwarning:
-                
+
             caus_res = ts_nino.causality(ts_air, method='granger')
             print(caus_res)
-        
+
         '''
         settings = {} if settings is None else settings.copy()
         spec_func={
@@ -1488,32 +1526,32 @@ class Series:
 
     def surrogates(self, method='ar1', number=1, length=None, seed=None, settings=None):
         ''' Generate surrogates with increasing time axis
-        
+
         Parameters
         ----------
-        
+
         method : {ar1}
             Uses an AR1 model to generate surrogates of the timeseries
-        
+
         number : int
             The number of surrogates to generate
-            
+
         length : int
             Lenght of the series
-        
+
         seed : int
             Control seed option for reproducibility
-        
+
         settings : dict
-            Parameters for surogate generator. See individual methods for details. 
-        
+            Parameters for surogate generator. See individual methods for details.
+
         Returns
         -------
         surr : pyleoclim SurrogateSeries
-        
+
         See also
         --------
-        
+
         pyleoclim.utils.tsmodel.ar1_sim : AR1 simulator
         '''
         settings = {} if settings is None else settings.copy()
@@ -1545,10 +1583,10 @@ class Series:
                  saveknee_settings=None,saveoutliers_settings=None, mute=False):
         '''
         Detects outliers in a timeseries and removes if specified
-        
+
         Parameters
         ----------
-        
+
         auto : boolean
             True by default, detects knee in the plot automatically
         remove : boolean
@@ -1570,21 +1608,21 @@ class Series:
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
-     
+
         Returns
         -------
         new : Series
             Time series with outliers removed if they exist
-        
+
         See also
         --------
-        
+
         pyleoclim.utils.tsutils.remove_outliers : remove outliers function
-        
+
         pyleoclim.utils.plotting.plot_xy : basic x-y plot
-        
+
         pyleoclim.utils.plotting.plot_scatter_xy : Scatter plot on top of a line plot
-        
+
         '''
         new = self.copy()
 
@@ -1610,22 +1648,22 @@ class Series:
 
         Parameters
         ----------
-        
+
         method : {‘linear’, ‘nearest’, ‘zero’, ‘slinear’, ‘quadratic’, ‘cubic’, ‘previous’, ‘next’}
             where ‘zero’, ‘slinear’, ‘quadratic’ and ‘cubic’ refer to a spline interpolation of zeroth, first, second or third order; ‘previous’ and ‘next’ simply return the previous or next value of the point) or as an integer specifying the order of the spline interpolator to use. Default is ‘linear’.
-    
-        kwargs : 
+
+        kwargs :
             Arguments specific to each interpolation function. See pyleoclim.utils.tsutils.interp for details
-        
+
         Returns
         -------
-        
+
         new : pyleoclim.Series
             An interpolated Series object
-        
+
         See also
         --------
-        
+
         pyleoclim.utils.tsutils.interp : interpolation function
 
         '''
@@ -1637,21 +1675,23 @@ class Series:
 
     def bin(self,**kwargs):
         '''Bin values in a time series
-        
+
         Parameters
         ----------
+
         
         kwargs : 
             Arguments for binning function. See pyleoclim.utils.tsutils.bin for details
         
         Returns
         -------
-        
+
         new : pyleoclim.Series
             An binned Series object
-        
+
         See also
         --------
+
         
         pyleoclim.utils.tsutils.bin : bin the time series into evenly-spaced bins
                 
@@ -1664,14 +1704,14 @@ class Series:
 
 class PSD:
     '''PSD object obtained from spectral analysis.
-    
+
     See examples in pyleoclim.core.ui.Series.spectral to see how to create and manipulate these objects
-    
+
     See also
     --------
-    
+
     pyleoclim.core.ui.Series.spectral : spectral analysis
-    
+
     '''
     def __init__(self, frequency, amplitude, label=None, timeseries=None, plot_kwargs=None,
                  spec_method=None, spec_args=None, signif_qs=None, signif_method=None, period_unit=None):
@@ -1684,10 +1724,11 @@ class PSD:
         self.signif_qs = signif_qs
         self.signif_method = signif_method
         self.plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = f'{timeseries.time_unit}s'
+            self.period_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
         else:
             self.period_unit = None
 
@@ -1708,7 +1749,7 @@ class PSD:
     def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95],
                     settings=None):
         '''
-        
+
 
         Parameters
         ----------
@@ -1782,13 +1823,13 @@ class PSD:
 
         return res_dict
 
-    def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='Amplitude', title=None,
+    def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
              plot_legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
              plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
         '''Plots the PSD estimates and signif level if included
-        
+
 
         Parameters
         ----------
@@ -1801,7 +1842,7 @@ class PSD:
         xlabel : str, optional
             Label for the x-axis. The default is None. Will guess based on Series
         ylabel : str, optional
-            Label for the y-axis. The default is 'Amplitude'. Will guess based on Series
+            Label for the y-axis. The default is 'PSD'.
         title : str, optional
             Plot title. The default is None.
         marker : str, optional
@@ -1857,13 +1898,16 @@ class PSD:
         Returns
         -------
         fig, ax
-        
+
         See also
         --------
-        
+
         pyleoclim.core.ui.Series.spectral : spectral analysis
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = self.plot_kwargs if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -1964,8 +2008,8 @@ class PSD:
                 )
 
         if in_loglog:
-            ax.set_xscale('log', nonpositive='clip')
-            ax.set_yscale('log', nonpositive='clip')
+            ax.set_xscale('log')
+            ax.set_yscale('log')
 
         if xticks is not None:
             ax.set_xticks(xticks)
@@ -2028,14 +2072,24 @@ class Scalogram:
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
+
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = timeseries.time_unit
+            self.period_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
+        else:
+            self.period_unit = None
+
         if time_label is not None:
             self.time_label = time_label
         elif timeseries is not None:
-            self.time_label = f'{timeseries.time_name}'
+            if timeseries.time_unit is not None:
+                self.time_label = f'{timeseries.time_name} [{timeseries.time_unit}]'
+            else:
+                self.time_label = f'{timeseries.time_name}'
+        else:
+            self.time_label = None
+
 
     def copy(self):
         '''Copy object
@@ -2056,7 +2110,7 @@ class Scalogram:
              ylim=None, xlim=None, yticks=None, figsize=[10, 8], mute=False,
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              contourf_style={}, cbar_style={}, savefig_settings={}, ax=None):
-        '''Plot the scalogram        
+        '''Plot the scalogram
 
         Parameters
         ----------
@@ -2097,14 +2151,17 @@ class Scalogram:
         Returns
         -------
         fig, ax
-        
+
         See also
         --------
-        
+
         pyleoclim.core.ui.Series.wavelet : Wavelet analysis
-        
+
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
 
@@ -2124,9 +2181,6 @@ class Scalogram:
             y_axis = self.frequency
             if ylabel is None:
                 ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
-
-        if xlabel is None:
-            xlabel = self.time_label
 
         cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
         ax.set_yscale('log', nonpositive='clip')
@@ -2168,8 +2222,14 @@ class Scalogram:
                 linewidths=signif_linewidths,
             )
 
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        if xlabel is None:
+            xlabel = self.time_label
+
+        if xlabel is not None:
+            ax.set_xlabel(xlabel)
+
+        if ylabel is not None:
+            ax.set_ylabel(ylabel)
 
         if xlim is not None:
             ax.set_xlim(xlim)
@@ -2189,7 +2249,7 @@ class Scalogram:
     def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95],
                     settings=None):
         '''Significance test for wavelet analysis
-        
+
         Parameters
         ----------
         number : int, optional
@@ -2212,14 +2272,14 @@ class Scalogram:
         -------
         new : pyleoclim.Scalogram
             A new Scalogram object with the significance level
-        
+
         See also
         --------
-        
+
         pyleoclim.core.ui.Series.wavelet : wavelet analysis
 
         '''
-        
+
         new = self.copy()
         surr = self.timeseries.surrogates(
             number=number, seed=seed, method=method, settings=settings
@@ -2237,12 +2297,12 @@ class Scalogram:
 
 class Coherence:
     '''Coherence object
-    
+
     See also
     --------
-    
+
     pyleoclim.core.ui.Series.wavelet_coherence : Wavelet coherence
-    
+
     '''
     def __init__(self, frequency, time, coherence, phase, coi=None,
                  timeseries1=None, timeseries2=None, signif_qs=None, signif_method=None,
@@ -2261,14 +2321,30 @@ class Coherence:
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
+
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries1 is not None:
-            self.period_unit = timeseries1.time_unit
+            self.period_unit = infer_period_unit_from_time_unit(timeseries1.time_unit)
+        elif timeseries2 is not None:
+            self.period_unit = infer_period_unit_from_time_unit(timeseries2.time_unit)
+        else:
+            self.period_unit = None
+
         if time_label is not None:
             self.time_label = time_label
         elif timeseries1 is not None:
-            self.time_label = f'{timeseries1.time_name}'
+            if timeseries1.time_unit is not None:
+                self.time_label = f'{timeseries1.time_name} [{timeseries1.time_unit}]'
+            else:
+                self.time_label = f'{timeseries1.time_name}'
+        elif timeseries2 is not None:
+            if timeseries2.time_unit is not None:
+                self.time_label = f'{timeseries2.time_name} [{timeseries2.time_unit}]'
+            else:
+                self.time_label = f'{timeseries2.time_name}'
+        else:
+            self.time_label = None
 
     def copy(self):
         '''Copy object
@@ -2281,7 +2357,7 @@ class Coherence:
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              under_clr='ivory', over_clr='black', bad_clr='dimgray'):
         '''Plot the cross-wavelet results
-        
+
         Parameters
         ----------
         xlabel : str, optional
@@ -2333,13 +2409,16 @@ class Coherence:
         Returns
         -------
         fig, ax
-        
+
         See also
         --------
-        
+
         pyleoclim.core.ui.Series.wavelet_coherence
 
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
@@ -2413,8 +2492,14 @@ class Coherence:
             ax.yaxis.set_major_formatter(ScalarFormatter())
             ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
+        if xlabel is None:
+            xlabel = self.time_label
+
+        if xlabel is not None:
+            ax.set_xlabel(xlabel)
+
+        if ylabel is not None:
+            ax.set_ylabel(ylabel)
 
         # plot phase
         yaxis_range = np.max(y_axis) - np.min(y_axis)
@@ -2461,7 +2546,7 @@ class Coherence:
             return ax
 
     def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95], settings=None, mute_pbar=False):
-        '''Significance testing        
+        '''Significance testing
 
         Parameters
         ----------
@@ -2482,14 +2567,14 @@ class Coherence:
         -------
         new : pyleoclim.Coherence
             Coherence with significance level
-            
+
         See also
         --------
-        
+
         pyleoclim.core.ui.Series.wavelet_coherence : Wavelet coherence
         '''
-        
-        
+
+
         new = self.copy()
         surr1 = self.timeseries1.surrogates(
             number=number, seed=seed, method=method, settings=settings
@@ -2527,23 +2612,23 @@ class Coherence:
 
 class MultipleSeries:
     '''Define a multiple series object.
-    
+
     This is useful for ensembling or working with multiple timeseries in the same workflow
-    
+
     Parameters
     ----------
-    
+
     series_list : list
         a list of pyleoclim.Series objects
-    
+
     Examples
     --------
-    
+
     Create a MultipleSeries object for the Nino and All Indian Rainfall indices
-    
+
     .. ipython:: python
         :okwarning:
-        
+
         import pyleoclim as pyleo
         import pandas as pd
         data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
@@ -2574,7 +2659,7 @@ class MultipleSeries:
         return ms
     
     def copy(self):
-        '''Copy the object 
+        '''Copy the object
         '''
         return deepcopy(self)
 
@@ -2700,10 +2785,10 @@ class MultipleSeries:
         -------
         ms : pyleoclim.MultipleSeries
             The detrended timeseries
-            
+
         See also
         --------
-        
+
         pyleoclim.core.ui.Series.detrend : Detrending for a single series
         pyleoclim.utils.tsutils.detrend : Detrending function
 
@@ -2716,110 +2801,119 @@ class MultipleSeries:
             ms.series_list[idx]=s
         return ms
 
-    def spectral(self, method='wwz', settings={}, mute_pbar=False, freq_method='log', freq_kwargs=None):
+    def spectral(self, method='wwz', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
         ----------
-        
+
         method : str
             {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram'}
 
         freq_method : str
             {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
-        
+
         freq_kwargs : dict
             Arguments for frequency vector
-        
+
         settings : dict
             Arguments for the specific spectral method
-        
+
+        label : str
+            Label for the PSD object
+
+        verbose : {True, False}
+
         mute_pbar : {True, False}
-            Mute the progress bar. Default is False. 
-        
+            Mute the progress bar. Default is False.
+
         Returns
         -------
-        
+
         psd : pyleoclim.MultiplePSD
             A Multiple PSD object
-            
+
         See also
         --------
         pyleoclim.utils.spectral.mtm : Spectral analysis using the Multitaper approach
-        
+
         pyleoclim.utils.spectral.lomb_scargle : Spectral analysis using the Lomb-Scargle method
-        
+
         pyleoclim.utils.spectral.welch: Spectral analysis using the Welch segement approach
-        
+
         pyleoclim.utils.spectral.periodogram: Spectral anaysis using the basic Fourier transform
-        
+
         pyleoclim.utils.spectral.wwz_psd : Spectral analysis using the Wavelet Weighted Z transform
-        
+
         pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
-        
+
         pyleoclim.utils.tsutils.detrend : Detrending function
-        
+
         pyleoclim.core.ui.Series.spectral : Spectral analysis for a single timeseries
-        
+
         pyleoclim.core.ui.PSD : PSD object
-        
+
         pyleoclim.core.ui.MultiplePSD : Multiple PSD object
         '''
         settings = {} if settings is None else settings.copy()
-        if method in ['wwz', 'lomb_scargle'] and 'freq' not in settings.keys():
-            res=[]
-            for s in(self.series_list):
-                c=np.mean(np.diff(s.value))
-                res.append(c)
-            res=np.array(res)
-            idx = np.argmin(res)
-            ts=self.series_list[idx].time
-            freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-            freq=waveutils.make_freq_vector(ts, freq_method=freq_method, **freq_kwargs)
-            settings.update({'freq':freq})
+
         psd_list = []
         for s in tqdm(self.series_list, desc='Performing spectral analysis on surrogates', position=0, leave=True, disable=mute_pbar):
-            psd_tmp = s.spectral(method=method, settings=settings)
+            psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
             psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)
 
         return psds
 
-    def wavelet(self, method='wwz', settings={}, mute_pbar=False):
-        '''Wavelet analysis        
+    def wavelet(self, method='wwz', settings={}, freq_method='log', freq_kwargs=None, verbose=False, mute_pbar=False):
+        '''Wavelet analysis
 
         Parameters
         ----------
-        method : {'wwz'}, optional
-            Method for the wavelet analysis. The default is 'wwz'.
+        method : {wwz, cwt}
+            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
+
         settings : dict, optional
             Settings for the particular method. The default is {}.
+
+        freq_method : str
+            {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
+
+        freq_kwargs : dict
+            Arguments for frequency vector
+
+        settings : dict
+            Arguments for the specific spectral method
+
+        verbose : {True, False}
+
+
         mute_pbar : bool, optional
             Whether to mute the progress bar. The default is False.
 
         Returns
         -------
         scals : pyleoclim.MultipleScalograms
-        
+
         See also
         --------
         pyleoclim.utils.wavelet.wwz : wwz function
-        
+
         pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
-        
+
         pyleoclim.utils.tsutils.detrend : Detrending function
-        
+
         pyleoclim.core.ui.Series.wavelet : wavelet analysis on single object
-        
+
         pyleoclim.core.ui.MultipleScalogram : Multiple Scalogram object
-        
+
         '''
         settings = {} if settings is None else settings.copy()
 
         scal_list = []
         for s in tqdm(self.series_list, desc='Performing wavelet analysis on surrogates', position=0, leave=True, disable=mute_pbar):
-            scal_tmp = s.wavelet(method=method, settings=settings)
+            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose)
             scal_list.append(scal_tmp)
 
         scals = MultipleScalogram(scalogram_list=scal_list)
@@ -2872,12 +2966,14 @@ class MultipleSeries:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
-            
+
         Returns
         -------
         fig, ax
-            
+
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
@@ -2903,9 +2999,9 @@ class MultipleSeries:
         else:
             return ax
 
-    # def stackplot(self, figsize=None, xlabel=None, ylabel=None, 
+    # def stackplot(self, figsize=None, xlabel=None, ylabel=None,
     #           xlim=None, ylim=None, title=None,
-    #           savefig_settings=None, ax=None, style=None, 
+    #           savefig_settings=None, ax=None, style=None,
     #           plot_kwargs=None, mute=False,color=None):
     #     x = []
     #     y = []
@@ -2926,9 +3022,135 @@ class SurrogateSeries(MultipleSeries):
         self.surrogate_method = surrogate_method
         self.surrogate_args = surrogate_args
 
+class EnsembleSeries(MultipleSeries):
+    ''' Object containing ensemble timeseries
+    '''
+    def __init__(self, series_list):
+        self.series_list = series_list
+
+    def correlation(self, target, timespan=None, settings=None, apply_fdr=True, fdr_kwargs=None):
+        ''' Calculate the correlation between an ensemble series group to a target series
+
+        Parameters
+        ----------
+        target : pyleoclim.Series or pyleoclim.EnsembleSeries
+            A pyleoclim Series object or EnsembleSeries object.
+            When the target is also an EnsembleSeries object, then the calculation of correlation is performed in a one-to-one sense,
+            and the ourput list of correlation values and p-values will be the size of the series_list of the self object.
+            That is, if the self object contains n Series, and the target contains n+m Series,
+            then only the first n Series from the object will be used for the calculation;
+            otherwise, if the target contains only n-m Series, then the first m Series in the target will be used twice in sequence.
+        
+        timespan : tuple
+            The time interval over which to perform the calculation
+        
+        settings : dict
+            Parameters for the correlation function (singificance testing and number of simulation)
+
+        apply_fdr : bool
+            Determine significance based on the FDR approach 
+
+        fdr_kwargs : dict
+            Parameters for the FDR function
+            
+        Returns
+        -------
+        
+        res : dict
+            Containing a list of the Pearson's correlation coefficient, associated significance and p-value. 
+        
+        See also
+        --------
+        
+        pyleoclim.utils.correlation.corr_sig : Correlation function
+        pyleoclim.utils.correlation.fdr : FDR function
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            from pyleoclim.utils.tsmodel import colored_noise
+
+            nt = 100
+            t0 = np.arange(nt)
+            v0 = colored_noise(alpha=1, t=t0)
+            noise = np.random.normal(loc=0, scale=1, size=nt)
+
+            ts0 = pyleo.Series(time=t0, value=v0)
+            ts1 = pyleo.Series(time=t0, value=v0+noise)
+            ts2 = pyleo.Series(time=t0, value=v0+2*noise)
+            ts3 = pyleo.Series(time=t0, value=v0+1/2*noise)
+
+            ts_list1 = [ts0, ts1]
+            ts_list2 = [ts2, ts3]
+
+            ts_ens = pyleo.EnsembleSeries(ts_list1)
+            ts_target = pyleo.EnsembleSeries(ts_list2)
+
+            corr_res = ts_ens.correlation(ts_target)
+            print(corr_res)
+
+        '''
+        settings = {} if settings is None else settings.copy()
+        args = {}
+        args.update(settings)
+
+        r_list = []
+        signif_list = []
+        p_list = []
+
+        for idx, ts in enumerate(self.series_list):
+            if timespan is None:
+                value1 = ts.value
+                if isinstance(target, Series):
+                    value2 = target.value
+                elif isinstance(target, EnsembleSeries): 
+                    value2 = target.series_list[idx].value
+            else:
+                value1 = ts.slice(timespan).value
+                if isinstance(target, Series):
+                    value2 = target.slice(timespan).value
+                elif isinstance(target, EnsembleSeries): 
+                    nEns = np.size(target.series_list)
+                    if idx < nEns:
+                        value2 = target.series_list[idx].slice(timespan).value
+                    else:
+                        value2 = target.series_list[idx-nEns].slice(timespan).value
+
+            corr_res = corrutils.corr_sig(value1, value2, **args)
+            r_list.append(corr_res['r'])
+            signif_list.append(corr_res['signif'])
+            p_list.append(corr_res['p'])
+
+        r_lsit = np.array(r_list)
+        p_lsit = np.array(p_list)
+
+        if apply_fdr:
+            fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
+            args = {}
+            args.update(fdr_kwargs)
+            for i in range(np.size(signif_list)):
+                signif_list[i] = False
+
+            fdr_res = corrutils.fdr(p_list, **fdr_kwargs)
+            if fdr_res is not None:
+                for i in fdr_res:
+                    signif_list[i] = True
+
+        corr_res = {
+            'r': r_list,
+            'signif': signif_list,
+            'p': p_list,
+        }
+
+        return corr_res
+
 class MultiplePSD:
     ''' Object for multiple PSD.
-    
+
     Used for significance level
     '''
     def __init__(self, psd_list):
@@ -2941,7 +3163,7 @@ class MultiplePSD:
 
     def quantiles(self, qs=[0.05, 0.5, 0.95], lw=[0.5, 1.5, 0.5]):
         '''Calculate quantiles
-        
+
         Parameters
         ----------
         qs : list, optional
@@ -2957,7 +3179,7 @@ class MultiplePSD:
         Returns
         -------
         psds : pyleoclim.MultiplePSD
-            
+
         '''
         if self.psd_list[0].timeseries is not None:
             period_unit = self.psd_list[0].timeseries.time_unit
@@ -3031,7 +3253,7 @@ class MultiplePSD:
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
              plot_kwargs=None, lgd_kwargs=None, mute=False):
         '''Plot multiple PSD on the same plot
-        
+
         Parameters
         ----------
         figsize : list, optional
@@ -3074,8 +3296,12 @@ class MultiplePSD:
 
         Returns
         -------
-        fig,ax
+        fig, ax
+
         '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -3113,7 +3339,7 @@ class MultiplePSD:
              curve_clr=sns.xkcd_rgb['pale red'], curve_lw=3, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.3, shade_label=None,
              lgd_kwargs=None, mute=False, members_plot_num=10, members_alpha=0.3, members_lw=1, seed=None):
         '''Plot mutiple PSD as an envelope.
-        
+
         Parameters
         ----------
         figsize : list, optional
@@ -3176,7 +3402,13 @@ class MultiplePSD:
         fig, ax
 
         '''
+
+
+        # Turn the interactive mode off.
+        plt.ioff()
         
+
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
@@ -3250,17 +3482,17 @@ class MultipleScalogram:
 
     def quantiles(self, qs=[0.05, 0.5, 0.95]):
         '''Calculate quantiles
-        
+
         Parameters
         ----------
         qs : list, optional
             List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
-        
+
         Raises
         ------
         ValueError
             Frequency axis not consistent across the PSD list!
-            
+
         Value Error
             Time axis not consistent across the scalogram list!
 
@@ -3300,33 +3532,33 @@ class MultipleScalogram:
 
 class Lipd:
     '''Create a Lipd object from Lipd Files
-    
+
     Parameters
     ----------
-    
+
     usr_path : str
         path to the Lipd file(s). Can be URL (LiPD utilities only support loading one file at a time from a URL)
         If it's a URL, it must start with "http", "https", or "ftp.
-    
+
     lidp_dict : dict
         LiPD files already loaded into Python through the LiPD utilities
-    
+
     TODO
     ----
-    
+
     Support querying the LinkedEarth platform
 
     Examples
     --------
-    
+
     .. ipython:: python
         :okwarning:
-        
+
         import pyleoclim as pyleo
         url='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
         d=pyleo.Lipd(usr_path=url)
     '''
-    
+
     def __init__(self, query=False, query_args={}, usr_path=None, lipd_dict=None):
         self.plot_default = {'ice/rock': ['#FFD600','h'],
                 'coral': ['#FF8B00','o'],
@@ -3543,7 +3775,7 @@ class Lipd:
            markersize = None, scatter_kwargs=None,
            legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
         '''Map the records contained in LiPD files by archive type
-        
+
         Parameters
         ----------
         projection : str, optional
@@ -3773,7 +4005,7 @@ class LipdSeries(Series):
            figsize = None, ax = None, marker=None, color=None,
            markersize = None, scatter_kwargs=None,
            legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
-        '''Map the location of the record        
+        '''Map the location of the record
 
         Parameters
         ----------

@@ -38,13 +38,7 @@ pyleoclim supports Python 3.8
 
 ### Installation
 
-The latest stable release is available through Pypi. We recommend using Anaconda or Miniconda with a dedicated environment.
- 
- `pip install pyleoclim`
-
-You may also want to use the Development version from GitHub to access the latest functionalities
- 
- `git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development`
+The latest stable release is available through Pypi. We recommend using Anaconda or Miniconda with a dedicated environment. Full installation instructions are available in the [package documentation](https://pyleoclim-util.readthedocs.io/en/stable/installation.html)
 
 
 ### Development
@@ -52,6 +46,8 @@ You may also want to use the Development version from GitHub to access the lates
 Pyleoclim development takes place on GitHub: https://github.com/LinkedEarth/Pyleoclim_util
 
 Please submit any reproducible bugs you encounter to the [issue tracker](https://github.com/LinkedEarth/Pyleoclim_util/issues)
+
+Guidelines for contributors are described _here_ (placeholder)
 
 ### License
 
