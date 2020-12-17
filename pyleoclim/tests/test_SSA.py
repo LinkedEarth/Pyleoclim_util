@@ -19,10 +19,13 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 from sklearn import metrics
+import os
+import pathlib
+test_dirpath = pathlib.Path(__file__).parent.absolute()
 #pyleo.set_style('journal')
 
 # 0. load the data
-data = sio.loadmat('./example_data/wtc_test_data_nino.mat')
+data = sio.loadmat(os.path.join(test_dirpath, '../../example_data/wtc_test_data_nino.mat'))
 nino = data['nino'][:, 0]
 t = data['datayear'][:, 0]
 ts_nino = pyleo.Series(time=t, value=nino)

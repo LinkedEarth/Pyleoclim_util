@@ -19,11 +19,14 @@ import pyleoclim as pyleo
 import scipy.io as sio
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+import pathlib
+test_dirpath = pathlib.Path(__file__).parent.absolute()
 #from sklearn import metrics
 pyleo.set_style('journal')
 
 # 0. load the data
-data = sio.loadmat('./example_data/wtc_test_data_nino.mat')
+data = sio.loadmat(os.path.join(test_dirpath, '../../example_data/wtc_test_data_nino.mat'))
 nino = data['nino'][:, 0]
 air  = data['air'][:, 0]
 t = data['datayear'][:, 0]
@@ -97,7 +100,7 @@ mts_joint = pyleo.MultipleSeries([*mtsCE.series_list, *mtsBP.series_list])
 # test the joint interpolation method
 ms_interp2 = mts_joint.common_time(method = 'interp')   
 ms_interp2.plot(color='gray',plot_kwargs={'alpha': 0.1})
-plt.show()   # FAIL
+# plt.show()   # FAIL
 
 
 #class Ensemble(MultipleSeries)

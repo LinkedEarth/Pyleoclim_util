@@ -1369,7 +1369,7 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, timespan=None, settings=None):
+    def correlation(self, target_series, timespan=None, settings=None, common_time_kwargs=None):
         ''' Estimates the Pearson's correlation and associated significance between two non IID time series
 
         The significance of the correlation is assessed using one of the following methods:
@@ -1394,6 +1394,9 @@ class Series:
 
         settings : dict
             Parameters for the correlation function (singificance testing and number of simulation)
+
+        common_time_kwargs : dict
+            Parameters for the method MultipleSeries.common_time(). Will use interpolation by default.
 
         Returns
         -------
@@ -1434,17 +1437,25 @@ class Series:
             print(corr_res)
         '''
         settings = {} if settings is None else settings.copy()
-        args = {}
-        args.update(settings)
+        corr_args = {}
+        corr_args.update(settings)
+
+        ms = MultipleSeries([self, target_series])
+        if list(self.time) != list(target_series.time):
+            common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
+            ct_args = {'method': 'interp'}
+            ct_args.update(common_time_kwargs)
+            ms = ms.common_time(**ct_args)
 
         if timespan is None:
-            value1 = self.value
-            value2 = target_series.value
+            value1 = ms.series_list[0].value
+            value2 = ms.series_list[1].value
         else:
-            value1 = self.slice(timespan).value
-            value2 = target_series.slice(timespan).value
+            value1 = ms.series_list[0].slice(timespan).value
+            value2 = ms.series_list[1].slice(timespan).value
 
-        corr_res = corrutils.corr_sig(value1, value2, **args)
+
+        corr_res = corrutils.corr_sig(value1, value2, **corr_args)
         return corr_res
 
     def causality(self, target_series, method='liang', settings=None):
@@ -3028,7 +3039,7 @@ class EnsembleSeries(MultipleSeries):
     def __init__(self, series_list):
         self.series_list = series_list
 
-    def correlation(self, target, timespan=None, settings=None, apply_fdr=True, fdr_kwargs=None):
+    def correlation(self, target, timespan=None, settings=None, apply_fdr=True, fdr_kwargs=None, common_time_kwargs=None):
         ''' Calculate the correlation between an ensemble series group to a target series
 
         Parameters
@@ -3052,6 +3063,9 @@ class EnsembleSeries(MultipleSeries):
 
         fdr_kwargs : dict
             Parameters for the FDR function
+
+        common_time_kwargs : dict
+            Parameters for the method MultipleSeries.common_time()
             
         Returns
         -------
@@ -3094,33 +3108,28 @@ class EnsembleSeries(MultipleSeries):
             print(corr_res)
 
         '''
-        settings = {} if settings is None else settings.copy()
-        args = {}
-        args.update(settings)
-
         r_list = []
         signif_list = []
         p_list = []
 
         for idx, ts in enumerate(self.series_list):
-            if timespan is None:
-                value1 = ts.value
-                if isinstance(target, Series):
-                    value2 = target.value
-                elif isinstance(target, EnsembleSeries): 
+            value1 = ts.value
+            time1 = ts.time
+            if isinstance(target, Series):
+                value2 = target.value
+                time2 = target.time
+            elif isinstance(target, EnsembleSeries): 
+                nEns = np.size(target.series_list)
+                if idx < nEns:
                     value2 = target.series_list[idx].value
-            else:
-                value1 = ts.slice(timespan).value
-                if isinstance(target, Series):
-                    value2 = target.slice(timespan).value
-                elif isinstance(target, EnsembleSeries): 
-                    nEns = np.size(target.series_list)
-                    if idx < nEns:
-                        value2 = target.series_list[idx].slice(timespan).value
-                    else:
-                        value2 = target.series_list[idx-nEns].slice(timespan).value
+                    time2 = target.series_list[idx].time
+                else:
+                    value2 = target.series_list[idx-nEns].value
+                    time2 = target.series_list[idx-nEns].time
 
-            corr_res = corrutils.corr_sig(value1, value2, **args)
+            ts1 = Series(time=time1, value=value1)
+            ts2 = Series(time=time2, value=value2)
+            corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs)
             r_list.append(corr_res['r'])
             signif_list.append(corr_res['signif'])
             p_list.append(corr_res['p'])
