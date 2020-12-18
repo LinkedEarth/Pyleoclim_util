@@ -19,6 +19,10 @@ from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
 
 import pytest
+import scipy.io as sio
+import os
+import pathlib
+test_dirpath = pathlib.Path(__file__).parent.absolute()
 
 import pyleoclim as pyleo
 from pyleoclim.utils.tsmodel import (
@@ -460,6 +464,35 @@ class TestUiSeriesCorrelation:
         r = corr_res['r']
         assert np.abs(r-0) < eps
 
+    @pytest.mark.parametrize('corr_method', ['ttest', 'isopersistent', 'isospectral'])
+    def test_correlation_t2(self, corr_method, eps=0.1):
+        ''' Test correlation between two series with inconsistent time axis
+        '''
+        data = sio.loadmat(os.path.join(test_dirpath, '../../example_data/wtc_test_data_nino.mat'))
+        nino = data['nino'][:, 0]
+        air  = data['air'][:, 0]
+        t = data['datayear'][:, 0]
+
+        # randomly delete 500 data pts
+        n_del = 500
+        deleted_idx_air = np.random.choice(range(np.size(t)), n_del, replace=False)
+        deleted_idx_nino = np.random.choice(range(np.size(t)), n_del, replace=False)
+        air_value_unevenly =  np.delete(air, deleted_idx_air)
+        air_time_unevenly =  np.delete(t, deleted_idx_air)
+        nino_value_unevenly =  np.delete(nino, deleted_idx_nino)
+        nino_time_unevenly =  np.delete(t, deleted_idx_nino)
+
+        ts1_evenly = pyleo.Series(time=t, value=air)
+        ts2_evenly = pyleo.Series(time=t, value=nino)
+        corr_res_evenly = ts1_evenly.correlation(ts2_evenly, settings={'method': corr_method})
+        r_evenly = corr_res_evenly['r']
+
+        ts1 = pyleo.Series(time=air_time_unevenly, value=air_value_unevenly)
+        ts2 = pyleo.Series(time=nino_time_unevenly, value=nino_value_unevenly)
+
+        corr_res = ts1.correlation(ts2, settings={'method': corr_method}, common_time_kwargs={'method': 'interp'})
+        r = corr_res['r']
+        assert np.abs(r-r_evenly) < eps
 
 class TestUiSeriesCausality:
     ''' Test Series.causality()

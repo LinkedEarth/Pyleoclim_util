@@ -91,7 +91,7 @@ reading sources... [ 62%] utils/tsmodel/colored_noise
 reading sources... [ 63%] utils/tsmodel/colored_noise_2regimes
 reading sources... [ 64%] utils/tsmodel/tau_estimation
 reading sources... [ 64%] utils/tsutils/annualize
-reading sources... [ 65%] utils/tsutils/bin_values
+reading sources... [ 65%] utils/tsutils/bin
 reading sources... [ 66%] utils/tsutils/clean_ts
 reading sources... [ 67%] utils/tsutils/detect_outliers
 reading sources... [ 67%] utils/tsutils/detrend
@@ -272,7 +272,7 @@ invalid option block.
    tsmodel/colored_noise.rst
    tsmodel/colored_noise_2regimes.rst
    tsutils/simple_stats.rst
-   tsutils/bin_values.rst
+   tsutils/bin.rst
    tsutils/interp.rst
    tsutils/on_common_axis.rst
    tsutils/standardize.rst
@@ -517,7 +517,7 @@ checking consistency... /Users/fzhu/Github/Pyleoclim_util/doc_build/anaconda_ins
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsmodel/colored_noise_2regimes.rst: WARNING: document isn't included in any toctree
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsmodel/tau_estimation.rst: WARNING: document isn't included in any toctree
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/annualize.rst: WARNING: document isn't included in any toctree
-/Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/bin_values.rst: WARNING: document isn't included in any toctree
+/Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/bin.rst: WARNING: document isn't included in any toctree
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/clean_ts.rst: WARNING: document isn't included in any toctree
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/detect_outliers.rst: WARNING: document isn't included in any toctree
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/detrend.rst: WARNING: document isn't included in any toctree
@@ -653,7 +653,7 @@ writing output... [ 62%] utils/tsmodel/colored_noise
 writing output... [ 63%] utils/tsmodel/colored_noise_2regimes
 writing output... [ 64%] utils/tsmodel/tau_estimation
 writing output... [ 64%] utils/tsutils/annualize
-writing output... [ 65%] utils/tsutils/bin_values
+writing output... [ 65%] utils/tsutils/bin
 writing output... [ 66%] utils/tsutils/clean_ts
 writing output... [ 67%] utils/tsutils/detect_outliers
 writing output... [ 67%] utils/tsutils/detrend

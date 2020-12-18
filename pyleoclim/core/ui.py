@@ -36,8 +36,31 @@ import lipd as lpd
 
 
 def dict2namedtuple(d):
+    ''' Convert a dictionary to a namedtuple
+    '''
     tupletype = namedtuple('tupletype', sorted(d))
     return tupletype(**d)
+
+def infer_period_unit_from_time_unit(time_unit):
+    ''' infer a period unit based on the given time unit
+    '''
+    if time_unit is None:
+        period_unit = None
+    else:
+        unit_group = lipdutils.timeUnitsCheck(time_unit)
+        if unit_group != 'unknown':
+            if unit_group == 'kage_units':
+                period_unit = 'kyrs'
+            else:
+                period_unit = 'yrs'
+        else:
+            if time_unit[-1] == 's':
+                period_unit = time_unit
+            else:
+                period_unit = f'{time_unit}s'
+
+    return period_unit
+
 
 class Series:
     ''' Create a pyleoSeries object
@@ -592,7 +615,7 @@ class Series:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
-        ax = sns.histplot(self.value, ax=ax, kde = True, **plot_kwargs)
+        ax = sns.histplot(self.value, ax=ax, kde=True, **plot_kwargs)
 
         time_label, value_label = self.make_labels()
 
@@ -618,10 +641,7 @@ class Series:
                     time_label=None, value_label=None, period_label=None, psd_label='PSD', mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. 
 
-                    time_label=None, value_label=None, period_label=None, psd_label=None, mute=False):
-        ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
-
-
+                   
         Parameters
         ----------
 
@@ -774,7 +794,7 @@ class Series:
             ax['scal'].set_xlabel(time_label)
 
         if period_label is not None:
-            period_unit = f'{self.time_unit}s' if self.time_unit is not None else None
+            period_unit = infer_period_unit_from_time_unit(self.time_unit)
             period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
             ax['scal'].set_ylabel(period_label)
 
@@ -1147,11 +1167,11 @@ class Series:
         Parameters
         ----------
 
-        method : {wwz,cwt}
+        method : {wwz, cwt}
             Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
 
         freq_method : str
-            {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
+            {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
 
         freq_kwargs : dict
             Arguments for frequency vector
@@ -1349,7 +1369,7 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, timespan=None, settings=None):
+    def correlation(self, target_series, timespan=None, settings=None, common_time_kwargs=None):
         ''' Estimates the Pearson's correlation and associated significance between two non IID time series
 
         The significance of the correlation is assessed using one of the following methods:
@@ -1374,6 +1394,9 @@ class Series:
 
         settings : dict
             Parameters for the correlation function (singificance testing and number of simulation)
+
+        common_time_kwargs : dict
+            Parameters for the method MultipleSeries.common_time(). Will use interpolation by default.
 
         Returns
         -------
@@ -1414,17 +1437,25 @@ class Series:
             print(corr_res)
         '''
         settings = {} if settings is None else settings.copy()
-        args = {}
-        args.update(settings)
+        corr_args = {}
+        corr_args.update(settings)
+
+        ms = MultipleSeries([self, target_series])
+        if list(self.time) != list(target_series.time):
+            common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
+            ct_args = {'method': 'interp'}
+            ct_args.update(common_time_kwargs)
+            ms = ms.common_time(**ct_args)
 
         if timespan is None:
-            value1 = self.value
-            value2 = target_series.value
+            value1 = ms.series_list[0].value
+            value2 = ms.series_list[1].value
         else:
-            value1 = self.slice(timespan).value
-            value2 = target_series.slice(timespan).value
+            value1 = ms.series_list[0].slice(timespan).value
+            value2 = ms.series_list[1].slice(timespan).value
 
-        corr_res = corrutils.corr_sig(value1, value2, **args)
+
+        corr_res = corrutils.corr_sig(value1, value2, **corr_args)
         return corr_res
 
     def causality(self, target_series, method='liang', settings=None):
@@ -1659,9 +1690,10 @@ class Series:
         Parameters
         ----------
 
-        kwargs :
-            Arguments for binning function. See pyleoclim.utils.tsutils.bin_values for details
-
+        
+        kwargs : 
+            Arguments for binning function. See pyleoclim.utils.tsutils.bin for details
+        
         Returns
         -------
 
@@ -1671,11 +1703,12 @@ class Series:
         See also
         --------
 
-        pyleoclim.utils.tsutils.bin_values : bin the time series into evenly-spaced bins
-
+        
+        pyleoclim.utils.tsutils.bin : bin the time series into evenly-spaced bins
+                
         '''
         new=self.copy()
-        res_dict = tsutils.bin_values(self.time,self.value,**kwargs)
+        res_dict = tsutils.bin(self.time,self.value,**kwargs)
         new.time = res_dict['bins']
         new.value = res_dict['binned_values']
         return new
@@ -1706,7 +1739,7 @@ class PSD:
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = f'{timeseries.time_unit}s' if timeseries.time_unit is not None else None
+            self.period_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
         else:
             self.period_unit = None
 
@@ -2054,7 +2087,7 @@ class Scalogram:
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
-            self.period_unit = f'{timeseries.time_unit}s' if timeseries.time_unit is not None else None
+            self.period_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
         else:
             self.period_unit = None
 
@@ -2303,9 +2336,9 @@ class Coherence:
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries1 is not None:
-            self.period_unit = f'{timeseries1.time_unit}s' if timeseries1.time_unit is not None else None
+            self.period_unit = infer_period_unit_from_time_unit(timeseries1.time_unit)
         elif timeseries2 is not None:
-            self.period_unit = f'{timeseries2.time_unit}s' if timeseries2.time_unit is not None else None
+            self.period_unit = infer_period_unit_from_time_unit(timeseries2.time_unit)
         else:
             self.period_unit = None
 
@@ -2621,6 +2654,21 @@ class MultipleSeries:
     def __init__(self, series_list):
         self.series_list = series_list
 
+    def append(self,ts):
+        '''Append timeseries ts to MultipleSeries object
+
+        Returns
+        -------
+        ms : pyleoclim.MultipleSeries
+            The augmented object, comprising the old one plus `ts`
+
+        '''
+        ms = self.copy()
+        ts_list = deepcopy(ms.series_list)
+        ts_list.append(ts)
+        ms = MultipleSeries(ts_list)  
+        return ms
+    
     def copy(self):
         '''Copy the object
         '''
@@ -2631,17 +2679,79 @@ class MultipleSeries:
 
         Returns
         -------
-        new : pyleoclim.MultipleSeries
+        ms : pyleoclim.MultipleSeries
             The standardized Series
 
         '''
-        new=self.copy()
-        for idx,item in enumerate(new.series_list):
+        ms=self.copy()
+        for idx,item in enumerate(ms.series_list):
             s=item.copy()
             v_mod=tsutils.standardize(item.value)[0]
             s.value=v_mod
-            new.series_list[idx]=s
-        return new
+            ms.series_list[idx]=s
+        return ms
+    
+    def common_time(self,method='binning',**kwargs):
+        ''' Aligns the time axes of a MultipleSeries object, via either binning 
+        or interpolation. This is critical for workflows that need to assume a 
+        common time axis for the group of series under consideration.  
+        
+        
+        The common time axis is characterized by the following parameters:
+            
+        start : the latest start date of the bunch (maximin of the minima)
+        stop  : the earliest stop date of the bunch (minimum of the maxima)
+        step  : The representative spacing between consecutive values (mean of the median spacings)
+        
+        Optional arguments for binning or interpolation are those of the underling functions. 
+    
+        Parameters
+        ----------
+        method:  string
+            either 'binning' or 'interp'
+        
+        kwargs: keyword arguments (dictionary) for the interpolation method    
+    
+        Returns
+        -------
+        ms : pyleoclim.MultipleSeries
+            The MultipleSeries objects with all series aligned to the same time axis. 
+        '''
+
+        gp = np.empty((len(self.series_list),3)) # obtain grid parameters
+        for idx,item in enumerate(self.series_list):
+            gp[idx,:] = tsutils.grid_properties(item.time)  
+            if gp[idx,2] < 0:  # flip time axis if retrograde
+                item.time  = item.time[::-1,...]  
+                item.value = item.value[::-1,...] 
+           
+        # define parameters for common time axis    
+        start = gp[:,0].max()
+        stop  = gp[:,1].min()
+        step  = gp[:,2].mean() 
+        
+        ms = self.copy()
+        
+        if method == 'binning':
+            for idx,item in enumerate(self.series_list):
+                ts = item.copy()
+                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop)                
+                ts.time  = d['bins']
+                ts.value = d['binned_values']
+                ms.series_list[idx] = ts
+
+        elif method == 'interp':
+            for idx,item in enumerate(self.series_list):  
+                ts = item.copy()
+                ti, xi = tsutils.interp(ts.time, ts.value, interp_type='linear', interp_step=step, start=start, end=stop,**kwargs)
+                ts.time  = ti
+                ts.value = xi
+                ms.series_list[idx] = ts
+
+        else:
+            raise NameError('Unknown methods; no action taken')
+        
+        return ms
 
     # def mssa(self, M, MC=0, f=0.5):
     #     data = []
@@ -2684,7 +2794,7 @@ class MultipleSeries:
 
         Returns
         -------
-        new : pyleoclim.MultipleSeries
+        ms : pyleoclim.MultipleSeries
             The detrended timeseries
 
         See also
@@ -2694,15 +2804,15 @@ class MultipleSeries:
         pyleoclim.utils.tsutils.detrend : Detrending function
 
         '''
-        new=self.copy()
-        for idx,item in enumerate(new.series_list):
+        ms=self.copy()
+        for idx,item in enumerate(ms.series_list):
             s=item.copy()
             v_mod=tsutils.detrend(item.value,x=item.time,method=method,**kwargs)
             s.value=v_mod
-            new.series_list[idx]=s
-        return new
+            ms.series_list[idx]=s
+        return ms
 
-    def spectral(self, method='wwz', settings={}, mute_pbar=False, freq_method='log', freq_kwargs=None):
+    def spectral(self, method='wwz', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -2719,6 +2829,11 @@ class MultipleSeries:
 
         settings : dict
             Arguments for the specific spectral method
+
+        label : str
+            Label for the PSD object
+
+        verbose : {True, False}
 
         mute_pbar : {True, False}
             Mute the progress bar. Default is False.
@@ -2752,35 +2867,39 @@ class MultipleSeries:
         pyleoclim.core.ui.MultiplePSD : Multiple PSD object
         '''
         settings = {} if settings is None else settings.copy()
-        if method in ['wwz', 'lomb_scargle'] and 'freq' not in settings.keys():
-            res=[]
-            for s in(self.series_list):
-                c=np.mean(np.diff(s.value))
-                res.append(c)
-            res=np.array(res)
-            idx = np.argmin(res)
-            ts=self.series_list[idx].time
-            freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-            freq=waveutils.make_freq_vector(ts, freq_method=freq_method, **freq_kwargs)
-            settings.update({'freq':freq})
+
         psd_list = []
         for s in tqdm(self.series_list, desc='Performing spectral analysis on surrogates', position=0, leave=True, disable=mute_pbar):
-            psd_tmp = s.spectral(method=method, settings=settings)
+            psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
             psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)
 
         return psds
 
-    def wavelet(self, method='wwz', settings={}, mute_pbar=False):
+    def wavelet(self, method='wwz', settings={}, freq_method='log', freq_kwargs=None, verbose=False, mute_pbar=False):
         '''Wavelet analysis
 
         Parameters
         ----------
-        method : {'wwz'}, optional
-            Method for the wavelet analysis. The default is 'wwz'.
+        method : {wwz, cwt}
+            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
+
         settings : dict, optional
             Settings for the particular method. The default is {}.
+
+        freq_method : str
+            {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
+
+        freq_kwargs : dict
+            Arguments for frequency vector
+
+        settings : dict
+            Arguments for the specific spectral method
+
+        verbose : {True, False}
+
+
         mute_pbar : bool, optional
             Whether to mute the progress bar. The default is False.
 
@@ -2805,7 +2924,7 @@ class MultipleSeries:
 
         scal_list = []
         for s in tqdm(self.series_list, desc='Performing wavelet analysis on surrogates', position=0, leave=True, disable=mute_pbar):
-            scal_tmp = s.wavelet(method=method, settings=settings)
+            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose)
             scal_list.append(scal_tmp)
 
         scals = MultipleScalogram(scalogram_list=scal_list)
@@ -2920,7 +3039,7 @@ class EnsembleSeries(MultipleSeries):
     def __init__(self, series_list):
         self.series_list = series_list
 
-    def correlation(self, target, timespan=None, settings=None, apply_fdr=True, fdr_kwargs=None):
+    def correlation(self, target, timespan=None, settings=None, apply_fdr=True, fdr_kwargs=None, common_time_kwargs=None):
         ''' Calculate the correlation between an ensemble series group to a target series
 
         Parameters
@@ -2944,6 +3063,9 @@ class EnsembleSeries(MultipleSeries):
 
         fdr_kwargs : dict
             Parameters for the FDR function
+
+        common_time_kwargs : dict
+            Parameters for the method MultipleSeries.common_time()
             
         Returns
         -------
@@ -2957,34 +3079,57 @@ class EnsembleSeries(MultipleSeries):
         pyleoclim.utils.correlation.corr_sig : Correlation function
         pyleoclim.utils.correlation.fdr : FDR function
 
-        '''
-        settings = {} if settings is None else settings.copy()
-        args = {}
-        args.update(settings)
+        Examples
+        --------
 
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            from pyleoclim.utils.tsmodel import colored_noise
+
+            nt = 100
+            t0 = np.arange(nt)
+            v0 = colored_noise(alpha=1, t=t0)
+            noise = np.random.normal(loc=0, scale=1, size=nt)
+
+            ts0 = pyleo.Series(time=t0, value=v0)
+            ts1 = pyleo.Series(time=t0, value=v0+noise)
+            ts2 = pyleo.Series(time=t0, value=v0+2*noise)
+            ts3 = pyleo.Series(time=t0, value=v0+1/2*noise)
+
+            ts_list1 = [ts0, ts1]
+            ts_list2 = [ts2, ts3]
+
+            ts_ens = pyleo.EnsembleSeries(ts_list1)
+            ts_target = pyleo.EnsembleSeries(ts_list2)
+
+            corr_res = ts_ens.correlation(ts_target)
+            print(corr_res)
+
+        '''
         r_list = []
         signif_list = []
         p_list = []
 
         for idx, ts in enumerate(self.series_list):
-            if timespan is None:
-                value1 = ts.value
-                if isinstance(target, Series):
-                    value2 = target.value
-                elif isinstance(target, EnsembleSeries): 
+            value1 = ts.value
+            time1 = ts.time
+            if isinstance(target, Series):
+                value2 = target.value
+                time2 = target.time
+            elif isinstance(target, EnsembleSeries): 
+                nEns = np.size(target.series_list)
+                if idx < nEns:
                     value2 = target.series_list[idx].value
-            else:
-                value1 = ts.slice(timespan).value
-                if isinstance(target, Series):
-                    value2 = target.slice(timespan).value
-                elif isinstance(target, EnsembleSeries): 
-                    nEns = np.size(target.series_list)
-                    if idx < nEns:
-                        value2 = target.series_list[idx].slice(timespan).value
-                    else:
-                        value2 = target.series_list[idx-nEns].slice(timespan).value
+                    time2 = target.series_list[idx].time
+                else:
+                    value2 = target.series_list[idx-nEns].value
+                    time2 = target.series_list[idx-nEns].time
 
-            corr_res = corrutils.corr_sig(value1, value2, **args)
+            ts1 = Series(time=time1, value=value1)
+            ts2 = Series(time=time2, value=value2)
+            corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs)
             r_list.append(corr_res['r'])
             signif_list.append(corr_res['signif'])
             p_list.append(corr_res['p'])
