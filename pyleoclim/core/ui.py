@@ -639,9 +639,9 @@ class Series:
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
 
                     time_label=None, value_label=None, period_label=None, psd_label='PSD', mute=False):
-        ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. 
+        ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
-                   
+
         Parameters
         ----------
 
@@ -1690,10 +1690,10 @@ class Series:
         Parameters
         ----------
 
-        
-        kwargs : 
+
+        kwargs :
             Arguments for binning function. See pyleoclim.utils.tsutils.bin for details
-        
+
         Returns
         -------
 
@@ -1703,9 +1703,9 @@ class Series:
         See also
         --------
 
-        
+
         pyleoclim.utils.tsutils.bin : bin the time series into evenly-spaced bins
-                
+
         '''
         new=self.copy()
         res_dict = tsutils.bin(self.time,self.value,**kwargs)
@@ -2666,9 +2666,9 @@ class MultipleSeries:
         ms = self.copy()
         ts_list = deepcopy(ms.series_list)
         ts_list.append(ts)
-        ms = MultipleSeries(ts_list)  
+        ms = MultipleSeries(ts_list)
         return ms
-    
+
     def copy(self):
         '''Copy the object
         '''
@@ -2690,58 +2690,58 @@ class MultipleSeries:
             s.value=v_mod
             ms.series_list[idx]=s
         return ms
-    
+
     def common_time(self,method='binning',**kwargs):
-        ''' Aligns the time axes of a MultipleSeries object, via either binning 
-        or interpolation. This is critical for workflows that need to assume a 
-        common time axis for the group of series under consideration.  
-        
-        
+        ''' Aligns the time axes of a MultipleSeries object, via either binning
+        or interpolation. This is critical for workflows that need to assume a
+        common time axis for the group of series under consideration.
+
+
         The common time axis is characterized by the following parameters:
-            
+
         start : the latest start date of the bunch (maximin of the minima)
         stop  : the earliest stop date of the bunch (minimum of the maxima)
         step  : The representative spacing between consecutive values (mean of the median spacings)
-        
-        Optional arguments for binning or interpolation are those of the underling functions. 
-    
+
+        Optional arguments for binning or interpolation are those of the underling functions.
+
         Parameters
         ----------
         method:  string
             either 'binning' or 'interp'
-        
-        kwargs: keyword arguments (dictionary) for the interpolation method    
-    
+
+        kwargs: keyword arguments (dictionary) for the interpolation method
+
         Returns
         -------
         ms : pyleoclim.MultipleSeries
-            The MultipleSeries objects with all series aligned to the same time axis. 
+            The MultipleSeries objects with all series aligned to the same time axis.
         '''
 
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
         for idx,item in enumerate(self.series_list):
-            gp[idx,:] = tsutils.grid_properties(item.time)  
+            gp[idx,:] = tsutils.grid_properties(item.time)
             if gp[idx,2] < 0:  # flip time axis if retrograde
-                item.time  = item.time[::-1,...]  
-                item.value = item.value[::-1,...] 
-           
-        # define parameters for common time axis    
+                item.time  = item.time[::-1,...]
+                item.value = item.value[::-1,...]
+
+        # define parameters for common time axis
         start = gp[:,0].max()
         stop  = gp[:,1].min()
-        step  = gp[:,2].mean() 
-        
+        step  = gp[:,2].mean()
+
         ms = self.copy()
-        
+
         if method == 'binning':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop)                
+                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop)
                 ts.time  = d['bins']
                 ts.value = d['binned_values']
                 ms.series_list[idx] = ts
 
         elif method == 'interp':
-            for idx,item in enumerate(self.series_list):  
+            for idx,item in enumerate(self.series_list):
                 ts = item.copy()
                 ti, xi = tsutils.interp(ts.time, ts.value, interp_type='linear', interp_step=step, start=start, end=stop,**kwargs)
                 ts.time  = ti
@@ -2750,7 +2750,7 @@ class MultipleSeries:
 
         else:
             raise NameError('Unknown methods; no action taken')
-        
+
         return ms
 
     # def mssa(self, M, MC=0, f=0.5):
@@ -2776,6 +2776,82 @@ class MultipleSeries:
     #     data = np.transpose(np.asarray(data))
     #     res = decomposition.pca(data)
     #     return res
+
+    def bin(self, **kwargs):
+        ''' Aligns the time axes of a MultipleSeries object, via binning.
+        This is critical for workflows that need to assume a common time axis
+        for the group of series under consideration.
+
+        The common time axis is characterized by the following parameters:
+
+        start : the latest start date of the bunch (maximin of the minima)
+        stop  : the earliest stop date of the bunch (minimum of the maxima)
+        step  : The representative spacing between consecutive values (mean of the median spacings)
+
+        This is a special case of the common_time function.
+
+        Parameters
+        ----------
+
+        kwargs: keyword arguments (dictionary) for the binning method
+
+        Returns
+        -------
+        ms : pyleoclim.MultipleSeries
+            The MultipleSeries objects with all series aligned to the same time axis.
+
+        See also
+        --------
+
+        pyleoclim.core.ui.MultipleSeries.common_time
+        
+        pyleoclim.utils.tsutils.bin
+        '''
+
+        ms = self.copy()
+
+        ms = ms.common_time(method = 'binning', **kwargs)
+
+        return ms
+
+    def interp(self, **kwargs):
+        ''' Aligns the time axes of a MultipleSeries object, via interpolation.
+        This is critical for workflows that need to assume a common time axis
+        for the group of series under consideration.
+
+
+        The common time axis is characterized by the following parameters:
+
+        start : the latest start date of the bunch (maximin of the minima)
+        stop  : the earliest stop date of the bunch (minimum of the maxima)
+        step  : The representative spacing between consecutive values (mean of the median spacings)
+
+        This is a special case of the common_time function.
+
+        Parameters
+        ----------
+
+        kwargs: keyword arguments (dictionary) for the interpolation method
+
+        Returns
+        -------
+        ms : pyleoclim.MultipleSeries
+            The MultipleSeries objects with all series aligned to the same time axis.
+
+        See also
+        --------
+
+        pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
+
+        pyleoclim.utils.tsutils.bin:
+
+        pyleoclim.core.ui.Series.bin
+        '''
+        ms = self.copy()
+
+        ms = ms.common_time(method = 'interp', **kwargs)
+
+        return ms
 
     def detrend(self,method='emd',**kwargs):
         '''Detrend timeseries
@@ -3051,31 +3127,31 @@ class EnsembleSeries(MultipleSeries):
             That is, if the self object contains n Series, and the target contains n+m Series,
             then only the first n Series from the object will be used for the calculation;
             otherwise, if the target contains only n-m Series, then the first m Series in the target will be used twice in sequence.
-        
+
         timespan : tuple
             The time interval over which to perform the calculation
-        
+
         settings : dict
             Parameters for the correlation function (singificance testing and number of simulation)
 
         apply_fdr : bool
-            Determine significance based on the FDR approach 
+            Determine significance based on the FDR approach
 
         fdr_kwargs : dict
             Parameters for the FDR function
 
         common_time_kwargs : dict
             Parameters for the method MultipleSeries.common_time()
-            
+
         Returns
         -------
-        
+
         res : dict
-            Containing a list of the Pearson's correlation coefficient, associated significance and p-value. 
-        
+            Containing a list of the Pearson's correlation coefficient, associated significance and p-value.
+
         See also
         --------
-        
+
         pyleoclim.utils.correlation.corr_sig : Correlation function
         pyleoclim.utils.correlation.fdr : FDR function
 
@@ -3118,7 +3194,7 @@ class EnsembleSeries(MultipleSeries):
             if isinstance(target, Series):
                 value2 = target.value
                 time2 = target.time
-            elif isinstance(target, EnsembleSeries): 
+            elif isinstance(target, EnsembleSeries):
                 nEns = np.size(target.series_list)
                 if idx < nEns:
                     value2 = target.series_list[idx].value
@@ -3415,7 +3491,7 @@ class MultiplePSD:
 
         # Turn the interactive mode off.
         plt.ioff()
-        
+
 
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
