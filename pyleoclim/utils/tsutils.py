@@ -13,7 +13,6 @@ __all__ = [
     'bin',
     'interp',
     'grid_properties',
-    'on_common_axis',
     'standardize',
     'ts2segments',
     'clean_ts',
@@ -454,7 +453,7 @@ def ts2segments(ys, ts, factor=10):
 
 
 def clean_ts(ys, ts):
-    ''' Delete the NaNs in the time series and sort it with time axis ascending
+    ''' Remove entries of ys or ts that bear NaNs
 
     Parameters
     ----------
@@ -481,6 +480,30 @@ def clean_ts(ys, ts):
     ts_tmp = np.copy(ts)
     ys = ys[~np.isnan(ts_tmp)]
     ts = ts[~np.isnan(ts_tmp)]
+
+    return ys, ts
+
+def forward_ts(ys, ts):
+    ''' Sort ts values in ascending order
+
+    Parameters
+    ----------
+    ys : array
+        Dependent variable
+    ts : array
+        Independent variable
+
+    Returns
+    -------
+    ys : array
+        Dependent variable
+    ts : array
+        Independent variable, sorted in ascending order
+
+    '''
+    ys = np.asarray(ys, dtype=np.float)
+    ts = np.asarray(ts, dtype=np.float)
+    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
 
     # sort the time series so that the time axis will be ascending
     sort_ind = np.argsort(ts)

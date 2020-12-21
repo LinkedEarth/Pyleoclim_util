@@ -63,24 +63,41 @@ def infer_period_unit_from_time_unit(time_unit):
 
 
 class Series:
-    ''' Create a pyleoSeries object
+    ''' pyleoSeries object y(t)
+
+    The Series class is, at its heart, a simple structure containing two arrays y and t of equal length, and some
+    metadata allowing to interpret and plot the series. It is similar to a 1-column pandas dataframe, but the concept 
+    was extended because pandas does not yet support geologic time.
 
     Parameters
     ----------
 
     time : list or numpy.array
-        Time values for the time series
+        independent variable (t)
 
     value : list of numpy.array
-        ordinate values for the time series
+        values of the dependent variable (y)
 
-    time_name : string
-        Name of the time vector (e.g., 'Age').
-        Default is None. This is used to label the time axis on plots
+    time_dir : string
+        Direction of time flow ('prograde' or 'retrograde')
+        Default is 'prograde'
+
+    time_datum : float
+        origin of the time axis. For ages in years BP, it is usually 1950 AD/CE, but could also be 2000 CE. 
+        Default is 0 (There is a year zero in astronomical year numbering (where it coincides with the Julian year 1 BC) and in ISO 8601:2004 (where it coincides with the Gregorian year 1 BC), as well as in all Buddhist and Hindu calendars).
+        Note that 'time_datum' must be expressed in the same units as 'time'. 
+
+    time_exponent: integer
+        exponent p used t = s 10**p 'units'. For instance, 1 kiloyear = 1 * 10**3 years, 5 milliseconds = 5*10**(-3) seconds.
+        Default is 0, which is understood to mean year 0 of the astronomical calendar.
 
     time_unit : string
-        Units for the time vector (e.g., 'yr B.P.').
-        Default is None
+        Units for the time vector (e.g., 'years').
+        Default is 'years'
+
+    time_name : string
+        Name of the time vector (e.g., 'Time','Age').
+        Default is None. This is used to label the time axis on plots
 
     value_name : string
         Name of the value vector (e.g., 'temperature')
@@ -88,12 +105,15 @@ class Series:
 
     value_unit : string
         Units for the value vector (e.g., 'deg C')
+        Default is None
 
     label : string
         Name of the time series (e.g., 'Nino 3.4')
+        Default is None
 
-    clean_ts : bool
-        remove the NaNs and let the time axis to be increasing if True
+    clean_ts : boolean flag
+        set to True to remove the NaNs and make time axis strictly prograde [TODO: adapt]
+        Default is None
 
     Examples
     --------
@@ -113,24 +133,47 @@ class Series:
         value=data.iloc[:,2]
         ts=pyleo.Series(
             time=time, value=value,
-            time_name='Year (CE)', value_name='SOI', label='SOI'
+            time_name='Year (CE)', value_name='SOI', label='Southern Oscillation Index'
         )
         ts
         ts.__dict__.keys()
     '''
 
-    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True):
+    def __init__(self, time, value, time_dir='prograde', time_unit=None, time_datum =0, time_exponent =0, time_name=None, value_name=None, value_unit=None, label=None, clean_ts=False):
 
         if clean_ts==True:
-            value, time = tsutils.clean_ts(np.array(value), np.array(time))
+            value, time = tsutils.clean_ts(np.array(value), np.array(time)) #MAY NEED UPDATE
 
-        self.time = time
+        tu = time_unit.lower()
+
+        if tu.find("ky")>=0 or tu.find("kyr")>=0 or tu.find("ka")>=0:
+            time_dir=='retrograde'
+            time_exponent = 3
+            
+        if tu.find("my")>=0 or tu.find("ma")>=0:
+            time_dir=='retrograde'
+            time_exponent = 6
+            
+        if tu.find("bp")>=0:
+            time_dir=='retrograde'
+            time_datum = 1950
+            
         self.value = value
         self.time_name = time_name
         self.time_unit = time_unit
+        self.time_datum = time_datum
+        self.time_exponent = time_exponent
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
+                      
+        if time_dir=='prograde':
+            self.time = (time_datum + time)*10**(time_exponent)
+        elif time_dir=='retrograde':
+            self.time = (time_datum - time)*10**(time_exponent)
+        else:
+            raise ValueError("time_dir must be either 'prograde' or 'retrograde'")
+
 
     def make_labels(self):
         '''
