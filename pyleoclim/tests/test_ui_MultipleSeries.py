@@ -158,7 +158,7 @@ class TestMultipleSeriesBin:
     x_axis_0 = ts_M_bin.series_list[0].__dict__['time']
     x_axis_1 = ts_M_bin.series_list[1].__dict__['time']
 
-    assert x_axis_0 == x_axis_1
+    assert_array_equal(x_axis_0, x_axis_1)
 
 class TestMultipleSeriesInterp:
     '''Test for MultipleSeries.interp()
@@ -181,4 +181,4 @@ class TestMultipleSeriesInterp:
     x_axis_0 = ts_M_interp.series_list[0].__dict__['time']
     x_axis_1 = ts_M_interp.series_list[1].__dict__['time']
 
-    assert x_axis_0 == x_axis_1
+    assert_array_equal(x_axis_0, x_axis_1)
