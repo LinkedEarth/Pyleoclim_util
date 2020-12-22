@@ -452,7 +452,7 @@ def ts2segments(ys, ts, factor=10):
     return seg_ys, seg_ts, n_segs
 
 
-def clean_ts(ys, ts):
+def drona(ys, ts):
     ''' Remove entries of ys or ts that bear NaNs
 
     Parameters
@@ -483,7 +483,7 @@ def clean_ts(ys, ts):
 
     return ys, ts
 
-def forward_ts(ys, ts):
+def sort_ts(ys, ts):
     ''' Sort ts values in ascending order
 
     Parameters
