@@ -89,7 +89,7 @@ class TestMultipleSeriesPlot:
         #Turn this list into a multiple series object
         ts_M = pyleo.MultipleSeries(serieslist)
 
-        fig, ax = ts_M.plot()
+        ax = ts_M.plot()
 
         lines_0 = ax.lines[0]
         lines_1 = ax.lines[1]
