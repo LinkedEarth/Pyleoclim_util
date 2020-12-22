@@ -451,6 +451,42 @@ def ts2segments(ys, ts, factor=10):
 
     return seg_ys, seg_ts, n_segs
 
+def clean_ts(ys, ts):
+    ''' Delete the NaNs in the time series and sort it with time axis ascending
+
+    Parameters
+    ----------
+    ys : array
+        A time series, NaNs allowed
+    ts : array
+        The time axis of the time series, NaNs allowed
+
+    Returns
+    -------
+    ys : array
+        The time series without nans
+    ts : array
+        The time axis of the time series without nans
+
+    '''
+    ys = np.asarray(ys, dtype=np.float)
+    ts = np.asarray(ts, dtype=np.float)
+    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
+
+    ys_tmp = np.copy(ys)
+    ys = ys[~np.isnan(ys_tmp)]
+    ts = ts[~np.isnan(ys_tmp)]
+    ts_tmp = np.copy(ts)
+    ys = ys[~np.isnan(ts_tmp)]
+    ts = ts[~np.isnan(ts_tmp)]
+
+    # sort the time series so that the time axis will be ascending
+    sort_ind = np.argsort(ts)
+    ys = ys[sort_ind]
+    ts = ts[sort_ind]
+
+    return ys, ts
+
 
 def drona(ys, ts):
     ''' Remove entries of ys or ts that bear NaNs

@@ -139,10 +139,10 @@ class Series:
         ts.__dict__.keys()
     '''
 
-    def __init__(self, time, value, time_dir='prograde', time_unit=None, time_datum =0, time_exponent =0, time_name=None, value_name=None, value_unit=None, label=None, clean_ts=False):
+    def __init__(self, time, value, time_dir='prograde', time_unit=None, time_datum =0, time_exponent =0, time_name=None, value_name=None, value_unit=None, label=None, dropna=False):
 
-        if clean_ts==True:
-            value, time = tsutils.clean_ts(np.array(value), np.array(time)) #MAY NEED UPDATE
+        if dropna==True:
+            value, time = tsutils.dropna(np.array(value), np.array(time)) 
 
         tu = time_unit.lower()
 
