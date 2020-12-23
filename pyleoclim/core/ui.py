@@ -3919,7 +3919,7 @@ class Lipd:
             d = self.lipd[key]
             lat.append(d['geo']['geometry']['coordinates'][1])
             lon.append(d['geo']['geometry']['coordinates'][0])
-            archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower())
+            archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower().strip())
 
         # make sure criteria is in the plot_default list
         for idx,val in enumerate(archiveType):
