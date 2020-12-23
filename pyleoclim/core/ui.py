@@ -2777,10 +2777,11 @@ class MultipleSeries:
     #     res = decomposition.pca(data)
     #     return res
 
-    def bin(self, **kwargs):
+    def bin(self):
         ''' Aligns the time axes of a MultipleSeries object, via binning.
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
+
 
         The common time axis is characterized by the following parameters:
 
@@ -2793,7 +2794,7 @@ class MultipleSeries:
         Parameters
         ----------
 
-        kwargs: keyword arguments (dictionary) for the binning method
+        None
 
         Returns
         -------
@@ -2803,9 +2804,11 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.core.ui.MultipleSeries.common_time
-        
-        pyleoclim.utils.tsutils.bin
+        pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
+
+        pyleoclim.utils.tsutils.bin: Underlying binning function
+
+        pyleoclim.core.ui.Series.bin: Bin function for Series object
         '''
 
         ms = self.copy()
@@ -2843,9 +2846,9 @@ class MultipleSeries:
 
         pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
 
-        pyleoclim.utils.tsutils.bin:
+        pyleoclim.utils.tsutils.interp: Underlying interpolation function
 
-        pyleoclim.core.ui.Series.bin
+        pyleoclim.core.ui.Series.interp: Interpolation function for Series object
         '''
         ms = self.copy()
 
