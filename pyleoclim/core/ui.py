@@ -2777,7 +2777,7 @@ class MultipleSeries:
     #     res = decomposition.pca(data)
     #     return res
 
-    def bin(self):
+    def bin(self, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via binning.
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
@@ -2794,7 +2794,8 @@ class MultipleSeries:
         Parameters
         ----------
 
-        None
+        None (As of writing this common_time does not accept keyword arguments for
+        the binning method.)
 
         Returns
         -------
