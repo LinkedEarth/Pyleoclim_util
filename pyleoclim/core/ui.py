@@ -21,7 +21,8 @@ from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
 
-from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
+from matplotlib.ticker import ScalarFormatter, FormatStrFormatter, MaxNLocator
+import matplotlib.transforms as transforms
 from matplotlib import cm
 import matplotlib.pylab as pl
 from matplotlib import gridspec
@@ -417,259 +418,7 @@ class Series:
 
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
         This implementation  uses the method of [1], with applications presented in [2].
-        Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
-        The method expects regular spacing, but is tolerant to missing values, up to a fraction 0<f<1 (see [4]).
-
-        Parameters
-        ----------
-        M : int, optional
-            window size. The default is None (10% of the length of the series).
-        MC : int, optional
-            Number of iteration in the Monte-Carlo process. The default is 0.
-        f : float, optional
-            maximum allowable fraction of missing values. The default is 0.5.
-
-        Returns
-        -------
-        res : dict
-            Containing:
-
-            - eig_val : (M, 1) array of eigenvalue spectrum of length r, the number of SSA modes. As in Principal Component Analysis, eigenvaluesare closely related to the fraction of variance accounted for ("explained", a common but not-so-helpful term) by each mode.
-
-            - eig_vec : is a matrix of the temporal eigenvectors (T-EOFs), i.e. the temporal patterns that explain most of the variations in the original series.
-
-            - PC : (N - M + 1, M) array of principal components, i.e. the loadings that, convolved with the T-EOFs, produce the reconstructed components, or RCs
-
-            - RC : (N,  M) array of reconstructed components, One can think of each RC as the contribution of each mode to the timeseries, weighted by their eigenvalue (loosely speaking, their "amplitude"). Summing over all columns of RC recovers the original series. (synthesis, the reciprocal operation of analysis).
-
-            - eig_val_q : (M, 2) array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC >0 ]
-
-        Examples
-        --------
-
-        SSA with SOI
-
-        .. ipython:: python
-            :okwarning:
-
-            import pyleoclim as pyleo
-            import pandas as pd
-            from matplotlib import pyplot as plt
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time=data.iloc[:,1]
-            value=data.iloc[:,2]
-            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
-            #plot
-            @savefig ts_plot.png
-            fig,ax = ts.plot()
-            plt.close(fig)
-            #SSA
-            nino_ssa = ts.ssa(M=60)
-
-        Let us now see how to make use of all these arrays. The first step is too inspect the eigenvalue spectrum ("scree plot") to identify remarkable modes. Let us restrict ourselves to the first 40, so we can see something:
-
-        .. ipython:: python
-            :okwarning:
-
-            import matplotlib.pyplot as plt
-            import matplotlib.gridspec as gridspec
-            import numpy as np
-
-            d  = nino_ssa['eig_val'] # extract eigenvalue vector
-            M  = len(d)  # infer window size
-            de = d*np.sqrt(2/(M-1))
-            var_pct = d**2/np.sum(d**2)*100  # extract the fraction of variance attributable to each mode
-
-            # plot eigenvalues
-            r = 20
-            rk = np.arange(0,r)+1
-            fig,ax = plt.subplots()
-            ax.errorbar(rk,d[:r],yerr=de[:r],label='SSA eigenvalues w/ 95% CI')
-            ax.set_title('Scree plot of SSA eigenvalues')
-            ax.set_xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
-            ax.legend(loc='upper right')
-            @savefig scree_plot.png
-            pyleo.showfig(fig)
-            plt.close(fig)
-
-        This highlights a few common phenomena with SSA:
-            * the eigenvalues are in descending order
-            * their uncertainties are proportional to the eigenvalues themselves
-            * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered within uncertainties . (5,6) looks like another doublet
-            * around i=15, the eigenvalues appear to reach a floor, and all subsequent eigenvalues explain a very small amount of variance.
-
-        So, summing the variance of all modes higher than 19, we get:
-
-        .. ipython:: python
-            :okwarning:
-
-            print(var_pct[15:].sum()*100)
-
-        That is, over 95% of the variance is in the first 15 modes. That is a typical result for a "warm-colored" timeseries, which is most geophysical timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
-
-        .. ipython:: python
-            :okwarning:
-
-            RCk = nino_ssa['RC'][:,:14].sum(axis=1)
-            fig, ax = ts.plot(title='ONI',mute=True) # we mute the first call to only get the plot with 2 lines
-            ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
-            ax.legend()
-            @savefig ssa_recon.png
-            pyleo.showfig(fig)
-            plt.close(fig)
-
-        Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
-            * there was not much rhyme or reason for picking 15 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
-            * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies, you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves features and excludes others (i.e, a filter).
-            * as with all orthgonal decompositions, summing over all RCs will recover the original signal within numerical precision.
-
-        Monte-Carlo SSA
-
-        Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, introduced by Allen & Smith, (1996) to identiy SSA modes that rise above what one would expect from "red noise", specifically an AR(1) process_process). To run it, simply provide the parameter MC, ideally with a number of iterations sufficient to get decent statistics. Here's let's use MC = 1000. The result will be stored in the eig_val_q array, which has the same length as eig_val, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
-
-        .. ipython:: python
-            :okwarning:
-
-            nino_mcssa = ts.ssa(M = 60, nMC=1000)
-
-        Now let's look at the result:
-
-        .. ipython:: python
-            :okwarning:
-
-            d  = nino_mcssa['eig_val'] # extract eigenvalue vector
-            de = d*np.sqrt(2/(M-1))
-            du = nino_mcssa['eig_val_q'][:,0]  # extract upper quantile of MC-SSA eigenvalues
-            dl = nino_mcssa['eig_val_q'][:,1]  # extract lower quantile of MC-SSA eigenvalues
-
-            # plot eigenvalues
-            rk = np.arange(0,20)+1
-            fig=plt.figure()
-            plt.fill_between(rk,dl[:20],du[:20],color='silver',alpha=0.5,label='MC-SSA 95% CI')
-            plt.errorbar(rk,d[:20],yerr=de[:20],label='SSA eigenvalues w/ 95% CI')
-            plt.title('Scree plot of SSA eigenvalues, w/ MC-SSA bounds')
-            plt.xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
-            plt.legend(loc='upper right')
-            @savefig scree_nmc.png
-            pyleo.showfig(fig)
-            plt.close(fig)
-
-        This suggests that modes 1-5 fall above the red noise benchmark.
-
-        '''
-
-        res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f)
-        return res
-
-    def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
-                 ax=None, ylabel='KDE', mute=False, **plot_kwargs):
-        ''' Plot the distribution of the timeseries values
-
-        Parameters
-        ----------
-
-        figsize : list
-            a list of two integers indicating the figure size
-
-        title : str
-            the title for the figure
-
-        savefig_settings : dict
-            the dictionary of arguments for plt.savefig(); some notes below:
-              - "path" must be specified; it can be any existed or non-existed path,
-                with or without a suffix; if the suffix is not given in "path", it will follow "format"
-              - "format" can be one of {"pdf", "eps", "png", "ps"}
-
-        See also
-        --------
-
-        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
-
-        Examples
-        --------
-
-        Distribution of the SOI record
-
-        .. ipython:: python
-            :okwarning:
-
-            import pyleoclim as pyleo
-            import pandas as pd
-            from matplotlib import pyplot as plt
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time=data.iloc[:,1]
-            value=data.iloc[:,2]
-            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
-            @savefig ts_plot.png
-            fig,ax = ts.plot()
-            @savefig ts_dist.png
-            fig,ax = ts.distplot()
-            plt.close(fig)
-
-
-        '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
-        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-        if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
-
-        ax = sns.histplot(self.value, ax=ax, kde=True, **plot_kwargs)
-
-        time_label, value_label = self.make_labels()
-
-        ax.set_xlabel(value_label)
-        ax.set_ylabel(ylabel)
-
-        if title is not None:
-            ax.set_title(title)
-
-        if 'fig' in locals():
-            if 'path' in savefig_settings:
-                plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
-            return fig, ax
-        else:
-            return ax
-
-    def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
-                    time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
-
-                    time_label=None, value_label=None, period_label=None, psd_label='PSD', mute=False):
-        ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses. 
-
-                   
-        Parameters
-        ----------
-
-        psd : PSD
-            the PSD object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
-
-        scalogram : Scalogram
-            the Scalogram object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
-
-        figsize : list
-            a list of two integers indicating the figure size
-
-        title : str
-            the title for the figure
-
-        time_lim : list or tuple
-            the limitation of the time axis
-
-        value_lim : list or tuple
-            the limitation of the value axis of the timeseries
-
-        period_lim : list or tuple
-            the limitation of the period axis
-
-        psd_lim : list or tuple
-            the limitation of the psd axis
-
-        n_signif_test=100 : int
+        Optionally (MC>0), the ignif_test=100 : int
             Number of Monte-Carlo simulations to perform for significance testing. Used when psd=None or scalogram=None
 
         time_label : str
@@ -1369,7 +1118,7 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, timespan=None, settings=None, common_time_kwargs=None):
+    def correlation(self, target_series, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None):
         ''' Estimates the Pearson's correlation and associated significance between two non IID time series
 
         The significance of the correlation is assessed using one of the following methods:
@@ -1392,6 +1141,9 @@ class Series:
         timespan : tuple
             The time interval over which to perform the calculation
 
+        alpha : float
+            The significance level (0.05 by default)
+
         settings : dict
             Parameters for the correlation function (singificance testing and number of simulation)
 
@@ -1401,7 +1153,7 @@ class Series:
         Returns
         -------
 
-        res : dict
+        corr_res_dict : dict
             Containing the Pearson's correlation coefficient, associated significance and p-value.
 
         See also
@@ -1437,7 +1189,7 @@ class Series:
             print(corr_res)
         '''
         settings = {} if settings is None else settings.copy()
-        corr_args = {}
+        corr_args = {'alpha': alpha}
         corr_args.update(settings)
 
         ms = MultipleSeries([self, target_series])
@@ -1456,7 +1208,14 @@ class Series:
 
 
         corr_res = corrutils.corr_sig(value1, value2, **corr_args)
-        return corr_res
+        signif = True if corr_res['signif'] == 1 else False
+        corr_res_dict = {
+            'r': corr_res['r'],
+            'p': corr_res['p'],
+            'signif': signif,
+            'alpha': alpha,
+        }
+        return corr_res_dict
 
     def causality(self, target_series, method='liang', settings=None):
         ''' Perform causality analysis with the target timeseries
@@ -2753,6 +2512,95 @@ class MultipleSeries:
         
         return ms
 
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None):
+        ''' Calculate the correlation between a MultipleSeries and a target Series
+
+        If the target Series is not specified, then the 1st member of MultipleSeries will be the target
+
+        Parameters
+        ----------
+        target : pyleoclim.Series, optional
+            A pyleoclim Series object.
+        
+        timespan : tuple
+            The time interval over which to perform the calculation
+
+        alpha : float
+            The significance level (0.05 by default)
+        
+        settings : dict
+            Parameters for the correlation function (singificance testing and number of simulation)
+
+        common_time_kwargs : dict
+            Parameters for the method MultipleSeries.common_time()
+            
+        Returns
+        -------
+        
+        res : dict
+            Containing a list of the Pearson's correlation coefficient, associated significance and p-value. 
+        
+        See also
+        --------
+        
+        pyleoclim.utils.correlation.corr_sig : Correlation function
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            from pyleoclim.utils.tsmodel import colored_noise
+
+            nt = 100
+            t0 = np.arange(nt)
+            v0 = colored_noise(alpha=1, t=t0)
+            noise = np.random.normal(loc=0, scale=1, size=nt)
+
+            ts0 = pyleo.Series(time=t0, value=v0)
+            ts1 = pyleo.Series(time=t0, value=v0+noise)
+            ts2 = pyleo.Series(time=t0, value=v0+2*noise)
+            ts3 = pyleo.Series(time=t0, value=v0+1/2*noise)
+
+            ts_list = [ts1, ts2, ts3]
+
+            ms = pyleo.MultipleSeries(ts_list)
+            ts_target = ts0
+
+            corr_res = ms.correlation(ts_target)
+            print(corr_res)
+
+            corr_res = ms.correlation()
+            print(corr_res)
+
+        '''
+        r_list = []
+        signif_list = []
+        p_list = []
+
+        if target is None:
+            target = self.series_list[0]
+
+        for idx, ts in enumerate(self.series_list):
+            corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings, common_time_kwargs=common_time_kwargs)
+            r_list.append(corr_res['r'])
+            signif_list.append(corr_res['signif'])
+            p_list.append(corr_res['p'])
+
+        r_lsit = np.array(r_list)
+        p_lsit = np.array(p_list)
+
+        corr_res = {
+            'r': r_list,
+            'p': p_list,
+            'signif': signif_list,
+            'alpha': alpha,
+        }
+
+        return corr_res
+
     # def mssa(self, M, MC=0, f=0.5):
     #     data = []
     #     for val in self.series_list:
@@ -3039,12 +2887,15 @@ class EnsembleSeries(MultipleSeries):
     def __init__(self, series_list):
         self.series_list = series_list
 
-    def correlation(self, target, timespan=None, settings=None, apply_fdr=True, fdr_kwargs=None, common_time_kwargs=None):
-        ''' Calculate the correlation between an ensemble series group to a target series
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None):
+        ''' Calculate the correlation between an ensemble series group to a target.
+
+        If the target is not specified, then the 1st member of EnsembleSeries will be the target
+        Note that the FDR approach is applied by default to determine the significance of the p-values (more information in See Also below).
 
         Parameters
         ----------
-        target : pyleoclim.Series or pyleoclim.EnsembleSeries
+        target : pyleoclim.Series or pyleoclim.EnsembleSeries, optional
             A pyleoclim Series object or EnsembleSeries object.
             When the target is also an EnsembleSeries object, then the calculation of correlation is performed in a one-to-one sense,
             and the ourput list of correlation values and p-values will be the size of the series_list of the self object.
@@ -3055,11 +2906,11 @@ class EnsembleSeries(MultipleSeries):
         timespan : tuple
             The time interval over which to perform the calculation
         
+        alpha : float
+            The significance level (0.05 by default)
+
         settings : dict
             Parameters for the correlation function (singificance testing and number of simulation)
-
-        apply_fdr : bool
-            Determine significance based on the FDR approach 
 
         fdr_kwargs : dict
             Parameters for the FDR function
@@ -3108,17 +2959,15 @@ class EnsembleSeries(MultipleSeries):
             print(corr_res)
 
         '''
-        r_list = []
-        signif_list = []
-        p_list = []
+        if target is None:
+            target = self.series_list[0]
 
-        for idx, ts in enumerate(self.series_list):
-            value1 = ts.value
-            time1 = ts.time
-            if isinstance(target, Series):
-                value2 = target.value
-                time2 = target.time
-            elif isinstance(target, EnsembleSeries): 
+        r_list = []
+        p_list = []
+        signif_list = []
+
+        for idx, ts1 in enumerate(self.series_list):
+            if hasattr(target, 'series_list'):
                 nEns = np.size(target.series_list)
                 if idx < nEns:
                     value2 = target.series_list[idx].value
@@ -3126,8 +2975,10 @@ class EnsembleSeries(MultipleSeries):
                 else:
                     value2 = target.series_list[idx-nEns].value
                     time2 = target.series_list[idx-nEns].time
+            else: 
+                value2 = target.value
+                time2 = target.time
 
-            ts1 = Series(time=time1, value=value1)
             ts2 = Series(time=time2, value=value2)
             corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs)
             r_list.append(corr_res['r'])
@@ -3137,25 +2988,20 @@ class EnsembleSeries(MultipleSeries):
         r_lsit = np.array(r_list)
         p_lsit = np.array(p_list)
 
-        if apply_fdr:
-            fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
-            args = {}
-            args.update(fdr_kwargs)
-            for i in range(np.size(signif_list)):
-                signif_list[i] = False
+        signif_fdr_list = []
+        fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
+        args = {}
+        args.update(fdr_kwargs)
+        for i in range(np.size(signif_list)):
+            signif_fdr_list.append(False)
 
-            fdr_res = corrutils.fdr(p_list, **fdr_kwargs)
-            if fdr_res is not None:
-                for i in fdr_res:
-                    signif_list[i] = True
+        fdr_res = corrutils.fdr(p_list, **fdr_kwargs)
+        if fdr_res is not None:
+            for i in fdr_res:
+                signif_fdr_list[i] = True
 
-        corr_res = {
-            'r': r_list,
-            'signif': signif_list,
-            'p': p_list,
-        }
-
-        return corr_res
+        corr_ens = CorrEns(r_list, p_list, signif_list, signif_fdr_list, alpha)
+        return corr_ens
 
 class MultiplePSD:
     ''' Object for multiple PSD.
@@ -3538,6 +3384,149 @@ class MultipleScalogram:
         scals = MultipleScalogram(scalogram_list=scal_list)
         return scals
 
+class CorrEns:
+    ''' Correlation Ensemble
+
+    Parameters
+    ----------
+
+    r: list
+        the list of correlation coefficients
+
+    p: list
+        the list of p-values
+
+    signif: list
+        the list of significance without FDR
+
+    signif_fdr: list
+        the list of significance with FDR
+
+    signif_fdr: list
+        the list of significance with FDR
+
+    alpha : float
+        The significance level (0.05 by default)
+
+    See also
+    --------
+        
+    pyleoclim.utils.correlation.corr_sig : Correlation function
+    pyleoclim.utils.correlation.fdr : FDR function
+    '''
+    def __init__(self, r, p, signif, signif_fdr, alpha):
+        self.r = r
+        self.p = p
+        self.signif = signif
+        self.signif_fdr = signif_fdr
+        self.alpha = alpha
+
+    def __str__(self):
+        '''
+        Prints out the correlation results
+        '''
+
+        table = {
+            'correlation': self.r,
+            'p-value': self.p,
+            f'signif. w/o FDR (α: {self.alpha})': self.signif,
+            f'signif. w/ FDR (α: {self.alpha})': self.signif_fdr,
+        }
+
+        msg = print(tabulate(table, headers='keys'))
+
+        return f'Ensemble size: {len(self.r)}'
+
+
+    def plot(self, figsize=[4, 4], title=None, ax=None, savefig_settings=None, hist_kwargs=None, title_kwargs=None,
+             clr_insignif=sns.xkcd_rgb['grey'], clr_signif=sns.xkcd_rgb['teal'], clr_signif_fdr=sns.xkcd_rgb['pale orange'],
+             clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None, mute=False):
+        ''' Plot the correlation ensembles
+
+        Parameters
+        ----------
+        figsize : list, optional
+            The figure size. The default is [4, 4].
+
+        title : str, optional
+            Plot title. The default is None.
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        hist_kwargs : dict
+            the keyword arguments for ax.hist()
+
+        title_kwargs : dict
+            the keyword arguments for ax.set_title()
+
+        ax : matplotlib.axis, optional
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+
+        See Also
+        --------
+
+        matplotlib.pyplot.hist: https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.hist.html
+        '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        hist_kwargs = {} if hist_kwargs is None else hist_kwargs.copy()
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        if vrange is None:
+            vrange = [np.min(self.r), np.max(self.r)]
+
+        clr_list = [clr_insignif, clr_signif, clr_signif_fdr]
+        args = {'rwidth': rwidth, 'bins': bins, 'range': vrange, 'color': clr_list}
+        args.update(hist_kwargs)
+        # insignif_args.update(hist_kwargs)
+
+        r_insignif = np.array(self.r)[~np.array(self.signif)]
+        r_signif = np.array(self.r)[self.signif]
+        r_signif_fdr = np.array(self.r)[self.signif_fdr]
+        r_stack = [r_insignif, r_signif, r_signif_fdr]
+        ax.hist(r_stack, stacked=True, **args)
+        ax.legend([f'p ≥ {self.alpha}', f'p < {self.alpha} (w/o FDR)', f'p < {self.alpha} (w/ FDR)'], loc='upper left', bbox_to_anchor=(1.1, 1), ncol=1)
+
+        frac_signif = np.size(r_signif) / np.size(self.r)
+        frac_signif_fdr = np.size(r_signif_fdr) / np.size(self.r)
+        ax.text(x=1.1, y=0.5, s=f'Fraction significant: {frac_signif*100:.1f}%', transform=ax.transAxes, fontsize=10, color=clr_signif)
+        ax.text(x=1.1, y=0.4, s=f'Fraction significant: {frac_signif_fdr*100:.1f}%', transform=ax.transAxes, fontsize=10, color=clr_signif_fdr)
+
+        r_pcts = np.percentile(self.r, [2.5, 25, 50, 75, 97.5])
+        trans = transforms.blended_transform_factory(ax.transData, ax.transAxes)
+        for r_pct, pt, ls in zip(r_pcts, np.array([2.5, 25, 50, 75, 97.5])/100, [':', '--', '-', '--', ':']): 
+            ax.axvline(x=r_pct, linestyle=ls, color=clr_percentile)
+            ax.text(x=r_pct, y=1.02, s=pt, color=clr_percentile, transform=trans, ha='center', fontsize=10)
+
+        ax.set_xlabel(r'$r$')
+        ax.set_ylabel('Count')
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+
+
+        if title is not None:
+            title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
+            t_args = {'y': 1.1, 'weight': 'bold'}
+            t_args.update(title_kwargs)
+            ax.set_title(title, **t_args)
+        
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, settings=savefig_settings)
+        else:
+            if not mute:
+                plotting.showfig(fig)
+        return fig, ax
 
 class Lipd:
     '''Create a Lipd object from Lipd Files
