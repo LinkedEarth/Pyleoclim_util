@@ -3979,7 +3979,7 @@ class LipdSeries(Series):
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
                 'midden' : ['#824E2B','o'],
-                'other':['#4169E0,'o']}
+                'other':['#4169E0','o']}
 
         time, label= lipdutils.checkTimeAxis(self.lipd_ts)
         if label=='age':
