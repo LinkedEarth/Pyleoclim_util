@@ -3862,7 +3862,7 @@ class Lipd:
     def mapAllArchive(self, projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
            figsize = None, ax = None, marker=None, color=None,
-           markersize = None, scatter_kwargs=None,
+           markersize = None, scatter_kwargs={},
            legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
         '''Map the records contained in LiPD files by archive type
 
