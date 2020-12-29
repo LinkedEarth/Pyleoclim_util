@@ -3649,18 +3649,19 @@ class Lipd:
     '''
 
     def __init__(self, query=False, query_args={}, usr_path=None, lipd_dict=None):
-        self.plot_default = {'ice/rock': ['#FFD600','h'],
+        self.plot_default = {'ice-other': ['#FFD600','h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
-                'glacier ice':['#86CDFA', 'd'],
+                'glacierice':['#86CDFA', 'd'],
                 'hybrid': ['#00BEFF','*'],
-                'lake sediment': ['#4169E0','s'],
-                'marine sediment': ['#8A4513', 's'],
+                'lakesediment': ['#4169E0','s'],
+                'marinesediment': ['#8A4513', 's'],
                 'sclerosponge' : ['r','o'],
                 'speleothem' : ['#FF1492','d'],
                 'wood' : ['#32CC32','^'],
-                'mollusk shells' : ['#FFD600','h'],
+                'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
+                'midden' : ['#824E2B','o'],
                 'other':['k','o']}
 
         #check that query has matching terms
@@ -3979,7 +3980,7 @@ class LipdSeries(Series):
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
                 'midden' : ['#824E2B','o'],
-                'other':['#4169E0','o']}
+                'other':['k','o']}
 
         time, label= lipdutils.checkTimeAxis(self.lipd_ts)
         if label=='age':
