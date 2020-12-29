@@ -499,13 +499,13 @@ def LipdToOntology(archiveType):
 
     """
     #Align with the ontology
-    if archiveType.lower()== "icecore":
+    if archiveType.lower().replace(" ", "") == "icecore":
         archiveType = 'glacierice'
-    elif archiveType.lower()== 'tree':
+    elif archiveType.lower().replace(" ", "") == 'tree':
         archiveType = 'wood'
-    elif archiveType.lower() == 'borehole':
+    elif archiveType.lower().replace(" ", "") == 'borehole':
         archiveType = 'ice/rock'
-    elif archiveType.lower() == 'bivalve':
+    elif archiveType.lower().replace(" ", "") == 'bivalve':
         archiveType = 'molluskshells'
 
     return archiveType
