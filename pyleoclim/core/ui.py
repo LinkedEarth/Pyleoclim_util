@@ -631,9 +631,9 @@ class Series:
             else:
                 if not mute:
                     plotting.showfig(fig)
-            return 69
+            return fig, ax
         else:
-            return 69
+            return ax
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
