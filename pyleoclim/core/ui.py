@@ -3928,7 +3928,7 @@ class Lipd:
                 archiveType[idx] = 'other'
 
         if markersize is not None:
-            scatter_kwargs.update({'markersize': markersize})
+            scatter_kwargs = {'markersize': markersize}
 
         if marker==None:
             marker=[]
