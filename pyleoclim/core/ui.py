@@ -3978,8 +3978,8 @@ class LipdSeries(Series):
                 'wood' : ['#32CC32','^'],
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
-                'midden' : ['#824e2b','o'],
-                'other':['k','o']}
+                'midden' : ['#824E2B','o'],
+                'other':['#4169E0,'o']}
 
         time, label= lipdutils.checkTimeAxis(self.lipd_ts)
         if label=='age':
