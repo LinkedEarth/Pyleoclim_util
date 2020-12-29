@@ -504,7 +504,7 @@ def LipdToOntology(archiveType):
     elif archiveType.lower().replace(" ", "") == 'tree':
         archiveType = 'wood'
     elif archiveType.lower().replace(" ", "") == 'borehole':
-        archiveType = 'ice/rock'
+        archiveType = 'ice-other'
     elif archiveType.lower().replace(" ", "") == 'bivalve':
         archiveType = 'molluskshells'
 
