@@ -3966,7 +3966,7 @@ class LipdSeries(Series):
         else:
             self.lipd_ts=tso
 
-        self.plot_default = {'ice/rock': ['#FFD600','h'],
+        self.plot_default = {'ice-other': ['#FFD600','h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
                 'glacierice':['#86CDFA', 'd'],
@@ -3978,6 +3978,7 @@ class LipdSeries(Series):
                 'wood' : ['#32CC32','^'],
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
+                'midden' : ['#824e2b','o'],
                 'other':['k','o']}
 
         time, label= lipdutils.checkTimeAxis(self.lipd_ts)
