@@ -3862,7 +3862,7 @@ class Lipd:
     def mapAllArchive(self, projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
            figsize = None, ax = None, marker=None, color=None,
-           markersize = None, scatter_kwargs=None,
+           markersize = None, scatter_kwargs={'markersize': None},
            legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
         '''Map the records contained in LiPD files by archive type
 
@@ -3928,7 +3928,7 @@ class Lipd:
                 archiveType[idx] = 'other'
 
         if markersize is not None:
-            scatter_kwargs = {'markersize': markersize}
+            scatter_kwargs.update({'markersize': markersize})
 
         if marker==None:
             marker=[]
