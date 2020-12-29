@@ -3972,7 +3972,7 @@ class LipdSeries(Series):
                 'glacierice':['#86CDFA', 'd'],
                 'hybrid': ['#00BEFF','*'],
                 'lakesediment': ['#4169E0','s'],
-                'marinesediment': ['#8A4513', 's'],
+                'MarineSediment': ['#8A4513', 's'],
                 'sclerosponge' : ['r','o'],
                 'speleothem' : ['#FF1492','d'],
                 'wood' : ['#32CC32','^'],
