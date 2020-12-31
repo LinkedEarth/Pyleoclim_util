@@ -3969,6 +3969,7 @@ class LipdSeries(Series):
             self.lipd_ts=tso
 
         self.plot_default = {'ice-other': ['#FFD600','h'],
+                'ice/rock': ['#FFD600', 'h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
                 'glacierice':['#86CDFA', 'd'],
