@@ -2710,7 +2710,8 @@ class MultipleSeries:
         method:  string
             either 'binning' or 'interp'
 
-        kwargs: keyword arguments (dictionary) for the interpolation method
+        kwargs: keyword arguments (dictionary) for the interpolation method or binning method depending
+        on chosen method.
 
         Returns
         -------
@@ -2735,7 +2736,7 @@ class MultipleSeries:
         if method == 'binning':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop)
+                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop, **kwargs)
                 ts.time  = d['bins']
                 ts.value = d['binned_values']
                 ms.series_list[idx] = ts
@@ -2777,7 +2778,7 @@ class MultipleSeries:
     #     res = decomposition.pca(data)
     #     return res
 
-    def bin(self):
+    def bin(self, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via binning.
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
@@ -2794,7 +2795,7 @@ class MultipleSeries:
         Parameters
         ----------
 
-        None
+        kwargs: dictionary of arguments for the binning function
 
         Returns
         -------
@@ -2813,7 +2814,7 @@ class MultipleSeries:
 
         ms = self.copy()
 
-        ms = ms.common_time(method = 'binning')
+        ms = ms.common_time(method = 'binning', **kwargs)
 
         return ms
 
