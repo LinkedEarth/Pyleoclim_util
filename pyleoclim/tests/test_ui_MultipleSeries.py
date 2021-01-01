@@ -161,7 +161,7 @@ class TestMultipleSeriesBin:
     assert_array_equal(x_axis_0, x_axis_1)
 
 class TestMultipleSeriesInterp:
-    '''Test for MultipleSeries.interp() Hello!
+    '''Test for MultipleSeries.interp()
 
     Testing if the interp function will place the series on the same time axis
     '''
