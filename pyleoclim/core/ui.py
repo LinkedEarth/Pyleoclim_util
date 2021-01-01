@@ -2794,7 +2794,7 @@ class MultipleSeries:
         Parameters
         ----------
 
-        None 
+        None
 
         Returns
         -------
@@ -2813,7 +2813,7 @@ class MultipleSeries:
 
         ms = self.copy()
 
-        ms = ms.common_time(method = 'binning', **kwargs)
+        ms = ms.common_time(method = 'binning')
 
         return ms
 
