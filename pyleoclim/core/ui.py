@@ -418,7 +418,263 @@ class Series:
 
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
         This implementation  uses the method of [1], with applications presented in [2].
+<<<<<<< HEAD
         Optionally (MC>0), the ignif_test=100 : int
+=======
+        Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
+        The method expects regular spacing, but is tolerant to missing values, up to a fraction 0<f<1 (see [4]).
+
+        Parameters
+        ----------
+        M : int, optional
+            window size. The default is None (10% of the length of the series).
+        MC : int, optional
+            Number of iteration in the Monte-Carlo process. The default is 0.
+        f : float, optional
+            maximum allowable fraction of missing values. The default is 0.5.
+
+        Returns
+        -------
+        res : dict
+            Containing:
+
+            - eig_val : (M, 1) array of eigenvalue spectrum of length r, the number of SSA modes. As in Principal Component Analysis, eigenvaluesare closely related to the fraction of variance accounted for ("explained", a common but not-so-helpful term) by each mode.
+
+            - eig_vec : is a matrix of the temporal eigenvectors (T-EOFs), i.e. the temporal patterns that explain most of the variations in the original series.
+
+            - PC : (N - M + 1, M) array of principal components, i.e. the loadings that, convolved with the T-EOFs, produce the reconstructed components, or RCs
+
+            - RC : (N,  M) array of reconstructed components, One can think of each RC as the contribution of each mode to the timeseries, weighted by their eigenvalue (loosely speaking, their "amplitude"). Summing over all columns of RC recovers the original series. (synthesis, the reciprocal operation of analysis).
+
+            - eig_val_q : (M, 2) array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC >0 ]
+
+        Examples
+        --------
+
+        SSA with SOI
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            from matplotlib import pyplot as plt
+            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time=data.iloc[:,1]
+            value=data.iloc[:,2]
+            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            #plot
+            @savefig ts_plot.png
+            fig,ax = ts.plot()
+            plt.close(fig)
+            #SSA
+            nino_ssa = ts.ssa(M=60)
+
+        Let us now see how to make use of all these arrays. The first step is too inspect the eigenvalue spectrum ("scree plot") to identify remarkable modes. Let us restrict ourselves to the first 40, so we can see something:
+
+        .. ipython:: python
+            :okwarning:
+
+            import matplotlib.pyplot as plt
+            import matplotlib.gridspec as gridspec
+            import numpy as np
+
+            d  = nino_ssa['eig_val'] # extract eigenvalue vector
+            M  = len(d)  # infer window size
+            de = d*np.sqrt(2/(M-1))
+            var_pct = d**2/np.sum(d**2)*100  # extract the fraction of variance attributable to each mode
+
+            # plot eigenvalues
+            r = 20
+            rk = np.arange(0,r)+1
+            fig,ax = plt.subplots()
+            ax.errorbar(rk,d[:r],yerr=de[:r],label='SSA eigenvalues w/ 95% CI')
+            ax.set_title('Scree plot of SSA eigenvalues')
+            ax.set_xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
+            ax.legend(loc='upper right')
+            @savefig scree_plot.png
+            pyleo.showfig(fig)
+            plt.close(fig)
+
+        This highlights a few common phenomena with SSA:
+            * the eigenvalues are in descending order
+            * their uncertainties are proportional to the eigenvalues themselves
+            * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered within uncertainties . (5,6) looks like another doublet
+            * around i=15, the eigenvalues appear to reach a floor, and all subsequent eigenvalues explain a very small amount of variance.
+
+        So, summing the variance of all modes higher than 19, we get:
+
+        .. ipython:: python
+            :okwarning:
+
+            print(var_pct[15:].sum()*100)
+
+        That is, over 95% of the variance is in the first 15 modes. That is a typical result for a "warm-colored" timeseries, which is most geophysical timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
+
+        .. ipython:: python
+            :okwarning:
+
+            RCk = nino_ssa['RC'][:,:14].sum(axis=1)
+            fig, ax = ts.plot(title='ONI',mute=True) # we mute the first call to only get the plot with 2 lines
+            ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
+            ax.legend()
+            @savefig ssa_recon.png
+            pyleo.showfig(fig)
+            plt.close(fig)
+
+        Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
+            * there was not much rhyme or reason for picking 15 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
+            * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies, you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves features and excludes others (i.e, a filter).
+            * as with all orthgonal decompositions, summing over all RCs will recover the original signal within numerical precision.
+
+        Monte-Carlo SSA
+
+        Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, introduced by Allen & Smith, (1996) to identiy SSA modes that rise above what one would expect from "red noise", specifically an AR(1) process_process). To run it, simply provide the parameter MC, ideally with a number of iterations sufficient to get decent statistics. Here's let's use MC = 1000. The result will be stored in the eig_val_q array, which has the same length as eig_val, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
+
+        .. ipython:: python
+            :okwarning:
+
+            nino_mcssa = ts.ssa(M = 60, nMC=1000)
+
+        Now let's look at the result:
+
+        .. ipython:: python
+            :okwarning:
+
+            d  = nino_mcssa['eig_val'] # extract eigenvalue vector
+            de = d*np.sqrt(2/(M-1))
+            du = nino_mcssa['eig_val_q'][:,0]  # extract upper quantile of MC-SSA eigenvalues
+            dl = nino_mcssa['eig_val_q'][:,1]  # extract lower quantile of MC-SSA eigenvalues
+
+            # plot eigenvalues
+            rk = np.arange(0,20)+1
+            fig=plt.figure()
+            plt.fill_between(rk,dl[:20],du[:20],color='silver',alpha=0.5,label='MC-SSA 95% CI')
+            plt.errorbar(rk,d[:20],yerr=de[:20],label='SSA eigenvalues w/ 95% CI')
+            plt.title('Scree plot of SSA eigenvalues, w/ MC-SSA bounds')
+            plt.xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
+            plt.legend(loc='upper right')
+            @savefig scree_nmc.png
+            pyleo.showfig(fig)
+            plt.close(fig)
+
+        This suggests that modes 1-5 fall above the red noise benchmark.
+
+        '''
+
+        res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f)
+        return res
+
+    def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
+                 ax=None, ylabel='KDE', mute=False, **plot_kwargs):
+        ''' Plot the distribution of the timeseries values
+
+        Parameters
+        ----------
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+              - "path" must be specified; it can be any existed or non-existed path,
+                with or without a suffix; if the suffix is not given in "path", it will follow "format"
+              - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+
+        Examples
+        --------
+
+        Distribution of the SOI record
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            from matplotlib import pyplot as plt
+            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time=data.iloc[:,1]
+            value=data.iloc[:,2]
+            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            @savefig ts_plot.png
+            fig,ax = ts.plot()
+            @savefig ts_dist.png
+            fig,ax = ts.distplot()
+            plt.close(fig)
+
+
+        '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        ax = sns.histplot(self.value, ax=ax, kde=True, **plot_kwargs)
+
+        time_label, value_label = self.make_labels()
+
+        ax.set_xlabel(value_label)
+        ax.set_ylabel(ylabel)
+
+        if title is not None:
+            ax.set_title(title)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            else:
+                if not mute:
+                    plotting.showfig(fig)
+            return fig, ax
+        else:
+            return ax
+
+    def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
+                    time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
+
+                    time_label=None, value_label=None, period_label=None, psd_label='PSD', mute=False):
+        ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
+
+
+        Parameters
+        ----------
+
+        psd : PSD
+            the PSD object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
+
+        scalogram : Scalogram
+            the Scalogram object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        time_lim : list or tuple
+            the limitation of the time axis
+
+        value_lim : list or tuple
+            the limitation of the value axis of the timeseries
+
+        period_lim : list or tuple
+            the limitation of the period axis
+
+        psd_lim : list or tuple
+            the limitation of the psd axis
+
+        n_signif_test=100 : int
+>>>>>>> 1bda15e24ef6629242152a5b7621cfe528aaa061
             Number of Monte-Carlo simulations to perform for significance testing. Used when psd=None or scalogram=None
 
         time_label : str
@@ -1449,10 +1705,10 @@ class Series:
         Parameters
         ----------
 
-        
-        kwargs : 
+
+        kwargs :
             Arguments for binning function. See pyleoclim.utils.tsutils.bin for details
-        
+
         Returns
         -------
 
@@ -1462,9 +1718,9 @@ class Series:
         See also
         --------
 
-        
+
         pyleoclim.utils.tsutils.bin : bin the time series into evenly-spaced bins
-                
+
         '''
         new=self.copy()
         res_dict = tsutils.bin(self.time,self.value,**kwargs)
@@ -2425,9 +2681,9 @@ class MultipleSeries:
         ms = self.copy()
         ts_list = deepcopy(ms.series_list)
         ts_list.append(ts)
-        ms = MultipleSeries(ts_list)  
+        ms = MultipleSeries(ts_list)
         return ms
-    
+
     def copy(self):
         '''Copy the object
         '''
@@ -2449,58 +2705,58 @@ class MultipleSeries:
             s.value=v_mod
             ms.series_list[idx]=s
         return ms
-    
+
     def common_time(self,method='binning',**kwargs):
-        ''' Aligns the time axes of a MultipleSeries object, via either binning 
-        or interpolation. This is critical for workflows that need to assume a 
-        common time axis for the group of series under consideration.  
-        
-        
+        ''' Aligns the time axes of a MultipleSeries object, via either binning
+        or interpolation. This is critical for workflows that need to assume a
+        common time axis for the group of series under consideration.
+
+
         The common time axis is characterized by the following parameters:
-            
+
         start : the latest start date of the bunch (maximin of the minima)
         stop  : the earliest stop date of the bunch (minimum of the maxima)
         step  : The representative spacing between consecutive values (mean of the median spacings)
-        
-        Optional arguments for binning or interpolation are those of the underling functions. 
-    
+
+        Optional arguments for binning or interpolation are those of the underling functions.
+
         Parameters
         ----------
         method:  string
             either 'binning' or 'interp'
-        
-        kwargs: keyword arguments (dictionary) for the interpolation method    
-    
+
+        kwargs: keyword arguments (dictionary) for the interpolation method
+
         Returns
         -------
         ms : pyleoclim.MultipleSeries
-            The MultipleSeries objects with all series aligned to the same time axis. 
+            The MultipleSeries objects with all series aligned to the same time axis.
         '''
 
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
         for idx,item in enumerate(self.series_list):
-            gp[idx,:] = tsutils.grid_properties(item.time)  
+            gp[idx,:] = tsutils.grid_properties(item.time)
             if gp[idx,2] < 0:  # flip time axis if retrograde
-                item.time  = item.time[::-1,...]  
-                item.value = item.value[::-1,...] 
-           
-        # define parameters for common time axis    
+                item.time  = item.time[::-1,...]
+                item.value = item.value[::-1,...]
+
+        # define parameters for common time axis
         start = gp[:,0].max()
         stop  = gp[:,1].min()
-        step  = gp[:,2].mean() 
-        
+        step  = gp[:,2].mean()
+
         ms = self.copy()
-        
+
         if method == 'binning':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop)                
+                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop)
                 ts.time  = d['bins']
                 ts.value = d['binned_values']
                 ms.series_list[idx] = ts
 
         elif method == 'interp':
-            for idx,item in enumerate(self.series_list):  
+            for idx,item in enumerate(self.series_list):
                 ts = item.copy()
                 ti, xi = tsutils.interp(ts.time, ts.value, interp_type='linear', interp_step=step, start=start, end=stop,**kwargs)
                 ts.time  = ti
@@ -2509,7 +2765,7 @@ class MultipleSeries:
 
         else:
             raise NameError('Unknown methods; no action taken')
-        
+
         return ms
 
     def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None):
@@ -2624,6 +2880,85 @@ class MultipleSeries:
     #     data = np.transpose(np.asarray(data))
     #     res = decomposition.pca(data)
     #     return res
+
+    def bin(self):
+        ''' Aligns the time axes of a MultipleSeries object, via binning.
+        This is critical for workflows that need to assume a common time axis
+        for the group of series under consideration.
+
+
+        The common time axis is characterized by the following parameters:
+
+        start : the latest start date of the bunch (maximin of the minima)
+        stop  : the earliest stop date of the bunch (minimum of the maxima)
+        step  : The representative spacing between consecutive values (mean of the median spacings)
+
+        This is a special case of the common_time function.
+
+        Parameters
+        ----------
+
+        None
+
+        Returns
+        -------
+        ms : pyleoclim.MultipleSeries
+            The MultipleSeries objects with all series aligned to the same time axis.
+
+        See also
+        --------
+
+        pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
+
+        pyleoclim.utils.tsutils.bin: Underlying binning function
+
+        pyleoclim.core.ui.Series.bin: Bin function for Series object
+        '''
+
+        ms = self.copy()
+
+        ms = ms.common_time(method = 'binning')
+
+        return ms
+
+    def interp(self, **kwargs):
+        ''' Aligns the time axes of a MultipleSeries object, via interpolation.
+        This is critical for workflows that need to assume a common time axis
+        for the group of series under consideration.
+
+
+        The common time axis is characterized by the following parameters:
+
+        start : the latest start date of the bunch (maximin of the minima)
+        stop  : the earliest stop date of the bunch (minimum of the maxima)
+        step  : The representative spacing between consecutive values (mean of the median spacings)
+
+        This is a special case of the common_time function.
+
+        Parameters
+        ----------
+
+        kwargs: keyword arguments (dictionary) for the interpolation method
+
+        Returns
+        -------
+        ms : pyleoclim.MultipleSeries
+            The MultipleSeries objects with all series aligned to the same time axis.
+
+        See also
+        --------
+
+        pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
+
+        pyleoclim.utils.tsutils.interp: Underlying interpolation function
+
+        pyleoclim.core.ui.Series.interp: Interpolation function for Series object
+        '''
+        ms = self.copy()
+
+        ms = ms.common_time(method = 'interp', **kwargs)
+
+        return ms
 
     def detrend(self,method='emd',**kwargs):
         '''Detrend timeseries
@@ -2902,31 +3237,40 @@ class EnsembleSeries(MultipleSeries):
             That is, if the self object contains n Series, and the target contains n+m Series,
             then only the first n Series from the object will be used for the calculation;
             otherwise, if the target contains only n-m Series, then the first m Series in the target will be used twice in sequence.
-        
+
         timespan : tuple
             The time interval over which to perform the calculation
+<<<<<<< HEAD
         
         alpha : float
             The significance level (0.05 by default)
+=======
+>>>>>>> 1bda15e24ef6629242152a5b7621cfe528aaa061
 
         settings : dict
             Parameters for the correlation function (singificance testing and number of simulation)
 
+<<<<<<< HEAD
+=======
+        apply_fdr : bool
+            Determine significance based on the FDR approach
+
+>>>>>>> 1bda15e24ef6629242152a5b7621cfe528aaa061
         fdr_kwargs : dict
             Parameters for the FDR function
 
         common_time_kwargs : dict
             Parameters for the method MultipleSeries.common_time()
-            
+
         Returns
         -------
-        
+
         res : dict
-            Containing a list of the Pearson's correlation coefficient, associated significance and p-value. 
-        
+            Containing a list of the Pearson's correlation coefficient, associated significance and p-value.
+
         See also
         --------
-        
+
         pyleoclim.utils.correlation.corr_sig : Correlation function
         pyleoclim.utils.correlation.fdr : FDR function
 
@@ -2966,8 +3310,18 @@ class EnsembleSeries(MultipleSeries):
         p_list = []
         signif_list = []
 
+<<<<<<< HEAD
         for idx, ts1 in enumerate(self.series_list):
             if hasattr(target, 'series_list'):
+=======
+        for idx, ts in enumerate(self.series_list):
+            value1 = ts.value
+            time1 = ts.time
+            if isinstance(target, Series):
+                value2 = target.value
+                time2 = target.time
+            elif isinstance(target, EnsembleSeries):
+>>>>>>> 1bda15e24ef6629242152a5b7621cfe528aaa061
                 nEns = np.size(target.series_list)
                 if idx < nEns:
                     value2 = target.series_list[idx].value
@@ -3261,7 +3615,7 @@ class MultiplePSD:
 
         # Turn the interactive mode off.
         plt.ioff()
-        
+
 
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -3558,18 +3912,20 @@ class Lipd:
     '''
 
     def __init__(self, query=False, query_args={}, usr_path=None, lipd_dict=None):
-        self.plot_default = {'ice/rock': ['#FFD600','h'],
+        self.plot_default = {'ice-other': ['#FFD600','h'],
+                'ice/rock': ['#FFD600', 'h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
-                'glacier ice':['#86CDFA', 'd'],
+                'glacierice':['#86CDFA', 'd'],
                 'hybrid': ['#00BEFF','*'],
-                'lake sediment': ['#4169E0','s'],
-                'marine sediment': ['#8A4513', 's'],
+                'lakesediment': ['#4169E0','s'],
+                'marinesediment': ['#8A4513', 's'],
                 'sclerosponge' : ['r','o'],
                 'speleothem' : ['#FF1492','d'],
                 'wood' : ['#32CC32','^'],
-                'mollusk shells' : ['#FFD600','h'],
+                'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
+                'midden' : ['#824E2B','o'],
                 'other':['k','o']}
 
         #check that query has matching terms
@@ -3828,7 +4184,7 @@ class Lipd:
             d = self.lipd[key]
             lat.append(d['geo']['geometry']['coordinates'][1])
             lon.append(d['geo']['geometry']['coordinates'][0])
-            archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower())
+            archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower().replace(" ",""))
 
         # make sure criteria is in the plot_default list
         for idx,val in enumerate(archiveType):
@@ -3875,18 +4231,20 @@ class LipdSeries(Series):
         else:
             self.lipd_ts=tso
 
-        self.plot_default = {'ice/rock': ['#FFD600','h'],
+        self.plot_default = {'ice-other': ['#FFD600','h'],
+                'ice/rock': ['#FFD600', 'h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
-                'glacier ice':['#86CDFA', 'd'],
+                'glacierice':['#86CDFA', 'd'],
                 'hybrid': ['#00BEFF','*'],
-                'lake sediment': ['#4169E0','s'],
-                'marine sediment': ['#8A4513', 's'],
+                'lakesediment': ['#4169E0','s'],
+                'marinesediment': ['#8A4513', 's'],
                 'sclerosponge' : ['r','o'],
                 'speleothem' : ['#FF1492','d'],
                 'wood' : ['#32CC32','^'],
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
+                'midden' : ['#824E2B','o'],
                 'other':['k','o']}
 
         time, label= lipdutils.checkTimeAxis(self.lipd_ts)
