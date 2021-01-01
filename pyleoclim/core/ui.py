@@ -418,9 +418,6 @@ class Series:
 
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
         This implementation  uses the method of [1], with applications presented in [2].
-<<<<<<< HEAD
-        Optionally (MC>0), the ignif_test=100 : int
-=======
         Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
         The method expects regular spacing, but is tolerant to missing values, up to a fraction 0<f<1 (see [4]).
 
@@ -674,7 +671,6 @@ class Series:
             the limitation of the psd axis
 
         n_signif_test=100 : int
->>>>>>> 1bda15e24ef6629242152a5b7621cfe528aaa061
             Number of Monte-Carlo simulations to perform for significance testing. Used when psd=None or scalogram=None
 
         time_label : str
@@ -3240,22 +3236,13 @@ class EnsembleSeries(MultipleSeries):
 
         timespan : tuple
             The time interval over which to perform the calculation
-<<<<<<< HEAD
         
         alpha : float
             The significance level (0.05 by default)
-=======
->>>>>>> 1bda15e24ef6629242152a5b7621cfe528aaa061
 
         settings : dict
             Parameters for the correlation function (singificance testing and number of simulation)
 
-<<<<<<< HEAD
-=======
-        apply_fdr : bool
-            Determine significance based on the FDR approach
-
->>>>>>> 1bda15e24ef6629242152a5b7621cfe528aaa061
         fdr_kwargs : dict
             Parameters for the FDR function
 
@@ -3310,18 +3297,8 @@ class EnsembleSeries(MultipleSeries):
         p_list = []
         signif_list = []
 
-<<<<<<< HEAD
         for idx, ts1 in enumerate(self.series_list):
             if hasattr(target, 'series_list'):
-=======
-        for idx, ts in enumerate(self.series_list):
-            value1 = ts.value
-            time1 = ts.time
-            if isinstance(target, Series):
-                value2 = target.value
-                time2 = target.time
-            elif isinstance(target, EnsembleSeries):
->>>>>>> 1bda15e24ef6629242152a5b7621cfe528aaa061
                 nEns = np.size(target.series_list)
                 if idx < nEns:
                     value2 = target.series_list[idx].value
