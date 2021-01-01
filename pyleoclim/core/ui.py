@@ -2813,7 +2813,7 @@ class MultipleSeries:
 
         ms = self.copy()
 
-        ms = ms.common_time(method = 'binning', **kwargs)
+        ms = ms.common_time(method = 'binning')
 
         return ms
 
@@ -3648,18 +3648,20 @@ class Lipd:
     '''
 
     def __init__(self, query=False, query_args={}, usr_path=None, lipd_dict=None):
-        self.plot_default = {'ice/rock': ['#FFD600','h'],
+        self.plot_default = {'ice-other': ['#FFD600','h'],
+                'ice/rock': ['#FFD600', 'h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
-                'glacier ice':['#86CDFA', 'd'],
+                'glacierice':['#86CDFA', 'd'],
                 'hybrid': ['#00BEFF','*'],
-                'lake sediment': ['#4169E0','s'],
-                'marine sediment': ['#8A4513', 's'],
+                'lakesediment': ['#4169E0','s'],
+                'marinesediment': ['#8A4513', 's'],
                 'sclerosponge' : ['r','o'],
                 'speleothem' : ['#FF1492','d'],
                 'wood' : ['#32CC32','^'],
-                'mollusk shells' : ['#FFD600','h'],
+                'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
+                'midden' : ['#824E2B','o'],
                 'other':['k','o']}
 
         #check that query has matching terms
@@ -3918,7 +3920,7 @@ class Lipd:
             d = self.lipd[key]
             lat.append(d['geo']['geometry']['coordinates'][1])
             lon.append(d['geo']['geometry']['coordinates'][0])
-            archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower())
+            archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower().replace(" ",""))
 
         # make sure criteria is in the plot_default list
         for idx,val in enumerate(archiveType):
@@ -3965,18 +3967,20 @@ class LipdSeries(Series):
         else:
             self.lipd_ts=tso
 
-        self.plot_default = {'ice/rock': ['#FFD600','h'],
+        self.plot_default = {'ice-other': ['#FFD600','h'],
+                'ice/rock': ['#FFD600', 'h'],
                 'coral': ['#FF8B00','o'],
                 'documents':['k','p'],
-                'glacier ice':['#86CDFA', 'd'],
+                'glacierice':['#86CDFA', 'd'],
                 'hybrid': ['#00BEFF','*'],
-                'lake sediment': ['#4169E0','s'],
-                'marine sediment': ['#8A4513', 's'],
+                'lakesediment': ['#4169E0','s'],
+                'marinesediment': ['#8A4513', 's'],
                 'sclerosponge' : ['r','o'],
                 'speleothem' : ['#FF1492','d'],
                 'wood' : ['#32CC32','^'],
                 'molluskshells' : ['#FFD600','h'],
                 'peat' : ['#2F4F4F','*'],
+                'midden' : ['#824E2B','o'],
                 'other':['k','o']}
 
         time, label= lipdutils.checkTimeAxis(self.lipd_ts)
