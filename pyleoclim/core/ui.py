@@ -78,19 +78,6 @@ class Series:
     value : list of numpy.array
         values of the dependent variable (y)
 
-    time_dir : string
-        Direction of time flow ('prograde' or 'retrograde')
-        Default is 'prograde'
-
-    time_datum : float
-        origin of the time axis. For ages in years BP, it is usually 1950 AD/CE, but could also be 2000 CE. 
-        Default is 0 (There is a year zero in astronomical year numbering (where it coincides with the Julian year 1 BC) and in ISO 8601:2004 (where it coincides with the Gregorian year 1 BC), as well as in all Buddhist and Hindu calendars).
-        Note that 'time_datum' must be expressed in the same units as 'time'. 
-
-    time_exponent: integer
-        exponent p used t = s 10**p 'units'. For instance, 1 kiloyear = 1 * 10**3 years, 5 milliseconds = 5*10**(-3) seconds.
-        Default is 0, which is understood to mean year 0 of the astronomical calendar.
-
     time_unit : string
         Units for the time vector (e.g., 'years').
         Default is 'years'
@@ -112,13 +99,13 @@ class Series:
         Default is None
 
     clean_ts : boolean flag
-        set to True to remove the NaNs and make time axis strictly prograde [TODO: adapt]
-        Default is None
+        set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
+        Default is True
 
     Examples
     --------
 
-    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a PyleoSeries object.
+    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a pyleoSeries object.
 
     .. ipython:: python
         :okwarning:
@@ -139,53 +126,128 @@ class Series:
         ts.__dict__.keys()
     '''
 
-    def __init__(self, time, value, time_dir='prograde', time_unit='years', time_datum =0, time_exponent =0, time_name='years CE', value_name=None, value_unit=None, label=None, dropna=False):
+    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True):
 
-        if dropna==True:
-            value, time = tsutils.dropna(np.array(value), np.array(time)) 
+        if clean_ts==True:
+            value, time = tsutils.clean_ts(np.array(value), np.array(time))
 
-        tu = time_unit.lower()
-
-        if tu.find("ky")>=0 or tu.find("ka")>=0:
-            time_dir = 'retrograde'
-            time_exponent = 3
-            
-        if tu.find("my")>=0 or tu.find("ma")>=0:
-            time_dir = 'retrograde'
-            time_exponent = 6
-            
-        if tu.find("bp")>=0:
-            time_dir ='retrograde'
-            time_datum = 1950
-            
+        self.time = time
+        self.value = value
         self.time_name = time_name
         self.time_unit = time_unit
-        self.time_datum = time_datum
-        self.time_exponent = time_exponent
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
-        
-        dt = np.diff(time)
-              
-        if time_dir=='prograde':
-            if any(dt<=0): # apply sorting if non-monotonous
-                value, time = tsutils.sort_ts(value, time)
-                print("“Provided time axis was not monotonous; prograde sorting was applied")
-                
-            self.time = (time_datum + time)*10**(time_exponent)
-        elif time_dir=='retrograde':
-            if any(dt<=0): # apply sorting if non-monotonous
-                value, time = tsutils.sort_ts(value, time)
-                print("“Provided time axis was not monotonous; prograde sorting was applied")
-            self.time = (time_datum - time)*10**(time_exponent)
+
+    def convert_time_unit(self, time_unit='years'):
+        ''' Convert the time unit of the timeseries
+
+        Parameters
+        ----------
+
+        time_unit : str, {'years', 'bp', 'ka', 'ma'}
+            the target time unit; {'years', 'bp', 'ka', 'ma'} are supported
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts = pyleo.Series(time=time, value=value, time_unit='years')
+            new_ts.convert_time_unit(time_unit='bp')
+            print('Original timeseries:')
+            print('time unit:', ts.time_unit)
+            print('time:', ts.time)
+            print()
+            print('Converted timeseries:')
+            print('time unit:', new_ts.time_unit)
+            print('time:', new_ts.time)
+        '''
+
+        def convert_to_years():
+            def prograde_time(time, time_datum, time_exponent):
+                new_time = (time_datum + time)*10**(time_exponent)
+                return new_time
+
+            def retrograde_time(time, time_datum, time_exponent):
+                new_time = (time_datum - time)*10**(time_exponent)
+                return new_time
+
+            convert_func = {
+                'prograde': prograde_time,
+                'retrograde': retrograde_time,
+            }
+
+            if self.time_unit is not None:
+                tu = self.time_unit.lower()
+
+                if tu.find('ky')>=0 or tu.find('ka')>=0:
+                    time_dir = 'retrograde'
+                    time_datum = 1950/1e3
+                    time_exponent = 3
+                elif tu.find('my')>=0 or tu.find('ma')>=0:
+                    time_dir = 'retrograde'
+                    time_datum = 1950/1e6
+                    time_exponent = 6
+                elif tu.find('bp')>=0:
+                    time_dir ='retrograde'
+                    time_datum = 1950
+                    time_exponent = 0
+                else:
+                    time_dir ='prograde'
+                    time_datum = 0
+                    time_exponent = 0
+
+                new_time = convert_func[time_dir](self.time, time_datum, time_exponent)
+            else:
+                new_time = None
+
+            return new_time
+
+        def convert_to_bp():
+            time_yrs = convert_to_years()
+            time_bp = 1950 - time_yrs
+            return time_bp
+
+        def convert_to_ka():
+            time_bp = convert_to_bp()
+            time_ka = time_bp / 1e3
+            return time_ka
+
+        def convert_to_ma():
+            time_bp = convert_to_bp()
+            time_ma = time_bp / 1e6
+            return time_ma
+
+        convert_to = {
+            'years': convert_to_years(),
+            'bp': convert_to_bp(),
+            'ka': convert_to_ka(),
+            'ma': convert_to_ma(),
+        }
+
+        new_time = convert_to[time_unit]
+
+        dt = np.diff(new_time)
+        if any(dt<=0):
+            new_value, new_time = tsutils.sort_ts(self.value, new_time)
         else:
-            raise ValueError("time_dir must be either 'prograde' or 'retrograde'")
-            self.time = time
-            self.value = value
-        
-            
-        
+            new_value = self.copy().value
+
+        new_ts = self.copy()
+        new_ts.time = new_time
+        new_ts.value = new_value
+        new_ts.time_unit = time_unit
+
+        return new_ts
 
     def make_labels(self):
         '''
@@ -2687,6 +2749,11 @@ class MultipleSeries:
     series_list : list
         a list of pyleoclim.Series objects
 
+    time_unit : str
+        The target time unit for every series in the list.
+        If None, then no conversion will be applied;
+        Otherwise, the time unit of every series in the list will be converted to the target.
+
     Examples
     --------
 
@@ -2706,8 +2773,16 @@ class MultipleSeries:
         series_list=[ts_nino,ts_air]
         ts_all = pyleo.MultipleSeries(series_list)
     '''
-    def __init__(self, series_list):
+    def __init__(self, series_list, time_unit=None):
         self.series_list = series_list
+
+        if time_unit is not None:
+            new_ts_list = []
+            for ts in self.series_list:
+                new_ts = ts.convert_time_unit(time_unit=time_unit)
+                new_ts_list.append(new_ts)
+
+            self.series_list = new_ts_list
 
     def append(self,ts):
         '''Append timeseries ts to MultipleSeries object
