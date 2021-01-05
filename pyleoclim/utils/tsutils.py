@@ -16,6 +16,8 @@ __all__ = [
     'standardize',
     'ts2segments',
     'clean_ts',
+    'dropna',
+    'sort_ts',
     'annualize',
     'gaussianize',
     'gaussianize_single',
@@ -488,7 +490,7 @@ def clean_ts(ys, ts):
     return ys, ts
 
 
-def drona(ys, ts):
+def dropna(ys, ts):
     ''' Remove entries of ys or ts that bear NaNs
 
     Parameters

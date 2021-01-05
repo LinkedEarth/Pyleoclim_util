@@ -139,26 +139,25 @@ class Series:
         ts.__dict__.keys()
     '''
 
-    def __init__(self, time, value, time_dir='prograde', time_unit=None, time_datum =0, time_exponent =0, time_name=None, value_name=None, value_unit=None, label=None, dropna=False):
+    def __init__(self, time, value, time_dir='prograde', time_unit='years', time_datum =0, time_exponent =0, time_name='years CE', value_name=None, value_unit=None, label=None, dropna=False):
 
         if dropna==True:
             value, time = tsutils.dropna(np.array(value), np.array(time)) 
 
         tu = time_unit.lower()
 
-        if tu.find("ky")>=0 or tu.find("kyr")>=0 or tu.find("ka")>=0:
-            time_dir=='retrograde'
+        if tu.find("ky")>=0 or tu.find("ka")>=0:
+            time_dir = 'retrograde'
             time_exponent = 3
             
         if tu.find("my")>=0 or tu.find("ma")>=0:
-            time_dir=='retrograde'
+            time_dir = 'retrograde'
             time_exponent = 6
             
         if tu.find("bp")>=0:
-            time_dir=='retrograde'
+            time_dir ='retrograde'
             time_datum = 1950
             
-        self.value = value
         self.time_name = time_name
         self.time_unit = time_unit
         self.time_datum = time_datum
@@ -166,14 +165,27 @@ class Series:
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
-                      
+        
+        dt = np.diff(time)
+              
         if time_dir=='prograde':
+            if any(dt<=0): # apply sorting if non-monotonous
+                value, time = tsutils.sort_ts(value, time)
+                print("“Provided time axis was not monotonous; prograde sorting was applied")
+                
             self.time = (time_datum + time)*10**(time_exponent)
         elif time_dir=='retrograde':
+            if any(dt<=0): # apply sorting if non-monotonous
+                value, time = tsutils.sort_ts(value, time)
+                print("“Provided time axis was not monotonous; prograde sorting was applied")
             self.time = (time_datum - time)*10**(time_exponent)
         else:
             raise ValueError("time_dir must be either 'prograde' or 'retrograde'")
-
+            self.time = time
+            self.value = value
+        
+            
+        
 
     def make_labels(self):
         '''
