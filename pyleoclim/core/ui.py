@@ -64,24 +64,28 @@ def infer_period_unit_from_time_unit(time_unit):
 
 
 class Series:
-    ''' Create a pyleoSeries object
+    ''' pyleoSeries object y(t)
+
+    The Series class is, at its heart, a simple structure containing two arrays y and t of equal length, and some
+    metadata allowing to interpret and plot the series. It is similar to a 1-column pandas dataframe, but the concept 
+    was extended because pandas does not yet support geologic time.
 
     Parameters
     ----------
 
     time : list or numpy.array
-        Time values for the time series
+        independent variable (t)
 
     value : list of numpy.array
-        ordinate values for the time series
-
-    time_name : string
-        Name of the time vector (e.g., 'Age').
-        Default is None. This is used to label the time axis on plots
+        values of the dependent variable (y)
 
     time_unit : string
-        Units for the time vector (e.g., 'yr B.P.').
-        Default is None
+        Units for the time vector (e.g., 'years').
+        Default is 'years'
+
+    time_name : string
+        Name of the time vector (e.g., 'Time','Age').
+        Default is None. This is used to label the time axis on plots
 
     value_name : string
         Name of the value vector (e.g., 'temperature')
@@ -89,17 +93,20 @@ class Series:
 
     value_unit : string
         Units for the value vector (e.g., 'deg C')
+        Default is None
 
     label : string
         Name of the time series (e.g., 'Nino 3.4')
+        Default is None
 
-    clean_ts : bool
-        remove the NaNs and let the time axis to be increasing if True
+    clean_ts : boolean flag
+        set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
+        Default is True
 
     Examples
     --------
 
-    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a PyleoSeries object.
+    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a pyleoSeries object.
 
     .. ipython:: python
         :okwarning:
@@ -114,7 +121,7 @@ class Series:
         value=data.iloc[:,2]
         ts=pyleo.Series(
             time=time, value=value,
-            time_name='Year (CE)', value_name='SOI', label='SOI'
+            time_name='Year (CE)', value_name='SOI', label='Southern Oscillation Index'
         )
         ts
         ts.__dict__.keys()
@@ -132,6 +139,136 @@ class Series:
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
+
+    def convert_time_unit(self, time_unit='years'):
+        ''' Convert the time unit of the timeseries
+
+        Parameters
+        ----------
+
+        time_unit : str
+            the target time unit, possible input: 
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts = pyleo.Series(time=time, value=value, time_unit='years')
+            new_ts.convert_time_unit(time_unit='bp')
+            print('Original timeseries:')
+            print('time unit:', ts.time_unit)
+            print('time:', ts.time)
+            print()
+            print('Converted timeseries:')
+            print('time unit:', new_ts.time_unit)
+            print('time:', new_ts.time)
+        '''
+
+        new_ts = self.copy()
+        if time_unit is not None:
+            tu = time_unit.lower()
+            if tu.find('ky')>=0 or tu.find('ka')>=0:
+                time_unit_label = 'ky BP'
+            elif tu.find('my')>=0 or tu.find('ma')>=0:
+                time_unit_label = 'my BP'
+            elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
+                time_unit_label = 'yrs BP'
+            elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0:
+                time_unit_label = 'yrs'
+            else:
+                raise ValueError(f"Input time_unit={time_unit} is not supported. Supported input: 'year', 'years', 'yr', 'yrs', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
+        else:
+            return new_ts
+
+        def convert_to_years():
+            def prograde_time(time, time_datum, time_exponent):
+                new_time = (time_datum + time)*10**(time_exponent)
+                return new_time
+
+            def retrograde_time(time, time_datum, time_exponent):
+                new_time = (time_datum - time)*10**(time_exponent)
+                return new_time
+
+            convert_func = {
+                'prograde': prograde_time,
+                'retrograde': retrograde_time,
+            }
+            if self.time_unit is not None:
+                tu = self.time_unit.lower()
+                if tu.find('ky')>=0 or tu.find('ka')>=0:
+                    time_dir = 'retrograde'
+                    time_datum = 1950/1e3
+                    time_exponent = 3
+                    time_unit_label = 'ky BP'
+                elif tu.find('my')>=0 or tu.find('ma')>=0:
+                    time_dir = 'retrograde'
+                    time_datum = 1950/1e6
+                    time_exponent = 6
+                elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
+                    time_dir ='retrograde'
+                    time_datum = 1950
+                    time_exponent = 0
+                else:
+                    time_dir ='prograde'
+                    time_datum = 0
+                    time_exponent = 0
+
+                new_time = convert_func[time_dir](self.time, time_datum, time_exponent)
+            else:
+                new_time = None
+
+            return new_time
+
+        def convert_to_bp():
+            time_yrs = convert_to_years()
+            time_bp = 1950 - time_yrs
+            return time_bp
+
+        def convert_to_ka():
+            time_bp = convert_to_bp()
+            time_ka = time_bp / 1e3
+            return time_ka
+
+        def convert_to_ma():
+            time_bp = convert_to_bp()
+            time_ma = time_bp / 1e6
+            return time_ma
+
+        convert_to = {
+            'yrs': convert_to_years(),
+            'yrs BP': convert_to_bp(),
+            'ky BP': convert_to_ka(),
+            'my BP': convert_to_ma(),
+        }
+
+        new_time = convert_to[time_unit_label]
+
+        dt = np.diff(new_time)
+        if any(dt<=0):
+            new_value, new_time = tsutils.sort_ts(self.value, new_time)
+        else:
+            new_value = self.copy().value
+
+        new_ts.time = new_time
+        new_ts.value = new_value
+        new_ts.time_unit = time_unit
+
+        return new_ts
 
     def make_labels(self):
         '''
@@ -2643,27 +2780,71 @@ class MultipleSeries:
     series_list : list
         a list of pyleoclim.Series objects
 
-    Examples
-    --------
+    time_unit : str
+        The target time unit for every series in the list.
+        If None, then no conversion will be applied;
+        Otherwise, the time unit of every series in the list will be converted to the target.
 
-    Create a MultipleSeries object for the Nino and All Indian Rainfall indices
-
-    .. ipython:: python
-        :okwarning:
-
-        import pyleoclim as pyleo
-        import pandas as pd
-        data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
-        t=data.iloc[:,0]
-        air=data.iloc[:,1]
-        nino=data.iloc[:,2]
-        ts_nino=pyleo.Series(time=t,value=nino)
-        ts_air=pyleo.Series(time=t,value=air)
-        series_list=[ts_nino,ts_air]
-        ts_all = pyleo.MultipleSeries(series_list)
     '''
-    def __init__(self, series_list):
+    def __init__(self, series_list, time_unit=None):
         self.series_list = series_list
+
+        if time_unit is not None:
+            new_ts_list = []
+            for ts in self.series_list:
+                new_ts = ts.convert_time_unit(time_unit=time_unit)
+                new_ts_list.append(new_ts)
+
+            self.series_list = new_ts_list
+    
+    def convert_time_unit(self, time_unit):
+        ''' Convert the time unit of the timeseries
+
+        Parameters
+        ----------
+
+        time_unit : str
+            the target time unit, possible input: 
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
+            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
+            ms = pyleo.MultipleSeries([ts1, ts2])
+            new_ms = ms.convert_time_unit('yr BP')
+            print('Original timeseries:')
+            print('time unit:', ms.time_unit)
+            print()
+            print('Converted timeseries:')
+            print('time unit:', new_ms.time_unit)
+        '''
+
+        new_ms = self.copy()
+        new_ts_list = []
+        for ts in self.series_list:
+            new_ts = ts.convert_time_unit(time_unit=time_unit)
+            new_ts_list.append(new_ts)
+
+        new_ms.time_unit = time_unit
+        new_ms.series_list = new_ts_list
+        return new_ms
 
     def append(self,ts):
         '''Append timeseries ts to MultipleSeries object
