@@ -149,9 +149,9 @@ class Series:
             the target time unit, possible input: 
             {
                 'year', 'years', 'yr', 'yrs',
-                'yr BP', 'yrs BP', 'year BP', 'years BP',
-                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP',
-                'my BP', 'myr BP', 'myrs BP', 'ma BP',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
             }
 
         Examples
@@ -185,12 +185,12 @@ class Series:
                 time_unit_label = 'ky BP'
             elif tu.find('my')>=0 or tu.find('ma')>=0:
                 time_unit_label = 'my BP'
-            elif tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
+            elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
                 time_unit_label = 'yrs BP'
             elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0:
                 time_unit_label = 'yrs'
             else:
-                raise ValueError(f"Input time_unit={time_unit} is not supported. Supported input: 'year', 'years', 'yr', 'yrs', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
+                raise ValueError(f"Input time_unit={time_unit} is not supported. Supported input: 'year', 'years', 'yr', 'yrs', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
         else:
             return new_ts
 
@@ -218,7 +218,7 @@ class Series:
                     time_dir = 'retrograde'
                     time_datum = 1950/1e6
                     time_exponent = 6
-                elif tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
+                elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
                     time_dir ='retrograde'
                     time_datum = 1950
                     time_exponent = 0
@@ -2774,24 +2774,6 @@ class MultipleSeries:
         If None, then no conversion will be applied;
         Otherwise, the time unit of every series in the list will be converted to the target.
 
-    Examples
-    --------
-
-    Create a MultipleSeries object for the Nino and All Indian Rainfall indices
-
-    .. ipython:: python
-        :okwarning:
-
-        import pyleoclim as pyleo
-        import pandas as pd
-        data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
-        t=data.iloc[:,0]
-        air=data.iloc[:,1]
-        nino=data.iloc[:,2]
-        ts_nino=pyleo.Series(time=t,value=nino)
-        ts_air=pyleo.Series(time=t,value=air)
-        series_list=[ts_nino,ts_air]
-        ts_all = pyleo.MultipleSeries(series_list)
     '''
     def __init__(self, series_list, time_unit=None):
         self.series_list = series_list
@@ -2803,6 +2785,55 @@ class MultipleSeries:
                 new_ts_list.append(new_ts)
 
             self.series_list = new_ts_list
+    
+    def convert_time_unit(self, time_unit):
+        ''' Convert the time unit of the timeseries
+
+        Parameters
+        ----------
+
+        time_unit : str
+            the target time unit, possible input: 
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
+            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
+            ms = pyleo.MultipleSeries([ts1, ts2])
+            new_ms = ms.convert_time_unit('yr BP')
+            print('Original timeseries:')
+            print('time unit:', ms.time_unit)
+            print()
+            print('Converted timeseries:')
+            print('time unit:', new_ms.time_unit)
+        '''
+
+        new_ms = self.copy()
+        new_ts_list = []
+        for ts in self.series_list:
+            new_ts = ts.convert_time_unit(time_unit=time_unit)
+            new_ts_list.append(new_ts)
+
+        new_ms.time_unit = time_unit
+        new_ms.series_list = new_ts_list
+        return new_ms
 
     def append(self,ts):
         '''Append timeseries ts to MultipleSeries object
@@ -2840,7 +2871,7 @@ class MultipleSeries:
             s.value=v_mod
             ms.series_list[idx]=s
         return ms
-    
+
     def common_time(self,method='binning',**kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via either binning 
         or interpolation. This is critical for workflows that need to assume a 
