@@ -145,8 +145,14 @@ class Series:
         Parameters
         ----------
 
-        time_unit : str, {'years', 'bp', 'ka', 'ma'}
-            the target time unit; {'years', 'bp', 'ka', 'ma'} are supported
+        time_unit : str
+            the target time unit, possible input: 
+            {
+                'year', 'years', 'yr', 'yrs',
+                'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP',
+            }
 
         Examples
         --------
@@ -172,6 +178,22 @@ class Series:
             print('time:', new_ts.time)
         '''
 
+        new_ts = self.copy()
+        if time_unit is not None:
+            tu = time_unit.lower()
+            if tu.find('ky')>=0 or tu.find('ka')>=0:
+                time_unit_label = 'ky BP'
+            elif tu.find('my')>=0 or tu.find('ma')>=0:
+                time_unit_label = 'my BP'
+            elif tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
+                time_unit_label = 'yrs BP'
+            elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0:
+                time_unit_label = 'yrs'
+            else:
+                raise ValueError(f"Input time_unit={time_unit} is not supported. Supported input: 'year', 'years', 'yr', 'yrs', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
+        else:
+            return new_ts
+
         def convert_to_years():
             def prograde_time(time, time_datum, time_exponent):
                 new_time = (time_datum + time)*10**(time_exponent)
@@ -185,19 +207,18 @@ class Series:
                 'prograde': prograde_time,
                 'retrograde': retrograde_time,
             }
-
             if self.time_unit is not None:
                 tu = self.time_unit.lower()
-
                 if tu.find('ky')>=0 or tu.find('ka')>=0:
                     time_dir = 'retrograde'
                     time_datum = 1950/1e3
                     time_exponent = 3
+                    time_unit_label = 'ky BP'
                 elif tu.find('my')>=0 or tu.find('ma')>=0:
                     time_dir = 'retrograde'
                     time_datum = 1950/1e6
                     time_exponent = 6
-                elif tu.find('bp')>=0:
+                elif tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
                     time_dir ='retrograde'
                     time_datum = 1950
                     time_exponent = 0
@@ -228,13 +249,13 @@ class Series:
             return time_ma
 
         convert_to = {
-            'years': convert_to_years(),
-            'bp': convert_to_bp(),
-            'ka': convert_to_ka(),
-            'ma': convert_to_ma(),
+            'yrs': convert_to_years(),
+            'yrs BP': convert_to_bp(),
+            'ky BP': convert_to_ka(),
+            'my BP': convert_to_ma(),
         }
 
-        new_time = convert_to[time_unit]
+        new_time = convert_to[time_unit_label]
 
         dt = np.diff(new_time)
         if any(dt<=0):
@@ -242,7 +263,6 @@ class Series:
         else:
             new_value = self.copy().value
 
-        new_ts = self.copy()
         new_ts.time = new_time
         new_ts.value = new_value
         new_ts.time_unit = time_unit
