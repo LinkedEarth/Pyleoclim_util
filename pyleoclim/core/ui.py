@@ -2797,7 +2797,7 @@ class MultipleSeries:
 
             self.series_list = new_ts_list
     
-    def convert_time_unit(self, time_unit):
+    def convert_time_unit(self, time_unit='years'):
         ''' Convert the time unit of the timeseries
 
         Parameters
