@@ -13,19 +13,22 @@ __all__ = [
     'bin',
     'interp',
     'grid_properties',
-    'on_common_axis',
     'standardize',
     'ts2segments',
     'clean_ts',
+    'dropna',
+    'sort_ts',
     'annualize',
     'gaussianize',
     'gaussianize_single',
     'detrend',
     'detect_outliers',
     'is_evenly_spaced',
-    'remove_outliers'
+    'remove_outliers',
+    'reduce_duplicated_timestamps',
 ]
 
+from typing import OrderedDict
 import numpy as np
 import pandas as pd
 from scipy import interpolate
@@ -452,9 +455,36 @@ def ts2segments(ys, ts, factor=10):
 
     return seg_ys, seg_ts, n_segs
 
-
 def clean_ts(ys, ts):
-    ''' Delete the NaNs in the time series and sort it with time axis ascending
+    ''' Cleaning the timeseries
+
+    Delete the NaNs in the time series and sort it with time axis ascending,
+    duplicated timestamps will be reduced by averaging the values.
+
+    Parameters
+    ----------
+    ys : array
+        A time series, NaNs allowed
+    ts : array
+        The time axis of the time series, NaNs allowed
+
+    Returns
+    -------
+    ys : array
+        The time series without nans
+    ts : array
+        The time axis of the time series without nans
+
+    '''
+    ys, ts = dropna(ys, ts)
+    ys, ts = sort_ts(ys, ts)
+    ys, ts = reduce_duplicated_timestamps(ys, ts)
+
+    return ys, ts
+
+
+def dropna(ys, ts):
+    ''' Remove entries of ys or ts that bear NaNs
 
     Parameters
     ----------
@@ -482,13 +512,82 @@ def clean_ts(ys, ts):
     ys = ys[~np.isnan(ts_tmp)]
     ts = ts[~np.isnan(ts_tmp)]
 
+    return ys, ts
+
+def sort_ts(ys, ts):
+    ''' Sort ts values in ascending order
+
+    Parameters
+    ----------
+    ys : array
+        Dependent variable
+    ts : array
+        Independent variable
+
+    Returns
+    -------
+    ys : array
+        Dependent variable
+    ts : array
+        Independent variable, sorted in ascending order
+
+    '''
+    ys = np.asarray(ys, dtype=np.float)
+    ts = np.asarray(ts, dtype=np.float)
+    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
+
     # sort the time series so that the time axis will be ascending
-    sort_ind = np.argsort(ts)
-    ys = ys[sort_ind]
-    ts = ts[sort_ind]
+    dt = np.median(np.diff(ts))
+    if dt < 0:
+        sort_ind = np.argsort(ts)
+        ys = ys[sort_ind]
+        ts = ts[sort_ind]
+        print('The time axis has been adjusted to be ascending!')
 
     return ys, ts
 
+def reduce_duplicated_timestamps(ys, ts):
+    ''' Reduce duplicated timestamps in a timeseries by averaging the values
+
+    Parameters
+    ----------
+    ys : array
+        Dependent variable
+    ts : array
+        Independent variable
+
+    Returns
+    -------
+    ys : array
+        Dependent variable
+    ts : array
+        Independent variable, with duplicated timestamps reduced by averaging the values
+
+    '''
+    ys = np.asarray(ys, dtype=np.float)
+    ts = np.asarray(ts, dtype=np.float)
+    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
+
+    if len(ts) != len(set(ts)):
+        value = OrderedDict()
+        for t, y in zip(ts, ys):
+            if t not in value:
+                value[t] = [y]
+            else:
+                value[t].append(y)
+
+        ts = []
+        ys = []
+        for k, v in value.items():
+            ts.append(k)
+            ys.append(np.mean(v))
+
+        ts = np.array(ts)
+        ys = np.array(ys)
+
+        print('Duplicated timestamps has been reduced by averaging values!')
+        
+    return ys, ts
 
 def annualize(ys, ts):
     ''' Annualize a time series whose time resolution is finer than 1 year
@@ -508,6 +607,10 @@ def annualize(ys, ts):
               The time axis of the annualized time series
 
     '''
+    ys = np.asarray(ys, dtype=np.float)
+    ts = np.asarray(ts, dtype=np.float)
+    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
+
     year_int = list(set(np.floor(ts)))
     year_int = np.sort(list(map(int, year_int)))
     n_year = len(year_int)
