@@ -366,7 +366,7 @@ class Series:
              linestyle=None, linewidth=None, xlim=None, ylim=None,
              label=None, xlabel=None, ylabel=None, title=None, zorder=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None, alpha=None,
-             savefig_settings=None, ax=None, mute=False):
+             savefig_settings=None, ax=None, mute=False, invert_xaxis=False):
         ''' Plot the timeseries
 
         Parameters
@@ -411,6 +411,9 @@ class Series:
 
         legend : {True, False}
             plot legend or not
+
+        invert_xaxis : bool, optional
+            if True, the x-axis of the plot will be inverted
 
         plot_kwargs : dict
             the dictionary of keyword arguments for ax.plot()
@@ -545,7 +548,7 @@ class Series:
             title=title, savefig_settings=savefig_settings,
             ax=ax, legend=legend, xlim=xlim, ylim=ylim,
             plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
-            mute=mute,
+            mute=mute, invert_xaxis=invert_xaxis,
         )
 
         return res
@@ -3294,9 +3297,9 @@ class MultipleSeries:
     def plot(self, figsize=[10, 4],
              marker=None, markersize=None, color=None,
              linestyle=None, linewidth=None,
-             label=None, xlabel=None, ylabel=None, title=None,
+             xlabel=None, ylabel=None, title=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None,
-             savefig_settings=None, ax=None, mute=False):
+             savefig_settings=None, ax=None, mute=False, invert_xaxis=False):
         '''Plot multiple timeseries on the same axis
 
         Parameters
@@ -3313,8 +3316,6 @@ class MultipleSeries:
             Line style. The default is None.
         linewidth : float, optional
             The width of the line. The default is None.
-        label : str, optional
-            Label for the series. The default is None.
         xlabel : str, optional
             x-axis label. The default is None.
         ylabel : str, optional
@@ -3337,6 +3338,8 @@ class MultipleSeries:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+        invert_xaxis : bool, optional
+            if True, the x-axis of the plot will be inverted
 
         Returns
         -------
@@ -3356,9 +3359,12 @@ class MultipleSeries:
         for s in self.series_list:
             ax = s.plot(
                 figsize=figsize, marker=marker, markersize=markersize, color=color, linestyle=linestyle,
-                linewidth=linewidth, label=label, xlabel=xlabel, ylabel=ylabel, title=title,
-                legend=False, plot_kwargs=plot_kwargs, ax=ax,
+                linewidth=linewidth, label=s.label, xlabel=xlabel, ylabel=ylabel, title=title,
+                legend=legend, lgd_kwargs=lgd_kwargs, plot_kwargs=plot_kwargs, ax=ax,
             )
+
+        if invert_xaxis:
+            ax.invert_xaxis()
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
