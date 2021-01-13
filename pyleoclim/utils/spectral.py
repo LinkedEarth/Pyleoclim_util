@@ -12,6 +12,7 @@ import numpy as np
 from scipy import signal
 import nitime.algorithms as nialg
 import collections
+import warnings
 
 __all__ = [
     'wwz_psd',
@@ -473,7 +474,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     # divide into segments
     nseg=int(np.floor(2*len(ts)/(n50+1)))
     index=np.array(np.arange(0,len(ts),nseg/2),dtype=int)
-    index[-1]=len(ts) #make it ends at the time series
+    index=np.append(index,len(ts)) #make it ends at the time series
 
     ts_seg=[]
     ys_seg=[]
@@ -499,11 +500,6 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
     freq_angular = 2 * np.pi * freq
 
-    # fix the zero frequency point
-    #if freq[0] == 0:
-        #freq_copy = freq[1:]
-        #freq_angular = 2 * np.pi * freq_copy
-
     psd_seg=[]
 
     for idx,item in enumerate(ys_seg):
@@ -519,8 +515,27 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     else:
         raise ValueError('Average should either be set to mean or median')
 
-    #if freq[0] == 0:
-        #psd = np.insert(psd, 0, np.nan)
+    # Fix possible problems at the edge
+    if psd[0]<psd[1]:    
+        if abs(1-abs(psd[1]-psd[0])/psd[1])<1.e-2:
+            warnings.warn("Unstability at the beginning of freq vector, removing point")
+            psd=psd[1:]
+            freq=freq[1:]
+    else:
+        if abs(1-abs(psd[0]-psd[1])/psd[0])<1.e-2:
+            warnings.warn("Unstability at the beginning of freq vector, removing point")
+            psd=psd[1:]
+            freq=freq[1:]
+    if psd[-1]>psd[-2]:
+        if abs(1-abs(psd[-1]-psd[-2])/psd[-1])<1.e-2:
+            warnings.warn("Unstability at the end of freq vector, removing point")
+            psd=psd[0:-2]
+            freq=freq[0:-2]
+    else:
+        if abs(1-abs(psd[-2]-psd[-1])/psd[-2])<1.e-2:
+            warnings.warn("Unstability at the end of freq vector, removing point")
+            psd=psd[0:-2]
+            freq=freq[0:-2]
 
     # output result
     res_dict = {
