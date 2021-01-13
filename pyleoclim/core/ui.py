@@ -1876,7 +1876,8 @@ class PSD:
 
     '''
     def __init__(self, frequency, amplitude, label=None, timeseries=None, plot_kwargs=None,
-                 spec_method=None, spec_args=None, signif_qs=None, signif_method=None, period_unit=None):
+                 spec_method=None, spec_args=None, signif_qs=None, signif_method=None, period_unit=None,
+                 beta_est_res=None):
         self.frequency = np.array(frequency)
         self.amplitude = np.array(amplitude)
         self.label = label
@@ -1886,6 +1887,7 @@ class PSD:
         self.signif_qs = signif_qs
         self.signif_method = signif_method
         self.plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+        self.beta_est_res = beta_est_res
 
         if period_unit is not None:
             self.period_unit = period_unit
@@ -1942,7 +1944,7 @@ class PSD:
 
         return new
 
-    def beta_est(self, fmin=None, fmax=None, verbose=False):
+    def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
         ''' Estimate the scaling factor beta of the PSD in a log-log space
 
         Parameters
@@ -1953,6 +1955,10 @@ class PSD:
 
         fmax : float
             the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
+
+        logf_binning_step : str, {'max', 'first'}
+            if 'max', then the maximum spacing of log(f) will be used as the binning step
+            if 'first', then the 1st spacing of log(f) will be used as the binning step
 
         verbose : bool
             if True, will print out debug information
@@ -1974,7 +1980,7 @@ class PSD:
         if fmax is None:
             fmax = np.max(self.frequency)
 
-        res = waveutils.beta_estimation(self.amplitude, self.frequency, fmin=fmin, fmax=fmax, verbose=verbose)
+        res = waveutils.beta_estimation(self.amplitude, self.frequency, fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
         res_dict = {
             'beta': res.beta,
             'std_err': res.std_err,
@@ -1982,13 +1988,12 @@ class PSD:
             'psd_binned': res.psd_binned,
             'Y_reg': res.Y_reg,
         }
-
         return res_dict
 
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
-             plot_legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
+             legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
              plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
         '''Plots the PSD estimates and signif level if included
 
@@ -2036,7 +2041,7 @@ class PSD:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax The default is False.
-        plot_legend : bool, optional
+        legend : bool, optional
             whether to plot the legend. The default is True.
         lgd_kwargs : dict, optional
             Arguments for the legend. The default is None.
@@ -2186,7 +2191,7 @@ class PSD:
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
 
-        if plot_legend:
+        if legend:
             lgd_args = {'frameon': False}
             lgd_args.update(lgd_kwargs)
             ax.legend(**lgd_args)
@@ -3576,7 +3581,7 @@ class MultiplePSD:
         psds = MultiplePSD(psd_list=psd_list)
         return psds
 
-    def beta_est(self, fmin=None, fmax=None, verbose=False):
+    def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
         ''' Estimate the scaling factor beta of the each PSD from the psd_list in a log-log space
 
         Parameters
@@ -3587,6 +3592,10 @@ class MultiplePSD:
 
         fmax : float
             the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
+
+        logf_binning_step : str, {'max', 'first'}
+            if 'max', then the maximum spacing of log(f) will be used as the binning step
+            if 'first', then the 1st spacing of log(f) will be used as the binning step
 
         verbose : bool
             if True, will print out debug information
@@ -3615,7 +3624,7 @@ class MultiplePSD:
         res_dict['psd_binned'] = []
         res_dict['Y_reg'] = []
         for psd_obj in self.psd_list:
-            res = psd_obj.beta_est(fmin=fmin, fmax=fmax, verbose=verbose)
+            res = psd_obj.beta_est(fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
             for k in res_dict.keys():
                 res_dict[k].append(res[k])
 
@@ -3623,7 +3632,7 @@ class MultiplePSD:
 
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
-             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
+             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, legend=True,
              plot_kwargs=None, lgd_kwargs=None, mute=False):
         '''Plot multiple PSD on the same plot
 
@@ -3656,7 +3665,7 @@ class MultiplePSD:
             x-ticks label. The default is None.
         yticks : list, optional
             y-ticks label. The default is None.
-        plot_legend : bool, optional
+        legend : bool, optional
             Whether to plot the legend. The default is True.
         plot_kwargs : TYPE, optional
             Parameters for plot function. The default is None.
@@ -3690,7 +3699,7 @@ class MultiplePSD:
             ax = psd.plot(
                 figsize=figsize, in_loglog=in_loglog, in_period=in_period, xlabel=xlabel, ylabel=ylabel,
                 title=title, xlim=xlim, ylim=ylim, savefig_settings=savefig_settings, ax=ax,
-                xticks=xticks, yticks=yticks, plot_legend=plot_legend, plot_kwargs=tmp_plot_kwargs, lgd_kwargs=lgd_kwargs,
+                xticks=xticks, yticks=yticks, legend=legend, plot_kwargs=tmp_plot_kwargs, lgd_kwargs=lgd_kwargs,
             )
 
         if title is not None:
