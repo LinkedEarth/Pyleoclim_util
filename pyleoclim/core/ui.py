@@ -44,6 +44,7 @@ def dict2namedtuple(d):
 
 def infer_period_unit_from_time_unit(time_unit):
     ''' infer a period unit based on the given time unit
+      
     '''
     if time_unit is None:
         period_unit = None
@@ -4063,7 +4064,7 @@ class Lipd:
 
     usr_path : str
         path to the Lipd file(s). Can be URL (LiPD utilities only support loading one file at a time from a URL)
-        If it's a URL, it must start with "http", "https", or "ftp.
+        If it's a URL, it must start with "http", "https", or "ftp".
 
     lidp_dict : dict
         LiPD files already loaded into Python through the LiPD utilities
@@ -4176,7 +4177,7 @@ class Lipd:
 
         return new
     
-    def to_LiPDSeries(self):
+    def to_LipdSeries(self):
         '''Extracts all the timeseries objects to a list of LipdSeries objects
         
         Returns
