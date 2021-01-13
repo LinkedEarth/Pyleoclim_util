@@ -2350,7 +2350,7 @@ class Scalogram:
                 ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
 
         cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
-        ax.set_yscale('log', nonpositive='clip')
+        ax.set_yscale('log')
 
         # plot colorbar
         cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
