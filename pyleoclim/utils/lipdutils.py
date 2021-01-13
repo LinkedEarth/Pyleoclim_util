@@ -501,6 +501,8 @@ def LipdToOntology(archiveType):
     #Align with the ontology
     if archiveType.lower().replace(" ", "") == "icecore":
         archiveType = 'glacierice'
+    elif archiveType.lower().replace(" ", "") == "ice-other":
+        archiveType = 'glacierice'
     elif archiveType.lower().replace(" ", "") == 'tree':
         archiveType = 'wood'
     elif archiveType.lower().replace(" ", "") == 'borehole':
