@@ -2797,11 +2797,12 @@ class MultipleSeries:
     '''
     def __init__(self, series_list, time_unit=None):
         self.series_list = series_list
+        self.time_unit = time_unit
 
-        if time_unit is not None:
+        if self.time_unit is not None:
             new_ts_list = []
             for ts in self.series_list:
-                new_ts = ts.convert_time_unit(time_unit=time_unit)
+                new_ts = ts.convert_time_unit(time_unit=self.time_unit)
                 new_ts_list.append(new_ts)
 
             self.series_list = new_ts_list
