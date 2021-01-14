@@ -16,9 +16,9 @@ Series (pyleoclim.Series)
 """""""""""""""""""""""""
 
 The Series class describes the most basic objects in Pyleoclim. A Series is a simple `dictionary <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_ that contains 3 things:
- (1) a series of real-valued numbers;
- (1) a time axis at which those values were measured/simulated ;
- (1) optionally, some metadata about both axes, like units, labels and the like.
+- a series of real-valued numbers;
+- a time axis at which those values were measured/simulated ;
+- optionally, some metadata about both axes, like units, labels and the like.
 
 How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
 
@@ -30,8 +30,7 @@ How to create and manipulate such objects is described in a short example below,
 MultipleSeries (pyleoclim.MultipleSeries)
 """""""""""""""""""""""""""""""""""""""""
 
-As the name implies, a MultipleSeries object is a collection (more precisely, a `list <https://docs.python.org/3/tutorial/introduction.html#lists
->`_) of multiple Series objects. This is handy in case you want to apply the same method to such a collection at once (e.g. process a bunch of series in a consistent fashion).
+As the name implies, a MultipleSeries object is a collection (more precisely, a `list <https://docs.python.org/3/tutorial/introduction.html#lists>`_) of multiple Series objects. This is handy in case you want to apply the same method to such a collection at once (e.g. process a bunch of series in a consistent fashion).
 
 .. autoclass:: pyleoclim.core.ui.MultipleSeries
    :members:
