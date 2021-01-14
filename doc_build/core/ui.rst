@@ -58,7 +58,8 @@ This class allows to manipulate LiPD objects.
 LipdSeries (pyleoclim.LipdSeries)
 """""""""""""""""""""""""""""""""
 
-This class allows to manipulate LiPD timeseries objects. This is a subclass of Series. See applicable methods there.
+LipdSeries are (you guessed it), Series objects that are created from LiPD objects. As a subclass of Series, they inherit all its methods.
+When created, LiPDSeries automatically instantiates the time, value and other parameters from what’s in the lipd file.
 
 .. autoclass:: pyleoclim.core.ui.LipdSeries
    :members:
@@ -76,7 +77,7 @@ Available methods:
 
 Scalogram (pyleoclim.Scalogram)
 """""""""""""""""""""""""""""""
-The Scalogram class is analogous to PSD:
+The Scalogram class is analogous to PSD, but for wavelet spectra (scalograms)
 
 .. autoclass:: pyleoclim.core.ui.Scalogram
    :members:
