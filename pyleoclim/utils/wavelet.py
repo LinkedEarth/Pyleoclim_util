@@ -1739,7 +1739,7 @@ def make_freq_vector(ts, method='log', **kwargs):
 
     return freq
 
-def beta_estimation(psd, freq, fmin=None, fmax=None, verbose=False):
+def beta_estimation(psd, freq, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
     ''' Estimate the power slope of a 1/f^beta process.
 
     Parameters
@@ -1798,7 +1798,13 @@ def beta_estimation(psd, freq, fmin=None, fmax=None, verbose=False):
         return res
 
     logf = np.log(freq)
-    logf_step = np.max(np.diff(logf))
+    if logf_binning_step == 'max':
+        logf_step = np.max(np.diff(logf))
+    elif logf_binning_step == 'first':
+        logf_step = logf[fminindx+1] - logf[fminindx]
+    else:
+        raise ValueError('the option for logf_binning_step is unknown')
+
     logf_start = logf[fminindx]
     logf_end = logf[fmaxindx]
     logf_binedges = np.arange(logf_start, logf_end+logf_step, logf_step)
@@ -1812,7 +1818,7 @@ def beta_estimation(psd, freq, fmin=None, fmax=None, verbose=False):
     for i in range(n_intervals):
         lb = logf_binedges[i]
         ub = logf_binedges[i+1]
-        q = np.where((logf >= lb) & (logf <= ub))
+        q = np.where((logf > lb) & (logf <= ub))
 
         logpsd_binned[i] = np.nanmean(logpsd[q])
         logf_binned[i] = (ub + lb) / 2

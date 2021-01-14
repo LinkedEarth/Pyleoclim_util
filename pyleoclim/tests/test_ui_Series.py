@@ -187,7 +187,7 @@ class TestUiSeriesSpectral:
         beta = psd.beta_est()['beta']
         assert np.abs(beta-alpha) < eps
 
-    def test_spectral_t5(self, eps=0.3):
+    def test_spectral_t5(self, eps=0.5):
         ''' Test Series.spectral() with WWZ with specified frequency vector passed via `settings`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.

@@ -44,6 +44,7 @@ def dict2namedtuple(d):
 
 def infer_period_unit_from_time_unit(time_unit):
     ''' infer a period unit based on the given time unit
+      
     '''
     if time_unit is None:
         period_unit = None
@@ -1876,7 +1877,8 @@ class PSD:
 
     '''
     def __init__(self, frequency, amplitude, label=None, timeseries=None, plot_kwargs=None,
-                 spec_method=None, spec_args=None, signif_qs=None, signif_method=None, period_unit=None):
+                 spec_method=None, spec_args=None, signif_qs=None, signif_method=None, period_unit=None,
+                 beta_est_res=None):
         self.frequency = np.array(frequency)
         self.amplitude = np.array(amplitude)
         self.label = label
@@ -1886,6 +1888,7 @@ class PSD:
         self.signif_qs = signif_qs
         self.signif_method = signif_method
         self.plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+        self.beta_est_res = beta_est_res
 
         if period_unit is not None:
             self.period_unit = period_unit
@@ -1942,7 +1945,7 @@ class PSD:
 
         return new
 
-    def beta_est(self, fmin=None, fmax=None, verbose=False):
+    def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
         ''' Estimate the scaling factor beta of the PSD in a log-log space
 
         Parameters
@@ -1953,6 +1956,10 @@ class PSD:
 
         fmax : float
             the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
+
+        logf_binning_step : str, {'max', 'first'}
+            if 'max', then the maximum spacing of log(f) will be used as the binning step
+            if 'first', then the 1st spacing of log(f) will be used as the binning step
 
         verbose : bool
             if True, will print out debug information
@@ -1974,7 +1981,7 @@ class PSD:
         if fmax is None:
             fmax = np.max(self.frequency)
 
-        res = waveutils.beta_estimation(self.amplitude, self.frequency, fmin=fmin, fmax=fmax, verbose=verbose)
+        res = waveutils.beta_estimation(self.amplitude, self.frequency, fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
         res_dict = {
             'beta': res.beta,
             'std_err': res.std_err,
@@ -1982,13 +1989,12 @@ class PSD:
             'psd_binned': res.psd_binned,
             'Y_reg': res.Y_reg,
         }
-
         return res_dict
 
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
-             plot_legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
+             legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
              plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
         '''Plots the PSD estimates and signif level if included
 
@@ -2036,7 +2042,7 @@ class PSD:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax The default is False.
-        plot_legend : bool, optional
+        legend : bool, optional
             whether to plot the legend. The default is True.
         lgd_kwargs : dict, optional
             Arguments for the legend. The default is None.
@@ -2186,7 +2192,7 @@ class PSD:
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
 
-        if plot_legend:
+        if legend:
             lgd_args = {'frameon': False}
             lgd_args.update(lgd_kwargs)
             ax.legend(**lgd_args)
@@ -2345,7 +2351,7 @@ class Scalogram:
                 ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
 
         cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
-        ax.set_yscale('log', nonpositive='clip')
+        ax.set_yscale('log')
 
         # plot colorbar
         cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
@@ -2791,11 +2797,12 @@ class MultipleSeries:
     '''
     def __init__(self, series_list, time_unit=None):
         self.series_list = series_list
+        self.time_unit = time_unit
 
-        if time_unit is not None:
+        if self.time_unit is not None:
             new_ts_list = []
             for ts in self.series_list:
-                new_ts = ts.convert_time_unit(time_unit=time_unit)
+                new_ts = ts.convert_time_unit(time_unit=self.time_unit)
                 new_ts_list.append(new_ts)
 
             self.series_list = new_ts_list
@@ -3576,7 +3583,7 @@ class MultiplePSD:
         psds = MultiplePSD(psd_list=psd_list)
         return psds
 
-    def beta_est(self, fmin=None, fmax=None, verbose=False):
+    def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
         ''' Estimate the scaling factor beta of the each PSD from the psd_list in a log-log space
 
         Parameters
@@ -3587,6 +3594,10 @@ class MultiplePSD:
 
         fmax : float
             the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
+
+        logf_binning_step : str, {'max', 'first'}
+            if 'max', then the maximum spacing of log(f) will be used as the binning step
+            if 'first', then the 1st spacing of log(f) will be used as the binning step
 
         verbose : bool
             if True, will print out debug information
@@ -3615,7 +3626,7 @@ class MultiplePSD:
         res_dict['psd_binned'] = []
         res_dict['Y_reg'] = []
         for psd_obj in self.psd_list:
-            res = psd_obj.beta_est(fmin=fmin, fmax=fmax, verbose=verbose)
+            res = psd_obj.beta_est(fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
             for k in res_dict.keys():
                 res_dict[k].append(res[k])
 
@@ -3623,7 +3634,7 @@ class MultiplePSD:
 
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
-             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
+             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, legend=True,
              plot_kwargs=None, lgd_kwargs=None, mute=False):
         '''Plot multiple PSD on the same plot
 
@@ -3656,7 +3667,7 @@ class MultiplePSD:
             x-ticks label. The default is None.
         yticks : list, optional
             y-ticks label. The default is None.
-        plot_legend : bool, optional
+        legend : bool, optional
             Whether to plot the legend. The default is True.
         plot_kwargs : TYPE, optional
             Parameters for plot function. The default is None.
@@ -3690,7 +3701,7 @@ class MultiplePSD:
             ax = psd.plot(
                 figsize=figsize, in_loglog=in_loglog, in_period=in_period, xlabel=xlabel, ylabel=ylabel,
                 title=title, xlim=xlim, ylim=ylim, savefig_settings=savefig_settings, ax=ax,
-                xticks=xticks, yticks=yticks, plot_legend=plot_legend, plot_kwargs=tmp_plot_kwargs, lgd_kwargs=lgd_kwargs,
+                xticks=xticks, yticks=yticks, legend=legend, plot_kwargs=tmp_plot_kwargs, lgd_kwargs=lgd_kwargs,
             )
 
         if title is not None:
@@ -4054,7 +4065,7 @@ class Lipd:
 
     usr_path : str
         path to the Lipd file(s). Can be URL (LiPD utilities only support loading one file at a time from a URL)
-        If it's a URL, it must start with "http", "https", or "ftp.
+        If it's a URL, it must start with "http", "https", or "ftp".
 
     lidp_dict : dict
         LiPD files already loaded into Python through the LiPD utilities
@@ -4075,7 +4086,7 @@ class Lipd:
         d=pyleo.Lipd(usr_path=url)
     '''
 
-    def __init__(self, query=False, query_args={}, usr_path=None, lipd_dict=None):
+    def __init__(self, usr_path=None, lipd_dict=None):
         self.plot_default = {'ice-other': ['#FFD600','h'],
                 'ice/rock': ['#FFD600', 'h'],
                 'coral': ['#FF8B00','o'],
@@ -4092,126 +4103,7 @@ class Lipd:
                 'midden' : ['#824E2B','o'],
                 'other':['k','o']}
 
-        #check that query has matching terms
-        if query==True and bool(query_args)==False:
-            raise ValueError('When query is set to true, you must define query terms')
-        if query==False and usr_path==None and lipd_dict==None:
-            usr_path==''
-
-        #deal with the query dictionary
-        if query==True and bool(query_args)==True:
-            if 'archiveType' in query_args.keys():
-                archiveType=query_args['archiveType']
-                if type(archiveType) == str:
-                    archiveType=lipdutils.pre_process_str(archiveType)
-                    archiveType=[archiveType]
-                else:
-                    archiveType=lipdutils.pre_process_list(archiveType)
-                availableType=lipdutils.whatArchives(print_response=False)
-                availableTypeP=lipdutils.pre_process_list(availableType)
-                res=[]
-                for item in archiveType:
-                    indices = [i for i, x in enumerate(availableTypeP) if x == item]
-                if len(indices)!=0:
-                    res.append(np.array(availableType)[indices].tolist())
-                res=np.unique(np.array(res)).tolist()
-                if len(res)==0:
-                    archiveType = [ ]
-                else:
-                    archiveType=res
-            else:
-                archiveType = [ ]
-
-            if 'proxyObsType' in query_args.keys():
-                proxyObsType=query_args['proxyObsType']
-                if type(proxyObsType) == str:
-                    proxyObsType=lipdutils.pre_process_str(proxyObsType)
-                    proxyObsType=[proxyObsType]
-                else:
-                    proxyObsType=lipdutils.pre_process_list(proxyObsType)
-                availableProxy=lipdutils.whatProxyObservations(print_response=False)
-                availableProxyP=lipdutils.pre_process_list(availableProxy)
-                res=[]
-                for item in proxyObsType:
-                    indices = [i for i, x in enumerate(availableProxyP) if x == item]
-                if len(indices)!=0:
-                    res.append(np.array(availableProxy)[indices].tolist())
-                res=np.unique(np.array(res)).tolist()
-                if len(res)==0:
-                    proxyObsType = [ ]
-                else:
-                    proxyObsType=res
-            else:
-                proxyObsType=[ ]
-
-            if 'infVarType' in query_args.keys():
-                infVarType=query_args['infVarType']
-            else:
-                infVarType=[ ]
-            if 'sensorGenus' in query_args.keys():
-                sensorGenus = query_args['sensorGenus']
-            else:
-                sensorGenus = [ ]
-            if 'sensorSpecies' in query_args.keys():
-                sensorSpecies = query_args['sensorSpecies']
-            else:
-                sensorSpecies=[ ]
-            if 'interpName' in query_args.keys():
-                interpName = query_args['interpName']
-            else:
-                interpName=[ ]
-            if 'interpDetail' in query_args.keys():
-                interpDetail = query_args['interpDetail']
-            else:
-                interpDetail = [ ]
-            if 'ageUnits' in query_args.keys():
-                ageUnits = query_args['ageUnits']
-            else:
-                ageUnits = [ ]
-            if 'ageBound' in query_args.keys():
-                ageBound = query_args['ageBound']
-            else:
-                ageBound=[ ]
-            if 'ageBoundType' in query_args.keys():
-                ageBoundType = query_args['ageBoundType']
-            else:
-                ageBoundType = [ ]
-            if 'recordLength' in query_args.keys():
-                recordLength = query_args['recordLength']
-            else:
-                recordLength = [ ]
-            if 'resolution' in query_args.keys():
-                resolution = query_args['resolution']
-            else:
-                resolution = [ ]
-            if 'lat' in query_args.keys():
-                lat = query_args['lat']
-            else:
-                lat = [ ]
-            if 'lon' in query_args.keys():
-                lon = query_args['lon']
-            else:
-                lon = [ ]
-            if 'alt' in query_args.keys():
-                alt = query_args['alt']
-            else:
-                alt= [ ]
-            if 'download_folder' in query_args.keys():
-                download_folder = query_args['download_folder']
-            else:
-                download_folder=os.getcwd()+'/'
-
-            lipdutils.queryLinkedEarth(archiveType=archiveType, proxyObsType=proxyObsType, infVarType = infVarType, sensorGenus=sensorGenus,
-                    sensorSpecies=sensorSpecies, interpName =interpName, interpDetail =interpDetail, ageUnits = ageUnits,
-                    ageBound = ageBound, ageBoundType = ageBoundType, recordLength = recordLength, resolution = resolution,
-                    lat = lat, lon = lon, alt = alt, print_response = False, download_lipd = True,
-                    download_folder = download_folder)
-
-            D_query = lpd.readLipd(download_folder)
-            if 'archiveType' in D_query.keys():
-                D_query={D_query['dataSetName']:D_query}
-        else:
-            D_query={}
+        
         #prepare the dictionaries for all possible scenarios
         if usr_path!=None:
             # since readLipd() takes only absolute path and it will change the current working directory (CWD) without turning back,
@@ -4241,7 +4133,6 @@ class Lipd:
 
         #assemble
         self.lipd={}
-        self.lipd.update(D_query)
         self.lipd.update(D_path)
         self.lipd.update(D_dict)
 
@@ -4254,12 +4145,12 @@ class Lipd:
         return deepcopy(self)
 
     def to_tso(self):
-        '''
+        '''Extracts all the timeseries objects to a list of LiPD tso
 
         Returns
         -------
         ts_list : list
-            List of Lipd timeseries objects
+            List of Lipd timeseries objects as defined by LiPD utilities
 
         '''
         ts_list=lpd.extractTs(self.__dict__['lipd'])
@@ -4286,7 +4177,25 @@ class Lipd:
             pass
 
         return new
+    
+    def to_LipdSeries(self):
+        '''Extracts all the timeseries objects to a list of LipdSeries objects
+        
+        Returns
+        -------
+        res : list
+            A list of LiPDSeries objects
 
+        '''
+        ts_list=lpd.extractTs(self.__dict__['lipd'])
+        
+        res=[]
+        
+        for item in ts_list:
+            res.append(LipdSeries(item))
+        
+        return res
+        
     def mapAllArchive(self, projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
            figsize = None, ax = None, marker=None, color=None,
