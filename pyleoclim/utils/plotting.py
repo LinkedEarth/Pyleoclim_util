@@ -380,11 +380,9 @@ def showfig(fig):
             print(f'{error.__class__.__name__}: {error.message}')
 
         display(fig)
-        plt.close(fig)
 
     else:
         plt.show()
-        plt.close(fig)
 
 
 def savefig(fig, path=None, settings={}, verbose=True):
