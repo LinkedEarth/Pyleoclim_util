@@ -44,7 +44,7 @@ def dict2namedtuple(d):
 
 def infer_period_unit_from_time_unit(time_unit):
     ''' infer a period unit based on the given time unit
-      
+
     '''
     if time_unit is None:
         period_unit = None
@@ -68,7 +68,7 @@ class Series:
     ''' pyleoSeries object y(t)
 
     The Series class is, at its heart, a simple structure containing two arrays y and t of equal length, and some
-    metadata allowing to interpret and plot the series. It is similar to a 1-column pandas dataframe, but the concept 
+    metadata allowing to interpret and plot the series. It is similar to a 1-column pandas dataframe, but the concept
     was extended because pandas does not yet support geologic time.
 
     Parameters
@@ -148,7 +148,7 @@ class Series:
         ----------
 
         time_unit : str
-            the target time unit, possible input: 
+            the target time unit, possible input:
             {
                 'year', 'years', 'yr', 'yrs',
                 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
@@ -2806,7 +2806,7 @@ class MultipleSeries:
                 new_ts_list.append(new_ts)
 
             self.series_list = new_ts_list
-    
+
     def convert_time_unit(self, time_unit='years'):
         ''' Convert the time unit of the timeseries
 
@@ -2814,7 +2814,7 @@ class MultipleSeries:
         ----------
 
         time_unit : str
-            the target time unit, possible input: 
+            the target time unit, possible input:
             {
                 'year', 'years', 'yr', 'yrs',
                 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
@@ -2964,28 +2964,28 @@ class MultipleSeries:
         ----------
         target : pyleoclim.Series, optional
             A pyleoclim Series object.
-        
+
         timespan : tuple
             The time interval over which to perform the calculation
 
         alpha : float
             The significance level (0.05 by default)
-        
+
         settings : dict
             Parameters for the correlation function (singificance testing and number of simulation)
 
         common_time_kwargs : dict
             Parameters for the method MultipleSeries.common_time()
-            
+
         Returns
         -------
-        
+
         res : dict
-            Containing a list of the Pearson's correlation coefficient, associated significance and p-value. 
-        
+            Containing a list of the Pearson's correlation coefficient, associated significance and p-value.
+
         See also
         --------
-        
+
         pyleoclim.utils.correlation.corr_sig : Correlation function
 
         Examples
@@ -3430,7 +3430,7 @@ class EnsembleSeries(MultipleSeries):
 
         timespan : tuple
             The time interval over which to perform the calculation
-        
+
         alpha : float
             The significance level (0.05 by default)
 
@@ -3500,7 +3500,7 @@ class EnsembleSeries(MultipleSeries):
                 else:
                     value2 = target.series_list[idx-nEns].value
                     time2 = target.series_list[idx-nEns].time
-            else: 
+            else:
                 value2 = target.value
                 time2 = target.time
 
@@ -3939,7 +3939,7 @@ class CorrEns:
 
     See also
     --------
-        
+
     pyleoclim.utils.correlation.corr_sig : Correlation function
     pyleoclim.utils.correlation.fdr : FDR function
     '''
@@ -4035,7 +4035,7 @@ class CorrEns:
 
         r_pcts = np.percentile(self.r, [2.5, 25, 50, 75, 97.5])
         trans = transforms.blended_transform_factory(ax.transData, ax.transAxes)
-        for r_pct, pt, ls in zip(r_pcts, np.array([2.5, 25, 50, 75, 97.5])/100, [':', '--', '-', '--', ':']): 
+        for r_pct, pt, ls in zip(r_pcts, np.array([2.5, 25, 50, 75, 97.5])/100, [':', '--', '-', '--', ':']):
             ax.axvline(x=r_pct, linestyle=ls, color=clr_percentile)
             ax.text(x=r_pct, y=1.02, s=pt, color=clr_percentile, transform=trans, ha='center', fontsize=10)
 
@@ -4049,7 +4049,7 @@ class CorrEns:
             t_args = {'y': 1.1, 'weight': 'bold'}
             t_args.update(title_kwargs)
             ax.set_title(title, **t_args)
-        
+
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
         else:
@@ -4103,7 +4103,7 @@ class Lipd:
                 'midden' : ['#824E2B','o'],
                 'other':['k','o']}
 
-        
+
         #prepare the dictionaries for all possible scenarios
         if usr_path!=None:
             # since readLipd() takes only absolute path and it will change the current working directory (CWD) without turning back,
@@ -4177,9 +4177,9 @@ class Lipd:
             pass
 
         return new
-    
+
     def to_LipdSeries(self):
-        '''Extracts all the timeseries objects to a list of LipdSeries objects
+        '''Extracts all LiPD timeseries objects to a list of LipdSeries objects
         
         Returns
         -------
@@ -4188,14 +4188,14 @@ class Lipd:
 
         '''
         ts_list=lpd.extractTs(self.__dict__['lipd'])
-        
+
         res=[]
-        
+
         for item in ts_list:
             res.append(LipdSeries(item))
-        
+
         return res
-        
+
     def mapAllArchive(self, projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
            figsize = None, ax = None, marker=None, color=None,
