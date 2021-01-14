@@ -170,7 +170,7 @@ class Series:
             time = data.iloc[:,1]
             value = data.iloc[:,2]
             ts = pyleo.Series(time=time, value=value, time_unit='years')
-            new_ts.convert_time_unit(time_unit='bp')
+            new_ts = ts.convert_time_unit(time_unit='yrs BP')
             print('Original timeseries:')
             print('time unit:', ts.time_unit)
             print('time:', ts.time)
