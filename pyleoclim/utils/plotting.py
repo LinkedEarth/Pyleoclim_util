@@ -122,7 +122,8 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
 
 def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, 
             xlim=None, ylim=None,savefig_settings=None, ax=None,
-            legend=True, plot_kwargs=None, lgd_kwargs=None, mute=False):
+            legend=True, plot_kwargs=None, lgd_kwargs=None, mute=False,
+            invert_xaxis=False):
     ''' Plot a timeseries
     
     Parameters
@@ -159,6 +160,9 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
         - "path" must be specified; it can be any existed or non-existed path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+    invert_xaxis : bool, optional
+        if True, the x-axis of the plot will be inverted
         
     Returns
     -------
@@ -202,6 +206,9 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
         ax.legend(**lgd_kwargs)
     else:
         ax.legend().remove()
+
+    if invert_xaxis:
+        ax.invert_xaxis()
 
     if 'fig' in locals():
         if 'path' in savefig_settings:
@@ -373,9 +380,11 @@ def showfig(fig):
             print(f'{error.__class__.__name__}: {error.message}')
 
         display(fig)
+        plt.close(fig)
 
     else:
         plt.show()
+        plt.close(fig)
 
 
 def savefig(fig, path=None, settings={}, verbose=True):
@@ -419,7 +428,7 @@ def savefig(fig, path=None, settings={}, verbose=True):
         path = pathlib.Path(f'{path_str}.pdf')
 
     fig.savefig(path_str, **savefig_args)
-    plt.close()
+    plt.close(fig)
 
     if verbose:
         print(f'Figure saved at: "{str(path)}"')

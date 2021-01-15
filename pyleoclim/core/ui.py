@@ -21,7 +21,8 @@ from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
 
-from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
+from matplotlib.ticker import ScalarFormatter, FormatStrFormatter, MaxNLocator
+import matplotlib.transforms as transforms
 from matplotlib import cm
 import matplotlib.pylab as pl
 from matplotlib import gridspec
@@ -43,6 +44,7 @@ def dict2namedtuple(d):
 
 def infer_period_unit_from_time_unit(time_unit):
     ''' infer a period unit based on the given time unit
+      
     '''
     if time_unit is None:
         period_unit = None
@@ -63,24 +65,28 @@ def infer_period_unit_from_time_unit(time_unit):
 
 
 class Series:
-    ''' Create a pyleoSeries object
+    ''' pyleoSeries object y(t)
+
+    The Series class is, at its heart, a simple structure containing two arrays y and t of equal length, and some
+    metadata allowing to interpret and plot the series. It is similar to a 1-column pandas dataframe, but the concept 
+    was extended because pandas does not yet support geologic time.
 
     Parameters
     ----------
 
     time : list or numpy.array
-        Time values for the time series
+        independent variable (t)
 
     value : list of numpy.array
-        ordinate values for the time series
-
-    time_name : string
-        Name of the time vector (e.g., 'Age').
-        Default is None. This is used to label the time axis on plots
+        values of the dependent variable (y)
 
     time_unit : string
-        Units for the time vector (e.g., 'yr B.P.').
-        Default is None
+        Units for the time vector (e.g., 'years').
+        Default is 'years'
+
+    time_name : string
+        Name of the time vector (e.g., 'Time','Age').
+        Default is None. This is used to label the time axis on plots
 
     value_name : string
         Name of the value vector (e.g., 'temperature')
@@ -88,17 +94,20 @@ class Series:
 
     value_unit : string
         Units for the value vector (e.g., 'deg C')
+        Default is None
 
     label : string
         Name of the time series (e.g., 'Nino 3.4')
+        Default is None
 
-    clean_ts : bool
-        remove the NaNs and let the time axis to be increasing if True
+    clean_ts : boolean flag
+        set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
+        Default is True
 
     Examples
     --------
 
-    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a PyleoSeries object.
+    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a pyleoSeries object.
 
     .. ipython:: python
         :okwarning:
@@ -113,7 +122,7 @@ class Series:
         value=data.iloc[:,2]
         ts=pyleo.Series(
             time=time, value=value,
-            time_name='Year (CE)', value_name='SOI', label='SOI'
+            time_name='Year (CE)', value_name='SOI', label='Southern Oscillation Index'
         )
         ts
         ts.__dict__.keys()
@@ -131,6 +140,136 @@ class Series:
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
+
+    def convert_time_unit(self, time_unit='years'):
+        ''' Convert the time unit of the timeseries
+
+        Parameters
+        ----------
+
+        time_unit : str
+            the target time unit, possible input: 
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts = pyleo.Series(time=time, value=value, time_unit='years')
+            new_ts.convert_time_unit(time_unit='bp')
+            print('Original timeseries:')
+            print('time unit:', ts.time_unit)
+            print('time:', ts.time)
+            print()
+            print('Converted timeseries:')
+            print('time unit:', new_ts.time_unit)
+            print('time:', new_ts.time)
+        '''
+
+        new_ts = self.copy()
+        if time_unit is not None:
+            tu = time_unit.lower()
+            if tu.find('ky')>=0 or tu.find('ka')>=0:
+                time_unit_label = 'ky BP'
+            elif tu.find('my')>=0 or tu.find('ma')>=0:
+                time_unit_label = 'my BP'
+            elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
+                time_unit_label = 'yrs BP'
+            elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0:
+                time_unit_label = 'yrs'
+            else:
+                raise ValueError(f"Input time_unit={time_unit} is not supported. Supported input: 'year', 'years', 'yr', 'yrs', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
+        else:
+            return new_ts
+
+        def convert_to_years():
+            def prograde_time(time, time_datum, time_exponent):
+                new_time = (time_datum + time)*10**(time_exponent)
+                return new_time
+
+            def retrograde_time(time, time_datum, time_exponent):
+                new_time = (time_datum - time)*10**(time_exponent)
+                return new_time
+
+            convert_func = {
+                'prograde': prograde_time,
+                'retrograde': retrograde_time,
+            }
+            if self.time_unit is not None:
+                tu = self.time_unit.lower()
+                if tu.find('ky')>=0 or tu.find('ka')>=0:
+                    time_dir = 'retrograde'
+                    time_datum = 1950/1e3
+                    time_exponent = 3
+                    time_unit_label = 'ky BP'
+                elif tu.find('my')>=0 or tu.find('ma')>=0:
+                    time_dir = 'retrograde'
+                    time_datum = 1950/1e6
+                    time_exponent = 6
+                elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
+                    time_dir ='retrograde'
+                    time_datum = 1950
+                    time_exponent = 0
+                else:
+                    time_dir ='prograde'
+                    time_datum = 0
+                    time_exponent = 0
+
+                new_time = convert_func[time_dir](self.time, time_datum, time_exponent)
+            else:
+                new_time = None
+
+            return new_time
+
+        def convert_to_bp():
+            time_yrs = convert_to_years()
+            time_bp = 1950 - time_yrs
+            return time_bp
+
+        def convert_to_ka():
+            time_bp = convert_to_bp()
+            time_ka = time_bp / 1e3
+            return time_ka
+
+        def convert_to_ma():
+            time_bp = convert_to_bp()
+            time_ma = time_bp / 1e6
+            return time_ma
+
+        convert_to = {
+            'yrs': convert_to_years(),
+            'yrs BP': convert_to_bp(),
+            'ky BP': convert_to_ka(),
+            'my BP': convert_to_ma(),
+        }
+
+        new_time = convert_to[time_unit_label]
+
+        dt = np.diff(new_time)
+        if any(dt<=0):
+            new_value, new_time = tsutils.sort_ts(self.value, new_time)
+        else:
+            new_value = self.copy().value
+
+        new_ts.time = new_time
+        new_ts.value = new_value
+        new_ts.time_unit = time_unit
+
+        return new_ts
 
     def make_labels(self):
         '''
@@ -228,7 +367,7 @@ class Series:
              linestyle=None, linewidth=None, xlim=None, ylim=None,
              label=None, xlabel=None, ylabel=None, title=None, zorder=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None, alpha=None,
-             savefig_settings=None, ax=None, mute=False):
+             savefig_settings=None, ax=None, mute=False, invert_xaxis=False):
         ''' Plot the timeseries
 
         Parameters
@@ -273,6 +412,9 @@ class Series:
 
         legend : {True, False}
             plot legend or not
+
+        invert_xaxis : bool, optional
+            if True, the x-axis of the plot will be inverted
 
         plot_kwargs : dict
             the dictionary of keyword arguments for ax.plot()
@@ -407,7 +549,7 @@ class Series:
             title=title, savefig_settings=savefig_settings,
             ax=ax, legend=legend, xlim=xlim, ylim=ylim,
             plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
-            mute=mute,
+            mute=mute, invert_xaxis=invert_xaxis,
         )
 
         return res
@@ -1369,7 +1511,7 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, timespan=None, settings=None, common_time_kwargs=None):
+    def correlation(self, target_series, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None):
         ''' Estimates the Pearson's correlation and associated significance between two non IID time series
 
         The significance of the correlation is assessed using one of the following methods:
@@ -1392,6 +1534,9 @@ class Series:
         timespan : tuple
             The time interval over which to perform the calculation
 
+        alpha : float
+            The significance level (0.05 by default)
+
         settings : dict
             Parameters for the correlation function (singificance testing and number of simulation)
 
@@ -1401,7 +1546,7 @@ class Series:
         Returns
         -------
 
-        res : dict
+        corr_res_dict : dict
             Containing the Pearson's correlation coefficient, associated significance and p-value.
 
         See also
@@ -1437,7 +1582,7 @@ class Series:
             print(corr_res)
         '''
         settings = {} if settings is None else settings.copy()
-        corr_args = {}
+        corr_args = {'alpha': alpha}
         corr_args.update(settings)
 
         ms = MultipleSeries([self, target_series])
@@ -1456,7 +1601,14 @@ class Series:
 
 
         corr_res = corrutils.corr_sig(value1, value2, **corr_args)
-        return corr_res
+        signif = True if corr_res['signif'] == 1 else False
+        corr_res_dict = {
+            'r': corr_res['r'],
+            'p': corr_res['p'],
+            'signif': signif,
+            'alpha': alpha,
+        }
+        return corr_res_dict
 
     def causality(self, target_series, method='liang', settings=None):
         ''' Perform causality analysis with the target timeseries
@@ -1725,7 +1877,8 @@ class PSD:
 
     '''
     def __init__(self, frequency, amplitude, label=None, timeseries=None, plot_kwargs=None,
-                 spec_method=None, spec_args=None, signif_qs=None, signif_method=None, period_unit=None):
+                 spec_method=None, spec_args=None, signif_qs=None, signif_method=None, period_unit=None,
+                 beta_est_res=None):
         self.frequency = np.array(frequency)
         self.amplitude = np.array(amplitude)
         self.label = label
@@ -1735,6 +1888,7 @@ class PSD:
         self.signif_qs = signif_qs
         self.signif_method = signif_method
         self.plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+        self.beta_est_res = beta_est_res
 
         if period_unit is not None:
             self.period_unit = period_unit
@@ -1791,7 +1945,7 @@ class PSD:
 
         return new
 
-    def beta_est(self, fmin=None, fmax=None, verbose=False):
+    def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
         ''' Estimate the scaling factor beta of the PSD in a log-log space
 
         Parameters
@@ -1802,6 +1956,10 @@ class PSD:
 
         fmax : float
             the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
+
+        logf_binning_step : str, {'max', 'first'}
+            if 'max', then the maximum spacing of log(f) will be used as the binning step
+            if 'first', then the 1st spacing of log(f) will be used as the binning step
 
         verbose : bool
             if True, will print out debug information
@@ -1823,7 +1981,7 @@ class PSD:
         if fmax is None:
             fmax = np.max(self.frequency)
 
-        res = waveutils.beta_estimation(self.amplitude, self.frequency, fmin=fmin, fmax=fmax, verbose=verbose)
+        res = waveutils.beta_estimation(self.amplitude, self.frequency, fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
         res_dict = {
             'beta': res.beta,
             'std_err': res.std_err,
@@ -1831,13 +1989,12 @@ class PSD:
             'psd_binned': res.psd_binned,
             'Y_reg': res.Y_reg,
         }
-
         return res_dict
 
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
-             plot_legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
+             legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
              plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
         '''Plots the PSD estimates and signif level if included
 
@@ -1885,7 +2042,7 @@ class PSD:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax The default is False.
-        plot_legend : bool, optional
+        legend : bool, optional
             whether to plot the legend. The default is True.
         lgd_kwargs : dict, optional
             Arguments for the legend. The default is None.
@@ -2035,7 +2192,7 @@ class PSD:
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
 
-        if plot_legend:
+        if legend:
             lgd_args = {'frameon': False}
             lgd_args.update(lgd_kwargs)
             ax.legend(**lgd_args)
@@ -2194,7 +2351,7 @@ class Scalogram:
                 ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
 
         cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
-        ax.set_yscale('log', nonpositive='clip')
+        ax.set_yscale('log')
 
         # plot colorbar
         cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
@@ -2632,27 +2789,72 @@ class MultipleSeries:
     series_list : list
         a list of pyleoclim.Series objects
 
-    Examples
-    --------
+    time_unit : str
+        The target time unit for every series in the list.
+        If None, then no conversion will be applied;
+        Otherwise, the time unit of every series in the list will be converted to the target.
 
-    Create a MultipleSeries object for the Nino and All Indian Rainfall indices
-
-    .. ipython:: python
-        :okwarning:
-
-        import pyleoclim as pyleo
-        import pandas as pd
-        data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
-        t=data.iloc[:,0]
-        air=data.iloc[:,1]
-        nino=data.iloc[:,2]
-        ts_nino=pyleo.Series(time=t,value=nino)
-        ts_air=pyleo.Series(time=t,value=air)
-        series_list=[ts_nino,ts_air]
-        ts_all = pyleo.MultipleSeries(series_list)
     '''
-    def __init__(self, series_list):
+    def __init__(self, series_list, time_unit=None):
         self.series_list = series_list
+        self.time_unit = time_unit
+
+        if self.time_unit is not None:
+            new_ts_list = []
+            for ts in self.series_list:
+                new_ts = ts.convert_time_unit(time_unit=self.time_unit)
+                new_ts_list.append(new_ts)
+
+            self.series_list = new_ts_list
+    
+    def convert_time_unit(self, time_unit='years'):
+        ''' Convert the time unit of the timeseries
+
+        Parameters
+        ----------
+
+        time_unit : str
+            the target time unit, possible input: 
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
+            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
+            ms = pyleo.MultipleSeries([ts1, ts2])
+            new_ms = ms.convert_time_unit('yr BP')
+            print('Original timeseries:')
+            print('time unit:', ms.time_unit)
+            print()
+            print('Converted timeseries:')
+            print('time unit:', new_ms.time_unit)
+        '''
+
+        new_ms = self.copy()
+        new_ts_list = []
+        for ts in self.series_list:
+            new_ts = ts.convert_time_unit(time_unit=time_unit)
+            new_ts_list.append(new_ts)
+
+        new_ms.time_unit = time_unit
+        new_ms.series_list = new_ts_list
+        return new_ms
 
     def append(self,ts):
         '''Append timeseries ts to MultipleSeries object
@@ -2752,6 +2954,95 @@ class MultipleSeries:
             raise NameError('Unknown methods; no action taken')
 
         return ms
+
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None):
+        ''' Calculate the correlation between a MultipleSeries and a target Series
+
+        If the target Series is not specified, then the 1st member of MultipleSeries will be the target
+
+        Parameters
+        ----------
+        target : pyleoclim.Series, optional
+            A pyleoclim Series object.
+        
+        timespan : tuple
+            The time interval over which to perform the calculation
+
+        alpha : float
+            The significance level (0.05 by default)
+        
+        settings : dict
+            Parameters for the correlation function (singificance testing and number of simulation)
+
+        common_time_kwargs : dict
+            Parameters for the method MultipleSeries.common_time()
+            
+        Returns
+        -------
+        
+        res : dict
+            Containing a list of the Pearson's correlation coefficient, associated significance and p-value. 
+        
+        See also
+        --------
+        
+        pyleoclim.utils.correlation.corr_sig : Correlation function
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            from pyleoclim.utils.tsmodel import colored_noise
+
+            nt = 100
+            t0 = np.arange(nt)
+            v0 = colored_noise(alpha=1, t=t0)
+            noise = np.random.normal(loc=0, scale=1, size=nt)
+
+            ts0 = pyleo.Series(time=t0, value=v0)
+            ts1 = pyleo.Series(time=t0, value=v0+noise)
+            ts2 = pyleo.Series(time=t0, value=v0+2*noise)
+            ts3 = pyleo.Series(time=t0, value=v0+1/2*noise)
+
+            ts_list = [ts1, ts2, ts3]
+
+            ms = pyleo.MultipleSeries(ts_list)
+            ts_target = ts0
+
+            corr_res = ms.correlation(ts_target)
+            print(corr_res)
+
+            corr_res = ms.correlation()
+            print(corr_res)
+
+        '''
+        r_list = []
+        signif_list = []
+        p_list = []
+
+        if target is None:
+            target = self.series_list[0]
+
+        for idx, ts in enumerate(self.series_list):
+            corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings, common_time_kwargs=common_time_kwargs)
+            r_list.append(corr_res['r'])
+            signif_list.append(corr_res['signif'])
+            p_list.append(corr_res['p'])
+
+        r_lsit = np.array(r_list)
+        p_lsit = np.array(p_list)
+
+        corr_res = {
+            'r': r_list,
+            'p': p_list,
+            'signif': signif_list,
+            'alpha': alpha,
+        }
+
+        return corr_res
 
     # def mssa(self, M, MC=0, f=0.5):
     #     data = []
@@ -3013,9 +3304,9 @@ class MultipleSeries:
     def plot(self, figsize=[10, 4],
              marker=None, markersize=None, color=None,
              linestyle=None, linewidth=None,
-             label=None, xlabel=None, ylabel=None, title=None,
+             xlabel=None, ylabel=None, title=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None,
-             savefig_settings=None, ax=None, mute=False):
+             savefig_settings=None, ax=None, mute=False, invert_xaxis=False):
         '''Plot multiple timeseries on the same axis
 
         Parameters
@@ -3032,8 +3323,6 @@ class MultipleSeries:
             Line style. The default is None.
         linewidth : float, optional
             The width of the line. The default is None.
-        label : str, optional
-            Label for the series. The default is None.
         xlabel : str, optional
             x-axis label. The default is None.
         ylabel : str, optional
@@ -3056,6 +3345,8 @@ class MultipleSeries:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+        invert_xaxis : bool, optional
+            if True, the x-axis of the plot will be inverted
 
         Returns
         -------
@@ -3075,9 +3366,12 @@ class MultipleSeries:
         for s in self.series_list:
             ax = s.plot(
                 figsize=figsize, marker=marker, markersize=markersize, color=color, linestyle=linestyle,
-                linewidth=linewidth, label=label, xlabel=xlabel, ylabel=ylabel, title=title,
-                legend=False, plot_kwargs=plot_kwargs, ax=ax,
+                linewidth=linewidth, label=s.label, xlabel=xlabel, ylabel=ylabel, title=title,
+                legend=legend, lgd_kwargs=lgd_kwargs, plot_kwargs=plot_kwargs, ax=ax,
             )
+
+        if invert_xaxis:
+            ax.invert_xaxis()
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
@@ -3118,12 +3412,15 @@ class EnsembleSeries(MultipleSeries):
     def __init__(self, series_list):
         self.series_list = series_list
 
-    def correlation(self, target, timespan=None, settings=None, apply_fdr=True, fdr_kwargs=None, common_time_kwargs=None):
-        ''' Calculate the correlation between an ensemble series group to a target series
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None):
+        ''' Calculate the correlation between an ensemble series group to a target.
+
+        If the target is not specified, then the 1st member of EnsembleSeries will be the target
+        Note that the FDR approach is applied by default to determine the significance of the p-values (more information in See Also below).
 
         Parameters
         ----------
-        target : pyleoclim.Series or pyleoclim.EnsembleSeries
+        target : pyleoclim.Series or pyleoclim.EnsembleSeries, optional
             A pyleoclim Series object or EnsembleSeries object.
             When the target is also an EnsembleSeries object, then the calculation of correlation is performed in a one-to-one sense,
             and the ourput list of correlation values and p-values will be the size of the series_list of the self object.
@@ -3133,12 +3430,12 @@ class EnsembleSeries(MultipleSeries):
 
         timespan : tuple
             The time interval over which to perform the calculation
+        
+        alpha : float
+            The significance level (0.05 by default)
 
         settings : dict
             Parameters for the correlation function (singificance testing and number of simulation)
-
-        apply_fdr : bool
-            Determine significance based on the FDR approach
 
         fdr_kwargs : dict
             Parameters for the FDR function
@@ -3187,17 +3484,15 @@ class EnsembleSeries(MultipleSeries):
             print(corr_res)
 
         '''
-        r_list = []
-        signif_list = []
-        p_list = []
+        if target is None:
+            target = self.series_list[0]
 
-        for idx, ts in enumerate(self.series_list):
-            value1 = ts.value
-            time1 = ts.time
-            if isinstance(target, Series):
-                value2 = target.value
-                time2 = target.time
-            elif isinstance(target, EnsembleSeries):
+        r_list = []
+        p_list = []
+        signif_list = []
+
+        for idx, ts1 in enumerate(self.series_list):
+            if hasattr(target, 'series_list'):
                 nEns = np.size(target.series_list)
                 if idx < nEns:
                     value2 = target.series_list[idx].value
@@ -3205,8 +3500,10 @@ class EnsembleSeries(MultipleSeries):
                 else:
                     value2 = target.series_list[idx-nEns].value
                     time2 = target.series_list[idx-nEns].time
+            else: 
+                value2 = target.value
+                time2 = target.time
 
-            ts1 = Series(time=time1, value=value1)
             ts2 = Series(time=time2, value=value2)
             corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs)
             r_list.append(corr_res['r'])
@@ -3216,25 +3513,20 @@ class EnsembleSeries(MultipleSeries):
         r_lsit = np.array(r_list)
         p_lsit = np.array(p_list)
 
-        if apply_fdr:
-            fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
-            args = {}
-            args.update(fdr_kwargs)
-            for i in range(np.size(signif_list)):
-                signif_list[i] = False
+        signif_fdr_list = []
+        fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
+        args = {}
+        args.update(fdr_kwargs)
+        for i in range(np.size(signif_list)):
+            signif_fdr_list.append(False)
 
-            fdr_res = corrutils.fdr(p_list, **fdr_kwargs)
-            if fdr_res is not None:
-                for i in fdr_res:
-                    signif_list[i] = True
+        fdr_res = corrutils.fdr(p_list, **fdr_kwargs)
+        if fdr_res is not None:
+            for i in fdr_res:
+                signif_fdr_list[i] = True
 
-        corr_res = {
-            'r': r_list,
-            'signif': signif_list,
-            'p': p_list,
-        }
-
-        return corr_res
+        corr_ens = CorrEns(r_list, p_list, signif_list, signif_fdr_list, alpha)
+        return corr_ens
 
 class MultiplePSD:
     ''' Object for multiple PSD.
@@ -3291,7 +3583,7 @@ class MultiplePSD:
         psds = MultiplePSD(psd_list=psd_list)
         return psds
 
-    def beta_est(self, fmin=None, fmax=None, verbose=False):
+    def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
         ''' Estimate the scaling factor beta of the each PSD from the psd_list in a log-log space
 
         Parameters
@@ -3302,6 +3594,10 @@ class MultiplePSD:
 
         fmax : float
             the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
+
+        logf_binning_step : str, {'max', 'first'}
+            if 'max', then the maximum spacing of log(f) will be used as the binning step
+            if 'first', then the 1st spacing of log(f) will be used as the binning step
 
         verbose : bool
             if True, will print out debug information
@@ -3330,7 +3626,7 @@ class MultiplePSD:
         res_dict['psd_binned'] = []
         res_dict['Y_reg'] = []
         for psd_obj in self.psd_list:
-            res = psd_obj.beta_est(fmin=fmin, fmax=fmax, verbose=verbose)
+            res = psd_obj.beta_est(fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
             for k in res_dict.keys():
                 res_dict[k].append(res[k])
 
@@ -3338,7 +3634,7 @@ class MultiplePSD:
 
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
-             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
+             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, legend=True,
              plot_kwargs=None, lgd_kwargs=None, mute=False):
         '''Plot multiple PSD on the same plot
 
@@ -3371,7 +3667,7 @@ class MultiplePSD:
             x-ticks label. The default is None.
         yticks : list, optional
             y-ticks label. The default is None.
-        plot_legend : bool, optional
+        legend : bool, optional
             Whether to plot the legend. The default is True.
         plot_kwargs : TYPE, optional
             Parameters for plot function. The default is None.
@@ -3405,7 +3701,7 @@ class MultiplePSD:
             ax = psd.plot(
                 figsize=figsize, in_loglog=in_loglog, in_period=in_period, xlabel=xlabel, ylabel=ylabel,
                 title=title, xlim=xlim, ylim=ylim, savefig_settings=savefig_settings, ax=ax,
-                xticks=xticks, yticks=yticks, plot_legend=plot_legend, plot_kwargs=tmp_plot_kwargs, lgd_kwargs=lgd_kwargs,
+                xticks=xticks, yticks=yticks, legend=legend, plot_kwargs=tmp_plot_kwargs, lgd_kwargs=lgd_kwargs,
             )
 
         if title is not None:
@@ -3617,6 +3913,149 @@ class MultipleScalogram:
         scals = MultipleScalogram(scalogram_list=scal_list)
         return scals
 
+class CorrEns:
+    ''' Correlation Ensemble
+
+    Parameters
+    ----------
+
+    r: list
+        the list of correlation coefficients
+
+    p: list
+        the list of p-values
+
+    signif: list
+        the list of significance without FDR
+
+    signif_fdr: list
+        the list of significance with FDR
+
+    signif_fdr: list
+        the list of significance with FDR
+
+    alpha : float
+        The significance level (0.05 by default)
+
+    See also
+    --------
+        
+    pyleoclim.utils.correlation.corr_sig : Correlation function
+    pyleoclim.utils.correlation.fdr : FDR function
+    '''
+    def __init__(self, r, p, signif, signif_fdr, alpha):
+        self.r = r
+        self.p = p
+        self.signif = signif
+        self.signif_fdr = signif_fdr
+        self.alpha = alpha
+
+    def __str__(self):
+        '''
+        Prints out the correlation results
+        '''
+
+        table = {
+            'correlation': self.r,
+            'p-value': self.p,
+            f'signif. w/o FDR (α: {self.alpha})': self.signif,
+            f'signif. w/ FDR (α: {self.alpha})': self.signif_fdr,
+        }
+
+        msg = print(tabulate(table, headers='keys'))
+
+        return f'Ensemble size: {len(self.r)}'
+
+
+    def plot(self, figsize=[4, 4], title=None, ax=None, savefig_settings=None, hist_kwargs=None, title_kwargs=None,
+             clr_insignif=sns.xkcd_rgb['grey'], clr_signif=sns.xkcd_rgb['teal'], clr_signif_fdr=sns.xkcd_rgb['pale orange'],
+             clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None, mute=False):
+        ''' Plot the correlation ensembles
+
+        Parameters
+        ----------
+        figsize : list, optional
+            The figure size. The default is [4, 4].
+
+        title : str, optional
+            Plot title. The default is None.
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        hist_kwargs : dict
+            the keyword arguments for ax.hist()
+
+        title_kwargs : dict
+            the keyword arguments for ax.set_title()
+
+        ax : matplotlib.axis, optional
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+
+        See Also
+        --------
+
+        matplotlib.pyplot.hist: https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.hist.html
+        '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        hist_kwargs = {} if hist_kwargs is None else hist_kwargs.copy()
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        if vrange is None:
+            vrange = [np.min(self.r), np.max(self.r)]
+
+        clr_list = [clr_insignif, clr_signif, clr_signif_fdr]
+        args = {'rwidth': rwidth, 'bins': bins, 'range': vrange, 'color': clr_list}
+        args.update(hist_kwargs)
+        # insignif_args.update(hist_kwargs)
+
+        r_insignif = np.array(self.r)[~np.array(self.signif)]
+        r_signif = np.array(self.r)[self.signif]
+        r_signif_fdr = np.array(self.r)[self.signif_fdr]
+        r_stack = [r_insignif, r_signif, r_signif_fdr]
+        ax.hist(r_stack, stacked=True, **args)
+        ax.legend([f'p ≥ {self.alpha}', f'p < {self.alpha} (w/o FDR)', f'p < {self.alpha} (w/ FDR)'], loc='upper left', bbox_to_anchor=(1.1, 1), ncol=1)
+
+        frac_signif = np.size(r_signif) / np.size(self.r)
+        frac_signif_fdr = np.size(r_signif_fdr) / np.size(self.r)
+        ax.text(x=1.1, y=0.5, s=f'Fraction significant: {frac_signif*100:.1f}%', transform=ax.transAxes, fontsize=10, color=clr_signif)
+        ax.text(x=1.1, y=0.4, s=f'Fraction significant: {frac_signif_fdr*100:.1f}%', transform=ax.transAxes, fontsize=10, color=clr_signif_fdr)
+
+        r_pcts = np.percentile(self.r, [2.5, 25, 50, 75, 97.5])
+        trans = transforms.blended_transform_factory(ax.transData, ax.transAxes)
+        for r_pct, pt, ls in zip(r_pcts, np.array([2.5, 25, 50, 75, 97.5])/100, [':', '--', '-', '--', ':']): 
+            ax.axvline(x=r_pct, linestyle=ls, color=clr_percentile)
+            ax.text(x=r_pct, y=1.02, s=pt, color=clr_percentile, transform=trans, ha='center', fontsize=10)
+
+        ax.set_xlabel(r'$r$')
+        ax.set_ylabel('Count')
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+
+
+        if title is not None:
+            title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
+            t_args = {'y': 1.1, 'weight': 'bold'}
+            t_args.update(title_kwargs)
+            ax.set_title(title, **t_args)
+        
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, settings=savefig_settings)
+        else:
+            if not mute:
+                plotting.showfig(fig)
+        return fig, ax
 
 class Lipd:
     '''Create a Lipd object from Lipd Files
@@ -3626,7 +4065,7 @@ class Lipd:
 
     usr_path : str
         path to the Lipd file(s). Can be URL (LiPD utilities only support loading one file at a time from a URL)
-        If it's a URL, it must start with "http", "https", or "ftp.
+        If it's a URL, it must start with "http", "https", or "ftp".
 
     lidp_dict : dict
         LiPD files already loaded into Python through the LiPD utilities
@@ -3647,7 +4086,7 @@ class Lipd:
         d=pyleo.Lipd(usr_path=url)
     '''
 
-    def __init__(self, query=False, query_args={}, usr_path=None, lipd_dict=None):
+    def __init__(self, usr_path=None, lipd_dict=None):
         self.plot_default = {'ice-other': ['#FFD600','h'],
                 'ice/rock': ['#FFD600', 'h'],
                 'coral': ['#FF8B00','o'],
@@ -3664,126 +4103,7 @@ class Lipd:
                 'midden' : ['#824E2B','o'],
                 'other':['k','o']}
 
-        #check that query has matching terms
-        if query==True and bool(query_args)==False:
-            raise ValueError('When query is set to true, you must define query terms')
-        if query==False and usr_path==None and lipd_dict==None:
-            usr_path==''
-
-        #deal with the query dictionary
-        if query==True and bool(query_args)==True:
-            if 'archiveType' in query_args.keys():
-                archiveType=query_args['archiveType']
-                if type(archiveType) == str:
-                    archiveType=lipdutils.pre_process_str(archiveType)
-                    archiveType=[archiveType]
-                else:
-                    archiveType=lipdutils.pre_process_list(archiveType)
-                availableType=lipdutils.whatArchives(print_response=False)
-                availableTypeP=lipdutils.pre_process_list(availableType)
-                res=[]
-                for item in archiveType:
-                    indices = [i for i, x in enumerate(availableTypeP) if x == item]
-                if len(indices)!=0:
-                    res.append(np.array(availableType)[indices].tolist())
-                res=np.unique(np.array(res)).tolist()
-                if len(res)==0:
-                    archiveType = [ ]
-                else:
-                    archiveType=res
-            else:
-                archiveType = [ ]
-
-            if 'proxyObsType' in query_args.keys():
-                proxyObsType=query_args['proxyObsType']
-                if type(proxyObsType) == str:
-                    proxyObsType=lipdutils.pre_process_str(proxyObsType)
-                    proxyObsType=[proxyObsType]
-                else:
-                    proxyObsType=lipdutils.pre_process_list(proxyObsType)
-                availableProxy=lipdutils.whatProxyObservations(print_response=False)
-                availableProxyP=lipdutils.pre_process_list(availableProxy)
-                res=[]
-                for item in proxyObsType:
-                    indices = [i for i, x in enumerate(availableProxyP) if x == item]
-                if len(indices)!=0:
-                    res.append(np.array(availableProxy)[indices].tolist())
-                res=np.unique(np.array(res)).tolist()
-                if len(res)==0:
-                    proxyObsType = [ ]
-                else:
-                    proxyObsType=res
-            else:
-                proxyObsType=[ ]
-
-            if 'infVarType' in query_args.keys():
-                infVarType=query_args['infVarType']
-            else:
-                infVarType=[ ]
-            if 'sensorGenus' in query_args.keys():
-                sensorGenus = query_args['sensorGenus']
-            else:
-                sensorGenus = [ ]
-            if 'sensorSpecies' in query_args.keys():
-                sensorSpecies = query_args['sensorSpecies']
-            else:
-                sensorSpecies=[ ]
-            if 'interpName' in query_args.keys():
-                interpName = query_args['interpName']
-            else:
-                interpName=[ ]
-            if 'interpDetail' in query_args.keys():
-                interpDetail = query_args['interpDetail']
-            else:
-                interpDetail = [ ]
-            if 'ageUnits' in query_args.keys():
-                ageUnits = query_args['ageUnits']
-            else:
-                ageUnits = [ ]
-            if 'ageBound' in query_args.keys():
-                ageBound = query_args['ageBound']
-            else:
-                ageBound=[ ]
-            if 'ageBoundType' in query_args.keys():
-                ageBoundType = query_args['ageBoundType']
-            else:
-                ageBoundType = [ ]
-            if 'recordLength' in query_args.keys():
-                recordLength = query_args['recordLength']
-            else:
-                recordLength = [ ]
-            if 'resolution' in query_args.keys():
-                resolution = query_args['resolution']
-            else:
-                resolution = [ ]
-            if 'lat' in query_args.keys():
-                lat = query_args['lat']
-            else:
-                lat = [ ]
-            if 'lon' in query_args.keys():
-                lon = query_args['lon']
-            else:
-                lon = [ ]
-            if 'alt' in query_args.keys():
-                alt = query_args['alt']
-            else:
-                alt= [ ]
-            if 'download_folder' in query_args.keys():
-                download_folder = query_args['download_folder']
-            else:
-                download_folder=os.getcwd()+'/'
-
-            lipdutils.queryLinkedEarth(archiveType=archiveType, proxyObsType=proxyObsType, infVarType = infVarType, sensorGenus=sensorGenus,
-                    sensorSpecies=sensorSpecies, interpName =interpName, interpDetail =interpDetail, ageUnits = ageUnits,
-                    ageBound = ageBound, ageBoundType = ageBoundType, recordLength = recordLength, resolution = resolution,
-                    lat = lat, lon = lon, alt = alt, print_response = False, download_lipd = True,
-                    download_folder = download_folder)
-
-            D_query = lpd.readLipd(download_folder)
-            if 'archiveType' in D_query.keys():
-                D_query={D_query['dataSetName']:D_query}
-        else:
-            D_query={}
+        
         #prepare the dictionaries for all possible scenarios
         if usr_path!=None:
             # since readLipd() takes only absolute path and it will change the current working directory (CWD) without turning back,
@@ -3813,7 +4133,6 @@ class Lipd:
 
         #assemble
         self.lipd={}
-        self.lipd.update(D_query)
         self.lipd.update(D_path)
         self.lipd.update(D_dict)
 
@@ -3826,12 +4145,12 @@ class Lipd:
         return deepcopy(self)
 
     def to_tso(self):
-        '''
+        '''Extracts all the timeseries objects to a list of LiPD tso
 
         Returns
         -------
         ts_list : list
-            List of Lipd timeseries objects
+            List of Lipd timeseries objects as defined by LiPD utilities
 
         '''
         ts_list=lpd.extractTs(self.__dict__['lipd'])
@@ -3858,7 +4177,25 @@ class Lipd:
             pass
 
         return new
+    
+    def to_LipdSeries(self):
+        '''Extracts all the timeseries objects to a list of LipdSeries objects
+        
+        Returns
+        -------
+        res : list
+            A list of LiPDSeries objects
 
+        '''
+        ts_list=lpd.extractTs(self.__dict__['lipd'])
+        
+        res=[]
+        
+        for item in ts_list:
+            res.append(LipdSeries(item))
+        
+        return res
+        
     def mapAllArchive(self, projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
            figsize = None, ax = None, marker=None, color=None,

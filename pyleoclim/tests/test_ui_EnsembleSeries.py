@@ -61,7 +61,7 @@ class TestUIEnsembleSeriesCorrelation():
         ts_ens = pyleo.EnsembleSeries(ts_list)
 
         corr_res = ts_ens.correlation(ts0)
-        signif_list = corr_res['signif']
+        signif_list = corr_res.signif
         for signif in signif_list:
             assert signif is True
 
@@ -85,11 +85,11 @@ class TestUIEnsembleSeriesCorrelation():
         ts_target = pyleo.EnsembleSeries(ts_list2)
 
         corr_res = ts_ens.correlation(ts_target)
-        signif_list = corr_res['signif']
+        signif_list = corr_res.signif
         for signif in signif_list:
             assert signif is True
 
-        assert np.size(corr_res['p']) == np.size(ts_list1)
+        assert np.size(corr_res.p) == np.size(ts_list1)
 
 
     def test_correlation_t2(self):
@@ -112,11 +112,11 @@ class TestUIEnsembleSeriesCorrelation():
         ts_target = pyleo.EnsembleSeries(ts_list2)
 
         corr_res = ts_ens.correlation(ts_target)
-        signif_list = corr_res['signif']
+        signif_list = corr_res.signif
         for signif in signif_list:
             assert signif is True
 
-        assert np.size(corr_res['p']) == np.size(ts_list1)
+        assert np.size(corr_res.p) == np.size(ts_list1)
 
 
     def test_correlation_t2(self):
@@ -139,8 +139,8 @@ class TestUIEnsembleSeriesCorrelation():
         ts_target = pyleo.EnsembleSeries(ts_list2)
 
         corr_res = ts_ens.correlation(ts_target)
-        signif_list = corr_res['signif']
+        signif_list = corr_res.signif
         for signif in signif_list:
             assert signif is True
 
-        assert np.size(corr_res['p']) == np.size(ts_list1)
+        assert np.size(corr_res.p) == np.size(ts_list1)
