@@ -404,7 +404,6 @@ def map_all(lat, lon, criteria, marker=None, color =None,
         return fig, ax
     else:
         return ax
-    
-    return ax    
+  
         
 
