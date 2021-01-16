@@ -170,7 +170,7 @@ class Series:
             time = data.iloc[:,1]
             value = data.iloc[:,2]
             ts = pyleo.Series(time=time, value=value, time_unit='years')
-            new_ts.convert_time_unit(time_unit='bp')
+            new_ts = ts.convert_time_unit(time_unit='yrs BP')
             print('Original timeseries:')
             print('time unit:', ts.time_unit)
             print('time:', ts.time)
@@ -2118,7 +2118,7 @@ class PSD:
                 xlabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
 
             if xticks is None:
-                xticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                xticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 1e4, 2e4, 5e4, 1e5, 2e5, 5e5, 1e6])
                 mask = (xticks_default >= np.nanmin(x_axis)) & (xticks_default <= np.nanmax(x_axis))
                 xticks = xticks_default[mask]
 
@@ -2342,7 +2342,7 @@ class Scalogram:
                 ylabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
 
             if yticks is None:
-                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 1e4, 2e4, 5e4, 1e5, 2e5, 5e5, 1e6])
                 mask = (yticks_default >= np.min(y_axis)) & (yticks_default <= np.max(y_axis))
                 yticks = yticks_default[mask]
         else:
@@ -2596,7 +2596,7 @@ class Coherence:
                 ylabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
 
             if yticks is None:
-                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 1e4, 2e4, 5e4, 1e5, 2e5, 5e5, 1e6])
                 mask = (yticks_default >= np.min(y_axis)) & (yticks_default <= np.max(y_axis))
                 yticks = yticks_default[mask]
         else:

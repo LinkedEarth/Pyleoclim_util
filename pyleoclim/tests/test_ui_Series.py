@@ -195,7 +195,7 @@ class TestUiSeriesSpectral:
         Also, we give `label` a test.
         '''
         alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=alpha)
+        t, v = gen_colored_noise(nt=800, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 20)
         psd = ts.spectral(method='wwz', settings={'freq': freq}, label='WWZ')
