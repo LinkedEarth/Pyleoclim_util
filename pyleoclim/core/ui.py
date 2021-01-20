@@ -4228,7 +4228,10 @@ class Lipd:
         res=[]
 
         for item in ts_list:
-            res.append(LipdSeries(item))
+            try:
+                res.append(LipdSeries(item))
+            except:
+                pass
 
         return res
 
@@ -4355,35 +4358,40 @@ class LipdSeries(Series):
                 'peat' : ['#2F4F4F','*'],
                 'midden' : ['#824E2B','o'],
                 'other':['k','o']}
-
-        time, label= lipdutils.checkTimeAxis(self.lipd_ts)
-        if label=='age':
-            time_name='Age'
-            if 'ageUnits' in self.lipd_ts.keys():
-                time_unit=self.lipd_ts['ageUnits']
-            else:
-                time_unit=None
-        elif label=='year':
-            time_name='Year'
-            if 'yearUnits' in self.lipd_ts.keys():
-                time_unit=self.lipd_ts['yearUnits']
-            else:
-                time_unit=None
-
-        value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
-        #Remove NaNs
-        ys_tmp=np.copy(value)
-        value=value[~np.isnan(ys_tmp)]
-        time=time[~np.isnan(ys_tmp)]
-        value_name=self.lipd_ts['paleoData_variableName']
-        if 'paleoData_units' in self.lipd_ts.keys():
-            value_unit=self.lipd_ts['paleoData_units']
-        else:
-            value_unit=None
-        label=self.lipd_ts['dataSetName']
-        super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
-             time_unit=time_unit,value_name=value_name,value_unit=value_unit,
-             label=label)
+        try:
+            time, label= lipdutils.checkTimeAxis(self.lipd_ts)
+            if label=='age':
+                time_name='Age'
+                if 'ageUnits' in self.lipd_ts.keys():
+                    time_unit=self.lipd_ts['ageUnits']
+                else:
+                    time_unit=None
+            elif label=='year':
+                time_name='Year'
+                if 'yearUnits' in self.lipd_ts.keys():
+                    time_unit=self.lipd_ts['yearUnits']
+                else:
+                    time_unit=None
+            try:
+                value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
+                #Remove NaNs
+                ys_tmp=np.copy(value)
+                value=value[~np.isnan(ys_tmp)]
+                time=time[~np.isnan(ys_tmp)]
+                value_name=self.lipd_ts['paleoData_variableName']
+                if 'paleoData_units' in self.lipd_ts.keys():
+                    value_unit=self.lipd_ts['paleoData_units']
+                else:
+                    value_unit=None
+                label=self.lipd_ts['dataSetName']
+                super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
+                     time_unit=time_unit,value_name=value_name,value_unit=value_unit,
+                     label=label)           
+            except:
+                raise ValueError("paleoData_values should contain floats")             
+        except:
+            raise KeyError("No time information present")
+        
 
     def copy(self):
         '''Copy the object
