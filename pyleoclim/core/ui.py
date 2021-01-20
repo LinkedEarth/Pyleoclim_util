@@ -1186,8 +1186,8 @@ class Series:
         Returns
         -------
 
-        psd : pyleoclim.Psd
-            A PSD object
+        psd : pyleoclim.PSD
+            A :mod:`pyleoclim.PSD` object
 
         See also
         --------
@@ -1227,38 +1227,95 @@ class Series:
             ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
             # Standardize the time series
             ts_std=ts.standardize()
-            # WWZ
-            psd_wwz=ts_std.spectral()
-            psd_wwz_signif=psd_wwz.signif_test(number=1)  # for real work, should use number=200 or even larger
+
+
+        - WWZ
+
+        .. ipython:: python
+            :okwarning:
+
+            psd_wwz = ts_std.spectral(method='wwz')  # wwz is the default method
+            psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger
             @savefig spec_wwz.png
-            fig,ax=psd_wwz_signif.plot(title='PSD using WWZ method')
+            fig, ax = psd_wwz_signif.plot(title='PSD using WWZ method')
             plt.close(fig)
-            #Periodogram
+
+        We may pass in method-specific arguments via "settings", which is a dictionary.
+        For instance, to adjust the analytical frequency resolution for WWZ, we may specify the method-specific argument, the decay constant, "c";
+        to adjust the frequency vector, we may modify the "freq_method" or modify the method-specific argument "freq".
+
+        .. ipython:: python
+            :okwarning:
+
+            psd_wwz_lres = ts_std.spectral(method='wwz', settings={'c': 1e-2})  # c=1e-2 yields lower frequency resolution
+            psd_wwz_hres = ts_std.spectral(method='wwz', settings={'c': 1e-4})  # c=1e-4 yields higher frequency resolution
+            psd_wwz_freq = ts_std.spectral(method='wwz', settings={'freq': np.linspace(1/20, 1/0.2, 51)})
+            psd_wwz_nfft = ts_std.spectral(method='wwz', freq_method='nfft')  # with frequency vector generated using NFFT style
+            fig, ax = psd_wwz_lres.plot(
+                title='PSD using WWZ method with differnt decay constants', mute=True,
+                label='settings={"c": 1e-2}')
+            @savefig spec_wwz_c.png
+            psd_wwz_hres.plot(ax=ax, label='settings={"c": 1e-4}')
+            plt.close(fig)
+
+            fig, ax = psd_wwz_freq.plot(
+                title='PSD using WWZ method with differnt frequency vectors', mute=True,
+                label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
+            psd_wwz.plot(ax=ax, label='freq_method="log"', marker='o')
+            @savefig spec_wwz_freq.png
+            psd_wwz_nfft.plot(ax=ax, label='freq_method="nfft"', marker='o')
+            plt.close(fig)
+
+        You may notice the differences in the PSD curves regarding smoothness and the locations of the analyzed period points.
+
+        For other method-specific arguments, please look up the specific methods in the "See also" section.
+
+
+        - Periodogram
+
+        .. ipython:: python
+            :okwarning:
+
             ts_interp = ts_std.interp()
-            psd_perio=ts_interp.spectral(method='periodogram')
-            psd_perio_signif=psd_perio.signif_test()
+            psd_perio = ts_interp.spectral(method='periodogram')
+            psd_perio_signif = psd_perio.signif_test()
             @savefig spec_perio.png
-            fig,ax=psd_perio_signif.plot(title='PSD using Periodogram method')
+            fig, ax = psd_perio_signif.plot(title='PSD using Periodogram method')
             plt.close(fig)
-            #Welch
+
+        - Welch
+
+        .. ipython:: python
+            :okwarning:
+
             ts_interp = ts_std.interp()
-            psd_welch=ts_interp.spectral(method='welch')
-            psd_welch_signif=psd_welch.signif_test()
+            psd_welch = ts_interp.spectral(method='welch')
+            psd_welch_signif = psd_welch.signif_test()
             @savefig spec_welch.png
-            fig,ax=psd_welch_signif.plot(title='PSD using Welch method')
+            fig, ax = psd_welch_signif.plot(title='PSD using Welch method')
             plt.close(fig)
-            #MTM
+
+        - MTM
+
+        .. ipython:: python
+            :okwarning:
+
             ts_interp = ts_std.interp()
-            psd_mtm=ts_interp.spectral(method='mtm')
-            psd_mtm_signif=psd_mtm.signif_test()
+            psd_mtm = ts_interp.spectral(method='mtm')
+            psd_mtm_signif = psd_mtm.signif_test()
             @savefig spec_mtm.png
-            fig,ax=psd_mtm_signif.plot(title='PSD using MTM method')
+            fig, ax = psd_mtm_signif.plot(title='PSD using MTM method')
             plt.close(fig)
-            #Lomb-Scargle
-            psd_ls=ts_std.spectral(method='lomb_scargle')
-            psd_ls_signif=psd_ls.signif_test()
+
+        - Lomb-Scargle
+
+        .. ipython:: python
+            :okwarning:
+
+            psd_ls = ts_std.spectral(method='lomb_scargle')
+            psd_ls_signif = psd_ls.signif_test()
             @savefig spec_ls.png
-            fig,ax=psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
+            fig, ax = psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
             plt.close(fig)
 
         '''
