@@ -187,7 +187,7 @@ class TestUiSeriesSpectral:
         beta = psd.beta_est()['beta']
         assert np.abs(beta-alpha) < eps
 
-    def test_spectral_t5(self, eps=0.5):
+    def test_spectral_t5(self, eps=0.6):
         ''' Test Series.spectral() with WWZ with specified frequency vector passed via `settings`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
@@ -195,7 +195,7 @@ class TestUiSeriesSpectral:
         Also, we give `label` a test.
         '''
         alpha = 1
-        t, v = gen_colored_noise(nt=800, alpha=alpha)
+        t, v = gen_colored_noise(nt=1000, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 20)
         psd = ts.spectral(method='wwz', settings={'freq': freq}, label='WWZ')

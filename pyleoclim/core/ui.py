@@ -1592,19 +1592,32 @@ class Series:
             The time interval over which to perform the calculation
 
         alpha : float
-            The significance level (0.05 by default)
+            The significance level (default: 0.05)
 
         settings : dict
-            Parameters for the correlation function (singificance testing and number of simulation)
+            Parameters for the correlation function, including:
+
+            - nsim : int
+                the number of simulations (default: 1000)
+            - method : str, {'ttest','isopersistent','isospectral' (default)}
+                method for significance testing
 
         common_time_kwargs : dict
-            Parameters for the method MultipleSeries.common_time(). Will use interpolation by default.
+            Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
 
         Returns
         -------
 
         corr_res_dict : dict
-            Containing the Pearson's correlation coefficient, associated significance and p-value.
+            the result dictionary, containing
+
+            - r : float
+                correlation coefficient
+            - p : float 
+                the p-value
+            - signif : bool
+                true if significant; false otherwise
+                Note that signif = True if and only if p <= alpha.
 
         See also
         --------
@@ -1622,20 +1635,24 @@ class Series:
             import pyleoclim as pyleo
             import pandas as pd
             from matplotlib import pyplot as plt
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
-            t=data.iloc[:,0]
-            air=data.iloc[:,1]
-            nino=data.iloc[:,2]
-            ts_nino=pyleo.Series(time=t,value=nino)
-            ts_air=pyleo.Series(time=t,value=air)
-            #plot the two timeseries
-            @savefig ts_nino.png
-            fig, ax = ts_nino.plot(title='El Nino Region 3 -- SST Anomalies')
-            plt.close(fig)
-            @savefig ts_air.png
-            fig, ax = ts_air.plot(title='Deasonalized All Indian Rainfall Index')
-            plt.close(fig)
+
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
+            t = data.iloc[:, 0]
+            air = data.iloc[:, 1]
+            nino = data.iloc[:, 2]
+            ts_nino = pyleo.Series(time=t, value=nino)
+            ts_air = pyleo.Series(time=t, value=air)
+
+            # the default setting with `nsim=1000` and `method='isospectral'`
             corr_res = ts_nino.correlation(ts_air)
+            print(corr_res)
+
+            # using a simple t-test
+            corr_res = ts_nino.correlation(ts_air, settings={'method': 'ttest'})
+            print(corr_res)
+
+            # using the method "isopersistent"
+            corr_res = ts_nino.correlation(ts_air, settings={'method': 'isopersistent'})
             print(corr_res)
         '''
         settings = {} if settings is None else settings.copy()
@@ -3029,7 +3046,12 @@ class MultipleSeries:
             The significance level (0.05 by default)
 
         settings : dict
-            Parameters for the correlation function (singificance testing and number of simulation)
+            Parameters for the correlation function, including:
+
+            - nsim : int
+                the number of simulations (default: 1000)
+            - method : str, {'ttest','isopersistent','isospectral' (default)}
+                method for significance testing
 
         common_time_kwargs : dict
             Parameters for the method MultipleSeries.common_time()
@@ -3428,7 +3450,7 @@ class MultipleSeries:
             Plot parameters. The default is None.
         lgd_kwargs : dict, optional
             Legend parameters. The default is None.
-        savefig_settings : TYPE, optional
+        savefig_settings : dictionary, optional
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
@@ -3455,6 +3477,19 @@ class MultipleSeries:
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
+
+        if ylabel is None:
+            consistent_ylabels = True
+            time_label, value_label = self.series_list[0].make_labels()
+            for s in self.series_list[1:]:
+                time_label_tmp, value_label_tmp = s.make_labels()
+                if value_label_tmp != value_label:
+                    consistent_ylabels = False
+
+            if consistent_ylabels:
+                ylabel = value_label
+            else:
+                ylabel = 'value'
 
         for s in self.series_list:
             ax = s.plot(
@@ -3490,6 +3525,148 @@ class MultipleSeries:
     #                                 ylabel=ylabel,title=title,plot_kwargs=plot_kwargs,
     #                                 savefig_settings=savefig_settings,ax=ax,mute=mute)
     #     return fig,ax
+
+    def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None,
+                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
+        ''' Stack plot of multiple series
+
+        Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
+                Parameters
+        ----------
+        figsize : list
+            Size of the figure.
+        colors : str, or list of str
+            Colors for plotting.
+            If None, the plotting will cycle the 'tab10' colormap;
+            if only one color is specified, then all curves will be plotted with that single color;
+            if a list of colors are specified, then the plotting will cycle that color list.
+        savefig_settings : dictionary
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+        xlim : list
+            The x-axis limit.
+        fill_between_alpha : float
+            The transparency for the fill_between shades.
+        spine_lw : float
+            The linewidth for the spines of the axes.
+        grid_lw : float
+            The linewidth for the gridlines.
+        linewidth : float
+            The linewidth for the curves.
+        font_scale : float
+            The scale for the font sizes. Default is 0.8.
+        label_x_loc : float
+            The x location for the label of each curve.
+        v_shift_factor : float
+            The factor for the vertical shift of each axis.
+            The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
+
+        Returns
+        -------
+        fig, ax
+        '''
+        plt.ioff()
+        plotting.set_style('journal', font_scale=font_scale)
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+
+        n_ts = len(self.series_list)
+
+        fig = plt.figure(figsize=figsize)
+
+        if xlim is None:
+            time_min = np.inf
+            time_max = -np.inf
+            for ts in self.series_list:
+                if np.min(ts.time) <= time_min:
+                    time_min = np.min(ts.time)
+                if np.max(ts.time) >= time_max:
+                    time_max = np.max(ts.time)
+            xlim = [time_min, time_max]
+
+        ax = {}
+        left = 0
+        width = 1
+        height = 1/n_ts
+        bottom = 1
+        for idx, ts in enumerate(self.series_list):
+            if colors is None:
+                cmap_obj = plt.get_cmap('tab10')
+                clr = cmap_obj(idx%10)
+            elif type(colors) is str:
+                clr = colors
+            elif type(colors) is list:
+                nc = len(colors)
+                clr = colors[idx%nc]
+
+            bottom -= height*v_shift_factor
+            ax[idx] = fig.add_axes([left, bottom, width, height])
+            ax[idx].plot(ts.time, ts.value, color=clr, lw=linewidth)
+            ax[idx].patch.set_alpha(0)
+            ax[idx].set_xlim(xlim)
+            time_label, value_label = ts.make_labels()
+            ax[idx].set_ylabel(value_label, weight='bold')
+
+            mu = np.mean(ts.value)
+            std = np.std(ts.value)
+            ylim = [mu-4*std, mu+4*std]
+            ax[idx].fill_between(ts.time, ts.value, y2=mu, alpha=fill_between_alpha, color=clr)
+            trans = transforms.blended_transform_factory(ax[idx].transAxes, ax[idx].transData)
+            if ts.label is not None:
+                ax[idx].text(label_x_loc, mu, ts.label, horizontalalignment='right', transform=trans, color=clr, weight='bold')
+            ax[idx].set_ylim(ylim)
+            ax[idx].set_yticks(ylim)
+            ax[idx].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            ax[idx].grid(False)
+            if idx % 2 == 0:
+                ax[idx].spines['left'].set_visible(True)
+                ax[idx].spines['left'].set_linewidth(spine_lw)
+                ax[idx].spines['left'].set_color(clr)
+                ax[idx].spines['right'].set_visible(False)
+                ax[idx].yaxis.set_label_position('left')
+                ax[idx].yaxis.tick_left()
+            else:
+                ax[idx].spines['left'].set_visible(False)
+                ax[idx].spines['right'].set_visible(True)
+                ax[idx].spines['right'].set_linewidth(spine_lw)
+                ax[idx].spines['right'].set_color(clr)
+                ax[idx].yaxis.set_label_position('right')
+                ax[idx].yaxis.tick_right()
+
+            ax[idx].yaxis.label.set_color(clr)
+            ax[idx].tick_params(axis='y', colors=clr)
+            ax[idx].spines['top'].set_visible(False)
+            ax[idx].spines['bottom'].set_visible(False)
+            ax[idx].tick_params(axis='x', which='both', length=0)
+            ax[idx].set_xlabel('')
+            ax[idx].set_xticklabels([])
+            xt = ax[idx].get_xticks()[1:-1]
+            for x in xt:
+                ax[idx].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
+            ax[idx].axhline(y=mu, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
+
+        bottom -= height*(1-v_shift_factor)
+        ax[n_ts] = fig.add_axes([left, bottom, width, height])
+        ax[n_ts].set_xlabel(time_label)
+        ax[n_ts].spines['left'].set_visible(False)
+        ax[n_ts].spines['right'].set_visible(False)
+        ax[n_ts].spines['bottom'].set_visible(True)
+        ax[n_ts].spines['bottom'].set_linewidth(spine_lw)
+        ax[n_ts].set_yticks([])
+        ax[n_ts].patch.set_alpha(0)
+        ax[n_ts].set_xlim(xlim)
+        ax[n_ts].grid(False)
+        ax[n_ts].tick_params(axis='x', which='both', length=3.5)
+        xt = ax[n_ts].get_xticks()[1:-1]
+        for x in xt:
+            ax[n_ts].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
+
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, settings=savefig_settings)
+        else:
+            plotting.showfig(fig)
+        return fig, ax
 
 class SurrogateSeries(MultipleSeries):
     ''' Object containing surrogate timeseries
@@ -3762,9 +3939,9 @@ class MultiplePSD:
             y-ticks label. The default is None.
         legend : bool, optional
             Whether to plot the legend. The default is True.
-        plot_kwargs : TYPE, optional
+        plot_kwargs : dictionary, optional
             Parameters for plot function. The default is None.
-        lgd_kwargs : TYPE, optional
+        lgd_kwargs : dictionary, optional
             Parameters for legend. The default is None.
         mute : bool, optional
             if True, the plot will not show;
@@ -3825,7 +4002,7 @@ class MultiplePSD:
             The significance levels to consider. The default is [0.025, 0.5, 0.975].
         in_loglog : bool, optional
             Plot in log space. The default is True.
-        in_period : TYPE, optional
+        in_period : bool, optional
             Whether to plot periodicity instead of frequency. The default is True.
         xlabel : str, optional
             x-axis label. The default is None.
@@ -4329,7 +4506,7 @@ class Lipd:
             Whether to plot the legend. The default is True.
         lgd_kwargs : dict, optional
             Arguments for the legend. The default is None.
-        savefig_settings : TYPE, optional
+        savefig_settings : dictionary, optional
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
@@ -4567,7 +4744,7 @@ class LipdSeries(Series):
             Whether to plot the legend. The default is True.
         lgd_kwargs : dict, optional
             Arguments for the legend. The default is None.
-        savefig_settings : TYPE, optional
+        savefig_settings : dictionary, optional
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
