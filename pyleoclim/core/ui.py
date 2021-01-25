@@ -4339,6 +4339,12 @@ class Lipd:
 
     lidp_dict : dict
         LiPD files already loaded into Python through the LiPD utilities
+    
+    validate : bool
+        Validate the LiPD files upon loading. Note that for a large library this can take up to half an hour.
+        
+    remove : bool
+        If validate is True and remove is True, ignores non-valid Lipd files. Note that loading unvalidated Lipd files may result in errors for some functionalities but not all. 
 
     TODO
     ----
@@ -4356,7 +4362,7 @@ class Lipd:
         d=pyleo.Lipd(usr_path=url)
     '''
 
-    def __init__(self, usr_path=None, lipd_dict=None):
+    def __init__(self, usr_path=None, lipd_dict=None, validate=False, remove=False):
         self.plot_default = {'ice-other': ['#FFD600','h'],
                 'ice/rock': ['#FFD600', 'h'],
                 'coral': ['#FF8B00','o'],
@@ -4373,7 +4379,9 @@ class Lipd:
                 'midden' : ['#824E2B','o'],
                 'other':['k','o']}
 
-
+        if validate==False and remove==True:
+            print('Removal of unvalidated LiPD files require validation')
+            validate=True
         #prepare the dictionaries for all possible scenarios
         if usr_path!=None:
             # since readLipd() takes only absolute path and it will change the current working directory (CWD) without turning back,
@@ -4392,15 +4400,44 @@ class Lipd:
             #make sure that it's more than one
             if 'archiveType' in D_path.keys():
                 D_path={D_path['dataSetName']:D_path}
+            if validate==True:
+                res=lpd.validate(D_path,detailed=False)
+                if remove == True:
+                    for item in res:
+                        if item['status'] == 'FAIL':
+                           c=item['feedback']['errMsgs'] 
+                           check = []
+                           for i in c:
+                               if i.startswith('Mismatched columns'):
+                                   check.append(1)
+                               else: check.append(0)
+                           if 0 in check:
+                               del D_path[item['filename'].strip('.lpd')]
         else:
             D_path={}
         if lipd_dict!=None:
             D_dict=lipd_dict
             if 'archiveType' in D_dict.keys():
                 D_dict={D_dict['dataSetName']:D_dict}
+            if validate==True:
+                res=lpd.validate(D_dict,detailed=False)
+                if remove == True:
+                    for item in res:
+                        if item['status'] == 'FAIL':
+                           c=item['feedback']['errMsgs'] 
+                           check = []
+                           for i in c:
+                               if i.startswith('Mismatched columns'):
+                                   check.append(1)
+                               else: check.append(0)
+                           if 0 in check:
+                               del D_dict[item['filename'].strip('.lpd')]
         else:
             D_dict={}
-
+            
+        # raise an error if empty
+        if not bool(D_dict) and not bool(D_path) == True:
+            raise ValueError('No valid files; try without validation.')
         #assemble
         self.lipd={}
         self.lipd.update(D_path)
@@ -4530,7 +4567,10 @@ class Lipd:
             d = self.lipd[key]
             lat.append(d['geo']['geometry']['coordinates'][1])
             lon.append(d['geo']['geometry']['coordinates'][0])
-            archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower().replace(" ",""))
+            if 'archiveType' in d.keys():
+                archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower().replace(" ",""))
+            else:
+                archiveType.append('other')
 
         # make sure criteria is in the plot_default list
         for idx,val in enumerate(archiveType):
