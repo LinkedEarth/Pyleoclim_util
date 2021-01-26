@@ -46,7 +46,7 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     nsim : int
         the number of simulations [default: 1000]
         
-    method : {'ttest','isopersistent','isospectral'}
+    method : {'ttest','isopersistent','isospectral' (default)}
         method for significance testing
         
     alpha : float
@@ -55,14 +55,15 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     Returns
     -------
     res : dict 
-        Containing:
-            
-        - r : correlation between x and y
-         
-        - signif : true (1) if significant; false (0) otherwise
-         
-        - p : Fraction of time series with higher correlation coefficents than observed (approximates the p-value).
-         Note that signif = True if and only if p <= alpha.
+        the result dictionary, containing
+
+        - r : float
+            correlation coefficient
+        - p : float 
+            the p-value
+        - signif : bool
+            true if significant; false otherwise
+            Note that signif = True if and only if p <= alpha.
          
     See Also
     --------

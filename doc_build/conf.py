@@ -51,6 +51,7 @@ plot_include_source = True
 plot_formats = [("png", 90)]
 plot_html_show_formats = True
 plot_html_show_source_link = True
+autosummary_generate = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -68,7 +69,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Pyleoclim'
-copyright = '2017-2020, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James'
+copyright = '2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James'
 author = 'Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James, Pratheek Athreya, Myron Kwan, Daniel Garijo'
 
 # The version info for the project you're documenting, acts as replacement for

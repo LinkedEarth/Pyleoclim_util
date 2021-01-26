@@ -170,7 +170,7 @@ class Series:
             time = data.iloc[:,1]
             value = data.iloc[:,2]
             ts = pyleo.Series(time=time, value=value, time_unit='years')
-            new_ts.convert_time_unit(time_unit='bp')
+            new_ts = ts.convert_time_unit(time_unit='yrs BP')
             print('Original timeseries:')
             print('time unit:', ts.time_unit)
             print('time:', ts.time)
@@ -1186,8 +1186,8 @@ class Series:
         Returns
         -------
 
-        psd : pyleoclim.Psd
-            A PSD object
+        psd : pyleoclim.PSD
+            A :mod:`pyleoclim.PSD` object
 
         See also
         --------
@@ -1227,38 +1227,95 @@ class Series:
             ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
             # Standardize the time series
             ts_std=ts.standardize()
-            # WWZ
-            psd_wwz=ts_std.spectral()
-            psd_wwz_signif=psd_wwz.signif_test(number=1)  # for real work, should use number=200 or even larger
+
+
+        - WWZ
+
+        .. ipython:: python
+            :okwarning:
+
+            psd_wwz = ts_std.spectral(method='wwz')  # wwz is the default method
+            psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger
             @savefig spec_wwz.png
-            fig,ax=psd_wwz_signif.plot(title='PSD using WWZ method')
+            fig, ax = psd_wwz_signif.plot(title='PSD using WWZ method')
             plt.close(fig)
-            #Periodogram
+
+        We may pass in method-specific arguments via "settings", which is a dictionary.
+        For instance, to adjust the analytical frequency resolution for WWZ, we may specify the method-specific argument, the decay constant, "c";
+        to adjust the frequency vector, we may modify the "freq_method" or modify the method-specific argument "freq".
+
+        .. ipython:: python
+            :okwarning:
+
+            psd_wwz_lres = ts_std.spectral(method='wwz', settings={'c': 1e-2})  # c=1e-2 yields lower frequency resolution
+            psd_wwz_hres = ts_std.spectral(method='wwz', settings={'c': 1e-4})  # c=1e-4 yields higher frequency resolution
+            psd_wwz_freq = ts_std.spectral(method='wwz', settings={'freq': np.linspace(1/20, 1/0.2, 51)})
+            psd_wwz_nfft = ts_std.spectral(method='wwz', freq_method='nfft')  # with frequency vector generated using NFFT style
+            fig, ax = psd_wwz_lres.plot(
+                title='PSD using WWZ method with differnt decay constants', mute=True,
+                label='settings={"c": 1e-2}')
+            @savefig spec_wwz_c.png
+            psd_wwz_hres.plot(ax=ax, label='settings={"c": 1e-4}')
+            plt.close(fig)
+
+            fig, ax = psd_wwz_freq.plot(
+                title='PSD using WWZ method with differnt frequency vectors', mute=True,
+                label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
+            psd_wwz.plot(ax=ax, label='freq_method="log"', marker='o')
+            @savefig spec_wwz_freq.png
+            psd_wwz_nfft.plot(ax=ax, label='freq_method="nfft"', marker='o')
+            plt.close(fig)
+
+        You may notice the differences in the PSD curves regarding smoothness and the locations of the analyzed period points.
+
+        For other method-specific arguments, please look up the specific methods in the "See also" section.
+
+
+        - Periodogram
+
+        .. ipython:: python
+            :okwarning:
+
             ts_interp = ts_std.interp()
-            psd_perio=ts_interp.spectral(method='periodogram')
-            psd_perio_signif=psd_perio.signif_test()
+            psd_perio = ts_interp.spectral(method='periodogram')
+            psd_perio_signif = psd_perio.signif_test()
             @savefig spec_perio.png
-            fig,ax=psd_perio_signif.plot(title='PSD using Periodogram method')
+            fig, ax = psd_perio_signif.plot(title='PSD using Periodogram method')
             plt.close(fig)
-            #Welch
+
+        - Welch
+
+        .. ipython:: python
+            :okwarning:
+
             ts_interp = ts_std.interp()
-            psd_welch=ts_interp.spectral(method='welch')
-            psd_welch_signif=psd_welch.signif_test()
+            psd_welch = ts_interp.spectral(method='welch')
+            psd_welch_signif = psd_welch.signif_test()
             @savefig spec_welch.png
-            fig,ax=psd_welch_signif.plot(title='PSD using Welch method')
+            fig, ax = psd_welch_signif.plot(title='PSD using Welch method')
             plt.close(fig)
-            #MTM
+
+        - MTM
+
+        .. ipython:: python
+            :okwarning:
+
             ts_interp = ts_std.interp()
-            psd_mtm=ts_interp.spectral(method='mtm')
-            psd_mtm_signif=psd_mtm.signif_test()
+            psd_mtm = ts_interp.spectral(method='mtm')
+            psd_mtm_signif = psd_mtm.signif_test()
             @savefig spec_mtm.png
-            fig,ax=psd_mtm_signif.plot(title='PSD using MTM method')
+            fig, ax = psd_mtm_signif.plot(title='PSD using MTM method')
             plt.close(fig)
-            #Lomb-Scargle
-            psd_ls=ts_std.spectral(method='lomb_scargle')
-            psd_ls_signif=psd_ls.signif_test()
+
+        - Lomb-Scargle
+
+        .. ipython:: python
+            :okwarning:
+
+            psd_ls = ts_std.spectral(method='lomb_scargle')
+            psd_ls_signif = psd_ls.signif_test()
             @savefig spec_ls.png
-            fig,ax=psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
+            fig, ax = psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
             plt.close(fig)
 
         '''
@@ -1520,8 +1577,8 @@ class Series:
         2) 'isopersistent': AR(1) modeling of x and y.
         3) 'isospectral': phase randomization of original inputs. (default)
 
-        The T-test is a parametric test, hence computationally cheap but can only be performed in ideal circumstances.
-        The others are non-parametric, but their computational requirements scale with the number of simulations.
+        The T-test is a parametric test, hence computationally cheap but can only be performed in idyllic circumstances.
+        The others are non-parametric, but their computational requirements scales with nsim.
 
         The choise of significance test and associated number of Monte-Carlo simulations are passed through the settings parameter.
 
@@ -1535,19 +1592,32 @@ class Series:
             The time interval over which to perform the calculation
 
         alpha : float
-            The significance level (0.05 by default)
+            The significance level (default: 0.05)
 
         settings : dict
-            Parameters for the correlation function (singificance testing and number of simulation)
+            Parameters for the correlation function, including:
+
+            - nsim : int
+                the number of simulations (default: 1000)
+            - method : str, {'ttest','isopersistent','isospectral' (default)}
+                method for significance testing
 
         common_time_kwargs : dict
-            Parameters for the method MultipleSeries.common_time(). Will use interpolation by default.
+            Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
 
         Returns
         -------
 
         corr_res_dict : dict
-            Containing the Pearson's correlation coefficient, associated significance and p-value.
+            the result dictionary, containing
+
+            - r : float
+                correlation coefficient
+            - p : float 
+                the p-value
+            - signif : bool
+                true if significant; false otherwise
+                Note that signif = True if and only if p <= alpha.
 
         See also
         --------
@@ -1565,20 +1635,24 @@ class Series:
             import pyleoclim as pyleo
             import pandas as pd
             from matplotlib import pyplot as plt
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
-            t=data.iloc[:,0]
-            air=data.iloc[:,1]
-            nino=data.iloc[:,2]
-            ts_nino=pyleo.Series(time=t,value=nino)
-            ts_air=pyleo.Series(time=t,value=air)
-            #plot the two timeseries
-            @savefig ts_nino.png
-            fig, ax = ts_nino.plot(title='El Nino Region 3 -- SST Anomalies')
-            plt.close(fig)
-            @savefig ts_air.png
-            fig, ax = ts_air.plot(title='Deasonalized All Indian Rainfall Index')
-            plt.close(fig)
+
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
+            t = data.iloc[:, 0]
+            air = data.iloc[:, 1]
+            nino = data.iloc[:, 2]
+            ts_nino = pyleo.Series(time=t, value=nino)
+            ts_air = pyleo.Series(time=t, value=air)
+
+            # the default setting with `nsim=1000` and `method='isospectral'`
             corr_res = ts_nino.correlation(ts_air)
+            print(corr_res)
+
+            # using a simple t-test
+            corr_res = ts_nino.correlation(ts_air, settings={'method': 'ttest'})
+            print(corr_res)
+
+            # using the method "isopersistent"
+            corr_res = ts_nino.correlation(ts_air, settings={'method': 'isopersistent'})
             print(corr_res)
         '''
         settings = {} if settings is None else settings.copy()
@@ -2118,7 +2192,7 @@ class PSD:
                 xlabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
 
             if xticks is None:
-                xticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                xticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 1e4, 2e4, 5e4, 1e5, 2e5, 5e5, 1e6])
                 mask = (xticks_default >= np.nanmin(x_axis)) & (xticks_default <= np.nanmax(x_axis))
                 xticks = xticks_default[mask]
 
@@ -2342,7 +2416,7 @@ class Scalogram:
                 ylabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
 
             if yticks is None:
-                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 1e4, 2e4, 5e4, 1e5, 2e5, 5e5, 1e6])
                 mask = (yticks_default >= np.min(y_axis)) & (yticks_default <= np.max(y_axis))
                 yticks = yticks_default[mask]
         else:
@@ -2596,7 +2670,7 @@ class Coherence:
                 ylabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
 
             if yticks is None:
-                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000])
+                yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 1e4, 2e4, 5e4, 1e5, 2e5, 5e5, 1e6])
                 mask = (yticks_default >= np.min(y_axis)) & (yticks_default <= np.max(y_axis))
                 yticks = yticks_default[mask]
         else:
@@ -2779,9 +2853,11 @@ class Coherence:
         return new
 
 class MultipleSeries:
-    '''Define a multiple series object.
+    '''MultipleSeries object.
 
-    This is useful for ensembling or working with multiple timeseries in the same workflow
+    This object handles multiple objects of the type Series and can be created from a list of Series objects. 
+    MultipleSeries should be used when the need to run analysis on multiple records arises, such as running principal component analysis.
+    Some of the methods automatically rescale the time axis prior to analysis to ensure that the analysis is run over the same time period. 
 
     Parameters
     ----------
@@ -2793,7 +2869,23 @@ class MultipleSeries:
         The target time unit for every series in the list.
         If None, then no conversion will be applied;
         Otherwise, the time unit of every series in the list will be converted to the target.
+    
+    Examples
+    --------
+    .. ipython:: python
+        :okwarning:
 
+        import pyleoclim as pyleo
+        import pandas as pd
+        data = pd.read_csv(
+            'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+            skiprows=0, header=1
+        )
+        time = data.iloc[:,1]
+        value = data.iloc[:,2]
+        ts1 = pyleo.Series(time=time, value=value, time_unit='years')
+        ts2 = pyleo.Series(time=time, value=value, time_unit='years')
+        ms = pyleo.MultipleSeries([ts1, ts2])
     '''
     def __init__(self, series_list, time_unit=None):
         self.series_list = series_list
@@ -2972,7 +3064,12 @@ class MultipleSeries:
             The significance level (0.05 by default)
 
         settings : dict
-            Parameters for the correlation function (singificance testing and number of simulation)
+            Parameters for the correlation function, including:
+
+            - nsim : int
+                the number of simulations (default: 1000)
+            - method : str, {'ttest','isopersistent','isospectral' (default)}
+                method for significance testing
 
         common_time_kwargs : dict
             Parameters for the method MultipleSeries.common_time()
@@ -3100,6 +3197,24 @@ class MultipleSeries:
         pyleoclim.utils.tsutils.bin: Underlying binning function
 
         pyleoclim.core.ui.Series.bin: Bin function for Series object
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import lipd
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            tslist = data.to_tso()
+            mslist = []
+            for item in tslist:
+                mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
+            ms = pyleo.MultipleSeries(mslist)
+            msbin = ms.bin()
+
         '''
 
         ms = self.copy()
@@ -3140,6 +3255,24 @@ class MultipleSeries:
         pyleoclim.utils.tsutils.interp: Underlying interpolation function
 
         pyleoclim.core.ui.Series.interp: Interpolation function for Series object
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import lipd
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            tslist = data.to_tso()
+            mslist = []
+            for item in tslist:
+                mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
+            ms = pyleo.MultipleSeries(mslist)
+            msinterp = ms.interp()
+
         '''
         ms = self.copy()
 
@@ -3335,7 +3468,7 @@ class MultipleSeries:
             Plot parameters. The default is None.
         lgd_kwargs : dict, optional
             Legend parameters. The default is None.
-        savefig_settings : TYPE, optional
+        savefig_settings : dictionary, optional
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
@@ -3362,6 +3495,19 @@ class MultipleSeries:
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
+
+        if ylabel is None:
+            consistent_ylabels = True
+            time_label, value_label = self.series_list[0].make_labels()
+            for s in self.series_list[1:]:
+                time_label_tmp, value_label_tmp = s.make_labels()
+                if value_label_tmp != value_label:
+                    consistent_ylabels = False
+
+            if consistent_ylabels:
+                ylabel = value_label
+            else:
+                ylabel = 'value'
 
         for s in self.series_list:
             ax = s.plot(
@@ -3398,6 +3544,148 @@ class MultipleSeries:
     #                                 savefig_settings=savefig_settings,ax=ax,mute=mute)
     #     return fig,ax
 
+    def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None,
+                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
+        ''' Stack plot of multiple series
+
+        Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
+                Parameters
+        ----------
+        figsize : list
+            Size of the figure.
+        colors : str, or list of str
+            Colors for plotting.
+            If None, the plotting will cycle the 'tab10' colormap;
+            if only one color is specified, then all curves will be plotted with that single color;
+            if a list of colors are specified, then the plotting will cycle that color list.
+        savefig_settings : dictionary
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+        xlim : list
+            The x-axis limit.
+        fill_between_alpha : float
+            The transparency for the fill_between shades.
+        spine_lw : float
+            The linewidth for the spines of the axes.
+        grid_lw : float
+            The linewidth for the gridlines.
+        linewidth : float
+            The linewidth for the curves.
+        font_scale : float
+            The scale for the font sizes. Default is 0.8.
+        label_x_loc : float
+            The x location for the label of each curve.
+        v_shift_factor : float
+            The factor for the vertical shift of each axis.
+            The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
+
+        Returns
+        -------
+        fig, ax
+        '''
+        plt.ioff()
+        plotting.set_style('journal', font_scale=font_scale)
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+
+        n_ts = len(self.series_list)
+
+        fig = plt.figure(figsize=figsize)
+
+        if xlim is None:
+            time_min = np.inf
+            time_max = -np.inf
+            for ts in self.series_list:
+                if np.min(ts.time) <= time_min:
+                    time_min = np.min(ts.time)
+                if np.max(ts.time) >= time_max:
+                    time_max = np.max(ts.time)
+            xlim = [time_min, time_max]
+
+        ax = {}
+        left = 0
+        width = 1
+        height = 1/n_ts
+        bottom = 1
+        for idx, ts in enumerate(self.series_list):
+            if colors is None:
+                cmap_obj = plt.get_cmap('tab10')
+                clr = cmap_obj(idx%10)
+            elif type(colors) is str:
+                clr = colors
+            elif type(colors) is list:
+                nc = len(colors)
+                clr = colors[idx%nc]
+
+            bottom -= height*v_shift_factor
+            ax[idx] = fig.add_axes([left, bottom, width, height])
+            ax[idx].plot(ts.time, ts.value, color=clr, lw=linewidth)
+            ax[idx].patch.set_alpha(0)
+            ax[idx].set_xlim(xlim)
+            time_label, value_label = ts.make_labels()
+            ax[idx].set_ylabel(value_label, weight='bold')
+
+            mu = np.mean(ts.value)
+            std = np.std(ts.value)
+            ylim = [mu-4*std, mu+4*std]
+            ax[idx].fill_between(ts.time, ts.value, y2=mu, alpha=fill_between_alpha, color=clr)
+            trans = transforms.blended_transform_factory(ax[idx].transAxes, ax[idx].transData)
+            if ts.label is not None:
+                ax[idx].text(label_x_loc, mu, ts.label, horizontalalignment='right', transform=trans, color=clr, weight='bold')
+            ax[idx].set_ylim(ylim)
+            ax[idx].set_yticks(ylim)
+            ax[idx].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            ax[idx].grid(False)
+            if idx % 2 == 0:
+                ax[idx].spines['left'].set_visible(True)
+                ax[idx].spines['left'].set_linewidth(spine_lw)
+                ax[idx].spines['left'].set_color(clr)
+                ax[idx].spines['right'].set_visible(False)
+                ax[idx].yaxis.set_label_position('left')
+                ax[idx].yaxis.tick_left()
+            else:
+                ax[idx].spines['left'].set_visible(False)
+                ax[idx].spines['right'].set_visible(True)
+                ax[idx].spines['right'].set_linewidth(spine_lw)
+                ax[idx].spines['right'].set_color(clr)
+                ax[idx].yaxis.set_label_position('right')
+                ax[idx].yaxis.tick_right()
+
+            ax[idx].yaxis.label.set_color(clr)
+            ax[idx].tick_params(axis='y', colors=clr)
+            ax[idx].spines['top'].set_visible(False)
+            ax[idx].spines['bottom'].set_visible(False)
+            ax[idx].tick_params(axis='x', which='both', length=0)
+            ax[idx].set_xlabel('')
+            ax[idx].set_xticklabels([])
+            xt = ax[idx].get_xticks()[1:-1]
+            for x in xt:
+                ax[idx].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
+            ax[idx].axhline(y=mu, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
+
+        bottom -= height*(1-v_shift_factor)
+        ax[n_ts] = fig.add_axes([left, bottom, width, height])
+        ax[n_ts].set_xlabel(time_label)
+        ax[n_ts].spines['left'].set_visible(False)
+        ax[n_ts].spines['right'].set_visible(False)
+        ax[n_ts].spines['bottom'].set_visible(True)
+        ax[n_ts].spines['bottom'].set_linewidth(spine_lw)
+        ax[n_ts].set_yticks([])
+        ax[n_ts].patch.set_alpha(0)
+        ax[n_ts].set_xlim(xlim)
+        ax[n_ts].grid(False)
+        ax[n_ts].tick_params(axis='x', which='both', length=3.5)
+        xt = ax[n_ts].get_xticks()[1:-1]
+        for x in xt:
+            ax[n_ts].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
+
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, settings=savefig_settings)
+        else:
+            plotting.showfig(fig)
+        return fig, ax
+
 class SurrogateSeries(MultipleSeries):
     ''' Object containing surrogate timeseries
     '''
@@ -3407,7 +3695,10 @@ class SurrogateSeries(MultipleSeries):
         self.surrogate_args = surrogate_args
 
 class EnsembleSeries(MultipleSeries):
-    ''' Object containing ensemble timeseries
+    ''' EnsembleSeries object
+    
+    The EnsembleSeries object is a child of the MultipleSeries object. In other word, it is a special case of MultipleSeries, that represents ensembles in paleoclimate data. Ensembles usually arise from age modeling or Bayesian calibrations.
+    One of the main difference between MultipleSeries and EnsembleSeries is the way the plot() method is handled: in the case of MultipleSeries, a stack plot is called. For ensembles, an envelop or overlapping lines are used. 
     '''
     def __init__(self, series_list):
         self.series_list = series_list
@@ -3435,7 +3726,7 @@ class EnsembleSeries(MultipleSeries):
             The significance level (0.05 by default)
 
         settings : dict
-            Parameters for the correlation function (significance testing and number of simulations)
+            Parameters for the correlation function (singificance testing and number of simulation)
 
         fdr_kwargs : dict
             Parameters for the FDR function
@@ -3669,9 +3960,9 @@ class MultiplePSD:
             y-ticks label. The default is None.
         legend : bool, optional
             Whether to plot the legend. The default is True.
-        plot_kwargs : TYPE, optional
+        plot_kwargs : dictionary, optional
             Parameters for plot function. The default is None.
-        lgd_kwargs : TYPE, optional
+        lgd_kwargs : dictionary, optional
             Parameters for legend. The default is None.
         mute : bool, optional
             if True, the plot will not show;
@@ -3732,7 +4023,7 @@ class MultiplePSD:
             The significance levels to consider. The default is [0.025, 0.5, 0.975].
         in_loglog : bool, optional
             Plot in log space. The default is True.
-        in_period : TYPE, optional
+        in_period : bool, optional
             Whether to plot periodicity instead of frequency. The default is True.
         xlabel : str, optional
             x-axis label. The default is None.
@@ -4069,6 +4360,12 @@ class Lipd:
 
     lidp_dict : dict
         LiPD files already loaded into Python through the LiPD utilities
+    
+    validate : bool
+        Validate the LiPD files upon loading. Note that for a large library this can take up to half an hour.
+        
+    remove : bool
+        If validate is True and remove is True, ignores non-valid Lipd files. Note that loading unvalidated Lipd files may result in errors for some functionalities but not all. 
 
     TODO
     ----
@@ -4086,7 +4383,7 @@ class Lipd:
         d=pyleo.Lipd(usr_path=url)
     '''
 
-    def __init__(self, usr_path=None, lipd_dict=None):
+    def __init__(self, usr_path=None, lipd_dict=None, validate=False, remove=False):
         self.plot_default = {'ice-other': ['#FFD600','h'],
                 'ice/rock': ['#FFD600', 'h'],
                 'coral': ['#FF8B00','o'],
@@ -4103,7 +4400,9 @@ class Lipd:
                 'midden' : ['#824E2B','o'],
                 'other':['k','o']}
 
-
+        if validate==False and remove==True:
+            print('Removal of unvalidated LiPD files require validation')
+            validate=True
         #prepare the dictionaries for all possible scenarios
         if usr_path!=None:
             # since readLipd() takes only absolute path and it will change the current working directory (CWD) without turning back,
@@ -4122,15 +4421,44 @@ class Lipd:
             #make sure that it's more than one
             if 'archiveType' in D_path.keys():
                 D_path={D_path['dataSetName']:D_path}
+            if validate==True:
+                res=lpd.validate(D_path,detailed=False)
+                if remove == True:
+                    for item in res:
+                        if item['status'] == 'FAIL':
+                           c=item['feedback']['errMsgs'] 
+                           check = []
+                           for i in c:
+                               if i.startswith('Mismatched columns'):
+                                   check.append(1)
+                               else: check.append(0)
+                           if 0 in check:
+                               del D_path[item['filename'].strip('.lpd')]
         else:
             D_path={}
         if lipd_dict!=None:
             D_dict=lipd_dict
             if 'archiveType' in D_dict.keys():
                 D_dict={D_dict['dataSetName']:D_dict}
+            if validate==True:
+                res=lpd.validate(D_dict,detailed=False)
+                if remove == True:
+                    for item in res:
+                        if item['status'] == 'FAIL':
+                           c=item['feedback']['errMsgs'] 
+                           check = []
+                           for i in c:
+                               if i.startswith('Mismatched columns'):
+                                   check.append(1)
+                               else: check.append(0)
+                           if 0 in check:
+                               del D_dict[item['filename'].strip('.lpd')]
         else:
             D_dict={}
-
+            
+        # raise an error if empty
+        if not bool(D_dict) and not bool(D_path) == True:
+            raise ValueError('No valid files; try without validation.')
         #assemble
         self.lipd={}
         self.lipd.update(D_path)
@@ -4179,7 +4507,7 @@ class Lipd:
         return new
 
     def to_LipdSeries(self):
-        '''Extracts all LiPD timeseries objects to a list of LipdSeries objects
+        '''Extracts all the timeseries objects to a list of LipdSeries objects
 
         Returns
         -------
@@ -4192,7 +4520,10 @@ class Lipd:
         res=[]
 
         for item in ts_list:
-            res.append(LipdSeries(item))
+            try:
+                res.append(LipdSeries(item))
+            except:
+                pass
 
         return res
 
@@ -4233,7 +4564,7 @@ class Lipd:
             Whether to plot the legend. The default is True.
         lgd_kwargs : dict, optional
             Arguments for the legend. The default is None.
-        savefig_settings : TYPE, optional
+        savefig_settings : dictionary, optional
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
@@ -4257,7 +4588,10 @@ class Lipd:
             d = self.lipd[key]
             lat.append(d['geo']['geometry']['coordinates'][1])
             lon.append(d['geo']['geometry']['coordinates'][0])
-            archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower().replace(" ",""))
+            if 'archiveType' in d.keys():
+                archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower().replace(" ",""))
+            else:
+                archiveType.append('other')
 
         # make sure criteria is in the plot_default list
         for idx,val in enumerate(archiveType):
@@ -4319,35 +4653,40 @@ class LipdSeries(Series):
                 'peat' : ['#2F4F4F','*'],
                 'midden' : ['#824E2B','o'],
                 'other':['k','o']}
-
-        time, label= lipdutils.checkTimeAxis(self.lipd_ts)
-        if label=='age':
-            time_name='Age'
-            if 'ageUnits' in self.lipd_ts.keys():
-                time_unit=self.lipd_ts['ageUnits']
-            else:
-                time_unit=None
-        elif label=='year':
-            time_name='Year'
-            if 'yearUnits' in self.lipd_ts.keys():
-                time_unit=self.lipd_ts['yearUnits']
-            else:
-                time_unit=None
-
-        value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
-        #Remove NaNs
-        ys_tmp=np.copy(value)
-        value=value[~np.isnan(ys_tmp)]
-        time=time[~np.isnan(ys_tmp)]
-        value_name=self.lipd_ts['paleoData_variableName']
-        if 'paleoData_units' in self.lipd_ts.keys():
-            value_unit=self.lipd_ts['paleoData_units']
-        else:
-            value_unit=None
-        label=self.lipd_ts['dataSetName']
-        super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
-             time_unit=time_unit,value_name=value_name,value_unit=value_unit,
-             label=label)
+        try:
+            time, label= lipdutils.checkTimeAxis(self.lipd_ts)
+            if label=='age':
+                time_name='Age'
+                if 'ageUnits' in self.lipd_ts.keys():
+                    time_unit=self.lipd_ts['ageUnits']
+                else:
+                    time_unit=None
+            elif label=='year':
+                time_name='Year'
+                if 'yearUnits' in self.lipd_ts.keys():
+                    time_unit=self.lipd_ts['yearUnits']
+                else:
+                    time_unit=None
+            try:
+                value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
+                #Remove NaNs
+                ys_tmp=np.copy(value)
+                value=value[~np.isnan(ys_tmp)]
+                time=time[~np.isnan(ys_tmp)]
+                value_name=self.lipd_ts['paleoData_variableName']
+                if 'paleoData_units' in self.lipd_ts.keys():
+                    value_unit=self.lipd_ts['paleoData_units']
+                else:
+                    value_unit=None
+                label=self.lipd_ts['dataSetName']
+                super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
+                     time_unit=time_unit,value_name=value_name,value_unit=value_unit,
+                     label=label)           
+            except:
+                raise ValueError("paleoData_values should contain floats")             
+        except:
+            raise KeyError("No time information present")
+        
 
     def copy(self):
         '''Copy the object
@@ -4466,7 +4805,7 @@ class LipdSeries(Series):
             Whether to plot the legend. The default is True.
         lgd_kwargs : dict, optional
             Arguments for the legend. The default is None.
-        savefig_settings : TYPE, optional
+        savefig_settings : dictionary, optional
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"

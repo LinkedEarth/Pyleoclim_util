@@ -241,7 +241,8 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
     c : float
-        the decay constant
+        the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
+        the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
         the threshold of the number of effective degree of freedom
     nproc :int
@@ -368,7 +369,8 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=Fal
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
     c : float
-        the decay constant
+        the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
+        the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
         the threshold of the number of effective degree of freedom
     nproc : int
@@ -501,7 +503,8 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
     c : float
-        the decay constant
+        the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
+        the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
         the threshold of the number of effective degree of freedom
     nproc : int
@@ -643,7 +646,8 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
     c : float
-        the decay constant
+        the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
+        the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
         the threshold of the number of effective degree of freedom
     nproc : int
@@ -787,7 +791,8 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, s
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
     c : float
-        the decay constant
+        the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
+        the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
         the threshold of the number of effective degree of freedom
     nproc : int
@@ -938,7 +943,8 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
     c : float
-        the decay constant
+        the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
+        the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
         the threshold of the number of effective degree of freedom
     nproc : int
@@ -1144,7 +1150,7 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
 
 def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
         nMC=200, nproc=8, detrend=False, sg_kwargs=None,
-        gaussianize=False, standardize=False, method='default', len_bd=0,
+        gaussianize=False, standardize=False, method='Kirchner_numba', len_bd=0,
         bc_mode='reflect', reflect_type='odd'):
     ''' Weighted wavelet amplitude (WWA) for unevenly-spaced data
 
@@ -1156,41 +1162,58 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
     ts : array
         the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
     tau : array
-        the evenly-spaced time points
+        the evenly-spaced time vector for the analysis, namely the time shift for wavelet analysis
     freq : array
         vector of frequency
     freq_method : str
-        when freq=None, freq will be ganerated according to freq_method
+        Method to generate the frequency vector if not set directly. The following options are avialable:
+
+        - 'log' (default)
+        - 'lomb_scargle'
+        - 'welch'
+        - 'scale'
+        - 'nfft'
+        See :func:`pyleoclim.utils.wavelet.make_freq_vector()` for details
+
     freq_kwargs : str
         used when freq=None for certain methods
     c : float
-        the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+        the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
+        the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
         effective number of points
     nMC : int
         the number of Monte-Carlo simulations
     nproc : int
         the number of processes for multiprocessing
-    detrend : string
-        None - the original time series is assumed to have no trend;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+
+    detrend : string, {None, 'linear', 'constant', 'savitzy-golay'}
+        available methods for detrending, including
+
+        - None: the original time series is assumed to have no trend;
+        - 'linear': a linear least-squares fit to `ys` is subtracted;
+        - 'constant': the mean of `ys` is subtracted
+        - 'savitzy-golay': ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
         Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
-    method : string
-        'Foster' - the original WWZ method;
-        'Kirchner' - the method Kirchner adapted from Foster;
-        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
-        'Kirchner_numba' - Kirchner's algorithm with Numba support for acceleration (default)
+        The parameters for the Savitzky-Golay filters. See :func:`pyleoclim.utils.filter.savitzky_golay()` for details.
+
+    method : string, {'Foster', 'Kirchner', 'Kirchner_f2py', 'Kirchner_numba'}
+        available specific implementation of WWZ, including
+
+        - 'Foster': the original WWZ method;
+        - 'Kirchner': the method Kirchner adapted from Foster;
+        - 'Kirchner_f2py': the method Kirchner adapted from Foster, implemented with f2py for acceleration;
+        - 'Kirchner_numba': the method Kirchner adapted from Foster, implemented with Numba for acceleration (default);
+
     len_bd : int
         the number of the ghost grids want to creat on each boundary
-    bc_mode : string
-        {'constant', 'edge', 'linear_ramp', 'maximum', 'mean', 'median', 'minimum', 'reflect' , 'symmetric', 'wrap'}
+
+    bc_mode : string, {'constant', 'edge', 'linear_ramp', 'maximum', 'mean', 'median', 'minimum', 'reflect' , 'symmetric', 'wrap'}
         For more details, see np.lib.pad()
-    reflect_type : string
-         {‘even’, ‘odd’}, optional
+
+    reflect_type : string, optional, {‘even’, ‘odd’}
          Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
          For the ‘odd’ style, the extented part of the array is created by subtracting the reflected values from two times the edge value.
          For more details, see np.lib.pad()
@@ -1198,20 +1221,26 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
     Returns
     -------
 
-    wwa : array
-        the weighted wavelet amplitude.
-    AR1_q : array
-        AR1 simulations
-    coi : array
-        cone of influence
-    freq : array
-        vector of frequency
-    tau : array
-        the evenly-spaced time points, namely the time shift for wavelet analysis
-    Neffs : array
-        the matrix of effective number of points in the time-scale coordinates
-    coeff : array
-        the wavelet transform coefficents
+    res : namedtuple
+        a namedtuple that includes below items
+
+        wwa : array
+            the weighted wavelet amplitude.
+
+        coi : array
+            cone of influence
+
+        freq : array
+            vector of frequency
+
+        tau : array
+            the evenly-spaced time points, namely the time shift for wavelet analysis
+
+        Neffs : array
+            the matrix of effective number of points in the time-scale coordinates
+
+        coeff : array
+            the wavelet transform coefficents
     
     See also
     --------
@@ -1231,6 +1260,47 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.    
     
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
+
+    Examples
+    --------
+
+    We perform an ideal test below.
+    We use a sine wave with a period of 50 yrs as the signal for test.
+    Then performing wavelet analysis should return an energy band around period of 50 yrs in the time-period scalogram domain.
+
+    .. ipython:: python
+        :okwarning:
+
+        from pyleoclim import utils
+        import matplotlib.pyplot as plt
+        from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
+        import numpy as np
+
+        # Create a signal
+        time = np.arange(2001)
+        f = 1/50  # the period is then 1/f = 50
+        signal = np.cos(2*np.pi*f*time)
+
+        # Wavelet Analysis
+        res = utils.wwz(signal, time)
+
+        # Visualization
+        fig, ax = plt.subplots()
+        contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
+        cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
+        cont = ax.contourf(res.time, 1/res.freq, res.amplitude.T, **contourf_args)
+        ax.plot(res.time, res.coi, 'k--')  # plot the cone of influence
+        ax.set_yscale('log')
+        ax.set_yticks([2, 5, 10, 20, 50, 100, 200, 500, 1000])
+        ax.set_ylim([2, 1000])
+        ax.yaxis.set_major_formatter(ScalarFormatter())
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
+        ax.set_xlabel('Time (yr)')
+        ax.set_ylabel('Period (yrs)')
+        cb = plt.colorbar(cont, **cbar_args)
+        @savefig wwa_wwz.png
+        plt.show()
+
     '''
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
 
@@ -1265,14 +1335,15 @@ def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*n
 
     #  else:
         #  AR1_q = None
-    wwa_red = None
-    AR1_q = None
+    # AR1_q = None
 
     # calculate the cone of influence
     coi = make_coi(tau, Neff=Neff_coi)
 
-    Results = collections.namedtuple('Results', ['amplitude', 'phase', 'AR1_q', 'coi', 'freq', 'time', 'Neffs', 'coeff'])
-    res = Results(amplitude=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
+    # Results = collections.namedtuple('Results', ['amplitude', 'phase', 'AR1_q', 'coi', 'freq', 'time', 'Neffs', 'coeff'])
+    # res = Results(amplitude=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
+    Results = collections.namedtuple('Results', ['amplitude', 'phase', 'coi', 'freq', 'time', 'Neffs', 'coeff'])
+    res = Results(amplitude=wwa, phase=phase, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
 
     return res
 
@@ -1280,7 +1351,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau=None, freq=None, freq_method='log', freq_kwargs=None,
         c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
         nMC=200,
-        gaussianize=False, standardize=False, method='default'):
+        gaussianize=False, standardize=False, method='Kirchner_numba'):
     ''' Return the cross-wavelet coherence of two time series.
 
     Parameters
@@ -1299,7 +1370,8 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     freq : array
         vector of frequency
     c : float
-        the decay constant, the default value 1/(8*np.pi**2) is good for most of the cases
+        the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
+        the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
         effective number of points
     nproc : int
@@ -1307,10 +1379,10 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     nMC : int
         the number of Monte-Carlo simulations
     detrend : string
-        None - the original time series is assumed to have no trend;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        - None: the original time series is assumed to have no trend;
+        - 'linear': a linear least-squares fit to `ys` is subtracted;
+        - 'constant': the mean of `ys` is subtracted
+        - 'savitzy-golay': ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
         Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
     sg_kwargs : dict
         The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
@@ -1319,9 +1391,10 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     standardize : bool
         If True, standardizes the timeseries
     method : string
-        'Foster' - the original WWZ method;
-        'Kirchner' - the method Kirchner adapted from Foster;
-        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
+        - 'Foster': the original WWZ method;
+        - 'Kirchner': the method Kirchner adapted from Foster;
+        - 'Kirchner_f2py': the method Kirchner adapted from Foster with f2py
+        - 'Kirchner_numba': Kirchner's algorithm with Numba support for acceleration (default)
 
     Returns
     -------
@@ -2035,9 +2108,10 @@ def get_wwz_func(nproc, method):
             wwz_func = kirchner_nproc
     elif method == 'Kirchner_f2py':
         wwz_func = kirchner_f2py
-    else:
-        # default method; Kirchner's algorithm with Numba support for acceleration
+    elif method == 'Kirchner_numba':
         wwz_func = kirchner_numba
+    else:
+        raise ValueError('Wrong specific method name for WWZ. Should be one of {"Foster", "Kirchner", "Kirchner_f2py", "Kirchner_numba"}')
 
     return wwz_func
 
