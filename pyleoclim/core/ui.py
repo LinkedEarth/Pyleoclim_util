@@ -2853,9 +2853,11 @@ class Coherence:
         return new
 
 class MultipleSeries:
-    '''Define a multiple series object.
+    '''MultipleSeries object.
 
-    This is useful for ensembling or working with multiple timeseries in the same workflow
+    This object handles multiple objects of the type Series and can be created from a list of Series objects. 
+    MultipleSeries should be used when the need to run analysis on multiple records arises, such as running principal component analysis.
+    Some of the methods automatically rescale the time axis prior to analysis to ensure that the analysis is run over the same time period. 
 
     Parameters
     ----------
@@ -2867,7 +2869,23 @@ class MultipleSeries:
         The target time unit for every series in the list.
         If None, then no conversion will be applied;
         Otherwise, the time unit of every series in the list will be converted to the target.
+    
+    Examples
+    --------
+    .. ipython:: python
+        :okwarning:
 
+        import pyleoclim as pyleo
+        import pandas as pd
+        data = pd.read_csv(
+            'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+            skiprows=0, header=1
+        )
+        time = data.iloc[:,1]
+        value = data.iloc[:,2]
+        ts1 = pyleo.Series(time=time, value=value, time_unit='years')
+        ts2 = pyleo.Series(time=time, value=value, time_unit='years')
+        ms = pyleo.MultipleSeries([ts1, ts2])
     '''
     def __init__(self, series_list, time_unit=None):
         self.series_list = series_list
@@ -3677,7 +3695,10 @@ class SurrogateSeries(MultipleSeries):
         self.surrogate_args = surrogate_args
 
 class EnsembleSeries(MultipleSeries):
-    ''' Object containing ensemble timeseries
+    ''' EnsembleSeries object
+    
+    The EnsembleSeries object is a child of the MultipleSeries object. In other word, it is a special case of MultipleSeries, that represents ensembles in paleoclimate data. Ensembles usually arise from age modeling or Bayesian calibrations.
+    One of the main difference between MultipleSeries and EnsembleSeries is the way the plot() method is handled: in the case of MultipleSeries, a stack plot is called. For ensembles, an envelop or overlapping lines are used. 
     '''
     def __init__(self, series_list):
         self.series_list = series_list
