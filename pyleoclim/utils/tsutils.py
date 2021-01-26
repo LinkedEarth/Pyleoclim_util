@@ -786,7 +786,7 @@ def distance_neighbors(signal):
        distances : array
            Distance of each point from its nearest neighbors in decreasing order
     '''
-    nn = NearestNeighbors(4) # 4 nearest neighbors
+    nn = NearestNeighbors(n_neighbors=4) # 4 nearest neighbors
     nbrs =nn.fit(signal.reshape(-1,1))
     distances, indices = nbrs.kneighbors(signal.reshape(-1,1))
     distances = sorted(distances[:,-1],reverse=True)
