@@ -1520,8 +1520,8 @@ class Series:
         2) 'isopersistent': AR(1) modeling of x and y.
         3) 'isospectral': phase randomization of original inputs. (default)
 
-        The T-test is a parametric test, hence computationally cheap but can only be performed in idyllic circumstances.
-        The others are non-parametric, but their computational requirements scales with nsim.
+        The T-test is a parametric test, hence computationally cheap but can only be performed in ideal circumstances.
+        The others are non-parametric, but their computational requirements scale with the number of simulations.
 
         The choise of significance test and associated number of Monte-Carlo simulations are passed through the settings parameter.
 
@@ -3435,7 +3435,7 @@ class EnsembleSeries(MultipleSeries):
             The significance level (0.05 by default)
 
         settings : dict
-            Parameters for the correlation function (singificance testing and number of simulation)
+            Parameters for the correlation function (significance testing and number of simulations)
 
         fdr_kwargs : dict
             Parameters for the FDR function
@@ -4180,7 +4180,7 @@ class Lipd:
 
     def to_LipdSeries(self):
         '''Extracts all LiPD timeseries objects to a list of LipdSeries objects
-        
+
         Returns
         -------
         res : list
