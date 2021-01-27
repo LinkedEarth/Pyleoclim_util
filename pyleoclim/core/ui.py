@@ -3702,7 +3702,7 @@ class EnsembleSeries(MultipleSeries):
     Ensembles usually arise from age modeling or Bayesian calibrations. All members of an EnsembleSeries object are assumed to share identical labels and units.
     One of the main difference between MultipleSeries and EnsembleSeries is the plot() method: for MultipleSeries, a stack plot is called.
     For EnsembleSeries, a spaghetti plot of transparent lines of identical color is used.
-    
+
     '''
     def __init__(self, series_list):
         self.series_list = series_list
@@ -3719,7 +3719,7 @@ class EnsembleSeries(MultipleSeries):
             Label for the value axis
 
         '''
-        ts_list = self.series_list()
+        ts_list = self.series_list
 
         if ts_list[0].time_name is not None:
             time_name_str = ts_list[0].time_name
@@ -3743,6 +3743,31 @@ class EnsembleSeries(MultipleSeries):
 
         return time_header, value_header
 
+    def quantiles(self, qs=[0.05, 0.5, 0.95]):
+        '''Calculate quantiles of an EnsembleSeries object
+
+        Parameters
+        ----------
+        qs : list, optional
+            List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
+
+        Returns
+        -------
+        ens_qs : pyleoclim.EnsembleSeries
+
+        '''
+        time = np.copy(self.series_list[0].time)
+        vals = []
+        for ts in self.series_list:
+            if not np.array_equal(ts.time, time):
+                raise ValueError('Time axis not consistent across the ensemble!')
+
+            vals.append(ts.value)
+
+        vals = np.array(vals)
+        ens_qs = mquantiles(vals, qs, axis=0)
+
+        return ens_qs
 
     def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None):
         ''' Calculate the correlation between an EnsembleSeries object to a target.
@@ -3860,9 +3885,9 @@ class EnsembleSeries(MultipleSeries):
         corr_ens = CorrEns(r_list, p_list, signif_list, signif_fdr_list, alpha)
         return corr_ens
 
-        def plot(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, line_num=10, seed=None,
-                 xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
-                 trace_clr=sns.xkcd_rgb['pale red'], trace_lw=0.5, trace_alpha=0.3, lgd_kwargs=None, mute=False):
+    def plot(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, line_num=10, seed=None,
+             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
+             trace_clr=sns.xkcd_rgb['pale red'], trace_lw=0.5, trace_alpha=0.3, lgd_kwargs=None, mute=False):
             '''Plot EnsembleSeries as a subset of traces.
 
             Parameters
@@ -3935,12 +3960,12 @@ class EnsembleSeries(MultipleSeries):
                 if seed is not None:
                     np.random.seed(seed)
 
-                nts = np.size(self.ts_list)
+                nts = np.size(self.series_list)
                 random_draw_idx = np.random.choice(nts, line_num)
 
                 for idx in random_draw_idx:
-                    self.ts_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=trace_lw,
-                        xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, ax=ax, color=trace_clr, alpha=trace_alpha,
+                    self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=trace_lw,
+                        xlim=xlim, ylim=ylim, ax=ax, color=trace_clr, alpha=trace_alpha,
                     )
                 ax.plot(np.nan, np.nan, color=trace_clr, label=f'example members (n={line_num})')
 
@@ -3962,11 +3987,11 @@ class EnsembleSeries(MultipleSeries):
             else:
                 return ax
 
-    def slope(self, figsize=[10, 4], qs=[0.025, 0.25, 0.5, 0.75, 0.975],
-             xlabel=None, ylabel=None, title=None,
-             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
-             curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
-             inner_shade_label='IQR', outer_shade_label='95\% CI', lgd_kwargs=None, mute=False):
+    def plot_envelope(self, figsize=[10, 4], qs=[0.025, 0.25, 0.5, 0.75, 0.975],
+                      xlabel=None, ylabel=None, title=None,
+                      xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
+                      curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
+                      inner_shade_label='IQR', outer_shade_label='95\% CI', lgd_kwargs=None, mute=False):
         '''Plot EnsembleSeries as an envelope.
 
         Parameters
@@ -4040,24 +4065,24 @@ class EnsembleSeries(MultipleSeries):
             fig, ax = plt.subplots(figsize=figsize)
 
         ts_qs = self.quantiles(qs=qs)
-        ts_qs.ts_list[2].plot(xlabel=xlabel, ylabel=ylabel, linewidth=curve_lw, color=curve_clr,
-            xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, ax=ax,  zorder=100
+        ts_qs.series_list[2].plot(xlabel=xlabel, ylabel=ylabel, linewidth=curve_lw, color=curve_clr,
+            xlim=xlim, ylim=ylim, ax=ax,  zorder=100
         )
 
         if inner_shade_label is None:
-            inner_shade_label = f'{ts_qs.ts_list[1].label}-{ts_qs.ts_list[-2].label}'
+            inner_shade_label = f'{ts_qs.series_list[1].label}-{ts_qs.series_list[-2].label}'
 
         if outer_shade_label is None:
-            outer_shade_label = f'{ts_qs.ts_list[0].label}-{ts_qs.ts_list[-1].label}'
+            outer_shade_label = f'{ts_qs.series_list[0].label}-{ts_qs.series_list[-1].label}'
 
         # outer envelope
         ax.fill_between(
-            x_axis, ts_qs.ts_list[0].value, ts_qs.ts_list[-1].value,
+            x_axis, ts_qs.series_list[0].value, ts_qs.series_list[4].value,
             color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=outer_shade_label,
         )
         # inner envelope
         ax.fill_between(
-            x_axis, ts_qs.ts_list[1].value, ts_qs.ts_list[-2].value,
+            x_axis, ts_qs.series_list[1].value, ts_qs.series_list[3].value,
             color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=inner_shade_label,
         )
 
