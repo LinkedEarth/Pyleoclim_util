@@ -3767,6 +3767,13 @@ class EnsembleSeries(MultipleSeries):
         vals = np.array(vals)
         ens_qs = mquantiles(vals, qs, axis=0)
 
+        ts_list = []
+        for i, quant in enumerate(ens_qs):
+            ts = Series(time=time, value=quant, label=f'{qs[i]*100:g}%')
+            ts_list.append(ts)
+
+        ens_qs = EnsembleSeries(series_list=ts_list)
+
         return ens_qs
 
     def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None):
@@ -3991,7 +3998,7 @@ class EnsembleSeries(MultipleSeries):
                       xlabel=None, ylabel=None, title=None,
                       xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
                       curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
-                      inner_shade_label='IQR', outer_shade_label='95\% CI', lgd_kwargs=None, mute=False):
+                      inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None, mute=False):
         '''Plot EnsembleSeries as an envelope.
 
         Parameters
@@ -4065,9 +4072,7 @@ class EnsembleSeries(MultipleSeries):
             fig, ax = plt.subplots(figsize=figsize)
 
         ts_qs = self.quantiles(qs=qs)
-        ts_qs.series_list[2].plot(xlabel=xlabel, ylabel=ylabel, linewidth=curve_lw, color=curve_clr,
-            xlim=xlim, ylim=ylim, ax=ax,  zorder=100
-        )
+
 
         if inner_shade_label is None:
             inner_shade_label = f'{ts_qs.series_list[1].label}-{ts_qs.series_list[-2].label}'
@@ -4075,15 +4080,21 @@ class EnsembleSeries(MultipleSeries):
         if outer_shade_label is None:
             outer_shade_label = f'{ts_qs.series_list[0].label}-{ts_qs.series_list[-1].label}'
 
-        # outer envelope
+        time = ts_qs.series_list[0].time
+        # plot outer envelope
         ax.fill_between(
-            x_axis, ts_qs.series_list[0].value, ts_qs.series_list[4].value,
+            time, ts_qs.series_list[0].value, ts_qs.series_list[4].value,
             color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=outer_shade_label,
         )
-        # inner envelope
+        # plot inner envelope on top
         ax.fill_between(
-            x_axis, ts_qs.series_list[1].value, ts_qs.series_list[3].value,
-            color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=inner_shade_label,
+            time, ts_qs.series_list[1].value, ts_qs.series_list[3].value,
+            color=shade_clr, alpha=2*shade_alpha, edgecolor=shade_clr, label=inner_shade_label,
+        )
+
+        # plot the median
+        ts_qs.series_list[2].plot(xlabel=xlabel, ylabel=ylabel, linewidth=curve_lw, color=curve_clr,
+            xlim=xlim, ylim=ylim, ax=ax,  zorder=100, label = 'median'
         )
 
         if title is not None:

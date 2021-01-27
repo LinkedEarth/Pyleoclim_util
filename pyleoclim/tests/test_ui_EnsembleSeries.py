@@ -148,27 +148,33 @@ class TestUIEnsembleSeriesCorrelation():
     def test_plot_envelope_t0(self):
         ''' Test EnsembleSeries.plot_envelope() on a list of colored noise
         '''
-        alphas = np.arange(0.5, 1.5, 0.1)
+        nn = 200 # number of noise realizations
         t, v = {}, {}
         series_list = []
-        for idx, alpha in enumerate(alphas):
-            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=alpha)
-            series_list.append(pyleo.Series(time=t[idx], value=v[idx]))
+
+        tm, vm =  gen_colored_noise(nt=1000, alpha=1.0,) # main signal
+
+        for idx in range(nn):  # noise
+            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=0)
+            series_list.append(pyleo.Series(time=t[idx], value=4*v[idx]+vm))
 
         ts_ens = pyleo.EnsembleSeries(series_list)
 
-        fig, ax = ts_ens.plot_envelope(mute=True)
+        fig, ax = ts_ens.plot_envelope(mute=True,curve_lw=1)
 
     def test_plot_t0(self):
         ''' Test EnsembleSeries.plot() on a list of colored noise
         '''
-        alphas = np.arange(0.5, 1.5, 0.1)
+        nn = 200 # number of noise realizations
         t, v = {}, {}
         series_list = []
-        for idx, alpha in enumerate(alphas):
-            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=alpha)
-            series_list.append(pyleo.Series(time=t[idx], value=v[idx]))
+
+        tm, vm =  gen_colored_noise(nt=1000, alpha=1.0,) # main signal
+
+        for idx in range(nn):  # noise
+            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=0)
+            series_list.append(pyleo.Series(time=t[idx], value=4*v[idx]+vm))
 
         ts_ens = pyleo.EnsembleSeries(series_list)
 
-        fig, ax = ts_ens.plot(mute=True)
+        fig, ax = ts_ens.plot(mute=True,trace_alpha=0.2)
