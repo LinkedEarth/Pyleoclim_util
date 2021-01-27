@@ -144,3 +144,31 @@ class TestUIEnsembleSeriesCorrelation():
             assert signif is True
 
         assert np.size(corr_res.p) == np.size(ts_list1)
+
+    def test_plot_envelope_t0(self):
+        ''' Test EnsembleSeries.plot_envelope() on a list of colored noise
+        '''
+        alphas = np.arange(0.5, 1.5, 0.1)
+        t, v = {}, {}
+        series_list = []
+        for idx, alpha in enumerate(alphas):
+            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=alpha)
+            series_list.append(pyleo.Series(time=t[idx], value=v[idx]))
+
+        ts_ens = pyleo.EnsembleSeries(series_list)
+
+        fig, ax = ts_ens.plot_envelope(mute=True)
+
+    def test_plot_t0(self):
+        ''' Test EnsembleSeries.plot() on a list of colored noise
+        '''
+        alphas = np.arange(0.5, 1.5, 0.1)
+        t, v = {}, {}
+        series_list = []
+        for idx, alpha in enumerate(alphas):
+            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=alpha)
+            series_list.append(pyleo.Series(time=t[idx], value=v[idx]))
+
+        ts_ens = pyleo.EnsembleSeries(series_list)
+
+        fig, ax = ts_ens.plot(mute=True)

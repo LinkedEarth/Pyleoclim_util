@@ -1577,8 +1577,8 @@ class Series:
         2) 'isopersistent': AR(1) modeling of x and y.
         3) 'isospectral': phase randomization of original inputs. (default)
 
-        The T-test is a parametric test, hence computationally cheap but can only be performed in idyllic circumstances.
-        The others are non-parametric, but their computational requirements scales with nsim.
+        The T-test is a parametric test, hence computationally cheap but can only be performed in ideal circumstances.
+        The others are non-parametric, but their computational requirements scale with the number of simulations.
 
         The choise of significance test and associated number of Monte-Carlo simulations are passed through the settings parameter.
 
@@ -1613,7 +1613,7 @@ class Series:
 
             - r : float
                 correlation coefficient
-            - p : float 
+            - p : float
                 the p-value
             - signif : bool
                 true if significant; false otherwise
@@ -1655,6 +1655,7 @@ class Series:
             corr_res = ts_nino.correlation(ts_air, settings={'method': 'isopersistent'})
             print(corr_res)
         '''
+
         settings = {} if settings is None else settings.copy()
         corr_args = {'alpha': alpha}
         corr_args.update(settings)
@@ -2855,9 +2856,9 @@ class Coherence:
 class MultipleSeries:
     '''MultipleSeries object.
 
-    This object handles multiple objects of the type Series and can be created from a list of Series objects. 
+    This object handles multiple objects of the type Series and can be created from a list of Series objects.
     MultipleSeries should be used when the need to run analysis on multiple records arises, such as running principal component analysis.
-    Some of the methods automatically rescale the time axis prior to analysis to ensure that the analysis is run over the same time period. 
+    Some of the methods automatically rescale the time axis prior to analysis to ensure that the analysis is run over the same time period.
 
     Parameters
     ----------
@@ -2869,7 +2870,7 @@ class MultipleSeries:
         The target time unit for every series in the list.
         If None, then no conversion will be applied;
         Otherwise, the time unit of every series in the list will be converted to the target.
-    
+
     Examples
     --------
     .. ipython:: python
@@ -3696,17 +3697,57 @@ class SurrogateSeries(MultipleSeries):
 
 class EnsembleSeries(MultipleSeries):
     ''' EnsembleSeries object
+
+    The EnsembleSeries object is a child of the MultipleSeries object, that is, a special case of MultipleSeries, aiming for ensembles of similar series.
+    Ensembles usually arise from age modeling or Bayesian calibrations. All members of an EnsembleSeries object are assumed to share identical labels and units.
+    One of the main difference between MultipleSeries and EnsembleSeries is the plot() method: for MultipleSeries, a stack plot is called.
+    For EnsembleSeries, a spaghetti plot of transparent lines of identical color is used.
     
-    The EnsembleSeries object is a child of the MultipleSeries object. In other word, it is a special case of MultipleSeries, that represents ensembles in paleoclimate data. Ensembles usually arise from age modeling or Bayesian calibrations.
-    One of the main difference between MultipleSeries and EnsembleSeries is the way the plot() method is handled: in the case of MultipleSeries, a stack plot is called. For ensembles, an envelop or overlapping lines are used. 
     '''
     def __init__(self, series_list):
         self.series_list = series_list
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None):
-        ''' Calculate the correlation between an ensemble series group to a target.
+    def make_labels(self):
+        '''
+        Initialization of labels
 
-        If the target is not specified, then the 1st member of EnsembleSeries will be the target
+        Returns
+        -------
+        time_header : str
+            Label for the time axis
+        value_header : str
+            Label for the value axis
+
+        '''
+        ts_list = self.series_list()
+
+        if ts_list[0].time_name is not None:
+            time_name_str = ts_list[0].time_name
+        else:
+            time_name_str = 'time'
+
+        if ts_list[0].value_name is not None:
+            value_name_str = ts_list[0].value_name
+        else:
+            value_name_str = 'value'
+
+        if ts_list[0].value_unit is not None:
+            value_header = f'{value_name_str} [{ts_list[0].value_unit}]'
+        else:
+            value_header = f'{value_name_str}'
+
+        if ts_list[0].time_unit is not None:
+            time_header = f'{time_name_str} [{ts_list[0].time_unit}]'
+        else:
+            time_header = f'{time_name_str}'
+
+        return time_header, value_header
+
+
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None):
+        ''' Calculate the correlation between an EnsembleSeries object to a target.
+
+        If the target is not specified, then the 1st member of the ensemble will be the target
         Note that the FDR approach is applied by default to determine the significance of the p-values (more information in See Also below).
 
         Parameters
@@ -3726,7 +3767,7 @@ class EnsembleSeries(MultipleSeries):
             The significance level (0.05 by default)
 
         settings : dict
-            Parameters for the correlation function (singificance testing and number of simulation)
+            Parameters for the correlation function (significance testing and number of simulations)
 
         fdr_kwargs : dict
             Parameters for the FDR function
@@ -3818,6 +3859,226 @@ class EnsembleSeries(MultipleSeries):
 
         corr_ens = CorrEns(r_list, p_list, signif_list, signif_fdr_list, alpha)
         return corr_ens
+
+        def plot(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, line_num=10, seed=None,
+                 xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
+                 trace_clr=sns.xkcd_rgb['pale red'], trace_lw=0.5, trace_alpha=0.3, lgd_kwargs=None, mute=False):
+            '''Plot EnsembleSeries as a subset of traces.
+
+            Parameters
+            ----------
+            figsize : list, optional
+                The figure size. The default is [10, 4].
+            xlabel : str, optional
+                x-axis label. The default is None.
+            ylabel : str, optional
+                y-axis label. The default is None.
+            title : str, optional
+                Plot title. The default is None.
+            xlim : list, optional
+                x-axis limits. The default is None.
+            ylim : list, optional
+                y-axis limits. The default is None.
+            trace_clr : str, optional
+                Color of the traces. The default is sns.xkcd_rgb['pale red'].
+            trace_alpha : float, optional
+                Transparency of the lines representing the multiple members. The default is 0.2.
+            trace_lw : float, optional
+                Width of the lines representing the multiple members. The default is 0.5.
+            line_num : int, optional
+                Number of individual members to plot. The default is 10.
+            savefig_settings : dict, optional
+                the dictionary of arguments for plt.savefig(); some notes below:
+                - "path" must be specified; it can be any existed or non-existed path,
+                  with or without a suffix; if the suffix is not given in "path", it will follow "format"
+                - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            ax : matplotlib.ax, optional
+                Matplotlib axis on which to return the plot. The default is None.
+            xticks : list, optional
+                xticks label. The default is None.
+            yticks : list, optional
+                yticks label. The default is None.
+            plot_legend : bool, optional
+                Whether to plot the legend. The default is True.
+            lgd_kwargs : dict, optional
+                Parameters for the legend. The default is None.
+            mute : bool, optional
+                if True, the plot will not show;
+                recommend to turn on when more modifications are going to be made on ax. The default is False.
+            seed : int, optional
+                Set the seed for the random number generator. Useful for reproducibility. The default is None.
+
+            Returns
+            -------
+            fig, ax
+
+            '''
+            # Turn the interactive mode off.
+            plt.ioff()
+
+            savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+            lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+
+            # generate default axis labels
+            time_label, value_label = self.make_labels()
+
+            if xlabel is None:
+                xlabel = time_label
+
+            if ylabel is None:
+                ylabel = value_label
+
+            if ax is None:
+                fig, ax = plt.subplots(figsize=figsize)
+
+            if line_num > 0:
+                if seed is not None:
+                    np.random.seed(seed)
+
+                nts = np.size(self.ts_list)
+                random_draw_idx = np.random.choice(nts, line_num)
+
+                for idx in random_draw_idx:
+                    self.ts_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=trace_lw,
+                        xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, ax=ax, color=trace_clr, alpha=trace_alpha,
+                    )
+                ax.plot(np.nan, np.nan, color=trace_clr, label=f'example members (n={line_num})')
+
+            if title is not None:
+                ax.set_title(title)
+
+            if plot_legend:
+                lgd_args = {'frameon': False}
+                lgd_args.update(lgd_kwargs)
+                ax.legend(**lgd_args)
+
+            if 'fig' in locals():
+                if 'path' in savefig_settings:
+                    plotting.savefig(fig, settings=savefig_settings)
+                else:
+                    if not mute:
+                        plotting.showfig(fig)
+                return fig, ax
+            else:
+                return ax
+
+    def slope(self, figsize=[10, 4], qs=[0.025, 0.25, 0.5, 0.75, 0.975],
+             xlabel=None, ylabel=None, title=None,
+             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
+             curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
+             inner_shade_label='IQR', outer_shade_label='95\% CI', lgd_kwargs=None, mute=False):
+        '''Plot EnsembleSeries as an envelope.
+
+        Parameters
+        ----------
+        figsize : list, optional
+            The figure size. The default is [10, 4].
+        qs : list, optional
+            The significance levels to consider. The default is [0.025, 0.25, 0.5, 0.75, 0.975] (median, interquartile range, and central 95% region)
+        xlabel : str, optional
+            x-axis label. The default is None.
+        ylabel : str, optional
+            y-axis label. The default is None.
+        title : str, optional
+            Plot title. The default is None.
+        xlim : list, optional
+            x-axis limits. The default is None.
+        ylim : list, optional
+            y-axis limits. The default is None.
+        savefig_settings : dict, optional
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+        ax : matplotlib.ax, optional
+            Matplotlib axis on which to return the plot. The default is None.
+        xticks : list, optional
+            xticks label. The default is None.
+        yticks : list, optional
+            yticks label. The default is None.
+        plot_legend : bool, optional
+            Wether to plot the legend. The default is True.
+        curve_clr : str, optional
+            Color of the main line (median). The default is sns.xkcd_rgb['pale red'].
+        curve_lw : str, optional
+            Width of the main line (median). The default is 2.
+        shade_clr : str, optional
+            Color of the shaded envelope. The default is sns.xkcd_rgb['pale red'].
+        shade_alpha : float, optional
+            Transparency on the envelope. The default is 0.2.
+        inner_shade_label : str, optional
+            Label for the envelope. The default is 'IQR'.
+        outer_shade_label : str, optional
+            Label for the envelope. The default is '95\% CI'.
+        lgd_kwargs : dict, optional
+            Parameters for the legend. The default is None.
+        mute : bool, optional
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax. The default is False.
+
+        Returns
+        -------
+        fig, ax
+
+        '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+
+        # generate default axis labels
+        time_label, value_label = self.make_labels()
+
+        if xlabel is None:
+            xlabel = time_label
+
+        if ylabel is None:
+            ylabel = value_label
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        ts_qs = self.quantiles(qs=qs)
+        ts_qs.ts_list[2].plot(xlabel=xlabel, ylabel=ylabel, linewidth=curve_lw, color=curve_clr,
+            xlim=xlim, ylim=ylim, xticks=xticks, yticks=yticks, ax=ax,  zorder=100
+        )
+
+        if inner_shade_label is None:
+            inner_shade_label = f'{ts_qs.ts_list[1].label}-{ts_qs.ts_list[-2].label}'
+
+        if outer_shade_label is None:
+            outer_shade_label = f'{ts_qs.ts_list[0].label}-{ts_qs.ts_list[-1].label}'
+
+        # outer envelope
+        ax.fill_between(
+            x_axis, ts_qs.ts_list[0].value, ts_qs.ts_list[-1].value,
+            color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=outer_shade_label,
+        )
+        # inner envelope
+        ax.fill_between(
+            x_axis, ts_qs.ts_list[1].value, ts_qs.ts_list[-2].value,
+            color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=inner_shade_label,
+        )
+
+        if title is not None:
+            ax.set_title(title)
+
+        if plot_legend:
+            lgd_args = {'frameon': False}
+            lgd_args.update(lgd_kwargs)
+            ax.legend(**lgd_args)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            else:
+                if not mute:
+                    plotting.showfig(fig)
+            return fig, ax
+        else:
+            return ax
+
 
 class MultiplePSD:
     ''' Object for multiple PSD.
@@ -4360,12 +4621,12 @@ class Lipd:
 
     lidp_dict : dict
         LiPD files already loaded into Python through the LiPD utilities
-    
+
     validate : bool
         Validate the LiPD files upon loading. Note that for a large library this can take up to half an hour.
-        
+
     remove : bool
-        If validate is True and remove is True, ignores non-valid Lipd files. Note that loading unvalidated Lipd files may result in errors for some functionalities but not all. 
+        If validate is True and remove is True, ignores non-valid Lipd files. Note that loading unvalidated Lipd files may result in errors for some functionalities but not all.
 
     TODO
     ----
@@ -4403,6 +4664,7 @@ class Lipd:
         if validate==False and remove==True:
             print('Removal of unvalidated LiPD files require validation')
             validate=True
+
         #prepare the dictionaries for all possible scenarios
         if usr_path!=None:
             # since readLipd() takes only absolute path and it will change the current working directory (CWD) without turning back,
@@ -4426,7 +4688,7 @@ class Lipd:
                 if remove == True:
                     for item in res:
                         if item['status'] == 'FAIL':
-                           c=item['feedback']['errMsgs'] 
+                           c=item['feedback']['errMsgs']
                            check = []
                            for i in c:
                                if i.startswith('Mismatched columns'):
@@ -4445,7 +4707,7 @@ class Lipd:
                 if remove == True:
                     for item in res:
                         if item['status'] == 'FAIL':
-                           c=item['feedback']['errMsgs'] 
+                           c=item['feedback']['errMsgs']
                            check = []
                            for i in c:
                                if i.startswith('Mismatched columns'):
@@ -4455,7 +4717,7 @@ class Lipd:
                                del D_dict[item['filename'].strip('.lpd')]
         else:
             D_dict={}
-            
+
         # raise an error if empty
         if not bool(D_dict) and not bool(D_path) == True:
             raise ValueError('No valid files; try without validation.')
@@ -4507,7 +4769,7 @@ class Lipd:
         return new
 
     def to_LipdSeries(self):
-        '''Extracts all the timeseries objects to a list of LipdSeries objects
+        '''Extracts all LiPD timeseries objects to a list of LipdSeries objects
 
         Returns
         -------
@@ -4520,6 +4782,7 @@ class Lipd:
         res=[]
 
         for item in ts_list:
+            res.append(LipdSeries(item))
             try:
                 res.append(LipdSeries(item))
             except:
@@ -4681,12 +4944,12 @@ class LipdSeries(Series):
                 label=self.lipd_ts['dataSetName']
                 super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
                      time_unit=time_unit,value_name=value_name,value_unit=value_unit,
-                     label=label)           
+                     label=label)
             except:
-                raise ValueError("paleoData_values should contain floats")             
+                raise ValueError("paleoData_values should contain floats")
         except:
             raise KeyError("No time information present")
-        
+
 
     def copy(self):
         '''Copy the object
