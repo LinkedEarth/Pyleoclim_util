@@ -10,11 +10,15 @@
 
 **Python Package for the Analysis of Paleoclimate Data**
 
-Pyleoclim is a Python package primarily geared towards the analysis and visualization of paleoclimate data. Such data often come in the form of timeseries with missing values and age uncertainties, so the package includes several low-level methods to deal with these issues, as well as high-level methods that re-use those within scientific workflows.
+Paleoclimate data, whether from observations or model simulations, offer unique challenges to the analyst,
+Pyleoclim is a Python package primarily geared towards the analysis and visualization of paleoclimate data. Such data usually come in the form of timeseries with missing values and age uncertainties, so the package includes several low-level methods to deal with these issues to simplify the user's life, with intuitive, high-level analysis and plotting methods that support publication-quality scientific workflows.
 
-High-level modules assume that data are stored in the Linked Paleo Data ([LiPD](http://www.clim-past.net/12/1093/2016/)) format and makes extensive use of the [LiPD utilities](http://nickmckay.github.io/LiPD-utilities/). Low-level modules are primarily based on [NumPy](http://www.numpy.org) arrays or [Pandas](https://pandas.pydata.org) dataframes, so Pyleoclim contains a lot of timeseries analysis code (e.g. spectral analysis, singular spectrum analysis, wavelet analysis, correlation analysis) that can apply to these more common types as well. See the example folder for details.
+There are many entry points to Pyleoclim, thanks to its underlying [data structures](https://pyleoclim-util.readthedocs.io/en/stable/core/ui.html).  The package makes use of the Linked Paleo Data ([LiPD](http://www.clim-past.net/12/1093/2016/)) format and its associated [utilities](http://nickmckay.github.io/LiPD-utilities/). The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses very much like [GeoChronR](http://nickmckay.github.io/GeoChronR/).
 
-The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses very much like [GeoChronR](http://nickmckay.github.io/GeoChronR/).
+LiPD, however, is not a necessary entry point. Low-level modules are primarily based on [NumPy](http://www.numpy.org) arrays or [Pandas](https://pandas.pydata.org) dataframes, so Pyleoclim contains a lot of timeseries analysis code (e.g. spectral analysis, singular spectrum analysis, wavelet analysis, correlation analysis) that can apply to these more common types as well, including those generated numerical models (via the [xarray](http://xarray.pydata.org) package).
+
+A growing collection of workflows that use Pyleoclim are available as Jupyter notebooks in the `example_notebooks` folder and on [LiPDBooks](https://github.com/LinkedEarth/LiPDbooks/tree/master/notebooks).
+
 
 New in version 0.5.0:
 
@@ -29,7 +33,7 @@ New in version 0.5.0:
 ### Documentation
 
 Online documentation is available through readthedocs:
-- [Stable version](https://pyleoclim-util.readthedocs.io/en/stable/) (available through Pypi
+- [Stable version](https://pyleoclim-util.readthedocs.io/en/stable/) (available through Pypi)
 - [Latest version](https://pyleoclim-util.readthedocs.io/en/latest/) (from the development branch)
 
 ### Dependencies
