@@ -148,11 +148,11 @@ class TestUIEnsembleSeriesCorrelation():
     def test_plot_envelope_t0(self):
         ''' Test EnsembleSeries.plot_envelope() on a list of colored noise
         '''
-        nn = 200 # number of noise realizations
+        nn = 20 # number of noise realizations
         t, v = {}, {}
         series_list = []
 
-        tm, vm =  gen_colored_noise(nt=1000, alpha=1.0,) # main signal
+        tm, vm =  gen_colored_noise(nt=1000, alpha=1.0) # main signal
 
         for idx in range(nn):  # noise
             t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=0)
@@ -165,11 +165,11 @@ class TestUIEnsembleSeriesCorrelation():
     def test_plot_t0(self):
         ''' Test EnsembleSeries.plot() on a list of colored noise
         '''
-        nn = 200 # number of noise realizations
+        nn = 20 # number of noise realizations
         t, v = {}, {}
         series_list = []
 
-        tm, vm =  gen_colored_noise(nt=1000, alpha=1.0,) # main signal
+        tm, vm =  gen_colored_noise(nt=1000, alpha=1.0) # main signal
 
         for idx in range(nn):  # noise
             t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=0)

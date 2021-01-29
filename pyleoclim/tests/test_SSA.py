@@ -67,8 +67,12 @@ RCmiss = miss_ssa['RC'][:,:19].sum(axis=1)
 MSE = metrics.mean_squared_error(nino, RCmiss)
 assert MSE < 0.3
 
+# Truncation
+nino_kaiser = ts_n.ssa(M = 60,trunc='kaiser')
+RCk = nino_kaiser['RC'].sum(axis=1)
+
 ## DEBUG only
-#fig, ax = ts_nino.plot(title=r'SSA reconstruction with '+ str(fm*100) +'% missing values',mute=True,label='monthly NINO3')
-#ax.plot(t,RCmiss,label='SSA recon, $k=20$',color='orange')
-#ax.legend()
-#pyleo.showfig(fig)
+fig, ax = ts_nino.plot(title=r'SSA reconstruction',mute=False,label='monthly NINO3')
+ax.plot(t,RCk,label='SSA recon, $k=20$',color='orange')
+ax.legend()
+pyleo.showfig(fig)

@@ -12,6 +12,7 @@ __all__ = [
     'simple_stats',
     'bin',
     'interp',
+    'gkernel',
     'grid_properties',
     'standardize',
     'ts2segments',
@@ -167,6 +168,52 @@ def bin(x, y, bin_size=None, start=None, end=None):
     }
 
     return  res_dict
+
+
+def gkernel(t,y,tc, h = 11):
+    '''
+    Coarsen time resolution using a Gaussian kernel
+    
+    Parameters
+    ----------
+    t  : 1d array; the original time axis
+    y  : 1d array; values on the original time axis
+    tc : 1d array; the coarse time axis
+    h  : scalar;  kernel e-folding scale 
+    
+    Returns
+    -------    
+    yc: The  upscaled time series
+    
+    References
+    ----------
+    
+    Rehfeld, K., Marwan, N., Heitzig, J., and Kurths, J.: Comparison of correlation analysis
+    techniques for irregularly sampled time series, Nonlin. Processes Geophys., 
+    18, 389–404, https://doi.org/10.5194/npg-18-389-2011, 2011.
+    
+    '''
+    if len(t) != len(y):
+        raise ValueError('y and t must have the same length')
+    
+    kernel = lambda x, h : 1.0/np.sqrt(2*np.pi*h)*np.exp(-x**2/(2*h**2))  # define kernel function
+    
+    yc = np.zeros((len(tc)))
+    yc[:] = np.nan
+    
+    for i in range(len(tc)-1):
+        xslice = t[(t>=tc[i])&(t<tc[i+1])]
+        yslice = y[(t>=tc[i])&(t<tc[i+1])]
+
+        if len(xslice)>0:
+            d      = xslice-tc[i]
+            weight = kernel(d,11)
+            yc[i]     = sum(weight*yslice)/sum(weight)
+        else:
+            yc[i] = np.nan
+            
+    return yc
+      
 
 def grid_properties(x,method='median'):
     ''' Establishes the grid properties of a numerical array:

@@ -4,10 +4,12 @@
 Created on Tue Feb 25 06:29:36 2020
 
 @author: deborahkhider
-Contains decompoistion methods (PCA, SSA...)
+Contains eigendecomposition methods:
+Principal Component Analysis, Singular Spectrum Analysis, Multi-channel SSA
 """
 
 __all__ = [
+    'mcpca',
     'pca',
     'ssa',
     'mssa',
@@ -17,12 +19,97 @@ import numpy as np
 from sklearn.decomposition import PCA
 from .tsutils import standardize
 from .tsmodel import ar1_sim
+from scipy.stats.mstats import mquantiles
 from scipy.linalg import eigh, toeplitz
 from nitime import algorithms as alg
+from statsmodels.multivariate.pca import PCA
+import copy
+import statsmodels.api as sm
 
 #------
-#Main functions
+# Main functions
 #------
+
+def mcpca(ys, nMC=1000):
+    '''Monte-Carlo Principal Component Analysis 
+    
+    Carries out Principal Component Analysis  (most unfortunately named EOF analysis in the meteorology
+    and climate literature) on a data matrix y3d, admitting ensembles. 
+    If NaNs are present, they will be infilled via the EM algorithm.
+    
+    The significance of eigenvalues is gauged against those of AR(1) surrogates fit to the data.
+         
+        
+    Parameters
+    ----------
+    ys : 2D numpy array (nt, nrec)
+        nt   = number of time samples (assumed identical for all records)
+        nrec = number of records (aka variables, channels, etc)
+        
+    nMC: the number of Monte-Carlo simulations
+    
+   Returns
+    -------
+    res : dict containing:
+        
+        - eig_ens : eigenvalues (nrec,)
+
+        - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)
+
+        - pc_mc : PC series of all components (nrec,nt)
+
+        - eof_mc : EOFs of all components (nrec, nt)
+    
+    
+    References:
+    ----------    
+    Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene 
+    European speleothem δ18O records linked to North Atlantic Ocean circulation. 
+    Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8
+
+    Written by Jun Hu (Rice University).
+    Adapted for pyleoclim by Julien Emile-Geay (USC)
+    '''
+    nt, nrec = ys.shape
+    
+    pc_mc = np.zeros((nrec,nt)) # principal components
+    eof_mc = np.zeros((nrec,nrec))  #eof (spatial loadings)
+    #eigenvalue matrices
+    eig_val = np.zeros((nrec))
+    eig_ar1 = np.zeros((nMC,nrec))
+
+    # apply PCA algorithm to the data matrix     
+    pc = PCA(ys,ncomp=nrec, missing= 'fill-em')
+    eig_val = pc.eigenvals
+    
+    # generate surrogate matrix
+    y_ar1 = np.full((nt,nrec,nMC), 0, dtype=np.double)
+    
+    for i in range(nrec):
+        yi = copy.deepcopy(ys[:,i])
+        # generate nMC AR(1) surrogates
+        y_ar1[:,i,:] = ar1_sim(yi, nMC)
+        # assign PC and EOF matrices
+        if pc.loadings[:,i][0]>0:
+            pc_mc[i,:]  = pc.factors[:,i]
+            eof_mc[i,:] = pc.loadings[:,i]
+        else:   # flip sign (arbitrary)
+            pc_mc[i,:]  = -pc.factors[:,i]
+            eof_mc[i,:] = -pc.loadings[:,i]
+            
+    # loop over Monte Carlo iterations     
+    for m in range(nMC):    
+        pc_ar1 = PCA(y_ar1[:,:,m],ncomp=nrec)
+        eig_ar1[:,m] = pc_ar1.eigenvals
+ 
+    eig95 = mquantiles(eig_ar1,0.95,axis=1)
+                
+    # assign result
+    res = {'eig_val': eig_val, 'eig95': eig95, 'pc_mc': pc_mc, 'eof_mc': eof_mc}
+
+    return res
+
+
 
 def pca(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,iterated_power='auto',random_state=None):
     '''Principal Component Analysis (Empirical Orthogonal Functions)
@@ -129,6 +216,7 @@ def mssa(ys, M=None, nMC=0, f=0.3):
     '''Multi-channel singular spectrum analysis analysis
 
     Multivariate generalization of SSA [2], using the original algorithm of [1].
+    Each variable is called a channel, hence the name.
 
     Parameters
     ----------
@@ -172,7 +260,7 @@ def mssa(ys, M=None, nMC=0, f=0.3):
     See Also
     --------
 
-    pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis (one channel)
+    pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis (single channel)
 
     '''
     N = len(ys[:, 0])
@@ -250,29 +338,36 @@ def mssa(ys, M=None, nMC=0, f=0.3):
 
     return res
 
-def ssa(ys, M=None, nMC=0, f=0.5):
+def ssa(ys, M=None, nMC=0, f=0.5, trunc=None):
     '''Singular spectrum analysis
 
-    Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
-    This implementation  uses the method of [1], with applications presented in [2]
-    Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
+    Nonparametric eigendecomposition of timeseries into orthogonal oscillations.
+    This implementation  uses the method of [1], with applications presented in [2].
+    Optionally (nMC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
     The method expects regular spacing, but is tolerant to missing values, up to a fraction 0<f<1 (see [4]).
 
     Parameters
     ----------
 
     ys : array of length N
-          time series (evenly-spaced, possibly with with up to f*N NaNs)
+          time series (evenly-spaced, possibly with up to f*N NaNs)
 
     M : int
-       window size (default: 10% of the length of the series)
+       window size (default: 10% of N)
 
     nMC : int
-        Number of iteration in the Monte-Carlo process (default nMC=0, bypasses Monte Carlo SSA)
-        Note: currently only supported for evenly-spaced, gap-free data.
+        Number of iterations in the Monte-Carlo simulation (default nMC=0, bypasses Monte Carlo SSA)
+        Currently only supported for evenly-spaced, gap-free data.
 
     f : float
-        maximum allowable fraction of missing values.
+        maximum allowable fraction of missing values. (Default is 0.5)
+
+    trunc : str
+        if present, truncates the expansion to a level K < M owing to one of 3 criteria:
+            (1) 'kaiser': Kaiser rule
+            (2) 'mc-ssa': Monte-Carlo SSA
+            (3) 'var': first K modes that explain at least 80% of the variance.
+        Default is None, which bypasses truncation (K = M)
 
     Returns
     -------
@@ -281,14 +376,16 @@ def ssa(ys, M=None, nMC=0, f=0.5):
         Containing:
 
         - eig_val : (M, 1) array of eigenvalue spectrum
-        
+
         - eig_vec : Matrix of temporal eigenvectors
 
         - PC : (N - M + 1, M) array of principal components
 
         - RC : (N,  M) array of reconstructed components
 
-        - eig_val_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC >0 ]
+        - pct_var: (M, 1) array of the fraction of variance (%) associated with each mode
+
+        - eig_val_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
 
     References
     ----------
@@ -349,23 +446,8 @@ def ssa(ys, M=None, nMC=0, f=0.5):
                 PC[i, k] = sum(
                     prod[~np.isnan(prod)]) * M / ngood  # the columns of this matrix are Ak(t), k=1 to M (T-PCs)
 
-    # compute reconstructed timeseries
-    Np = N - M + 1
-
-    RC = np.zeros((N, M))
-
-    for im in np.arange(M):
-        x2 = np.dot(np.expand_dims(PC[:, im], axis=1), np.expand_dims(eig_vec[0:M, im], axis=0))
-        x2 = np.flipud(x2)
-
-        for n in np.arange(N):
-            RC[n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
-
-    RC = RC + np.tile(mu, reps=[N, M])  # put the mean back in
-
-    # TODO: implement automatic truncation criteria: (1) Kaiser rule (2) significant MC-SSA modes
-    # and (3) variance % criterion (e.g. first K modes that explain at least 90% of the variance).
-
+    de = eig_val*np.sqrt(2/(M-1))
+    pct_var = eig_val**2/np.sum(eig_val**2)*100 # percent variance
 
     if nMC > 0: # If Monte-Carlo SSA is requested.
         # TODO: translate and use https://github.com/SMAC-Group/uAR1 here
@@ -386,7 +468,39 @@ def ssa(ys, M=None, nMC=0, f=0.5):
         eig_val_q = np.empty((M,2))
         eig_val_q[:,0] = np.percentile(eig_val_R, 5, axis=1)
         eig_val_q[:,1] = np.percentile(eig_val_R, 95, axis=1)
+        mode_idx = np.where(eig_val>=eig_val_q[:,1]) # modes to retain
     else:
         eig_val_q = None
-    res = {'eig_val': eig_val, 'eig_vec': eig_vec, 'PC': PC, 'RC': RC, 'eig_val_q': eig_val_q}
+
+    # TODO: implement automatic truncation criteria: (1) Kaiser rule (2) significant MC-SSA modes
+    # and (3) variance % criterion (e.g. first K modes that explain at least 90% of the variance).
+
+
+    if trunc == 'mcssa':
+        if nMC == 0:
+            raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
+    elif trunc == 'kaiser':
+        mval = np.median(eig_val) # median eigenvalues
+        mode_idx = np.where(eig_val>=mval)
+    elif trunc == 'var':
+        mode_idx = np.arange(np.argwhere(np.cumsum(pct_var)>=80)[0]+1)
+    else:
+        mode_idx = np.arange(M)
+
+    # compute reconstructed timeseries
+    Np = N - M + 1
+    K = len(mode_idx)
+    RC = np.zeros((N, K))
+
+    for im in mode_idx:
+        x2 = np.dot(np.expand_dims(PC[:, im], axis=1), np.expand_dims(eig_vec[0:M, im], axis=0))
+        x2 = np.flipud(x2)
+
+        for n in np.arange(N):
+            RC[n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
+
+    RC = RC + np.tile(mu, reps=[N, K])  # restore the mean
+
+    # export results
+    res = {'eig_val': eig_val, 'eig_vec': eig_vec, 'PC': PC, 'RC': RC, 'pct_var': pct_var, 'eig_val_q': eig_val_q}
     return res
