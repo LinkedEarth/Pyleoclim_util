@@ -472,14 +472,13 @@ class Series:
 
                 import pyleoclim as pyleo
                 import pandas as pd
-                from matplotlib import pyplot as plt
-                data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-                time=data.iloc[:,1]
-                value=data.iloc[:,2]
-                ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+                data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+                time = data.iloc[:,1]
+                value = data.iloc[:,2]
+                ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
                 @savefig ts_plot.png
-                fig,ax = ts.plot()
-                plt.close(fig)
+                fig, ax = ts.plot()
+                pyleo.closefig(fig)
 
         Change the line color
 
@@ -488,7 +487,7 @@ class Series:
 
                 @savefig ts_plot2.png
                 fig, ax = ts.plot(color='r')
-                plt.close(fig)
+                pyleo.closefig(fig)
 
         Save the figure. Two options available:
             * Within the plotting command
@@ -497,10 +496,8 @@ class Series:
             .. ipython:: python
                 :okwarning:
 
-                #@savefig ts_plot3.png
-                fig,ax = ts.plot(color='k',savefig_settings={'path':'ts_plot3.png'})
+                fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'})
                 pyleo.savefig(fig,path='ts_plot3.png')
-                plt.close(fig)
         '''
         # Turn the interactive mode off.
         plt.ioff()
@@ -596,16 +593,16 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
-            from matplotlib import pyplot as plt
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time=data.iloc[:,1]
-            value=data.iloc[:,2]
-            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
-            #plot
-            @savefig ts_plot.png
-            fig,ax = ts.plot()
-            plt.close(fig)
-            #SSA
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts = pyleo.Series(time=time, value=value, time_name='Year C.E', value_name='SOI', label='SOI')
+            # plot
+            @savefig ts_plot4.png
+            fig, ax = ts.plot()
+            pyleo.closefig(fig)
+
+            # SSA
             nino_ssa = ts.ssa(M=60)
 
         Let us now see how to make use of all these arrays. The first step is too inspect the eigenvalue spectrum ("scree plot") to identify remarkable modes. Let us restrict ourselves to the first 40, so we can see something:
@@ -625,14 +622,14 @@ class Series:
             # plot eigenvalues
             r = 20
             rk = np.arange(0,r)+1
-            fig,ax = plt.subplots()
+            fig, ax = plt.subplots()
             ax.errorbar(rk,d[:r],yerr=de[:r],label='SSA eigenvalues w/ 95% CI')
             ax.set_title('Scree plot of SSA eigenvalues')
             ax.set_xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
             ax.legend(loc='upper right')
             @savefig scree_plot.png
             pyleo.showfig(fig)
-            plt.close(fig)
+            pyleo.closefig(fig)
 
         This highlights a few common phenomena with SSA:
             * the eigenvalues are in descending order
@@ -658,7 +655,7 @@ class Series:
             ax.legend()
             @savefig ssa_recon.png
             pyleo.showfig(fig)
-            plt.close(fig)
+            pyleo.closefig(fig)
 
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
             * there was not much rhyme or reason for picking 15 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
@@ -686,15 +683,15 @@ class Series:
 
             # plot eigenvalues
             rk = np.arange(0,20)+1
-            fig=plt.figure()
-            plt.fill_between(rk,dl[:20],du[:20],color='silver',alpha=0.5,label='MC-SSA 95% CI')
+            fig = plt.figure()
+            plt.fill_between(rk, dl[:20], du[:20], color='silver', alpha=0.5, label='MC-SSA 95% CI')
             plt.errorbar(rk,d[:20],yerr=de[:20],label='SSA eigenvalues w/ 95% CI')
             plt.title('Scree plot of SSA eigenvalues, w/ MC-SSA bounds')
             plt.xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
             plt.legend(loc='upper right')
             @savefig scree_nmc.png
             pyleo.showfig(fig)
-            plt.close(fig)
+            pyleo.closefig(fig)
 
         This suggests that modes 1-5 fall above the red noise benchmark.
 
@@ -737,17 +734,18 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
-            from matplotlib import pyplot as plt
             data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
             time=data.iloc[:,1]
             value=data.iloc[:,2]
             ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
-            @savefig ts_plot.png
-            fig,ax = ts.plot()
-            @savefig ts_dist.png
-            fig,ax = ts.distplot()
-            plt.close(fig)
 
+            @savefig ts_plot5.png
+            fig, ax = ts.plot()
+            pyleo.closefig(fig)
+
+            @savefig ts_dist.png
+            fig, ax = ts.distplot()
+            pyleo.closefig(fig)
 
         '''
         # Turn the interactive mode off.
@@ -859,7 +857,6 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
-            from matplotlib import pyplot as plt
             data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
             time=data.iloc[:,1]
             value=data.iloc[:,2]
@@ -883,7 +880,7 @@ class Series:
                         psd_label='PSD',
                         title='Summary of SOI timeseries'
                         )
-            plt.close(fig)
+            pyleo.closefig(fig)
 
         '''
         # Turn the interactive mode off.
@@ -1111,7 +1108,6 @@ class Series:
 
             import pyleoclim as pyleo
             import numpy as np
-            from matplotlib import pyplot as plt
 
             # Generate a mixed signal with known frequencies
             freqs=[1/20,1/80]
@@ -1127,32 +1123,32 @@ class Series:
             nonlinear_trend = slope*time**2 + intercept
             signal_trend = signal + nonlinear_trend
 
-            #Add white noise
+            # Add white noise
             sig_var = np.var(signal)
             noise_var = sig_var / 2 #signal is twice the size of noise
             white_noise = np.random.normal(0, np.sqrt(noise_var), size=np.size(signal))
             signal_noise = signal_trend + white_noise
 
-            #Create a series object
-            ts=pyleo.Series(time=time,value=signal_noise)
+            # Create a series object
+            ts = pyleo.Series(time=time,value=signal_noise)
             @savefig random_series.png
-            fig,ax = ts.plot(title='Timeseries with nonlinear trend')
-            plt.close(fig)
+            fig, ax = ts.plot(title='Timeseries with nonlinear trend')
+            pyleo.closefig(fig)
 
-            #Standardize
-            ts_std=ts.standardize()
+            # kStandardize
+            ts_std = ts.standardize()
 
-            #Detrend using EMD
+            # Detrend using EMD
             ts_emd = ts_std.detrend()
             @savefig ts_emd.png
-            fig,ax=ts_emd.plot(title='Detrended with EMD method')
-            plt.close(fig)
+            fig, ax = ts_emd.plot(title='Detrended with EMD method')
+            pyleo.closefig(fig)
 
-            #Detrend using Savitzky-Golay filter
+            # Detrend using Savitzky-Golay filter
             ts_sg = ts_std.detrend(method='savitzky-golay')
             @savefig ts_sg.png
-            fig,ax=ts_sg.plot(title='Detrended with Savitzky-Golay filter')
-            plt.close(fig)
+            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter')
+            pyleo.closefig(fig)
 
         '''
         new = self.copy()
@@ -1220,13 +1216,12 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
-            from matplotlib import pyplot as plt
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time=data.iloc[:,1]
-            value=data.iloc[:,2]
-            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts = pyleo.Series(time=time, value=value, time_name='Year C.E', value_name='SOI', label='SOI')
             # Standardize the time series
-            ts_std=ts.standardize()
+            ts_std = ts.standardize()
 
 
         - WWZ
@@ -1238,7 +1233,7 @@ class Series:
             psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger
             @savefig spec_wwz.png
             fig, ax = psd_wwz_signif.plot(title='PSD using WWZ method')
-            plt.close(fig)
+            pyleo.closefig(fig)
 
         We may pass in method-specific arguments via "settings", which is a dictionary.
         For instance, to adjust the analytical frequency resolution for WWZ, we may specify the method-specific argument, the decay constant, "c";
@@ -1256,15 +1251,16 @@ class Series:
                 label='settings={"c": 1e-2}')
             @savefig spec_wwz_c.png
             psd_wwz_hres.plot(ax=ax, label='settings={"c": 1e-4}')
-            plt.close(fig)
+            pyleo.closefig(fig)
 
             fig, ax = psd_wwz_freq.plot(
                 title='PSD using WWZ method with differnt frequency vectors', mute=True,
                 label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
             psd_wwz.plot(ax=ax, label='freq_method="log"', marker='o')
-            @savefig spec_wwz_freq.png
             psd_wwz_nfft.plot(ax=ax, label='freq_method="nfft"', marker='o')
-            plt.close(fig)
+            @savefig spec_wwz_freq.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
 
         You may notice the differences in the PSD curves regarding smoothness and the locations of the analyzed period points.
 
@@ -1281,7 +1277,7 @@ class Series:
             psd_perio_signif = psd_perio.signif_test()
             @savefig spec_perio.png
             fig, ax = psd_perio_signif.plot(title='PSD using Periodogram method')
-            plt.close(fig)
+            pyleo.closefig(fig)
 
         - Welch
 
@@ -1293,7 +1289,7 @@ class Series:
             psd_welch_signif = psd_welch.signif_test()
             @savefig spec_welch.png
             fig, ax = psd_welch_signif.plot(title='PSD using Welch method')
-            plt.close(fig)
+            pyleo.closefig(fig)
 
         - MTM
 
@@ -1305,7 +1301,7 @@ class Series:
             psd_mtm_signif = psd_mtm.signif_test()
             @savefig spec_mtm.png
             fig, ax = psd_mtm_signif.plot(title='PSD using MTM method')
-            plt.close(fig)
+            pyleo.closefig(fig)
 
         - Lomb-Scargle
 
@@ -1314,9 +1310,9 @@ class Series:
 
             psd_ls = ts_std.spectral(method='lomb_scargle')
             psd_ls_signif = psd_ls.signif_test()
-            @savefig spec_ls.png
+            @savefig spec_mtm.png
             fig, ax = psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
-            plt.close(fig)
+            pyleo.closefig(fig)
 
         '''
         if not verbose:
@@ -1410,17 +1406,16 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
-            from matplotlib import pyplot as plt
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time=data.iloc[:,1]
-            value=data.iloc[:,2]
-            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
-            #WWZ
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            # WWZ
             scal = ts.wavelet()
             scal_signif = scal.signif_test(number=1)  # for real work, should use number=200 or even larger
-            @savefig wave_wwz.png
-            fig,ax=scal_signif.plot()
-            plt.close(fig)
+            @savefig spec_mtm.png
+            fig, ax = scal_signif.plot()
+            pyleo.closefig(fig)
 
         '''
         if not verbose:
@@ -1509,27 +1504,30 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
-            from matplotlib import pyplot as plt
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
-            t=data.iloc[:,0]
-            air=data.iloc[:,1]
-            nino=data.iloc[:,2]
-            ts_nino=pyleo.Series(time=t,value=nino)
-            ts_air=pyleo.Series(time=t,value=air)
-            #plot the two timeseries
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
+            t = data.iloc[:,0]
+            air = data.iloc[:,1]
+            nino = data.iloc[:,2]
+            ts_nino = pyleo.Series(time=t, value=nino)
+            ts_air = pyleo.Series(time=t, value=air)
+
+            # plot the two timeseries
             @savefig ts_nino.png
             fig, ax = ts_nino.plot(title='El Nino Region 3 -- SST Anomalies')
-            plt.close(fig)
+            pyleo.closefig(fig)
+
             @savefig ts_air.png
             fig, ax = ts_air.plot(title='Deasonalized All Indian Rainfall Index')
-            plt.close(fig)
+            pyleo.closefig(fig)
+
             ts_air_std=ts_air.standardize()
             ts_nino_std=ts_nino.standardize()
             coh = ts_nino.wavelet_coherence(ts_air)
             coh_signif = coh.signif_test(number=1, qs=[0.99])  # for real work, should use number=200 or even larger
+
             @savefig coh_plot.png
             fig, ax = coh_signif.plot(phase_style={'skip_x': 50, 'skip_y': 10})
-            plt.close(fig)
+            pyleo.closefig(fig)
 
         '''
         if not verbose:
@@ -1634,7 +1632,6 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
-            from matplotlib import pyplot as plt
 
             data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
             t = data.iloc[:, 0]
@@ -1723,20 +1720,22 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
-            from matplotlib import pyplot as plt
             data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
             t=data.iloc[:,0]
             air=data.iloc[:,1]
             nino=data.iloc[:,2]
             ts_nino=pyleo.Series(time=t,value=nino)
             ts_air=pyleo.Series(time=t,value=air)
-            #plot the two timeseries
+
+            # plot the two timeseries
             @savefig ts_nino.png
             fig, ax = ts_nino.plot(title='El Nino Region 3 -- SST Anomalies')
-            plt.close(fig)
+            pyleo.closefig(fig)
+
             @savefig ts_air.png
             fig, ax = ts_air.plot(title='Deasonalized All Indian Rainfall Index')
-            plt.close(fig)
+            pyleo.closefig(fig)
+
             # we use the specific params below in ts_nino.causality() just to make the example less heavier;
             # please drop the `settings` for real work
             caus_res = ts_nino.causality(ts_air, settings={'nsim': 2, 'signif_test': 'isopersist'})
