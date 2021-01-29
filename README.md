@@ -20,7 +20,7 @@ LiPD, however, is not a necessary entry point. Low-level modules are primarily b
 A growing collection of workflows that use Pyleoclim are available as Jupyter notebooks in the `example_notebooks` folder and on [LiPDBooks](https://github.com/LinkedEarth/LiPDbooks/tree/master/notebooks).
 
 New in version 0.5.2
-====================
+--------------------
 - re-introduced support for LiPD objects, including loading, export, and mapping
 - rigorous time representation, based on PaCTS proposal
 - Gaussian kernel method for coarsening time grids
@@ -31,7 +31,7 @@ New in version 0.5.2
 - various bug fixes
 
 New in version 0.5.1
-====================
+--------------------
 - enabled unit tests through TravisCI (to facilitate external contributions)
 - developed unit tests for all methods
 - expanded documentation, now on [readthedocs](https://pyleoclim-util.readthedocs.io/)
@@ -39,7 +39,7 @@ New in version 0.5.1
 - more user-friendly Getting Started section
 
 New in version 0.5.0
-====================
+--------------------
 - complete redesign of the code, now centered on `Series` objects and descendants.
 - [user interface](https://github.com/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb) allowing succinct, expressive calls
 - expanded repertoire of spectral and wavelet methods
