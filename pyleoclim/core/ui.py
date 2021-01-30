@@ -573,7 +573,7 @@ class Series:
         res : dict
             Containing:
 
-            - eig_val : (M, 1) array of eigenvalue spectrum of length r, the number of SSA modes. As in Principal Component Analysis, eigenvaluesare closely related to the fraction of variance accounted for ("explained", a common but not-so-helpful term) by each mode.
+            - eigval : (M, 1) array of eigenvalue spectrum of length r, the number of SSA modes. As in Principal Component Analysis, eigenvaluesare closely related to the fraction of variance accounted for ("explained", a common but not-so-helpful term) by each mode.
 
             - eig_vec : is a matrix of the temporal eigenvectors (T-EOFs), i.e. the temporal patterns that explain most of the variations in the original series.
 
@@ -581,7 +581,7 @@ class Series:
 
             - RC : (N,  M) array of reconstructed components, One can think of each RC as the contribution of each mode to the timeseries, weighted by their eigenvalue (loosely speaking, their "amplitude"). Summing over all columns of RC recovers the original series. (synthesis, the reciprocal operation of analysis).
 
-            - eig_val_q : (M, 2) array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC >0 ]
+            - eigval_q : (M, 2) array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC >0 ]
 
         Examples
         --------
@@ -614,7 +614,7 @@ class Series:
             import matplotlib.gridspec as gridspec
             import numpy as np
 
-            d  = nino_ssa['eig_val'] # extract eigenvalue vector
+            d  = nino_ssa['eigval'] # extract eigenvalue vector
             M  = len(d)  # infer window size
             de = d*np.sqrt(2/(M-1))
             var_pct = d**2/np.sum(d**2)*100  # extract the fraction of variance attributable to each mode
@@ -664,7 +664,7 @@ class Series:
 
         Monte-Carlo SSA
 
-        Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, introduced by Allen & Smith, (1996) to identiy SSA modes that rise above what one would expect from "red noise", specifically an AR(1) process_process). To run it, simply provide the parameter MC, ideally with a number of iterations sufficient to get decent statistics. Here's let's use MC = 1000. The result will be stored in the eig_val_q array, which has the same length as eig_val, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
+        Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, introduced by Allen & Smith, (1996) to identiy SSA modes that rise above what one would expect from "red noise", specifically an AR(1) process_process). To run it, simply provide the parameter MC, ideally with a number of iterations sufficient to get decent statistics. Here's let's use MC = 1000. The result will be stored in the eigval_q array, which has the same length as eigval, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
 
         .. ipython:: python
             :okwarning:
@@ -676,10 +676,10 @@ class Series:
         .. ipython:: python
             :okwarning:
 
-            d  = nino_mcssa['eig_val'] # extract eigenvalue vector
+            d  = nino_mcssa['eigval'] # extract eigenvalue vector
             de = d*np.sqrt(2/(M-1))
-            du = nino_mcssa['eig_val_q'][:,0]  # extract upper quantile of MC-SSA eigenvalues
-            dl = nino_mcssa['eig_val_q'][:,1]  # extract lower quantile of MC-SSA eigenvalues
+            du = nino_mcssa['eigval_q'][:,0]  # extract upper quantile of MC-SSA eigenvalues
+            dl = nino_mcssa['eigval_q'][:,1]  # extract lower quantile of MC-SSA eigenvalues
 
             # plot eigenvalues
             rk = np.arange(0,20)+1
@@ -3160,20 +3160,94 @@ class MultipleSeries:
 
     #     res = decomposition.mssa(data, M=M, MC=MC, f=f)
     #     return res
+    
+    def equal_lengths(self):
+        ''' Test whether all series in object have equal length 
 
-    # def pca(self):
-    #     data = []
-    #     for val in self.series_list:
-    #         data.append(val.value)
-    #     a = len(data[0])
-    #     r = data[1:]
-    #     flag = all (len(v)==a for v in r)
-    #     if flag==False:
-    #         print('All Time Series should be of same length')
-    #         return
-    #     data = np.transpose(np.asarray(data))
-    #     res = decomposition.pca(data)
-    #     return res
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        flag : boolean 
+        lengths : list containing the lengths of the series in object
+        '''
+        
+        lengths = []
+        for ts in self.series_list:  
+            lengths.append(len(ts.value))
+        
+        L = lengths[0]
+        r = lengths[1:]
+        flag = all (l==L for l in r)
+        
+        return flag, lengths
+
+    def pca(self,nMC=200,**pca_kwargs):
+        ''' Principal Component Analysis
+
+        Parameters
+        ----------
+
+        nMC : int
+            number of Monte Carlo simulations
+         
+        pca_kwargs : tuple
+            
+
+        Returns
+        -------
+        res : dictionary containing:
+            
+            - eigval : eigenvalues (nrec,)
+            - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)
+            - pcs  : PC series of all components (nrec, nt)
+            - eofs : EOFs of all components (nrec, nrec)
+            
+        References:
+        ----------    
+        Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene 
+        European speleothem δ18O records linked to North Atlantic Ocean circulation. 
+        Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8    
+
+        See also
+        --------
+
+        pyleoclim.core.ui.MultipleSeries.mssa: multi-channel SSA  
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import lipd
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            tslist = data.to_tso()
+            mslist = []
+            for item in tslist:
+                mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
+            ms = pyleo.MultipleSeries(mslist)
+            
+            res = ms.pca()
+            
+        '''
+        flag, lengths = self.equal_lengths()
+        
+        if flag==False:
+            print('All Time Series should be of same length. Apply common_time() first')
+        else: # if all series have equal length
+            p = len(lengths)
+            n = lengths[0]
+            ys = np.empty((n,p))
+            for j in range(p):
+                ys[:,j] = self.series_list[j].value
+                
+        res = decomposition.mcpca(ys, nMC, **pca_kwargs)
+        return res
 
     def bin(self):
         ''' Aligns the time axes of a MultipleSeries object, via binning.
@@ -3232,7 +3306,64 @@ class MultipleSeries:
         ms = ms.common_time(method = 'binning')
 
         return ms
+    
+    def gkernel(self):
+        ''' Aligns the time axes of a MultipleSeries object, via Gaussian kernel.
+        This is critical for workflows that need to assume a common time axis
+        for the group of series under consideration.
 
+
+        The common time axis is characterized by the following parameters:
+
+        start : the latest start date of the bunch (maximin of the minima)
+        stop  : the earliest stop date of the bunch (minimum of the maxima)
+        step  : The representative spacing between consecutive values (mean of the median spacings)
+
+        This is a special case of the common_time function.
+
+        Parameters
+        ----------
+
+        None
+
+        Returns
+        -------
+        ms : pyleoclim.MultipleSeries
+            The MultipleSeries objects with all series aligned to the same time axis.
+
+        See also
+        --------
+
+        pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
+
+        pyleoclim.utils.tsutils.gkernel: Underlying binning function
+
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import lipd
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            tslist = data.to_tso()
+            mslist = []
+            for item in tslist:
+                mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
+            ms = pyleo.MultipleSeries(mslist)
+            msk = ms.gkernel()
+
+        '''
+
+        ms = self.copy()
+
+        ms = ms.common_time(method = 'gkernel')
+
+        return ms
+    
     def interp(self, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via interpolation.
         This is critical for workflows that need to assume a common time axis

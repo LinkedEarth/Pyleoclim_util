@@ -37,7 +37,7 @@ ts_n    = ts_nino.standardize()
 # 1. Test basic SSA
 nino_ssa = ts_n.ssa(M = 60)
 # check that first 15 modes capture > 95% of the variance.
-d  = nino_ssa['eig_val']
+d  = nino_ssa['eigval']
 var_pct = d**2/np.sum(d**2)*100
 assert np.abs(var_pct[15:].sum()*100-4.825612144779388) < 1e-6
 
