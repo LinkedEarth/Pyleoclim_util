@@ -19,20 +19,9 @@ for item in tslist:
     mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
 ms = pyleo.MultipleSeries(mslist)
 
-msc = ms.common_time(method='gkernel')
-#  
-flag, lengths = msc.equal_lengths()
+msc = ms.common_time()
 
-if flag==False:
-    print('All Time Series should be of same length. Apply common_time() first')
-else: # if all series have equal length
-    p = len(lengths)
-    n = lengths[0]
-    ys = np.empty((n,p))
-    for j in range(p):
-        ys[:,j] = msc.series_list[j].value
-        
-# res = msc.pca(nMC=20)
+res = msc.pca(nMC=20)
 # fails because too many NaNs are left through, whether with 'binning', 'interp' or 'gkernel'
 
 

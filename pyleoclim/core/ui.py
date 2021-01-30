@@ -3232,7 +3232,9 @@ class MultipleSeries:
                 mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
             ms = pyleo.MultipleSeries(mslist)
             
-            res = ms.pca()
+            msc = ms.common_time()
+
+            res = msc.pca(nMC=20)
             
         '''
         flag, lengths = self.equal_lengths()
