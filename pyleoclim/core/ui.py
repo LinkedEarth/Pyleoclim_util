@@ -3002,7 +3002,7 @@ class MultipleSeries:
         Parameters
         ----------
         method:  string
-            either 'binning' or 'interp'
+            either 'binning', 'interp' or 'gkernel'
 
         kwargs: keyword arguments (dictionary) for the interpolation method
 
@@ -3037,9 +3037,19 @@ class MultipleSeries:
         elif method == 'interp':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, xi = tsutils.interp(ts.time, ts.value, interp_type='linear', interp_step=step, start=start, end=stop,**kwargs)
+                ti, vi = tsutils.interp(ts.time, ts.value, interp_type='linear', interp_step=step, start=start, end=stop,**kwargs)
                 ts.time  = ti
-                ts.value = xi
+                ts.value = vi
+                ms.series_list[idx] = ts
+        
+        elif method == 'gkernel':
+            # Get the interpolated x-axis.
+            ti = np.arange(start,stop,step)
+            for idx,item in enumerate(self.series_list):
+                ts = item.copy()
+                vi = tsutils.gkernel(ts.time,ts.value,ti, h = 11)
+                ts.time  = ti
+                ts.value = vi
                 ms.series_list[idx] = ts
 
         else:

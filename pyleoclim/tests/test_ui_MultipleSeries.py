@@ -182,3 +182,26 @@ class TestMultipleSeriesInterp:
     x_axis_1 = ts_M_interp.series_list[1].__dict__['time']
 
     assert_array_equal(x_axis_0, x_axis_1)
+
+# class TestMultipleSeriesCommonTime:
+#     '''Test for MultipleSeries.common_time()
+
+#     Testing if the common_time function will place the series on the same time axis
+#     '''
+
+#     t_0, v_0 = gen_colored_noise()
+#     t_1, v_1 = gen_colored_noise()
+
+#     ts_0 = pyleo.Series(time = t_0, value = v_0)
+#     ts_1 = pyleo.Series(time = t_1, value = v_1)
+
+#     serieslist = [ts_0, ts_1]
+
+#     ts_M = pyleo.MultipleSeries(serieslist)
+
+#     ts_M_interp = ts_M.interp()
+
+#     x_axis_0 = ts_M_interp.series_list[0].__dict__['time']
+#     x_axis_1 = ts_M_interp.series_list[1].__dict__['time']
+
+#     assert_array_equal(x_axis_0, x_axis_1)

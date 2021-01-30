@@ -174,6 +174,8 @@ def gkernel(t,y,tc, h = 11):
     '''
     Coarsen time resolution using a Gaussian kernel
     
+    TODO: adaptive choice of e-folding scale
+    
     Parameters
     ----------
     t  : 1d array; the original time axis
@@ -191,14 +193,14 @@ def gkernel(t,y,tc, h = 11):
     Rehfeld, K., Marwan, N., Heitzig, J., and Kurths, J.: Comparison of correlation analysis
     techniques for irregularly sampled time series, Nonlin. Processes Geophys., 
     18, 389–404, https://doi.org/10.5194/npg-18-389-2011, 2011.
-    
     '''
+    
     if len(t) != len(y):
         raise ValueError('y and t must have the same length')
     
-    kernel = lambda x, h : 1.0/np.sqrt(2*np.pi*h)*np.exp(-x**2/(2*h**2))  # define kernel function
+    kernel = lambda x, s : 1.0/np.sqrt(2*np.pi*s)*np.exp(-x**2/(2*s**2))  # define kernel function
     
-    yc = np.zeros((len(tc)))
+    yc    = np.zeros((len(tc)))
     yc[:] = np.nan
     
     for i in range(len(tc)-1):
@@ -207,8 +209,8 @@ def gkernel(t,y,tc, h = 11):
 
         if len(xslice)>0:
             d      = xslice-tc[i]
-            weight = kernel(d,11)
-            yc[i]     = sum(weight*yslice)/sum(weight)
+            weight = kernel(d,h)
+            yc[i]  = sum(weight*yslice)/sum(weight)
         else:
             yc[i] = np.nan
             

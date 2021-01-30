@@ -92,6 +92,10 @@ ms_interp = mtsCE.common_time(method = 'interp')   # ACCEPTABLY FAST
 #ms_interp.plot()
 #plt.show()
 
+ms_gkernel = mtsCE.common_time(method = 'gkernel')  # VERY FAST
+#ms_gkernel.plot()
+#plt.show()
+
 # combine CE and BP
 mts_joint = pyleo.MultipleSeries([*mtsCE.series_list, *mtsBP.series_list])
 #mts_joint.plot(color='blue',plot_kwargs={'alpha': 0.1})

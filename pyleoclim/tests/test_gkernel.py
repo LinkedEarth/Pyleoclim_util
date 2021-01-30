@@ -9,7 +9,6 @@ Created on Thu Jan 28 17:57:48 2021
 import pyleoclim as pyleo
 import numpy as np
     
-# a collection of useful functions
 
 def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
     ''' Generate colored noise
@@ -24,6 +23,11 @@ tc = t[1::2]
 
 vc = pyleo.utils.tsutils.gkernel(t,v,tc, h = 11)
 
-ts = pyleo.Series(time=t,value = v)
+ts = pyleo.Series(time=t,value = v,label='original series')
+tsc = pyleo.Series(time=tc,value = vc,label=r'coarsened series, $h=11$')
 
-fig, ax = plt.subplots()
+fig, ax = ts.plot()
+tsc.plot(ax=ax)
+#pyleo.showfig(fig)
+
+# MultiplSeries
