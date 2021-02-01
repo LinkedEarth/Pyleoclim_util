@@ -225,7 +225,9 @@ class TestMultipleSeriesPca:
         mslist.append(pyleo.Series(time = t, value = x[:,i]))
     ms = pyleo.MultipleSeries(mslist)
             
+    #res = ms.pca(nMC=20, missing='fill-em', standardize=False)
     res = ms.pca(nMC=20)
+
     
     # assert what?
     assert_array_equal(pc.eigenvals, res['eigval'])    
