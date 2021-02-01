@@ -1001,6 +1001,28 @@ class Series:
         new.value = v_mod
         return new
 
+    def anomaly(self, timespan=None):
+        ''' Calculate the anomaly of the series
+
+        Parameters
+        ----------
+        timespan : tuple or list
+            The timespan in form of [a, b], where a, b are two time points.
+
+        Returns
+        -------
+        new : pyleoclim.Series
+            The standardized series object
+
+        '''
+        new = self.copy()
+        if timespan is not None:
+            v_mod = self.value - np.nanmean(self.slice(timespan).value)
+        else:
+            v_mod = self.value - np.nanmean(self.value)
+        new.value = v_mod
+        return new
+
     def segment(self, factor=10):
         """Gap detection
 
