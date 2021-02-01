@@ -2869,6 +2869,9 @@ class MultipleSeries:
         The target time unit for every series in the list.
         If None, then no conversion will be applied;
         Otherwise, the time unit of every series in the list will be converted to the target.
+    
+   name : str
+        name of the collection of timeseries (e.g. 'PAGES 2k ice cores')    
 
     Examples
     --------
@@ -2885,11 +2888,12 @@ class MultipleSeries:
         value = data.iloc[:,2]
         ts1 = pyleo.Series(time=time, value=value, time_unit='years')
         ts2 = pyleo.Series(time=time, value=value, time_unit='years')
-        ms = pyleo.MultipleSeries([ts1, ts2])
+        ms = pyleo.MultipleSeries([ts1, ts2], name = 'SOI x2')
     '''
-    def __init__(self, series_list, time_unit=None):
+    def __init__(self, series_list, time_unit=None, name=None):
         self.series_list = series_list
         self.time_unit = time_unit
+        self.name = name
 
         if self.time_unit is not None:
             new_ts_list = []

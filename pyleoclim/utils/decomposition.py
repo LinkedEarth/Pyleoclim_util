@@ -80,7 +80,7 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     eig_ar1 = np.zeros((nrec,nMC))
 
     # apply PCA algorithm to the data matrix     
-    pc = PCA(ys,ncomp=nrec, missing= None) # TODO : implement EM infilling with missing = ‘fill-em’ 
+    pc = PCA(ys,ncomp=nrec, **pca_kwargs) # TODO : implement EM infilling with missing = ‘fill-em’ 
     eigval = pc.eigenvals
     
     # generate surrogate matrix
@@ -100,7 +100,7 @@ def mcpca(ys, nMC=200, **pca_kwargs):
             
     # loop over Monte Carlo iterations     
     for m in range(nMC):    
-        pc_ar1 = PCA(y_ar1[:,:,m],ncomp=nrec)
+        pc_ar1 = PCA(y_ar1[:,:,m],ncomp=nrec,**pca_kwargs)
         eig_ar1[:,m] = pc_ar1.eigenvals
  
     eig95 = np.percentile(eig_ar1, 95, axis=1)
