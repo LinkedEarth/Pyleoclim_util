@@ -23,7 +23,6 @@ from scipy.linalg import eigh, toeplitz
 from nitime import algorithms as alg
 from statsmodels.multivariate.pca import PCA
 import copy
-import statsmodels.api as sm
 
 #------
 # Main functions
@@ -54,9 +53,9 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     -------
     res : dict containing:
         
-        - eigval : eigenvalues (nrec,)
+        - eigvals : eigenvalues (nrec,)
 
-        - eigval95 : eigenvalues of the AR(1) ensemble (nrec, nMC)
+        - eigvals95 : eigenvalues of the AR(1) ensemble (nrec, nMC)
 
         - pcs : PC series of all components (nt, rec)
 
@@ -76,12 +75,12 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     pc_mc = np.zeros((nt,nrec)) # principal components
     eof_mc = np.zeros((nrec,nrec))  #eof (spatial loadings)
     #eigenvalue matrices
-    eigval = np.zeros((nrec))
+    eigvals = np.zeros((nrec))
     eig_ar1 = np.zeros((nrec,nMC))
 
     # apply PCA algorithm to the data matrix     
     pc = PCA(ys,ncomp=nrec, **pca_kwargs) # TODO : implement EM infilling with missing = ‘fill-em’ 
-    eigval = pc.eigenvals
+    eigvals = pc.eigenvals
     
     # generate surrogate matrix
     y_ar1 = np.full((nt,nrec,nMC), 0, dtype=np.double)
@@ -106,7 +105,7 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     eig95 = np.percentile(eig_ar1, 95, axis=1)
                 
     # assign result
-    res = {'eigval': eigval, 'eigval95': eig95, 'pcs': pc_mc, 'eofs': eof_mc}
+    res = {'eigvals': eigvals, 'eigvals95': eig95, 'pcs': pc_mc, 'eofs': eof_mc}
 
     return res
 
@@ -239,11 +238,11 @@ def mssa(ys, M=None, nMC=0, f=0.3):
     res : dict
         Containing:
 
-        - eigval : array of eigenvalue spectrum
+        - eigvals : array of eigenvalue spectrum
 
-        - eigval05 : The 5% percentile of eigenvalues
+        - eigvals05 : The 5% percentile of eigenvalues
 
-        - eigval95 : The 95% percentile of eigenvalues
+        - eigvals95 : The 95% percentile of eigenvalues
 
         - PC : matrix of principal components (2D array)
 
@@ -274,20 +273,20 @@ def mssa(ys, M=None, nMC=0, f=0.3):
             Y[:, m + irec * M] = ys[m:N - M + 1 + m, irec]
 
     C = np.dot(np.nan_to_num(np.transpose(Y)), np.nan_to_num(Y)) / (N - M + 1)
-    D, eig_vec = eigh(C)
+    D, eigvecs = eigh(C)
 
     sort_tmp = np.sort(D)
-    eigval = sort_tmp[::-1]
+    eigvals = sort_tmp[::-1]
     sortarg = np.argsort(-D)
 
-    eig_vec = eig_vec[:, sortarg]
+    eigvecs = eigvecs[:, sortarg]
 
     # test the signifiance using Monte-Carlo
     Ym = np.zeros((N - M + 1, nrec * M))
     noise = np.zeros((nrec, N, nMC))
     for irec in np.arange(nrec):
         noise[irec, 0, :] = ys[0, irec]
-    eigval_R = np.zeros((nrec * M, nMC))
+    eigvals_R = np.zeros((nrec * M, nMC))
     # estimate coefficents of ar1 processes, and then generate ar1 time series (noise)
     for irec in np.arange(nrec):
         Xs = ys[:, irec]
@@ -304,8 +303,8 @@ def mssa(ys, M=None, nMC=0, f=0.3):
             for im in np.arange(0, M):
                 Ym[:, im + irec * M] = noise[irec, im:N - M + 1 + im, m]
         Cn = np.dot(np.nan_to_num(np.transpose(Ym)), np.nan_to_num(Ym)) / (N - M + 1)
-        # eigval_R[:,m] = np.diag(np.dot(np.dot(eig_vec,Cn),np.transpose(eig_vec)))
-        eigval_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eig_vec), Cn), eig_vec))
+        # eigvals_R[:,m] = np.diag(np.dot(np.dot(eigvecs,Cn),np.transpose(eigvecs)))
+        eigval_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eigvecs), Cn), eigvecs))
 
     eigval95 = np.percentile(eigval_R, 95, axis=1)
     eigval05 = np.percentile(eigval_R, 5, axis=1)
@@ -317,7 +316,7 @@ def mssa(ys, M=None, nMC=0, f=0.3):
     for k in np.arange(nrec * M):
         for i in np.arange(0, N - M + 1):
             #   modify for nan
-            prod = Y[i, :] * eig_vec[:, k]
+            prod = Y[i, :] * eigvecs[:, k]
             ngood = sum(~np.isnan(prod))
             #   must have at least m*f good points
             if ngood >= M * f:
@@ -330,16 +329,16 @@ def mssa(ys, M=None, nMC=0, f=0.3):
 
     for k in np.arange(nrec):
         for im in np.arange(M):
-            x2 = np.dot(np.expand_dims(PC[:, im], axis=1), np.expand_dims(eig_vec[0 + k * M:M + k * M, im], axis=0))
+            x2 = np.dot(np.expand_dims(PC[:, im], axis=1), np.expand_dims(eigvecs[0 + k * M:M + k * M, im], axis=0))
             x2 = np.flipud(x2)
 
             for n in np.arange(N):
                 RC[k, n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
-    res = {'eigval': eigval, 'eig_vec': eig_vec, 'q05': eigval95, 'q95': eigval05, 'PC': PC, 'RC': RC}
+    res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'q05': eigvals95, 'q95': eigvals05, 'PC': PC, 'RC': RC}
 
     return res
 
-def ssa(ys, M=None, nMC=0, f=0.5, trunc=None):
+def ssa(ys, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     '''Singular spectrum analysis
 
     Nonparametric eigendecomposition of timeseries into orthogonal oscillations.
@@ -365,10 +364,13 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None):
 
     trunc : str
         if present, truncates the expansion to a level K < M owing to one of 3 criteria:
-            (1) 'kaiser': Kaiser rule
-            (2) 'mc-ssa': Monte-Carlo SSA
-            (3) 'var': first K modes that explain at least 80% of the variance.
+            (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
+            (2) 'mc-ssa': Monte-Carlo SSA (use modes above the 95% threshold)
+            (3) 'var': first K modes that explain at least var_thresh % of the variance.
         Default is None, which bypasses truncation (K = M)
+        
+    var_thresh : float
+        variance threshold for reconstruction (only impcatful if trunc is set to 'var')
 
     Returns
     -------
@@ -376,17 +378,19 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None):
     res : dict
         Containing:
 
-        - eigval : (M, 1) array of eigenvalue spectrum
+        - eigvals : (M, ) array of eigenvalue spectrum
 
-        - eig_vec : Matrix of temporal eigenvectors
+        - eigvecs : Matrix of temporal eigenvectors
 
         - PC : (N - M + 1, M) array of principal components
 
-        - RC : (N,  M) array of reconstructed components
+        - RCmat : (N,  M) array of reconstructed components
+        
+        - RCseries : (N,) reconstructed series
 
-        - pct_var: (M, 1) array of the fraction of variance (%) associated with each mode
+        - pctvar: (M, ) array of the fraction of variance (%) associated with each mode
 
-        - eigval_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
+        - eigvals_q : (M, ) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
 
     References
     ----------
@@ -412,7 +416,8 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None):
 
     '''
 
-    ys, mu, _ = standardize(ys)
+    mu = np.nanmean(ys)
+    ys -= mu  # center the series
 
     N = len(ys)
 
@@ -420,19 +425,19 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None):
         M=int(N/10)
     c = np.zeros(M)
 
-    for j in range(M):
+    for j in range(M): 
         prod = ys[0:N - j] * ys[j:N]
         c[j] = sum(prod[~np.isnan(prod)]) / (sum(~np.isnan(prod)) - 1)
 
 
     C = toeplitz(c[0:M])  #form correlation matrix
 
-    D, eig_vec = eigh(C) # solve eigendecomposition
+    D, eigvecs = eigh(C) # solve eigendecomposition
 
     sort_tmp = np.sort(D)
-    eigval = sort_tmp[::-1]
+    eigvals = sort_tmp[::-1]
     sortarg = np.argsort(-D)
-    eig_vec = eig_vec[:, sortarg]
+    eigvecs = eigvecs[:, sortarg]
 
     # determine principal component time series
     PC = np.zeros((N - M + 1, M))
@@ -440,22 +445,22 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None):
     for k in np.arange(M):
         for i in np.arange(0, N - M + 1):
             #   modify for nan
-            prod = ys[i:i + M] * eig_vec[:, k]
+            prod = ys[i:i + M] * eigvecs[:, k]
             ngood = sum(~np.isnan(prod))
             #   must have at least m*f good points
             if ngood >= M * f:
                 PC[i, k] = sum(
                     prod[~np.isnan(prod)]) * M / ngood  # the columns of this matrix are Ak(t), k=1 to M (T-PCs)
 
-    de = eigval*np.sqrt(2/(M-1))
-    pct_var = eigval**2/np.sum(eigval**2)*100 # percent variance
+    de = eigvals*np.sqrt(2/(M-1))
+    pctvar = eigvals**2/np.sum(eigvals**2)*100 # percent variance
 
     if nMC > 0: # If Monte-Carlo SSA is requested.
         # TODO: translate and use https://github.com/SMAC-Group/uAR1 here
 
         noise = ar1_sim(ys, nMC)  # generate MC AR(1) surrogates of y
 
-        eigval_R = np.zeros((M,nMC)) # define eigenvalue matrix
+        eigvals_R = np.zeros((M,nMC)) # define eigenvalue matrix
 
         lgs = np.arange(-N + 1, N)
 
@@ -464,14 +469,14 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None):
             Gn = np.correlate(xn, xn, "full")
             Gn = Gn / (N - abs(lgs))
             Cn = toeplitz(Gn[N - 1:N - 1 + M])
-            eigval_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eig_vec), Cn), eig_vec))
+            eigvals_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eigvecs), Cn), eigvecs))
 
-        eigval_q = np.empty((M,2))
-        eigval_q[:,0] = np.percentile(eigval_R, 5, axis=1)
-        eigval_q[:,1] = np.percentile(eigval_R, 95, axis=1)
-        mode_idx = np.where(eigval>=eigval_q[:,1]) # modes to retain
+        eigvals_q = np.empty((M,2))
+        eigvals_q[:,0] = np.percentile(eigvals_R, 5, axis=1)
+        eigvals_q[:,1] = np.percentile(eigvals_R, 95, axis=1)
+        mode_idx = np.where(eigvals>=eigvals_q[:,1]) # modes to retain
     else:
-        eigval_q = None
+        eigvals_q = None
 
     # TODO: implement automatic truncation criteria: (1) Kaiser rule (2) significant MC-SSA modes
     # and (3) variance % criterion (e.g. first K modes that explain at least 90% of the variance).
@@ -481,27 +486,29 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None):
         if nMC == 0:
             raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
     elif trunc == 'kaiser':
-        mval = np.median(eigval) # median eigenvalues
-        mode_idx = np.where(eigval>=mval)
+        mval = np.median(eigvals) # median eigenvalues
+        mode_idx = np.where(eigvals>=mval)
     elif trunc == 'var':
-        mode_idx = np.arange(np.argwhere(np.cumsum(pct_var)>=80)[0]+1)
+        mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0]+1)
     else:
         mode_idx = np.arange(M)
 
     # compute reconstructed timeseries
     Np = N - M + 1
     K = len(mode_idx)
-    RC = np.zeros((N, K))
+    RCmat = np.zeros((N, K))
 
-    for im in mode_idx:
-        x2 = np.dot(np.expand_dims(PC[:, im], axis=1), np.expand_dims(eig_vec[0:M, im], axis=0))
-        x2 = np.flipud(x2)
+    for i, m in enumerate(mode_idx):
+        xdum = np.dot(np.expand_dims(PC[:, m], axis=1), np.expand_dims(eigvecs[0:M, m], axis=0))
+        xdum = np.flipud(xdum)
 
         for n in np.arange(N):
-            RC[n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
+            RCmat[n, i] = np.diagonal(xdum, offset=-(Np - 1 - n)).mean()
 
-    RC = RC + np.tile(mu, reps=[N, K])  # restore the mean
+    RCmat = RCmat + np.tile(mu, reps=[N, K])  # restore the mean
+    
+    RCseries = RCmat.sum(axis=1)
 
     # export results
-    res = {'eigval': eigval, 'eig_vec': eig_vec, 'PC': PC, 'RC': RC, 'pct_var': pct_var, 'eigval_q': eigval_q}
+    res = {'eigval': eigvals, 'eigvecs': eigvecs, 'PC': PC, 'RCseries': RCseries, 'RCmat': RCmat, 'pctvar': pctvar, 'eigvals_q': eigvals_q}
     return res
