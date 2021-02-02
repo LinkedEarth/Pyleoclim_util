@@ -32,7 +32,7 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     '''Monte-Carlo Principal Component Analysis 
     
     Carries out Principal Component Analysis  (most unfortunately named EOF analysis in the meteorology
-    and climate literature) on a data matrix y3d, admitting ensembles. 
+    and climate literature) on a data matrix ys.  
     If NaNs are present, they will be infilled via the EM algorithm.
     
     The significance of eigenvalues is gauged against those of AR(1) surrogates fit to the data.
@@ -288,6 +288,7 @@ def mssa(ys, M=None, nMC=0, f=0.3):
         noise[irec, 0, :] = ys[0, irec]
     eigvals_R = np.zeros((nrec * M, nMC))
     # estimate coefficents of ar1 processes, and then generate ar1 time series (noise)
+    # TODO : update to use ar1_sim(), as in ssa() 
     for irec in np.arange(nrec):
         Xs = ys[:, irec]
         coefs_est, var_est = alg.AR_est_YW(Xs[~np.isnan(Xs)], 1)
@@ -304,10 +305,10 @@ def mssa(ys, M=None, nMC=0, f=0.3):
                 Ym[:, im + irec * M] = noise[irec, im:N - M + 1 + im, m]
         Cn = np.dot(np.nan_to_num(np.transpose(Ym)), np.nan_to_num(Ym)) / (N - M + 1)
         # eigvals_R[:,m] = np.diag(np.dot(np.dot(eigvecs,Cn),np.transpose(eigvecs)))
-        eigval_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eigvecs), Cn), eigvecs))
+        eigvals_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eigvecs), Cn), eigvecs))
 
-    eigval95 = np.percentile(eigval_R, 95, axis=1)
-    eigval05 = np.percentile(eigval_R, 5, axis=1)
+    eigvals95 = np.percentile(eigvals_R, 95, axis=1)
+    eigvals05 = np.percentile(eigvals_R, 5, axis=1)
 
 
     # determine principal component time series
@@ -334,11 +335,11 @@ def mssa(ys, M=None, nMC=0, f=0.3):
 
             for n in np.arange(N):
                 RC[k, n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
-    res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'q05': eigvals95, 'q95': eigvals05, 'PC': PC, 'RC': RC}
+    res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'q05': eigvals05, 'q95': eigvals95, 'PC': PC, 'RC': RC}
 
     return res
 
-def ssa(ys, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
+def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     '''Singular spectrum analysis
 
     Nonparametric eigendecomposition of timeseries into orthogonal oscillations.
@@ -349,7 +350,7 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     Parameters
     ----------
 
-    ys : array of length N
+    y : array of length N
           time series (evenly-spaced, possibly with up to f*N NaNs)
 
     M : int
@@ -370,7 +371,7 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         Default is None, which bypasses truncation (K = M)
         
     var_thresh : float
-        variance threshold for reconstruction (only impcatful if trunc is set to 'var')
+        variance threshold for reconstruction (only impactful if trunc is set to 'var')
 
     Returns
     -------
@@ -416,8 +417,7 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
 
     '''
 
-    mu = np.nanmean(ys)
-    ys -= mu  # center the series
+    ys, mu, scale = standardize(y)
 
     N = len(ys)
 
@@ -452,18 +452,13 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
                 PC[i, k] = sum(
                     prod[~np.isnan(prod)]) * M / ngood  # the columns of this matrix are Ak(t), k=1 to M (T-PCs)
 
-    de = eigvals*np.sqrt(2/(M-1))
     pctvar = eigvals**2/np.sum(eigvals**2)*100 # percent variance
 
     if nMC > 0: # If Monte-Carlo SSA is requested.
-        # TODO: translate and use https://github.com/SMAC-Group/uAR1 here
-
         noise = ar1_sim(ys, nMC)  # generate MC AR(1) surrogates of y
-
         eigvals_R = np.zeros((M,nMC)) # define eigenvalue matrix
-
         lgs = np.arange(-N + 1, N)
-
+        
         for m in range(nMC):
             xn, _ , _ = standardize(noise[:, m]) # center and standardize
             Gn = np.correlate(xn, xn, "full")
@@ -497,17 +492,18 @@ def ssa(ys, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     Np = N - M + 1
     K = len(mode_idx)
     RCmat = np.zeros((N, K))
-
-    for i, m in enumerate(mode_idx):
-        xdum = np.dot(np.expand_dims(PC[:, m], axis=1), np.expand_dims(eigvecs[0:M, m], axis=0))
+    
+    for im in range(M):
+        xdum = np.dot(np.expand_dims(PC[:, im], axis=1), np.expand_dims(eigvecs[0:M, im], axis=0))
         xdum = np.flipud(xdum)
 
         for n in np.arange(N):
-            RCmat[n, i] = np.diagonal(xdum, offset=-(Np - 1 - n)).mean()
+            RCmat[n, im] = np.diagonal(xdum, offset=-(Np - 1 - n)).mean()
+        del xdum            
 
-    RCmat = RCmat + np.tile(mu, reps=[N, K])  # restore the mean
+    RCmat = scale*(RCmat + np.tile(mu, reps=[N, K]))  # restore the mean
     
-    RCseries = RCmat.sum(axis=1)
+    RCseries = RCmat[:,mode_idx].sum(axis=1)
 
     # export results
     res = {'eigval': eigvals, 'eigvecs': eigvecs, 'PC': PC, 'RCseries': RCseries, 'RCmat': RCmat, 'pctvar': pctvar, 'eigvals_q': eigvals_q}

@@ -670,7 +670,27 @@ class TestUISeriesWavelet():
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 20)
         scal = ts.wavelet(method=wave_method, settings={'freq': freq})
+        
+class TestUISeriesSsa():
+    ''' Test the SSA functionalities
+    '''
 
+    def test_ssa_t0(self):
+        ''' Test Series.ssa() with available methods using default arguments
+        '''
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts = pyleo.Series(time=t, value=v)
+        res = ts.ssa()
+
+    def test_ssa_t1(self):
+        '''Test Series.ssa() with Monte-Carlo option
+        '''
+
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts = pyleo.Series(time=t, value=v)
+        
+        res = ts.ssa(M=60, nMC=10, trunc='mc-ssa')
 
 class TestUiSeriesPlot:
     '''Test for Series.plot()

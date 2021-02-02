@@ -65,7 +65,7 @@ def infer_period_unit_from_time_unit(time_unit):
 
 
 class Series:
-    ''' pyleoSeries object y(t)
+    ''' pyleoSeries object
 
     The Series class is, at its heart, a simple structure containing two arrays y and t of equal length, and some
     metadata allowing to interpret and plot the series. It is similar to a 1-column pandas dataframe, but the concept
@@ -551,7 +551,7 @@ class Series:
 
         return res
 
-    def ssa(self, M=None, nMC=0, f=0.5):
+    def ssa(self, M=None, nMC=0, f=0.5, trunc = 'kaiser',var_thresh=80):
         '''Singular Spectrum Analysis
 
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
@@ -567,6 +567,15 @@ class Series:
             Number of iteration in the Monte-Carlo process. The default is 0.
         f : float, optional
             maximum allowable fraction of missing values. The default is 0.5.
+        trunc : str
+            if present, truncates the expansion to a level K < M owing to one of 3 criteria:
+                (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
+                (2) 'mc-ssa': Monte-Carlo SSA (use modes above the 95% threshold)
+                (3) 'var': first K modes that explain at least var_thresh % of the variance.
+            Default is None, which bypasses truncation (K = M)
+            
+        var_thresh : float
+            variance threshold for reconstruction (only impcatful if trunc is set to 'var')
 
         Returns
         -------
@@ -617,7 +626,7 @@ class Series:
             d  = nino_ssa['eigval'] # extract eigenvalue vector
             M  = len(d)  # infer window size
             de = d*np.sqrt(2/(M-1))
-            var_pct = d**2/np.sum(d**2)*100  # extract the fraction of variance attributable to each mode
+            var_pct = nino_ssa['pctvar'] # extract the fraction of variance attributable to each mode
 
             # plot eigenvalues
             r = 20
@@ -627,7 +636,6 @@ class Series:
             ax.set_title('Scree plot of SSA eigenvalues')
             ax.set_xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
             ax.legend(loc='upper right')
-            @savefig scree_plot.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
@@ -644,7 +652,7 @@ class Series:
 
             print(var_pct[15:].sum()*100)
 
-        That is, over 95% of the variance is in the first 15 modes. That is a typical result for a "warm-colored" timeseries, which is most geophysical timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
+        That is, over 95% of the variance is in the first 15 modes. That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
 
         .. ipython:: python
             :okwarning:
@@ -697,7 +705,7 @@ class Series:
 
         '''
 
-        res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f)
+        res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
         return res
 
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
