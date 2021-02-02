@@ -505,7 +505,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     for idx,item in enumerate(ys_seg):
         psd_seg.append(signal.lombscargle(ts_seg[idx],
                                           item*signal.get_window(window,len(ts_seg[idx])),
-                                          freq_angular))
+                                          freq_angular)*2*np.pi)
 
     # average them up
     if average=='mean':
