@@ -230,6 +230,6 @@ class TestMultipleSeriesPca:
 
     
     # assert what?
-    assert_array_equal(pc.eigenvals, res['eigval'])    
+    assert_array_equal(pc.eigenvals, res['eigvals'])    
 
     

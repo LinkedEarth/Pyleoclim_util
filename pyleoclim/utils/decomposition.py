@@ -469,7 +469,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         eigvals_q = np.empty((M,2))
         eigvals_q[:,0] = np.percentile(eigvals_R, 5, axis=1)
         eigvals_q[:,1] = np.percentile(eigvals_R, 95, axis=1)
-        mode_idx = np.where(eigvals>=eigvals_q[:,1]) # modes to retain
+        mode_idx = np.where(eigvals>=eigvals_q[:,1])[0] # modes to retain
     else:
         eigvals_q = None
 
@@ -482,7 +482,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
             raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
     elif trunc == 'kaiser':
         mval = np.median(eigvals) # median eigenvalues
-        mode_idx = np.where(eigvals>=mval)
+        mode_idx = np.where(eigvals>=mval)[0]
     elif trunc == 'var':
         mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0]+1)
     else:

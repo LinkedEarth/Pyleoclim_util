@@ -551,7 +551,7 @@ class Series:
 
         return res
 
-    def ssa(self, M=None, nMC=0, f=0.5, trunc = None, var_thresh=80):
+    def ssa(self, M=None, nMC=0, f=0.3, trunc = None, var_thresh=80):
         '''Singular Spectrum Analysis
 
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
@@ -566,7 +566,7 @@ class Series:
         MC : int, optional
             Number of iteration in the Monte-Carlo process. The default is 0.
         f : float, optional
-            maximum allowable fraction of missing values. The default is 0.5.
+            maximum allowable fraction of missing values. The default is 0.3.
         trunc : str
             if present, truncates the expansion to a level K < M owing to one of 3 criteria:
                 (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
