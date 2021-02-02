@@ -2891,9 +2891,9 @@ class MultipleSeries:
         The target time unit for every series in the list.
         If None, then no conversion will be applied;
         Otherwise, the time unit of every series in the list will be converted to the target.
-    
+
    name : str
-        name of the collection of timeseries (e.g. 'PAGES 2k ice cores')    
+        name of the collection of timeseries (e.g. 'PAGES 2k ice cores')
 
     Examples
     --------
@@ -3067,7 +3067,7 @@ class MultipleSeries:
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
-        
+
         elif method == 'gkernel':
             # Get the interpolated x-axis.
             ti = np.arange(start,stop,step)
@@ -3186,9 +3186,9 @@ class MultipleSeries:
 
     #     res = decomposition.mssa(data, M=M, MC=MC, f=f)
     #     return res
-    
+
     def equal_lengths(self):
-        ''' Test whether all series in object have equal length 
+        ''' Test whether all series in object have equal length
 
         Parameters
         ----------
@@ -3196,18 +3196,18 @@ class MultipleSeries:
 
         Returns
         -------
-        flag : boolean 
+        flag : boolean
         lengths : list containing the lengths of the series in object
         '''
-        
+
         lengths = []
-        for ts in self.series_list:  
+        for ts in self.series_list:
             lengths.append(len(ts.value))
-        
+
         L = lengths[0]
         r = lengths[1:]
         flag = all (l==L for l in r)
-        
+
         return flag, lengths
 
     def pca(self,nMC=200,**pca_kwargs):
@@ -3218,29 +3218,29 @@ class MultipleSeries:
 
         nMC : int
             number of Monte Carlo simulations
-         
+
         pca_kwargs : tuple
-            
+
 
         Returns
         -------
         res : dictionary containing:
-            
+
             - eigval : eigenvalues (nrec,)
             - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)
             - pcs  : PC series of all components (nrec, nt)
             - eofs : EOFs of all components (nrec, nrec)
-            
+
         References:
-        ----------    
-        Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene 
-        European speleothem δ18O records linked to North Atlantic Ocean circulation. 
-        Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8    
+        ----------
+        Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene
+        European speleothem δ18O records linked to North Atlantic Ocean circulation.
+        Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8
 
         See also
         --------
 
-        pyleoclim.core.ui.MultipleSeries.mssa: multi-channel SSA  
+        pyleoclim.core.ui.MultipleSeries.mssa: multi-channel SSA
 
         Examples
         --------
@@ -3257,14 +3257,14 @@ class MultipleSeries:
             for item in tslist:
                 mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
             ms = pyleo.MultipleSeries(mslist)
-            
+
             msc = ms.common_time()
 
             res = msc.pca(nMC=20)
-            
+
         '''
         flag, lengths = self.equal_lengths()
-        
+
         if flag==False:
             print('All Time Series should be of same length. Apply common_time() first')
         else: # if all series have equal length
@@ -3273,7 +3273,7 @@ class MultipleSeries:
             ys = np.empty((n,p))
             for j in range(p):
                 ys[:,j] = self.series_list[j].value
-                
+
         res = decomposition.mcpca(ys, nMC, **pca_kwargs)
         return res
 
@@ -3334,7 +3334,7 @@ class MultipleSeries:
         ms = ms.common_time(method = 'binning')
 
         return ms
-    
+
     def gkernel(self):
         ''' Aligns the time axes of a MultipleSeries object, via Gaussian kernel.
         This is critical for workflows that need to assume a common time axis
@@ -3391,7 +3391,7 @@ class MultipleSeries:
         ms = ms.common_time(method = 'gkernel')
 
         return ms
-    
+
     def interp(self, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via interpolation.
         This is critical for workflows that need to assume a common time axis
@@ -4972,13 +4972,17 @@ class Lipd:
 
         return new
 
-    def to_LipdSeries(self):
+    def to_LipdSeriesList(self):
         '''Extracts all LiPD timeseries objects to a list of LipdSeries objects
 
         Returns
         -------
         res : list
             A list of LiPDSeries objects
+
+        See also
+        --------
+        pyleoclim.ui.LipdSeries : LipdSeries object
 
         '''
         ts_list=lpd.extractTs(self.__dict__['lipd'])
@@ -4993,6 +4997,26 @@ class Lipd:
                 pass
 
         return res
+
+    def to_LipdSeries(self):
+        '''Extracts one timeseries from the Lipd object
+
+        Note that this function requires user interaction.
+
+        Returns
+        -------
+        ts : pyleoclim.LipdSeries
+            A LipdSeries object
+
+        See also
+        --------
+        pyleoclim.ui.LipdSeries : LipdSeries object
+
+        '''
+
+        ts_list = lpd.extractTs(self.__dict__['lipd'])
+        ts = LipdSeries(ts_list)
+        return ts
 
     def mapAllArchive(self, projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
