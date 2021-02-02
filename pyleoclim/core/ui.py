@@ -551,7 +551,7 @@ class Series:
 
         return res
 
-    def ssa(self, M=None, nMC=0, f=0.5, trunc = 'kaiser',var_thresh=80):
+    def ssa(self, M=None, nMC=0, f=0.5, trunc = None, var_thresh=80):
         '''Singular Spectrum Analysis
 
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.

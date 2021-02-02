@@ -681,9 +681,18 @@ class TestUISeriesSsa():
         t, v = gen_colored_noise(nt=500, alpha=1.0)
         ts = pyleo.Series(time=t, value=v)
         res = ts.ssa()
-
+        
     def test_ssa_t1(self):
-        '''Test Series.ssa() with Monte-Carlo option
+        '''Test Series.ssa() with var truncation
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts = pyleo.Series(time=t, value=v)
+        
+        res = ts.ssa(trunc='var')    
+
+    def test_ssa_t2(self):
+        '''Test Series.ssa() with Monte-Carlo truncation
         '''
 
         alpha = 1
@@ -691,6 +700,14 @@ class TestUISeriesSsa():
         ts = pyleo.Series(time=t, value=v)
         
         res = ts.ssa(M=60, nMC=10, trunc='mc-ssa')
+        
+    def test_ssa_t3(self):
+        '''Test Series.ssa() with Kaiser truncation
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts  = pyleo.Series(time=t, value=v)
+        res = ts.ssa(trunc='kaiser')
 
 class TestUiSeriesPlot:
     '''Test for Series.plot()

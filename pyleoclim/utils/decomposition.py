@@ -490,8 +490,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
 
     # compute reconstructed timeseries
     Np = N - M + 1
-    K = len(mode_idx)
-    RCmat = np.zeros((N, K))
+    RCmat = np.zeros((N, M))
     
     for im in range(M):
         xdum = np.dot(np.expand_dims(PC[:, im], axis=1), np.expand_dims(eigvecs[0:M, im], axis=0))
@@ -501,10 +500,10 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
             RCmat[n, im] = np.diagonal(xdum, offset=-(Np - 1 - n)).mean()
         del xdum            
 
-    RCmat = scale*(RCmat + np.tile(mu, reps=[N, K]))  # restore the mean
+    RCmat = scale*(RCmat + np.tile(mu, reps=[N, M]))  # restore the mean
     
     RCseries = RCmat[:,mode_idx].sum(axis=1)
 
     # export results
-    res = {'eigval': eigvals, 'eigvecs': eigvecs, 'PC': PC, 'RCseries': RCseries, 'RCmat': RCmat, 'pctvar': pctvar, 'eigvals_q': eigvals_q}
+    res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'PC': PC, 'RCseries': RCseries, 'RCmat': RCmat, 'pctvar': pctvar, 'eigvals_q': eigvals_q}
     return res
