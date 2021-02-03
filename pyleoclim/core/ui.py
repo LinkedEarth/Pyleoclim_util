@@ -1015,7 +1015,8 @@ class Series:
         Parameters
         ----------
         timespan : tuple or list
-            The timespan in form of [a, b], where a, b are two time points.
+            The timespan of the mean as the reference for anomaly calculation.
+            It is in form of [a, b], where a, b are two time points.
 
         Returns
         -------

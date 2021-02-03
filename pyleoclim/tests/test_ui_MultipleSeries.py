@@ -144,22 +144,23 @@ class TestMultipleSeriesBin:
     Testing if the bin function will place the series on the same time axis
     '''
 
-    t_0, v_0 = gen_colored_noise()
-    t_1, v_1 = gen_colored_noise()
+    def test_bin(self):
+        t_0, v_0 = gen_colored_noise()
+        t_1, v_1 = gen_colored_noise()
 
-    ts_0 = pyleo.Series(time = t_0, value = v_0)
-    ts_1 = pyleo.Series(time = t_1, value = v_1)
+        ts_0 = pyleo.Series(time = t_0, value = v_0)
+        ts_1 = pyleo.Series(time = t_1, value = v_1)
 
-    serieslist = [ts_0, ts_1]
+        serieslist = [ts_0, ts_1]
 
-    ts_M = pyleo.MultipleSeries(serieslist)
+        ts_M = pyleo.MultipleSeries(serieslist)
 
-    ts_M_bin = ts_M.bin()
+        ts_M_bin = ts_M.bin()
 
-    x_axis_0 = ts_M_bin.series_list[0].__dict__['time']
-    x_axis_1 = ts_M_bin.series_list[1].__dict__['time']
+        x_axis_0 = ts_M_bin.series_list[0].__dict__['time']
+        x_axis_1 = ts_M_bin.series_list[1].__dict__['time']
 
-    assert_array_equal(x_axis_0, x_axis_1)
+        assert_array_equal(x_axis_0, x_axis_1)
 
 class TestMultipleSeriesInterp:
     '''Test for MultipleSeries.interp()
@@ -167,22 +168,23 @@ class TestMultipleSeriesInterp:
     Testing if the interp function will place the series on the same time axis
     '''
 
-    t_0, v_0 = gen_colored_noise()
-    t_1, v_1 = gen_colored_noise()
+    def test_interp(self):
+        t_0, v_0 = gen_colored_noise()
+        t_1, v_1 = gen_colored_noise()
 
-    ts_0 = pyleo.Series(time = t_0, value = v_0)
-    ts_1 = pyleo.Series(time = t_1, value = v_1)
+        ts_0 = pyleo.Series(time = t_0, value = v_0)
+        ts_1 = pyleo.Series(time = t_1, value = v_1)
 
-    serieslist = [ts_0, ts_1]
+        serieslist = [ts_0, ts_1]
 
-    ts_M = pyleo.MultipleSeries(serieslist)
+        ts_M = pyleo.MultipleSeries(serieslist)
 
-    ts_M_interp = ts_M.interp()
+        ts_M_interp = ts_M.interp()
 
-    x_axis_0 = ts_M_interp.series_list[0].__dict__['time']
-    x_axis_1 = ts_M_interp.series_list[1].__dict__['time']
+        x_axis_0 = ts_M_interp.series_list[0].__dict__['time']
+        x_axis_1 = ts_M_interp.series_list[1].__dict__['time']
 
-    assert_array_equal(x_axis_0, x_axis_1)
+        assert_array_equal(x_axis_0, x_axis_1)
     
 class TestMultipleSeriesGkernel:
     '''Test for MultipleSeries.gkernel()
@@ -190,22 +192,23 @@ class TestMultipleSeriesGkernel:
     Testing the gkernel function will place the series on the same time axis
     '''
 
-    t_0, v_0 = gen_colored_noise()
-    t_1, v_1 = gen_colored_noise()
+    def test_gkernel(self):
+        t_0, v_0 = gen_colored_noise()
+        t_1, v_1 = gen_colored_noise()
 
-    ts_0 = pyleo.Series(time = t_0, value = v_0)
-    ts_1 = pyleo.Series(time = t_1, value = v_1)
+        ts_0 = pyleo.Series(time = t_0, value = v_0)
+        ts_1 = pyleo.Series(time = t_1, value = v_1)
 
-    serieslist = [ts_0, ts_1]
+        serieslist = [ts_0, ts_1]
 
-    ts_M = pyleo.MultipleSeries(serieslist)
+        ts_M = pyleo.MultipleSeries(serieslist)
 
-    ts_M_gkernel = ts_M.gkernel()
+        ts_M_gkernel = ts_M.gkernel()
 
-    x_axis_0 = ts_M_gkernel.series_list[0].__dict__['time']
-    x_axis_1 = ts_M_gkernel.series_list[1].__dict__['time']
+        x_axis_0 = ts_M_gkernel.series_list[0].__dict__['time']
+        x_axis_1 = ts_M_gkernel.series_list[1].__dict__['time']
 
-    assert_array_equal(x_axis_0, x_axis_1)    
+        assert_array_equal(x_axis_0, x_axis_1)    
 
 class TestMultipleSeriesPca:
     '''Test for MultipleSeries.pca()
@@ -213,23 +216,44 @@ class TestMultipleSeriesPca:
     Testing the PCA function 
     '''
 
-    p = 20
-    x = np.random.randn(100)[:, None]
-    x = x + np.random.randn(100, p)
-    pc = PCA(x, ncomp=p, missing= None)
+    def test_pca(self):
+        p = 20
+        x = np.random.randn(100)[:, None]
+        x = x + np.random.randn(100, p)
+        pc = PCA(x, ncomp=p, missing= None)
     
-    t = np.arange(100)
+        t = np.arange(100)
     
-    mslist = []
-    for i in range(p):
-        mslist.append(pyleo.Series(time = t, value = x[:,i]))
-    ms = pyleo.MultipleSeries(mslist)
-            
-    #res = ms.pca(nMC=20, missing='fill-em', standardize=False)
-    res = ms.pca(nMC=20)
+        mslist = []
+        for i in range(p):
+            mslist.append(pyleo.Series(time = t, value = x[:,i]))
+        ms = pyleo.MultipleSeries(mslist)
+
+        #res = ms.pca(nMC=20, missing='fill-em', standardize=False)
+        res = ms.pca(nMC=20)
+    
+        # assert what?
+        assert_array_equal(pc.eigenvals, res['eigvals'])    
 
     
-    # assert what?
-    assert_array_equal(pc.eigenvals, res['eigvals'])    
+class TestMultipleSeriesCommonTime:
+    '''Test for MultipleSeries.common_time()
+    '''
+    @pytest.mark.parametrize('method', ['binning', 'interp', 'gkernel'])
+    def test_common_time(self, method):
+        t_0, v_0 = gen_colored_noise()
+        t_1, v_1 = gen_colored_noise()
 
-    
+        ts_0 = pyleo.Series(time = t_0, value = v_0)
+        ts_1 = pyleo.Series(time = t_1, value = v_1)
+
+        serieslist = [ts_0, ts_1]
+
+        ts_M = pyleo.MultipleSeries(serieslist)
+
+        ts_M_ct = ts_M.common_time(method=method)
+
+        x_axis_0 = ts_M_ct.series_list[0].time
+        x_axis_1 = ts_M_ct.series_list[1].time
+
+        assert_array_equal(x_axis_0, x_axis_1)
