@@ -33,7 +33,7 @@ setup(
         "matplotlib>=3.3.1",
         "scipy>=1.5.0",
         "statsmodels>=0.11.1",
-        "seaborn>=0.10.1",
+        "seaborn>=0.11",
         "scikit-learn>=0.23.1",
         "pathos>=0.2.6",
         "tqdm>=4.47.0",
@@ -46,5 +46,5 @@ setup(
         "PyWavelets>=1.1.1",
         "Unidecode>=1.1.1"
     ],
-    python_requires=">=3.8.0"
+    python_requires=">=3.8.0, <3.9"
 )
