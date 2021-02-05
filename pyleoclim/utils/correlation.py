@@ -20,6 +20,7 @@ from scipy.stats import t as stu
 from scipy.stats import gaussian_kde
 import statsmodels.api as sm
 from sklearn import preprocessing
+from .tsmodel import ar1_fit_evenly
 
 
 def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
@@ -207,8 +208,8 @@ def corr_ttest(y1, y2, alpha=0.05):
     """
     r = pearsonr(y1, y2)[0]
 
-    g1 = sm_ar1_fit(y1)
-    g2 = sm_ar1_fit(y2)
+    g1 = ar1_fit_evenly(y1)
+    g2 = ar1_fit_evenly(y2)
 
     N = np.size(y1)
 
@@ -336,33 +337,12 @@ def isopersistent_rn(X, p):
     n = np.size(X)
     sig = np.std(X, ddof=1)
 
-    g = sm_ar1_fit(X)
+    g = ar1_fit_evenly(X)
     #  red = red_noise(N, M, g)
     red = sm_ar1_sim(n, p, g, sig)
 
     return red, g
 
-def sm_ar1_fit(ys):
-    ''' Return the lag-1 autocorrelation from ar1 fit using statsmodels.
-
-    Parameters
-    ----------
-
-    ys : array
-        vector of (real) numbers as a time series
-
-    Returns
-    -------
-
-    g :float
-        lag-1 autocorrelation coefficient
-    '''
-
-
-    ar1_mod = sm.tsa.AR(ys, missing='drop').fit(maxlag=1)
-    g = ar1_mod.params[1]
-
-    return g
 
 def sm_ar1_sim(n, p, g, sig):
     ''' Produce p realizations of an AR1 process of length n with lag-1 autocorrelation g using statsmodels

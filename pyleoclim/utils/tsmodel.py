@@ -77,8 +77,7 @@ def ar1_fit(y, t=None):
     '''
 
     if is_evenly_spaced(t):
-        #  g = ar1_fit_evenly(y, t, detrend=detrend, params=params)
-        g = ar1_fit_evenly(y, t)
+        g = ar1_fit_evenly(y)
     else:
         #  g = tau_estimation(y, t, detrend=detrend, params=params)
         g = tau_estimation(y, t)
@@ -121,7 +120,7 @@ def ar1_sim(y, p, t=None):
 
     sig = np.std(y)
     if is_evenly_spaced(t):
-        g = ar1_fit_evenly(y, t=t)
+        g = ar1_fit_evenly(y)
 
         # specify model parameters (statmodel want lag0 coefficent as unity)
         ar = np.r_[1, -g]  # AR model parameter
@@ -146,15 +145,13 @@ def ar1_sim(y, p, t=None):
 
     return ysim
 
-def ar1_fit_evenly(y, t):
+def ar1_fit_evenly(y):
     ''' Returns the lag-1 autocorrelation from AR(1) fit.
 
     Parameters
     ----------
     y : array
         vector of (float) numbers as a time series
-    t : array
-        The time axis for the timeseries.
 
     Returns
     -------
