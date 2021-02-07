@@ -24,8 +24,8 @@ from copy import deepcopy
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter, MaxNLocator
 import matplotlib.transforms as transforms
 from matplotlib import cm
-import matplotlib.pylab as pl
 from matplotlib import gridspec
+import matplotlib as mpl
 #from matplotlib.colors import BoundaryNorm, Normalize
 
 from tqdm import tqdm
@@ -3707,20 +3707,6 @@ class MultipleSeries:
         else:
             return ax
 
-    # def stackplot(self, figsize=None, xlabel=None, ylabel=None,
-    #           xlim=None, ylim=None, title=None,
-    #           savefig_settings=None, ax=None, style=None,
-    #           plot_kwargs=None, mute=False,color=None):
-    #     x = []
-    #     y = []
-    #     for s in self.series_list:
-    #         x.append(s.time)
-    #         y.append(s.value)
-    #     color = pl.cm.jet(np.linspace(0.3, 1, len(x)))
-    #     fig,ax = plotting.stackplot(x,y,figsize=figsize,color=color,xlabel=xlabel,
-    #                                 ylabel=ylabel,title=title,plot_kwargs=plot_kwargs,
-    #                                 savefig_settings=savefig_settings,ax=ax,mute=mute)
-    #     return fig,ax
 
     def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None,
                   spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
@@ -3764,6 +3750,7 @@ class MultipleSeries:
         fig, ax
         '''
         plt.ioff()
+        current_style = deepcopy(mpl.rcParams)
         plotting.set_style('journal', font_scale=font_scale)
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
@@ -3862,6 +3849,9 @@ class MultipleSeries:
             plotting.savefig(fig, settings=savefig_settings)
         else:
             plotting.showfig(fig)
+
+        # reset the plotting style
+        mpl.rcParams.update(current_style)
         return fig, ax
 
 class SurrogateSeries(MultipleSeries):
