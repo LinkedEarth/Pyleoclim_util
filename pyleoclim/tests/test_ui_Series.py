@@ -536,6 +536,35 @@ class TestUISeriesOutliers:
         # Remove outliers
         ts_out = ts.outliers(remove=remove_outliers, mute=True)
 
+class TestUISeriesGkernel():
+    ''' Unit tests for the TestUISeriesGkernel function
+    '''
+    def test_interp_t1(self):
+        ''' Test the gkernel function with default parameter values'''
+
+        t, v = gen_colored_noise(nt=550, alpha=1.0)
+        # randomly remove some data pts
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts_interp=ts.gkernel()
+
+    def test_interp_t2(self):
+        ''' Test the gkernel function with specified bandwidth'''
+
+        t, v = gen_colored_noise(nt=550, alpha=1.0)
+        # randomly remove some data pts
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts_interp=ts.gkernel(h=15)
+
 
 class TestUISeriesInterp():
     ''' Unit tests for the interpolation function
@@ -670,7 +699,7 @@ class TestUISeriesWavelet():
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 20)
         scal = ts.wavelet(method=wave_method, settings={'freq': freq})
-        
+
 class TestUISeriesSsa():
     ''' Test the SSA functionalities
     '''
@@ -681,15 +710,15 @@ class TestUISeriesSsa():
         t, v = gen_colored_noise(nt=500, alpha=1.0)
         ts = pyleo.Series(time=t, value=v)
         res = ts.ssa()
-        
+
     def test_ssa_t1(self):
         '''Test Series.ssa() with var truncation
         '''
         alpha = 1
         t, v = gen_colored_noise(nt=500, alpha=1.0)
         ts = pyleo.Series(time=t, value=v)
-        
-        res = ts.ssa(trunc='var')    
+
+        res = ts.ssa(trunc='var')
 
     def test_ssa_t2(self):
         '''Test Series.ssa() with Monte-Carlo truncation
@@ -698,9 +727,9 @@ class TestUISeriesSsa():
         alpha = 1
         t, v = gen_colored_noise(nt=500, alpha=1.0)
         ts = pyleo.Series(time=t, value=v)
-        
+
         res = ts.ssa(M=60, nMC=10, trunc='mc-ssa')
-        
+
     def test_ssa_t3(self):
         '''Test Series.ssa() with Kaiser truncation
         '''

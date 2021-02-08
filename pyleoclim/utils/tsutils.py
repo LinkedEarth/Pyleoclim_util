@@ -92,7 +92,7 @@ def simple_stats(y, axis=None):
     min_ = np.nanmin(y, axis=axis)
     max_ = np.nanmax(y, axis=axis)
     IQR = np.nanpercentile(y, 75, axis=axis) - np.nanpercentile(y, 25, axis=axis)
-    
+
     return mean, median, min_, max_, std, IQR
 
 
@@ -172,36 +172,36 @@ def bin(x, y, bin_size=None, start=None, end=None):
 def gkernel(t,y,tc, h = 11):
     '''
     Coarsen time resolution using a Gaussian kernel
-    
+
     TODO: adaptive choice of e-folding scale
-    
+
     Parameters
     ----------
     t  : 1d array; the original time axis
     y  : 1d array; values on the original time axis
     tc : 1d array; the coarse time axis
-    h  : scalar;  kernel e-folding scale 
-    
+    h  : scalar;  kernel e-folding scale
+
     Returns
-    -------    
+    -------
     yc: The  upscaled time series
-    
+
     References
     ----------
-    
+
     Rehfeld, K., Marwan, N., Heitzig, J., and Kurths, J.: Comparison of correlation analysis
-    techniques for irregularly sampled time series, Nonlin. Processes Geophys., 
+    techniques for irregularly sampled time series, Nonlin. Processes Geophys.,
     18, 389–404, https://doi.org/10.5194/npg-18-389-2011, 2011.
     '''
-    
+
     if len(t) != len(y):
         raise ValueError('y and t must have the same length')
-    
-    kernel = lambda x, s : 1.0/np.sqrt(2*np.pi*s)*np.exp(-x**2/(2*s**2))  # define kernel function
-    
+
+    kernel = lambda x, s : 1.0/(s*np.sqrt(2*np.pi))*np.exp(-0.5*(x/s)**2)  # define kernel function
+
     yc    = np.zeros((len(tc)))
     yc[:] = np.nan
-    
+
     for i in range(len(tc)-1):
         xslice = t[(t>=tc[i])&(t<tc[i+1])]
         yslice = y[(t>=tc[i])&(t<tc[i+1])]
@@ -212,22 +212,22 @@ def gkernel(t,y,tc, h = 11):
             yc[i]  = sum(weight*yslice)/sum(weight)
         else:
             yc[i] = np.nan
-            
+
     return yc
-      
+
 
 def grid_properties(x,method='median'):
     ''' Establishes the grid properties of a numerical array:
-        start, stop, and representative step. 
-             
+        start, stop, and representative step.
+
     Parameters
     ----------
     x : array
-    
+
     method : str
         Method to obtain a representative step if x is not evenly spaced.
-        Valid entries: 'median' [default] or 'mean'
-       
+        Valid entries: 'median' [default], 'mean' or 'max'
+
     Returns
     -------
     start : float
@@ -235,17 +235,19 @@ def grid_properties(x,method='median'):
     stop : float
         max(x)
     step : float
-        The representative spacing between consecutive values 
+        The representative spacing between consecutive values
     '''
     start = np.nanmin(x)
     stop = np.nanmax(x)
-    
+
     delta = np.diff(x)
     if method == 'mean':
         step = delta.mean()
+    elif method == 'max':
+        step = delta.max()
     else:
         step = np.median(delta)
-    
+
     return start, stop, step
 
 
@@ -308,7 +310,7 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **kw
 
 def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None, end=None):
     """Places two timeseries on a common axis
-    
+
     Note this function assumes that the time representation and units are the same (e.g., BP vs CE)
 
     Parameters
@@ -324,7 +326,7 @@ def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=No
     method : str
         Which method to use to get the timeseries on the same x axis.
         Valid entries: 'interpolation' (default, linear interpolation),
-        'bin', 'None'. 'None' only cuts the timeseries to the common 
+        'bin', 'None'. 'None' only cuts the timeseries to the common
         period but does not attempt to generate a common time axis
     step : float
         The interpolation step. Default is mean resolution
@@ -420,11 +422,11 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
 
     1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
     2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
-    
+
     See also
     --------
-    
-    pyleoclim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending. 
+
+    pyleoclim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending.
 
     """
     x = np.asanyarray(x)
@@ -634,7 +636,7 @@ def reduce_duplicated_timestamps(ys, ts):
         ys = np.array(ys)
 
         print('Duplicated timestamps has been reduced by averaging values!')
-        
+
     return ys, ts
 
 def annualize(ys, ts):
@@ -679,19 +681,19 @@ def gaussianize(X):
     """ Transforms a (proxy) timeseries to a Gaussian distribution.
 
     Originator: Michael Erb, Univ. of Southern California - April 2017
-    
+
     Parameters
     ----------
-    
+
     X : array
         Values for the timeseries.
-    
+
     Returns
     -------
-    
+
     Xn : array
         Gaussianized timseries
-    
+
     """
 
     # Give every record at least one dimensions, or else the code will crash.
@@ -714,18 +716,18 @@ def gaussianize_single(X_single):
     """ Transforms a single (proxy) timeseries to Gaussian distribution.
 
     Originator: Michael Erb, Univ. of Southern California - April 2017
-    
+
     Parameters
     ----------
-    
+
     X_single : 1D Array
         A single timeseries
-        
+
     Returns
     -------
-    
+
     Xn_single : Gaussianized values for a single timeseries.
-    
+
     """
     # Count only elements with data.
 
@@ -777,8 +779,8 @@ def detrend(y, x = None, method = "emd", sg_kwargs = None):
     --------
 
     pylecolim.utils.filter.savitzky_golay : Filtering using Savitzy-Golay
-    
-    pylecolim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending. 
+
+    pylecolim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending.
 
     """
     y = np.array(y)
@@ -822,13 +824,13 @@ def detrend(y, x = None, method = "emd", sg_kwargs = None):
 
 def distance_neighbors(signal):
     '''Finds Distance of each point in the timeseries from its 4 nearest neighbors
-       
+
        Parameters
        ----------
-       
+
        signal : array
            The timeseries
-               
+
        Returns
        -------
        distances : array
@@ -842,16 +844,16 @@ def distance_neighbors(signal):
 
 def find_knee(distances):
     '''Finds knee point automatically in a given array sorted in decreasing order
-    
+
        Parameters
        ----------
-       
+
        distances : array
                   Distance of each point in the timeseries from it's nearest neighbors in decreasing order
-      
+
        Returns
        -------
-       
+
       knee : float
             knee point in the array
     '''
@@ -903,16 +905,16 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
 
        outliers : array
                    a list of values consisting of outlier indices
-                   
+
        See also
        --------
-       
+
        pylecolim.utils.tsutils.distance_neighbors : Finds Distance of each point in the timeseries from its 4 nearest neighbors
-       
-       pylecolim.utils.tsustils.find_knee : Finds knee point automatically in a given array sorted in decreasing order  
-       
+
+       pylecolim.utils.tsustils.find_knee : Finds knee point automatically in a given array sorted in decreasing order
+
        pylecolim.utils.tsutils.remove_outliers : Removes outliers from a timeseries
-       
+
        '''
     #Take care of arguments for the knee plot
     saveknee_settings = {} if saveknee_settings is None else saveknee_settings.copy()
@@ -979,7 +981,7 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
 
 def remove_outliers(ts,ys,outlier_points):
     ''' Removes outliers from a timeseries
-    
+
     Parameters
     ----------
 
@@ -996,10 +998,10 @@ def remove_outliers(ts,ys,outlier_points):
         y axis of timeseries
     ts : array
           x axis of timeseries
-          
+
     See also
     --------
-    
+
     pylecolim.utils.tsutils.detect_outliers : Function to detect outliers in the given timeseries
     '''
 

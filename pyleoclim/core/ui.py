@@ -573,7 +573,7 @@ class Series:
                 (2) 'mc-ssa': Monte-Carlo SSA (use modes above the 95% threshold)
                 (3) 'var': first K modes that explain at least var_thresh % of the variance.
             Default is None, which bypasses truncation (K = M)
-            
+
         var_thresh : float
             variance threshold for reconstruction (only impcatful if trunc is set to 'var')
 
@@ -1912,7 +1912,7 @@ class Series:
         return new
 
     def interp(self, method='linear', **kwargs):
-        '''Interpolate a time series onto  a new  time axis
+        '''Interpolate a Series object onto  a new  time axis
 
         Parameters
         ----------
@@ -1941,12 +1941,42 @@ class Series:
         new.value = v_mod
         return new
 
-    def bin(self,**kwargs):
-        '''Bin values in a time series
+    def gkernel(self,**kwargs):
+        ''' Coarse-grain a Series object via a Gaussian kernel.
 
         Parameters
         ----------
 
+        kwargs :
+            Arguments for kernel function. See pyleoclim.utils.tsutils.gkernel for details
+
+        Returns
+        -------
+
+        new : pyleoclim.Series
+            The coarse-grained Series object
+
+        See also
+        --------
+
+        pyleoclim.utils.tsutils.gkernel : application of a Gaussian kernel
+
+        '''
+        new=self.copy()
+
+        start, stop, step = tsutils.grid_properties(self.time, method='max')
+
+        ti = np.arange(start,stop,step) # generate new axis
+        vi = tsutils.gkernel(self.time,self.value,ti,**kwargs) # apply kernel
+        new.time = ti
+        new.value = vi
+        return new
+
+    def bin(self,**kwargs):
+        '''Bin a _Series_' values on an evenly-spaced time axis
+
+        Parameters
+        ----------
 
         kwargs :
             Arguments for binning function. See pyleoclim.utils.tsutils.bin for details
@@ -1969,6 +1999,8 @@ class Series:
         new.time = res_dict['bins']
         new.value = res_dict['binned_values']
         return new
+
+
 
 class PSD:
     '''PSD object obtained from spectral analysis.
@@ -3057,11 +3089,11 @@ class MultipleSeries:
         # define parameters for common time axis
         start = gp[:,0].max()
         stop  = gp[:,1].min()
-        step  = gp[:,2].mean()
 
         ms = self.copy()
 
         if method == 'binning':
+            step  = gp[:,2].mean()
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
                 d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop)
@@ -3070,6 +3102,7 @@ class MultipleSeries:
                 ms.series_list[idx] = ts
 
         elif method == 'interp':
+            step  = gp[:,2].mean()
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
                 ti, vi = tsutils.interp(ts.time, ts.value, interp_type='linear', interp_step=step, start=start, end=stop,**kwargs)
@@ -3078,11 +3111,12 @@ class MultipleSeries:
                 ms.series_list[idx] = ts
 
         elif method == 'gkernel':
+            step  = gp[:,2].max()
             # Get the interpolated x-axis.
             ti = np.arange(start,stop,step)
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                vi = tsutils.gkernel(ts.time,ts.value,ti, h = 11)
+                vi = tsutils.gkernel(ts.time,ts.value,ti)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
@@ -3373,7 +3407,7 @@ class MultipleSeries:
 
         pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
 
-        pyleoclim.utils.tsutils.gkernel: Underlying binning function
+        pyleoclim.utils.tsutils.gkernel: Underlying function
 
 
         Examples
