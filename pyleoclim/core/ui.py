@@ -1941,11 +1941,13 @@ class Series:
         new.value = v_mod
         return new
 
-    def gkernel(self,**kwargs):
+    def gkernel(self, step_type = 'median', **kwargs):
         ''' Coarse-grain a Series object via a Gaussian kernel.
 
         Parameters
         ----------
+        step_type : str
+            type of timestep: 'mean', 'median', or 'max' of the time increments
 
         kwargs :
             Arguments for kernel function. See pyleoclim.utils.tsutils.gkernel for details
@@ -1964,7 +1966,7 @@ class Series:
         '''
         new=self.copy()
 
-        start, stop, step = tsutils.grid_properties(self.time, method='max')
+        start, stop, step = tsutils.grid_properties(self.time, method=step_type)
 
         ti = np.arange(start,stop,step) # generate new axis
         vi = tsutils.gkernel(self.time,self.value,ti,**kwargs) # apply kernel

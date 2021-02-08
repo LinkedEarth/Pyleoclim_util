@@ -169,7 +169,7 @@ def bin(x, y, bin_size=None, start=None, end=None):
     return  res_dict
 
 
-def gkernel(t,y,tc, h = 11):
+def gkernel(t,y,tc, h = 3):
     '''
     Coarsen time resolution using a Gaussian kernel
 
