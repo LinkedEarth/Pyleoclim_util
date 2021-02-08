@@ -3717,7 +3717,7 @@ class MultipleSeries:
         ----------
         figsize : list
             Size of the figure.
-        colors : str, or list of str
+        colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
             Colors for plotting.
             If None, the plotting will cycle the 'tab10' colormap;
             if only one color is specified, then all curves will be plotted with that single color;
@@ -3782,6 +3782,8 @@ class MultipleSeries:
             elif type(colors) is list:
                 nc = len(colors)
                 clr = colors[idx%nc]
+            else:
+                raise TypeError('"colors" should be a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)')
 
             bottom -= height*v_shift_factor
             ax[idx] = fig.add_axes([left, bottom, width, height])
