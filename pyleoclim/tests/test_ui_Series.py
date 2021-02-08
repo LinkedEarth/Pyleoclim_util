@@ -19,6 +19,10 @@ from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
 
 import pytest
+import scipy.io as sio
+import os
+import pathlib
+test_dirpath = pathlib.Path(__file__).parent.absolute()
 
 import pyleoclim as pyleo
 from pyleoclim.utils.tsmodel import (
@@ -183,7 +187,7 @@ class TestUiSeriesSpectral:
         beta = psd.beta_est()['beta']
         assert np.abs(beta-alpha) < eps
 
-    def test_spectral_t5(self, eps=0.3):
+    def test_spectral_t5(self, eps=0.6):
         ''' Test Series.spectral() with WWZ with specified frequency vector passed via `settings`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
@@ -191,7 +195,7 @@ class TestUiSeriesSpectral:
         Also, we give `label` a test.
         '''
         alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=alpha)
+        t, v = gen_colored_noise(nt=1000, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 20)
         psd = ts.spectral(method='wwz', settings={'freq': freq}, label='WWZ')
@@ -460,6 +464,35 @@ class TestUiSeriesCorrelation:
         r = corr_res['r']
         assert np.abs(r-0) < eps
 
+    @pytest.mark.parametrize('corr_method', ['ttest', 'isopersistent', 'isospectral'])
+    def test_correlation_t2(self, corr_method, eps=0.1):
+        ''' Test correlation between two series with inconsistent time axis
+        '''
+        data = sio.loadmat(os.path.join(test_dirpath, '../../example_data/wtc_test_data_nino.mat'))
+        nino = data['nino'][:, 0]
+        air  = data['air'][:, 0]
+        t = data['datayear'][:, 0]
+
+        # randomly delete 500 data pts
+        n_del = 500
+        deleted_idx_air = np.random.choice(range(np.size(t)), n_del, replace=False)
+        deleted_idx_nino = np.random.choice(range(np.size(t)), n_del, replace=False)
+        air_value_unevenly =  np.delete(air, deleted_idx_air)
+        air_time_unevenly =  np.delete(t, deleted_idx_air)
+        nino_value_unevenly =  np.delete(nino, deleted_idx_nino)
+        nino_time_unevenly =  np.delete(t, deleted_idx_nino)
+
+        ts1_evenly = pyleo.Series(time=t, value=air)
+        ts2_evenly = pyleo.Series(time=t, value=nino)
+        corr_res_evenly = ts1_evenly.correlation(ts2_evenly, settings={'method': corr_method})
+        r_evenly = corr_res_evenly['r']
+
+        ts1 = pyleo.Series(time=air_time_unevenly, value=air_value_unevenly)
+        ts2 = pyleo.Series(time=nino_time_unevenly, value=nino_value_unevenly)
+
+        corr_res = ts1.correlation(ts2, settings={'method': corr_method}, common_time_kwargs={'method': 'interp'})
+        r = corr_res['r']
+        assert np.abs(r-r_evenly) < eps
 
 class TestUiSeriesCausality:
     ''' Test Series.causality()
@@ -637,7 +670,44 @@ class TestUISeriesWavelet():
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 20)
         scal = ts.wavelet(method=wave_method, settings={'freq': freq})
+        
+class TestUISeriesSsa():
+    ''' Test the SSA functionalities
+    '''
 
+    def test_ssa_t0(self):
+        ''' Test Series.ssa() with available methods using default arguments
+        '''
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts = pyleo.Series(time=t, value=v)
+        res = ts.ssa()
+        
+    def test_ssa_t1(self):
+        '''Test Series.ssa() with var truncation
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts = pyleo.Series(time=t, value=v)
+        
+        res = ts.ssa(trunc='var')    
+
+    def test_ssa_t2(self):
+        '''Test Series.ssa() with Monte-Carlo truncation
+        '''
+
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts = pyleo.Series(time=t, value=v)
+        
+        res = ts.ssa(M=60, nMC=10, trunc='mc-ssa')
+        
+    def test_ssa_t3(self):
+        '''Test Series.ssa() with Kaiser truncation
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts  = pyleo.Series(time=t, value=v)
+        res = ts.ssa(trunc='kaiser')
 
 class TestUiSeriesPlot:
     '''Test for Series.plot()
@@ -664,7 +734,7 @@ class TestUiSeriesPlot:
 class TestSeriesDistplot:
     '''Test for Series.distplot()'''
 
-    def test_distplot(self, max_axis = 5):
+    def test_distplot_t0(self, max_axis = 5):
         t, v = gen_normal()
 
         ts = pyleo.Series(time = t, value = v)
@@ -677,3 +747,12 @@ class TestSeriesDistplot:
         y_plot = line.get_ydata()
 
         assert max(x_plot) < max_axis
+    
+    def test_distplot_t1(self, vertical = True):
+        t, v = gen_normal()
+
+        ts = pyleo.Series(time = t, value = v)
+
+        fig, ax = ts.distplot(vertical=vertical, mute=True)
+
+        

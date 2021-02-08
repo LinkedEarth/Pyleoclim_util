@@ -5603,7 +5603,7 @@ class LipdSeries(Series):
         plt_kwargs : dict, optional
             Optional arguments for the timeseries plot. See Series.plot(). The default is None.
         distplt_kwargs : dict, optional
-            Optional arguments for the distribution plot. See Series.displot(). The default is None.
+            Optional arguments for the distribution plot. See Series.distplot(). The default is None.
         spectral_kwargs : dict, optional
             Optional arguments for the spectral method. Default is to use Lomb-Scargle method. See Series.spectral(). The default is None.
         spectralsignif_kwargs : dict, optional
