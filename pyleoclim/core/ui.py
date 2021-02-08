@@ -26,7 +26,6 @@ import matplotlib.transforms as transforms
 from matplotlib import cm
 from matplotlib import gridspec
 import matplotlib as mpl
-#from matplotlib.colors import BoundaryNorm, Normalize
 
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
@@ -3744,7 +3743,7 @@ class MultipleSeries:
             return ax
 
 
-    def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None,
+    def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
                   spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
         ''' Stack plot of multiple series
 
@@ -3758,6 +3757,11 @@ class MultipleSeries:
             If None, the plotting will cycle the 'tab10' colormap;
             if only one color is specified, then all curves will be plotted with that single color;
             if a list of colors are specified, then the plotting will cycle that color list.
+        cmap : str
+            The colormap to use when "colors" is None.
+        norm : matplotlib.colors.Normalize like
+            The nomorlization for the colormap.
+            If None, a linear normalization will be used.
         savefig_settings : dictionary
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -3811,8 +3815,16 @@ class MultipleSeries:
         bottom = 1
         for idx, ts in enumerate(self.series_list):
             if colors is None:
-                cmap_obj = plt.get_cmap('tab10')
-                clr = cmap_obj(idx%10)
+                cmap_obj = plt.get_cmap(cmap)
+                if hasattr(cmap_obj, 'colors'):
+                    nc = len(cmap_obj.colors)
+                else:
+                    nc = len(self.series_list)
+
+                if norm is None:
+                    norm = mpl.colors.Normalize(vmin=0, vmax=nc-1)
+
+                clr = cmap_obj(norm(idx%nc))
             elif type(colors) is str:
                 clr = colors
             elif type(colors) is list:
