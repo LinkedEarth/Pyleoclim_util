@@ -12,6 +12,7 @@ import numpy as np
 from scipy import signal
 import nitime.algorithms as nialg
 import collections
+import warnings
 
 __all__ = [
     'wwz_psd',
@@ -33,7 +34,7 @@ from .wavelet import (
     wwz,
     wwa2psd,
 )
-#from .tsutils import clean_ts, interp, bin_values
+#from .tsutils import clean_ts, interp, bin
 
 #-----------
 #Wrapper
@@ -133,29 +134,6 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
     References
     ----------
     P. Welch, “The use of the fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms”, IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.
-
-    Examples
-    --------
-
-    .. plot::
-        :context: close-figs
-
-        >>> from pyleoclim import utils
-        >>> import matplotlib.pyplot as plt
-        >>> import numpy as np
-        >>> # Create a signal
-        >>> time = np.arange(2001)
-        >>> f = 1/50
-        >>> signal = np.cos(2*np.pi*f*time)
-        >>> # Spectral Analysis
-        >>> res = utils.welch(signal, time)
-        >>> # plot
-        >>> fig = plt.loglog(
-        ...           res['freq'],
-        ...           res['psd'])
-        >>> plt.xlabel('Frequency')
-        >>> plt.ylabel('PSD')
-        >>> plt.show()
 
     '''
 
@@ -267,29 +245,6 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
     pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
     pyleoclim.utils.tsutils.detrend : Detrending method
-
-    Examples
-    --------
-
-    .. plot::
-        :context: close-figs
-
-        >>> from pyleoclim import utils
-        >>> import matplotlib.pyplot as plt
-        >>> import numpy as np
-        >>> # Create a signal
-        >>> time = np.arange(2001)
-        >>> f = 1/50
-        >>> signal = np.cos(2*np.pi*f*time)
-        >>> # Spectral Analysis
-        >>> res = utils.mtm(signal, time)
-        >>> # plot
-        >>> fig = plt.loglog(
-        ...           res['freq'],
-        ...           res['psd'])
-        >>> plt.xlabel('Frequency')
-        >>> plt.ylabel('PSD')
-        >>> plt.show()
 
     '''
     # preprocessing
@@ -431,28 +386,6 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
     Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.
 
-    Examples
-    --------
-
-    .. plot::
-        :context: close-figs
-
-        >>> from pyleoclim import utils
-        >>> import matplotlib.pyplot as plt
-        >>> import numpy as np
-        >>> # Create a signal
-        >>> time = np.arange(2001)
-        >>> f = 1/50
-        >>> signal = np.cos(2*np.pi*f*time)
-        >>> # Spectral Analysis
-        >>> res = utils.lomb_scargle(signal, time)
-        >>> # plot
-        >>> fig = plt.loglog(
-        ...           res['freq'],
-        ...           res['psd'])
-        >>> plt.xlabel('Frequency')
-        >>> plt.ylabel('PSD')
-        >>> plt.show()
     """
     ts = np.array(ts)
     ys = np.array(ys)
@@ -473,7 +406,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     # divide into segments
     nseg=int(np.floor(2*len(ts)/(n50+1)))
     index=np.array(np.arange(0,len(ts),nseg/2),dtype=int)
-    index[-1]=len(ts) #make it ends at the time series
+    index=np.append(index,len(ts)) #make it ends at the time series
 
     ts_seg=[]
     ys_seg=[]
@@ -499,17 +432,12 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
     freq_angular = 2 * np.pi * freq
 
-    # fix the zero frequency point
-    #if freq[0] == 0:
-        #freq_copy = freq[1:]
-        #freq_angular = 2 * np.pi * freq_copy
-
     psd_seg=[]
 
     for idx,item in enumerate(ys_seg):
         psd_seg.append(signal.lombscargle(ts_seg[idx],
                                           item*signal.get_window(window,len(ts_seg[idx])),
-                                          freq_angular))
+                                          freq_angular)*2*np.pi)
 
     # average them up
     if average=='mean':
@@ -519,8 +447,27 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     else:
         raise ValueError('Average should either be set to mean or median')
 
-    #if freq[0] == 0:
-        #psd = np.insert(psd, 0, np.nan)
+    # Fix possible problems at the edge
+    if psd[0]<psd[1]:    
+        if abs(1-abs(psd[1]-psd[0])/psd[1])<1.e-2:
+            warnings.warn("Unstability at the beginning of freq vector, removing point")
+            psd=psd[1:]
+            freq=freq[1:]
+    else:
+        if abs(1-abs(psd[0]-psd[1])/psd[0])<1.e-2:
+            warnings.warn("Unstability at the beginning of freq vector, removing point")
+            psd=psd[1:]
+            freq=freq[1:]
+    if psd[-1]>psd[-2]:
+        if abs(1-abs(psd[-1]-psd[-2])/psd[-1])<1.e-2:
+            warnings.warn("Unstability at the end of freq vector, removing point")
+            psd=psd[0:-2]
+            freq=freq[0:-2]
+    else:
+        if abs(1-abs(psd[-2]-psd[-1])/psd[-2])<1.e-2:
+            warnings.warn("Unstability at the end of freq vector, removing point")
+            psd=psd[0:-2]
+            freq=freq[0:-2]
 
     # output result
     res_dict = {
@@ -607,30 +554,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
     pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
     pyleoclim.utils.tsutils.detrend : Detrending method
-
-    Examples
-    --------
-
-    .. plot::
-        :context: close-figs
-
-        >>> from pyleoclim import utils
-        >>> import matplotlib.pyplot as plt
-        >>> import numpy as np
-        >>> # Create a signal
-        >>> time = np.arange(2001)
-        >>> f = 1/50
-        >>> signal = np.cos(2*np.pi*f*time)
-        >>> # Spectral Analysis
-        >>> res = utils.periodogram(signal, time)
-        >>> # plot
-        >>> fig = plt.loglog(
-        ...           res['freq'],
-        ...           res['psd'])
-        >>> plt.xlabel('Frequency')
-        >>> plt.ylabel('PSD')
-        >>> plt.show()
-
+    
     '''
     ts = np.array(ts)
     ys = np.array(ys)
@@ -674,7 +598,7 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             tau=None, c=1e-3, nproc=8,
             detrend=False, sg_kwargs=None, gaussianize=False,
             standardize=False, Neff=3, anti_alias=False, avgs=2,
-            method='default'):
+            method='Kirchner_numba'):
     ''' Return the psd of a timeseries using wwz method.
 
     Parameters
@@ -686,39 +610,49 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         the time points, if `ys` contains any NaNs, some of the time points will be deleted accordingly
     freq : array
         vector of frequency
-    freq_method : str
+    freq_method : str, {'log', 'lomb_scargle', 'welch', 'scale', 'nfft'}
         Method to generate the frequency vector if not set directly. The following options are avialable:
-            - log (default)
-            - lomb_scargle
-            - welch
-            - scale
-            - nfft
-        See utils.wavelet.make_freq_vector for details
+
+        - 'log' (default)
+        - 'lomb_scargle'
+        - 'welch'
+        - 'scale'
+        - 'nfft'
+        See :func:`pyleoclim.utils.wavelet.make_freq_vector` for details
+
     freq_kwargs : dict
-        Arguments for the method chosen in freq_method. See specific functions in utils.wavelet for details
+        Arguments for the method chosen in freq_method. See specific functions in pyleoclim.utils.wavelet for details
     tau : array
-        the evenly-spaced time points, namely the time shift for wavelet analysis
+        the evenly-spaced time vector for the analysis, namely the time shift for wavelet analysis
     c : float
-        the decay constant, the default value 1e-3 is good for most of the cases
+        the decay constant that will determine the analytical resolution of frequency for analysis, the smaller the higher resolution;
+        the default value 1e-3 is good for most of the spectral analysis cases
     nproc : int
         the number of processes for multiprocessing
-    detrend : str
-        None - the original time series is assumed to have no trend;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay
-               filters and the resulting filtered series is subtracted from y.
+
+    detrend : str, {None, 'linear', 'constant', 'savitzy-golay'}
+        available methods for detrending, including
+
+        - None: the original time series is assumed to have no trend;
+        - 'linear': a linear least-squares fit to `ys` is subtracted;
+        - 'constant': the mean of `ys` is subtracted
+        - 'savitzy-golay': ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+        The parameters for the Savitzky-Golay filters. See :func:`pyleoclim.utils.filter.savitzky_golay()` for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
         If True, standardizes the timeseries
-    method : string
-        'Foster' - the original WWZ method;
-        'Kirchner' - the method Kirchner adapted from Foster;
-        'Kirchner_f2py' - the method Kirchner adapted from Foster with f2py
-        'default' - the Numba version of the Kirchner algorithm will be called. Defaults to default
+
+    method : string, {'Foster', 'Kirchner', 'Kirchner_f2py', 'Kirchner_numba'}
+        available specific implementation of WWZ, including
+
+        - 'Foster': the original WWZ method;
+        - 'Kirchner': the method Kirchner adapted from Foster;
+        - 'Kirchner_f2py':  the method Kirchner adapted from Foster, implemented with f2py for acceleration;
+        - 'Kirchner_numba':  the method Kirchner adapted from Foster, implemented with Numba for acceleration (default);
+
     Neff : int
         effective number of points
     anti_alias : bool
@@ -730,14 +664,13 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     Returns
     -------
 
-    psd : array
-        power spectral density
-    freq : array
-        vector of frequency
-    psd_ar1_q95 : array
-        the 95% quantile of the psds of AR1 processes
-    psd_ar1 : array
-        the psds of AR1 processes
+    res : namedtuple
+        a namedtuple that includes below items
+
+        psd : array
+            power spectral density
+        freq : array
+            vector of frequency
 
     See Also
     --------
@@ -750,31 +683,8 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
 
     References
     ----------
-    Foster, G. (1996). Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112(4), 1709-1729.
-    Kirchner, J. W. (2005). Aliasin in 1/f(alpha) noise spectra: origins, consequences, and remedies. Physical Review E covering statistical, nonlinear, biological, and soft matter physics, 71, 66110.
-
-    Examples
-    --------
-
-    .. plot::
-        :context: close-figs
-
-        >>> from pyleoclim import utils
-        >>> import matplotlib.pyplot as plt
-        >>> import numpy as np
-        >>> # Create a signal
-        >>> time = np.arange(2001)
-        >>> f = 1/50
-        >>> signal = np.cos(2*np.pi*f*time)
-        >>> # Spectral Analysis
-        >>> res = utils.wwz_psd(signal, time)
-        >>> # plot
-        >>> fig = plt.loglog(
-        ...           res['freq'],
-        ...           res['psd'])
-        >>> plt.xlabel('Frequency')
-        >>> plt.ylabel('PSD')
-        >>> plt.show()
+    - Foster, G. (1996). Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112(4), 1709-1729.
+    - Kirchner, J. W. (2005). Aliasin in 1/f(alpha) noise spectra: origins, consequences, and remedies. Physical Review E covering statistical, nonlinear, biological, and soft matter physics, 71, 66110.
 
     '''
     ys_cut, ts_cut, freq, tau = prepare_wwz(ys, ts, freq=freq,
@@ -817,10 +727,9 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     #  else:
         #  psd_ar1_q95 = None
 
-    psd_ar1_q95 = None
-    psd_ar1 = None
-
-    Results = collections.namedtuple('Results', ['psd', 'freq', 'psd_ar1_q95', 'psd_ar1'])
-    res = Results(psd=psd, freq=freq, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
+    # Results = collections.namedtuple('Results', ['psd', 'freq', 'psd_ar1_q95', 'psd_ar1'])
+    # res = Results(psd=psd, freq=freq, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
+    Results = collections.namedtuple('Results', ['psd', 'freq'])
+    res = Results(psd=psd, freq=freq)
 
     return res
