@@ -74,7 +74,7 @@ class Series:
     ''' pyleoSeries object
 
     The Series class is, at its heart, a simple structure containing two arrays y and t of equal length, and some
-    metadata allowing to interpret and plot the series. It is similar to a 1-column pandas dataframe, but the concept
+    metadata allowing to interpret and plot the series. It is similar to a pandas Series, but the concept
     was extended because pandas does not yet support geologic time.
 
     Parameters
@@ -905,41 +905,6 @@ class Series:
         pyleoclim.core.ui.PSD : PSD object
 
         pyleoclim.core.ui.MultiplePSD : Multiple PSD object
-
-        Examples
-        --------
-
-        Create a summary plot for the SOI dataset. Note: because the wwz method can be slow, only 10 AR1 models are generated in this example. For normal applications, we recommend at least 200.
-
-        .. ipython:: python
-            :okwarning:
-
-            import pyleoclim as pyleo
-            import pandas as pd
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time=data.iloc[:,1]
-            value=data.iloc[:,2]
-            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
-            #Perform spectral analysis
-            psd=ts.spectral()
-            # Significance testing
-            psd_signif=psd.signif_test(number=1)
-            # Perform wavelet analysis
-            scal=ts.wavelet()
-            # Significance testing
-            scal_signif = scal.signif_test(number=1)
-            @savefig ts_summary_plot.png
-            fig, ax = ts.summary_plot(
-                        scalogram=scal_signif, psd=psd_signif,
-                        psd_lim=[1e-2, 1e2],
-                        period_lim=[0.2, 50],
-                        value_label='SOI [K]',
-                        period_label='Period [yrs]',
-                        time_label='Year (CE)',
-                        psd_label='PSD',
-                        title='Summary of SOI timeseries'
-                        )
-            pyleo.closefig(fig)
 
         '''
         # Turn the interactive mode off.
@@ -1963,7 +1928,7 @@ class Series:
         return new
 
     def interp(self, method='linear', **kwargs):
-        '''Interpolate a time series onto  a new  time axis
+        '''Interpolate a Series object onto a new time axis
 
         Parameters
         ----------
@@ -1991,7 +1956,33 @@ class Series:
         new.time = x_mod
         new.value = v_mod
         return new
+    
+    def gkernel(self, step_type = 'median', **kwargs):
+        ''' Coarse-grain a Series object via a Gaussian kernel.
+        Parameters
+        ----------
+        step_type : str
+            type of timestep: 'mean', 'median', or 'max' of the time increments
+        kwargs :
+            Arguments for kernel function. See pyleoclim.utils.tsutils.gkernel for details
+        Returns
+        -------
+        new : pyleoclim.Series
+            The coarse-grained Series object
+        See also
+        --------
+        pyleoclim.utils.tsutils.gkernel : application of a Gaussian kernel
+        '''
+        new=self.copy()
 
+        start, stop, step = tsutils.grid_properties(self.time, method=step_type)
+
+        ti = np.arange(start,stop,step) # generate new axis
+        vi = tsutils.gkernel(self.time,self.value,ti,**kwargs) # apply kernel
+        new.time = ti
+        new.value = vi
+        return new
+    
     def bin(self,**kwargs):
         '''Bin values in a time series
 
@@ -3300,7 +3291,7 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.core.ui.MultipleSeries.mssa: multi-channel SSA
+        pyleoclim.utils.decomposition.mcpca: Monte Carlo PCA
 
         Examples
         --------
@@ -5840,11 +5831,6 @@ class Lipd:
 
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
 
-        See also
-        --------
-
-        pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
-
         '''
         #get the information from the LiPD dict
         lat=[]
@@ -5899,7 +5885,7 @@ class Lipd:
 class LipdSeries(Series):
     '''Lipd time series object
     '''
-    def __init__(self, tso):
+    def __init__(self, tso, clean_ts=True):
         if type(tso) is list:
             self.lipd_ts=lipdutils.getTs(tso)
         else:
@@ -5948,7 +5934,7 @@ class LipdSeries(Series):
                 label=self.lipd_ts['dataSetName']
                 super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
                      time_unit=time_unit,value_name=value_name,value_unit=value_unit,
-                     label=label,clean_ts=True)
+                     label=label,clean_ts=clean_ts)
             except:
                 raise ValueError("paleoData_values should contain floats")
         except:
