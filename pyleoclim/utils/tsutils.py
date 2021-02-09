@@ -39,7 +39,7 @@ from scipy import special
 from scipy import signal
 from pyhht import EMD
 from sklearn.cluster import DBSCAN
-#from matplotlib import cm
+import warnings
 import matplotlib.pyplot as plt
 
 from sklearn.neighbors import NearestNeighbors
@@ -96,7 +96,7 @@ def simple_stats(y, axis=None):
     return mean, median, min_, max_, std, IQR
 
 
-def bin(x, y, bin_size=None, start=None, end=None):
+def bin(x, y, bin_size=None, start=None, end=None, evenly_spaced = True):
     """ Bin the values
 
     Parameters
@@ -107,11 +107,13 @@ def bin(x, y, bin_size=None, start=None, end=None):
     y : array
         The y-axis series.
     bin_size : float
-        The size of the bins. Default is the average resolution
+        The size of the bins. Default is the median resolution if evenly_spaced is not True
     start : float
         Where/when to start binning. Default is the minimum
     end : float
         When/where to stop binning. Default is the maximum
+    evenly_spaced : {True,False}
+        Makes the series evenly-spaced. This option is ignored if bin_size is set to float
 
     Returns
     -------
@@ -130,10 +132,16 @@ def bin(x, y, bin_size=None, start=None, end=None):
     # Make sure x and y are numpy arrays
     x = np.array(x, dtype='float64')
     y = np.array(y, dtype='float64')
+    
+    if bin_size is not None and evenly_spaced == True:
+        warnings.warn('The bin_size has been set, the series may not be evenly_spaced')
 
     # Get the bin_size if not available
     if bin_size is None:
-        bin_size = np.nanmean(np.diff(x))
+        if evenly_spaced == True:
+            bin_size = np.nanmax(np.diff(x))
+        else:
+            bin_size = np.nanmean(np.diff(x))
 
     # Get the start/end if not given
     if start is None:
@@ -636,7 +644,6 @@ def reduce_duplicated_timestamps(ys, ts):
         ys = np.array(ys)
 
         print('Duplicated timestamps has been reduced by averaging values!')
-
     return ys, ts
 
 def annualize(ys, ts):

@@ -135,29 +135,6 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
     ----------
     P. Welch, “The use of the fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms”, IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.
 
-    Examples
-    --------
-
-    .. plot::
-        :context: close-figs
-
-        >>> from pyleoclim import utils
-        >>> import matplotlib.pyplot as plt
-        >>> import numpy as np
-        >>> # Create a signal
-        >>> time = np.arange(2001)
-        >>> f = 1/50
-        >>> signal = np.cos(2*np.pi*f*time)
-        >>> # Spectral Analysis
-        >>> res = utils.welch(signal, time)
-        >>> # plot
-        >>> fig = plt.loglog(
-        ...           res['freq'],
-        ...           res['psd'])
-        >>> plt.xlabel('Frequency')
-        >>> plt.ylabel('PSD')
-        >>> plt.show()
-
     '''
 
     ts = np.array(ts)
@@ -268,29 +245,6 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
     pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
     pyleoclim.utils.tsutils.detrend : Detrending method
-
-    Examples
-    --------
-
-    .. plot::
-        :context: close-figs
-
-        >>> from pyleoclim import utils
-        >>> import matplotlib.pyplot as plt
-        >>> import numpy as np
-        >>> # Create a signal
-        >>> time = np.arange(2001)
-        >>> f = 1/50
-        >>> signal = np.cos(2*np.pi*f*time)
-        >>> # Spectral Analysis
-        >>> res = utils.mtm(signal, time)
-        >>> # plot
-        >>> fig = plt.loglog(
-        ...           res['freq'],
-        ...           res['psd'])
-        >>> plt.xlabel('Frequency')
-        >>> plt.ylabel('PSD')
-        >>> plt.show()
 
     '''
     # preprocessing
@@ -432,28 +386,6 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
     Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.
 
-    Examples
-    --------
-
-    .. plot::
-        :context: close-figs
-
-        >>> from pyleoclim import utils
-        >>> import matplotlib.pyplot as plt
-        >>> import numpy as np
-        >>> # Create a signal
-        >>> time = np.arange(2001)
-        >>> f = 1/50
-        >>> signal = np.cos(2*np.pi*f*time)
-        >>> # Spectral Analysis
-        >>> res = utils.lomb_scargle(signal, time)
-        >>> # plot
-        >>> fig = plt.loglog(
-        ...           res['freq'],
-        ...           res['psd'])
-        >>> plt.xlabel('Frequency')
-        >>> plt.ylabel('PSD')
-        >>> plt.show()
     """
     ts = np.array(ts)
     ys = np.array(ys)
@@ -622,30 +554,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
     pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
     pyleoclim.utils.tsutils.detrend : Detrending method
-
-    Examples
-    --------
-
-    .. plot::
-        :context: close-figs
-
-        >>> from pyleoclim import utils
-        >>> import matplotlib.pyplot as plt
-        >>> import numpy as np
-        >>> # Create a signal
-        >>> time = np.arange(2001)
-        >>> f = 1/50
-        >>> signal = np.cos(2*np.pi*f*time)
-        >>> # Spectral Analysis
-        >>> res = utils.periodogram(signal, time)
-        >>> # plot
-        >>> fig = plt.loglog(
-        ...           res['freq'],
-        ...           res['psd'])
-        >>> plt.xlabel('Frequency')
-        >>> plt.ylabel('PSD')
-        >>> plt.show()
-
+    
     '''
     ts = np.array(ts)
     ys = np.array(ys)
@@ -776,31 +685,6 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     ----------
     - Foster, G. (1996). Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112(4), 1709-1729.
     - Kirchner, J. W. (2005). Aliasin in 1/f(alpha) noise spectra: origins, consequences, and remedies. Physical Review E covering statistical, nonlinear, biological, and soft matter physics, 71, 66110.
-
-    Examples
-    --------
-
-    .. ipython:: python
-        :okwarning:
-
-        from pyleoclim import utils
-        import matplotlib.pyplot as plt
-        import numpy as np
-
-        # Create a signal
-        time = np.arange(2001)
-        f = 1/50
-        signal = np.cos(2*np.pi*f*time)
-
-        # Spectral Analysis
-        res = utils.wwz_psd(signal, time)
-
-        # Visualization
-        fig = plt.loglog(res.freq, res.psd)
-        plt.xlabel('Frequency')
-        plt.ylabel('PSD')
-        @savefig psd_wwz.png
-        plt.show()
 
     '''
     ys_cut, ts_cut, freq, tau = prepare_wwz(ys, ts, freq=freq,
