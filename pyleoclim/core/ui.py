@@ -16,7 +16,7 @@ from ..utils import decomposition
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
-#import pandas as pd
+import pandas as pd
 from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
@@ -26,6 +26,10 @@ import matplotlib.transforms as transforms
 from matplotlib import cm
 from matplotlib import gridspec
 import matplotlib as mpl
+#from matplotlib.colors import BoundaryNorm, Normalize
+
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
@@ -572,7 +576,7 @@ class Series:
                 (2) 'mc-ssa': Monte-Carlo SSA (use modes above the 95% threshold)
                 (3) 'var': first K modes that explain at least var_thresh % of the variance.
             Default is None, which bypasses truncation (K = M)
-
+            
         var_thresh : float
             variance threshold for reconstruction (only impcatful if trunc is set to 'var')
 
@@ -708,7 +712,7 @@ class Series:
         return res
 
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
-                 ax=None, ylabel='KDE', mute=False, **plot_kwargs):
+                 ax=None, ylabel='KDE', vertical=False, edgecolor='w',mute=False, **plot_kwargs):
         ''' Plot the distribution of the timeseries values
 
         Parameters
@@ -725,6 +729,26 @@ class Series:
               - "path" must be specified; it can be any existed or non-existed path,
                 with or without a suffix; if the suffix is not given in "path", it will follow "format"
               - "format" can be one of {"pdf", "eps", "png", "ps"}
+              
+        ax : matplotlib.axis, optional
+            A matplotlib axis
+        
+        ylabel : str
+            Label for the count axis
+        
+        vertical : {True,False}
+            Whether to flip the plot vertically
+        
+        edgecolor : matplotlib.color
+            The color of the edges of the bar
+        
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+        
+        plot_kwargs : dict
+            Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
+            
 
         See also
         --------
@@ -761,13 +785,18 @@ class Series:
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
-
-        ax = sns.histplot(self.value, ax=ax, kde=True, **plot_kwargs)
-
-        time_label, value_label = self.make_labels()
-
-        ax.set_xlabel(value_label)
-        ax.set_ylabel(ylabel)
+        
+        #make the data into a dataframe so we can flip the figure
+        time_label, value_label = self.make_labels()   
+        if vertical == True:
+            data=pd.DataFrame({'value':self.value}) 
+            ax = sns.histplot(data=data, y="value", ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
+            ax.set_ylabel(value_label)
+            ax.set_xlabel(ylabel)
+        else:
+            ax = sns.histplot(self.value, ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
+            ax.set_xlabel(value_label)
+            ax.set_ylabel(ylabel)
 
         if title is not None:
             ax.set_title(title)
@@ -1911,7 +1940,7 @@ class Series:
         return new
 
     def interp(self, method='linear', **kwargs):
-        '''Interpolate a Series object onto  a new  time axis
+        '''Interpolate a time series onto  a new  time axis
 
         Parameters
         ----------
@@ -1940,44 +1969,12 @@ class Series:
         new.value = v_mod
         return new
 
-    def gkernel(self, step_type = 'median', **kwargs):
-        ''' Coarse-grain a Series object via a Gaussian kernel.
-
-        Parameters
-        ----------
-        step_type : str
-            type of timestep: 'mean', 'median', or 'max' of the time increments
-
-        kwargs :
-            Arguments for kernel function. See pyleoclim.utils.tsutils.gkernel for details
-
-        Returns
-        -------
-
-        new : pyleoclim.Series
-            The coarse-grained Series object
-
-        See also
-        --------
-
-        pyleoclim.utils.tsutils.gkernel : application of a Gaussian kernel
-
-        '''
-        new=self.copy()
-
-        start, stop, step = tsutils.grid_properties(self.time, method=step_type)
-
-        ti = np.arange(start,stop,step) # generate new axis
-        vi = tsutils.gkernel(self.time,self.value,ti,**kwargs) # apply kernel
-        new.time = ti
-        new.value = vi
-        return new
-
     def bin(self,**kwargs):
-        '''Bin a _Series_' values on an evenly-spaced time axis
+        '''Bin values in a time series
 
         Parameters
         ----------
+
 
         kwargs :
             Arguments for binning function. See pyleoclim.utils.tsutils.bin for details
@@ -2000,8 +1997,6 @@ class Series:
         new.time = res_dict['bins']
         new.value = res_dict['binned_values']
         return new
-
-
 
 class PSD:
     '''PSD object obtained from spectral analysis.
@@ -3090,11 +3085,11 @@ class MultipleSeries:
         # define parameters for common time axis
         start = gp[:,0].max()
         stop  = gp[:,1].min()
+        step  = gp[:,2].mean()
 
         ms = self.copy()
 
         if method == 'binning':
-            step  = gp[:,2].mean()
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
                 d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop)
@@ -3103,7 +3098,6 @@ class MultipleSeries:
                 ms.series_list[idx] = ts
 
         elif method == 'interp':
-            step  = gp[:,2].mean()
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
                 ti, vi = tsutils.interp(ts.time, ts.value, interp_type='linear', interp_step=step, start=start, end=stop,**kwargs)
@@ -3112,12 +3106,11 @@ class MultipleSeries:
                 ms.series_list[idx] = ts
 
         elif method == 'gkernel':
-            step  = gp[:,2].max()
             # Get the interpolated x-axis.
             ti = np.arange(start,stop,step)
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                vi = tsutils.gkernel(ts.time,ts.value,ti)
+                vi = tsutils.gkernel(ts.time,ts.value,ti, h = 11)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
@@ -3408,7 +3401,7 @@ class MultipleSeries:
 
         pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
 
-        pyleoclim.utils.tsutils.gkernel: Underlying function
+        pyleoclim.utils.tsutils.gkernel: Underlying binning function
 
 
         Examples
@@ -3743,7 +3736,7 @@ class MultipleSeries:
             return ax
 
 
-    def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
+    def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None,
                   spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
         ''' Stack plot of multiple series
 
@@ -3752,16 +3745,11 @@ class MultipleSeries:
         ----------
         figsize : list
             Size of the figure.
-        colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
+        colors : str, or list of str
             Colors for plotting.
             If None, the plotting will cycle the 'tab10' colormap;
             if only one color is specified, then all curves will be plotted with that single color;
             if a list of colors are specified, then the plotting will cycle that color list.
-        cmap : str
-            The colormap to use when "colors" is None.
-        norm : matplotlib.colors.Normalize like
-            The nomorlization for the colormap.
-            If None, a linear normalization will be used.
         savefig_settings : dictionary
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -3815,23 +3803,13 @@ class MultipleSeries:
         bottom = 1
         for idx, ts in enumerate(self.series_list):
             if colors is None:
-                cmap_obj = plt.get_cmap(cmap)
-                if hasattr(cmap_obj, 'colors'):
-                    nc = len(cmap_obj.colors)
-                else:
-                    nc = len(self.series_list)
-
-                if norm is None:
-                    norm = mpl.colors.Normalize(vmin=0, vmax=nc-1)
-
-                clr = cmap_obj(norm(idx%nc))
+                cmap_obj = plt.get_cmap('tab10')
+                clr = cmap_obj(idx%10)
             elif type(colors) is str:
                 clr = colors
             elif type(colors) is list:
                 nc = len(colors)
                 clr = colors[idx%nc]
-            else:
-                raise TypeError('"colors" should be a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)')
 
             bottom -= height*v_shift_factor
             ax[idx] = fig.add_axes([left, bottom, width, height])
@@ -5047,10 +5025,16 @@ class Lipd:
 
         return res
 
-    def to_LipdSeries(self):
+    def to_LipdSeries(self, number = None):
         '''Extracts one timeseries from the Lipd object
 
-        Note that this function requires user interaction.
+        Note that this function may require user interaction.
+        
+        Parameters
+        ----------
+        
+        number : int
+            the number of the timeseries object
 
         Returns
         -------
@@ -5062,10 +5046,17 @@ class Lipd:
         pyleoclim.ui.LipdSeries : LipdSeries object
 
         '''
-
         ts_list = lpd.extractTs(self.__dict__['lipd'])
-        ts = LipdSeries(ts_list)
+        if number is None:
+            ts = LipdSeries(ts_list)
+        else:
+            try:
+                number = int(number)
+            except:
+                raise TypeError('Number needs to be an integer or should be coerced into an integer.')
+            ts = LipdSeries(ts_list[number])
         return ts
+        
 
     def mapAllArchive(self, projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
@@ -5117,6 +5108,11 @@ class Lipd:
         -------
         res : figure
             The figure
+            
+        See also
+        --------
+        
+        pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
 
         '''
         #get the information from the LiPD dict
@@ -5221,7 +5217,7 @@ class LipdSeries(Series):
                 label=self.lipd_ts['dataSetName']
                 super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
                      time_unit=time_unit,value_name=value_name,value_unit=value_unit,
-                     label=label)
+                     label=label,clean_ts=True)
             except:
                 raise ValueError("paleoData_values should contain floats")
         except:
@@ -5357,11 +5353,20 @@ class LipdSeries(Series):
         Returns
         -------
         res : fig
+        
+        See also
+        --------
+        
+        pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
         '''
         #get the information from the timeseries
         lat=[self.lipd_ts['geo_meanLat']]
         lon=[self.lipd_ts['geo_meanLon']]
-        archiveType=lipdutils.LipdToOntology(self.lipd_ts['archiveType'])
+        lon=[self.lipd_ts['geo_meanLon']]
+        if 'archiveType' in self.lipd_ts.keys():
+            archiveType=lipdutils.LipdToOntology(self.lipd_ts['archiveType']).lower().replace(" ","")
+        else:
+            archiveType=('other')
 
         # make sure criteria is in the plot_default list
         if archiveType not in self.plot_default.keys():
@@ -5432,3 +5437,392 @@ class LipdSeries(Series):
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
                               mute=mute)
         return res
+    
+    def getMetadata(self):
+    
+        """ Get the necessary metadata for the ensemble plots
+        
+        Parameters
+        ----------
+            
+        timeseries : object
+                    a specific timeseries object. 
+            
+        Returns
+        -------
+        
+        res : dict
+                  A dictionary containing the following metadata:
+                    archiveType
+                    Authors (if more than 2, replace by et al)
+                    PublicationYear 
+                    Publication DOI 
+                    Variable Name
+                    Units
+                    Climate Interpretation
+                    Calibration Equation 
+                    Calibration References
+                    Calibration Notes
+            
+        """
+        
+        # Get all the necessary information
+        # Top level information
+        if "archiveType" in self.lipd_ts.keys():
+            archiveType = self.lipd_ts["archiveType"]
+        else:
+            archiveType = "NA"
+            
+        if "pub1_author" in self.lipd_ts.keys():
+            authors = self.lipd_ts["pub1_author"]
+        else:
+            authors = "NA"
+        
+        #Truncate if more than two authors
+        idx = [pos for pos, char in enumerate(authors) if char == ";"]
+        if  len(idx)>2:
+            authors = authors[0:idx[1]+1] + "et al."
+        
+        if "pub1_pubYear" in self.lipd_ts.keys():
+            Year = str(self.lipd_ts["pub1_pubYear"])
+        else:
+            Year = "NA"
+        
+        if "pub1_DOI" in self.lipd_ts.keys():
+            DOI = self.lipd_ts["pub1_DOI"]  
+        else:
+            DOI = "NA"
+        
+        if "paleoData_InferredVariableType" in self.lipd_ts.keys():
+            if type(self.lipd_ts["paleoData_InferredVariableType"]) is list:
+                Variable = self.lipd_ts["paleoData_InferredVariableType"][0]
+            else:
+                Variable = self.lipd_ts["paleoData_InferredVariableType"]
+        elif "paleoData_ProxyObservationType" in self.lipd_ts.keys():
+            if type(self.lipd_ts["paleoData_ProxyObservationType"]) is list:
+                Variable = self.lipd_ts["paleoData_ProxyObservationType"][0]
+            else:
+                Variable = self.lipd_ts["paleoData_ProxyObservationType"]
+        else:
+            Variable = self.lipd_ts["paleoData_variableName"]
+        
+        if "paleoData_units" in self.lipd_ts.keys():
+            units = self.lipd_ts["paleoData_units"]
+        else:
+            units = "NA"
+        
+        #Climate interpretation information
+        if "paleoData_interpretation" in self.lipd_ts.keys():
+            interpretation = self.lipd_ts["paleoData_interpretation"][0]
+            if "name" in interpretation.keys():
+                ClimateVar = interpretation["name"]
+            elif "variable" in interpretation.keys():
+                ClimateVar = interpretation["variable"]
+            else:
+                ClimateVar = "NA"
+            if "detail" in interpretation.keys(): 
+                Detail = interpretation["detail"]
+            elif "variableDetail" in interpretation.keys():
+                Detail = interpretation['variableDetail']
+            else:
+                Detail = "NA"
+            if "scope" in interpretation.keys():
+                Scope = interpretation['scope']
+            else:
+                Scope = "NA"
+            if "seasonality" in interpretation.keys():    
+                Seasonality = interpretation["seasonality"]
+            else:
+                Seasonality = "NA"
+            if "interpdirection" in interpretation.keys():    
+                Direction = interpretation["interpdirection"]
+            else:
+                Direction = "NA"
+        else:
+            ClimateVar = "NA"
+            Detail = "NA"
+            Scope = "NA"
+            Seasonality = "NA"
+            Direction = "NA"
+            
+        # Calibration information
+        if "paleoData_calibration" in self.lipd_ts.keys():
+            calibration = self.lipd_ts['paleoData_calibration'][0]
+            if "equation" in calibration.keys():
+                Calibration_equation = calibration["equation"]
+            else:
+                Calibration_equation = "NA"
+            if  "calibrationReferences" in calibration.keys():
+                ref = calibration["calibrationReferences"]
+                if "author" in ref.keys():
+                    ref_author = ref["author"][0] # get the first author
+                else:
+                    ref_author = "NA"
+                if  "publicationYear" in ref.keys():
+                    ref_year = str(ref["publicationYear"])
+                else: ref_year="NA"
+                Calibration_notes = ref_author +"."+ref_year
+            elif "notes" in calibration.keys():
+                Calibration_notes = calibration["notes"]
+            else: Calibration_notes = "NA"    
+        else:
+            Calibration_equation = "NA"
+            Calibration_notes = "NA"
+        
+        #Truncate the notes if too long
+        charlim = 30;
+        if len(Calibration_notes)>charlim:
+            Calibration_notes = Calibration_notes[0:charlim] + " ..."
+            
+        res = {"archiveType" : archiveType,
+                    "authors" : authors,
+                    "Year": Year,
+                    "DOI": DOI,
+                    "Variable": Variable,
+                    "units": units,
+                    "Climate_Variable" : ClimateVar,
+                    "Detail" : Detail,
+                    "Scope":Scope,
+                    "Seasonality" : Seasonality,
+                    "Interpretation_Direction" : Direction,
+                    "Calibration_equation" : Calibration_equation,
+                    "Calibration_notes" : Calibration_notes}
+        
+        return res
+    
+    def dashboard(self, figsize = [11,8], plt_kwargs=None, distplt_kwargs=None, spectral_kwargs=None,
+                  spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None, metadata = True,
+                  savefig_settings=None, mute=False):
+        '''
+        
+
+        Parameters
+        ----------
+        figsize : list, optional
+            Figure size. The default is [11,8].
+        plt_kwargs : dict, optional
+            Optional arguments for the timeseries plot. See Series.plot(). The default is None.
+        distplt_kwargs : dict, optional
+            Optional arguments for the distribution plot. See Series.distplot(). The default is None.
+        spectral_kwargs : dict, optional
+            Optional arguments for the spectral method. Default is to use Lomb-Scargle method. See Series.spectral(). The default is None.
+        spectralsignif_kwargs : dict, optional
+            Optional arguments to estimate the significance of the power spectrum. See PSD.signif_test. Note that the default number of simulations has been changed to 1000. The default is None.
+        spectralfig_kwargs : dict, optional
+            Optional arguments for the power spectrum figure. See PSD.plot(). The default is None.
+        map_kwargs : dict, optional
+            Optional arguments for the map. See LipdSeries.map(). The default is None.
+        metadata : {True,False}, optional
+            Whether or not to produce a dashboard with printed metadata. The default is True.
+        savefig_settings : dict, optional
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}.
+            The default is None.
+        mute : {True,False}, optional
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax. The default is False.
+
+        Returns
+        -------
+        fig : matplotlib.figure
+            The figure
+        ax : matplolib.axis
+            The axis.
+        
+        See also
+        --------    
+        
+        pyleoclim.Series.plot : plot a timeseries
+        
+        pyleoclim.Series.distplot : plot a distribution of the timeseries
+        
+        pyleoclim.Series.spectral : spectral analysis method.
+        
+        pyleoclim.PSD.signif_test : significance test for timeseries analysis
+        
+        pyleoclim.PSD.plot : plot power spectrum
+        
+        pyleoclim.LipdSeries.map : map location of dataset
+        
+        pyleolim.LipdSeries.getMetadata : get relevant metadata from the timeseries object
+        
+        pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
+        
+        '''
+        
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        res=self.getMetadata()
+        # start plotting
+        fig = plt.figure(figsize=figsize)
+        gs = gridspec.GridSpec(2,5)
+        gs.update(left=0,right=1.1)
+        
+        ax={}
+       # Plot the timeseries
+        plt_kwargs={} if plt_kwargs is None else plt_kwargs.copy()
+        ax['ts'] = plt.subplot(gs[0,:-3])
+        plt_kwargs.update({'ax':ax['ts']})
+        # use the defaults if color/markers not specified
+        if 'marker' not in plt_kwargs.keys():
+            archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
+            plt_kwargs.update({'marker':self.plot_default[archiveType][1]})
+        if 'color' not in plt_kwargs.keys():
+            archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
+            plt_kwargs.update({'color':self.plot_default[archiveType][0]})    
+        ax['ts'] = self.plot(**plt_kwargs)
+        ymin, ymax = ax['ts'].get_ylim()
+        
+        #plot the distplot
+        distplt_kwargs={} if distplt_kwargs is None else distplt_kwargs.copy()
+        ax['dts'] = plt.subplot(gs[0,2])
+        distplt_kwargs.update({'ax':ax['dts']})
+        distplt_kwargs.update({'ylabel':'PDF'})
+        distplt_kwargs.update({'vertical':True})
+        if 'color' not in distplt_kwargs.keys():
+            archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
+            distplt_kwargs.update({'color':self.plot_default[archiveType][0]}) 
+        ax['dts'] = self.distplot(**distplt_kwargs)
+        ax['dts'].set_ylim([ymin,ymax])
+        ax['dts'].set_yticklabels([])
+        ax['dts'].set_ylabel('')
+        ax['dts'].set_yticks([])
+    
+        #make the map - brute force since projection is not being returned properly
+        lat=[self.lipd_ts['geo_meanLat']]
+        lon=[self.lipd_ts['geo_meanLon']]
+        
+        map_kwargs={} if map_kwargs is None else map_kwargs.copy()
+        if 'projection' in map_kwargs.keys():
+            projection=map_kwargs['projection']
+        else:
+            projection='Orthographic'
+        if 'proj_default' in map_kwargs.keys():
+            proj_default=map_kwargs['proj_default']
+        else:
+            proj_default=True
+        if proj_default==True:
+            proj1={'central_latitude':lat[0],
+                   'central_longitude':lon[0]}
+            proj2={'central_latitude':lat[0]}
+            proj3={'central_longitude':lon[0]}
+            try:
+                proj = mapping.set_proj(projection=projection, proj_default=proj1)
+            except:
+                try:
+                    proj = mapping.set_proj(projection=projection, proj_default=proj3)
+                except:
+                    proj = mapping.set_proj(projection=projection, proj_default=proj2)       
+        if 'marker' in map_kwargs.keys():
+            marker = map_kwargs['marker']
+        else:
+            marker = self.plot_default[archiveType][1]
+        if 'color' in map_kwargs.keys():
+            color = map_kwargs['color']
+        else:
+            color = self.plot_default[archiveType][0]
+        if 'background' in map_kwargs.keys():
+            background = map_kwargs['background']
+        else:
+            background = True
+        if 'borders' in map_kwargs.keys():
+            borders= map_kwargs['borders']
+        else:
+            borders = False
+        if 'rivers' in map_kwargs.keys():
+            rivers= map_kwargs['rivers']
+        else:
+            rivers = False
+        if 'lakes' in map_kwargs.keys():
+            lakes = map_kwargs['lakes']
+        else:
+            lakes = False
+        if 'scatter_kwargs' in map_kwargs.keys():
+            scatter_kwargs = map_kwargs['scatter_kwargs']
+        else:
+            scatter_kwargs={}
+        if 'lgd_kwargs' in map_kwargs.keys():
+            lgd_kwargs = map_kwargs['lgd_kwargs']
+        else:
+            lgd_kwargs ={}
+        if 'legend' in map_kwargs.keys():
+            legend = map_kwargs['legend']
+        else:
+            legend = False
+        #make the plot map
+        
+        data_crs = ccrs.PlateCarree()
+        ax['map'] = plt.subplot(gs[1,0],projection=proj)
+        ax['map'].coastlines()
+        if background is True:
+            ax['map'].stock_img()     
+        #Other extra information
+        if borders is True:
+            ax['map'].add_feature(cfeature.BORDERS)
+        if lakes is True:
+            ax['map'].add_feature(cfeature.LAKES)
+        if rivers is True:
+            ax['map'].add_feature(cfeature.RIVERS)
+        ax['map'].scatter(lon,lat,zorder=10,label=marker,facecolor=color,transform=data_crs, **scatter_kwargs)
+        if legend == True:
+            ax.legend(**lgd_kwargs)
+        
+        #spectral analysis
+        spectral_kwargs={} if spectral_kwargs is None else spectral_kwargs.copy()
+        if 'method' in spectral_kwargs.keys():
+            pass
+        else:
+            spectral_kwargs.update({'method':'lomb_scargle'})
+        if 'freq_method' in spectral_kwargs.keys():
+            pass
+        else:
+            spectral_kwargs.update({'freq_method':'lomb_scargle'})
+        ts_preprocess = self.detrend().standardize()
+        psd=ts_preprocess.spectral(**spectral_kwargs)
+        
+        #Significance test
+        spectralsignif_kwargs={} if spectralsignif_kwargs is None else spectralsignif_kwargs.copy()
+        if 'number' in  spectralsignif_kwargs.keys():
+            pass
+        else:
+            spectralsignif_kwargs.update({'number':1000})
+            
+        psd_signif = psd.signif_test(**spectralsignif_kwargs)
+        
+        #Make the plot
+        spectralfig_kwargs={} if spectralfig_kwargs is None else spectralfig_kwargs.copy()
+        if 'color' not in spectralfig_kwargs.keys():
+            archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
+            spectralfig_kwargs.update({'color':self.plot_default[archiveType][0]})
+        if 'signif_clr' not in spectralfig_kwargs.keys():
+            spectralfig_kwargs.update({'signif_clr':'grey'})
+        ax['spec'] = plt.subplot(gs[1,1:3])
+        spectralfig_kwargs.update({'ax':ax['spec']})
+        ax['spec'] = psd_signif.plot(**spectralfig_kwargs)
+        
+        if metadata == True:
+            # get metadata
+            textstr = "archiveType: " + res["archiveType"]+"\n"+"\n"+\
+              "Authors: " + res["authors"]+"\n"+"\n"+\
+              "Year: " + res["Year"]+"\n"+"\n"+\
+              "DOI: " + res["DOI"]+"\n"+"\n"+\
+              "Variable: " + res["Variable"]+"\n"+"\n"+\
+              "units: " + res["units"]+"\n"+"\n"+\
+              "Climate Interpretation: " +"\n"+\
+              "    Climate Variable: " + res["Climate_Variable"] +"\n"+\
+              "    Detail: " + res["Detail"]+"\n"+\
+              "    Seasonality: " + res["Seasonality"]+"\n"+\
+              "    Direction: " + res["Interpretation_Direction"]+"\n \n"+\
+              "Calibration: \n" + \
+              "    Equation: " + res["Calibration_equation"] + "\n" +\
+              "    Notes: " + res["Calibration_notes"]
+            plt.figtext(0.7, 0.4, textstr, fontsize = 12)
+        
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, settings=savefig_settings)
+        else:
+            if not mute:
+                plotting.showfig(fig)
+        return fig, ax
+        
