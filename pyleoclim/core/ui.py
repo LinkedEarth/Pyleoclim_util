@@ -5217,7 +5217,7 @@ class LipdSeries(Series):
                 label=self.lipd_ts['dataSetName']
                 super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
                      time_unit=time_unit,value_name=value_name,value_unit=value_unit,
-                     label=label)
+                     label=label,clean_ts=True)
             except:
                 raise ValueError("paleoData_values should contain floats")
         except:

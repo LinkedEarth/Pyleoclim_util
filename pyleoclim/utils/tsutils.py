@@ -3,28 +3,33 @@
 """
 Created on Tue Feb 25 06:43:14 2020
 
-@author: deborahkhider, fzhu
+@author: deborahkhider, fzhu, jeg
 
 Utilities to manipulate timeseries
 """
 
 __all__ = [
     'simple_stats',
-    'bin_values',
+    'bin',
     'interp',
-    'on_common_axis',
+    'gkernel',
+    'grid_properties',
     'standardize',
     'ts2segments',
     'clean_ts',
+    'dropna',
+    'sort_ts',
     'annualize',
     'gaussianize',
     'gaussianize_single',
     'detrend',
     'detect_outliers',
     'is_evenly_spaced',
-    'remove_outliers'
+    'remove_outliers',
+    'reduce_duplicated_timestamps',
 ]
 
+from typing import OrderedDict
 import numpy as np
 import pandas as pd
 from scipy import interpolate
@@ -34,10 +39,9 @@ from scipy import special
 from scipy import signal
 from pyhht import EMD
 from sklearn.cluster import DBSCAN
-#from matplotlib import cm
+import warnings
 import matplotlib.pyplot as plt
 
-import numpy.matlib
 from sklearn.neighbors import NearestNeighbors
 import math
 from sys import exit
@@ -92,7 +96,7 @@ def simple_stats(y, axis=None):
     return mean, median, min_, max_, std, IQR
 
 
-def bin_values(x, y, bin_size=None, start=None, end=None):
+def bin(x, y, bin_size=None, start=None, end=None, evenly_spaced = True):
     """ Bin the values
 
     Parameters
@@ -103,11 +107,13 @@ def bin_values(x, y, bin_size=None, start=None, end=None):
     y : array
         The y-axis series.
     bin_size : float
-        The size of the bins. Default is the average resolution
+        The size of the bins. Default is the median resolution if evenly_spaced is not True
     start : float
         Where/when to start binning. Default is the minimum
     end : float
         When/where to stop binning. Default is the maximum
+    evenly_spaced : {True,False}
+        Makes the series evenly-spaced. This option is ignored if bin_size is set to float
 
     Returns
     -------
@@ -126,10 +132,16 @@ def bin_values(x, y, bin_size=None, start=None, end=None):
     # Make sure x and y are numpy arrays
     x = np.array(x, dtype='float64')
     y = np.array(y, dtype='float64')
+    
+    if bin_size is not None and evenly_spaced == True:
+        warnings.warn('The bin_size has been set, the series may not be evenly_spaced')
 
     # Get the bin_size if not available
     if bin_size is None:
-        bin_size = np.nanmean(np.diff(x))
+        if evenly_spaced == True:
+            bin_size = np.nanmax(np.diff(x))
+        else:
+            bin_size = np.nanmean(np.diff(x))
 
     # Get the start/end if not given
     if start is None:
@@ -165,7 +177,87 @@ def bin_values(x, y, bin_size=None, start=None, end=None):
     return  res_dict
 
 
-def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **args):
+def gkernel(t,y,tc, h = 11):
+    '''
+    Coarsen time resolution using a Gaussian kernel
+    
+    TODO: adaptive choice of e-folding scale
+    
+    Parameters
+    ----------
+    t  : 1d array; the original time axis
+    y  : 1d array; values on the original time axis
+    tc : 1d array; the coarse time axis
+    h  : scalar;  kernel e-folding scale 
+    
+    Returns
+    -------    
+    yc: The  upscaled time series
+    
+    References
+    ----------
+    
+    Rehfeld, K., Marwan, N., Heitzig, J., and Kurths, J.: Comparison of correlation analysis
+    techniques for irregularly sampled time series, Nonlin. Processes Geophys., 
+    18, 389–404, https://doi.org/10.5194/npg-18-389-2011, 2011.
+    '''
+    
+    if len(t) != len(y):
+        raise ValueError('y and t must have the same length')
+    
+    kernel = lambda x, s : 1.0/np.sqrt(2*np.pi*s)*np.exp(-x**2/(2*s**2))  # define kernel function
+    
+    yc    = np.zeros((len(tc)))
+    yc[:] = np.nan
+    
+    for i in range(len(tc)-1):
+        xslice = t[(t>=tc[i])&(t<tc[i+1])]
+        yslice = y[(t>=tc[i])&(t<tc[i+1])]
+
+        if len(xslice)>0:
+            d      = xslice-tc[i]
+            weight = kernel(d,h)
+            yc[i]  = sum(weight*yslice)/sum(weight)
+        else:
+            yc[i] = np.nan
+            
+    return yc
+      
+
+def grid_properties(x,method='median'):
+    ''' Establishes the grid properties of a numerical array:
+        start, stop, and representative step. 
+             
+    Parameters
+    ----------
+    x : array
+    
+    method : str
+        Method to obtain a representative step if x is not evenly spaced.
+        Valid entries: 'median' [default] or 'mean'
+       
+    Returns
+    -------
+    start : float
+        min(x)
+    stop : float
+        max(x)
+    step : float
+        The representative spacing between consecutive values 
+    '''
+    start = np.nanmin(x)
+    stop = np.nanmax(x)
+    
+    delta = np.diff(x)
+    if method == 'mean':
+        step = delta.mean()
+    else:
+        step = np.median(delta)
+    
+    return start, stop, step
+
+
+def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **kwargs):
     """ Interpolation onto a new x-axis
 
     Parameters
@@ -183,7 +275,7 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **ar
            where/when to start the interpolation. Default is min..
     end : float
          where/when to stop the interpolation. Default is max.
-    args :  args
+    kwargs :  kwargs
         Aguments specific to interpolate.interp1D. See scipy for details https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html
 
     Returns
@@ -217,7 +309,7 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **ar
 
     # Add arguments
 
-    interp_values = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**args)(xi)
+    interp_values = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**kwargs)(xi)
 
     return xi, interp_values
 
@@ -283,9 +375,9 @@ def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=No
         xi2, interp_values2 = interp(x2, y2, interp_step=step, start=start,
                                 end=end)
     elif method == 'bin':
-        xi1, interp_values1, n, error = bin_values(x1, y1, bin_size=step, start=start,
+        xi1, interp_values1, n, error = bin(x1, y1, bin_size=step, start=start,
                                 end=end)
-        xi2, interp_values2, n, error = bin_values(x2, y2, bin_size=step, start=start,
+        xi2, interp_values2, n, error = bin(x2, y2, bin_size=step, start=start,
                                 end=end)
     elif method == None:
         min_idx1 = np.where(x1>=start)[0][0]
@@ -419,9 +511,36 @@ def ts2segments(ys, ts, factor=10):
 
     return seg_ys, seg_ts, n_segs
 
-
 def clean_ts(ys, ts):
-    ''' Delete the NaNs in the time series and sort it with time axis ascending
+    ''' Cleaning the timeseries
+
+    Delete the NaNs in the time series and sort it with time axis ascending,
+    duplicated timestamps will be reduced by averaging the values.
+
+    Parameters
+    ----------
+    ys : array
+        A time series, NaNs allowed
+    ts : array
+        The time axis of the time series, NaNs allowed
+
+    Returns
+    -------
+    ys : array
+        The time series without nans
+    ts : array
+        The time axis of the time series without nans
+
+    '''
+    ys, ts = dropna(ys, ts)
+    ys, ts = sort_ts(ys, ts)
+    ys, ts = reduce_duplicated_timestamps(ys, ts)
+
+    return ys, ts
+
+
+def dropna(ys, ts):
+    ''' Remove entries of ys or ts that bear NaNs
 
     Parameters
     ----------
@@ -449,13 +568,82 @@ def clean_ts(ys, ts):
     ys = ys[~np.isnan(ts_tmp)]
     ts = ts[~np.isnan(ts_tmp)]
 
+    return ys, ts
+
+def sort_ts(ys, ts):
+    ''' Sort ts values in ascending order
+
+    Parameters
+    ----------
+    ys : array
+        Dependent variable
+    ts : array
+        Independent variable
+
+    Returns
+    -------
+    ys : array
+        Dependent variable
+    ts : array
+        Independent variable, sorted in ascending order
+
+    '''
+    ys = np.asarray(ys, dtype=np.float)
+    ts = np.asarray(ts, dtype=np.float)
+    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
+
     # sort the time series so that the time axis will be ascending
-    sort_ind = np.argsort(ts)
-    ys = ys[sort_ind]
-    ts = ts[sort_ind]
+    dt = np.median(np.diff(ts))
+    if dt < 0:
+        sort_ind = np.argsort(ts)
+        ys = ys[sort_ind]
+        ts = ts[sort_ind]
+        print('The time axis has been adjusted to be ascending!')
 
     return ys, ts
 
+def reduce_duplicated_timestamps(ys, ts):
+    ''' Reduce duplicated timestamps in a timeseries by averaging the values
+
+    Parameters
+    ----------
+    ys : array
+        Dependent variable
+    ts : array
+        Independent variable
+
+    Returns
+    -------
+    ys : array
+        Dependent variable
+    ts : array
+        Independent variable, with duplicated timestamps reduced by averaging the values
+
+    '''
+    ys = np.asarray(ys, dtype=np.float)
+    ts = np.asarray(ts, dtype=np.float)
+    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
+
+    if len(ts) != len(set(ts)):
+        value = OrderedDict()
+        for t, y in zip(ts, ys):
+            if t not in value:
+                value[t] = [y]
+            else:
+                value[t].append(y)
+
+        ts = []
+        ys = []
+        for k, v in value.items():
+            ts.append(k)
+            ys.append(np.mean(v))
+
+        ts = np.array(ts)
+        ys = np.array(ys)
+
+        print('Duplicated timestamps has been reduced by averaging values!')
+        
+    return ys, ts
 
 def annualize(ys, ts):
     ''' Annualize a time series whose time resolution is finer than 1 year
@@ -475,6 +663,10 @@ def annualize(ys, ts):
               The time axis of the annualized time series
 
     '''
+    ys = np.asarray(ys, dtype=np.float)
+    ts = np.asarray(ts, dtype=np.float)
+    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
+
     year_int = list(set(np.floor(ts)))
     year_int = np.sort(list(map(int, year_int)))
     n_year = len(year_int)
@@ -650,7 +842,7 @@ def distance_neighbors(signal):
        distances : array
            Distance of each point from its nearest neighbors in decreasing order
     '''
-    nn = NearestNeighbors(4) # 4 nearest neighbors
+    nn = NearestNeighbors(n_neighbors=4) # 4 nearest neighbors
     nbrs =nn.fit(signal.reshape(-1,1))
     distances, indices = nbrs.kneighbors(signal.reshape(-1,1))
     distances = sorted(distances[:,-1],reverse=True)
@@ -678,7 +870,8 @@ def find_knee(distances):
     lineVec = allCoord[-1] - allCoord[0]
     lineVecNorm = lineVec / np.sqrt(np.sum(lineVec**2))
     vecFromFirst = allCoord - firstPoint
-    scalarProduct = np.sum(vecFromFirst * np.matlib.repmat(lineVecNorm, nPoints, 1), axis=1)
+    # scalarProduct = np.sum(vecFromFirst * np.matlib.repmat(lineVecNorm, nPoints, 1), axis=1)
+    scalarProduct = np.sum(vecFromFirst * np.tile(lineVecNorm, (nPoints, 1)), axis=1)
     vecFromFirstParallel = np.outer(scalarProduct, lineVecNorm)
     vecToLine = vecFromFirst - vecFromFirstParallel
     distToLine = np.sqrt(np.sum(vecToLine ** 2, axis=1))
