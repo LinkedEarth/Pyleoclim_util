@@ -110,3 +110,10 @@ MultipleScalogram (pyleoclim.MultipleScalogram)
 .. autoclass:: pyleoclim.core.ui.MultipleScalogram
    :members:
    :inherited-members:
+
+CorrEns (pyleoclim.CorrEns)
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+ .. autoclass:: pyleoclim.core.ui.MultipleScalogram
+    :members:
+    :inherited-members:

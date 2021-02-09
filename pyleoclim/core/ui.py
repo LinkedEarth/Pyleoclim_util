@@ -576,7 +576,7 @@ class Series:
                 (2) 'mc-ssa': Monte-Carlo SSA (use modes above the 95% threshold)
                 (3) 'var': first K modes that explain at least var_thresh % of the variance.
             Default is None, which bypasses truncation (K = M)
-            
+
         var_thresh : float
             variance threshold for reconstruction (only impcatful if trunc is set to 'var')
 
@@ -729,26 +729,26 @@ class Series:
               - "path" must be specified; it can be any existed or non-existed path,
                 with or without a suffix; if the suffix is not given in "path", it will follow "format"
               - "format" can be one of {"pdf", "eps", "png", "ps"}
-              
+
         ax : matplotlib.axis, optional
             A matplotlib axis
-        
+
         ylabel : str
             Label for the count axis
-        
+
         vertical : {True,False}
             Whether to flip the plot vertically
-        
+
         edgecolor : matplotlib.color
             The color of the edges of the bar
-        
+
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
-        
+
         plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
-            
+
 
         See also
         --------
@@ -785,11 +785,11 @@ class Series:
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
-        
+
         #make the data into a dataframe so we can flip the figure
-        time_label, value_label = self.make_labels()   
+        time_label, value_label = self.make_labels()
         if vertical == True:
-            data=pd.DataFrame({'value':self.value}) 
+            data=pd.DataFrame({'value':self.value})
             ax = sns.histplot(data=data, y="value", ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
             ax.set_ylabel(value_label)
             ax.set_xlabel(ylabel)
@@ -5029,10 +5029,10 @@ class Lipd:
         '''Extracts one timeseries from the Lipd object
 
         Note that this function may require user interaction.
-        
+
         Parameters
         ----------
-        
+
         number : int
             the number of the timeseries object
 
@@ -5056,7 +5056,7 @@ class Lipd:
                 raise TypeError('Number needs to be an integer or should be coerced into an integer.')
             ts = LipdSeries(ts_list[number])
         return ts
-        
+
 
     def mapAllArchive(self, projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
@@ -5108,10 +5108,10 @@ class Lipd:
         -------
         res : figure
             The figure
-            
+
         See also
         --------
-        
+
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
 
         '''
@@ -5353,10 +5353,10 @@ class LipdSeries(Series):
         Returns
         -------
         res : fig
-        
+
         See also
         --------
-        
+
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
         '''
         #get the information from the timeseries
@@ -5437,62 +5437,62 @@ class LipdSeries(Series):
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
                               mute=mute)
         return res
-    
+
     def getMetadata(self):
-    
+
         """ Get the necessary metadata for the ensemble plots
-        
+
         Parameters
         ----------
-            
+
         timeseries : object
-                    a specific timeseries object. 
-            
+                    a specific timeseries object.
+
         Returns
         -------
-        
+
         res : dict
                   A dictionary containing the following metadata:
                     archiveType
                     Authors (if more than 2, replace by et al)
-                    PublicationYear 
-                    Publication DOI 
+                    PublicationYear
+                    Publication DOI
                     Variable Name
                     Units
                     Climate Interpretation
-                    Calibration Equation 
+                    Calibration Equation
                     Calibration References
                     Calibration Notes
-            
+
         """
-        
+
         # Get all the necessary information
         # Top level information
         if "archiveType" in self.lipd_ts.keys():
             archiveType = self.lipd_ts["archiveType"]
         else:
             archiveType = "NA"
-            
+
         if "pub1_author" in self.lipd_ts.keys():
             authors = self.lipd_ts["pub1_author"]
         else:
             authors = "NA"
-        
+
         #Truncate if more than two authors
         idx = [pos for pos, char in enumerate(authors) if char == ";"]
         if  len(idx)>2:
             authors = authors[0:idx[1]+1] + "et al."
-        
+
         if "pub1_pubYear" in self.lipd_ts.keys():
             Year = str(self.lipd_ts["pub1_pubYear"])
         else:
             Year = "NA"
-        
+
         if "pub1_DOI" in self.lipd_ts.keys():
-            DOI = self.lipd_ts["pub1_DOI"]  
+            DOI = self.lipd_ts["pub1_DOI"]
         else:
             DOI = "NA"
-        
+
         if "paleoData_InferredVariableType" in self.lipd_ts.keys():
             if type(self.lipd_ts["paleoData_InferredVariableType"]) is list:
                 Variable = self.lipd_ts["paleoData_InferredVariableType"][0]
@@ -5505,12 +5505,12 @@ class LipdSeries(Series):
                 Variable = self.lipd_ts["paleoData_ProxyObservationType"]
         else:
             Variable = self.lipd_ts["paleoData_variableName"]
-        
+
         if "paleoData_units" in self.lipd_ts.keys():
             units = self.lipd_ts["paleoData_units"]
         else:
             units = "NA"
-        
+
         #Climate interpretation information
         if "paleoData_interpretation" in self.lipd_ts.keys():
             interpretation = self.lipd_ts["paleoData_interpretation"][0]
@@ -5520,7 +5520,7 @@ class LipdSeries(Series):
                 ClimateVar = interpretation["variable"]
             else:
                 ClimateVar = "NA"
-            if "detail" in interpretation.keys(): 
+            if "detail" in interpretation.keys():
                 Detail = interpretation["detail"]
             elif "variableDetail" in interpretation.keys():
                 Detail = interpretation['variableDetail']
@@ -5530,11 +5530,11 @@ class LipdSeries(Series):
                 Scope = interpretation['scope']
             else:
                 Scope = "NA"
-            if "seasonality" in interpretation.keys():    
+            if "seasonality" in interpretation.keys():
                 Seasonality = interpretation["seasonality"]
             else:
                 Seasonality = "NA"
-            if "interpdirection" in interpretation.keys():    
+            if "interpdirection" in interpretation.keys():
                 Direction = interpretation["interpdirection"]
             else:
                 Direction = "NA"
@@ -5544,7 +5544,7 @@ class LipdSeries(Series):
             Scope = "NA"
             Seasonality = "NA"
             Direction = "NA"
-            
+
         # Calibration information
         if "paleoData_calibration" in self.lipd_ts.keys():
             calibration = self.lipd_ts['paleoData_calibration'][0]
@@ -5564,16 +5564,16 @@ class LipdSeries(Series):
                 Calibration_notes = ref_author +"."+ref_year
             elif "notes" in calibration.keys():
                 Calibration_notes = calibration["notes"]
-            else: Calibration_notes = "NA"    
+            else: Calibration_notes = "NA"
         else:
             Calibration_equation = "NA"
             Calibration_notes = "NA"
-        
+
         #Truncate the notes if too long
         charlim = 30;
         if len(Calibration_notes)>charlim:
             Calibration_notes = Calibration_notes[0:charlim] + " ..."
-            
+
         res = {"archiveType" : archiveType,
                     "authors" : authors,
                     "Year": Year,
@@ -5587,14 +5587,14 @@ class LipdSeries(Series):
                     "Interpretation_Direction" : Direction,
                     "Calibration_equation" : Calibration_equation,
                     "Calibration_notes" : Calibration_notes}
-        
+
         return res
-    
+
     def dashboard(self, figsize = [11,8], plt_kwargs=None, distplt_kwargs=None, spectral_kwargs=None,
                   spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None, metadata = True,
                   savefig_settings=None, mute=False):
         '''
-        
+
 
         Parameters
         ----------
@@ -5630,35 +5630,35 @@ class LipdSeries(Series):
             The figure
         ax : matplolib.axis
             The axis.
-        
+
         See also
-        --------    
-        
+        --------
+
         pyleoclim.Series.plot : plot a timeseries
-        
+
         pyleoclim.Series.distplot : plot a distribution of the timeseries
-        
+
         pyleoclim.Series.spectral : spectral analysis method.
-        
+
         pyleoclim.PSD.signif_test : significance test for timeseries analysis
-        
+
         pyleoclim.PSD.plot : plot power spectrum
-        
+
         pyleoclim.LipdSeries.map : map location of dataset
-        
+
         pyleolim.LipdSeries.getMetadata : get relevant metadata from the timeseries object
-        
+
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
-        
+
         '''
-        
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         res=self.getMetadata()
         # start plotting
         fig = plt.figure(figsize=figsize)
         gs = gridspec.GridSpec(2,5)
         gs.update(left=0,right=1.1)
-        
+
         ax={}
        # Plot the timeseries
         plt_kwargs={} if plt_kwargs is None else plt_kwargs.copy()
@@ -5670,10 +5670,10 @@ class LipdSeries(Series):
             plt_kwargs.update({'marker':self.plot_default[archiveType][1]})
         if 'color' not in plt_kwargs.keys():
             archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
-            plt_kwargs.update({'color':self.plot_default[archiveType][0]})    
+            plt_kwargs.update({'color':self.plot_default[archiveType][0]})
         ax['ts'] = self.plot(**plt_kwargs)
         ymin, ymax = ax['ts'].get_ylim()
-        
+
         #plot the distplot
         distplt_kwargs={} if distplt_kwargs is None else distplt_kwargs.copy()
         ax['dts'] = plt.subplot(gs[0,2])
@@ -5682,17 +5682,17 @@ class LipdSeries(Series):
         distplt_kwargs.update({'vertical':True})
         if 'color' not in distplt_kwargs.keys():
             archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
-            distplt_kwargs.update({'color':self.plot_default[archiveType][0]}) 
+            distplt_kwargs.update({'color':self.plot_default[archiveType][0]})
         ax['dts'] = self.distplot(**distplt_kwargs)
         ax['dts'].set_ylim([ymin,ymax])
         ax['dts'].set_yticklabels([])
         ax['dts'].set_ylabel('')
         ax['dts'].set_yticks([])
-    
+
         #make the map - brute force since projection is not being returned properly
         lat=[self.lipd_ts['geo_meanLat']]
         lon=[self.lipd_ts['geo_meanLon']]
-        
+
         map_kwargs={} if map_kwargs is None else map_kwargs.copy()
         if 'projection' in map_kwargs.keys():
             projection=map_kwargs['projection']
@@ -5713,7 +5713,7 @@ class LipdSeries(Series):
                 try:
                     proj = mapping.set_proj(projection=projection, proj_default=proj3)
                 except:
-                    proj = mapping.set_proj(projection=projection, proj_default=proj2)       
+                    proj = mapping.set_proj(projection=projection, proj_default=proj2)
         if 'marker' in map_kwargs.keys():
             marker = map_kwargs['marker']
         else:
@@ -5751,12 +5751,12 @@ class LipdSeries(Series):
         else:
             legend = False
         #make the plot map
-        
+
         data_crs = ccrs.PlateCarree()
         ax['map'] = plt.subplot(gs[1,0],projection=proj)
         ax['map'].coastlines()
         if background is True:
-            ax['map'].stock_img()     
+            ax['map'].stock_img()
         #Other extra information
         if borders is True:
             ax['map'].add_feature(cfeature.BORDERS)
@@ -5767,7 +5767,7 @@ class LipdSeries(Series):
         ax['map'].scatter(lon,lat,zorder=10,label=marker,facecolor=color,transform=data_crs, **scatter_kwargs)
         if legend == True:
             ax.legend(**lgd_kwargs)
-        
+
         #spectral analysis
         spectral_kwargs={} if spectral_kwargs is None else spectral_kwargs.copy()
         if 'method' in spectral_kwargs.keys():
@@ -5780,16 +5780,16 @@ class LipdSeries(Series):
             spectral_kwargs.update({'freq_method':'lomb_scargle'})
         ts_preprocess = self.detrend().standardize()
         psd=ts_preprocess.spectral(**spectral_kwargs)
-        
+
         #Significance test
         spectralsignif_kwargs={} if spectralsignif_kwargs is None else spectralsignif_kwargs.copy()
         if 'number' in  spectralsignif_kwargs.keys():
             pass
         else:
             spectralsignif_kwargs.update({'number':1000})
-            
+
         psd_signif = psd.signif_test(**spectralsignif_kwargs)
-        
+
         #Make the plot
         spectralfig_kwargs={} if spectralfig_kwargs is None else spectralfig_kwargs.copy()
         if 'color' not in spectralfig_kwargs.keys():
@@ -5800,7 +5800,7 @@ class LipdSeries(Series):
         ax['spec'] = plt.subplot(gs[1,1:3])
         spectralfig_kwargs.update({'ax':ax['spec']})
         ax['spec'] = psd_signif.plot(**spectralfig_kwargs)
-        
+
         if metadata == True:
             # get metadata
             textstr = "archiveType: " + res["archiveType"]+"\n"+"\n"+\
@@ -5818,11 +5818,10 @@ class LipdSeries(Series):
               "    Equation: " + res["Calibration_equation"] + "\n" +\
               "    Notes: " + res["Calibration_notes"]
             plt.figtext(0.7, 0.4, textstr, fontsize = 12)
-        
+
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
         else:
             if not mute:
                 plotting.showfig(fig)
         return fig, ax
-        
