@@ -803,5 +803,3 @@ class TestSeriesDistplot:
         ts = pyleo.Series(time = t, value = v)
 
         fig, ax = ts.distplot(vertical=vertical, mute=True)
-
-        

@@ -10,6 +10,7 @@ from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
 from ..utils import causality as causalutils
 from ..utils import decomposition
+from ..utils import filter as filterutils
 
 #from textwrap import dedent
 
@@ -713,6 +714,71 @@ class Series:
 
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
         return res
+
+    def is_evenly_spaced(self):
+        ''' Check if the timeseries is evenly-spaced
+
+        Return
+        ------
+
+        res : bool
+        '''
+
+        res = tsutils.is_evenly_spaced(self.value)
+        return res
+
+    def filter(self, cutoff_freq=None, method='Butterworth', settings=None):
+        ''' Filtering the timeseries
+
+        Parameters
+        ----------
+
+        method : str, {'Savitzky-Golay', 'Butterworth'}
+            the filtering method; 'Butterworth' is the default
+
+        cutoff_freq : float or list
+            The cutoff frequency only works with the Butterworth method.
+            If a float, it is interpreted as a low-frequency cutoff (lowpass).
+            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
+
+        settings : dict
+            a dictionary of the keyword arguments for the filtering method,
+            see `pyleoclim.utils.filter.savitzky_golay` and `pyleoclim.utils.filter.butterworth` for the details
+
+        Return
+        ------
+
+        new : pyleoclim.Series
+
+        See also
+        --------
+
+        pyleoclim.utils.filter.butterworth : Butterworth method
+        pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
+
+        '''
+        if not self.is_evenly_spaced():
+            raise ValueError('This filtering method assumes evenly-spaced timeseries, while the input is not. Please consider call the ".interp()" or ".bin()" method prior to ".filter()".')
+
+        settings = {} if settings is None else settings.copy()
+
+        new = self.copy()
+
+        method_func = {
+            'Savitzky-Golay': filterutils.savitzky_golay,
+            'Butterworth': filterutils.butterworth,
+        }
+
+        args = {}
+        args['Butterworth'] = {'fc': cutoff_freq}
+        args.update(settings)
+
+        new_val = method_func[method](self.value, **args)
+        new.value = new_val
+
+        return new
+
+
 
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                  ax=None, ylabel='KDE', vertical=False, edgecolor='w',mute=False, **plot_kwargs):
@@ -1989,7 +2055,6 @@ class Series:
         Parameters
         ----------
 
-
         kwargs :
             Arguments for binning function. See pyleoclim.utils.tsutils.bin for details
 
@@ -2001,7 +2066,6 @@ class Series:
 
         See also
         --------
-
 
         pyleoclim.utils.tsutils.bin : bin the time series into evenly-spaced bins
 
@@ -3025,6 +3089,49 @@ class MultipleSeries:
         new_ms.series_list = new_ts_list
         return new_ms
 
+    def filter(self, cutoff_freq=None, method='Butterworth', settings=None):
+        ''' Filtering the timeseries in the MultipleSeries object
+
+        Parameters
+        ----------
+
+        method : str, {'Savitzky-Golay', 'Butterworth'}
+            the filtering method; 'Butterworth' is the default
+
+        cutoff_freq : float or list
+            The cutoff frequency only works with the Butterworth method.
+            If a float, it is interpreted as a low-frequency cutoff (lowpass).
+            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
+
+        settings : dict
+            a dictionary of the keyword arguments for the filtering method,
+            see `pyleoclim.utils.filter.savitzky_golay` and `pyleoclim.utils.filter.butterworth` for the details
+
+        Return
+        ------
+
+        ms : pyleoclim.MultipleSeries
+
+        See also
+        --------
+
+        pyleoclim.utils.filter.butterworth : Butterworth method
+        pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
+
+        '''
+
+        ms = self.copy()
+
+        new_tslist = []
+        for ts in self.series_list:
+            new_tslist.append(ts.filter(cutoff_freq=cutoff_freq, method=method, settings=settings))
+
+        ms.series_list = new_tslist
+
+        return ms
+
+
+
     def append(self,ts):
         '''Append timeseries ts to MultipleSeries object
 
@@ -3749,21 +3856,24 @@ class MultipleSeries:
         else:
             return ax
 
-
-    def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None,
+    def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
                   spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
         ''' Stack plot of multiple series
-
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
                 Parameters
         ----------
         figsize : list
             Size of the figure.
-        colors : str, or list of str
+        colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
             Colors for plotting.
             If None, the plotting will cycle the 'tab10' colormap;
             if only one color is specified, then all curves will be plotted with that single color;
             if a list of colors are specified, then the plotting will cycle that color list.
+        cmap : str
+            The colormap to use when "colors" is None.
+        norm : matplotlib.colors.Normalize like
+            The nomorlization for the colormap.
+            If None, a linear normalization will be used.
         savefig_settings : dictionary
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -3786,7 +3896,6 @@ class MultipleSeries:
         v_shift_factor : float
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
-
         Returns
         -------
         fig, ax
@@ -3817,13 +3926,23 @@ class MultipleSeries:
         bottom = 1
         for idx, ts in enumerate(self.series_list):
             if colors is None:
-                cmap_obj = plt.get_cmap('tab10')
-                clr = cmap_obj(idx%10)
+                cmap_obj = plt.get_cmap(cmap)
+                if hasattr(cmap_obj, 'colors'):
+                    nc = len(cmap_obj.colors)
+                else:
+                    nc = len(self.series_list)
+
+                if norm is None:
+                    norm = mpl.colors.Normalize(vmin=0, vmax=nc-1)
+
+                clr = cmap_obj(norm(idx%nc))
             elif type(colors) is str:
                 clr = colors
             elif type(colors) is list:
                 nc = len(colors)
                 clr = colors[idx%nc]
+            else:
+                raise TypeError('"colors" should be a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)')
 
             bottom -= height*v_shift_factor
             ax[idx] = fig.add_axes([left, bottom, width, height])
@@ -3895,6 +4014,7 @@ class MultipleSeries:
         # reset the plotting style
         mpl.rcParams.update(current_style)
         return fig, ax
+
 
 class SurrogateSeries(MultipleSeries):
     ''' Object containing surrogate timeseries

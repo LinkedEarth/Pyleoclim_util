@@ -45,7 +45,7 @@ def savitzky_golay(ys,window_length=None, polyorder=2, deriv=0, delta=1,
         the values of the signal to be filtered
         
     window_length : int
-        The length of the filter window. Must be a positive off integer. 
+        The length of the filter window. Must be a positive integer. 
             If mode is 'interp', window_length must be less than or equal to the size of ys. 
             Default is the size of ys.
     
@@ -121,7 +121,7 @@ def savitzky_golay(ys,window_length=None, polyorder=2, deriv=0, delta=1,
                             delta=delta,
                             axis=axis,
                             mode=mode,
-                            cval=0)
+                            cval=cval)
 
     return yf
 
