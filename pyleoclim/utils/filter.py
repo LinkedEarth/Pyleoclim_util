@@ -244,11 +244,12 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
     ts = np.arange(len(ys)) # define time axis
 
     if pad=='ARIMA':
-        yp,tp = ts_pad(ys,ts,method = 'ARIMA', params=params, padFrac=padFrac)
+        yp, tp = ts_pad(ys,ts,method = 'ARIMA', params=params, padFrac=padFrac)
     elif pad=='reflect':
-        yp,tp = ts_pad(ys,ts,method = 'reflect', reflect_type=reflect_type, padFrac=padFrac)
+        yp, tp = ts_pad(ys,ts,method = 'reflect', reflect_type=reflect_type, padFrac=padFrac)
     elif pad is None:
-        yp = ys; tp = ts
+        yp = ys
+        tp = ts
     else:
         raise ValueError('Not a valid argument. Enter "ARIMA", "reflect" or None')
 

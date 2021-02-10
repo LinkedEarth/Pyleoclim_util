@@ -630,7 +630,7 @@ class Series:
             import matplotlib.gridspec as gridspec
             import numpy as np
 
-            d  = nino_ssa['eigval'] # extract eigenvalue vector
+            d  = nino_ssa['eigvals'] # extract eigenvalue vector
             M  = len(d)  # infer window size
             de = d*np.sqrt(2/(M-1))
             var_pct = nino_ssa['pctvar'] # extract the fraction of variance attributable to each mode
@@ -643,6 +643,7 @@ class Series:
             ax.set_title('Scree plot of SSA eigenvalues')
             ax.set_xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
             ax.legend(loc='upper right')
+            @savefig ts_eigen.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
@@ -664,7 +665,7 @@ class Series:
         .. ipython:: python
             :okwarning:
 
-            RCk = nino_ssa['RC'][:,:14].sum(axis=1)
+            RCk = nino_ssa['RCmat'][:,:14].sum(axis=1)
             fig, ax = ts.plot(title='ONI',mute=True) # we mute the first call to only get the plot with 2 lines
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
@@ -691,10 +692,10 @@ class Series:
         .. ipython:: python
             :okwarning:
 
-            d  = nino_mcssa['eigval'] # extract eigenvalue vector
+            d  = nino_mcssa['eigvals'] # extract eigenvalue vector
             de = d*np.sqrt(2/(M-1))
-            du = nino_mcssa['eigval_q'][:,0]  # extract upper quantile of MC-SSA eigenvalues
-            dl = nino_mcssa['eigval_q'][:,1]  # extract lower quantile of MC-SSA eigenvalues
+            du = nino_mcssa['eigvals_q'][:,0]  # extract upper quantile of MC-SSA eigenvalues
+            dl = nino_mcssa['eigvals_q'][:,1]  # extract lower quantile of MC-SSA eigenvalues
 
             # plot eigenvalues
             rk = np.arange(0,20)+1
@@ -718,23 +719,25 @@ class Series:
     def is_evenly_spaced(self):
         ''' Check if the timeseries is evenly-spaced
 
-        Return
+        Returns
         ------
 
         res : bool
         '''
 
-        res = tsutils.is_evenly_spaced(self.value)
+        res = tsutils.is_evenly_spaced(self.time)
         return res
 
-    def filter(self, cutoff_freq=None, method='Butterworth', settings=None):
+    def filter(self, cutoff_freq=None, method='butterworth', settings=None):
         ''' Filtering the timeseries
 
         Parameters
         ----------
 
-        method : str, {'Savitzky-Golay', 'Butterworth'}
-            the filtering method; 'Butterworth' is the default
+        method : str, {'savitzky-golay', 'butterworth'}
+            the filtering method
+            - 'butterworth': the Butterworth method (default)
+            - 'savitzky-golay': the Savitzky-Golay method
 
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
@@ -745,10 +748,54 @@ class Series:
             a dictionary of the keyword arguments for the filtering method,
             see `pyleoclim.utils.filter.savitzky_golay` and `pyleoclim.utils.filter.butterworth` for the details
 
-        Return
-        ------
+        Returns
+        -------
 
         new : pyleoclim.Series
+
+        Examples
+        --------
+
+        In the example below, we generate a signal as the sum of two signals with frequency 10 Hz and 20 Hz, respectively.
+        Then we apply a low-pass filter with a cutoff frequency at 15 Hz, and compare the output to the signal of 10 Hz.
+        After that, we apply a band-pass filter with the band 15-25 Hz, and compare the outcome to the signal of 20 Hz.
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import numpy as np
+
+            t = np.linspace(0, 1, 1000)
+            sig1 = np.sin(2*np.pi*10*t)
+            sig2 = np.sin(2*np.pi*20*t)
+            sig = sig1 + sig2
+            ts1 = pyleo.Series(time=t, value=sig1)
+            ts2 = pyleo.Series(time=t, value=sig2)
+            ts = pyleo.Series(time=t, value=sig)
+            fig, ax = ts.plot(mute=True, label='mix')
+            ts1.plot(ax=ax, label='10 Hz')
+            ts2.plot(ax=ax, label='20 Hz')
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
+            @savefig ts_filter1.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+
+            fig, ax = ts.plot(mute=True, label='mix')
+            ts.filter(cutoff_freq=15).plot(ax=ax, label='After 15 Hz low-pass filter')
+            ts1.plot(ax=ax, label='10 Hz')
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
+            @savefig ts_filter2.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+
+            fig, ax = ts.plot(mute=True, label='mix')
+            ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label='After 15-25 Hz band-pass filter')
+            ts2.plot(ax=ax, label='20 Hz')
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
+            @savefig ts_filter3.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
 
         See also
         --------
@@ -765,15 +812,19 @@ class Series:
         new = self.copy()
 
         method_func = {
-            'Savitzky-Golay': filterutils.savitzky_golay,
-            'Butterworth': filterutils.butterworth,
+            'savitzky-golay': filterutils.savitzky_golay,
+            'butterworth': filterutils.butterworth,
         }
 
         args = {}
-        args['Butterworth'] = {'fc': cutoff_freq}
-        args.update(settings)
 
-        new_val = method_func[method](self.value, **args)
+        if method == 'butterworth' and cutoff_freq is None:
+            raise ValueError('Please set the cutoff frequency argument: "cutoff_freq".')
+
+        args['butterworth'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
+        args[method].update(settings)
+
+        new_val = method_func[method](self.value, **args[method])
         new.value = new_val
 
         return new
@@ -1346,15 +1397,15 @@ class Series:
             @savefig spec_ls.png
             fig, ax = psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
             pyleo.closefig(fig)
-        
+
         We may pass in method-specific arguments via "settings", which is a dictionary.
         For instance, to adjust the number of overlapping segment for Lomb-Scargle, we may specify the method-specific argument "n50";
         to adjust the frequency vector, we may modify the "freq_method" or modify the method-specific argument "freq".
 
         .. ipython:: python
             :okwarning:
-            
-            import numpy as np    
+
+            import numpy as np
             psd_LS_n50 = ts_std.spectral(method='lomb_scargle', settings={'n50': 4})  # c=1e-2 yields lower frequency resolution
             psd_LS_freq = ts_std.spectral(method='lomb_scargle', settings={'freq': np.linspace(1/20, 1/0.2, 51)})
             psd_LS_LS = ts_std.spectral(method='lomb_scargle', freq_method='lomb_scargle')  # with frequency vector generated using REDFIT method
@@ -1370,7 +1421,6 @@ class Series:
                 title='PSD using Lomb-Scargle method with differnt frequency vectors', mute=True,
                 label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
             psd_ls.plot(ax=ax, label='freq_method="log"', marker='o')
-            psd_ls_nfft.plot(ax=ax, label='freq_method="nfft"', marker='o')
             @savefig spec_ls_freq.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
@@ -1378,7 +1428,7 @@ class Series:
         You may notice the differences in the PSD curves regarding smoothness and the locations of the analyzed period points.
 
         For other method-specific arguments, please look up the specific methods in the "See also" section.
-            
+
         - WWZ
 
         .. ipython:: python
@@ -1608,7 +1658,7 @@ class Series:
 
         pyleoclim.core.ui.Coherence : Coherence object
 
-        
+
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -1989,10 +2039,10 @@ class Series:
         new.time = x_mod
         new.value = v_mod
         return new
-    
+
     def gkernel(self, step_type = 'median', **kwargs):
         ''' Coarse-grain a Series object via a Gaussian kernel.
-        
+
         Parameters
         ----------
         step_type : str
@@ -2007,7 +2057,7 @@ class Series:
         --------
         pyleoclim.utils.tsutils.gkernel : application of a Gaussian kernel
         '''
-        
+
         new=self.copy()
 
         start, stop, step = tsutils.grid_properties(self.time, method=step_type)
@@ -2017,7 +2067,7 @@ class Series:
         new.time = ti
         new.value = vi
         return new
-    
+
     def bin(self,**kwargs):
         '''Bin values in a time series
 
@@ -2176,7 +2226,7 @@ class PSD:
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
              legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
              plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
-        
+
         '''Plots the PSD estimates and signif level if included
 
 
@@ -3059,14 +3109,16 @@ class MultipleSeries:
         new_ms.series_list = new_ts_list
         return new_ms
 
-    def filter(self, cutoff_freq=None, method='Butterworth', settings=None):
+    def filter(self, cutoff_freq=None, method='butterworth', settings=None):
         ''' Filtering the timeseries in the MultipleSeries object
 
         Parameters
         ----------
 
-        method : str, {'Savitzky-Golay', 'Butterworth'}
-            the filtering method; 'Butterworth' is the default
+        method : str, {'savitzky-golay', 'butterworth'}
+            the filtering method
+            - 'butterworth': the Butterworth method (default)
+            - 'savitzky-golay': the Savitzky-Golay method
 
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
@@ -3383,9 +3435,9 @@ class MultipleSeries:
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
             ms = pyleo.MultipleSeries(tslist)
 
-            msc = ms.common_time()
+            # msc = ms.common_time()
 
-            res = msc.pca(nMC=20)
+            # res = msc.pca(nMC=20)
 
         '''
         flag, lengths = self.equal_lengths()
@@ -3817,8 +3869,9 @@ class MultipleSeries:
     def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
                   spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
         ''' Stack plot of multiple series
+
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
-        
+
         Parameters
         ----------
         figsize : list
@@ -3855,14 +3908,14 @@ class MultipleSeries:
         v_shift_factor : float
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
-        
+
         Returns
         -------
         fig, ax
-        
+
         Examples
         --------
-        
+
         .. ipython:: python
             :okwarning:
 
@@ -3875,7 +3928,7 @@ class MultipleSeries:
             @savefig mts_stackplot.png
             fig, ax = ms.stackplot()
             pyleo.closefig(fig)
-            
+
         '''
         plt.ioff()
         current_style = deepcopy(mpl.rcParams)
@@ -4305,7 +4358,7 @@ class EnsembleSeries(MultipleSeries):
                       xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
                       curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
                       inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None, mute=False):
-        
+
         '''Plot EnsembleSeries as an envelope.
 
         Parameters
