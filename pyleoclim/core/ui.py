@@ -3442,14 +3442,11 @@ class MultipleSeries:
             :okwarning:
 
             import pyleoclim as pyleo
-            import lipd
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_tso()
-            mslist = []
-            for item in tslist:
-                mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
-            ms = pyleo.MultipleSeries(mslist)
+            tslist = data.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
             msbin = ms.bin()
 
         '''
@@ -3499,14 +3496,11 @@ class MultipleSeries:
             :okwarning:
 
             import pyleoclim as pyleo
-            import lipd
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_tso()
-            mslist = []
-            for item in tslist:
-                mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
-            ms = pyleo.MultipleSeries(mslist)
+            tslist = data.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
             msk = ms.gkernel()
 
         '''
@@ -3557,14 +3551,11 @@ class MultipleSeries:
             :okwarning:
 
             import pyleoclim as pyleo
-            import lipd
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_tso()
-            mslist = []
-            for item in tslist:
-                mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
-            ms = pyleo.MultipleSeries(mslist)
+            tslist = data.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
             msinterp = ms.interp()
 
         '''
@@ -3827,7 +3818,8 @@ class MultipleSeries:
                   spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
         ''' Stack plot of multiple series
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
-                Parameters
+        
+        Parameters
         ----------
         figsize : list
             Size of the figure.
@@ -3863,9 +3855,27 @@ class MultipleSeries:
         v_shift_factor : float
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
+        
         Returns
         -------
         fig, ax
+        
+        Examples
+        --------
+        
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            tslist = data.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
+            @savefig mts_stackplot.png
+            fig, ax = ms.stackplot()
+            pyleo.closefig(fig)
+            
         '''
         plt.ioff()
         current_style = deepcopy(mpl.rcParams)
@@ -4295,6 +4305,7 @@ class EnsembleSeries(MultipleSeries):
                       xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
                       curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
                       inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None, mute=False):
+        
         '''Plot EnsembleSeries as an envelope.
 
         Parameters
