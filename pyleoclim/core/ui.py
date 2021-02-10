@@ -743,7 +743,6 @@ class Series:
             The cutoff frequency only works with the Butterworth method.
             If a float, it is interpreted as a low-frequency cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
-            If None, 
 
         settings : dict
             a dictionary of the keyword arguments for the filtering method,
