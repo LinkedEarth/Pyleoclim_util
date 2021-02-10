@@ -17,7 +17,7 @@ import numpy as np
 from statsmodels.tsa.stattools import grangercausalitytests
 from tqdm import tqdm
 from .tsmodel import ar1_fit_evenly
-from .correlation import phaseran
+from .correlation import sm_ar1_sim, phaseran
 from scipy.stats.mstats import mquantiles
 
 #-------
@@ -396,8 +396,8 @@ def signif_isopersist(y1, y2, method,
     sig1 = np.std(y1)
     sig2 = np.std(y2)
     n = np.size(y1)
-    noise1 = ar1_sim_evenly(n, nsim, g1, sig1)
-    noise2 = ar1_sim_evenly(n, nsim, g2, sig2)
+    noise1 = sm_ar1_sim(n, nsim, g1, sig1)
+    noise2 = sm_ar1_sim(n, nsim, g2, sig2)
 
     if method == 'liang':
         npt = kwargs['npt'] if 'npt' in kwargs else 1
