@@ -5668,8 +5668,8 @@ class LipdSeries(Series):
 
         Returns
         -------
-        ms : pyleoclim.MultipleSeries
-            A MultipleSeries object with each series representing a possible realization of the age model
+        ms : pyleoclim.EnsembleSeries
+            An EnsembleSeries object with each series representing a possible realization of the age model
 
         '''
         #get the corresponding LiPD
@@ -5721,9 +5721,9 @@ class LipdSeries(Series):
             s_tmp=Series(time=s,value=self.value)
             s_list.append(s_tmp)
 
-        ms = MultipleSeries(series_list=s_list)
+        ens = EnsembleSeries(series_list=s_list)
 
-        return ms
+        return ens
 
     def map(self,projection = 'Orthographic', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
