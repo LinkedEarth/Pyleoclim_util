@@ -4358,23 +4358,12 @@ class EnsembleSeries(MultipleSeries):
                       xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
                       curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
                       inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None, mute=False):
-
         '''Plot EnsembleSeries as an envelope.
 
         Parameters
         ----------
         figsize : list, optional
-            Size of the figure. The default is [10, 4].
-        marker : str, optional
-            marker type. The default is None.
-        markersize : float, optional
-            marker size. The default is None.
-        color : str, optional
-            color. The default is None.
-        linestyle : str, optional
-            Line style. The default is None.
-        linewidth : float, optional
-            The width of the line. The default is None.
+            The figure size. The default is [10, 4].
         qs : list, optional
             The significance levels to consider. The default is [0.025, 0.25, 0.5, 0.75, 0.975] (median, interquartile range, and central 95% region)
         xlabel : str, optional
@@ -4382,25 +4371,41 @@ class EnsembleSeries(MultipleSeries):
         ylabel : str, optional
             y-axis label. The default is None.
         title : str, optional
-            Title. The default is None.
-        legend : bool, optional
-            Wether the show the legend. The default is True.
-        plot_kwargs : dict, optional
-            Plot parameters. The default is None.
-        lgd_kwargs : dict, optional
-            Legend parameters. The default is None.
-        savefig_settings : dictionary, optional
+            Plot title. The default is None.
+        xlim : list, optional
+            x-axis limits. The default is None.
+        ylim : list, optional
+            y-axis limits. The default is None.
+        savefig_settings : dict, optional
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
         ax : matplotlib.ax, optional
-            The matplotlib axis onto which to return the figure. The default is None.
+            Matplotlib axis on which to return the plot. The default is None.
+        xticks : list, optional
+            xticks label. The default is None.
+        yticks : list, optional
+            yticks label. The default is None.
+        plot_legend : bool, optional
+            Wether to plot the legend. The default is True.
+        curve_clr : str, optional
+            Color of the main line (median). The default is sns.xkcd_rgb['pale red'].
+        curve_lw : str, optional
+            Width of the main line (median). The default is 2.
+        shade_clr : str, optional
+            Color of the shaded envelope. The default is sns.xkcd_rgb['pale red'].
+        shade_alpha : float, optional
+            Transparency on the envelope. The default is 0.2.
+        inner_shade_label : str, optional
+            Label for the envelope. The default is 'IQR'.
+        outer_shade_label : str, optional
+            Label for the envelope. The default is '95\% CI'.
+        lgd_kwargs : dict, optional
+            Parameters for the legend. The default is None.
         mute : bool, optional
             if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-        invert_xaxis : bool, optional
-            if True, the x-axis of the plot will be inverted
+            recommend to turn on when more modifications are going to be made on ax. The default is False.
 
         Returns
         -------
@@ -4411,34 +4416,53 @@ class EnsembleSeries(MultipleSeries):
         plt.ioff()
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-        plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+
+        # generate default axis labels
+        time_label, value_label = self.make_labels()
+
+        if xlabel is None:
+            xlabel = time_label
+
+        if ylabel is None:
+            ylabel = value_label
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
-        if ylabel is None:
-            consistent_ylabels = True
-            time_label, value_label = self.series_list[0].make_labels()
-            for s in self.series_list[1:]:
-                time_label_tmp, value_label_tmp = s.make_labels()
-                if value_label_tmp != value_label:
-                    consistent_ylabels = False
+        ts_qs = self.quantiles(qs=qs)
 
-            if consistent_ylabels:
-                ylabel = value_label
-            else:
-                ylabel = 'value'
 
-        for s in self.series_list:
-            ax = s.plot(
-                figsize=figsize, marker=marker, markersize=markersize, color=color, linestyle=linestyle,
-                linewidth=linewidth, label=s.label, xlabel=xlabel, ylabel=ylabel, title=title,
-                legend=legend, lgd_kwargs=lgd_kwargs, plot_kwargs=plot_kwargs, ax=ax,
-            )
+        if inner_shade_label is None:
+            inner_shade_label = f'{ts_qs.series_list[1].label}-{ts_qs.series_list[-2].label}'
 
-        if invert_xaxis:
-            ax.invert_xaxis()
+        if outer_shade_label is None:
+            outer_shade_label = f'{ts_qs.series_list[0].label}-{ts_qs.series_list[-1].label}'
+
+        time = ts_qs.series_list[0].time
+        # plot outer envelope
+        ax.fill_between(
+            time, ts_qs.series_list[0].value, ts_qs.series_list[4].value,
+            color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=outer_shade_label,
+        )
+        # plot inner envelope on top
+        ax.fill_between(
+            time, ts_qs.series_list[1].value, ts_qs.series_list[3].value,
+            color=shade_clr, alpha=2*shade_alpha, edgecolor=shade_clr, label=inner_shade_label,
+        )
+
+        # plot the median
+        ts_qs.series_list[2].plot(xlabel=xlabel, ylabel=ylabel, linewidth=curve_lw, color=curve_clr,
+            xlim=xlim, ylim=ylim, ax=ax,  zorder=100, label = 'median'
+        )
+
+        if title is not None:
+            ax.set_title(title)
+
+        if plot_legend:
+            lgd_args = {'frameon': False}
+            lgd_args.update(lgd_kwargs)
+            ax.legend(**lgd_args)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
@@ -4449,7 +4473,7 @@ class EnsembleSeries(MultipleSeries):
             return fig, ax
         else:
             return ax
-
+        
 
     def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
                   spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
@@ -4611,435 +4635,6 @@ class EnsembleSeries(MultipleSeries):
         # reset the plotting style
         mpl.rcParams.update(current_style)
         return fig, ax
-
-class SurrogateSeries(MultipleSeries):
-    ''' Object containing surrogate timeseries
-    '''
-    def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
-        self.series_list = series_list
-        self.surrogate_method = surrogate_method
-        self.surrogate_args = surrogate_args
-
-class EnsembleSeries(MultipleSeries):
-    ''' EnsembleSeries object
-
-    The EnsembleSeries object is a child of the MultipleSeries object, that is, a special case of MultipleSeries, aiming for ensembles of similar series.
-    Ensembles usually arise from age modeling or Bayesian calibrations. All members of an EnsembleSeries object are assumed to share identical labels and units.
-    One of the main difference between MultipleSeries and EnsembleSeries is the plot() method: for MultipleSeries, a stack plot is called.
-    For EnsembleSeries, a spaghetti plot of transparent lines of identical color is used.
-
-    '''
-    def __init__(self, series_list):
-        self.series_list = series_list
-
-    def make_labels(self):
-        '''
-        Initialization of labels
-
-        Returns
-        -------
-        time_header : str
-            Label for the time axis
-        value_header : str
-            Label for the value axis
-
-        '''
-        ts_list = self.series_list
-
-        if ts_list[0].time_name is not None:
-            time_name_str = ts_list[0].time_name
-        else:
-            time_name_str = 'time'
-
-        if ts_list[0].value_name is not None:
-            value_name_str = ts_list[0].value_name
-        else:
-            value_name_str = 'value'
-
-        if ts_list[0].value_unit is not None:
-            value_header = f'{value_name_str} [{ts_list[0].value_unit}]'
-        else:
-            value_header = f'{value_name_str}'
-
-        if ts_list[0].time_unit is not None:
-            time_header = f'{time_name_str} [{ts_list[0].time_unit}]'
-        else:
-            time_header = f'{time_name_str}'
-
-        return time_header, value_header
-
-    def quantiles(self, qs=[0.05, 0.5, 0.95]):
-        '''Calculate quantiles of an EnsembleSeries object
-
-        Parameters
-        ----------
-        qs : list, optional
-            List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
-
-        Returns
-        -------
-        ens_qs : pyleoclim.EnsembleSeries
-
-        '''
-        time = np.copy(self.series_list[0].time)
-        vals = []
-        for ts in self.series_list:
-            if not np.array_equal(ts.time, time):
-                raise ValueError('Time axis not consistent across the ensemble!')
-
-            vals.append(ts.value)
-
-        vals = np.array(vals)
-        ens_qs = mquantiles(vals, qs, axis=0)
-
-        ts_list = []
-        for i, quant in enumerate(ens_qs):
-            ts = Series(time=time, value=quant, label=f'{qs[i]*100:g}%')
-            ts_list.append(ts)
-
-        ens_qs = EnsembleSeries(series_list=ts_list)
-
-        return ens_qs
-
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None):
-        ''' Calculate the correlation between an EnsembleSeries object to a target.
-
-        If the target is not specified, then the 1st member of the ensemble will be the target
-        Note that the FDR approach is applied by default to determine the significance of the p-values (more information in See Also below).
-
-        Parameters
-        ----------
-        target : pyleoclim.Series or pyleoclim.EnsembleSeries, optional
-            A pyleoclim Series object or EnsembleSeries object.
-            When the target is also an EnsembleSeries object, then the calculation of correlation is performed in a one-to-one sense,
-            and the ourput list of correlation values and p-values will be the size of the series_list of the self object.
-            That is, if the self object contains n Series, and the target contains n+m Series,
-            then only the first n Series from the object will be used for the calculation;
-            otherwise, if the target contains only n-m Series, then the first m Series in the target will be used twice in sequence.
-
-        timespan : tuple
-            The time interval over which to perform the calculation
-
-        alpha : float
-            The significance level (0.05 by default)
-
-        settings : dict
-            Parameters for the correlation function (significance testing and number of simulations)
-
-        fdr_kwargs : dict
-            Parameters for the FDR function
-
-        common_time_kwargs : dict
-            Parameters for the method MultipleSeries.common_time()
-
-        Returns
-        -------
-
-        res : dict
-            Containing a list of the Pearson's correlation coefficient, associated significance and p-value.
-
-        See also
-        --------
-
-        pyleoclim.utils.correlation.corr_sig : Correlation function
-        pyleoclim.utils.correlation.fdr : FDR function
-
-        Examples
-        --------
-
-        .. ipython:: python
-            :okwarning:
-
-            import pyleoclim as pyleo
-            from pyleoclim.utils.tsmodel import colored_noise
-
-            nt = 100
-            t0 = np.arange(nt)
-            v0 = colored_noise(alpha=1, t=t0)
-            noise = np.random.normal(loc=0, scale=1, size=nt)
-
-            ts0 = pyleo.Series(time=t0, value=v0)
-            ts1 = pyleo.Series(time=t0, value=v0+noise)
-            ts2 = pyleo.Series(time=t0, value=v0+2*noise)
-            ts3 = pyleo.Series(time=t0, value=v0+1/2*noise)
-
-            ts_list1 = [ts0, ts1]
-            ts_list2 = [ts2, ts3]
-
-            ts_ens = pyleo.EnsembleSeries(ts_list1)
-            ts_target = pyleo.EnsembleSeries(ts_list2)
-
-            corr_res = ts_ens.correlation(ts_target)
-            print(corr_res)
-
-        '''
-        if target is None:
-            target = self.series_list[0]
-
-        r_list = []
-        p_list = []
-        signif_list = []
-
-        for idx, ts1 in enumerate(self.series_list):
-            if hasattr(target, 'series_list'):
-                nEns = np.size(target.series_list)
-                if idx < nEns:
-                    value2 = target.series_list[idx].value
-                    time2 = target.series_list[idx].time
-                else:
-                    value2 = target.series_list[idx-nEns].value
-                    time2 = target.series_list[idx-nEns].time
-            else:
-                value2 = target.value
-                time2 = target.time
-
-            ts2 = Series(time=time2, value=value2)
-            corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs)
-            r_list.append(corr_res['r'])
-            signif_list.append(corr_res['signif'])
-            p_list.append(corr_res['p'])
-
-        r_lsit = np.array(r_list)
-        p_lsit = np.array(p_list)
-
-        signif_fdr_list = []
-        fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
-        args = {}
-        args.update(fdr_kwargs)
-        for i in range(np.size(signif_list)):
-            signif_fdr_list.append(False)
-
-        fdr_res = corrutils.fdr(p_list, **fdr_kwargs)
-        if fdr_res is not None:
-            for i in fdr_res:
-                signif_fdr_list[i] = True
-
-        corr_ens = CorrEns(r_list, p_list, signif_list, signif_fdr_list, alpha)
-        return corr_ens
-
-    def plot(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, line_num=10, seed=None,
-             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
-             trace_clr=sns.xkcd_rgb['pale red'], trace_lw=0.5, trace_alpha=0.3, lgd_kwargs=None, mute=False):
-            '''Plot EnsembleSeries as a subset of traces.
-
-            Parameters
-            ----------
-            figsize : list, optional
-                The figure size. The default is [10, 4].
-            xlabel : str, optional
-                x-axis label. The default is None.
-            ylabel : str, optional
-                y-axis label. The default is None.
-            title : str, optional
-                Plot title. The default is None.
-            xlim : list, optional
-                x-axis limits. The default is None.
-            ylim : list, optional
-                y-axis limits. The default is None.
-            trace_clr : str, optional
-                Color of the traces. The default is sns.xkcd_rgb['pale red'].
-            trace_alpha : float, optional
-                Transparency of the lines representing the multiple members. The default is 0.2.
-            trace_lw : float, optional
-                Width of the lines representing the multiple members. The default is 0.5.
-            line_num : int, optional
-                Number of individual members to plot. The default is 10.
-            savefig_settings : dict, optional
-                the dictionary of arguments for plt.savefig(); some notes below:
-                - "path" must be specified; it can be any existed or non-existed path,
-                  with or without a suffix; if the suffix is not given in "path", it will follow "format"
-                - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
-            ax : matplotlib.ax, optional
-                Matplotlib axis on which to return the plot. The default is None.
-            xticks : list, optional
-                xticks label. The default is None.
-            yticks : list, optional
-                yticks label. The default is None.
-            plot_legend : bool, optional
-                Whether to plot the legend. The default is True.
-            lgd_kwargs : dict, optional
-                Parameters for the legend. The default is None.
-            mute : bool, optional
-                if True, the plot will not show;
-                recommend to turn on when more modifications are going to be made on ax. The default is False.
-            seed : int, optional
-                Set the seed for the random number generator. Useful for reproducibility. The default is None.
-
-            Returns
-            -------
-            fig, ax
-
-            '''
-            # Turn the interactive mode off.
-            plt.ioff()
-
-            savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-            lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
-
-            # generate default axis labels
-            time_label, value_label = self.make_labels()
-
-            if xlabel is None:
-                xlabel = time_label
-
-            if ylabel is None:
-                ylabel = value_label
-
-            if ax is None:
-                fig, ax = plt.subplots(figsize=figsize)
-
-            if line_num > 0:
-                if seed is not None:
-                    np.random.seed(seed)
-
-                nts = np.size(self.series_list)
-                random_draw_idx = np.random.choice(nts, line_num)
-
-                for idx in random_draw_idx:
-                    self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=trace_lw,
-                        xlim=xlim, ylim=ylim, ax=ax, color=trace_clr, alpha=trace_alpha,
-                    )
-                ax.plot(np.nan, np.nan, color=trace_clr, label=f'example members (n={line_num})')
-
-            if title is not None:
-                ax.set_title(title)
-
-            if plot_legend:
-                lgd_args = {'frameon': False}
-                lgd_args.update(lgd_kwargs)
-                ax.legend(**lgd_args)
-
-            if 'fig' in locals():
-                if 'path' in savefig_settings:
-                    plotting.savefig(fig, settings=savefig_settings)
-                else:
-                    if not mute:
-                        plotting.showfig(fig)
-                return fig, ax
-            else:
-                return ax
-
-    def plot_envelope(self, figsize=[10, 4], qs=[0.025, 0.25, 0.5, 0.75, 0.975],
-                      xlabel=None, ylabel=None, title=None,
-                      xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
-                      curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
-                      inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None, mute=False):
-        '''Plot EnsembleSeries as an envelope.
-
-        Parameters
-        ----------
-        figsize : list, optional
-            The figure size. The default is [10, 4].
-        qs : list, optional
-            The significance levels to consider. The default is [0.025, 0.25, 0.5, 0.75, 0.975] (median, interquartile range, and central 95% region)
-        xlabel : str, optional
-            x-axis label. The default is None.
-        ylabel : str, optional
-            y-axis label. The default is None.
-        title : str, optional
-            Plot title. The default is None.
-        xlim : list, optional
-            x-axis limits. The default is None.
-        ylim : list, optional
-            y-axis limits. The default is None.
-        savefig_settings : dict, optional
-            the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
-              with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
-        ax : matplotlib.ax, optional
-            Matplotlib axis on which to return the plot. The default is None.
-        xticks : list, optional
-            xticks label. The default is None.
-        yticks : list, optional
-            yticks label. The default is None.
-        plot_legend : bool, optional
-            Wether to plot the legend. The default is True.
-        curve_clr : str, optional
-            Color of the main line (median). The default is sns.xkcd_rgb['pale red'].
-        curve_lw : str, optional
-            Width of the main line (median). The default is 2.
-        shade_clr : str, optional
-            Color of the shaded envelope. The default is sns.xkcd_rgb['pale red'].
-        shade_alpha : float, optional
-            Transparency on the envelope. The default is 0.2.
-        inner_shade_label : str, optional
-            Label for the envelope. The default is 'IQR'.
-        outer_shade_label : str, optional
-            Label for the envelope. The default is '95\% CI'.
-        lgd_kwargs : dict, optional
-            Parameters for the legend. The default is None.
-        mute : bool, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax. The default is False.
-
-        Returns
-        -------
-        fig, ax
-
-        '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
-        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-        lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
-
-        # generate default axis labels
-        time_label, value_label = self.make_labels()
-
-        if xlabel is None:
-            xlabel = time_label
-
-        if ylabel is None:
-            ylabel = value_label
-
-        if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
-
-        ts_qs = self.quantiles(qs=qs)
-
-
-        if inner_shade_label is None:
-            inner_shade_label = f'{ts_qs.series_list[1].label}-{ts_qs.series_list[-2].label}'
-
-        if outer_shade_label is None:
-            outer_shade_label = f'{ts_qs.series_list[0].label}-{ts_qs.series_list[-1].label}'
-
-        time = ts_qs.series_list[0].time
-        # plot outer envelope
-        ax.fill_between(
-            time, ts_qs.series_list[0].value, ts_qs.series_list[4].value,
-            color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=outer_shade_label,
-        )
-        # plot inner envelope on top
-        ax.fill_between(
-            time, ts_qs.series_list[1].value, ts_qs.series_list[3].value,
-            color=shade_clr, alpha=2*shade_alpha, edgecolor=shade_clr, label=inner_shade_label,
-        )
-
-        # plot the median
-        ts_qs.series_list[2].plot(xlabel=xlabel, ylabel=ylabel, linewidth=curve_lw, color=curve_clr,
-            xlim=xlim, ylim=ylim, ax=ax,  zorder=100, label = 'median'
-        )
-
-        if title is not None:
-            ax.set_title(title)
-
-        if plot_legend:
-            lgd_args = {'frameon': False}
-            lgd_args.update(lgd_kwargs)
-            ax.legend(**lgd_args)
-
-        if 'fig' in locals():
-            if 'path' in savefig_settings:
-                plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
-            return fig, ax
-        else:
-            return ax
-
 
 class MultiplePSD:
     ''' Object for multiple PSD.
@@ -5235,6 +4830,7 @@ class MultiplePSD:
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
              curve_clr=sns.xkcd_rgb['pale red'], curve_lw=3, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.3, shade_label=None,
              lgd_kwargs=None, mute=False, members_plot_num=10, members_alpha=0.3, members_lw=1, seed=None):
+        
         '''Plot mutiple PSD as an envelope.
 
         Parameters
