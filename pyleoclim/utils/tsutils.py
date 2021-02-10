@@ -136,9 +136,6 @@ def bin(x, y, bin_size=None, start=None, end=None, evenly_spaced = True):
     if bin_size is not None and evenly_spaced == True:
         warnings.warn('The bin_size has been set, the series may not be evenly_spaced')
 
-    if bin_size is not None and evenly_spaced == True:
-        warnings.warn('The bin_size has been set, the series may not be evenly_spaced')
-
     # Get the bin_size if not available
     if bin_size is None:
         if evenly_spaced == True:
@@ -180,7 +177,7 @@ def bin(x, y, bin_size=None, start=None, end=None, evenly_spaced = True):
     return  res_dict
 
 
-def gkernel(t,y,tc, h = 3):
+def gkernel(t,y,tc, h = 3.0):
     '''
     Coarsen time resolution using a Gaussian kernel
 
