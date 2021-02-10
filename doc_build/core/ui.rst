@@ -25,7 +25,7 @@ How to create and manipulate such objects is described in a short example below,
 
 .. autoclass:: pyleoclim.core.ui.Series
    :members:
-   :inherited-members:
+
 
 MultipleSeries (pyleoclim.MultipleSeries)
 """""""""""""""""""""""""""""""""""""""""
@@ -34,7 +34,7 @@ As the name implies, a MultipleSeries object is a collection (more precisely, a 
 
 .. autoclass:: pyleoclim.core.ui.MultipleSeries
    :members:
-   :inherited-members:
+
 
 EnsembleSeries (pyleoclim.EnsembleSeries)
 """""""""""""""""""""""""""""""""""""""""
@@ -44,7 +44,6 @@ Compared to a MultipleSeries object, an EnsembleSeries object has the following 
 
 .. autoclass:: pyleoclim.core.ui.EnsembleSeries
    :members:
-   :inherited-members:
 
 Lipd (pyleoclim.Lipd)
 """""""""""""""""""""
@@ -53,7 +52,7 @@ This class allows to manipulate LiPD objects.
 
 .. autoclass:: pyleoclim.core.ui.Lipd
    :members:
-   :inherited-members:
+
 
 LipdSeries (pyleoclim.LipdSeries)
 """""""""""""""""""""""""""""""""
@@ -63,7 +62,7 @@ When created, LiPDSeries automatically instantiates the time, value and other pa
 
 .. autoclass:: pyleoclim.core.ui.LipdSeries
    :members:
-   :inherited-members:
+
 
 PSD (pyleoclim.PSD)
 """""""""""""""""""
@@ -73,7 +72,7 @@ Available methods:
 
 .. autoclass:: pyleoclim.core.ui.PSD
    :members:
-   :inherited-members:
+
 
 Scalogram (pyleoclim.Scalogram)
 """""""""""""""""""""""""""""""
@@ -81,39 +80,38 @@ The Scalogram class is analogous to PSD, but for wavelet spectra (scalograms)
 
 .. autoclass:: pyleoclim.core.ui.Scalogram
    :members:
-   :inherited-members:
+
 
 Coherence (pyleoclim.Coherence)
 """""""""""""""""""""""""""""""
 
 .. autoclass:: pyleoclim.core.ui.Coherence
    :members:
-   :inherited-members:
+
 
 SurrogateSeries (pyleoclim.SurrogateSeries)
 """""""""""""""""""""""""""""""""""""""""""
 
 .. autoclass:: pyleoclim.core.ui.SurrogateSeries
    :members:
-   :inherited-members:
+
 
 MultiplePSD (pyleoclim.MultiplePSD)
 """""""""""""""""""""""""""""""""""
 
 .. autoclass:: pyleoclim.core.ui.MultiplePSD
    :members:
-   :inherited-members:
+
 
 MultipleScalogram (pyleoclim.MultipleScalogram)
 """""""""""""""""""""""""""""""""""""""""""""""
 
 .. autoclass:: pyleoclim.core.ui.MultipleScalogram
    :members:
-   :inherited-members:
+
 
 CorrEns (pyleoclim.CorrEns)
-"""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""
 
- .. autoclass:: pyleoclim.core.ui.MultipleScalogram
+ .. autoclass:: pyleoclim.core.ui.CorrEns
     :members:
-    :inherited-members:

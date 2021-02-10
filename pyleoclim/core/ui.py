@@ -1825,7 +1825,7 @@ class Series:
             The causality method to use.
 
         settings : dict
-            Parameters associated with the causality methods  . Note that each method has different parameters. See individual methods for details
+            Parameters associated with the causality methods. Note that each method has different parameters. See individual methods for details
 
         Returns
         -------
@@ -3129,8 +3129,8 @@ class MultipleSeries:
             a dictionary of the keyword arguments for the filtering method,
             see `pyleoclim.utils.filter.savitzky_golay` and `pyleoclim.utils.filter.butterworth` for the details
 
-        Return
-        ------
+        Returns
+        -------
 
         ms : pyleoclim.MultipleSeries
 
@@ -3199,7 +3199,7 @@ class MultipleSeries:
 
         The common time axis is characterized by the following parameters:
 
-        start : the latest start date of the bunch (maximin of the minima)
+        start : the latest start date of the bunch (maximun of the minima)
         stop  : the earliest stop date of the bunch (minimum of the maxima)
         step  : The representative spacing between consecutive values (mean of the median spacings)
 
@@ -3210,7 +3210,8 @@ class MultipleSeries:
         method:  string
             either 'binning', 'interp' or 'gkernel'
 
-        kwargs: keyword arguments (dictionary) for the interpolation method
+        kwargs: dict 
+            keyword arguments (dictionary) for the various methods
 
         Returns
         -------
@@ -3454,7 +3455,7 @@ class MultipleSeries:
         res = decomposition.mcpca(ys, nMC, **pca_kwargs)
         return res
 
-    def bin(self):
+    def bin(self, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via binning.
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
@@ -3471,7 +3472,8 @@ class MultipleSeries:
         Parameters
         ----------
 
-        None
+        kwargs : dict
+            Arguments for the binning function. See pyleoclim.utils.tsutils.bin
 
         Returns
         -------
@@ -3505,11 +3507,11 @@ class MultipleSeries:
 
         ms = self.copy()
 
-        ms = ms.common_time(method = 'binning')
+        ms = ms.common_time(method = 'binning', **kwargs)
 
         return ms
 
-    def gkernel(self):
+    def gkernel(self, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via Gaussian kernel.
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
@@ -3526,7 +3528,8 @@ class MultipleSeries:
         Parameters
         ----------
 
-        None
+        kwargs : dict
+            Arguments for gkernel. See pyleoclim.utils.tsutils.gkernel for details. 
 
         Returns
         -------
@@ -4047,7 +4050,9 @@ class MultipleSeries:
 
 
 class SurrogateSeries(MultipleSeries):
-    ''' Object containing surrogate timeseries
+    ''' Object containing surrogate timeseries, usually obtained through recursive modeling (e.g., AR1)
+    
+    Surrogate Series is a child of MultipleSeries. All methods available for MultipleSeries are available for surrogate series. 
     '''
     def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
         self.series_list = series_list
@@ -4059,8 +4064,8 @@ class EnsembleSeries(MultipleSeries):
 
     The EnsembleSeries object is a child of the MultipleSeries object, that is, a special case of MultipleSeries, aiming for ensembles of similar series.
     Ensembles usually arise from age modeling or Bayesian calibrations. All members of an EnsembleSeries object are assumed to share identical labels and units.
-    One of the main difference between MultipleSeries and EnsembleSeries is the plot() method: for MultipleSeries, a stack plot is called.
-    For EnsembleSeries, a spaghetti plot of transparent lines of identical color is used.
+    
+    All methods available for MultipleSeries are available for EnsembleSeries. Some functions were modified for the special case of ensembles. 
 
     '''
     def __init__(self, series_list):
@@ -5300,6 +5305,12 @@ class Lipd:
         -------
         ts_list : list
             List of Lipd timeseries objects as defined by LiPD utilities
+        
+        See also
+        --------
+        
+        pyleoclim.ui.LipdSeries : LiPD Series object. 
+        
 
         '''
         ts_list=lpd.extractTs(self.__dict__['lipd'])
@@ -5391,6 +5402,7 @@ class Lipd:
            figsize = None, ax = None, marker=None, color=None,
            markersize = None, scatter_kwargs=None,
            legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
+        
         '''Map the records contained in LiPD files by archive type
 
         Parameters
@@ -5441,8 +5453,40 @@ class Lipd:
         --------
 
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
+        
+        Examples
+        --------
+        
+        For speed, we are only using one LiPD file. But these functions can load and map multiple.
+        
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            @savefig mapallarchive.png
+            fig, ax = data.mapAllArchive()
+            pyleo.closefig(fig)
+            
+        Change the markersize
+        
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            @savefig mapallarchive_marker.png
+            fig, ax = data.mapAllArchive(markersize=100)
+            pyleo.closefig(fig)
+            
 
         '''
+        
+        scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
+        
+        
         #get the information from the LiPD dict
         lat=[]
         lon=[]
@@ -5463,7 +5507,7 @@ class Lipd:
                 archiveType[idx] = 'other'
 
         if markersize is not None:
-            scatter_kwargs.update({'markersize': markersize})
+            scatter_kwargs.update({'s': markersize})
 
         if marker==None:
             marker=[]
@@ -5495,6 +5539,55 @@ class Lipd:
 
 class LipdSeries(Series):
     '''Lipd time series object
+    
+    
+    These objects can be obtained from a LiPD either through Pyleoclim or the LiPD utilities. 
+    If multiple objects (i.e., list) is given, then the user will be prompted to choose one timeseries.
+    
+    LipdSeries is a child of Series, therefore all the methods available for Series apply to LipdSeries in addition to some specific methods.
+    
+    Examples
+    --------
+
+    In this example, we will import a LiPD file and explore the various options to create a series object.
+
+    First, let's look at the Lipd.to_tso option. This method is attractive because the object is a list of dictionaries that are easily explored in Python.
+    
+    .. ipython:: python
+        :okwarning:
+
+        import pyleoclim as pyleo
+        url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+        data = pyleo.Lipd(usr_path = url)
+        ts_list = data.to_tso()
+        # Print out the dataset name and the variable name
+        for item in ts_list:
+            print(item['dataSetName']+': '+item['paleoData_variableName'])
+        # Load the sst data into a LipdSeries. Since Python indexing starts at zero, sst has index 5. 
+        ts = pyleo.LipdSeries(ts_list[5])
+        
+    If you attempt to pass the full list of series, Pyleoclim will prompt you to choose a series by printing out something similar as above.
+    If you already now the number of the timeseries object you're interested in, then you should use the following:
+        
+    .. ipython:: python
+        :okwarning:
+
+        ts1 = data.to_LipdSeries(number=5)
+    
+    If number is not specified, Pyleoclim will prompt you for the number automatically.
+    
+    Sometimes, one may want to create a MultipleSeries object from a collection of LiPD files. In this case, we recommend using the following:
+    
+    .. ipython:: python
+        :okwarning:
+
+        ts_list = data.to_LipdSeriesList()
+        # only keep the Mg/Ca and SST
+        ts_list=ts_list[4:]
+        #create a MultipleSeries object
+        ms=pyleo.MultipleSeries(ts_list)
+        
+    
     '''
     def __init__(self, tso, clean_ts=True):
         if type(tso) is list:
@@ -5534,9 +5627,9 @@ class LipdSeries(Series):
             try:
                 value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
                 #Remove NaNs
-                ys_tmp=np.copy(value)
-                value=value[~np.isnan(ys_tmp)]
-                time=time[~np.isnan(ys_tmp)]
+                #ys_tmp=np.copy(value)
+                #value=value[~np.isnan(ys_tmp)]
+                #time=time[~np.isnan(ys_tmp)]
                 value_name=self.lipd_ts['paleoData_variableName']
                 if 'paleoData_units' in self.lipd_ts.keys():
                     value_unit=self.lipd_ts['paleoData_units']
@@ -5686,7 +5779,23 @@ class LipdSeries(Series):
         --------
 
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
+        
+        Examples
+        --------
+        
+        .. ipython:: python
+            :okwarning:
+    
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            ts = data.to_LipdSeries(number=5)
+            @savefig mapone.png
+            fig, ax = ts.map()
+            pyleo.closefig(fig)
+        
         '''
+        scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
         #get the information from the timeseries
         lat=[self.lipd_ts['geo_meanLat']]
         lon=[self.lipd_ts['geo_meanLon']]
@@ -5701,7 +5810,7 @@ class LipdSeries(Series):
             archiveType = 'other'
 
         if markersize is not None:
-            scatter_kwargs.update({'markersize': markersize})
+            scatter_kwargs.update({'s': markersize})
 
         if marker==None:
             marker= self.plot_default[archiveType][1]
@@ -5977,6 +6086,20 @@ class LipdSeries(Series):
         pyleolim.LipdSeries.getMetadata : get relevant metadata from the timeseries object
 
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
+        
+        Examples
+        --------
+        
+        .. ipython:: python
+            :okwarning:
+    
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            ts = data.to_LipdSeries(number=5)
+            @savefig ts_dashboard.png
+            fig, ax = ts.dashboard()
+            pyleo.closefig(fig)
 
         '''
 
@@ -6070,6 +6193,10 @@ class LipdSeries(Series):
             scatter_kwargs = map_kwargs['scatter_kwargs']
         else:
             scatter_kwargs={}
+        if 'markersize' in map_kwargs.keys():
+            scatter_kwargs.update({'s': map_kwargs['markersize']})
+        else:
+            pass        
         if 'lgd_kwargs' in map_kwargs.keys():
             lgd_kwargs = map_kwargs['lgd_kwargs']
         else:
