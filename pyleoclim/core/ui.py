@@ -3168,7 +3168,7 @@ class MultipleSeries:
 
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
         for idx,item in enumerate(self.series_list):
-            gp[idx,:] = tsutils.grid_properties(item.time)
+            gp[idx,:] = tsutils.grid_properties(item.time, method='max')
             if gp[idx,2] < 0:  # flip time axis if retrograde
                 item.time  = item.time[::-1,...]
                 item.value = item.value[::-1,...]
@@ -3183,7 +3183,7 @@ class MultipleSeries:
         if method == 'binning':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop)
+                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop, evenly_spaced = False)
                 ts.time  = d['bins']
                 ts.value = d['binned_values']
                 ms.series_list[idx] = ts
@@ -3380,10 +3380,8 @@ class MultipleSeries:
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
             tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and deptn
-            for item in tslist:
-                mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
-            ms = pyleo.MultipleSeries(mslist)
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
 
             msc = ms.common_time()
 
