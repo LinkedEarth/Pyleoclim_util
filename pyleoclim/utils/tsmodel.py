@@ -77,8 +77,7 @@ def ar1_fit(y, t=None):
     '''
 
     if is_evenly_spaced(t):
-        #  g = ar1_fit_evenly(y, t, detrend=detrend, params=params)
-        g = ar1_fit_evenly(y, t)
+        g = ar1_fit_evenly(y)
     else:
         #  g = tau_estimation(y, t, detrend=detrend, params=params)
         g = tau_estimation(y, t)
@@ -101,7 +100,7 @@ def ar1_sim(y, p, t=None):
     Returns
     -------
 
-    Yr : array
+    ysim : array
         n by p matrix of simulated AR(1) vector
 
     See Also
@@ -117,11 +116,11 @@ def ar1_sim(y, p, t=None):
 
     '''
     n = np.size(y)
-    Yr = np.empty(shape=(n, p))  # declare array
+    ysim = np.empty(shape=(n, p))  # declare array
 
     sig = np.std(y)
     if is_evenly_spaced(t):
-        g = ar1_fit_evenly(y, t=t)
+        g = ar1_fit_evenly(y)
 
         # specify model parameters (statmodel want lag0 coefficent as unity)
         ar = np.r_[1, -g]  # AR model parameter
@@ -130,31 +129,29 @@ def ar1_sim(y, p, t=None):
 
         # simulate AR(1) model for each column
         for i in np.arange(p):
-            #Yr[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n) # old statsmodels syntax
-            #Yr[:, i] = sm.tsa.ArmaProcess(ar, ma).generate_sample(nsample=n, scale=sig_n, burnin=50) # statsmodels v0.11.1-?
-            Yr[:, i] = arma_generate_sample(ar, ma, nsample=n, scale=sig_n, burnin=50) # statsmodels v0.12+
+            #ysim[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n) # old statsmodels syntax
+            #ysim[:, i] = sm.tsa.ArmaProcess(ar, ma).generate_sample(nsample=n, scale=sig_n, burnin=50) # statsmodels v0.11.1-?
+            ysim[:, i] = arma_generate_sample(ar, ma, nsample=n, scale=sig_n, burnin=50) # statsmodels v0.12+
     else:
         #  tau_est = ar1_fit(y, t=t, detrend=detrend, params=params)
         tau_est = tau_estimation(y, t)
         for i in np.arange(p):
             # the output of ar1_model has unit variance,
             # multiply by sig to be consistent with the original input timeseries
-            Yr[:, i] = ar1_model(t, tau_est, output_sigma=sig)
+            ysim[:, i] = ar1_model(t, tau_est, output_sigma=sig)
 
     if p == 1:
-        Yr = Yr[:, 0]
+        ysim = ysim[:, 0]
 
-    return Yr
+    return ysim
 
-def ar1_fit_evenly(y, t):
+def ar1_fit_evenly(y):
     ''' Returns the lag-1 autocorrelation from AR(1) fit.
 
     Parameters
     ----------
     y : array
         vector of (float) numbers as a time series
-    t : array
-        The time axis for the timeseries.
 
     Returns
     -------

@@ -54,11 +54,11 @@ Pyleoclim was originally developed to allow scientists to analyze paleoclimate d
 
 There are many ways to get involved in the development of Pyleoclim:
 
-  * If you write a paper making use of Pyleoclim, please consider :ref:`citing <citing_pyleoclim>`.
+  * If you write a paper making use of Pyleoclim, please cite it :ref:`thus <citing_pyleoclim>`.
   * Report bugs and problems with the code or documentation to our `GitHub repository <https://github.com/LinkedEarth/Pyleoclim_util/issues>`_. Please make sure that there is not outstanding issues that cover the problem you're experiencing.
   * Contribute bug fixes
   * Contribute enhancements and new features
-  * Contribute to the code documentation, and to the dissemination of Pyleoclim-supported scientific workflows (`LiPDBooks <https://github.com/LinkedEarth/LiPDbooks>`_).
+  * Contribute to the code documentation, and share your Pyleoclim-supported scientific workflows via our public repository (`LiPDBooks <https://github.com/LinkedEarth/LiPDbooks>`_).
 
 Search Pyleoclim
 ================

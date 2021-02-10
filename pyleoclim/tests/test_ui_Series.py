@@ -187,7 +187,7 @@ class TestUiSeriesSpectral:
         beta = psd.beta_est()['beta']
         assert np.abs(beta-alpha) < eps
 
-    def test_spectral_t5(self, eps=0.5):
+    def test_spectral_t5(self, eps=0.6):
         ''' Test Series.spectral() with WWZ with specified frequency vector passed via `settings`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
@@ -195,7 +195,7 @@ class TestUiSeriesSpectral:
         Also, we give `label` a test.
         '''
         alpha = 1
-        t, v = gen_colored_noise(nt=800, alpha=alpha)
+        t, v = gen_colored_noise(nt=1000, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 20)
         psd = ts.spectral(method='wwz', settings={'freq': freq}, label='WWZ')
@@ -536,6 +536,35 @@ class TestUISeriesOutliers:
         # Remove outliers
         ts_out = ts.outliers(remove=remove_outliers, mute=True)
 
+class TestUISeriesGkernel():
+    ''' Unit tests for the TestUISeriesGkernel function
+    '''
+    def test_interp_t1(self):
+        ''' Test the gkernel function with default parameter values'''
+
+        t, v = gen_colored_noise(nt=550, alpha=1.0)
+        # randomly remove some data pts
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts_interp=ts.gkernel()
+
+    def test_interp_t2(self):
+        ''' Test the gkernel function with specified bandwidth'''
+
+        t, v = gen_colored_noise(nt=550, alpha=1.0)
+        # randomly remove some data pts
+        n_del = 50
+        deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+        t_unevenly =  np.delete(t, deleted_idx)
+        v_unevenly =  np.delete(v, deleted_idx)
+
+        ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
+        ts_interp=ts.gkernel(h=15)
+
 
 class TestUISeriesInterp():
     ''' Unit tests for the interpolation function
@@ -670,7 +699,64 @@ class TestUISeriesWavelet():
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 20)
         scal = ts.wavelet(method=wave_method, settings={'freq': freq})
+        
+class TestUISeriesSsa():
+    ''' Test the SSA functionalities
+    '''
 
+    def test_ssa_t0(self):
+        ''' Test Series.ssa() with available methods using default arguments
+        '''
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts = pyleo.Series(time=t, value=v)
+        res = ts.ssa()
+        
+    def test_ssa_t1(self):
+        '''Test Series.ssa() with var truncation
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts = pyleo.Series(time=t, value=v)
+        
+        res = ts.ssa(trunc='var')    
+
+class TestUISeriesSsa():
+    ''' Test the SSA functionalities
+    '''
+
+    def test_ssa_t0(self):
+        ''' Test Series.ssa() with available methods using default arguments
+        '''
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts = pyleo.Series(time=t, value=v)
+        res = ts.ssa()
+
+    def test_ssa_t1(self):
+        '''Test Series.ssa() with var truncation
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts = pyleo.Series(time=t, value=v)
+
+        res = ts.ssa(trunc='var')
+
+    def test_ssa_t2(self):
+        '''Test Series.ssa() with Monte-Carlo truncation
+        '''
+
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts = pyleo.Series(time=t, value=v)
+
+        res = ts.ssa(M=60, nMC=10, trunc='mc-ssa')
+
+    def test_ssa_t3(self):
+        '''Test Series.ssa() with Kaiser truncation
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=500, alpha=1.0)
+        ts  = pyleo.Series(time=t, value=v)
+        res = ts.ssa(trunc='kaiser')
 
 class TestUiSeriesPlot:
     '''Test for Series.plot()
@@ -694,10 +780,10 @@ class TestUiSeriesPlot:
         assert_array_equal(t, x_plot)
         assert_array_equal(v, y_plot)
 
-class TestSeriesDistplot:
+class TestUiSeriesDistplot:
     '''Test for Series.distplot()'''
 
-    def test_distplot(self, max_axis = 5):
+    def test_distplot_t0(self, max_axis = 5):
         t, v = gen_normal()
 
         ts = pyleo.Series(time = t, value = v)
@@ -710,3 +796,42 @@ class TestSeriesDistplot:
         y_plot = line.get_ydata()
 
         assert max(x_plot) < max_axis
+    
+    def test_distplot_t1(self, vertical = True):
+        t, v = gen_normal()
+
+        ts = pyleo.Series(time = t, value = v)
+
+        fig, ax = ts.distplot(vertical=vertical, mute=True)
+
+class TestUiSeriesFilter:
+    '''Test for Series.filter()'''
+
+    def test_filter_t0(self):
+        ''' Low-pass filtering with Butterworth
+        '''
+        t = np.linspace(0, 1, 1000)
+        sig1 = np.sin(2*np.pi*10*t)
+        sig2 = np.sin(2*np.pi*20*t)
+        sig = sig1 + sig2
+        ts1 = pyleo.Series(time=t, value=sig1)
+        ts2 = pyleo.Series(time=t, value=sig2)
+        ts = pyleo.Series(time=t, value=sig)
+        ts_lp = ts.filter(cutoff_freq=15)
+        val_diff = ts_lp.value - ts1.value
+        assert np.mean(val_diff**2) < 0.1
+
+
+    def test_filter_t1(self):
+        ''' Band-pass filtering with Butterworth
+        '''
+        t = np.linspace(0, 1, 1000)
+        sig1 = np.sin(2*np.pi*10*t)
+        sig2 = np.sin(2*np.pi*20*t)
+        sig = sig1 + sig2
+        ts1 = pyleo.Series(time=t, value=sig1)
+        ts2 = pyleo.Series(time=t, value=sig2)
+        ts = pyleo.Series(time=t, value=sig)
+        ts_bp = ts.filter(cutoff_freq=[15, 25])
+        val_diff = ts_bp.value - ts2.value
+        assert np.mean(val_diff**2) < 0.1

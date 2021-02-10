@@ -144,3 +144,37 @@ class TestUIEnsembleSeriesCorrelation():
             assert signif is True
 
         assert np.size(corr_res.p) == np.size(ts_list1)
+
+    def test_plot_envelope_t0(self):
+        ''' Test EnsembleSeries.plot_envelope() on a list of colored noise
+        '''
+        nn = 20 # number of noise realizations
+        t, v = {}, {}
+        series_list = []
+
+        tm, vm =  gen_colored_noise(nt=1000, alpha=1.0) # main signal
+
+        for idx in range(nn):  # noise
+            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=0)
+            series_list.append(pyleo.Series(time=t[idx], value=4*v[idx]+vm))
+
+        ts_ens = pyleo.EnsembleSeries(series_list)
+
+        fig, ax = ts_ens.plot_envelope(mute=True,curve_lw=1)
+
+    def test_plot_t0(self):
+        ''' Test EnsembleSeries.plot() on a list of colored noise
+        '''
+        nn = 20 # number of noise realizations
+        t, v = {}, {}
+        series_list = []
+
+        tm, vm =  gen_colored_noise(nt=1000, alpha=1.0) # main signal
+
+        for idx in range(nn):  # noise
+            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=0)
+            series_list.append(pyleo.Series(time=t[idx], value=4*v[idx]+vm))
+
+        ts_ens = pyleo.EnsembleSeries(series_list)
+
+        fig, ax = ts_ens.plot(mute=True,trace_alpha=0.2)

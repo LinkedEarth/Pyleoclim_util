@@ -3210,7 +3210,7 @@ class MultipleSeries:
         method:  string
             either 'binning', 'interp' or 'gkernel'
 
-        kwargs: dict
+        kwargs: dict 
             keyword arguments (dictionary) for the various methods
 
         Returns
@@ -3529,7 +3529,7 @@ class MultipleSeries:
         ----------
 
         kwargs : dict
-            Arguments for gkernel. See pyleoclim.utils.tsutils.gkernel for details.
+            Arguments for gkernel. See pyleoclim.utils.tsutils.gkernel for details. 
 
         Returns
         -------
@@ -4051,8 +4051,8 @@ class MultipleSeries:
 
 class SurrogateSeries(MultipleSeries):
     ''' Object containing surrogate timeseries, usually obtained through recursive modeling (e.g., AR1)
-
-    Surrogate Series is a child of MultipleSeries. All methods available for MultipleSeries are available for surrogate series.
+    
+    Surrogate Series is a child of MultipleSeries. All methods available for MultipleSeries are available for surrogate series. 
     '''
     def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
         self.series_list = series_list
@@ -4064,8 +4064,8 @@ class EnsembleSeries(MultipleSeries):
 
     The EnsembleSeries object is a child of the MultipleSeries object, that is, a special case of MultipleSeries, aiming for ensembles of similar series.
     Ensembles usually arise from age modeling or Bayesian calibrations. All members of an EnsembleSeries object are assumed to share identical labels and units.
-
-    All methods available for MultipleSeries are available for EnsembleSeries. Some functions were modified for the special case of ensembles.
+    
+    All methods available for MultipleSeries are available for EnsembleSeries. Some functions were modified for the special case of ensembles. 
 
     '''
     def __init__(self, series_list):
@@ -5305,12 +5305,12 @@ class Lipd:
         -------
         ts_list : list
             List of Lipd timeseries objects as defined by LiPD utilities
-
+        
         See also
         --------
-
-        pyleoclim.ui.LipdSeries : LiPD Series object.
-
+        
+        pyleoclim.ui.LipdSeries : LiPD Series object. 
+        
 
         '''
         ts_list=lpd.extractTs(self.__dict__['lipd'])
@@ -5453,12 +5453,12 @@ class Lipd:
         --------
 
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
-
+        
         Examples
         --------
-
+        
         For speed, we are only using one LiPD file. But these functions can load and map multiple.
-
+        
         .. ipython:: python
             :okwarning:
 
@@ -5480,13 +5480,13 @@ class Lipd:
             @savefig mapallarchive_marker.png
             fig, ax = data.mapAllArchive(markersize=100)
             pyleo.closefig(fig)
-
+            
 
         '''
-
+        
         scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
-
-
+        
+        
         #get the information from the LiPD dict
         lat=[]
         lon=[]
@@ -5563,21 +5563,21 @@ class LipdSeries(Series):
         # Print out the dataset name and the variable name
         for item in ts_list:
             print(item['dataSetName']+': '+item['paleoData_variableName'])
-        # Load the sst data into a LipdSeries. Since Python indexing starts at zero, sst has index 5.
+        # Load the sst data into a LipdSeries. Since Python indexing starts at zero, sst has index 5. 
         ts = pyleo.LipdSeries(ts_list[5])
-
+        
     If you attempt to pass the full list of series, Pyleoclim will prompt you to choose a series by printing out something similar as above.
     If you already now the number of the timeseries object you're interested in, then you should use the following:
-
+        
     .. ipython:: python
         :okwarning:
 
         ts1 = data.to_LipdSeries(number=5)
-
+    
     If number is not specified, Pyleoclim will prompt you for the number automatically.
-
+    
     Sometimes, one may want to create a MultipleSeries object from a collection of LiPD files. In this case, we recommend using the following:
-
+    
     .. ipython:: python
         :okwarning:
 
@@ -5779,13 +5779,13 @@ class LipdSeries(Series):
         --------
 
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
-
+        
         Examples
         --------
-
+        
         .. ipython:: python
             :okwarning:
-
+    
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
@@ -6086,10 +6086,10 @@ class LipdSeries(Series):
         pyleolim.LipdSeries.getMetadata : get relevant metadata from the timeseries object
 
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
-
+        
         Examples
         --------
-
+        
         .. ipython:: python
             :okwarning:
 

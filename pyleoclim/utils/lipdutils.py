@@ -838,40 +838,6 @@ def queryLinkedEarth(archiveType=[ ], proxyObsType=[ ], infVarType = [ ], sensor
 
     res : the response to the query
 
-    Examples
-    --------
-
-        .. code-block::
-
-            >>> from pyleoclim import utils
-            >>> # variables and parameters
-            >>> archiveType=["marine sediment","Marine Sediment"]
-            >>> proxyObsType=[ ]
-            >>> infVarType=["Sea Surface Temperature"]
-            >>> sensorGenus=[ ]
-            >>> sensorSpecies=[ ]
-            >>> interpName=["temperature","Temperature"]
-            >>> interpDetail=["sea surface"]
-            >>> ageUnits=["kyr BP"]
-            >>> ageBound=[0,10]
-            >>> ageBoundType=["any"]
-            >>> recordLength=[4]
-            >>> resolution=[ ]
-            >>> lat=[-14,1.5]
-            >>> lon=[110,135]
-            >>> alt=[-10000,0]
-            >>> res = utils.queryLinkedEarth(archiveType=archiveType, proxyObsType=proxyObsType,
-            ...                     infVarType = infVarType, sensorGenus=sensorGenus,
-            ...                     sensorSpecies=sensorSpecies, interpName=interpName,
-            ...                     interpDetail =interpDetail, ageUnits = ageUnits,
-            ...                     ageBound = ageBound, ageBoundType = ageBoundType,
-            ...                     recordLength = recordLength, resolution = resolution,
-            ...                     lat = lat, lon = lon, alt = alt,
-            ...                     print_response = True, download_lipd = False,
-            ...                     download_folder = './lipd')
-            http://wiki.linked.earth/Special:URIResolver/MD01-2D2378.Xu.2008
-            http://wiki.linked.earth/Special:URIResolver/GeoB10069-2D3.Gibbons.2014
-
     """
     # Perform a lot of checks
     if len(ageBound)==1:

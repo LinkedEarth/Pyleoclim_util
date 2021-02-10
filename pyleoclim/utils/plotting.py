@@ -10,6 +10,7 @@ __all__ = [
     'set_style',
     'showfig',
     'savefig',
+    'closefig',
 ]
 
 import matplotlib.pyplot as plt
@@ -354,18 +355,17 @@ def in_notebook():
     return True
 
 
-def showfig(fig):
+def showfig(fig, close=False):
     '''Show the figure
 
     Parameters
     ----------
-    fig : TYPE
-        The fig matplotlib object
+    fig : matplotlib.pyplot.figure
+        The matplotlib figure object
 
-    Returns
-    -------
-    None
-    
+    close : bool
+        if True, close the figure automatically
+
     See Also
     --------
     pyleoclim.utils.plotting.savefig : saves a figure to a specific path
@@ -384,14 +384,32 @@ def showfig(fig):
     else:
         plt.show()
 
+    if close:
+        closefig(fig)
+
+def closefig(fig):
+    '''Show the figure
+
+    Parameters
+    ----------
+    fig : matplotlib.pyplot.figure
+        The matplotlib figure object
+
+    See Also
+    --------
+    pyleoclim.utils.plotting.savefig : saves a figure to a specific path
+    pyleoclim.utils.plotting.in_notebook: Functions to sense a notebook environment
+
+    '''
+    plt.close(fig)
 
 def savefig(fig, path=None, settings={}, verbose=True):
     ''' Save a figure to a path
 
     Parameters
     ----------
-    fig : figure
-        the figure to save. Matplotlib object
+    fig : matplotlib.pyplot.figure
+        the figure to save
     path : str
         the path to save the figure, can be ignored and specify in "settings" instead
     settings : dict

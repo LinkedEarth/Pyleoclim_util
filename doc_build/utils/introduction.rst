@@ -38,7 +38,9 @@ Methods used for decomposing timeseries into orthogonal components.
    :widths: 30 70
    :header-rows: 0
 
-   * - :ref:`pca <utils_pca>`
+   * - :ref:`mpca <utils_mpca>`
+     - Monte-Carlo Principal Component Analysis (PCA, sometimes known as EOF analysis)
+     * - :ref:`pca <utils_pca>`
      - Principal Component Analysis (PCA, sometimes known as EOF analysis)
    * - :ref:`ssa <utils_ssa>`
      - Singular Spectrum Analysis
@@ -155,6 +157,10 @@ This modules contain pre-processing functions for time series analysis.
      - Computes the mean, median, min, max, standard deviation and interquartile range of a timeseries
    * - :ref:`bin <utils_bin>`
      - Bin the values into evenly-spaced bins
+   * - :ref:`gkernel <utils_gkernel>`
+     - Coarsen time resolution using a Gaussian Kernel
+   * - :ref:`grid_properties <utils_grid_properties>`
+     - Establishes the grid properties of a numerical array
    * - :ref:`interp <utils_interp>`
      - Interpolation function based on `scipy.interpolate.interp1d <https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html>_`
    * - :ref:`on_common_axis <utils_on_common_axis>`
@@ -165,6 +171,12 @@ This modules contain pre-processing functions for time series analysis.
      - Chop a timeseries into several segments based on gap detection
    * - :ref:`clean_ts <utils_clean_ts>`
      - Remove NaNs in the time series and sort it in ascending time order
+   * - :ref:`dropna <utils_dropna>`
+     - Remove NaNs
+   * - :ref:`sort_ts <utils_sort_ts>`
+     - Sort time values in ascending order
+   * - :ref:`reduce_duplicated_timestamps <utils_reduce_duplicated_timestamps>`
+     - Reduce duplicated timestamps in a timeseries by averaging the values       
    * - :ref:`annualize <utils_annualize>`
      - Annualize a time series whose time resolution is finer than 1 year
    * - :ref:`gaussianize <utils_gaussianize>`

@@ -16,7 +16,8 @@ __all__ = [
 import numpy as np
 from statsmodels.tsa.stattools import grangercausalitytests
 from tqdm import tqdm
-from .correlation import sm_ar1_fit, sm_ar1_sim, phaseran
+from .tsmodel import ar1_fit_evenly
+from .correlation import sm_ar1_sim, phaseran
 from scipy.stats.mstats import mquantiles
 
 #-------
@@ -390,8 +391,8 @@ def signif_isopersist(y1, y2, method,
             the quantiles of the standardized information flow from noise2 to noise1 for significance testing
 
     '''
-    g1 = sm_ar1_fit(y1)
-    g2 = sm_ar1_fit(y2)
+    g1 = ar1_fit_evenly(y1)
+    g2 = ar1_fit_evenly(y2)
     sig1 = np.std(y1)
     sig2 = np.std(y2)
     n = np.size(y1)
