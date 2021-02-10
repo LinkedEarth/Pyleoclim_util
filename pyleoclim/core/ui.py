@@ -1270,7 +1270,49 @@ class Series:
             # Standardize the time series
             ts_std = ts.standardize()
 
+        - Lomb-Scargle
 
+        .. ipython:: python
+            :okwarning:
+
+            psd_ls = ts_std.spectral(method='lomb_scargle')
+            psd_ls_signif = psd_ls.signif_test(number=20) #in practice, need more AR1 simulations
+            @savefig spec_ls.png
+            fig, ax = psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
+            pyleo.closefig(fig)
+        
+        We may pass in method-specific arguments via "settings", which is a dictionary.
+        For instance, to adjust the number of overlapping segment for Lomb-Scargle, we may specify the method-specific argument "n50";
+        to adjust the frequency vector, we may modify the "freq_method" or modify the method-specific argument "freq".
+
+        .. ipython:: python
+            :okwarning:
+            
+            import numpy as np    
+            psd_LS_n50 = ts_std.spectral(method='lomb_scargle', settings={'n50': 4})  # c=1e-2 yields lower frequency resolution
+            psd_LS_freq = ts_std.spectral(method='lomb_scargle', settings={'freq': np.linspace(1/20, 1/0.2, 51)})
+            psd_LS_LS = ts_std.spectral(method='lomb_scargle', freq_method='lomb_scargle')  # with frequency vector generated using REDFIT method
+            fig, ax = psd_LS_n50.plot(
+                title='PSD using Lomb-Scargle method with 4 overlapping segments',
+                label='settings={"n50": 4}', mute=True)
+            psd_ls.plot(ax=ax, label='settings={"n50": 3}', marker='o')
+            @savefig spec_ls_n50.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+
+            fig, ax = psd_LS_freq.plot(
+                title='PSD using Lomb-Scargle method with differnt frequency vectors', mute=True,
+                label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
+            psd_ls.plot(ax=ax, label='freq_method="log"', marker='o')
+            psd_ls_nfft.plot(ax=ax, label='freq_method="nfft"', marker='o')
+            @savefig spec_ls_freq.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+
+        You may notice the differences in the PSD curves regarding smoothness and the locations of the analyzed period points.
+
+        For other method-specific arguments, please look up the specific methods in the "See also" section.
+            
         - WWZ
 
         .. ipython:: python
@@ -1282,38 +1324,6 @@ class Series:
             fig, ax = psd_wwz_signif.plot(title='PSD using WWZ method')
             pyleo.closefig(fig)
 
-        We may pass in method-specific arguments via "settings", which is a dictionary.
-        For instance, to adjust the analytical frequency resolution for WWZ, we may specify the method-specific argument, the decay constant, "c";
-        to adjust the frequency vector, we may modify the "freq_method" or modify the method-specific argument "freq".
-
-        .. ipython:: python
-            :okwarning:
-
-            psd_wwz_lres = ts_std.spectral(method='wwz', settings={'c': 1e-2})  # c=1e-2 yields lower frequency resolution
-            psd_wwz_hres = ts_std.spectral(method='wwz', settings={'c': 1e-4})  # c=1e-4 yields higher frequency resolution
-            psd_wwz_freq = ts_std.spectral(method='wwz', settings={'freq': np.linspace(1/20, 1/0.2, 51)})
-            psd_wwz_nfft = ts_std.spectral(method='wwz', freq_method='nfft')  # with frequency vector generated using NFFT style
-            fig, ax = psd_wwz_lres.plot(
-                title='PSD using WWZ method with differnt decay constants', mute=True,
-                label='settings={"c": 1e-2}')
-            @savefig spec_wwz_c.png
-            psd_wwz_hres.plot(ax=ax, label='settings={"c": 1e-4}')
-            pyleo.closefig(fig)
-
-            fig, ax = psd_wwz_freq.plot(
-                title='PSD using WWZ method with differnt frequency vectors', mute=True,
-                label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
-            psd_wwz.plot(ax=ax, label='freq_method="log"', marker='o')
-            psd_wwz_nfft.plot(ax=ax, label='freq_method="nfft"', marker='o')
-            @savefig spec_wwz_freq.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
-
-        You may notice the differences in the PSD curves regarding smoothness and the locations of the analyzed period points.
-
-        For other method-specific arguments, please look up the specific methods in the "See also" section.
-
-
         - Periodogram
 
         .. ipython:: python
@@ -1321,7 +1331,7 @@ class Series:
 
             ts_interp = ts_std.interp()
             psd_perio = ts_interp.spectral(method='periodogram')
-            psd_perio_signif = psd_perio.signif_test()
+            psd_perio_signif = psd_perio.signif_test(number=20) #in practice, need more AR1 simulations
             @savefig spec_perio.png
             fig, ax = psd_perio_signif.plot(title='PSD using Periodogram method')
             pyleo.closefig(fig)
@@ -1333,7 +1343,7 @@ class Series:
 
             ts_interp = ts_std.interp()
             psd_welch = ts_interp.spectral(method='welch')
-            psd_welch_signif = psd_welch.signif_test()
+            psd_welch_signif = psd_welch.signif_test(number=20) #in practice, need more AR1 simulations
             @savefig spec_welch.png
             fig, ax = psd_welch_signif.plot(title='PSD using Welch method')
             pyleo.closefig(fig)
@@ -1345,20 +1355,9 @@ class Series:
 
             ts_interp = ts_std.interp()
             psd_mtm = ts_interp.spectral(method='mtm')
-            psd_mtm_signif = psd_mtm.signif_test()
+            psd_mtm_signif = psd_mtm.signif_test(number=20) #in practice, need more AR1 simulations
             @savefig spec_mtm.png
             fig, ax = psd_mtm_signif.plot(title='PSD using MTM method')
-            pyleo.closefig(fig)
-
-        - Lomb-Scargle
-
-        .. ipython:: python
-            :okwarning:
-
-            psd_ls = ts_std.spectral(method='lomb_scargle')
-            psd_ls_signif = psd_ls.signif_test()
-            @savefig spec_mtm.png
-            fig, ax = psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
             pyleo.closefig(fig)
 
         '''
@@ -1543,39 +1542,7 @@ class Series:
 
         pyleoclim.core.ui.Coherence : Coherence object
 
-        Examples
-        --------
-
-        .. ipython:: python
-            :okwarning:
-
-            import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
-            t = data.iloc[:,0]
-            air = data.iloc[:,1]
-            nino = data.iloc[:,2]
-            ts_nino = pyleo.Series(time=t, value=nino)
-            ts_air = pyleo.Series(time=t, value=air)
-
-            # plot the two timeseries
-            @savefig ts_nino.png
-            fig, ax = ts_nino.plot(title='El Nino Region 3 -- SST Anomalies')
-            pyleo.closefig(fig)
-
-            @savefig ts_air.png
-            fig, ax = ts_air.plot(title='Deasonalized All Indian Rainfall Index')
-            pyleo.closefig(fig)
-
-            ts_air_std=ts_air.standardize()
-            ts_nino_std=ts_nino.standardize()
-            coh = ts_nino.wavelet_coherence(ts_air)
-            coh_signif = coh.signif_test(number=1, qs=[0.99])  # for real work, should use number=200 or even larger
-
-            @savefig coh_plot.png
-            fig, ax = coh_signif.plot(phase_style={'skip_x': 50, 'skip_y': 10})
-            pyleo.closefig(fig)
-
+        
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -1687,16 +1654,16 @@ class Series:
             ts_nino = pyleo.Series(time=t, value=nino)
             ts_air = pyleo.Series(time=t, value=air)
 
-            # the default setting with `nsim=1000` and `method='isospectral'`
-            corr_res = ts_nino.correlation(ts_air)
+            # with `nsim=20` and default `method='isospectral'`
+            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20})
             print(corr_res)
 
             # using a simple t-test
-            corr_res = ts_nino.correlation(ts_air, settings={'method': 'ttest'})
+            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'ttest'})
             print(corr_res)
 
             # using the method "isopersistent"
-            corr_res = ts_nino.correlation(ts_air, settings={'method': 'isopersistent'})
+            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'isopersistent'})
             print(corr_res)
         '''
 
@@ -1959,6 +1926,7 @@ class Series:
     
     def gkernel(self, step_type = 'median', **kwargs):
         ''' Coarse-grain a Series object via a Gaussian kernel.
+        
         Parameters
         ----------
         step_type : str
@@ -1973,6 +1941,7 @@ class Series:
         --------
         pyleoclim.utils.tsutils.gkernel : application of a Gaussian kernel
         '''
+        
         new=self.copy()
 
         start, stop, step = tsutils.grid_properties(self.time, method=step_type)
@@ -2001,7 +1970,6 @@ class Series:
 
         See also
         --------
-
 
         pyleoclim.utils.tsutils.bin : bin the time series into evenly-spaced bins
 
@@ -2143,6 +2111,7 @@ class PSD:
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
              legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
              plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
+        
         '''Plots the PSD estimates and signif level if included
 
 
@@ -2362,8 +2331,8 @@ class Scalogram:
                  wave_method=None, wave_args=None, signif_qs=None, signif_method=None, freq_method=None, freq_kwargs=None,
                  period_unit=None, time_label=None):
         '''
-        Args
-        ----
+        Parameters
+        ----------
             frequency : array
                 the frequency axis
             time : array
@@ -3196,10 +3165,10 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries(ts_list)
             ts_target = ts0
 
-            corr_res = ms.correlation(ts_target)
+            corr_res = ms.correlation(ts_target, settings={'nsim': 20})
             print(corr_res)
 
-            corr_res = ms.correlation()
+            corr_res = ms.correlation(settings={'nsim': 20})
             print(corr_res)
 
         '''
@@ -3300,11 +3269,10 @@ class MultipleSeries:
             :okwarning:
 
             import pyleoclim as pyleo
-            import lipd
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_tso()
-            mslist = []
+            tslist = data.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and deptn
             for item in tslist:
                 mslist.append(pyleo.Series(time = item['age'], value = item['paleoData_values']))
             ms = pyleo.MultipleSeries(mslist)
@@ -5275,142 +5243,7 @@ class MultipleScalogram:
         scals = MultipleScalogram(scalogram_list=scal_list)
         return scals
 
-class CorrEns:
-    ''' Correlation Ensemble
 
-    Parameters
-    ----------
-
-    r: list
-        the list of correlation coefficients
-
-    p: list
-        the list of p-values
-
-    signif: list
-        the list of significance without FDR
-
-    signif_fdr: list
-        the list of significance with FDR
-
-    signif_fdr: list
-        the list of significance with FDR
-
-    alpha : float
-        The significance level (0.05 by default)
-
-    See also
-    --------
-
-    pyleoclim.utils.correlation.corr_sig : Correlation function
-    pyleoclim.utils.correlation.fdr : FDR function
-    '''
-    def __init__(self, r, p, signif, signif_fdr, alpha):
-        self.r = r
-        self.p = p
-        self.signif = signif
-        self.signif_fdr = signif_fdr
-        self.alpha = alpha
-
-    def __str__(self):
-        '''
-        Prints out the correlation results
-        '''
-
-        table = {
-            'correlation': self.r,
-            'p-value': self.p,
-            f'signif. w/o FDR (α: {self.alpha})': self.signif,
-            f'signif. w/ FDR (α: {self.alpha})': self.signif_fdr,
-        }
-
-        msg = print(tabulate(table, headers='keys'))
-
-        return f'Ensemble size: {len(self.r)}'
-
-
-    def plot(self, figsize=[4, 4], title=None, ax=None, savefig_settings=None, hist_kwargs=None, title_kwargs=None,
-             clr_insignif=sns.xkcd_rgb['grey'], clr_signif=sns.xkcd_rgb['teal'], clr_signif_fdr=sns.xkcd_rgb['pale orange'],
-             clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None, mute=False):
-        ''' Plot the correlation ensembles
-
-        Parameters
-        ----------
-        figsize : list, optional
-            The figure size. The default is [4, 4].
-
-        title : str, optional
-            Plot title. The default is None.
-
-        savefig_settings : dict
-            the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
-              with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}
-
-        hist_kwargs : dict
-            the keyword arguments for ax.hist()
-
-        title_kwargs : dict
-            the keyword arguments for ax.set_title()
-
-        ax : matplotlib.axis, optional
-            the axis object from matplotlib
-            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
-
-        mute : {True,False}
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-
-        See Also
-        --------
-
-        matplotlib.pyplot.hist: https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.hist.html
-        '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
-        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-        hist_kwargs = {} if hist_kwargs is None else hist_kwargs.copy()
-        if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
-
-        if vrange is None:
-            vrange = [np.min(self.r), np.max(self.r)]
-
-        clr_list = [clr_insignif, clr_signif, clr_signif_fdr]
-        args = {'rwidth': rwidth, 'bins': bins, 'range': vrange, 'color': clr_list}
-        args.update(hist_kwargs)
-        # insignif_args.update(hist_kwargs)
-
-        r_insignif = np.array(self.r)[~np.array(self.signif)]
-        r_signif = np.array(self.r)[self.signif]
-        r_signif_fdr = np.array(self.r)[self.signif_fdr]
-        r_stack = [r_insignif, r_signif, r_signif_fdr]
-        ax.hist(r_stack, stacked=True, **args)
-        ax.legend([f'p ≥ {self.alpha}', f'p < {self.alpha} (w/o FDR)', f'p < {self.alpha} (w/ FDR)'], loc='upper left', bbox_to_anchor=(1.1, 1), ncol=1)
-
-        frac_signif = np.size(r_signif) / np.size(self.r)
-        frac_signif_fdr = np.size(r_signif_fdr) / np.size(self.r)
-        ax.text(x=1.1, y=0.5, s=f'Fraction significant: {frac_signif*100:.1f}%', transform=ax.transAxes, fontsize=10, color=clr_signif)
-        ax.text(x=1.1, y=0.4, s=f'Fraction significant: {frac_signif_fdr*100:.1f}%', transform=ax.transAxes, fontsize=10, color=clr_signif_fdr)
-
-        r_pcts = np.percentile(self.r, [2.5, 25, 50, 75, 97.5])
-        trans = transforms.blended_transform_factory(ax.transData, ax.transAxes)
-        for r_pct, pt, ls in zip(r_pcts, np.array([2.5, 25, 50, 75, 97.5])/100, [':', '--', '-', '--', ':']):
-            ax.axvline(x=r_pct, linestyle=ls, color=clr_percentile)
-            ax.text(x=r_pct, y=1.02, s=pt, color=clr_percentile, transform=trans, ha='center', fontsize=10)
-
-        ax.set_xlabel(r'$r$')
-        ax.set_ylabel('Count')
-        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-
-
-        if title is not None:
-            title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
-            t_args = {'y': 1.1, 'weight': 'bold'}
-            t_args.update(title_kwargs)
-            ax.set_title(title, **t_args)
 
 class CorrEns:
     ''' Correlation Ensemble
@@ -5733,7 +5566,6 @@ class Lipd:
         res=[]
 
         for item in ts_list:
-            res.append(LipdSeries(item))
             try:
                 res.append(LipdSeries(item))
             except:
