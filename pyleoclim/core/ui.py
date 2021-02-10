@@ -4478,7 +4478,7 @@ class EnsembleSeries(MultipleSeries):
             return fig, ax
         else:
             return ax
-        
+
 
     def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
                   spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
@@ -4835,7 +4835,7 @@ class MultiplePSD:
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
              curve_clr=sns.xkcd_rgb['pale red'], curve_lw=3, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.3, shade_label=None,
              lgd_kwargs=None, mute=False, members_plot_num=10, members_alpha=0.3, members_lw=1, seed=None):
-        
+
         '''Plot mutiple PSD as an envelope.
 
         Parameters
@@ -5402,7 +5402,7 @@ class Lipd:
            figsize = None, ax = None, marker=None, color=None,
            markersize = None, scatter_kwargs=None,
            legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
-        
+
         '''Map the records contained in LiPD files by archive type
 
         Parameters
@@ -5468,9 +5468,9 @@ class Lipd:
             @savefig mapallarchive.png
             fig, ax = data.mapAllArchive()
             pyleo.closefig(fig)
-            
+
         Change the markersize
-        
+
         .. ipython:: python
             :okwarning:
 
@@ -5539,20 +5539,20 @@ class Lipd:
 
 class LipdSeries(Series):
     '''Lipd time series object
-    
-    
-    These objects can be obtained from a LiPD either through Pyleoclim or the LiPD utilities. 
+
+
+    These objects can be obtained from a LiPD either through Pyleoclim or the LiPD utilities.
     If multiple objects (i.e., list) is given, then the user will be prompted to choose one timeseries.
-    
+
     LipdSeries is a child of Series, therefore all the methods available for Series apply to LipdSeries in addition to some specific methods.
-    
+
     Examples
     --------
 
     In this example, we will import a LiPD file and explore the various options to create a series object.
 
     First, let's look at the Lipd.to_tso option. This method is attractive because the object is a list of dictionaries that are easily explored in Python.
-    
+
     .. ipython:: python
         :okwarning:
 
@@ -5586,8 +5586,8 @@ class LipdSeries(Series):
         ts_list=ts_list[4:]
         #create a MultipleSeries object
         ms=pyleo.MultipleSeries(ts_list)
-        
-    
+
+
     '''
     def __init__(self, tso, clean_ts=True):
         if type(tso) is list:
@@ -5793,7 +5793,7 @@ class LipdSeries(Series):
             @savefig mapone.png
             fig, ax = ts.map()
             pyleo.closefig(fig)
-        
+
         '''
         scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
         #get the information from the timeseries
@@ -6092,7 +6092,7 @@ class LipdSeries(Series):
         
         .. ipython:: python
             :okwarning:
-    
+
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
@@ -6196,7 +6196,7 @@ class LipdSeries(Series):
         if 'markersize' in map_kwargs.keys():
             scatter_kwargs.update({'s': map_kwargs['markersize']})
         else:
-            pass        
+            pass
         if 'lgd_kwargs' in map_kwargs.keys():
             lgd_kwargs = map_kwargs['lgd_kwargs']
         else:
