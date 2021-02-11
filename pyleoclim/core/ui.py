@@ -3609,7 +3609,7 @@ class MultipleSeries:
 
         ms = self.copy()
 
-        ms = ms.common_time(method = 'binning', **kwargs)
+        ms = ms.common_time(method = 'bin', **kwargs)
 
         return ms
 
@@ -3643,7 +3643,7 @@ class MultipleSeries:
 
         pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
 
-        pyleoclim.utils.tsutils.gkernel: Underlying binning function
+        pyleoclim.utils.tsutils.gkernel: Underlying kernel module
 
 
         Examples
