@@ -5248,7 +5248,9 @@ class Lipd:
             if 'archiveType' in D_path.keys():
                 D_path={D_path['dataSetName']:D_path}
             if validate==True:
+                cwd = os.getcwd()
                 res=lpd.validate(D_path,detailed=False)
+                os.chdir(cwd)
                 if remove == True:
                     for item in res:
                         if item['status'] == 'FAIL':
@@ -5267,7 +5269,9 @@ class Lipd:
             if 'archiveType' in D_dict.keys():
                 D_dict={D_dict['dataSetName']:D_dict}
             if validate==True:
+                cwd = os.getcwd()
                 res=lpd.validate(D_dict,detailed=False)
+                os.chdir(cwd)
                 if remove == True:
                     for item in res:
                         if item['status'] == 'FAIL':
@@ -5313,7 +5317,9 @@ class Lipd:
         
 
         '''
+        cwd = os.getcwd()
         ts_list=lpd.extractTs(self.__dict__['lipd'])
+        os.chdir(cwd)
         return ts_list
 
     def extract(self,dataSetName):
@@ -5351,7 +5357,9 @@ class Lipd:
         pyleoclim.ui.LipdSeries : LipdSeries object
 
         '''
+        cwd = os.getcwd()
         ts_list=lpd.extractTs(self.__dict__['lipd'])
+        os.chdir(cwd)
 
         res=[]
 
@@ -5384,7 +5392,9 @@ class Lipd:
         pyleoclim.ui.LipdSeries : LipdSeries object
 
         '''
+        cwd = os.getcwd()
         ts_list = lpd.extractTs(self.__dict__['lipd'])
+        os.chdir(cwd)
         if number is None:
             ts = LipdSeries(ts_list)
         else:
@@ -5683,7 +5693,9 @@ class LipdSeries(Series):
             a=D.extract(dataSetName)
             lipd=a.__dict__['lipd']
         #Look for the ensemble and get values
+        cwd = os.getcwd()
         csv_dict=lpd.getCsv(lipd)
+        os.chdir(cwd)
         chron,paleo = lipdutils.isEnsemble(csv_dict)
         if len(chron)==0:
             raise ValueError("No ChronMeasurementTables available")
