@@ -32,11 +32,10 @@ import matplotlib as mpl
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
 
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
+from scipy import stats
 import warnings
 import os
 
@@ -149,7 +148,7 @@ class Series:
         self.label = label
 
     def convert_time_unit(self, time_unit='years'):
-        ''' Convert the time unit of the timeseries
+        ''' Convert the time unit of the Series object
 
         Parameters
         ----------
@@ -3191,7 +3190,7 @@ class MultipleSeries:
             ms.series_list[idx]=s
         return ms
 
-    def common_time(self,method='binning',**kwargs):
+    def common_time(self, method='interp', common_step = 'max', start=None, stop = None, step=None, step_style = None, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via either binning
         or interpolation. This is critical for workflows that need to assume a
         common time axis for the group of series under consideration.
@@ -3201,27 +3200,112 @@ class MultipleSeries:
 
         start : the latest start date of the bunch (maximun of the minima)
         stop  : the earliest stop date of the bunch (minimum of the maxima)
-        step  : The representative spacing between consecutive values (mean of the median spacings)
+        step  : The representative spacing between consecutive values 
 
         Optional arguments for binning or interpolation are those of the underling functions.
+        
+        Note that by default, all MultipleSeries objects have prograde time grids
 
         Parameters
         ----------
-        method:  string
-            either 'binning', 'interp' or 'gkernel'
-
+        method :  string
+            either 'bin', 'interp' [default] or 'gkernel'
+        common_step : string
+            Method to obtain a representative step among all Series
+            Valid entries: 'median' [default], 'mean', 'mode' or 'max'  
+        start : float
+            starting point of the common time axis [default = None]
+        stop : float
+            end point of the common time axis [default = None]
+        step : float
+            increment the common time axis  [default = None]
+        
+        if not provided, `pyleoclim` will use `grid_properties()` to determine these parameters 
+        
+        step_style : 'string'
+            step style to be applied from `grid_properties` [default = None]
+        
+            
         kwargs: dict 
-            keyword arguments (dictionary) for the various methods
+            keyword arguments (dictionary) of the various methods
 
         Returns
         -------
         ms : pyleoclim.MultipleSeries
             The MultipleSeries objects with all series aligned to the same time axis.
+            
+            
+        See also
+        --------
+
+        pyleoclim.utils.tsutils.bin : put timeseries values into equal bins (possibly leaving NaNs in).
+        pyleoclim.utils.tsutils.gkernel : coarse-graining using a Gaussian kernel
+        pyleoclim.utils.tsutils.interp : interpolation onto a regular grid (default = linear interpolation)
+        pyleoclim.utils.tsutils.grid_properties : infer grid properties
+        
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+
+            import numpy as np
+            import pyleoclim as pyleo
+            import matplotlib.pyplot as plt
+            from pyleoclim.utils.tsmodel import colored_noise
+
+            # create 2 incompletely sampled series
+            ns = 2 ; nt = 200; n_del = 20
+            serieslist = []
+
+
+            for j in range(ns):
+                t = np.arange(nt)
+                v = colored_noise(alpha=1, t=t)
+                deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+                tu =  np.delete(t, deleted_idx)
+                vu =  np.delete(v, deleted_idx)
+                ts = pyleo.Series(time = tu, value = vu, label = 'series ' + str(j+1))
+                serieslist.append(ts)
+
+            # create MS object from the list
+            ms = pyleo.MultipleSeries(serieslist)
+            
+            fig, ax = plt.subplots(2,2)
+            ax = ax.flatten()
+            # apply common_time with default parameters
+            msc = ms.common_time()
+            msc.plot(title='linear interpolation',ax=ax[0])
+            
+            # apply common_time with binning
+            msc = ms.common_time(method='bin')
+            msc.plot(title='Binning',ax=ax[1], legend=False)
+            
+            # apply common_time with gkernel
+            msc = ms.common_time(method='gkernel')
+            msc.plot(title=r'Gaussian kernel ($h=3$)',ax=ax[2],legend=False)
+            
+            # apply common_time with gkernel modified
+            msc = ms.common_time(method='gkernel', h=11)
+            msc.plot(title=r'Gaussian kernel ($h=11$)',ax=ax[3],legend=False)
+            
+            # display, save and close figure
+            fig.tight_layout()
+            @savefig ms_ct.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+                          
         '''
+        
+        if step_style == None:
+          if method == 'bin' or method == 'gkernel':
+             step_style = 'max'
+          elif  method == 'interp':
+             step_style = 'mean' 
 
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
         for idx,item in enumerate(self.series_list):
-            gp[idx,:] = tsutils.grid_properties(item.time, method='max')
+            gp[idx,:] = tsutils.grid_properties(item.time, step_style=step_style)
             if gp[idx,2] < 0:  # flip time axis if retrograde
                 item.time  = item.time[::-1,...]
                 item.value = item.value[::-1,...]
@@ -3229,14 +3313,22 @@ class MultipleSeries:
         # define parameters for common time axis
         start = gp[:,0].max()
         stop  = gp[:,1].min()
-        step  = gp[:,2].mean()
-
+        
+        if common_step == 'mean':
+            step = gp[:,2].mean()
+        elif common_step == 'max':
+            step = gp[:,2].max()
+        elif common_step == 'mode':
+            step = stats.mode(gp[:,2])[0][0]
+        else:
+            step = np.median(gp[:,2])
+        
         ms = self.copy()
 
-        if method == 'binning':
+        if method == 'bin':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop, evenly_spaced = False)
+                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, stop=stop, evenly_spaced = False, **kwargs)
                 ts.time  = d['bins']
                 ts.value = d['binned_values']
                 ms.series_list[idx] = ts
@@ -3244,17 +3336,15 @@ class MultipleSeries:
         elif method == 'interp':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.interp(ts.time, ts.value, interp_type='linear', interp_step=step, start=start, end=stop,**kwargs)
+                ti, vi = tsutils.interp(ts.time, ts.value, step=step, start=start, stop=stop,**kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
 
         elif method == 'gkernel':
-            # Get the interpolated x-axis.
-            ti = np.arange(start,stop,step)
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                vi = tsutils.gkernel(ts.time,ts.value,ti, h = 11)
+                ti, vi = tsutils.gkernel(ts.time,ts.value,step=step, start=start, stop=stop, **kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
@@ -3562,7 +3652,7 @@ class MultipleSeries:
 
         ms = self.copy()
 
-        ms = ms.common_time(method = 'gkernel')
+        ms = ms.common_time(method = 'gkernel', **kwargs)
 
         return ms
 
