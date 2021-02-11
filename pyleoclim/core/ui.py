@@ -37,6 +37,7 @@ import cartopy.feature as cfeature
 
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
+from statsmodels.tsa.arima_process import arma_generate_sample
 import warnings
 import os
 
@@ -69,6 +70,52 @@ def infer_period_unit_from_time_unit(time_unit):
                 period_unit = f'{time_unit}s'
 
     return period_unit
+
+def gen_ts(model, nt=1000, settings=None):
+    ''' Generate pyleoclim.Series with timeseries models
+
+    Parameters
+    ----------
+
+    model : str, {'colored_noise', 'colored_noise_2regimes', 'ar1'}
+        the timeseries model to use
+        - colored_noise : colored noise with one scaling slope
+        - colored_noise_2regimes : colored noise with two regimes of two different scaling slopes
+        - ar1 : AR(1) series
+
+    settings : dict
+        the keyward arguments for the specified timeseries model
+
+    Return
+    ------
+
+    ts : `pyleoclim.Series`
+
+    See also
+    --------
+
+    pyleoclim.utils.tsmodel.colored_noise : generate a colored noise timeseries
+    pyleoclim.utils.tsmodel.colored_noise_2regime : generate a colored noise timeseries with two regimes
+    pyleoclim.utils.tsmodel.ar1_model : generate an AR(1) series
+
+    '''
+    settings = {} if settings is None else settings.copy()
+    t = np.arange(nt)
+    tsm = {
+        'colored_noise': tsmodel.colored_noise,
+        'colored_noise_2regimes': tsmodel.colored_noise_2regimes,
+        'ar1': tsmodel.gen_ar1_evenly,
+    }
+
+    tsm_args = {}
+    tsm_args['colored_noise'] = {'alpha': 1}
+    tsm_args['colored_noise_2regimes'] = {'alpha1': 1/2, 'alpha2': 2, 'f_break': 1/20}
+    tsm_args['ar1'] = {'g': 0.5}
+    tsm_args[model].update(settings)
+
+    v = tsm[model](t=t, **tsm_args[model])
+    ts = Series(time=t, value=v)
+    return ts
 
 
 class Series:
