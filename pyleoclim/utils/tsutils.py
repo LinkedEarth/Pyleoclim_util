@@ -32,11 +32,12 @@ __all__ = [
 from typing import OrderedDict
 import numpy as np
 import pandas as pd
-from scipy import interpolate
 import warnings
 import copy
 from scipy import special
 from scipy import signal
+from scipy import interpolate
+from scipy import stats
 from pyhht import EMD
 from sklearn.cluster import DBSCAN
 import warnings
@@ -96,7 +97,7 @@ def simple_stats(y, axis=None):
     return mean, median, min_, max_, std, IQR
 
 
-def bin(x, y, bin_size=None, start=None, end=None, evenly_spaced = True):
+def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True):
     """ Bin the values
 
     Parameters
@@ -107,10 +108,10 @@ def bin(x, y, bin_size=None, start=None, end=None, evenly_spaced = True):
     y : array
         The y-axis series.
     bin_size : float
-        The size of the bins. Default is the median resolution if evenly_spaced is not True
+        The size of the bins. Default is the mean resolution if evenly_spaced is not True
     start : float
         Where/when to start binning. Default is the minimum
-    end : float
+    stop : float
         When/where to stop binning. Default is the maximum
     evenly_spaced : {True,False}
         Makes the series evenly-spaced. This option is ignored if bin_size is set to float
@@ -143,14 +144,14 @@ def bin(x, y, bin_size=None, start=None, end=None, evenly_spaced = True):
         else:
             bin_size = np.nanmean(np.diff(x))
 
-    # Get the start/end if not given
+    # Get the start/stop if not given
     if start is None:
         start = np.nanmin(x)
-    if end is None:
-        end = np.nanmax(x)
+    if stop is None:
+        stop = np.nanmax(x)
 
     # Set the bin medians
-    bins = np.arange(start+bin_size/2, end + bin_size/2, bin_size)
+    bins = np.arange(start+bin_size/2, stop + bin_size/2, bin_size)
 
     # Perform the calculation
     binned_values = []
@@ -177,7 +178,7 @@ def bin(x, y, bin_size=None, start=None, end=None, evenly_spaced = True):
     return  res_dict
 
 
-def gkernel(t,y,tc, h = 3.0):
+def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
     '''
     Coarsen time resolution using a Gaussian kernel
 
@@ -185,14 +186,30 @@ def gkernel(t,y,tc, h = 3.0):
 
     Parameters
     ----------
-    t  : 1d array; the original time axis
-    y  : 1d array; values on the original time axis
-    tc : 1d array; the coarse time axis
+    t  : 1d array
+        the original time axis
+    
+    y  : 1d array
+        values on the original time axis
+    
+    step : float
+        The interpolation step. Default is max spacing between consecutive points.
+        
+    start : float
+        where/when to start the interpolation. Default is min(t).
+        
+    stop : float
+        where/when to stop the interpolation. Default is max(t).
+    
     h  : scalar;  kernel e-folding scale
 
     Returns
     -------
-    yc: The  upscaled time series
+    tc : 1d array
+        the coarse time axis
+        
+    yc:  1d array
+        The coarse-grained time series
 
     References
     ----------
@@ -204,6 +221,19 @@ def gkernel(t,y,tc, h = 3.0):
 
     if len(t) != len(y):
         raise ValueError('y and t must have the same length')
+        
+    # get the interpolation step if not provided
+    if step is None:
+        _, _, step = grid_properties(np.asarray(t), step_style = step_style)
+        # Get the start and end point if not given
+    if start is None:
+        start = np.nanmin(np.asarray(t))
+    if stop is None:
+        stop = np.nanmax(np.asarray(t))
+    
+    # Get the uniform time axis.
+    tc = np.arange(start,stop,step)
+        
 
     kernel = lambda x, s : 1.0/(s*np.sqrt(2*np.pi))*np.exp(-0.5*(x/s)**2)  # define kernel function
 
@@ -221,10 +251,10 @@ def gkernel(t,y,tc, h = 3.0):
         else:
             yc[i] = np.nan
 
-    return yc
+    return tc, yc
 
 
-def grid_properties(x,method='median'):
+def grid_properties(x,step_style='median'):
     ''' Establishes the grid properties of a numerical array:
         start, stop, and representative step.
 
@@ -232,9 +262,13 @@ def grid_properties(x,method='median'):
     ----------
     x : array
 
-    method : str
+    step_style : str
         Method to obtain a representative step if x is not evenly spaced.
-        Valid entries: 'median' [default], 'mean' or 'max'
+        Valid entries: 'median' [default], 'mean', 'mode' or 'max'
+        The mode is the most frequent entry in a dataset, and may be a good choice if the timeseries
+        is nearly equally spaced but for a few gaps. 
+        
+        Max is a conservative choice, appropriate for binning methods and Gaussian kernel coarse-graining
 
     Returns
     -------
@@ -243,24 +277,26 @@ def grid_properties(x,method='median'):
     stop : float
         max(x)
     step : float
-        The representative spacing between consecutive values
+        The representative spacing between consecutive values, computed as above
     '''
     start = np.nanmin(x)
     stop = np.nanmax(x)
 
     delta = np.diff(x)
-    if method == 'mean':
+    if step_style == 'mean':
         step = delta.mean()
-    elif method == 'max':
+    elif step_style == 'max':
         step = delta.max()
+    elif step_style == 'mode':
+        step = stats.mode(delta)[0][0]
     else:
         step = np.median(delta)
 
     return start, stop, step
 
 
-def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **kwargs):
-    """ Interpolation onto a new x-axis
+def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style= 'mean',**kwargs):
+    """ Interpolate y onto a new x-axis
 
     Parameters
     ----------
@@ -271,11 +307,11 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **kw
        The y-axis
     interp_type : {‘linear’, ‘nearest’, ‘zero’, ‘slinear’, ‘quadratic’, ‘cubic’, ‘previous’, ‘next’}
         where ‘zero’, ‘slinear’, ‘quadratic’ and ‘cubic’ refer to a spline interpolation of zeroth, first, second or third order; ‘previous’ and ‘next’ simply return the previous or next value of the point) or as an integer specifying the order of the spline interpolator to use. Default is ‘linear’.
-    interp_step : float
-            The interpolation step. Default is mean resolution.
+    step : float
+            The interpolation step. Default is mean spacing between consecutive points.
     start : float
            where/when to start the interpolation. Default is min..
-    end : float
+    stop : float
          where/when to stop the interpolation. Default is max.
     kwargs :  kwargs
         Aguments specific to interpolate.interp1D. See scipy for details https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html
@@ -285,38 +321,38 @@ def interp(x,y, interp_type='linear', interp_step=None,start=None,end=None, **kw
 
     xi : array
         The interpolated x-axis
-    interp_values : array
-        The interpolated values
+    yi : array
+        The interpolated y values
     """
 
         #Make sure x and y are numpy arrays
     x = np.array(x,dtype='float64')
     y = np.array(y,dtype='float64')
 
-        # get the interpolation step if not available
-    if interp_step is None:
-        interp_step = np.nanmean(np.diff(x))
+    # get the interpolation step if not available
+    if step is None:
+        _, _, step = grid_properties(np.asarray(x), step_style = step_style)
 
         # Get the start and end point if not given
     if start is None:
         start = np.nanmin(np.asarray(x))
-    if end is None:
-        end = np.nanmax(np.asarray(x))
+    if stop is None:
+        stop = np.nanmax(np.asarray(x))
 
     # Get the interpolated x-axis.
-    xi = np.arange(start,end,interp_step)
+    xi = np.arange(start,stop,step)
 
     #Make sure the data is increasing
     data = pd.DataFrame({"x-axis": x, "y-axis": y}).sort_values('x-axis')
 
     # Add arguments
 
-    interp_values = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**kwargs)(xi)
+    yi = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**kwargs)(xi)
 
-    return xi, interp_values
+    return xi, yi
 
 
-def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None, end=None):
+def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None, stop=None):
     """Places two timeseries on a common axis
 
     Note this function assumes that the time representation and units are the same (e.g., BP vs CE)
@@ -342,8 +378,8 @@ def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=No
     start : float
         where/when to start. Default is the maximum of the minima of
         the two timeseries
-    end : float
-        Where/when to end. Default is the minimum of the maxima of
+    stop : float
+        Where/when to stop. Default is the minimum of the maxima of
         the two timeseries
 
     Returns
@@ -363,8 +399,8 @@ def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=No
     # Find the mean/max x-axis is not provided
     if start is None:
         start = np.nanmax([np.nanmin(x1), np.nanmin(x2)])
-    if end is None:
-        end = np.nanmin([np.nanmax(x1), np.nanmax(x2)])
+    if stop is None:
+        stop = np.nanmin([np.nanmax(x1), np.nanmax(x2)])
 
     # Get the interp_step
     if step is None:
@@ -372,20 +408,20 @@ def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=No
 
     if method == 'interpolation':
     # perform the interpolation
-        xi1, interp_values1 = interp(x1, y1, interp_step=step, start=start,
-                                end=end)
-        xi2, interp_values2 = interp(x2, y2, interp_step=step, start=start,
-                                end=end)
+        xi1, interp_values1 = interp(x1, y1, step=step, start=start,
+                                stop=stop)
+        xi2, interp_values2 = interp(x2, y2, step=step, start=start,
+                                stop=stop)
     elif method == 'bin':
-        xi1, interp_values1, n, error = bin(x1, y1, bin_size=step, start=start,
-                                end=end)
-        xi2, interp_values2, n, error = bin(x2, y2, bin_size=step, start=start,
-                                end=end)
+        xi1, interp_values1, _ , _ = bin(x1, y1, bin_size=step, start=start,
+                                stop=stop)
+        xi2, interp_values2, _ , _ = bin(x2, y2, bin_size=step, start=start,
+                                stop=stop)
     elif method == None:
         min_idx1 = np.where(x1>=start)[0][0]
         min_idx2 = np.where(x2>=start)[0][0]
-        max_idx1 = np.where(x1<=end)[0][-1]
-        max_idx2 = np.where(x2<=end)[0][-1]
+        max_idx1 = np.where(x1<=stop)[0][-1]
+        max_idx2 = np.where(x2<=stop)[0][-1]
 
         xi1 = x1[min_idx1:max_idx1+1]
         xi2 = x2[min_idx2:max_idx2+1]
