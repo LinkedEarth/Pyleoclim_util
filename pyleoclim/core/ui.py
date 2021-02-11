@@ -111,6 +111,9 @@ class Series:
         set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
         Default is True
 
+    verbose : bool
+        If True, will print warning messages if there is any
+
     Examples
     --------
 
@@ -135,10 +138,10 @@ class Series:
         ts.__dict__.keys()
     '''
 
-    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True):
+    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True, verbose=False):
 
         if clean_ts==True:
-            value, time = tsutils.clean_ts(np.array(value), np.array(time))
+            value, time = tsutils.clean_ts(np.array(value), np.array(time), verbose=verbose)
 
         self.time = time
         self.value = value
@@ -1099,8 +1102,14 @@ class Series:
         '''
         return deepcopy(self)
 
-    def clean(self):
+    def clean(self, verbose=False):
         ''' Clean up the timeseries by removing NaNs and sort with increasing time points
+
+        Parameters
+        ----------
+
+        verbose : bool
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -1109,7 +1118,7 @@ class Series:
 
         '''
         new = self.copy()
-        v_mod, t_mod = tsutils.clean_ts(self.value, self.time)
+        v_mod, t_mod = tsutils.clean_ts(self.value, self.time, verbose=verbose)
         new.time = t_mod
         new.value = v_mod
         return new
@@ -1341,7 +1350,8 @@ class Series:
         label : str
             Label for the PSD object
 
-        verbose : {True, False}
+        verbose : bool
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -1536,7 +1546,8 @@ class Series:
         settings : dict
             Arguments for the specific spectral method
 
-        verbose : {True, False}
+        verbose : bool
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -1640,7 +1651,8 @@ class Series:
         settings : dict
             Arguments for the specific spectral method
 
-        verbose : {True, False}
+        verbose : bool
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -2192,7 +2204,7 @@ class PSD:
             if 'first', then the 1st spacing of log(f) will be used as the binning step
 
         verbose : bool
-            if True, will print out debug information
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -3676,7 +3688,8 @@ class MultipleSeries:
         label : str
             Label for the PSD object
 
-        verbose : {True, False}
+        verbose : bool
+            If True, will print warning messages if there is any
 
         mute_pbar : {True, False}
             Mute the progress bar. Default is False.
@@ -3740,7 +3753,8 @@ class MultipleSeries:
         settings : dict
             Arguments for the specific spectral method
 
-        verbose : {True, False}
+        verbose : bool
+            If True, will print warning messages if there is any
 
 
         mute_pbar : bool, optional
@@ -4713,7 +4727,7 @@ class MultiplePSD:
             if 'first', then the 1st spacing of log(f) will be used as the binning step
 
         verbose : bool
-            if True, will print out debug information
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -5729,8 +5743,8 @@ class LipdSeries(Series):
         ensembleValuestoPaleo=lipdutils.mapAgeEnsembleToPaleoData(ensembleValues, depth, ds)
         #create multipleseries
         s_list=[]
-        for s in ensembleValuestoPaleo.T:
-            s_tmp=Series(time=s,value=self.value)
+        for i, s in enumerate(ensembleValuestoPaleo.T):
+            s_tmp = Series(time=s,value=self.value, verbose=i==0)
             s_list.append(s_tmp)
 
         ens = EnsembleSeries(series_list=s_list)

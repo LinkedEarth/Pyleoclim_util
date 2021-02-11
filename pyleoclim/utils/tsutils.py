@@ -513,7 +513,7 @@ def ts2segments(ys, ts, factor=10):
 
     return seg_ys, seg_ts, n_segs
 
-def clean_ts(ys, ts):
+def clean_ts(ys, ts, verbose=False):
     ''' Cleaning the timeseries
 
     Delete the NaNs in the time series and sort it with time axis ascending,
@@ -534,14 +534,14 @@ def clean_ts(ys, ts):
         The time axis of the time series without nans
 
     '''
-    ys, ts = dropna(ys, ts)
-    ys, ts = sort_ts(ys, ts)
-    ys, ts = reduce_duplicated_timestamps(ys, ts)
+    ys, ts = dropna(ys, ts, verbose=verbose)
+    ys, ts = sort_ts(ys, ts, verbose=verbose)
+    ys, ts = reduce_duplicated_timestamps(ys, ts, verbose=verbose)
 
     return ys, ts
 
 
-def dropna(ys, ts):
+def dropna(ys, ts, verbose=False):
     ''' Remove entries of ys or ts that bear NaNs
 
     Parameters
@@ -550,6 +550,8 @@ def dropna(ys, ts):
         A time series, NaNs allowed
     ts : array
         The time axis of the time series, NaNs allowed
+    verbose : bool
+        If True, will print a warning message
 
     Returns
     -------
@@ -570,6 +572,9 @@ def dropna(ys, ts):
     ys = ys[~np.isnan(ts_tmp)]
     ts = ts[~np.isnan(ts_tmp)]
 
+    if verbose and any(np.isnan(ys_tmp)):
+        print('NaNs have been detected and dropped.')
+
     return ys, ts
 
 def sort_ts(ys, ts, verbose=False):
@@ -581,6 +586,8 @@ def sort_ts(ys, ts, verbose=False):
         Dependent variable
     ts : array
         Independent variable
+    verbose : bool
+        If True, will print a warning message
 
     Returns
     -------
@@ -614,6 +621,8 @@ def reduce_duplicated_timestamps(ys, ts, verbose=False):
         Dependent variable
     ts : array
         Independent variable
+    verbose : bool
+        If True, will print a warning message
 
     Returns
     -------
