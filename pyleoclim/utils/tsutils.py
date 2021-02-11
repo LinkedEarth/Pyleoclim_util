@@ -572,7 +572,7 @@ def dropna(ys, ts):
 
     return ys, ts
 
-def sort_ts(ys, ts):
+def sort_ts(ys, ts, verbose=False):
     ''' Sort ts values in ascending order
 
     Parameters
@@ -600,11 +600,12 @@ def sort_ts(ys, ts):
         sort_ind = np.argsort(ts)
         ys = ys[sort_ind]
         ts = ts[sort_ind]
-        print('The time axis has been adjusted to be ascending!')
+        if verbose:
+            print('The time axis has been adjusted to be ascending!')
 
     return ys, ts
 
-def reduce_duplicated_timestamps(ys, ts):
+def reduce_duplicated_timestamps(ys, ts, verbose=False):
     ''' Reduce duplicated timestamps in a timeseries by averaging the values
 
     Parameters
@@ -643,7 +644,8 @@ def reduce_duplicated_timestamps(ys, ts):
         ts = np.array(ts)
         ys = np.array(ys)
 
-        print('Duplicated timestamps has been reduced by averaging values!')
+        if verbose:
+            print('Duplicated timestamps has been reduced by averaging values!')
     return ys, ts
 
 def annualize(ys, ts):
