@@ -113,5 +113,11 @@ MultipleScalogram (pyleoclim.MultipleScalogram)
 CorrEns (pyleoclim.CorrEns)
 """""""""""""""""""""""""""
 
- .. autoclass:: pyleoclim.core.ui.CorrEns
-    :members:
+.. autoclass:: pyleoclim.core.ui.CorrEns
+   :members:
+
+
+gen_ts (pyleoclim.gen_ts)
+"""""""""""""""""""""""""
+
+.. autofunction:: pyleoclim.gen_ts

@@ -69,7 +69,7 @@ def infer_period_unit_from_time_unit(time_unit):
 
     return period_unit
 
-def gen_ts(model, nt=1000, settings=None):
+def gen_ts(model, nt=1000, **kwargs):
     ''' Generate pyleoclim.Series with timeseries models
 
     Parameters
@@ -81,11 +81,11 @@ def gen_ts(model, nt=1000, settings=None):
         - colored_noise_2regimes : colored noise with two regimes of two different scaling slopes
         - ar1 : AR(1) series
 
-    settings : dict
+    kwargs : dict
         the keyward arguments for the specified timeseries model
 
-    Return
-    ------
+    Returns
+    -------
 
     ts : `pyleoclim.Series`
 
@@ -93,11 +93,108 @@ def gen_ts(model, nt=1000, settings=None):
     --------
 
     pyleoclim.utils.tsmodel.colored_noise : generate a colored noise timeseries
-    pyleoclim.utils.tsmodel.colored_noise_2regime : generate a colored noise timeseries with two regimes
-    pyleoclim.utils.tsmodel.ar1_model : generate an AR(1) series
+    pyleoclim.utils.tsmodel.colored_noise_2regimes : generate a colored noise timeseries with two regimes
+    pyleoclim.utils.tsmodel.gen_ar1_evenly : generate an AR(1) series
+
+
+    Examples
+    --------
+
+    - AR(1) series
+
+    .. ipython:: python
+        :okwarning:
+
+        import pyleoclim as pyleo
+
+        # default length nt=1000; default persistence parameter g=0.5
+        ts = pyleo.gen_ts(model='ar1')
+        g = pyleo.utils.tsmodel.ar1_fit(ts.value)
+        @savefig gen_ar1_t0.png
+        fig, ax = ts.plot(label=f'g={g:.2f}')
+        pyleo.closefig(fig)
+
+        # use 'nt' to modify the data length
+        ts = pyleo.gen_ts(model='ar1', nt=100)
+        g = pyleo.utils.tsmodel.ar1_fit(ts.value)
+        @savefig gen_ar1_t1.png
+        fig, ax = ts.plot(label=f'g={g:.2f}')
+        pyleo.closefig(fig)
+
+        # use 'settings' to modify the persistence parameter 'g'
+        ts = pyleo.gen_ts(model='ar1', g=0.9)
+        g = pyleo.utils.tsmodel.ar1_fit(ts.value)
+        @savefig gen_ar1_t2.png
+        fig, ax = ts.plot(label=f'g={g:.2f}')
+        pyleo.closefig(fig)
+
+    - Colored noise with 1 regime
+
+    .. ipython:: python
+        :okwarning:
+
+        # default scaling slope 'alpha' is 1
+        ts = pyleo.gen_ts(model='colored_noise')
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        beta_info = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(beta_info['beta'])
+
+        # visualize
+        @savefig gen_cn_t0.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
+
+        # modify 'alpha' with 'settings'
+        ts = pyleo.gen_ts(model='colored_noise', alpha=2)
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        beta_info = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(beta_info['beta'])
+
+        # visualize
+        @savefig gen_cn_t1.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
+
+    - Colored noise with 2 regimes
+
+    .. ipython:: python
+        :okwarning
+
+        # default scaling slopes 'alpha1' is 0.5 and 'alpha2' is 2, with break at 1/20
+        ts = pyleo.gen_ts(model='colored_noise_2regimes')
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        beta_info_lf = psd.beta_est(fmin=1/50, fmax=1/20)
+        beta_info_hf = psd.beta_est(fmin=1/20, fmax=1/2)
+        print(beta_info_lf['beta'])
+        print(beta_info_hf['beta'])
+
+        # visualize
+        @savefig gen_cn2_t0.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
+
+        # modify the scaling slopes and scaling break with 'settings'
+        ts = pyleo.gen_ts(model='colored_noise_2regimes', alpha1=2, alpha2=1, f_break=1/10)
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        beta_info_lf = psd.beta_est(fmin=1/50, fmax=1/10)
+        beta_info_hf = psd.beta_est(fmin=1/10, fmax=1/2)
+        print(beta_info_lf['beta'])
+        print(beta_info_hf['beta'])
+
+        # visualize
+        @savefig gen_cn2_t1.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
 
     '''
-    settings = {} if settings is None else settings.copy()
     t = np.arange(nt)
     tsm = {
         'colored_noise': tsmodel.colored_noise,
@@ -109,7 +206,7 @@ def gen_ts(model, nt=1000, settings=None):
     tsm_args['colored_noise'] = {'alpha': 1}
     tsm_args['colored_noise_2regimes'] = {'alpha1': 1/2, 'alpha2': 2, 'f_break': 1/20}
     tsm_args['ar1'] = {'g': 0.5}
-    tsm_args[model].update(settings)
+    tsm_args[model].update(kwargs)
 
     v = tsm[model](t=t, **tsm_args[model])
     ts = Series(time=t, value=v)
@@ -801,12 +898,20 @@ class Series:
 
         new : pyleoclim.Series
 
+        See also
+        --------
+
+        pyleoclim.utils.filter.butterworth : Butterworth method
+        pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
+
         Examples
         --------
 
         In the example below, we generate a signal as the sum of two signals with frequency 10 Hz and 20 Hz, respectively.
         Then we apply a low-pass filter with a cutoff frequency at 15 Hz, and compare the output to the signal of 10 Hz.
         After that, we apply a band-pass filter with the band 15-25 Hz, and compare the outcome to the signal of 20 Hz.
+
+        - Generating the test data
 
         .. ipython:: python
             :okwarning:
@@ -829,6 +934,11 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
+        - Applying the low-pass filter
+
+        .. ipython:: python
+            :okwarning:
+
             fig, ax = ts.plot(mute=True, label='mix')
             ts.filter(cutoff_freq=15).plot(ax=ax, label='After 15 Hz low-pass filter')
             ts1.plot(ax=ax, label='10 Hz')
@@ -837,6 +947,11 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
+        - Applying the band-pass filter
+
+        .. ipython:: python
+            :okwarning:
+
             fig, ax = ts.plot(mute=True, label='mix')
             ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label='After 15-25 Hz band-pass filter')
             ts2.plot(ax=ax, label='20 Hz')
@@ -844,12 +959,6 @@ class Series:
             @savefig ts_filter3.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
-
-        See also
-        --------
-
-        pyleoclim.utils.filter.butterworth : Butterworth method
-        pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
 
         '''
         if not self.is_evenly_spaced():
@@ -2097,7 +2206,7 @@ class Series:
         new.value = v_mod
         return new
 
-    def gkernel(self, step_type = 'median', **kwargs):
+    def gkernel(self, step_type='median', **kwargs):
         ''' Coarse-grain a Series object via a Gaussian kernel.
 
         Parameters
@@ -2117,10 +2226,10 @@ class Series:
 
         new=self.copy()
 
-        start, stop, step = tsutils.grid_properties(self.time, method=step_type)
+        start, stop, step = tsutils.grid_properties(self.time, step_style=step_type)
 
         ti = np.arange(start,stop,step) # generate new axis
-        vi = tsutils.gkernel(self.time,self.value,ti,**kwargs) # apply kernel
+        vi = tsutils.gkernel(self.value, self.value, **kwargs) # apply kernel
         new.time = ti
         new.value = vi
         return new
@@ -3356,10 +3465,10 @@ class MultipleSeries:
         '''
 
         if step_style == None:
-          if method == 'bin' or method == 'gkernel':
-             step_style = 'max'
-          elif  method == 'interp':
-             step_style = 'mean'
+            if method == 'bin' or method == 'gkernel':
+               step_style = 'max'
+            elif  method == 'interp':
+               step_style = 'mean'
 
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
         for idx,item in enumerate(self.series_list):
@@ -3655,7 +3764,7 @@ class MultipleSeries:
 
         ms = self.copy()
 
-        ms = ms.common_time(method = 'binning', **kwargs)
+        ms = ms.common_time(method='bin', **kwargs)
 
         return ms
 
@@ -3689,7 +3798,7 @@ class MultipleSeries:
 
         pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
 
-        pyleoclim.utils.tsutils.gkernel: Underlying binning function
+        pyleoclim.utils.tsutils.gkernel: Underlying kernel module
 
 
         Examples
@@ -3764,7 +3873,7 @@ class MultipleSeries:
         '''
         ms = self.copy()
 
-        ms = ms.common_time(method = 'interp', **kwargs)
+        ms = ms.common_time(method='interp', **kwargs)
 
         return ms
 
