@@ -1899,9 +1899,9 @@ class Series:
         settings : dict
             Parameters for the correlation function, including:
 
-            - nsim : int
+            nsim : int
                 the number of simulations (default: 1000)
-            - method : str, {'ttest','isopersistent','isospectral' (default)}
+            method : str, {'ttest','isopersistent','isospectral' (default)}
                 method for significance testing
 
         common_time_kwargs : dict
@@ -3547,9 +3547,9 @@ class MultipleSeries:
         settings : dict
             Parameters for the correlation function, including:
 
-            - nsim : int
+            nsim : int
                 the number of simulations (default: 1000)
-            - method : str, {'ttest','isopersistent','isospectral' (default)}
+            method : str, {'ttest','isopersistent','isospectral' (default)}
                 method for significance testing
 
         common_time_kwargs : dict
@@ -4456,7 +4456,12 @@ class EnsembleSeries(MultipleSeries):
             The significance level (0.05 by default)
 
         settings : dict
-            Parameters for the correlation function (significance testing and number of simulations)
+            Parameters for the correlation function, including:
+
+            nsim : int
+                the number of simulations (default: 1000)
+            method : str, {'ttest','isopersistent','isospectral' (default)}
+                method for significance testing
 
         fdr_kwargs : dict
             Parameters for the FDR function
