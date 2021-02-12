@@ -5991,7 +5991,7 @@ class LipdSeries(Series):
         #create multipleseries
         s_list=[]
         for i, s in enumerate(ensembleValuestoPaleo.T):
-            s_tmp = Series(time=s,value=self.value, verbose=i==0)
+            s_tmp = Series(time=s,value=self.value)
             s_list.append(s_tmp)
 
         ens = EnsembleSeries(series_list=s_list)
