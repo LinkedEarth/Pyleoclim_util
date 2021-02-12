@@ -30,6 +30,7 @@ from scipy import optimize
 #from .tsmodel import ar1_sim
 from .tsutils import (
     clean_ts,
+    dropna,
     preprocess,
 )
 
@@ -1905,6 +1906,7 @@ def beta_estimation(psd, freq, fmin=None, fmax=None, logf_binning_step='max', ve
     X = np.log10(f_binned)
     X_ex = sm.add_constant(X)
 
+    # note below: 'drop' is used for missing, so NaNs will be removed, and we need to put it back in the end
     model = sm.OLS(Y, X_ex, missing='drop')
     results = model.fit()
 
@@ -1914,7 +1916,19 @@ def beta_estimation(psd, freq, fmin=None, fmax=None, logf_binning_step='max', ve
         std_err = np.nan
     else:
         beta = -results.params[1]  # the slope we want
-        Y_reg = 10**model.predict(results.params)  # prediction based on linear regression
+        Y_reg_raw = 10**model.predict(results.params)  # prediction based on linear regression
+        # handeling potential NaNs in psd_binned
+        Y_reg = []
+        i = 0
+        for psd in psd_binned:
+            if np.isnan(psd):
+                Y_reg.append(np.nan)
+            else:
+                Y_reg.append(Y_reg_raw[i])
+                i += 1
+
+        Y_reg = np.array(Y_reg)
+
         std_err = results.bse[1]
 
     res = Results(beta=beta, f_binned=f_binned, psd_binned=psd_binned, Y_reg=Y_reg, std_err=std_err)
