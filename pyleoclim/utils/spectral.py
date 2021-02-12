@@ -450,24 +450,33 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     # Fix possible problems at the edge
     if psd[0]<psd[1]:    
         if abs(1-abs(psd[1]-psd[0])/psd[1])<1.e-2:
-            warnings.warn("Unstability at the beginning of freq vector, removing point")
-            psd=psd[1:]
-            freq=freq[1:]
+            # warnings.warn("Unstability at the beginning of freq vector, removing point")
+            # psd=psd[1:]
+            # freq=freq[1:]
+            warnings.warn("Unstability at the beginning of freq vector, setting the point to NaN")
+            psd[0] = np.nan
     else:
         if abs(1-abs(psd[0]-psd[1])/psd[0])<1.e-2:
-            warnings.warn("Unstability at the beginning of freq vector, removing point")
-            psd=psd[1:]
-            freq=freq[1:]
+            # warnings.warn("Unstability at the beginning of freq vector, removing point")
+            # psd=psd[1:]
+            # freq=freq[1:]
+            warnings.warn("Unstability at the beginning of freq vector, setting the point to NaN")
+            psd[0] = np.nan
     if psd[-1]>psd[-2]:
         if abs(1-abs(psd[-1]-psd[-2])/psd[-1])<1.e-2:
             warnings.warn("Unstability at the end of freq vector, removing point")
-            psd=psd[0:-2]
-            freq=freq[0:-2]
+            # psd=psd[0:-2]
+            # freq=freq[0:-2]
+            psd[-1] = np.nan
+            psd[-2] = np.nan
     else:
         if abs(1-abs(psd[-2]-psd[-1])/psd[-2])<1.e-2:
-            warnings.warn("Unstability at the end of freq vector, removing point")
-            psd=psd[0:-2]
-            freq=freq[0:-2]
+            # warnings.warn("Unstability at the end of freq vector, removing point")
+            # psd=psd[0:-2]
+            # freq=freq[0:-2]
+            warnings.warn("Unstability at the end of freq vector, setting the point point to NaN")
+            psd[-1] = np.nan
+            psd[-2] = np.nan
 
     # output result
     res_dict = {
