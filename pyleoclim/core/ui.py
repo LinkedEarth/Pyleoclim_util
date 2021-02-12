@@ -32,11 +32,10 @@ import matplotlib as mpl
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
-import cartopy.crs as ccrs
-import cartopy.feature as cfeature
 
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
+from scipy import stats
 import warnings
 import os
 
@@ -69,6 +68,149 @@ def infer_period_unit_from_time_unit(time_unit):
                 period_unit = f'{time_unit}s'
 
     return period_unit
+
+def gen_ts(model, nt=1000, **kwargs):
+    ''' Generate pyleoclim.Series with timeseries models
+
+    Parameters
+    ----------
+
+    model : str, {'colored_noise', 'colored_noise_2regimes', 'ar1'}
+        the timeseries model to use
+        - colored_noise : colored noise with one scaling slope
+        - colored_noise_2regimes : colored noise with two regimes of two different scaling slopes
+        - ar1 : AR(1) series
+
+    kwargs : dict
+        the keyward arguments for the specified timeseries model
+
+    Returns
+    -------
+
+    ts : `pyleoclim.Series`
+
+    See also
+    --------
+
+    pyleoclim.utils.tsmodel.colored_noise : generate a colored noise timeseries
+    pyleoclim.utils.tsmodel.colored_noise_2regimes : generate a colored noise timeseries with two regimes
+    pyleoclim.utils.tsmodel.gen_ar1_evenly : generate an AR(1) series
+
+
+    Examples
+    --------
+
+    - AR(1) series
+
+    .. ipython:: python
+        :okwarning:
+
+        import pyleoclim as pyleo
+
+        # default length nt=1000; default persistence parameter g=0.5
+        ts = pyleo.gen_ts(model='ar1')
+        g = pyleo.utils.tsmodel.ar1_fit(ts.value)
+        @savefig gen_ar1_t0.png
+        fig, ax = ts.plot(label=f'g={g:.2f}')
+        pyleo.closefig(fig)
+
+        # use 'nt' to modify the data length
+        ts = pyleo.gen_ts(model='ar1', nt=100)
+        g = pyleo.utils.tsmodel.ar1_fit(ts.value)
+        @savefig gen_ar1_t1.png
+        fig, ax = ts.plot(label=f'g={g:.2f}')
+        pyleo.closefig(fig)
+
+        # use 'settings' to modify the persistence parameter 'g'
+        ts = pyleo.gen_ts(model='ar1', g=0.9)
+        g = pyleo.utils.tsmodel.ar1_fit(ts.value)
+        @savefig gen_ar1_t2.png
+        fig, ax = ts.plot(label=f'g={g:.2f}')
+        pyleo.closefig(fig)
+
+    - Colored noise with 1 regime
+
+    .. ipython:: python
+        :okwarning:
+
+        # default scaling slope 'alpha' is 1
+        ts = pyleo.gen_ts(model='colored_noise')
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        beta_info = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(beta_info['beta'])
+
+        # visualize
+        @savefig gen_cn_t0.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
+
+        # modify 'alpha' with 'settings'
+        ts = pyleo.gen_ts(model='colored_noise', alpha=2)
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        beta_info = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(beta_info['beta'])
+
+        # visualize
+        @savefig gen_cn_t1.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
+
+    - Colored noise with 2 regimes
+
+    .. ipython:: python
+        :okwarning
+
+        # default scaling slopes 'alpha1' is 0.5 and 'alpha2' is 2, with break at 1/20
+        ts = pyleo.gen_ts(model='colored_noise_2regimes')
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        beta_info_lf = psd.beta_est(fmin=1/50, fmax=1/20)
+        beta_info_hf = psd.beta_est(fmin=1/20, fmax=1/2)
+        print(beta_info_lf['beta'])
+        print(beta_info_hf['beta'])
+
+        # visualize
+        @savefig gen_cn2_t0.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
+
+        # modify the scaling slopes and scaling break with 'settings'
+        ts = pyleo.gen_ts(model='colored_noise_2regimes', alpha1=2, alpha2=1, f_break=1/10)
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        beta_info_lf = psd.beta_est(fmin=1/50, fmax=1/10)
+        beta_info_hf = psd.beta_est(fmin=1/10, fmax=1/2)
+        print(beta_info_lf['beta'])
+        print(beta_info_hf['beta'])
+
+        # visualize
+        @savefig gen_cn2_t1.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
+
+    '''
+    t = np.arange(nt)
+    tsm = {
+        'colored_noise': tsmodel.colored_noise,
+        'colored_noise_2regimes': tsmodel.colored_noise_2regimes,
+        'ar1': tsmodel.gen_ar1_evenly,
+    }
+
+    tsm_args = {}
+    tsm_args['colored_noise'] = {'alpha': 1}
+    tsm_args['colored_noise_2regimes'] = {'alpha1': 1/2, 'alpha2': 2, 'f_break': 1/20}
+    tsm_args['ar1'] = {'g': 0.5}
+    tsm_args[model].update(kwargs)
+
+    v = tsm[model](t=t, **tsm_args[model])
+    ts = Series(time=t, value=v)
+    return ts
 
 
 class Series:
@@ -111,6 +253,9 @@ class Series:
         set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
         Default is True
 
+    verbose : bool
+        If True, will print warning messages if there is any
+
     Examples
     --------
 
@@ -135,10 +280,10 @@ class Series:
         ts.__dict__.keys()
     '''
 
-    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True):
+    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True, verbose=False):
 
         if clean_ts==True:
-            value, time = tsutils.clean_ts(np.array(value), np.array(time))
+            value, time = tsutils.clean_ts(np.array(value), np.array(time), verbose=verbose)
 
         self.time = time
         self.value = value
@@ -149,7 +294,7 @@ class Series:
         self.label = label
 
     def convert_time_unit(self, time_unit='years'):
-        ''' Convert the time unit of the timeseries
+        ''' Convert the time unit of the Series object
 
         Parameters
         ----------
@@ -753,12 +898,20 @@ class Series:
 
         new : pyleoclim.Series
 
+        See also
+        --------
+
+        pyleoclim.utils.filter.butterworth : Butterworth method
+        pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
+
         Examples
         --------
 
         In the example below, we generate a signal as the sum of two signals with frequency 10 Hz and 20 Hz, respectively.
         Then we apply a low-pass filter with a cutoff frequency at 15 Hz, and compare the output to the signal of 10 Hz.
         After that, we apply a band-pass filter with the band 15-25 Hz, and compare the outcome to the signal of 20 Hz.
+
+        - Generating the test data
 
         .. ipython:: python
             :okwarning:
@@ -781,6 +934,11 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
+        - Applying the low-pass filter
+
+        .. ipython:: python
+            :okwarning:
+
             fig, ax = ts.plot(mute=True, label='mix')
             ts.filter(cutoff_freq=15).plot(ax=ax, label='After 15 Hz low-pass filter')
             ts1.plot(ax=ax, label='10 Hz')
@@ -789,6 +947,11 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
+        - Applying the band-pass filter
+
+        .. ipython:: python
+            :okwarning:
+
             fig, ax = ts.plot(mute=True, label='mix')
             ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label='After 15-25 Hz band-pass filter')
             ts2.plot(ax=ax, label='20 Hz')
@@ -796,12 +959,6 @@ class Series:
             @savefig ts_filter3.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
-
-        See also
-        --------
-
-        pyleoclim.utils.filter.butterworth : Butterworth method
-        pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
 
         '''
         if not self.is_evenly_spaced():
@@ -1099,8 +1256,14 @@ class Series:
         '''
         return deepcopy(self)
 
-    def clean(self):
+    def clean(self, verbose=False):
         ''' Clean up the timeseries by removing NaNs and sort with increasing time points
+
+        Parameters
+        ----------
+
+        verbose : bool
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -1109,7 +1272,7 @@ class Series:
 
         '''
         new = self.copy()
-        v_mod, t_mod = tsutils.clean_ts(self.value, self.time)
+        v_mod, t_mod = tsutils.clean_ts(self.value, self.time, verbose=verbose)
         new.time = t_mod
         new.value = v_mod
         return new
@@ -1341,7 +1504,8 @@ class Series:
         label : str
             Label for the PSD object
 
-        verbose : {True, False}
+        verbose : bool
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -1536,7 +1700,8 @@ class Series:
         settings : dict
             Arguments for the specific spectral method
 
-        verbose : {True, False}
+        verbose : bool
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -1640,7 +1805,8 @@ class Series:
         settings : dict
             Arguments for the specific spectral method
 
-        verbose : {True, False}
+        verbose : bool
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -2035,12 +2201,12 @@ class Series:
 
         '''
         new = self.copy()
-        x_mod, v_mod = tsutils.interp(self.time,self.value,interp_type=method,**kwargs)
-        new.time = x_mod
-        new.value = v_mod
+        ti, vi = tsutils.interp(self.time,self.value,interp_type=method,**kwargs)
+        new.time = ti
+        new.value = vi
         return new
 
-    def gkernel(self, step_type = 'median', **kwargs):
+    def gkernel(self, step_type='median', **kwargs):
         ''' Coarse-grain a Series object via a Gaussian kernel.
 
         Parameters
@@ -2059,11 +2225,8 @@ class Series:
         '''
 
         new=self.copy()
-
-        start, stop, step = tsutils.grid_properties(self.time, method=step_type)
-
-        ti = np.arange(start,stop,step) # generate new axis
-        vi = tsutils.gkernel(self.time,self.value,ti,**kwargs) # apply kernel
+        
+        ti, vi = tsutils.gkernel(self.value, self.value, **kwargs) # apply kernel
         new.time = ti
         new.value = vi
         return new
@@ -2192,7 +2355,7 @@ class PSD:
             if 'first', then the 1st spacing of log(f) will be used as the binning step
 
         verbose : bool
-            if True, will print out debug information
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -3191,7 +3354,7 @@ class MultipleSeries:
             ms.series_list[idx]=s
         return ms
 
-    def common_time(self,method='binning',**kwargs):
+    def common_time(self, method='interp', common_step = 'max', start=None, stop = None, step=None, step_style = None, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via either binning
         or interpolation. This is critical for workflows that need to assume a
         common time axis for the group of series under consideration.
@@ -3201,27 +3364,112 @@ class MultipleSeries:
 
         start : the latest start date of the bunch (maximun of the minima)
         stop  : the earliest stop date of the bunch (minimum of the maxima)
-        step  : The representative spacing between consecutive values (mean of the median spacings)
+        step  : The representative spacing between consecutive values
 
         Optional arguments for binning or interpolation are those of the underling functions.
 
+        Note that by default, all MultipleSeries objects have prograde time grids
+
         Parameters
         ----------
-        method:  string
-            either 'binning', 'interp' or 'gkernel'
+        method :  string
+            either 'bin', 'interp' [default] or 'gkernel'
+        common_step : string
+            Method to obtain a representative step among all Series
+            Valid entries: 'median' [default], 'mean', 'mode' or 'max'
+        start : float
+            starting point of the common time axis [default = None]
+        stop : float
+            end point of the common time axis [default = None]
+        step : float
+            increment the common time axis  [default = None]
 
-        kwargs: dict 
-            keyword arguments (dictionary) for the various methods
+        if not provided, `pyleoclim` will use `grid_properties()` to determine these parameters
+
+        step_style : 'string'
+            step style to be applied from `grid_properties` [default = None]
+
+
+        kwargs: dict
+            keyword arguments (dictionary) of the various methods
 
         Returns
         -------
         ms : pyleoclim.MultipleSeries
             The MultipleSeries objects with all series aligned to the same time axis.
+
+
+        See also
+        --------
+
+        pyleoclim.utils.tsutils.bin : put timeseries values into equal bins (possibly leaving NaNs in).
+        pyleoclim.utils.tsutils.gkernel : coarse-graining using a Gaussian kernel
+        pyleoclim.utils.tsutils.interp : interpolation onto a regular grid (default = linear interpolation)
+        pyleoclim.utils.tsutils.grid_properties : infer grid properties
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+
+            import numpy as np
+            import pyleoclim as pyleo
+            import matplotlib.pyplot as plt
+            from pyleoclim.utils.tsmodel import colored_noise
+
+            # create 2 incompletely sampled series
+            ns = 2 ; nt = 200; n_del = 20
+            serieslist = []
+
+
+            for j in range(ns):
+                t = np.arange(nt)
+                v = colored_noise(alpha=1, t=t)
+                deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
+                tu =  np.delete(t, deleted_idx)
+                vu =  np.delete(v, deleted_idx)
+                ts = pyleo.Series(time = tu, value = vu, label = 'series ' + str(j+1))
+                serieslist.append(ts)
+
+            # create MS object from the list
+            ms = pyleo.MultipleSeries(serieslist)
+
+            fig, ax = plt.subplots(2,2)
+            ax = ax.flatten()
+            # apply common_time with default parameters
+            msc = ms.common_time()
+            msc.plot(title='linear interpolation',ax=ax[0])
+
+            # apply common_time with binning
+            msc = ms.common_time(method='bin')
+            msc.plot(title='Binning',ax=ax[1], legend=False)
+
+            # apply common_time with gkernel
+            msc = ms.common_time(method='gkernel')
+            msc.plot(title=r'Gaussian kernel ($h=3$)',ax=ax[2],legend=False)
+
+            # apply common_time with gkernel modified
+            msc = ms.common_time(method='gkernel', h=11)
+            msc.plot(title=r'Gaussian kernel ($h=11$)',ax=ax[3],legend=False)
+
+            # display, save and close figure
+            fig.tight_layout()
+            @savefig ms_ct.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+
         '''
+
+        if step_style == None:
+            if method == 'bin' or method == 'gkernel':
+               step_style = 'max'
+            elif  method == 'interp':
+               step_style = 'mean'
 
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
         for idx,item in enumerate(self.series_list):
-            gp[idx,:] = tsutils.grid_properties(item.time, method='max')
+            gp[idx,:] = tsutils.grid_properties(item.time, step_style=step_style)
             if gp[idx,2] < 0:  # flip time axis if retrograde
                 item.time  = item.time[::-1,...]
                 item.value = item.value[::-1,...]
@@ -3229,14 +3477,24 @@ class MultipleSeries:
         # define parameters for common time axis
         start = gp[:,0].max()
         stop  = gp[:,1].min()
-        step  = gp[:,2].mean()
+        if start > stop:
+            raise ValueError('At least one series has no common time interval with others. Please check the time axis of the series.')
+
+        if common_step == 'mean':
+            step = gp[:,2].mean()
+        elif common_step == 'max':
+            step = gp[:,2].max()
+        elif common_step == 'mode':
+            step = stats.mode(gp[:,2])[0][0]
+        else:
+            step = np.median(gp[:,2])
 
         ms = self.copy()
 
-        if method == 'binning':
+        if method == 'bin':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, end=stop, evenly_spaced = False)
+                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, stop=stop, evenly_spaced = False, **kwargs)
                 ts.time  = d['bins']
                 ts.value = d['binned_values']
                 ms.series_list[idx] = ts
@@ -3244,17 +3502,15 @@ class MultipleSeries:
         elif method == 'interp':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.interp(ts.time, ts.value, interp_type='linear', interp_step=step, start=start, end=stop,**kwargs)
+                ti, vi = tsutils.interp(ts.time, ts.value, step=step, start=start, stop=stop,**kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
 
         elif method == 'gkernel':
-            # Get the interpolated x-axis.
-            ti = np.arange(start,stop,step)
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                vi = tsutils.gkernel(ts.time,ts.value,ti, h = 11)
+                ti, vi = tsutils.gkernel(ts.time,ts.value,step=step, start=start, stop=stop, **kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
@@ -3507,7 +3763,7 @@ class MultipleSeries:
 
         ms = self.copy()
 
-        ms = ms.common_time(method = 'binning', **kwargs)
+        ms = ms.common_time(method = 'bin', **kwargs)
 
         return ms
 
@@ -3529,7 +3785,7 @@ class MultipleSeries:
         ----------
 
         kwargs : dict
-            Arguments for gkernel. See pyleoclim.utils.tsutils.gkernel for details. 
+            Arguments for gkernel. See pyleoclim.utils.tsutils.gkernel for details.
 
         Returns
         -------
@@ -3541,7 +3797,7 @@ class MultipleSeries:
 
         pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
 
-        pyleoclim.utils.tsutils.gkernel: Underlying binning function
+        pyleoclim.utils.tsutils.gkernel: Underlying kernel module
 
 
         Examples
@@ -3562,7 +3818,7 @@ class MultipleSeries:
 
         ms = self.copy()
 
-        ms = ms.common_time(method = 'gkernel')
+        ms = ms.common_time(method = 'gkernel', **kwargs)
 
         return ms
 
@@ -3616,7 +3872,7 @@ class MultipleSeries:
         '''
         ms = self.copy()
 
-        ms = ms.common_time(method = 'interp', **kwargs)
+        ms = ms.common_time(method='interp', **kwargs)
 
         return ms
 
@@ -3655,7 +3911,7 @@ class MultipleSeries:
             ms.series_list[idx]=s
         return ms
 
-    def spectral(self, method='wwz', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False):
+    def spectral(self, method='lomb_scargle', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -3676,7 +3932,8 @@ class MultipleSeries:
         label : str
             Label for the PSD object
 
-        verbose : {True, False}
+        verbose : bool
+            If True, will print warning messages if there is any
 
         mute_pbar : {True, False}
             Mute the progress bar. Default is False.
@@ -3712,7 +3969,7 @@ class MultipleSeries:
         settings = {} if settings is None else settings.copy()
 
         psd_list = []
-        for s in tqdm(self.series_list, desc='Performing spectral analysis on surrogates', position=0, leave=True, disable=mute_pbar):
+        for s in tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar):
             psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
             psd_list.append(psd_tmp)
 
@@ -3740,7 +3997,8 @@ class MultipleSeries:
         settings : dict
             Arguments for the specific spectral method
 
-        verbose : {True, False}
+        verbose : bool
+            If True, will print warning messages if there is any
 
 
         mute_pbar : bool, optional
@@ -3766,7 +4024,7 @@ class MultipleSeries:
         settings = {} if settings is None else settings.copy()
 
         scal_list = []
-        for s in tqdm(self.series_list, desc='Performing wavelet analysis on surrogates', position=0, leave=True, disable=mute_pbar):
+        for s in tqdm(self.series_list, desc='Performing wavelet analysis on individual series', position=0, leave=True, disable=mute_pbar):
             scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose)
             scal_list.append(scal_tmp)
 
@@ -3869,7 +4127,7 @@ class MultipleSeries:
         else:
             return ax
 
-    def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
+    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
                   spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
         ''' Stack plot of multiple series
 
@@ -4051,8 +4309,8 @@ class MultipleSeries:
 
 class SurrogateSeries(MultipleSeries):
     ''' Object containing surrogate timeseries, usually obtained through recursive modeling (e.g., AR1)
-    
-    Surrogate Series is a child of MultipleSeries. All methods available for MultipleSeries are available for surrogate series. 
+
+    Surrogate Series is a child of MultipleSeries. All methods available for MultipleSeries are available for surrogate series.
     '''
     def __init__(self, series_list, surrogate_method=None, surrogate_args=None):
         self.series_list = series_list
@@ -4064,8 +4322,8 @@ class EnsembleSeries(MultipleSeries):
 
     The EnsembleSeries object is a child of the MultipleSeries object, that is, a special case of MultipleSeries, aiming for ensembles of similar series.
     Ensembles usually arise from age modeling or Bayesian calibrations. All members of an EnsembleSeries object are assumed to share identical labels and units.
-    
-    All methods available for MultipleSeries are available for EnsembleSeries. Some functions were modified for the special case of ensembles. 
+
+    All methods available for MultipleSeries are available for EnsembleSeries. Some functions were modified for the special case of ensembles.
 
     '''
     def __init__(self, series_list):
@@ -4713,7 +4971,7 @@ class MultiplePSD:
             if 'first', then the 1st spacing of log(f) will be used as the binning step
 
         verbose : bool
-            if True, will print out debug information
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -5248,7 +5506,9 @@ class Lipd:
             if 'archiveType' in D_path.keys():
                 D_path={D_path['dataSetName']:D_path}
             if validate==True:
+                cwd = os.getcwd()
                 res=lpd.validate(D_path,detailed=False)
+                os.chdir(cwd)
                 if remove == True:
                     for item in res:
                         if item['status'] == 'FAIL':
@@ -5267,7 +5527,9 @@ class Lipd:
             if 'archiveType' in D_dict.keys():
                 D_dict={D_dict['dataSetName']:D_dict}
             if validate==True:
+                cwd = os.getcwd()
                 res=lpd.validate(D_dict,detailed=False)
+                os.chdir(cwd)
                 if remove == True:
                     for item in res:
                         if item['status'] == 'FAIL':
@@ -5305,15 +5567,17 @@ class Lipd:
         -------
         ts_list : list
             List of Lipd timeseries objects as defined by LiPD utilities
-        
+
         See also
         --------
-        
-        pyleoclim.ui.LipdSeries : LiPD Series object. 
-        
+
+        pyleoclim.ui.LipdSeries : LiPD Series object.
+
 
         '''
+        cwd = os.getcwd()
         ts_list=lpd.extractTs(self.__dict__['lipd'])
+        os.chdir(cwd)
         return ts_list
 
     def extract(self,dataSetName):
@@ -5351,7 +5615,9 @@ class Lipd:
         pyleoclim.ui.LipdSeries : LipdSeries object
 
         '''
+        cwd = os.getcwd()
         ts_list=lpd.extractTs(self.__dict__['lipd'])
+        os.chdir(cwd)
 
         res=[]
 
@@ -5384,7 +5650,9 @@ class Lipd:
         pyleoclim.ui.LipdSeries : LipdSeries object
 
         '''
+        cwd = os.getcwd()
         ts_list = lpd.extractTs(self.__dict__['lipd'])
+        os.chdir(cwd)
         if number is None:
             ts = LipdSeries(ts_list)
         else:
@@ -5453,12 +5721,12 @@ class Lipd:
         --------
 
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
-        
+
         Examples
         --------
-        
+
         For speed, we are only using one LiPD file. But these functions can load and map multiple.
-        
+
         .. ipython:: python
             :okwarning:
 
@@ -5480,13 +5748,13 @@ class Lipd:
             @savefig mapallarchive_marker.png
             fig, ax = data.mapAllArchive(markersize=100)
             pyleo.closefig(fig)
-            
+
 
         '''
-        
+
         scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
-        
-        
+
+
         #get the information from the LiPD dict
         lat=[]
         lon=[]
@@ -5563,21 +5831,21 @@ class LipdSeries(Series):
         # Print out the dataset name and the variable name
         for item in ts_list:
             print(item['dataSetName']+': '+item['paleoData_variableName'])
-        # Load the sst data into a LipdSeries. Since Python indexing starts at zero, sst has index 5. 
+        # Load the sst data into a LipdSeries. Since Python indexing starts at zero, sst has index 5.
         ts = pyleo.LipdSeries(ts_list[5])
-        
+
     If you attempt to pass the full list of series, Pyleoclim will prompt you to choose a series by printing out something similar as above.
     If you already now the number of the timeseries object you're interested in, then you should use the following:
-        
+
     .. ipython:: python
         :okwarning:
 
         ts1 = data.to_LipdSeries(number=5)
-    
+
     If number is not specified, Pyleoclim will prompt you for the number automatically.
-    
+
     Sometimes, one may want to create a MultipleSeries object from a collection of LiPD files. In this case, we recommend using the following:
-    
+
     .. ipython:: python
         :okwarning:
 
@@ -5668,8 +5936,8 @@ class LipdSeries(Series):
 
         Returns
         -------
-        ms : pyleoclim.MultipleSeries
-            A MultipleSeries object with each series representing a possible realization of the age model
+        ms : pyleoclim.EnsembleSeries
+            An EnsembleSeries object with each series representing a possible realization of the age model
 
         '''
         #get the corresponding LiPD
@@ -5683,7 +5951,9 @@ class LipdSeries(Series):
             a=D.extract(dataSetName)
             lipd=a.__dict__['lipd']
         #Look for the ensemble and get values
+        cwd = os.getcwd()
         csv_dict=lpd.getCsv(lipd)
+        os.chdir(cwd)
         chron,paleo = lipdutils.isEnsemble(csv_dict)
         if len(chron)==0:
             raise ValueError("No ChronMeasurementTables available")
@@ -5717,13 +5987,13 @@ class LipdSeries(Series):
         ensembleValuestoPaleo=lipdutils.mapAgeEnsembleToPaleoData(ensembleValues, depth, ds)
         #create multipleseries
         s_list=[]
-        for s in ensembleValuestoPaleo.T:
-            s_tmp=Series(time=s,value=self.value)
+        for i, s in enumerate(ensembleValuestoPaleo.T):
+            s_tmp = Series(time=s,value=self.value, verbose=i==0)
             s_list.append(s_tmp)
 
-        ms = MultipleSeries(series_list=s_list)
+        ens = EnsembleSeries(series_list=s_list)
 
-        return ms
+        return ens
 
     def map(self,projection = 'Orthographic', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
@@ -5779,13 +6049,13 @@ class LipdSeries(Series):
         --------
 
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
-        
+
         Examples
         --------
-        
+
         .. ipython:: python
             :okwarning:
-    
+
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
@@ -6086,10 +6356,10 @@ class LipdSeries(Series):
         pyleolim.LipdSeries.getMetadata : get relevant metadata from the timeseries object
 
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
-        
+
         Examples
         --------
-        
+
         .. ipython:: python
             :okwarning:
 

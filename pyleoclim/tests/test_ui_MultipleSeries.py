@@ -239,7 +239,7 @@ class TestMultipleSeriesPca:
 class TestMultipleSeriesCommonTime:
     '''Test for MultipleSeries.common_time()
     '''
-    @pytest.mark.parametrize('method', ['binning', 'interp', 'gkernel'])
+    @pytest.mark.parametrize('method', ['bin', 'interp', 'gkernel'])
     def test_common_time(self, method):
         t_0, v_0 = gen_colored_noise()
         t_1, v_1 = gen_colored_noise()

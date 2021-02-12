@@ -437,16 +437,18 @@ def enumerateTs(timeseries_list):
     """
     available_y = []
     dataSetName =[]
+    at =[]
     for index,val in enumerate(timeseries_list):
         for key, value in val.items():
             if 'dataSetName' in key:
                 dataSetName.append(value)
             if 'Data_variableName' in key:
                 available_y.append(value)
-
+            if 'archiveType' in key:
+                at.append(value)
 
     for idx,val in enumerate(available_y):
-        print(idx,': ',dataSetName[idx], ': ', val)
+        print(idx,': ',dataSetName[idx], ': ',at[idx],': ', val)
 
 def getTs(timeseries_list, option = None):
     """Get a specific timeseries object from a dictionary of timeseries

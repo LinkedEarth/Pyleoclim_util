@@ -17,6 +17,7 @@ __all__ = [
     'ar1_sim',
     'colored_noise',
     'colored_noise_2regimes',
+    'gen_ar1_evenly',
 ]
 
 def ar1_model(t, tau, output_sigma=1):
@@ -144,6 +145,41 @@ def ar1_sim(y, p, t=None):
         ysim = ysim[:, 0]
 
     return ysim
+
+def gen_ar1_evenly(t, g, scale=1, burnin=50):
+    ''' Generate AR(1) series samples
+
+    Parameters
+    ----------
+
+    t : array
+        the time axis
+    
+    g : float
+        lag-1 autocorrelation
+
+    scale : float
+        The standard deviation of noise.
+
+    burnin : int
+        Number of observation at the beginning of the sample to drop. Used to reduce dependence on initial values.
+
+    Returns
+    -------
+    y : array
+        the generated AR(1) series
+
+
+    See also
+    --------
+    statsmodels.tsa.arima_process.arma_generate_sample: Simulate data from an ARMA. (https://www.statsmodels.org/stable/generated/statsmodels.tsa.arima_process.arma_generate_sample.html)
+
+    '''
+    ar = np.r_[1, -g]  # AR model parameter
+    ma = np.r_[1, 0.0]  # MA model parameters
+    y = arma_generate_sample(ar, ma, nsample=np.size(t), scale=scale, burnin=burnin)
+    return y
+
 
 def ar1_fit_evenly(y):
     ''' Returns the lag-1 autocorrelation from AR(1) fit.

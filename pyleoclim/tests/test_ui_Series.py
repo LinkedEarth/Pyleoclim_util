@@ -129,7 +129,7 @@ class TestUiSeriesSpectral:
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
         alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=alpha)
+        t, v = gen_colored_noise(nt=1000, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method=spec_method)
         beta = psd.beta_est()['beta']
@@ -197,9 +197,9 @@ class TestUiSeriesSpectral:
         alpha = 1
         t, v = gen_colored_noise(nt=1000, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
-        freq = np.linspace(1/500, 1/2, 20)
+        freq = np.linspace(1/500, 1/2, 100)
         psd = ts.spectral(method='wwz', settings={'freq': freq}, label='WWZ')
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est(fmin=1/200, fmax=1/10)['beta']
         assert_array_equal(psd.frequency, freq)
         assert np.abs(beta-alpha) < eps
 
@@ -255,7 +255,7 @@ class TestUiSeriesBin:
         bin_size=np.mean(np.diff(t_unevenly))
 
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
-        ts_bin=ts.bin(start=start_date,bin_size=bin_size,end=end_date)
+        ts_bin=ts.bin(start=start_date,bin_size=bin_size,stop=end_date)
 
 class TestUiSeriesStats:
     '''Test for Series.stats()
@@ -536,7 +536,7 @@ class TestUISeriesOutliers:
         # Remove outliers
         ts_out = ts.outliers(remove=remove_outliers, mute=True)
 
-class TestUISeriesGkernel():
+class TestUISeriesGkernel:
     ''' Unit tests for the TestUISeriesGkernel function
     '''
     def test_interp_t1(self):
@@ -597,7 +597,7 @@ class TestUISeriesInterp():
         bin_size=np.mean(np.diff(t_unevenly))
 
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
-        ts_interp=ts.interp(start=start_date,interp_step=bin_size,end=end_date)
+        ts_interp=ts.interp(start=start_date, step=bin_size, stop=end_date)
 
     @pytest.mark.parametrize('interp_method', ['linear', 'nearest', 'zero', 'slinear', 'quadratic', 'cubic', 'previous', 'next'])
     def test_interp_t3(self,interp_method):

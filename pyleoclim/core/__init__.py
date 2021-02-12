@@ -12,6 +12,7 @@ function should be set in these files)
 from .ui import *
 
 __all__=[
+    'gen_ts',
     'Series',
     'PSD',
     'Scalogram',
@@ -22,5 +23,5 @@ __all__=[
     'MultipleSeries',
     'SurrogateSeries',
     'EnsembleSeries',
-    'MultipleScalogram'
+    'MultipleScalogram',
 ]
