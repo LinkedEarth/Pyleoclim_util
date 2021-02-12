@@ -2201,9 +2201,9 @@ class Series:
 
         '''
         new = self.copy()
-        x_mod, v_mod = tsutils.interp(self.time,self.value,interp_type=method,**kwargs)
-        new.time = x_mod
-        new.value = v_mod
+        ti, vi = tsutils.interp(self.time,self.value,interp_type=method,**kwargs)
+        new.time = ti
+        new.value = vi
         return new
 
     def gkernel(self, step_type='median', **kwargs):
@@ -2225,11 +2225,8 @@ class Series:
         '''
 
         new=self.copy()
-
-        start, stop, step = tsutils.grid_properties(self.time, step_style=step_type)
-
-        ti = np.arange(start,stop,step) # generate new axis
-        vi = tsutils.gkernel(self.value, self.value, **kwargs) # apply kernel
+        
+        ti, vi = tsutils.gkernel(self.value, self.value, **kwargs) # apply kernel
         new.time = ti
         new.value = vi
         return new
