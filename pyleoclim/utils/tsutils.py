@@ -315,7 +315,7 @@ def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style
          where/when to stop the interpolation. Default is max.
     kwargs :  kwargs
         Aguments specific to interpolate.interp1D. See scipy for details https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html
-
+        If getting an error about extrapolation, you can use the arguments `bound_errors=False` and `fill_value="extrapolate"` to allow for extrapolation. 
     Returns
     -------
 
