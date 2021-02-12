@@ -197,9 +197,9 @@ class TestUiSeriesSpectral:
         alpha = 1
         t, v = gen_colored_noise(nt=1000, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
-        freq = np.linspace(1/500, 1/2, 20)
+        freq = np.linspace(1/500, 1/2, 100)
         psd = ts.spectral(method='wwz', settings={'freq': freq}, label='WWZ')
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est(fmin=1/200, fmax=1/10)['beta']
         assert_array_equal(psd.frequency, freq)
         assert np.abs(beta-alpha) < eps
 
