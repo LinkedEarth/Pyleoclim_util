@@ -6242,37 +6242,42 @@ class LipdSeries(Series):
         if  len(idx)>2:
             authors = authors[0:idx[1]+1] + "et al."
 
-        if "pub1_pubYear" in self.lipd_ts.keys():
+        if "pub1_year" in self.lipd_ts.keys():
             Year = str(self.lipd_ts["pub1_pubYear"])
         else:
             Year = "NA"
 
-        if "pub1_DOI" in self.lipd_ts.keys():
+        if "pub1_doi" in self.lipd_ts.keys():
             DOI = self.lipd_ts["pub1_DOI"]
         else:
             DOI = "NA"
-
-        if "paleoData_InferredVariableType" in self.lipd_ts.keys():
-            if type(self.lipd_ts["paleoData_InferredVariableType"]) is list:
-                Variable = self.lipd_ts["paleoData_InferredVariableType"][0]
-            else:
-                Variable = self.lipd_ts["paleoData_InferredVariableType"]
-        elif "paleoData_ProxyObservationType" in self.lipd_ts.keys():
-            if type(self.lipd_ts["paleoData_ProxyObservationType"]) is list:
-                Variable = self.lipd_ts["paleoData_ProxyObservationType"][0]
-            else:
-                Variable = self.lipd_ts["paleoData_ProxyObservationType"]
+        
+        if self.lipd_ts['mode'] == 'paleoData':
+            prefix = 'paleo'
         else:
-            Variable = self.lipd_ts["paleoData_variableName"]
+            prefix = 'chron'
 
-        if "paleoData_units" in self.lipd_ts.keys():
-            units = self.lipd_ts["paleoData_units"]
+        if prefix+"Data_InferredVariableType" in self.lipd_ts.keys():
+            if type(self.lipd_ts[prefix+"Data_InferredVariableType"]) is list:
+                Variable = self.lipd_ts[prefix+"Data_InferredVariableType"][0]
+            else:
+                Variable = self.lipd_ts[prefix+"Data_InferredVariableType"]
+        elif prefix+"Data_ProxyObservationType" in self.lipd_ts.keys():
+            if type(self.lipd_ts[prefix+"Data_ProxyObservationType"]) is list:
+                Variable = self.lipd_ts[prefix+"Data_ProxyObservationType"][0]
+            else:
+                Variable = self.lipd_ts[prefix+"Data_ProxyObservationType"]
+        else:
+            Variable = self.lipd_ts[prefix+"Data_variableName"]
+
+        if prefix+"Data_units" in self.lipd_ts.keys():
+            units = self.lipd_ts[prefix+"Data_units"]
         else:
             units = "NA"
 
         #Climate interpretation information
-        if "paleoData_interpretation" in self.lipd_ts.keys():
-            interpretation = self.lipd_ts["paleoData_interpretation"][0]
+        if prefix+"Data_interpretation" in self.lipd_ts.keys():
+            interpretation = self.lipd_ts[prefix+"Data_interpretation"][0]
             if "name" in interpretation.keys():
                 ClimateVar = interpretation["name"]
             elif "variable" in interpretation.keys():
@@ -6305,8 +6310,8 @@ class LipdSeries(Series):
             Direction = "NA"
 
         # Calibration information
-        if "paleoData_calibration" in self.lipd_ts.keys():
-            calibration = self.lipd_ts['paleoData_calibration'][0]
+        if prefix+"Data_calibration" in self.lipd_ts.keys():
+            calibration = self.lipd_ts[prefix+'Data_calibration'][0]
             if "equation" in calibration.keys():
                 Calibration_equation = calibration["equation"]
             else:
@@ -6560,10 +6565,7 @@ class LipdSeries(Series):
 
         #Significance test
         spectralsignif_kwargs={} if spectralsignif_kwargs is None else spectralsignif_kwargs.copy()
-        if 'number' in  spectralsignif_kwargs.keys():
-            pass
-        else:
-            spectralsignif_kwargs.update({'number':1000})
+
 
         psd_signif = psd.signif_test(**spectralsignif_kwargs)
 
