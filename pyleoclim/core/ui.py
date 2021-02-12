@@ -2233,7 +2233,7 @@ class Series:
         '''
 
         new=self.copy()
-        
+
         ti, vi = tsutils.gkernel(self.value, self.value, **kwargs) # apply kernel
         new.time = ti
         new.value = vi
@@ -5629,8 +5629,14 @@ class Lipd:
 
         return new
 
-    def to_LipdSeriesList(self):
+    def to_LipdSeriesList(self, mode='paleo'):
         '''Extracts all LiPD timeseries objects to a list of LipdSeries objects
+
+        Parameters
+        ----------
+
+        mode : {'paleo','chron'}
+            Whether to extract the timeseries information from the paleo tables or chron tables
 
         Returns
         -------
@@ -5643,7 +5649,7 @@ class Lipd:
 
         '''
         cwd = os.getcwd()
-        ts_list=lpd.extractTs(self.__dict__['lipd'])
+        ts_list=lpd.extractTs(self.__dict__['lipd'], mode=mode)
         os.chdir(cwd)
 
         res=[]
@@ -5656,7 +5662,7 @@ class Lipd:
 
         return res
 
-    def to_LipdSeries(self, number = None):
+    def to_LipdSeries(self, number = None, mode = 'paleo'):
         '''Extracts one timeseries from the Lipd object
 
         Note that this function may require user interaction.
@@ -5666,6 +5672,9 @@ class Lipd:
 
         number : int
             the number of the timeseries object
+
+        mode : {'paleo','chron'}
+            whether to extract the paleo or chron series.
 
         Returns
         -------
@@ -5678,7 +5687,7 @@ class Lipd:
 
         '''
         cwd = os.getcwd()
-        ts_list = lpd.extractTs(self.__dict__['lipd'])
+        ts_list = lpd.extractTs(self.__dict__['lipd'], mode=mode)
         os.chdir(cwd)
         if number is None:
             ts = LipdSeries(ts_list)
@@ -5920,20 +5929,36 @@ class LipdSeries(Series):
                 else:
                     time_unit=None
             try:
-                value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
-                #Remove NaNs
-                #ys_tmp=np.copy(value)
-                #value=value[~np.isnan(ys_tmp)]
-                #time=time[~np.isnan(ys_tmp)]
-                value_name=self.lipd_ts['paleoData_variableName']
-                if 'paleoData_units' in self.lipd_ts.keys():
-                    value_unit=self.lipd_ts['paleoData_units']
-                else:
-                    value_unit=None
-                label=self.lipd_ts['dataSetName']
-                super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
-                     time_unit=time_unit,value_name=value_name,value_unit=value_unit,
-                     label=label,clean_ts=clean_ts)
+                if self.lipd_ts['mode'] == 'paleoData':
+                    value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
+                    #Remove NaNs
+                    #ys_tmp=np.copy(value)
+                    #value=value[~np.isnan(ys_tmp)]
+                    #time=time[~np.isnan(ys_tmp)]
+                    value_name=self.lipd_ts['paleoData_variableName']
+                    if 'paleoData_units' in self.lipd_ts.keys():
+                        value_unit=self.lipd_ts['paleoData_units']
+                    else:
+                        value_unit=None
+                    label=self.lipd_ts['dataSetName']
+                    super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
+                         time_unit=time_unit,value_name=value_name,value_unit=value_unit,
+                         label=label,clean_ts=clean_ts)
+                elif self.lipd_ts['mode'] == 'chronData':
+                    value=np.array(self.lipd_ts['chronData_values'],dtype='float64')
+                    #Remove NaNs
+                    #ys_tmp=np.copy(value)
+                    #value=value[~np.isnan(ys_tmp)]
+                    #time=time[~np.isnan(ys_tmp)]
+                    value_name=self.lipd_ts['chronData_variableName']
+                    if 'paleoData_units' in self.lipd_ts.keys():
+                        value_unit=self.lipd_ts['chronData_units']
+                    else:
+                        value_unit=None
+                    label=self.lipd_ts['dataSetName']
+                    super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
+                         time_unit=time_unit,value_name=value_name,value_unit=value_unit,
+                         label=label,clean_ts=clean_ts)
             except:
                 raise ValueError("paleoData_values should contain floats")
         except:
