@@ -6248,12 +6248,12 @@ class LipdSeries(Series):
             authors = authors[0:idx[1]+1] + "et al."
 
         if "pub1_year" in self.lipd_ts.keys():
-            Year = str(self.lipd_ts["pub1_pubYear"])
+            Year = str(self.lipd_ts["pub1_year"])
         else:
             Year = "NA"
 
         if "pub1_doi" in self.lipd_ts.keys():
-            DOI = self.lipd_ts["pub1_DOI"]
+            DOI = self.lipd_ts["pub1_doi"]
         else:
             DOI = "NA"
         
