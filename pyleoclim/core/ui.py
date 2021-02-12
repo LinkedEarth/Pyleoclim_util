@@ -3480,6 +3480,8 @@ class MultipleSeries:
         # define parameters for common time axis
         start = gp[:,0].max()
         stop  = gp[:,1].min()
+        if start > stop:
+            raise ValueError('At least one series has no common time interval with others. Please check the time axis of the series.')
 
         if common_step == 'mean':
             step = gp[:,2].mean()
