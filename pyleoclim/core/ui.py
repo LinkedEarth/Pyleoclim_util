@@ -1483,7 +1483,7 @@ class Series:
         new.value = v_mod
         return new
 
-    def spectral(self, method='wwz', freq_method='log', freq_kwargs=None, settings=None, label=None, verbose=False):
+    def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
