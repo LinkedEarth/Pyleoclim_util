@@ -2225,7 +2225,7 @@ class Series:
         '''
 
         new=self.copy()
-        
+
         ti, vi = tsutils.gkernel(self.value, self.value, **kwargs) # apply kernel
         new.time = ti
         new.value = vi
@@ -4033,8 +4033,8 @@ class MultipleSeries:
         return scals
 
     def plot(self, figsize=[10, 4],
-             marker=None, markersize=None, color=None,
-             linestyle=None, linewidth=None,
+             marker=None, markersize=None,
+             linestyle=None, linewidth=None, colors=None, cmap='tab10', norm=None,
              xlabel=None, ylabel=None, title=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None,
              savefig_settings=None, ax=None, mute=False, invert_xaxis=False):
@@ -4048,8 +4048,16 @@ class MultipleSeries:
             marker type. The default is None.
         markersize : float, optional
             marker size. The default is None.
-        color : str, optional
-            color. The default is None.
+        colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
+            Colors for plotting.
+            If None, the plotting will cycle the 'tab10' colormap;
+            if only one color is specified, then all curves will be plotted with that single color;
+            if a list of colors are specified, then the plotting will cycle that color list.
+        cmap : str
+            The colormap to use when "colors" is None.
+        norm : matplotlib.colors.Normalize like
+            The nomorlization for the colormap.
+            If None, a linear normalization will be used.
         linestyle : str, optional
             Line style. The default is None.
         linewidth : float, optional
@@ -4107,9 +4115,28 @@ class MultipleSeries:
             else:
                 ylabel = 'value'
 
-        for s in self.series_list:
+        for idx, s in enumerate(self.series_list):
+            if colors is None:
+                cmap_obj = plt.get_cmap(cmap)
+                if hasattr(cmap_obj, 'colors'):
+                    nc = len(cmap_obj.colors)
+                else:
+                    nc = len(self.series_list)
+
+                if norm is None:
+                    norm = mpl.colors.Normalize(vmin=0, vmax=nc-1)
+
+                clr = cmap_obj(norm(idx%nc))
+            elif type(colors) is str:
+                clr = colors
+            elif type(colors) is list:
+                nc = len(colors)
+                clr = colors[idx%nc]
+            else:
+                raise TypeError('"colors" should be a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)')
+
             ax = s.plot(
-                figsize=figsize, marker=marker, markersize=markersize, color=color, linestyle=linestyle,
+                figsize=figsize, marker=marker, markersize=markersize, color=clr, linestyle=linestyle,
                 linewidth=linewidth, label=s.label, xlabel=xlabel, ylabel=ylabel, title=title,
                 legend=legend, lgd_kwargs=lgd_kwargs, plot_kwargs=plot_kwargs, ax=ax,
             )
@@ -4515,7 +4542,7 @@ class EnsembleSeries(MultipleSeries):
         return corr_ens
 
     def plot(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, line_num=10, seed=None,
-             xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
+             xlim=None, ylim=None, savefig_settings=None, ax=None, plot_legend=True,
              trace_clr=sns.xkcd_rgb['pale red'], trace_lw=0.5, trace_alpha=0.3, lgd_kwargs=None, mute=False):
             '''Plot EnsembleSeries as a subset of traces.
 
@@ -4548,10 +4575,6 @@ class EnsembleSeries(MultipleSeries):
                 - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
             ax : matplotlib.ax, optional
                 Matplotlib axis on which to return the plot. The default is None.
-            xticks : list, optional
-                xticks label. The default is None.
-            yticks : list, optional
-                yticks label. The default is None.
             plot_legend : bool, optional
                 Whether to plot the legend. The default is True.
             lgd_kwargs : dict, optional
@@ -4618,7 +4641,7 @@ class EnsembleSeries(MultipleSeries):
 
     def plot_envelope(self, figsize=[10, 4], qs=[0.025, 0.25, 0.5, 0.75, 0.975],
                       xlabel=None, ylabel=None, title=None,
-                      xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
+                      xlim=None, ylim=None, savefig_settings=None, ax=None, plot_legend=True,
                       curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
                       inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None, mute=False):
         '''Plot EnsembleSeries as an envelope.
@@ -4646,10 +4669,6 @@ class EnsembleSeries(MultipleSeries):
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
         ax : matplotlib.ax, optional
             Matplotlib axis on which to return the plot. The default is None.
-        xticks : list, optional
-            xticks label. The default is None.
-        yticks : list, optional
-            yticks label. The default is None.
         plot_legend : bool, optional
             Wether to plot the legend. The default is True.
         curve_clr : str, optional
@@ -5607,7 +5626,7 @@ class Lipd:
 
         Parameters
         ----------
-        
+
         mode : {'paleo','chron'}
             Whether to extract the timeseries information from the paleo tables or chron tables
 
@@ -5645,7 +5664,7 @@ class Lipd:
 
         number : int
             the number of the timeseries object
-        
+
         mode : {'paleo','chron'}
             whether to extract the paleo or chron series.
 
@@ -6013,7 +6032,7 @@ class LipdSeries(Series):
         #create multipleseries
         s_list=[]
         for i, s in enumerate(ensembleValuestoPaleo.T):
-            s_tmp = Series(time=s,value=self.value,verbose=i==0)
+            s_tmp = Series(time=s,value=self.value, verbose=i==0)
             s_list.append(s_tmp)
 
         ens = EnsembleSeries(series_list=s_list)
