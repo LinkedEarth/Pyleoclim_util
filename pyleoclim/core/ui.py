@@ -69,7 +69,7 @@ def infer_period_unit_from_time_unit(time_unit):
 
     return period_unit
 
-def gen_ts(model, nt=1000, **kwargs):
+def gen_ts(model, t=None, nt=1000, **kwargs):
     ''' Generate pyleoclim.Series with timeseries models
 
     Parameters
@@ -80,6 +80,12 @@ def gen_ts(model, nt=1000, **kwargs):
         - colored_noise : colored noise with one scaling slope
         - colored_noise_2regimes : colored noise with two regimes of two different scaling slopes
         - ar1 : AR(1) series
+
+    t : array
+        the time axis
+
+    nt : number of time points
+        only works if 't' is None, and it will use an evenly-spaced vector with nt points 
 
     kwargs : dict
         the keyward arguments for the specified timeseries model
@@ -195,7 +201,9 @@ def gen_ts(model, nt=1000, **kwargs):
         pyleo.closefig(fig)
 
     '''
-    t = np.arange(nt)
+    if t is None:
+        t = np.arange(nt)
+
     tsm = {
         'colored_noise': tsmodel.colored_noise,
         'colored_noise_2regimes': tsmodel.colored_noise_2regimes,
