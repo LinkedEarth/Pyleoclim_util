@@ -3911,7 +3911,7 @@ class MultipleSeries:
             ms.series_list[idx]=s
         return ms
 
-    def spectral(self, method='wwz', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False):
+    def spectral(self, method='lomb_scargle', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -3969,7 +3969,7 @@ class MultipleSeries:
         settings = {} if settings is None else settings.copy()
 
         psd_list = []
-        for s in tqdm(self.series_list, desc='Performing spectral analysis on surrogates', position=0, leave=True, disable=mute_pbar):
+        for s in tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar):
             psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
             psd_list.append(psd_tmp)
 
@@ -4024,7 +4024,7 @@ class MultipleSeries:
         settings = {} if settings is None else settings.copy()
 
         scal_list = []
-        for s in tqdm(self.series_list, desc='Performing wavelet analysis on surrogates', position=0, leave=True, disable=mute_pbar):
+        for s in tqdm(self.series_list, desc='Performing wavelet analysis on individual series', position=0, leave=True, disable=mute_pbar):
             scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose)
             scal_list.append(scal_tmp)
 
