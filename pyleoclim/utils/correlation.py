@@ -28,12 +28,18 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     
     The significance of the correlation is assessed using one of the following methods:
         
-    1) 'ttest': T-test adjusted for effective sample size.
+    1) 'ttest': T-test adjusted for effective sample size. 
+        This is a parametric test (data are Gaussian and identically distributed) with a rather ad-hoc adjustment. 
+        It is instantaneous but makes a lot of assumptions about the data, many of which may not be met.
     2) 'isopersistent': AR(1) modeling of x and y.
+        This is a parametric test as well (series follow an AR(1) model) but 
+        solves the issue by direct simulation. 
     3) 'isospectral': phase randomization of original inputs. (default)
+        This is a non-parametric method, assuming only wide-sense stationarity.
+        
     
-    The T-test is a parametric test, hence computationally cheap but can only be performed in idyllic circumstances.
-    The others are non-parametric, but their computational requirements scales with nsim.
+    For 2 and 3, computational requirements scale with nsim.
+    When possible, nsim should be at least 1000. 
 
     Parameters
     ----------

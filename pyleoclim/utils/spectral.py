@@ -441,9 +441,9 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
     # average them up
     if average=='mean':
-        psd=np.mean(psd_seg,axis=0)
+        psd=np.mean(psd_seg,axis=0)*np.mean(np.diff(ts))
     elif average=='median':
-        psd=np.median(psd_seg,axis=0)
+        psd=np.median(psd_seg,axis=0)*np.mean(np.diff(ts))
     else:
         raise ValueError('Average should either be set to mean or median')
 

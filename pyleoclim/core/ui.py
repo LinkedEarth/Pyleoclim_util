@@ -69,7 +69,7 @@ def infer_period_unit_from_time_unit(time_unit):
 
     return period_unit
 
-def gen_ts(model, nt=1000, **kwargs):
+def gen_ts(model, t=None, nt=1000, **kwargs):
     ''' Generate pyleoclim.Series with timeseries models
 
     Parameters
@@ -80,6 +80,12 @@ def gen_ts(model, nt=1000, **kwargs):
         - colored_noise : colored noise with one scaling slope
         - colored_noise_2regimes : colored noise with two regimes of two different scaling slopes
         - ar1 : AR(1) series
+
+    t : array
+        the time axis
+
+    nt : number of time points
+        only works if 't' is None, and it will use an evenly-spaced vector with nt points 
 
     kwargs : dict
         the keyward arguments for the specified timeseries model
@@ -195,7 +201,9 @@ def gen_ts(model, nt=1000, **kwargs):
         pyleo.closefig(fig)
 
     '''
-    t = np.arange(nt)
+    if t is None:
+        t = np.arange(nt)
+
     tsm = {
         'colored_noise': tsmodel.colored_noise,
         'colored_noise_2regimes': tsmodel.colored_noise_2regimes,
@@ -1891,9 +1899,9 @@ class Series:
         settings : dict
             Parameters for the correlation function, including:
 
-            - nsim : int
+            nsim : int
                 the number of simulations (default: 1000)
-            - method : str, {'ttest','isopersistent','isospectral' (default)}
+            method : str, {'ttest','isopersistent','isospectral' (default)}
                 method for significance testing
 
         common_time_kwargs : dict
@@ -2225,8 +2233,8 @@ class Series:
         '''
 
         new=self.copy()
-        
-        ti, vi = tsutils.gkernel(self.value, self.value, **kwargs) # apply kernel
+
+        ti, vi = tsutils.gkernel(self.time, self.value, **kwargs) # apply kernel
         new.time = ti
         new.value = vi
         return new
@@ -3539,9 +3547,9 @@ class MultipleSeries:
         settings : dict
             Parameters for the correlation function, including:
 
-            - nsim : int
+            nsim : int
                 the number of simulations (default: 1000)
-            - method : str, {'ttest','isopersistent','isospectral' (default)}
+            method : str, {'ttest','isopersistent','isospectral' (default)}
                 method for significance testing
 
         common_time_kwargs : dict
@@ -4448,7 +4456,12 @@ class EnsembleSeries(MultipleSeries):
             The significance level (0.05 by default)
 
         settings : dict
-            Parameters for the correlation function (significance testing and number of simulations)
+            Parameters for the correlation function, including:
+
+            nsim : int
+                the number of simulations (default: 1000)
+            method : str, {'ttest','isopersistent','isospectral' (default)}
+                method for significance testing
 
         fdr_kwargs : dict
             Parameters for the FDR function
@@ -4541,9 +4554,9 @@ class EnsembleSeries(MultipleSeries):
         corr_ens = CorrEns(r_list, p_list, signif_list, signif_fdr_list, alpha)
         return corr_ens
 
-    def plot(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, line_num=10, seed=None,
+    def plot_traces(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, num_traces=10, seed=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, plot_legend=True,
-             trace_clr=sns.xkcd_rgb['pale red'], trace_lw=0.5, trace_alpha=0.3, lgd_kwargs=None, mute=False):
+             color=sns.xkcd_rgb['pale red'], lw=0.5, alpha=0.3, lgd_kwargs=None, mute=False):
             '''Plot EnsembleSeries as a subset of traces.
 
             Parameters
@@ -4560,14 +4573,14 @@ class EnsembleSeries(MultipleSeries):
                 x-axis limits. The default is None.
             ylim : list, optional
                 y-axis limits. The default is None.
-            trace_clr : str, optional
+            color : str, optional
                 Color of the traces. The default is sns.xkcd_rgb['pale red'].
-            trace_alpha : float, optional
-                Transparency of the lines representing the multiple members. The default is 0.2.
-            trace_lw : float, optional
+            alpha : float, optional
+                Transparency of the lines representing the multiple members. The default is 0.3.
+            lw : float, optional
                 Width of the lines representing the multiple members. The default is 0.5.
-            line_num : int, optional
-                Number of individual members to plot. The default is 10.
+            num_traces : int, optional
+                Number of traces to plot. The default is 10.
             savefig_settings : dict, optional
                 the dictionary of arguments for plt.savefig(); some notes below:
                 - "path" must be specified; it can be any existed or non-existed path,
@@ -4588,6 +4601,27 @@ class EnsembleSeries(MultipleSeries):
             Returns
             -------
             fig, ax
+            
+            Examples
+            --------
+
+            .. ipython:: python
+                :okwarning:
+                
+                nn = 30 # number of noise realizations
+                nt = 500
+                series_list = []
+        
+                signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
+                noise = np.random.randn(nt,nn)
+        
+                for idx in range(nn):  # noise
+                    ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                    series_list.append(ts)
+        
+                ts_ens = pyleo.EnsembleSeries(series_list)
+        
+                fig, ax = ts_ens.plot_traces(alpha=0.2,num_traces=8) 
 
             '''
             # Turn the interactive mode off.
@@ -4608,18 +4642,18 @@ class EnsembleSeries(MultipleSeries):
             if ax is None:
                 fig, ax = plt.subplots(figsize=figsize)
 
-            if line_num > 0:
+            if num_traces > 0:
                 if seed is not None:
                     np.random.seed(seed)
 
                 nts = np.size(self.series_list)
-                random_draw_idx = np.random.choice(nts, line_num)
+                random_draw_idx = np.random.choice(nts, num_traces)
 
                 for idx in random_draw_idx:
-                    self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=trace_lw,
-                        xlim=xlim, ylim=ylim, ax=ax, color=trace_clr, alpha=trace_alpha,
+                    self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=lw,
+                        xlim=xlim, ylim=ylim, ax=ax, color=color, alpha=alpha,
                     )
-                ax.plot(np.nan, np.nan, color=trace_clr, label=f'example members (n={line_num})')
+                ax.plot(np.nan, np.nan, color=color, label=f'example members (n={num_traces})')
 
             if title is not None:
                 ax.set_title(title)
@@ -4692,7 +4726,26 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
         fig, ax
-
+        
+        Example
+        --------
+        .. ipython:: python
+            :okwarning:
+            
+            nn = 30 # number of noise realizations
+            nt = 500
+            series_list = []
+    
+            signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
+            noise = np.random.randn(nt,nn)
+    
+            for idx in range(nn):  # noise
+                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                series_list.append(ts)
+    
+            ts_ens = pyleo.EnsembleSeries(series_list)  
+            fig, ax = ts_ens.plot_envelope(curve_lw=1.5) 
+ 
         '''
         # Turn the interactive mode off.
         plt.ioff()
@@ -5621,8 +5674,14 @@ class Lipd:
 
         return new
 
-    def to_LipdSeriesList(self):
+    def to_LipdSeriesList(self, mode='paleo'):
         '''Extracts all LiPD timeseries objects to a list of LipdSeries objects
+
+        Parameters
+        ----------
+
+        mode : {'paleo','chron'}
+            Whether to extract the timeseries information from the paleo tables or chron tables
 
         Returns
         -------
@@ -5635,7 +5694,7 @@ class Lipd:
 
         '''
         cwd = os.getcwd()
-        ts_list=lpd.extractTs(self.__dict__['lipd'])
+        ts_list=lpd.extractTs(self.__dict__['lipd'], mode=mode)
         os.chdir(cwd)
 
         res=[]
@@ -5648,7 +5707,7 @@ class Lipd:
 
         return res
 
-    def to_LipdSeries(self, number = None):
+    def to_LipdSeries(self, number = None, mode = 'paleo'):
         '''Extracts one timeseries from the Lipd object
 
         Note that this function may require user interaction.
@@ -5658,6 +5717,9 @@ class Lipd:
 
         number : int
             the number of the timeseries object
+
+        mode : {'paleo','chron'}
+            whether to extract the paleo or chron series.
 
         Returns
         -------
@@ -5670,7 +5732,7 @@ class Lipd:
 
         '''
         cwd = os.getcwd()
-        ts_list = lpd.extractTs(self.__dict__['lipd'])
+        ts_list = lpd.extractTs(self.__dict__['lipd'], mode=mode)
         os.chdir(cwd)
         if number is None:
             ts = LipdSeries(ts_list)
@@ -5912,20 +5974,36 @@ class LipdSeries(Series):
                 else:
                     time_unit=None
             try:
-                value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
-                #Remove NaNs
-                #ys_tmp=np.copy(value)
-                #value=value[~np.isnan(ys_tmp)]
-                #time=time[~np.isnan(ys_tmp)]
-                value_name=self.lipd_ts['paleoData_variableName']
-                if 'paleoData_units' in self.lipd_ts.keys():
-                    value_unit=self.lipd_ts['paleoData_units']
-                else:
-                    value_unit=None
-                label=self.lipd_ts['dataSetName']
-                super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
-                     time_unit=time_unit,value_name=value_name,value_unit=value_unit,
-                     label=label,clean_ts=clean_ts)
+                if self.lipd_ts['mode'] == 'paleoData':
+                    value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
+                    #Remove NaNs
+                    #ys_tmp=np.copy(value)
+                    #value=value[~np.isnan(ys_tmp)]
+                    #time=time[~np.isnan(ys_tmp)]
+                    value_name=self.lipd_ts['paleoData_variableName']
+                    if 'paleoData_units' in self.lipd_ts.keys():
+                        value_unit=self.lipd_ts['paleoData_units']
+                    else:
+                        value_unit=None
+                    label=self.lipd_ts['dataSetName']
+                    super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
+                         time_unit=time_unit,value_name=value_name,value_unit=value_unit,
+                         label=label,clean_ts=clean_ts)
+                elif self.lipd_ts['mode'] == 'chronData':
+                    value=np.array(self.lipd_ts['chronData_values'],dtype='float64')
+                    #Remove NaNs
+                    #ys_tmp=np.copy(value)
+                    #value=value[~np.isnan(ys_tmp)]
+                    #time=time[~np.isnan(ys_tmp)]
+                    value_name=self.lipd_ts['chronData_variableName']
+                    if 'paleoData_units' in self.lipd_ts.keys():
+                        value_unit=self.lipd_ts['chronData_units']
+                    else:
+                        value_unit=None
+                    label=self.lipd_ts['dataSetName']
+                    super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
+                         time_unit=time_unit,value_name=value_name,value_unit=value_unit,
+                         label=label,clean_ts=clean_ts)
             except:
                 raise ValueError("paleoData_values should contain floats")
         except:
@@ -6209,37 +6287,42 @@ class LipdSeries(Series):
         if  len(idx)>2:
             authors = authors[0:idx[1]+1] + "et al."
 
-        if "pub1_pubYear" in self.lipd_ts.keys():
-            Year = str(self.lipd_ts["pub1_pubYear"])
+        if "pub1_year" in self.lipd_ts.keys():
+            Year = str(self.lipd_ts["pub1_year"])
         else:
             Year = "NA"
 
-        if "pub1_DOI" in self.lipd_ts.keys():
-            DOI = self.lipd_ts["pub1_DOI"]
+        if "pub1_doi" in self.lipd_ts.keys():
+            DOI = self.lipd_ts["pub1_doi"]
         else:
             DOI = "NA"
-
-        if "paleoData_InferredVariableType" in self.lipd_ts.keys():
-            if type(self.lipd_ts["paleoData_InferredVariableType"]) is list:
-                Variable = self.lipd_ts["paleoData_InferredVariableType"][0]
-            else:
-                Variable = self.lipd_ts["paleoData_InferredVariableType"]
-        elif "paleoData_ProxyObservationType" in self.lipd_ts.keys():
-            if type(self.lipd_ts["paleoData_ProxyObservationType"]) is list:
-                Variable = self.lipd_ts["paleoData_ProxyObservationType"][0]
-            else:
-                Variable = self.lipd_ts["paleoData_ProxyObservationType"]
+        
+        if self.lipd_ts['mode'] == 'paleoData':
+            prefix = 'paleo'
         else:
-            Variable = self.lipd_ts["paleoData_variableName"]
+            prefix = 'chron'
 
-        if "paleoData_units" in self.lipd_ts.keys():
-            units = self.lipd_ts["paleoData_units"]
+        if prefix+"Data_InferredVariableType" in self.lipd_ts.keys():
+            if type(self.lipd_ts[prefix+"Data_InferredVariableType"]) is list:
+                Variable = self.lipd_ts[prefix+"Data_InferredVariableType"][0]
+            else:
+                Variable = self.lipd_ts[prefix+"Data_InferredVariableType"]
+        elif prefix+"Data_ProxyObservationType" in self.lipd_ts.keys():
+            if type(self.lipd_ts[prefix+"Data_ProxyObservationType"]) is list:
+                Variable = self.lipd_ts[prefix+"Data_ProxyObservationType"][0]
+            else:
+                Variable = self.lipd_ts[prefix+"Data_ProxyObservationType"]
+        else:
+            Variable = self.lipd_ts[prefix+"Data_variableName"]
+
+        if prefix+"Data_units" in self.lipd_ts.keys():
+            units = self.lipd_ts[prefix+"Data_units"]
         else:
             units = "NA"
 
         #Climate interpretation information
-        if "paleoData_interpretation" in self.lipd_ts.keys():
-            interpretation = self.lipd_ts["paleoData_interpretation"][0]
+        if prefix+"Data_interpretation" in self.lipd_ts.keys():
+            interpretation = self.lipd_ts[prefix+"Data_interpretation"][0]
             if "name" in interpretation.keys():
                 ClimateVar = interpretation["name"]
             elif "variable" in interpretation.keys():
@@ -6272,8 +6355,8 @@ class LipdSeries(Series):
             Direction = "NA"
 
         # Calibration information
-        if "paleoData_calibration" in self.lipd_ts.keys():
-            calibration = self.lipd_ts['paleoData_calibration'][0]
+        if prefix+"Data_calibration" in self.lipd_ts.keys():
+            calibration = self.lipd_ts[prefix+'Data_calibration'][0]
             if "equation" in calibration.keys():
                 Calibration_equation = calibration["equation"]
             else:
@@ -6527,10 +6610,7 @@ class LipdSeries(Series):
 
         #Significance test
         spectralsignif_kwargs={} if spectralsignif_kwargs is None else spectralsignif_kwargs.copy()
-        if 'number' in  spectralsignif_kwargs.keys():
-            pass
-        else:
-            spectralsignif_kwargs.update({'number':1000})
+
 
         psd_signif = psd.signif_test(**spectralsignif_kwargs)
 
