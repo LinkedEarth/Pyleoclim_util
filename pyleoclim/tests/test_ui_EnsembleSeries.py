@@ -148,33 +148,35 @@ class TestUIEnsembleSeriesCorrelation():
     def test_plot_envelope_t0(self):
         ''' Test EnsembleSeries.plot_envelope() on a list of colored noise
         '''
-        nn = 20 # number of noise realizations
-        t, v = {}, {}
+        nn = 30 # number of noise realizations
+        nt = 500
         series_list = []
 
-        tm, vm =  gen_colored_noise(nt=1000, alpha=1.0) # main signal
+        signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
+        noise = np.random.randn(nt,nn)
 
         for idx in range(nn):  # noise
-            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=0)
-            series_list.append(pyleo.Series(time=t[idx], value=4*v[idx]+vm))
+            ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+            series_list.append(ts)
 
         ts_ens = pyleo.EnsembleSeries(series_list)
 
-        fig, ax = ts_ens.plot_envelope(mute=True,curve_lw=1)
+        fig, ax = ts_ens.plot_envelope(curve_lw=1.5, mute=True) 
 
-    def test_plot_t0(self):
-        ''' Test EnsembleSeries.plot() on a list of colored noise
+    def test_plot_traces_t0(self):
+        ''' Test EnsembleSeries.plot_traces() on a list of colored noise
         '''
-        nn = 20 # number of noise realizations
-        t, v = {}, {}
+        nn = 30 # number of noise realizations
+        nt = 500
         series_list = []
 
-        tm, vm =  gen_colored_noise(nt=1000, alpha=1.0) # main signal
+        signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
+        noise = np.random.randn(nt,nn)
 
         for idx in range(nn):  # noise
-            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=0)
-            series_list.append(pyleo.Series(time=t[idx], value=4*v[idx]+vm))
+            ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+            series_list.append(ts)
 
         ts_ens = pyleo.EnsembleSeries(series_list)
 
-        fig, ax = ts_ens.plot(mute=True,trace_alpha=0.2)
+        fig, ax = ts_ens.plot_traces(alpha=0.2,num_traces=8, mute=True) 

@@ -4554,9 +4554,9 @@ class EnsembleSeries(MultipleSeries):
         corr_ens = CorrEns(r_list, p_list, signif_list, signif_fdr_list, alpha)
         return corr_ens
 
-    def plot(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, line_num=10, seed=None,
+    def plot_traces(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, num_traces=10, seed=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, plot_legend=True,
-             trace_clr=sns.xkcd_rgb['pale red'], trace_lw=0.5, trace_alpha=0.3, lgd_kwargs=None, mute=False):
+             color=sns.xkcd_rgb['pale red'], lw=0.5, alpha=0.3, lgd_kwargs=None, mute=False):
             '''Plot EnsembleSeries as a subset of traces.
 
             Parameters
@@ -4573,14 +4573,14 @@ class EnsembleSeries(MultipleSeries):
                 x-axis limits. The default is None.
             ylim : list, optional
                 y-axis limits. The default is None.
-            trace_clr : str, optional
+            color : str, optional
                 Color of the traces. The default is sns.xkcd_rgb['pale red'].
-            trace_alpha : float, optional
-                Transparency of the lines representing the multiple members. The default is 0.2.
-            trace_lw : float, optional
+            alpha : float, optional
+                Transparency of the lines representing the multiple members. The default is 0.3.
+            lw : float, optional
                 Width of the lines representing the multiple members. The default is 0.5.
-            line_num : int, optional
-                Number of individual members to plot. The default is 10.
+            num_traces : int, optional
+                Number of traces to plot. The default is 10.
             savefig_settings : dict, optional
                 the dictionary of arguments for plt.savefig(); some notes below:
                 - "path" must be specified; it can be any existed or non-existed path,
@@ -4601,6 +4601,27 @@ class EnsembleSeries(MultipleSeries):
             Returns
             -------
             fig, ax
+            
+            Examples
+            --------
+
+            .. ipython:: python
+                :okwarning:
+                
+                nn = 30 # number of noise realizations
+                nt = 500
+                series_list = []
+        
+                signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
+                noise = np.random.randn(nt,nn)
+        
+                for idx in range(nn):  # noise
+                    ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                    series_list.append(ts)
+        
+                ts_ens = pyleo.EnsembleSeries(series_list)
+        
+                fig, ax = ts_ens.plot_traces(alpha=0.2,num_traces=8) 
 
             '''
             # Turn the interactive mode off.
@@ -4621,18 +4642,18 @@ class EnsembleSeries(MultipleSeries):
             if ax is None:
                 fig, ax = plt.subplots(figsize=figsize)
 
-            if line_num > 0:
+            if num_traces > 0:
                 if seed is not None:
                     np.random.seed(seed)
 
                 nts = np.size(self.series_list)
-                random_draw_idx = np.random.choice(nts, line_num)
+                random_draw_idx = np.random.choice(nts, num_traces)
 
                 for idx in random_draw_idx:
-                    self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=trace_lw,
-                        xlim=xlim, ylim=ylim, ax=ax, color=trace_clr, alpha=trace_alpha,
+                    self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=lw,
+                        xlim=xlim, ylim=ylim, ax=ax, color=color, alpha=alpha,
                     )
-                ax.plot(np.nan, np.nan, color=trace_clr, label=f'example members (n={line_num})')
+                ax.plot(np.nan, np.nan, color=color, label=f'example members (n={num_traces})')
 
             if title is not None:
                 ax.set_title(title)
@@ -4705,7 +4726,26 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
         fig, ax
-
+        
+        Example
+        --------
+        .. ipython:: python
+            :okwarning:
+            
+            nn = 30 # number of noise realizations
+            nt = 500
+            series_list = []
+    
+            signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
+            noise = np.random.randn(nt,nn)
+    
+            for idx in range(nn):  # noise
+                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                series_list.append(ts)
+    
+            ts_ens = pyleo.EnsembleSeries(series_list)  
+            fig, ax = ts_ens.plot_envelope(curve_lw=1.5) 
+ 
         '''
         # Turn the interactive mode off.
         plt.ioff()
