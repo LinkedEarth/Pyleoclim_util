@@ -2234,7 +2234,7 @@ class Series:
 
         new=self.copy()
 
-        ti, vi = tsutils.gkernel(self.value, self.value, **kwargs) # apply kernel
+        ti, vi = tsutils.gkernel(self.time, self.value, **kwargs) # apply kernel
         new.time = ti
         new.value = vi
         return new

@@ -182,8 +182,6 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
     '''
     Coarsen time resolution using a Gaussian kernel
 
-    TODO: adaptive choice of e-folding scale
-
     Parameters
     ----------
     t  : 1d array
