@@ -1870,7 +1870,7 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None):
+    def correlation(self, target_series, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None, seed=None):
         ''' Estimates the Pearson's correlation and associated significance between two non IID time series
 
         The significance of the correlation is assessed using one of the following methods:
@@ -1906,6 +1906,9 @@ class Series:
 
         common_time_kwargs : dict
             Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
+
+        seed : float or int
+            random seed for isopersistent and isospectral methods
 
         Returns
         -------
@@ -1975,6 +1978,9 @@ class Series:
             value1 = ms.series_list[0].slice(timespan).value
             value2 = ms.series_list[1].slice(timespan).value
 
+
+        if seed is not None:
+            np.random.seed(seed)
 
         corr_res = corrutils.corr_sig(value1, value2, **corr_args)
         signif = True if corr_res['signif'] == 1 else False
@@ -3154,7 +3160,7 @@ class Coherence:
         )
 
         cohs = []
-        for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', position=0, leave=True, disable=mute_pbar):
+        for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', total=len(number), disable=mute_pbar):
             coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i], freq_method=self.freq_method, freq_kwargs=self.freq_kwargs)
             cohs.append(coh_tmp.coherence)
 
@@ -3528,7 +3534,7 @@ class MultipleSeries:
 
         return ms
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None):
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
 
         If the target Series is not specified, then the 1st member of MultipleSeries will be the target
@@ -3554,6 +3560,12 @@ class MultipleSeries:
 
         common_time_kwargs : dict
             Parameters for the method MultipleSeries.common_time()
+
+        seed : float or int
+            random seed for isopersistent and isospectral methods
+
+        mute_pbar : bool
+            If True, the progressbar will be muted. Default is False.
 
         Returns
         -------
@@ -3604,8 +3616,8 @@ class MultipleSeries:
         if target is None:
             target = self.series_list[0]
 
-        for idx, ts in enumerate(self.series_list):
-            corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings, common_time_kwargs=common_time_kwargs)
+        for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):
+            corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res['r'])
             signif_list.append(corr_res['signif'])
             p_list.append(corr_res['p'])
@@ -4433,7 +4445,7 @@ class EnsembleSeries(MultipleSeries):
 
         return ens_qs
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None):
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between an EnsembleSeries object to a target.
 
         If the target is not specified, then the 1st member of the ensemble will be the target
@@ -4468,6 +4480,12 @@ class EnsembleSeries(MultipleSeries):
 
         common_time_kwargs : dict
             Parameters for the method MultipleSeries.common_time()
+
+        mute_pbar : bool
+            If True, the progressbar will be muted. Default is False.
+
+        seed : float or int
+            random seed for isopersistent and isospectral methods
 
         Returns
         -------
@@ -4516,8 +4534,7 @@ class EnsembleSeries(MultipleSeries):
         r_list = []
         p_list = []
         signif_list = []
-
-        for idx, ts1 in enumerate(self.series_list):
+        for idx, ts1 in tqdm(enumerate(self.series_list), total=len(self.series_list), disable=mute_pbar):
             if hasattr(target, 'series_list'):
                 nEns = np.size(target.series_list)
                 if idx < nEns:
@@ -4531,7 +4548,7 @@ class EnsembleSeries(MultipleSeries):
                 time2 = target.time
 
             ts2 = Series(time=time2, value=value2)
-            corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs)
+            corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res['r'])
             signif_list.append(corr_res['signif'])
             p_list.append(corr_res['p'])
