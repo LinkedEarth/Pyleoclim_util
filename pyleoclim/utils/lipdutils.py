@@ -527,16 +527,19 @@ def timeUnitsCheck(units):
     -------
 
     unit_group : string
-        Whether the units belongs to age_units, kage_units, year_units, or undefined
+        Whether the units belongs to age_units, kage_units, year_units, ma_units, or undefined
     """
 
     age_units = ['year B.P.','yr B.P.','yr BP','BP','yrs BP','years B.P.',\
                  'yr. BP','yr. B.P.', 'cal. BP', 'cal B.P.', \
                  'year BP','years BP']
-    kage_units = ['kyr BP','kaBP','ka BP','ky','kyr','kyr B.P.', 'ka B.P.']
+    kage_units = ['kyr BP','kaBP','ka BP','ky','kyr','kyr B.P.', 'ka B.P.', 'ky BP',\
+                  'kyrs BP','ky B.P.', 'kyrs B.P.', 'kyBP', 'kyrBP']
     year_units = ['AD','CE','year C.E.','year A.D.', 'year CE','year AD',\
                   'years C.E.','years A.D.','yr CE','yr AD','yr C.E.'\
                   'yr A.D.', 'yrs C.E.', 'yrs A.D.', 'yrs CE', 'yrs AD']
+    mage_units = ['my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',\
+                  'my B.P.', 'myr B.P.', 'myrs B.P.', 'ma B.P.']
     undefined = ['years', 'yr','year','yrs']
 
     if units in age_units:
@@ -547,6 +550,8 @@ def timeUnitsCheck(units):
         unit_group = 'year_units'
     elif units in undefined:
         unit_group = 'undefined'
+    elif units in mage_units:
+        unit_group = 'ma_units'
     else:
         unit_group = 'unknown'
 

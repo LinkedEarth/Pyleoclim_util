@@ -1533,7 +1533,7 @@ class Series:
 
         pyleoclim.utils.spectral.wwz_psd : Spectral analysis using the Wavelet Weighted Z transform
 
-        pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
+        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 

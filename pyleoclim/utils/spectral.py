@@ -429,7 +429,10 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
         freq = make_freq_vector(ts_seg[0],
                                 method=freq_method,
                                 **freq_kwargs)
-
+        #remove zero freq
+    if freq[0]==0:
+        freq=np.delete(freq,0)
+    
     freq_angular = 2 * np.pi * freq
 
     psd_seg=[]
