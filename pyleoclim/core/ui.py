@@ -1948,15 +1948,18 @@ class Series:
             ts_air = pyleo.Series(time=t, value=air)
 
             # with `nsim=20` and default `method='isospectral'`
-            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20})
+            # set an arbitrary randome seed to fix the result
+            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
             # using a simple t-test
-            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'ttest'})
+            # set an arbitrary randome seed to fix the result
+            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'ttest'}, seed=2333)
             print(corr_res)
 
             # using the method "isopersistent"
-            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'isopersistent'})
+            # set an arbitrary randome seed to fix the result
+            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'isopersistent'}, seed=2333)
             print(corr_res)
         '''
 
@@ -3602,10 +3605,12 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries(ts_list)
             ts_target = ts0
 
-            corr_res = ms.correlation(ts_target, settings={'nsim': 20})
+            # set an arbitrary randome seed to fix the result
+            corr_res = ms.correlation(ts_target, settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
-            corr_res = ms.correlation(settings={'nsim': 20})
+            # set an arbitrary randome seed to fix the result
+            corr_res = ms.correlation(settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
         '''
@@ -4524,7 +4529,8 @@ class EnsembleSeries(MultipleSeries):
             ts_ens = pyleo.EnsembleSeries(ts_list1)
             ts_target = pyleo.EnsembleSeries(ts_list2)
 
-            corr_res = ts_ens.correlation(ts_target)
+            # set an arbitrary randome seed to fix the result
+            corr_res = ts_ens.correlation(ts_target, seed=2333)
             print(corr_res)
 
         '''
