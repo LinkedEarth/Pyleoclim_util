@@ -419,7 +419,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     else:
         ts_seg.append(ts)
         ys_seg.append(ys)
-        
+
     # calculate the frequency vector if needed
     if freq is None:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
@@ -435,9 +435,10 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     psd_seg=[]
 
     for idx,item in enumerate(ys_seg):
+        win=signal.get_window(window,len(ts_seg[idx]))
         psd_seg.append(signal.lombscargle(ts_seg[idx],
-                                          item*signal.get_window(window,len(ts_seg[idx])),
-                                          freq_angular)*2*np.pi)
+                                          item*win,
+                                          freq_angular,precenter=True)*2)
 
     # average them up
     if average=='mean':
@@ -448,7 +449,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
         raise ValueError('Average should either be set to mean or median')
 
     # Fix possible problems at the edge
-    if psd[0]<psd[1]:    
+    if psd[0]<psd[1]:
         if abs(1-abs(psd[1]-psd[0])/psd[1])<1.e-2:
             # warnings.warn("Unstability at the beginning of freq vector, removing point")
             # psd=psd[1:]
@@ -563,7 +564,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
     pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
     pyleoclim.utils.tsutils.detrend : Detrending method
-    
+
     '''
     ts = np.array(ts)
     ys = np.array(ys)
