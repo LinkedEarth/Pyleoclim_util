@@ -387,7 +387,7 @@ def showfig(fig, close=False):
     if close:
         closefig(fig)
 
-def closefig(fig):
+def closefig(fig=None):
     '''Show the figure
 
     Parameters
@@ -401,7 +401,10 @@ def closefig(fig):
     pyleoclim.utils.plotting.in_notebook: Functions to sense a notebook environment
 
     '''
-    plt.close(fig)
+    if fig is not None:
+        plt.close(fig)
+    else:
+        plt.close()
 
 def savefig(fig, path=None, settings={}, verbose=True):
     ''' Save a figure to a path
