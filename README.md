@@ -8,8 +8,6 @@
 
 ![](./pyleoclim_logo_full_white.png)
 
-# Pyleoclim
-
 **Python Package for the Analysis of Paleoclimate Data**
 
 Paleoclimate data, whether from observations or model simulations, offer unique challenges to the analyst.
