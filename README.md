@@ -6,6 +6,8 @@
 [![NSF-1541029](https://img.shields.io/badge/NSF-1541029-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1541029)
 [![Build Status](https://travis-ci.org/LinkedEarth/Pyleoclim_util.svg?branch=master)](https://travis-ci.org/LinkedEarth/Pyleoclim_util)
 
+![](./pyleoclim_logo_full_white.png)
+
 # Pyleoclim
 
 **Python Package for the Analysis of Paleoclimate Data**
