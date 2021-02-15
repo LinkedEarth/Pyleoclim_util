@@ -1149,7 +1149,7 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
 
     return psd
 
-def wwz(ys, ts, tau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
+def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
         nMC=200, nproc=8, detrend=False, sg_kwargs=None,
         gaussianize=False, standardize=False, method='Kirchner_numba', len_bd=0,
         bc_mode='reflect', reflect_type='odd'):
@@ -2147,8 +2147,9 @@ def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None
     freq_kwargs : str
         used when freq=None for certain methods
     tau : array
-        the evenly-spaced time points, namely the time shift for wavelet analysis
-        if the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so
+        The evenly-spaced time points, namely the time shift for wavelet analysis.
+        If the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so.
+        If None, at most 50 tau points will be generated from the input time span.
     len_bd : int
         the number of the ghost grids want to create on each boundary
     bc_mode : string
@@ -2176,8 +2177,8 @@ def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None
     ys, ts = clean_ts(ys, ts)
 
     if tau is None:
-        med_res = int(np.size(ts) // np.median(np.diff(ts)))
-        tau = np.linspace(np.min(ts), np.max(ts), np.max([int(np.size(ts)//10), 50, med_res]))
+        ntau = np.min([np.size(ts), 50])
+        tau = np.linspace(np.min(ts), np.max(ts), ntau)
 
     elif np.isnan(tau).any():
         warnings.warn("The input tau contains some NaNs." +

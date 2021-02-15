@@ -1118,7 +1118,6 @@ class Series:
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
-
                     time_label=None, value_label=None, period_label=None, psd_label='PSD', mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
@@ -1209,13 +1208,19 @@ class Series:
 
         ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
         if scalogram is None:
-            scalogram = self.wavelet().signif_test(number=n_signif_test)
+            if n_signif_test > 0:
+                scalogram = self.wavelet().signif_test(number=n_signif_test)
+            else:
+                scalogram = self.wavelet()
 
         ax['scal'] = scalogram.plot(ax=ax['scal'], cbar_style={'orientation': 'horizontal', 'pad': 0.1})
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
         if psd is None:
-            psd = self.spectral().signif_test(number=n_signif_test)
+            if n_signif_test > 0:
+                psd = self.spectral().signif_test(number=n_signif_test)
+            else:
+                psd = self.spectral()
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True)
         if period_lim is not None:
@@ -1688,7 +1693,7 @@ class Series:
 
         return psd
 
-    def wavelet(self, method='wwz', settings=None, freq_method='log', freq_kwargs=None, verbose=False):
+    def wavelet(self, method='wwz', settings=None, freq_method='log', ntau=None, freq_kwargs=None, verbose=False):
         ''' Perform wavelet analysis on the timeseries
 
         cwt wavelets documented on https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
@@ -1704,6 +1709,10 @@ class Series:
 
         freq_kwargs : dict
             Arguments for frequency vector
+
+        ntau : int
+            The length of the time shift points that determins the temporal resolution of the result.
+            If None, it will be either the length of the input time axis, or at most 50.
 
         settings : dict
             Arguments for the specific spectral method
@@ -1772,7 +1781,12 @@ class Series:
 
         args = {}
 
-        args['wwz'] = {'tau': self.time, 'freq': freq}
+        if ntau is None:
+            ntau = np.min([np.size(self.time), 50])
+
+        tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
+
+        args['wwz'] = {'tau': tau, 'freq': freq}
         args['cwt'] = {'wavelet' : 'morl', 'scales':1/freq}
 
 
@@ -1793,7 +1807,7 @@ class Series:
 
         return scal
 
-    def wavelet_coherence(self, target_series, method='wwz', settings=None, freq_method='log', freq_kwargs=None, verbose=False):
+    def wavelet_coherence(self, target_series, method='wwz', settings=None, freq_method='log', ntau=None, freq_kwargs=None, verbose=False):
         ''' Perform wavelet coherence analysis with the target timeseries
 
         Parameters
@@ -1809,6 +1823,10 @@ class Series:
 
         freq_kwargs : dict
             Arguments for frequency vector
+
+        ntau : int
+            The length of the time shift points that determins the temporal resolution of the result.
+            If None, it will be either the length of the input time axis, or at most 50.
 
         settings : dict
             Arguments for the specific spectral method
@@ -1851,8 +1869,13 @@ class Series:
         dt2 = np.median(np.diff(t2))
         overlap = np.arange(np.max([t1[0], t2[0]]), np.min([t1[-1], t2[-1]]), np.max([dt1, dt2]))
 
+        if ntau is None:
+            ntau = np.min([np.size(overlap), 50])
+
+        tau = np.linspace(np.min(overlap), np.max(overlap), ntau)
+
         args = {}
-        args['wwz'] = {'tau': overlap, 'freq': freq}
+        args['wwz'] = {'tau': tau, 'freq': freq}
         args[method].update(settings)
         xwc_res = xwc_func[method](self.value, self.time, target_series.value, target_series.time, **args[method])
 
@@ -2345,6 +2368,9 @@ class PSD:
             New PSD object with appropriate significance test
 
         '''
+        if number == 0:
+            return self
+
         new = self.copy()
         surr = self.timeseries.surrogates(
             number=number, seed=seed, method=method, settings=settings
@@ -2858,6 +2884,8 @@ class Scalogram:
         pyleoclim.core.ui.Series.wavelet : wavelet analysis
 
         '''
+        if number == 0:
+            return self
 
         new = self.copy()
         surr = self.timeseries.surrogates(
@@ -3153,6 +3181,8 @@ class Coherence:
         pyleoclim.core.ui.Series.wavelet_coherence : Wavelet coherence
         '''
 
+        if number == 0:
+            return self
 
         new = self.copy()
         surr1 = self.timeseries1.surrogates(
@@ -4002,7 +4032,7 @@ class MultipleSeries:
 
         return psds
 
-    def wavelet(self, method='wwz', settings={}, freq_method='log', freq_kwargs=None, verbose=False, mute_pbar=False):
+    def wavelet(self, method='wwz', settings={}, freq_method='log', ntau=None, freq_kwargs=None, verbose=False, mute_pbar=False):
         '''Wavelet analysis
 
         Parameters
@@ -4018,6 +4048,10 @@ class MultipleSeries:
 
         freq_kwargs : dict
             Arguments for frequency vector
+
+        ntau : int
+            The length of the time shift points that determins the temporal resolution of the result.
+            If None, it will be either the length of the input time axis, or at most 100.
 
         settings : dict
             Arguments for the specific spectral method
@@ -4050,7 +4084,7 @@ class MultipleSeries:
 
         scal_list = []
         for s in tqdm(self.series_list, desc='Performing wavelet analysis on individual series', position=0, leave=True, disable=mute_pbar):
-            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose)
+            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose, ntau=ntau)
             scal_list.append(scal_tmp)
 
         scals = MultipleScalogram(scalogram_list=scal_list)
