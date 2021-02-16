@@ -398,7 +398,7 @@ class TestUiSeriesSurrogates:
         g = 0.5  # persistence
         ar = [1, -g]
         ma = [1, 0]
-        n = 1000
+        n = 10000
         ar1 = arma_generate_sample(ar, ma, nsample=n, scale=1)
         ts = pyleo.Series(time=np.arange(1000), value=ar1)
 
@@ -699,7 +699,7 @@ class TestUISeriesWavelet():
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 20)
         scal = ts.wavelet(method=wave_method, settings={'freq': freq})
-        
+
 class TestUISeriesSsa():
     ''' Test the SSA functionalities
     '''
@@ -710,15 +710,15 @@ class TestUISeriesSsa():
         t, v = gen_colored_noise(nt=500, alpha=1.0)
         ts = pyleo.Series(time=t, value=v)
         res = ts.ssa()
-        
+
     def test_ssa_t1(self):
         '''Test Series.ssa() with var truncation
         '''
         alpha = 1
         t, v = gen_colored_noise(nt=500, alpha=1.0)
         ts = pyleo.Series(time=t, value=v)
-        
-        res = ts.ssa(trunc='var')    
+
+        res = ts.ssa(trunc='var')
 
 class TestUISeriesSsa():
     ''' Test the SSA functionalities
@@ -796,7 +796,7 @@ class TestUiSeriesDistplot:
         y_plot = line.get_ydata()
 
         assert max(x_plot) < max_axis
-    
+
     def test_distplot_t1(self, vertical = True):
         t, v = gen_normal()
 
