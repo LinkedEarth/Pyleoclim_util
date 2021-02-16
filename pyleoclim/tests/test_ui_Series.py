@@ -391,14 +391,14 @@ class TestUiSeriesSlice:
 class TestUiSeriesSurrogates:
     ''' Test Series.surrogates()
     '''
-    def test_surrogates_t0(self, eps=0.1):
+    def test_surrogates_t0(self, eps=0.2):
         ''' Generate AR(1) surrogates based on a AR(1) series with certain parameters,
         and then evaluate and assert the parameters of the surrogates are correct
         '''
         g = 0.5  # persistence
         ar = [1, -g]
         ma = [1, 0]
-        n = 10000
+        n = 1000
         ar1 = arma_generate_sample(ar, ma, nsample=n, scale=1)
         ts = pyleo.Series(time=np.arange(1000), value=ar1)
 
