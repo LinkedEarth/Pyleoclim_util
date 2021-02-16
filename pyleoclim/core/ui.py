@@ -881,7 +881,7 @@ class Series:
         res = tsutils.is_evenly_spaced(self.time)
         return res
 
-    def filter(self, cutoff_freq=None, method='butterworth', settings=None):
+    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', settings=None):
         ''' Filtering the timeseries
 
         Parameters
@@ -895,6 +895,12 @@ class Series:
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
             If a float, it is interpreted as a low-frequency cutoff (lowpass).
+            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
+
+        cutoff_scale : float or list
+            cutoff_freq = 1 / cutoff_scale
+            The cutoff scale only works with the Butterworth method and when cutoff_freq is None.
+            If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
 
         settings : dict
@@ -970,11 +976,14 @@ class Series:
 
         '''
         if not self.is_evenly_spaced():
-            raise ValueError('This filtering method assumes evenly-spaced timeseries, while the input is not. Please consider call the ".interp()" or ".bin()" method prior to ".filter()".')
+            raise ValueError('This  method assumes evenly-spaced timeseries, while the input is not. Use the ".interp()", ".bin()" or ".gkernel()" methods prior to ".filter()".')
 
         settings = {} if settings is None else settings.copy()
 
         new = self.copy()
+        
+        mu = np.mean(self.value) # extract the mean
+        y = self.value - mu
 
         method_func = {
             'savitzky-golay': filterutils.savitzky_golay,
@@ -983,14 +992,23 @@ class Series:
 
         args = {}
 
-        if method == 'butterworth' and cutoff_freq is None:
-            raise ValueError('Please set the cutoff frequency argument: "cutoff_freq".')
+        if method == 'butterworth':
+            if cutoff_freq is None:
+                if cutoff_scale is None:
+                    raise ValueError('Please set the cutoff frequency or scale argument: "cutoff_freq" or "cutoff_scale".')
+                else:
+                    if np.isscalar(cutoff_scale) :
+                        cutoff_freq = 1 / cutoff_scale
+                    elif len(cutoff_scale) == 2:
+                        cutoff_scale = np.array(cutoff_scale)
+                        cutoff_freq = np.sort(1 / cutoff_scale)
+                        cutoff_freq = list(cutoff_freq)
 
         args['butterworth'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
         args[method].update(settings)
 
-        new_val = method_func[method](self.value, **args[method])
-        new.value = new_val
+        new_val = method_func[method](y, **args[method])
+        new.value = new_val + mu # restore the mean
 
         return new
 
@@ -3319,7 +3337,7 @@ class MultipleSeries:
         new_ms.series_list = new_ts_list
         return new_ms
 
-    def filter(self, cutoff_freq=None, method='butterworth', settings=None):
+    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', settings=None):
         ''' Filtering the timeseries in the MultipleSeries object
 
         Parameters
@@ -3333,6 +3351,12 @@ class MultipleSeries:
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
             If a float, it is interpreted as a low-frequency cutoff (lowpass).
+            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
+
+        cutoff_scale : float or list
+            cutoff_freq = 1 / cutoff_scale
+            The cutoff scale only works with the Butterworth method and when cutoff_freq is None.
+            If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
 
         settings : dict
@@ -3356,7 +3380,7 @@ class MultipleSeries:
 
         new_tslist = []
         for ts in self.series_list:
-            new_tslist.append(ts.filter(cutoff_freq=cutoff_freq, method=method, settings=settings))
+            new_tslist.append(ts.filter(cutoff_freq=cutoff_freq, cutoff_scale=cutoff_scale, method=method, settings=settings))
 
         ms.series_list = new_tslist
 
