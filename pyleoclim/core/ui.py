@@ -3007,7 +3007,12 @@ class Coherence:
         contourf_style : dict, optional
             Arguments for the contour plot. The default is {}.
         phase_style : dict, optional
-            Arguments for the phase arrows. The default is {}.
+            Arguments for the phase arrows. The default is {}. It includes:
+            - 'pt': the default threshold above which phase arrows will be plotted
+            - 'skip_x': the number of points to skip between phase arrows along the x-axis
+            - 'skip_y':  the number of points to skip between phase arrows along the y-axis
+            - 'scale': number of data units per arrow length unit (see matplotlib.pyplot.quiver)
+            - 'width': shaft width in arrow units (see matplotlib.pyplot.quiver)
         cbar_style : dict, optional
             Arguments for the color bar. The default is {}.
         savefig_settings : dict, optional
@@ -3039,6 +3044,7 @@ class Coherence:
         --------
 
         pyleoclim.core.ui.Series.wavelet_coherence
+        matplotlib.pyplot.quiver
 
         '''
         # Turn the interactive mode off.
