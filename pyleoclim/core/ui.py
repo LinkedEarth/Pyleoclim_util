@@ -976,11 +976,14 @@ class Series:
 
         '''
         if not self.is_evenly_spaced():
-            raise ValueError('This filtering method assumes evenly-spaced timeseries, while the input is not. Please consider call the ".interp()" or ".bin()" method prior to ".filter()".')
+            raise ValueError('This  method assumes evenly-spaced timeseries, while the input is not. Use the ".interp()", ".bin()" or ".gkernel()" methods prior to ".filter()".')
 
         settings = {} if settings is None else settings.copy()
 
         new = self.copy()
+        
+        mu = np.mean(self.value) # extract the mean
+        y = self.value - mu
 
         method_func = {
             'savitzky-golay': filterutils.savitzky_golay,
@@ -994,7 +997,7 @@ class Series:
                 if cutoff_scale is None:
                     raise ValueError('Please set the cutoff frequency or scale argument: "cutoff_freq" or "cutoff_scale".')
                 else:
-                    if len(cutoff_scale) == 1:
+                    if np.isscalar(3.1) :
                         cutoff_freq = 1 / cutoff_scale
                     elif len(cutoff_scale) == 2:
                         cutoff_scale = np.array(cutoff_scale)
@@ -1004,8 +1007,8 @@ class Series:
         args['butterworth'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
         args[method].update(settings)
 
-        new_val = method_func[method](self.value, **args[method])
-        new.value = new_val
+        new_val = method_func[method](y, **args[method])
+        new.value = new_val + mu # restore the mean
 
         return new
 
