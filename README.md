@@ -19,34 +19,9 @@ LiPD, however, is not an obligatory entry point to Pyleoclim. Low-level modules 
 
 We've worked very hard to make Pyleoclim accessible to a wide variety of users, from establisher researchers to high-school students, and from seasoned Pythonistas to first-time programmers. A growing collection of workflows that use Pyleoclim are available as Jupyter notebooks in the `example_notebooks` folder and on [LiPDBooks](https://github.com/LinkedEarth/LiPDbooks/tree/master/notebooks).
 
-New in version 0.5.2
---------------------
-- re-introduced support for LiPD objects, including loading, export, and mapping
-- rigorous time representation, based on [PaCTS](https://doi.org/10.1029/2019PA003632) proposal
-- Gaussian kernel method for coarsening time grids
-- `common_time` method to put various timeseries on a common timescale, using interpolation, binning or Gaussian kernel
-- _MultipleSeries_ methods, including stack plots, correlation, and PCA
-- _EnsembleSeries_ methods, including correlation and plotting
-- expanded documentation of data structures (classes)
-- various bug fixes
+### Versions
 
-New in version 0.5.1
---------------------
-- enabled unit tests through TravisCI (to facilitate external contributions)
-- developed unit tests for all methods
-- expanded documentation, now on [readthedocs](https://pyleoclim-util.readthedocs.io/)
-- expanded Jupyter notebook tutorials (under "example_notebooks")
-- more user-friendly Getting Started section
-
-New in version 0.5.0
---------------------
-- complete redesign of the code, now centered on `Series` objects and descendants.
-- [user interface](https://github.com/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb) allowing succinct, expressive calls
-- expanded repertoire of spectral and wavelet methods
-- inclusion of singular spectral analysis, permitting missing data
-- Sphinx [documentation](http://linkedearth.github.io/Pyleoclim_util/) for all functions
-- clean, additive [plot styles](https://github.com/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/plot_styles.ipynb) inspired by Matplotlib [style sheets](https://matplotlib.org/3.3.1/gallery/style_sheets/style_sheets_reference.html).  
-
+See our [releases page](https://github.com/LinkedEarth/Pyleoclim_util/releases) for details on what's included in each version. 
 
 ### Documentation
 
@@ -56,7 +31,7 @@ Online documentation is available through readthedocs:
 
 ### Dependencies
 
-pyleoclim supports Python 3.8
+pyleoclim **only** supports Python 3.8
 
 ### Installation
 
