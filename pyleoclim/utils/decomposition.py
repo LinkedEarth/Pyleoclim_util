@@ -473,10 +473,6 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     else:
         eigvals_q = None
 
-    # TODO: implement automatic truncation criteria: (1) Kaiser rule (2) significant MC-SSA modes
-    # and (3) variance % criterion (e.g. first K modes that explain at least 90% of the variance).
-
-
     if trunc == 'mcssa':
         if nMC == 0:
             raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
@@ -500,9 +496,9 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
             RCmat[n, im] = np.diagonal(xdum, offset=-(Np - 1 - n)).mean()
         del xdum            
 
-    RCmat = scale*(RCmat + np.tile(mu, reps=[N, M]))  # restore the mean
+    #RCmat = RCmat + np.tile(mu, reps=[N, M])  # restore the mean and variance
     
-    RCseries = RCmat[:,mode_idx].sum(axis=1)
+    RCseries = scale*RCmat[:,mode_idx].sum(axis=1) + mu
 
     # export results
     res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'PC': PC, 'RCseries': RCseries, 'RCmat': RCmat, 'pctvar': pctvar, 'eigvals_q': eigvals_q}

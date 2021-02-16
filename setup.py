@@ -4,7 +4,7 @@ import io
 
 from setuptools import setup, find_packages
 
-version = '0.5.2beta'
+version = '0.6.1beta'
 
 # Read the readme file contents into variable
 def read(fname):
@@ -20,8 +20,8 @@ setup(
     description='A Python package for paleoclimate data analysis',
     long_description=read("README.md"),
     long_description_content_type = 'text/markdown',
-    author='Deborah Khider, Feng Zhu, Julien Emile-Geay',
-    author_email='khider@usc.edu',
+    author='Deborah Khider, Feng Zhu, Julien Emile-Geay, Jun Hu, Myron Kwan, Pratheek Athreya, Alexander James, Daniel Garijo',
+    author_email='linkedearth@gmail.com',
     url='https://github.com/LinkedEarth/Pyleoclim_util/pyleoclim',
     download_url='https://github.com/LinkedEarth/Pyleoclim_util/tarball/'+version,
     keywords=['Paleoclimate, Data Analysis, LiPD'],

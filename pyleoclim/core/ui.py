@@ -881,7 +881,7 @@ class Series:
         res = tsutils.is_evenly_spaced(self.time)
         return res
 
-    def filter(self, cutoff_freq=None, method='butterworth', settings=None):
+    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', settings=None):
         ''' Filtering the timeseries
 
         Parameters
@@ -895,6 +895,12 @@ class Series:
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
             If a float, it is interpreted as a low-frequency cutoff (lowpass).
+            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
+
+        cutoff_scale : float or list
+            cutoff_freq = 1 / cutoff_scale
+            The cutoff scale only works with the Butterworth method and when cutoff_freq is None.
+            If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
 
         settings : dict
@@ -970,11 +976,14 @@ class Series:
 
         '''
         if not self.is_evenly_spaced():
-            raise ValueError('This filtering method assumes evenly-spaced timeseries, while the input is not. Please consider call the ".interp()" or ".bin()" method prior to ".filter()".')
+            raise ValueError('This  method assumes evenly-spaced timeseries, while the input is not. Use the ".interp()", ".bin()" or ".gkernel()" methods prior to ".filter()".')
 
         settings = {} if settings is None else settings.copy()
 
         new = self.copy()
+        
+        mu = np.mean(self.value) # extract the mean
+        y = self.value - mu
 
         method_func = {
             'savitzky-golay': filterutils.savitzky_golay,
@@ -983,14 +992,23 @@ class Series:
 
         args = {}
 
-        if method == 'butterworth' and cutoff_freq is None:
-            raise ValueError('Please set the cutoff frequency argument: "cutoff_freq".')
+        if method == 'butterworth':
+            if cutoff_freq is None:
+                if cutoff_scale is None:
+                    raise ValueError('Please set the cutoff frequency or scale argument: "cutoff_freq" or "cutoff_scale".')
+                else:
+                    if np.isscalar(cutoff_scale) :
+                        cutoff_freq = 1 / cutoff_scale
+                    elif len(cutoff_scale) == 2:
+                        cutoff_scale = np.array(cutoff_scale)
+                        cutoff_freq = np.sort(1 / cutoff_scale)
+                        cutoff_freq = list(cutoff_freq)
 
         args['butterworth'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
         args[method].update(settings)
 
-        new_val = method_func[method](self.value, **args[method])
-        new.value = new_val
+        new_val = method_func[method](y, **args[method])
+        new.value = new_val + mu # restore the mean
 
         return new
 
@@ -1118,7 +1136,6 @@ class Series:
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
-
                     time_label=None, value_label=None, period_label=None, psd_label='PSD', mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
@@ -1209,13 +1226,19 @@ class Series:
 
         ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
         if scalogram is None:
-            scalogram = self.wavelet().signif_test(number=n_signif_test)
+            if n_signif_test > 0:
+                scalogram = self.wavelet().signif_test(number=n_signif_test)
+            else:
+                scalogram = self.wavelet()
 
         ax['scal'] = scalogram.plot(ax=ax['scal'], cbar_style={'orientation': 'horizontal', 'pad': 0.1})
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
         if psd is None:
-            psd = self.spectral().signif_test(number=n_signif_test)
+            if n_signif_test > 0:
+                psd = self.spectral().signif_test(number=n_signif_test)
+            else:
+                psd = self.spectral()
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True)
         if period_lim is not None:
@@ -1533,7 +1556,7 @@ class Series:
 
         pyleoclim.utils.spectral.wwz_psd : Spectral analysis using the Wavelet Weighted Z transform
 
-        pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
+        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
@@ -1688,7 +1711,7 @@ class Series:
 
         return psd
 
-    def wavelet(self, method='wwz', settings=None, freq_method='log', freq_kwargs=None, verbose=False):
+    def wavelet(self, method='wwz', settings=None, freq_method='log', ntau=None, freq_kwargs=None, verbose=False):
         ''' Perform wavelet analysis on the timeseries
 
         cwt wavelets documented on https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
@@ -1704,6 +1727,10 @@ class Series:
 
         freq_kwargs : dict
             Arguments for frequency vector
+
+        ntau : int
+            The length of the time shift points that determins the temporal resolution of the result.
+            If None, it will be either the length of the input time axis, or at most 50.
 
         settings : dict
             Arguments for the specific spectral method
@@ -1772,7 +1799,12 @@ class Series:
 
         args = {}
 
-        args['wwz'] = {'tau': self.time, 'freq': freq}
+        if ntau is None:
+            ntau = np.min([np.size(self.time), 50])
+
+        tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
+
+        args['wwz'] = {'tau': tau, 'freq': freq}
         args['cwt'] = {'wavelet' : 'morl', 'scales':1/freq}
 
 
@@ -1793,7 +1825,7 @@ class Series:
 
         return scal
 
-    def wavelet_coherence(self, target_series, method='wwz', settings=None, freq_method='log', freq_kwargs=None, verbose=False):
+    def wavelet_coherence(self, target_series, method='wwz', settings=None, freq_method='log', ntau=None, freq_kwargs=None, verbose=False):
         ''' Perform wavelet coherence analysis with the target timeseries
 
         Parameters
@@ -1809,6 +1841,10 @@ class Series:
 
         freq_kwargs : dict
             Arguments for frequency vector
+
+        ntau : int
+            The length of the time shift points that determins the temporal resolution of the result.
+            If None, it will be either the length of the input time axis, or at most 50.
 
         settings : dict
             Arguments for the specific spectral method
@@ -1851,8 +1887,13 @@ class Series:
         dt2 = np.median(np.diff(t2))
         overlap = np.arange(np.max([t1[0], t2[0]]), np.min([t1[-1], t2[-1]]), np.max([dt1, dt2]))
 
+        if ntau is None:
+            ntau = np.min([np.size(overlap), 50])
+
+        tau = np.linspace(np.min(overlap), np.max(overlap), ntau)
+
         args = {}
-        args['wwz'] = {'tau': overlap, 'freq': freq}
+        args['wwz'] = {'tau': tau, 'freq': freq}
         args[method].update(settings)
         xwc_res = xwc_func[method](self.value, self.time, target_series.value, target_series.time, **args[method])
 
@@ -1870,7 +1911,7 @@ class Series:
 
         return coh
 
-    def correlation(self, target_series, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None):
+    def correlation(self, target_series, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None, seed=None):
         ''' Estimates the Pearson's correlation and associated significance between two non IID time series
 
         The significance of the correlation is assessed using one of the following methods:
@@ -1906,6 +1947,9 @@ class Series:
 
         common_time_kwargs : dict
             Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
+
+        seed : float or int
+            random seed for isopersistent and isospectral methods
 
         Returns
         -------
@@ -1945,15 +1989,18 @@ class Series:
             ts_air = pyleo.Series(time=t, value=air)
 
             # with `nsim=20` and default `method='isospectral'`
-            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20})
+            # set an arbitrary randome seed to fix the result
+            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
             # using a simple t-test
-            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'ttest'})
+            # set an arbitrary randome seed to fix the result
+            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'ttest'}, seed=2333)
             print(corr_res)
 
             # using the method "isopersistent"
-            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'isopersistent'})
+            # set an arbitrary randome seed to fix the result
+            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'isopersistent'}, seed=2333)
             print(corr_res)
         '''
 
@@ -1975,6 +2022,9 @@ class Series:
             value1 = ms.series_list[0].slice(timespan).value
             value2 = ms.series_list[1].slice(timespan).value
 
+
+        if seed is not None:
+            np.random.seed(seed)
 
         corr_res = corrutils.corr_sig(value1, value2, **corr_args)
         signif = True if corr_res['signif'] == 1 else False
@@ -2336,6 +2386,9 @@ class PSD:
             New PSD object with appropriate significance test
 
         '''
+        if number == 0:
+            return self
+
         new = self.copy()
         surr = self.timeseries.surrogates(
             number=number, seed=seed, method=method, settings=settings
@@ -2849,6 +2902,8 @@ class Scalogram:
         pyleoclim.core.ui.Series.wavelet : wavelet analysis
 
         '''
+        if number == 0:
+            return self
 
         new = self.copy()
         surr = self.timeseries.surrogates(
@@ -3144,6 +3199,8 @@ class Coherence:
         pyleoclim.core.ui.Series.wavelet_coherence : Wavelet coherence
         '''
 
+        if number == 0:
+            return self
 
         new = self.copy()
         surr1 = self.timeseries1.surrogates(
@@ -3154,7 +3211,7 @@ class Coherence:
         )
 
         cohs = []
-        for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', position=0, leave=True, disable=mute_pbar):
+        for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', total=len(number), disable=mute_pbar):
             coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i], freq_method=self.freq_method, freq_kwargs=self.freq_kwargs)
             cohs.append(coh_tmp.coherence)
 
@@ -3280,7 +3337,7 @@ class MultipleSeries:
         new_ms.series_list = new_ts_list
         return new_ms
 
-    def filter(self, cutoff_freq=None, method='butterworth', settings=None):
+    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', settings=None):
         ''' Filtering the timeseries in the MultipleSeries object
 
         Parameters
@@ -3294,6 +3351,12 @@ class MultipleSeries:
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
             If a float, it is interpreted as a low-frequency cutoff (lowpass).
+            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
+
+        cutoff_scale : float or list
+            cutoff_freq = 1 / cutoff_scale
+            The cutoff scale only works with the Butterworth method and when cutoff_freq is None.
+            If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
 
         settings : dict
@@ -3317,7 +3380,7 @@ class MultipleSeries:
 
         new_tslist = []
         for ts in self.series_list:
-            new_tslist.append(ts.filter(cutoff_freq=cutoff_freq, method=method, settings=settings))
+            new_tslist.append(ts.filter(cutoff_freq=cutoff_freq, cutoff_scale=cutoff_scale, method=method, settings=settings))
 
         ms.series_list = new_tslist
 
@@ -3528,7 +3591,7 @@ class MultipleSeries:
 
         return ms
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None):
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
 
         If the target Series is not specified, then the 1st member of MultipleSeries will be the target
@@ -3554,6 +3617,12 @@ class MultipleSeries:
 
         common_time_kwargs : dict
             Parameters for the method MultipleSeries.common_time()
+
+        seed : float or int
+            random seed for isopersistent and isospectral methods
+
+        mute_pbar : bool
+            If True, the progressbar will be muted. Default is False.
 
         Returns
         -------
@@ -3590,10 +3659,12 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries(ts_list)
             ts_target = ts0
 
-            corr_res = ms.correlation(ts_target, settings={'nsim': 20})
+            # set an arbitrary randome seed to fix the result
+            corr_res = ms.correlation(ts_target, settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
-            corr_res = ms.correlation(settings={'nsim': 20})
+            # set an arbitrary randome seed to fix the result
+            corr_res = ms.correlation(settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
         '''
@@ -3604,8 +3675,8 @@ class MultipleSeries:
         if target is None:
             target = self.series_list[0]
 
-        for idx, ts in enumerate(self.series_list):
-            corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings, common_time_kwargs=common_time_kwargs)
+        for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):
+            corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res['r'])
             signif_list.append(corr_res['signif'])
             p_list.append(corr_res['p'])
@@ -3985,7 +4056,7 @@ class MultipleSeries:
 
         return psds
 
-    def wavelet(self, method='wwz', settings={}, freq_method='log', freq_kwargs=None, verbose=False, mute_pbar=False):
+    def wavelet(self, method='wwz', settings={}, freq_method='log', ntau=None, freq_kwargs=None, verbose=False, mute_pbar=False):
         '''Wavelet analysis
 
         Parameters
@@ -4001,6 +4072,10 @@ class MultipleSeries:
 
         freq_kwargs : dict
             Arguments for frequency vector
+
+        ntau : int
+            The length of the time shift points that determins the temporal resolution of the result.
+            If None, it will be either the length of the input time axis, or at most 100.
 
         settings : dict
             Arguments for the specific spectral method
@@ -4033,7 +4108,7 @@ class MultipleSeries:
 
         scal_list = []
         for s in tqdm(self.series_list, desc='Performing wavelet analysis on individual series', position=0, leave=True, disable=mute_pbar):
-            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose)
+            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose, ntau=ntau)
             scal_list.append(scal_tmp)
 
         scals = MultipleScalogram(scalogram_list=scal_list)
@@ -4433,7 +4508,7 @@ class EnsembleSeries(MultipleSeries):
 
         return ens_qs
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None):
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between an EnsembleSeries object to a target.
 
         If the target is not specified, then the 1st member of the ensemble will be the target
@@ -4468,6 +4543,12 @@ class EnsembleSeries(MultipleSeries):
 
         common_time_kwargs : dict
             Parameters for the method MultipleSeries.common_time()
+
+        mute_pbar : bool
+            If True, the progressbar will be muted. Default is False.
+
+        seed : float or int
+            random seed for isopersistent and isospectral methods
 
         Returns
         -------
@@ -4506,7 +4587,8 @@ class EnsembleSeries(MultipleSeries):
             ts_ens = pyleo.EnsembleSeries(ts_list1)
             ts_target = pyleo.EnsembleSeries(ts_list2)
 
-            corr_res = ts_ens.correlation(ts_target)
+            # set an arbitrary randome seed to fix the result
+            corr_res = ts_ens.correlation(ts_target, seed=2333)
             print(corr_res)
 
         '''
@@ -4516,8 +4598,7 @@ class EnsembleSeries(MultipleSeries):
         r_list = []
         p_list = []
         signif_list = []
-
-        for idx, ts1 in enumerate(self.series_list):
+        for idx, ts1 in tqdm(enumerate(self.series_list), total=len(self.series_list), disable=mute_pbar):
             if hasattr(target, 'series_list'):
                 nEns = np.size(target.series_list)
                 if idx < nEns:
@@ -4531,7 +4612,7 @@ class EnsembleSeries(MultipleSeries):
                 time2 = target.time
 
             ts2 = Series(time=time2, value=value2)
-            corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs)
+            corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res['r'])
             signif_list.append(corr_res['signif'])
             p_list.append(corr_res['p'])
