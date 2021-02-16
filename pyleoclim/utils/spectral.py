@@ -419,8 +419,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     else:
         ts_seg.append(ts)
         ys_seg.append(ys)
-
-    # calculate the frequency vector if needed
+    
     if freq is None:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         if 'dt' not in freq_kwargs.keys():
@@ -429,25 +428,26 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
         freq = make_freq_vector(ts_seg[0],
                                 method=freq_method,
                                 **freq_kwargs)
-        #remove zero freq
+            #remove zero freq
     if freq[0]==0:
         freq=np.delete(freq,0)
     
     freq_angular = 2 * np.pi * freq
-
+    
     psd_seg=[]
 
     for idx,item in enumerate(ys_seg):
+    # calculate the frequency vector if needed
         win=signal.get_window(window,len(ts_seg[idx]))
+        scale = len(ts_seg[idx])*2*np.mean(np.diff(ts_seg[idx]))/((win*win).sum())
         psd_seg.append(signal.lombscargle(ts_seg[idx],
                                           item*win,
-                                          freq_angular,precenter=True)*2*np.pi)
-
+                                          freq_angular)*scale)
     # average them up
     if average=='mean':
-        psd=np.mean(psd_seg,axis=0)*np.mean(np.diff(ts))
+        psd=np.mean(psd_seg,axis=0)
     elif average=='median':
-        psd=np.median(psd_seg,axis=0)*np.mean(np.diff(ts))
+        psd=np.median(psd_seg,axis=0)
     else:
         raise ValueError('Average should either be set to mean or median')
 
