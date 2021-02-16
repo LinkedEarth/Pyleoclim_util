@@ -997,7 +997,7 @@ class Series:
                 if cutoff_scale is None:
                     raise ValueError('Please set the cutoff frequency or scale argument: "cutoff_freq" or "cutoff_scale".')
                 else:
-                    if np.isscalar(3.1) :
+                    if np.isscalar(cutoff_scale) :
                         cutoff_freq = 1 / cutoff_scale
                     elif len(cutoff_scale) == 2:
                         cutoff_scale = np.array(cutoff_scale)
