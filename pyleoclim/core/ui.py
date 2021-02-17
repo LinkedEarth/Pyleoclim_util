@@ -3555,9 +3555,9 @@ class MultipleSeries:
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
         for idx,item in enumerate(self.series_list):
             gp[idx,:] = tsutils.grid_properties(item.time, step_style=step_style)
-            if gp[idx,2] < 0:  # flip time axis if retrograde
-                item.time  = item.time[::-1,...]
-                item.value = item.value[::-1,...]
+            # if gp[idx,2] < 0:  # flip time axis if retrograde
+            #     item.time  = item.time[::-1,...]
+            #     item.value = item.value[::-1,...]
 
         # define parameters for common time axis
         start = gp[:,0].max()
