@@ -501,5 +501,5 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     RCseries = scale*RCmat[:,mode_idx].sum(axis=1) + mu
 
     # export results
-    res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'PC': PC, 'RCseries': RCseries, 'RCmat': RCmat, 'pctvar': pctvar, 'eigvals_q': eigvals_q}
+    res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'PC': PC, 'RCseries': RCseries, 'RCmat': RCmat, 'pctvar': pctvar, 'eigvals_q': eigvals_q, 'mode_idx': mode_idx}
     return res

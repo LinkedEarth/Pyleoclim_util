@@ -3007,7 +3007,12 @@ class Coherence:
         contourf_style : dict, optional
             Arguments for the contour plot. The default is {}.
         phase_style : dict, optional
-            Arguments for the phase arrows. The default is {}.
+            Arguments for the phase arrows. The default is {}. It includes:
+            - 'pt': the default threshold above which phase arrows will be plotted
+            - 'skip_x': the number of points to skip between phase arrows along the x-axis
+            - 'skip_y':  the number of points to skip between phase arrows along the y-axis
+            - 'scale': number of data units per arrow length unit (see matplotlib.pyplot.quiver)
+            - 'width': shaft width in arrow units (see matplotlib.pyplot.quiver)
         cbar_style : dict, optional
             Arguments for the color bar. The default is {}.
         savefig_settings : dict, optional
@@ -3039,6 +3044,7 @@ class Coherence:
         --------
 
         pyleoclim.core.ui.Series.wavelet_coherence
+        matplotlib.pyplot.quiver
 
         '''
         # Turn the interactive mode off.
@@ -3047,8 +3053,16 @@ class Coherence:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
+        # handling NaNs
+        mask_freq = []
+        for i in range(np.size(self.frequency)):
+            if all(np.isnan(self.coherence[:, i])):
+                mask_freq.append(False)
+            else:
+                mask_freq.append(True)
+
         if in_period:
-            y_axis = 1/self.frequency
+            y_axis = 1/self.frequency[mask_freq]
             if ylabel is None:
                 ylabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
 
@@ -3057,7 +3071,7 @@ class Coherence:
                 mask = (yticks_default >= np.min(y_axis)) & (yticks_default <= np.max(y_axis))
                 yticks = yticks_default[mask]
         else:
-            y_axis = self.frequency
+            y_axis = self.frequency[mask_freq]
             if ylabel is None:
                 ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
 
@@ -3075,7 +3089,7 @@ class Coherence:
         cmap.set_bad(bad_clr)
         contourf_args['cmap'] = cmap
 
-        cont = ax.contourf(self.time, y_axis, self.coherence.T, **contourf_args)
+        cont = ax.contourf(self.time, y_axis, self.coherence[:, mask_freq].T, **contourf_args)
 
         # plot significance levels
         if self.signif_qs is not None:
@@ -3083,7 +3097,7 @@ class Coherence:
                 'ar1': 'AR(1)',
             }
             signif_coh = self.signif_qs.scalogram_list[0]
-            signif_boundary = self.coherence.T / signif_coh.amplitude.T
+            signif_boundary = self.coherence[:, mask_freq].T / signif_coh.amplitude[:, mask_freq].T
             ax.contour(
                 self.time, y_axis, signif_boundary, [-99, 1],
                 colors=signif_clr,
@@ -3127,9 +3141,9 @@ class Coherence:
             ax.set_ylabel(ylabel)
 
         # plot phase
-        yaxis_range = np.max(y_axis) - np.min(y_axis)
-        xaxis_range = np.max(self.time) - np.min(self.time)
-        phase_args = {'pt': 0.5, 'skip_x': int(xaxis_range//10), 'skip_y': int(yaxis_range//50), 'scale': 30, 'width': 0.004}
+        skip_x = np.max([int(np.size(self.time)//20), 1])
+        skip_y = np.max([int(np.size(y_axis)//20), 1])
+        phase_args = {'pt': 0.5, 'skip_x': skip_x, 'skip_y': skip_y, 'scale': 30, 'width': 0.004}
         phase_args.update(phase_style)
 
         pt = phase_args['pt']
@@ -3138,14 +3152,14 @@ class Coherence:
         scale = phase_args['scale']
         width = phase_args['width']
 
-        phase = np.copy(self.phase)
+        phase = np.copy(self.phase)[:, mask_freq]
 
         if self.signif_qs is None:
             phase[self.coherence < pt] = np.nan
         else:
             phase[signif_boundary.T < 1] = np.nan
 
-        X, Y = np.meshgrid(self.time, 1/self.frequency)
+        X, Y = np.meshgrid(self.time, 1/self.frequency[mask_freq])
         U, V = np.cos(phase).T, np.sin(phase).T
 
         ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
@@ -3211,7 +3225,7 @@ class Coherence:
         )
 
         cohs = []
-        for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', total=len(number), disable=mute_pbar):
+        for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', total=number, disable=mute_pbar):
             coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i], freq_method=self.freq_method, freq_kwargs=self.freq_kwargs)
             cohs.append(coh_tmp.coherence)
 
@@ -3541,9 +3555,9 @@ class MultipleSeries:
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
         for idx,item in enumerate(self.series_list):
             gp[idx,:] = tsutils.grid_properties(item.time, step_style=step_style)
-            if gp[idx,2] < 0:  # flip time axis if retrograde
-                item.time  = item.time[::-1,...]
-                item.value = item.value[::-1,...]
+            # if gp[idx,2] < 0:  # flip time axis if retrograde
+            #     item.time  = item.time[::-1,...]
+            #     item.value = item.value[::-1,...]
 
         # define parameters for common time axis
         start = gp[:,0].max()
