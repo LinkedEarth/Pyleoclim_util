@@ -6176,11 +6176,14 @@ class LipdSeries(Series):
         #Remove NaNs
         ys_tmp=np.copy(ys)
         ds=ds[~np.isnan(ys_tmp)]
+        sort_ind2=np.argsort(ds)
+        ds=np.array(ds[sort_ind2])
+        ys=np.array(ys[sort_ind2])
         ensembleValuestoPaleo=lipdutils.mapAgeEnsembleToPaleoData(ensembleValues, depth, ds)
         #create multipleseries
         s_list=[]
         for i, s in enumerate(ensembleValuestoPaleo.T):
-            s_tmp = Series(time=s,value=self.value, verbose=i==0)
+            s_tmp = Series(time=s,value=ys, verbose=i==0, clean_ts=False)
             s_list.append(s_tmp)
 
         ens = EnsembleSeries(series_list=s_list)
