@@ -97,7 +97,7 @@ def PyleoObj_to_json(PyleoObj,filename,dict_return=False):
 
     '''
     obj_dict = PyleoObj.__dict__
-    obj_dict = transform(obj_dict, filename)
+    obj_dict = transform(obj_dict)
     if dict_return == False:
         with open(filename,'w') as f:
             json.dump(obj_dict, f)
