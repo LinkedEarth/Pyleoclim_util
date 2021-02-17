@@ -21,7 +21,7 @@ We've worked very hard to make Pyleoclim accessible to a wide variety of users, 
 
 ### Versions
 
-See our [releases page](https://github.com/LinkedEarth/Pyleoclim_util/releases) for details on what's included in each version. 
+See our [releases page](https://github.com/LinkedEarth/Pyleoclim_util/releases) for details on what's included in each version.
 
 ### Documentation
 
@@ -49,7 +49,9 @@ Guidelines for contributors are described _here_ (placeholder)
 ### License
 
 The project is licensed under the GNU Public License. Please refer to the file call license.
-If you use the code in publications, please credit the work using [this citation](https://zenodo.org/record/1212692#.WsaZ7maZNE4).
+If you use the code in publications, please credit the work using this citation:
+
+_Deborah Khider, Feng Zhu, Julien Emile-Geay, Jun Hu, Alexander James, Pratheek Athreya, Myron Kwan, Daniel Garijo. (2021). Pyleoclim: v0.6.1 Release. Zenodo. http://doi.org/10.5281/zenodo.1212692_
 
 
 ### Disclaimer
