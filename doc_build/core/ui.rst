@@ -10,6 +10,13 @@ These situations are described in classes, the beauty of which is called "inheri
 A major advantage of object-oriented design is that you, the user, can harness the power of Pyleoclim methods in very few lines of code through the user interface (UI) without ever having to get your hands dirty with our code (unless you want to, of course).
 The flipside is that any user would do well to understand Pyleoclim classes, what they are intended for, and what methods they can and cannot support.
 
+.. image:: Pyleoclim_UI.png
+   :width: 1477px
+   :height: 946px
+   :scale: 80 %
+   :alt: The Pyleoclim UI. Credit: Feng Zhu
+   :align: center
+
 The following describes the various classes that undergird the Pyleoclim edifice.
 
 Series (pyleoclim.Series)

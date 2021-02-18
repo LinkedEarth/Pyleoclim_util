@@ -406,7 +406,10 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     # divide into segments
     nseg=int(np.floor(2*len(ts)/(n50+1)))
     index=np.array(np.arange(0,len(ts),nseg/2),dtype=int)
-    index=np.append(index,len(ts)) #make it ends at the time series
+    if len(index) == n50+2:
+        index[-1] = len(ts)
+    else:
+        index=np.append(index,len(ts)) #make it ends at the time series
 
     ts_seg=[]
     ys_seg=[]
@@ -442,7 +445,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
         scale = len(ts_seg[idx])*2*np.mean(np.diff(ts_seg[idx]))/((win*win).sum())
         psd_seg.append(signal.lombscargle(ts_seg[idx],
                                           item*win,
-                                          freq_angular)*scale)
+                                          freq_angular,precenter=True)*scale)
     # average them up
     if average=='mean':
         psd=np.mean(psd_seg,axis=0)
