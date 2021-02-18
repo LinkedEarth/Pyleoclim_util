@@ -5174,7 +5174,7 @@ class MultiplePSD:
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, legend=True,
-             plot_kwargs=None, lgd_kwargs=None, mute=False):
+             colors=None, cmap='tab10', norm=None, plot_kwargs=None, lgd_kwargs=None, mute=False):
         '''Plot multiple PSD on the same plot
 
         Parameters
@@ -5195,6 +5195,16 @@ class MultiplePSD:
             Limits for the x-axis. The default is None.
         ylim : list, optional
             limits for the y-axis. The default is None.
+        colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
+            Colors for plotting.
+            If None, the plotting will cycle the 'tab10' colormap;
+            if only one color is specified, then all curves will be plotted with that single color;
+            if a list of colors are specified, then the plotting will cycle that color list.
+        cmap : str
+            The colormap to use when "colors" is None.
+        norm : matplotlib.colors.Normalize like
+            The nomorlization for the colormap.
+            If None, a linear normalization will be used.
         savefig_settings : dict, optional
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -5232,11 +5242,34 @@ class MultiplePSD:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
-        for psd in self.psd_list:
+        for idx, psd in enumerate(self.psd_list):
+
             tmp_plot_kwargs = {}
             if psd.plot_kwargs is not None:
                 tmp_plot_kwargs.update(psd.plot_kwargs)
+
             tmp_plot_kwargs.update(plot_kwargs)
+            if 'c' not in tmp_plot_kwargs and 'color' not in tmp_plot_kwargs:
+                if colors is None:
+                    cmap_obj = plt.get_cmap(cmap)
+                    if hasattr(cmap_obj, 'colors'):
+                        nc = len(cmap_obj.colors)
+                    else:
+                        nc = len(self.psd_list)
+
+                    if norm is None:
+                        norm = mpl.colors.Normalize(vmin=0, vmax=nc-1)
+
+                    clr = cmap_obj(norm(idx%nc))
+                elif type(colors) is str:
+                    clr = colors
+                elif type(colors) is list:
+                    nc = len(colors)
+                    clr = colors[idx%nc]
+                else:
+                    raise TypeError('"colors" should be a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)')
+                tmp_plot_kwargs['color'] = clr
+
             ax = psd.plot(
                 figsize=figsize, in_loglog=in_loglog, in_period=in_period, xlabel=xlabel, ylabel=ylabel,
                 title=title, xlim=xlim, ylim=ylim, savefig_settings=savefig_settings, ax=ax,
