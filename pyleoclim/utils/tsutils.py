@@ -551,7 +551,7 @@ def clean_ts(ys, ts, verbose=False):
     ''' Cleaning the timeseries
 
     Delete the NaNs in the time series and sort it with time axis ascending,
-    duplicated timestamps will be reduced by averaging the values.
+    duplicate timestamps will be reduced by averaging the values.
 
     Parameters
     ----------
@@ -633,7 +633,7 @@ def sort_ts(ys, ts, verbose=False):
     '''
     ys = np.asarray(ys, dtype=np.float)
     ts = np.asarray(ts, dtype=np.float)
-    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
+    assert ys.size == ts.size, 'time and value arrays must be of equal length'
 
     # sort the time series so that the time axis will be ascending
     dt = np.median(np.diff(ts))
@@ -642,7 +642,7 @@ def sort_ts(ys, ts, verbose=False):
         ys = ys[sort_ind]
         ts = ts[sort_ind]
         if verbose:
-            print('The time axis has been adjusted to be ascending!')
+            print('The time axis has been adjusted to be prograde')
 
     return ys, ts
 
@@ -688,7 +688,7 @@ def reduce_duplicated_timestamps(ys, ts, verbose=False):
         ys = np.array(ys)
 
         if verbose:
-            print('Duplicated timestamps has been reduced by averaging values!')
+            print('Duplicate timestamps have been combined by averaging values.')
     return ys, ts
 
 def annualize(ys, ts):
