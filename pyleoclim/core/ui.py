@@ -3440,9 +3440,9 @@ class MultipleSeries:
         return ms
 
     def common_time(self, method='interp', common_step = 'max', start=None, stop = None, step=None, step_style = None, **kwargs):
-        ''' Aligns the time axes of a MultipleSeries object, via either binning
-        or interpolation. This is critical for workflows that need to assume a
-        common time axis for the group of series under consideration.
+        ''' Aligns the time axes of a MultipleSeries object, via binning
+        interpolation., or Gaussian kernel. Alignmentis critical for workflows
+        that need to assume a common time axis for the group of series under consideration.
 
 
         The common time axis is characterized by the following parameters:
@@ -3453,7 +3453,7 @@ class MultipleSeries:
 
         Optional arguments for binning or interpolation are those of the underling functions.
 
-        Note that by default, all MultipleSeries objects have prograde time grids
+        If the time axis are retrograde, this step makes them prograde.
 
         Parameters
         ----------
