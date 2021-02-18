@@ -5174,7 +5174,7 @@ class MultiplePSD:
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, legend=True,
-             colors=None, cmap='tab10', norm=None, plot_kwargs=None, lgd_kwargs=None, mute=False):
+             colors=None, cmap=None, norm=None, plot_kwargs=None, lgd_kwargs=None, mute=False):
         '''Plot multiple PSD on the same plot
 
         Parameters
@@ -5249,8 +5249,26 @@ class MultiplePSD:
                 tmp_plot_kwargs.update(psd.plot_kwargs)
 
             tmp_plot_kwargs.update(plot_kwargs)
-            if 'c' not in tmp_plot_kwargs and 'color' not in tmp_plot_kwargs:
+
+            # get color for each psd curve
+            use_clr = False
+
+            if 'color' not in tmp_plot_kwargs and 'c' not in 'tmp_plot_kwargs':
+                use_clr = True
+            
+            if 'color' in tmp_plot_kwargs and tmp_plot_kwargs['color'] is None:
+                use_clr = True
+
+            if 'c' in tmp_plot_kwargs and tmp_plot_kwargs['c'] is None:
+                use_clr = True
+
+            if colors is not None or cmap is not None:
+                use_clr = True
+
+            if use_clr:
+                # use the color based on the argument 'colors' or 'cmap'
                 if colors is None:
+                    cmap = 'tab10' if cmap is None else cmap
                     cmap_obj = plt.get_cmap(cmap)
                     if hasattr(cmap_obj, 'colors'):
                         nc = len(cmap_obj.colors)
@@ -5268,7 +5286,8 @@ class MultiplePSD:
                     clr = colors[idx%nc]
                 else:
                     raise TypeError('"colors" should be a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)')
-                tmp_plot_kwargs['color'] = clr
+
+                tmp_plot_kwargs.update({'color': clr})
 
             ax = psd.plot(
                 figsize=figsize, in_loglog=in_loglog, in_period=in_period, xlabel=xlabel, ylabel=ylabel,
