@@ -3155,7 +3155,7 @@ class Coherence:
         phase = np.copy(self.phase)[:, mask_freq]
 
         if self.signif_qs is None:
-            phase[self.coherence < pt] = np.nan
+            phase[self.coherence[:, mask_freq] < pt] = np.nan
         else:
             phase[signif_boundary.T < 1] = np.nan
 
