@@ -4626,7 +4626,7 @@ class EnsembleSeries(MultipleSeries):
                 value2 = target.value
                 time2 = target.time
 
-            ts2 = Series(time=time2, value=value2)
+            ts2 = Series(time=time2, value=value2, verbose=idx==0)
             corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res['r'])
             signif_list.append(corr_res['signif'])
