@@ -257,3 +257,78 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
     yf  = ypf[np.isin(tp,ts)]
 
     return yf
+
+
+def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_type='odd', params=(2,1,2), padFrac=0.1, **kwargs):
+    '''Applies a FIR filter design with window method and frequency fc, with padding
+
+    Parameters
+    ----------
+
+    ys : numpy array
+        Timeseries
+    fc : float or list
+        cutoff frequency. If scalar, it is interpreted as a low-frequency cutoff (lowpass)
+        If fc is a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass)
+    numptaps : int
+        Length of the filter (number of coefficients, i.e. the filter order + 1). numtaps must be odd if a passband includes the Nyquist frequency.
+        If None, will use the largest number that is smaller than 1/3 of the the data length.
+    fs : float
+        sampling frequency
+    window : str or tuple of string and parameter values, optional
+        Desired window to use. See scipy.signal.get_window for a list of windows and required parameters.
+    pad : string
+        Indicates if padding is needed.
+        - 'reflect': Reflects the timeseries
+        - 'ARIMA': Uses an ARIMA model for the padding
+        - None: No padding.
+    params : tuple
+        model parameters for ARIMA model (if pad = True)
+    padFrac : float
+        fraction of the series to be padded
+    kwargs : dict
+        a dictionary of keyword arguments for scipy.signal.firwin
+
+    Returns
+    -------
+
+    yf : array
+        filtered array
+    
+    See also
+    --------
+    
+    scipy.signal.firwin : FIR filter design using the window method
+    
+    '''
+    # taps = signal.firwin(numtaps, fc, window=window, fs=fs, **kwargs)
+    nyq = 0.5 * fs
+    if np.isscalar(fc):
+        pass_zero = 'lowpass'
+    elif len(fc) == 2:
+        pass_zero = 'bandpass'
+    else:
+        raise ValueError('Wrong input fc')
+
+    if numtaps is None:
+        # use the largest number of taps that the default padding method in scipy.signal.filtfilt allows
+        numtaps = int(np.size(ys)//3)
+
+    taps = signal.firwin(numtaps, fc/nyq, window=window, pass_zero=pass_zero, **kwargs)
+
+    ts = np.arange(len(ys)) # define time axis
+
+    if pad=='ARIMA':
+        yp, tp = ts_pad(ys,ts,method = 'ARIMA', params=params, padFrac=padFrac)
+    elif pad=='reflect':
+        yp, tp = ts_pad(ys,ts,method = 'reflect', reflect_type=reflect_type, padFrac=padFrac)
+    elif pad is None:
+        yp = ys
+        tp = ts
+    else:
+        raise ValueError('Not a valid argument. Enter "ARIMA", "reflect" or None')
+
+    ypf = signal.filtfilt(taps, 1, yp)
+    yf  = ypf[np.isin(tp,ts)]
+
+    return yf
