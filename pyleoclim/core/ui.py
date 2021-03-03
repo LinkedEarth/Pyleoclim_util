@@ -35,7 +35,7 @@ import cartopy.feature as cfeature
 
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
-from scipy import stats
+from scipy import stats, signal
 import warnings
 import os
 
@@ -881,7 +881,7 @@ class Series:
         res = tsutils.is_evenly_spaced(self.time)
         return res
 
-    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', settings=None):
+    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
         ''' Filtering the timeseries
 
         Parameters
@@ -891,6 +891,7 @@ class Series:
             the filtering method
             - 'butterworth': the Butterworth method (default)
             - 'savitzky-golay': the Savitzky-Golay method
+            - 'firwin': FIR filter design using the window method, with default window as Hanning
 
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
@@ -903,9 +904,9 @@ class Series:
             If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
 
-        settings : dict
+        kwargs : dict
             a dictionary of the keyword arguments for the filtering method,
-            see `pyleoclim.utils.filter.savitzky_golay` and `pyleoclim.utils.filter.butterworth` for the details
+            see `pyleoclim.utils.filter.savitzky_golay`, `pyleoclim.utils.filter.butterworth`, and `pyleoclim.utils.filter.firwin` for the details
 
         Returns
         -------
@@ -917,6 +918,7 @@ class Series:
 
         pyleoclim.utils.filter.butterworth : Butterworth method
         pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
+        pyleoclim.utils.filter.firwin : FIR filter design using the window method
 
         Examples
         --------
@@ -974,11 +976,21 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
+        Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:
+        .. ipython:: python
+            :okwarning:
+
+            fig, ax = ts.plot(mute=True, label='mix')
+            ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
+            ts2.plot(ax=ax, label='20 Hz')
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
+            @savefig ts_filter4.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+
         '''
         if not self.is_evenly_spaced():
             raise ValueError('This  method assumes evenly-spaced timeseries, while the input is not. Use the ".interp()", ".bin()" or ".gkernel()" methods prior to ".filter()".')
-
-        settings = {} if settings is None else settings.copy()
 
         new = self.copy()
         
@@ -988,11 +1000,12 @@ class Series:
         method_func = {
             'savitzky-golay': filterutils.savitzky_golay,
             'butterworth': filterutils.butterworth,
+            'firwin': filterutils.firwin,
         }
 
         args = {}
 
-        if method == 'butterworth':
+        if method in ['butterworth', 'firwin']:
             if cutoff_freq is None:
                 if cutoff_scale is None:
                     raise ValueError('Please set the cutoff frequency or scale argument: "cutoff_freq" or "cutoff_scale".')
@@ -1003,9 +1016,12 @@ class Series:
                         cutoff_scale = np.array(cutoff_scale)
                         cutoff_freq = np.sort(1 / cutoff_scale)
                         cutoff_freq = list(cutoff_freq)
+                    else:
+                        raise ValueError('Wrong cutoff_scale; should be either one float value (lowpass) or a list two float values (bandpass).')
 
         args['butterworth'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
-        args[method].update(settings)
+        args['firwin'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
+        args[method].update(kwargs)
 
         new_val = method_func[method](y, **args[method])
         new.value = new_val + mu # restore the mean
@@ -3351,16 +3367,17 @@ class MultipleSeries:
         new_ms.series_list = new_ts_list
         return new_ms
 
-    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', settings=None):
+    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
         ''' Filtering the timeseries in the MultipleSeries object
 
         Parameters
         ----------
 
-        method : str, {'savitzky-golay', 'butterworth'}
+        method : str, {'savitzky-golay', 'butterworth', 'firwin'}
             the filtering method
             - 'butterworth': the Butterworth method (default)
             - 'savitzky-golay': the Savitzky-Golay method
+            - 'firwin': FIR filter design using the window method, with default window as Hanning
 
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
@@ -3373,9 +3390,9 @@ class MultipleSeries:
             If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
 
-        settings : dict
+        kwargs : dict
             a dictionary of the keyword arguments for the filtering method,
-            see `pyleoclim.utils.filter.savitzky_golay` and `pyleoclim.utils.filter.butterworth` for the details
+            see `pyleoclim.utils.filter.savitzky_golay`, `pyleoclim.utils.filter.butterworth`, and `pyleoclim.utils.filter.firwin` for the details
 
         Returns
         -------
@@ -3387,6 +3404,7 @@ class MultipleSeries:
 
         pyleoclim.utils.filter.butterworth : Butterworth method
         pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
+        pyleoclim.utils.filter.firwin : FIR filter design using the window method
 
         '''
 
@@ -3394,7 +3412,7 @@ class MultipleSeries:
 
         new_tslist = []
         for ts in self.series_list:
-            new_tslist.append(ts.filter(cutoff_freq=cutoff_freq, cutoff_scale=cutoff_scale, method=method, settings=settings))
+            new_tslist.append(ts.filter(cutoff_freq=cutoff_freq, cutoff_scale=cutoff_scale, method=method, **kwargs))
 
         ms.series_list = new_tslist
 
@@ -3440,9 +3458,9 @@ class MultipleSeries:
         return ms
 
     def common_time(self, method='interp', common_step = 'max', start=None, stop = None, step=None, step_style = None, **kwargs):
-        ''' Aligns the time axes of a MultipleSeries object, via either binning
-        or interpolation. This is critical for workflows that need to assume a
-        common time axis for the group of series under consideration.
+        ''' Aligns the time axes of a MultipleSeries object, via binning
+        interpolation., or Gaussian kernel. Alignmentis critical for workflows
+        that need to assume a common time axis for the group of series under consideration.
 
 
         The common time axis is characterized by the following parameters:
@@ -3453,7 +3471,7 @@ class MultipleSeries:
 
         Optional arguments for binning or interpolation are those of the underling functions.
 
-        Note that by default, all MultipleSeries objects have prograde time grids
+        If the time axis are retrograde, this step makes them prograde.
 
         Parameters
         ----------
@@ -4626,7 +4644,7 @@ class EnsembleSeries(MultipleSeries):
                 value2 = target.value
                 time2 = target.time
 
-            ts2 = Series(time=time2, value=value2)
+            ts2 = Series(time=time2, value=value2, verbose=idx==0)
             corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res['r'])
             signif_list.append(corr_res['signif'])
