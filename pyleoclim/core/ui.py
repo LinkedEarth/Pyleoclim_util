@@ -3155,7 +3155,7 @@ class Coherence:
         phase = np.copy(self.phase)[:, mask_freq]
 
         if self.signif_qs is None:
-            phase[self.coherence[:, mask_freq] < pt] = np.nan
+            phase[self.coherence < pt] = np.nan
         else:
             phase[signif_boundary.T < 1] = np.nan
 
@@ -5847,10 +5847,21 @@ class Lipd:
 
         res=[]
 
-        for item in ts_list:
+        for idx, item in enumerate(ts_list):
             try:
                 res.append(LipdSeries(item))
             except:
+                if mode == 'paleo':
+                    txt = 'The timeseries from ' + str(idx) + ': ' +\
+                            item['dataSetName'] + ': ' + \
+                            item['paleoData_variableName'] + \
+                            ' could not be coerced into a LipdSeries object, passing'
+                else:
+                    txt = 'The timeseries from ' + str(idx) + ': ' +\
+                            item['dataSetName'] + ': ' + \
+                            item['chronData_variableName'] + \
+                            ' could not be coerced into a LipdSeries object, passing'  
+                warnings.warn(txt)
                 pass
 
         return res
