@@ -1448,6 +1448,51 @@ class Series:
         new.value = self.value[mask]
         return new
 
+    def fill_na(self, timespan=None, dt=1):
+        ''' Fill NaNs into the timespan
+
+        Parameters
+        ----------
+
+        timespan : tuple or list
+            The list of time points for slicing, whose length must be 2.
+            For example, if timespan = [a, b], then the sliced output includes one segment [a, b].
+            If None, will use the start point and end point of the original timeseries
+
+        dt : float
+            The time spacing to fill the NaNs; default is 1.
+
+        Returns
+        -------
+
+        new : Series
+            The sliced Series object.
+
+        '''
+        new = self.copy()
+        if timespan is None:
+            start = np.min(self.time)
+            end = np.max(self.time)
+        else:
+            start = timespan[0]
+            end = timespan[-1]
+
+        new_time = np.arange(start, end+dt, dt)
+        new_value = np.empty(np.size(new_time))
+
+        for i, t in enumerate(new_time):
+            if t in self.time:
+                loc = list(self.time).index(t)
+                new_value[i] = self.value[loc]
+            else:
+                new_value[i] = np.nan
+
+        new.time = new_time
+        new.value = new_value
+
+        return new
+
+
     def detrend(self, method='emd', **kwargs):
         '''Detrend Series object
 
