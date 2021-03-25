@@ -807,8 +807,9 @@ class TestUiSeriesDistplot:
 class TestUiSeriesFilter:
     '''Test for Series.filter()'''
 
-    def test_filter_t0(self):
-        ''' Low-pass filtering with Butterworth
+    @pytest.mark.parametrize('method', ['butterworth', 'firwin'])
+    def test_filter_t0(self, method):
+        ''' Low-pass filtering with Butterworth or FIR with window
         '''
         t = np.linspace(0, 1, 1000)
         sig1 = np.sin(2*np.pi*10*t)
@@ -816,13 +817,14 @@ class TestUiSeriesFilter:
         sig = sig1 + sig2
         ts1 = pyleo.Series(time=t, value=sig1)
         ts = pyleo.Series(time=t, value=sig)
-        ts_lp = ts.filter(cutoff_freq=15)
+        ts_lp = ts.filter(cutoff_freq=15, method=method)
         val_diff = ts_lp.value - ts1.value
         assert np.mean(val_diff**2) < 0.1
 
 
-    def test_filter_t1(self):
-        ''' Band-pass filtering with Butterworth
+    @pytest.mark.parametrize('method', ['butterworth', 'firwin'])
+    def test_filter_t1(self, method):
+        ''' Band-pass filtering with Butterworth or FIR with window
         '''
         t = np.linspace(0, 1, 1000)
         sig1 = np.sin(2*np.pi*10*t)
@@ -830,7 +832,7 @@ class TestUiSeriesFilter:
         sig = sig1 + sig2
         ts2 = pyleo.Series(time=t, value=sig2)
         ts = pyleo.Series(time=t, value=sig)
-        ts_bp = ts.filter(cutoff_freq=[15, 25])
+        ts_bp = ts.filter(cutoff_freq=[15, 25], method=method)
         val_diff = ts_bp.value - ts2.value
         assert np.mean(val_diff**2) < 0.1
         
