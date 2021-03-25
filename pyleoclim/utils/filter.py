@@ -11,6 +11,8 @@ Handles filtering
 __all__ = [
     'butterworth',
     'savitzky_golay',
+    'firwin',
+    'lanczos'
 ]
 
 import numpy as np
@@ -18,7 +20,7 @@ import statsmodels.api as sm
 from scipy import signal
 
 #----
-#Main functions
+# Main functions
 #-----
 
 def savitzky_golay(ys,window_length=None, polyorder=2, deriv=0, delta=1,
@@ -196,6 +198,7 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
 def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
                 reflect_type='odd',params=(2,1,2),padFrac=0.1):
     '''Applies a Butterworth filter with frequency fc, with padding
+       Supports both lowpass and band-pass filtering.  
 
     Parameters
     ----------
@@ -215,7 +218,7 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
         - 'ARIMA': Uses an ARIMA model for the padding
         - None: No padding.
     params : tuple
-        model parameters for ARIMA model (if pad = True)
+        model parameters for ARIMA model (if pad = 'ARIMA')
     padFrac : float
         fraction of the series to be padded
 
@@ -258,9 +261,80 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
 
     return yf
 
+def lanczos(ys,fc,fs=1,pad='reflect',
+                reflect_type='odd',params=(2,1,2),padFrac=0.1):
+    '''Applies a Lanczos (lowpass) filter with frequency fc, with optional padding
+
+    Parameters
+    ----------
+
+    ys : numpy array
+        Timeseries
+    fc : float
+        cutoff frequency. 
+    fs : float
+        sampling frequency
+    
+    pad : string
+        Indicates if padding is needed.
+        - 'reflect': Reflects the timeseries
+        - 'ARIMA': Uses an ARIMA model for the padding
+        - None: No padding.
+    params : tuple
+        model parameters for ARIMA model (if pad = 'ARIMA'). May require fiddling.
+    padFrac : float
+        fraction of the series to be padded
+
+    Returns
+    -------
+
+    yf : array
+        filtered array
+        
+    References
+    ----------
+    Filter design from http://scitools.org.uk/iris/docs/v1.2/examples/graphics/SOI_filtering.html
+    
+    See also
+    --------
+    
+    pyleoclim.utils.filter.ts_pad : Pad a timeseries based on timeseries model predictions
+    
+    '''
+    ts = np.arange(len(ys)) # define "time" axis
+
+    if pad=='ARIMA':
+        yp, tp = ts_pad(ys,ts,method = 'ARIMA', params=params, padFrac=padFrac)
+    elif pad=='reflect':
+        yp, tp = ts_pad(ys,ts,method = 'reflect', reflect_type=reflect_type, padFrac=padFrac)
+    elif pad is None:
+        yp = ys
+        tp = ts
+    else:
+        raise ValueError("Not a valid argument. Enter 'ARIMA', 'reflect' or None")
+
+    window = max(51,len(yp)//4)  # arbitrary?
+
+    order = ((window - 1) // 2 ) + 1
+    nwts = 2 * order + 1
+    w = np.zeros([nwts])
+    n = nwts // 2
+    w[n] = 2 * fc / fs
+    k = np.arange(1., n)
+    sigma = np.sin(np.pi * k / n) * n / (np.pi * k)
+    firstfactor = np.sin(2. * np.pi * fc / fs * k) / (np.pi * k)
+    w[n-1:0:-1] = firstfactor * sigma
+    w[n+1:-1] = firstfactor * sigma
+    wgts = w[1:-1]
+
+    ypf = np.convolve(yp,wgts, 'same')
+    yf  = ypf[np.isin(tp,ts)]
+
+    return yf    
+
 
 def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_type='odd', params=(2,1,2), padFrac=0.1, **kwargs):
-    '''Applies a FIR filter design with window method and frequency fc, with padding
+    '''Applies a Finite Impulse Response filter design with window method and frequency fc, with padding
 
     Parameters
     ----------
@@ -332,3 +406,4 @@ def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_
     yf  = ypf[np.isin(tp,ts)]
 
     return yf
+
