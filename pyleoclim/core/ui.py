@@ -887,7 +887,7 @@ class Series:
         Parameters
         ----------
 
-        method : str, {'savitzky-golay', 'butterworth'}
+        method : str, {'savitzky-golay', 'butterworth', 'firwin'}
             the filtering method
             - 'butterworth': the Butterworth method (default)
             - 'savitzky-golay': the Savitzky-Golay method
