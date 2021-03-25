@@ -712,8 +712,8 @@ class Series:
         return res
 
     def ssa(self, M=None, nMC=0, f=0.3, trunc = None, var_thresh=80):
-        '''Singular Spectrum Analysis
-
+        ''' Singular Spectrum Analysis
+        
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
         This implementation  uses the method of [1], with applications presented in [2].
         Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
@@ -735,7 +735,7 @@ class Series:
             Default is None, which bypasses truncation (K = M)
 
         var_thresh : float
-            variance threshold for reconstruction (only impcatful if trunc is set to 'var')
+            variance threshold for reconstruction (only impactful if trunc is set to 'var')
 
         Returns
         -------
@@ -882,21 +882,23 @@ class Series:
         return res
 
     def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
-        ''' Filtering the timeseries
+        ''' Apply a filter to the timeseries
 
         Parameters
         ----------
 
-        method : str, {'savitzky-golay', 'butterworth'}
+        method : str, {'savitzky-golay', 'butterworth','firwin','lanczos'}
             the filtering method
-            - 'butterworth': the Butterworth method (default)
-            - 'savitzky-golay': the Savitzky-Golay method
-            - 'firwin': FIR filter design using the window method, with default window as Hanning
+            - 'butterworth': a Butterworth filter (default = 4th order)
+            - 'savitzky-golay': Savitzky-Golay filter
+            - 'firwin': finite impulse response filter design using the window method, with default window as Hamming
+            - 'lanczos': Lanczos zero-phase filter 
 
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
             If a float, it is interpreted as a low-frequency cutoff (lowpass).
-            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
+            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass). 
+            Note that only the Butterworth option (default) currently supports bandpass filtering. 
 
         cutoff_scale : float or list
             cutoff_freq = 1 / cutoff_scale
@@ -906,7 +908,7 @@ class Series:
 
         kwargs : dict
             a dictionary of the keyword arguments for the filtering method,
-            see `pyleoclim.utils.filter.savitzky_golay`, `pyleoclim.utils.filter.butterworth`, and `pyleoclim.utils.filter.firwin` for the details
+            see `pyleoclim.utils.filter.savitzky_golay`, `pyleoclim.utils.filter.butterworth`, `pyleoclim.utils.filter.lanczos` and `pyleoclim.utils.filter.firwin` for the details
 
         Returns
         -------
@@ -919,6 +921,8 @@ class Series:
         pyleoclim.utils.filter.butterworth : Butterworth method
         pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
         pyleoclim.utils.filter.firwin : FIR filter design using the window method
+        pyleoclim.utils.filter.lanczos : lowpass filter via Lanczos resampling
+
 
         Examples
         --------
@@ -1001,26 +1005,30 @@ class Series:
             'savitzky-golay': filterutils.savitzky_golay,
             'butterworth': filterutils.butterworth,
             'firwin': filterutils.firwin,
+            'lanczos': filterutils.lanczos,
         }
 
         args = {}
 
-        if method in ['butterworth', 'firwin']:
+        if method in ['butterworth', 'firwin', 'lanczos']:
             if cutoff_freq is None:
                 if cutoff_scale is None:
                     raise ValueError('Please set the cutoff frequency or scale argument: "cutoff_freq" or "cutoff_scale".')
                 else:
-                    if np.isscalar(cutoff_scale) :
+                    if np.isscalar(cutoff_scale):
                         cutoff_freq = 1 / cutoff_scale
-                    elif len(cutoff_scale) == 2:
+                    elif len(cutoff_scale) == 2 and method in ['butterworth', 'firwin']:
                         cutoff_scale = np.array(cutoff_scale)
                         cutoff_freq = np.sort(1 / cutoff_scale)
                         cutoff_freq = list(cutoff_freq)
+                    elif len(cutoff_scale) > 1 and method == 'lanczos':
+                        raise ValueError('Lanczos filter requires a scalar input as cutoff scale/frequency')
                     else:
                         raise ValueError('Wrong cutoff_scale; should be either one float value (lowpass) or a list two float values (bandpass).')
 
         args['butterworth'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
         args['firwin'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
+        args['lanczos'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
         args[method].update(kwargs)
 
         new_val = method_func[method](y, **args[method])
@@ -3422,7 +3430,8 @@ class MultipleSeries:
             the filtering method
             - 'butterworth': the Butterworth method (default)
             - 'savitzky-golay': the Savitzky-Golay method
-            - 'firwin': FIR filter design using the window method, with default window as Hanning
+            - 'firwin': FIR filter design using the window method, with default window as Hamming
+            - 'lanczos': lowpass filter via Lanczos resampling
 
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
@@ -3450,6 +3459,7 @@ class MultipleSeries:
         pyleoclim.utils.filter.butterworth : Butterworth method
         pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
         pyleoclim.utils.filter.firwin : FIR filter design using the window method
+        pyleoclim.utils.filter.lanczos : lowpass filter via Lanczos resampling
 
         '''
 
@@ -4837,7 +4847,7 @@ class EnsembleSeries(MultipleSeries):
                       xlim=None, ylim=None, savefig_settings=None, ax=None, plot_legend=True,
                       curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
                       inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None, mute=False):
-        '''Plot EnsembleSeries as an envelope.
+        ''' Plot EnsembleSeries as an envelope.
 
         Parameters
         ----------
