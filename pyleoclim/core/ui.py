@@ -35,7 +35,7 @@ import cartopy.feature as cfeature
 
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
-from scipy import stats
+from scipy import stats, signal
 import warnings
 import os
 
@@ -712,8 +712,8 @@ class Series:
         return res
 
     def ssa(self, M=None, nMC=0, f=0.3, trunc = None, var_thresh=80):
-        '''Singular Spectrum Analysis
-
+        ''' Singular Spectrum Analysis
+        
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
         This implementation  uses the method of [1], with applications presented in [2].
         Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
@@ -735,7 +735,7 @@ class Series:
             Default is None, which bypasses truncation (K = M)
 
         var_thresh : float
-            variance threshold for reconstruction (only impcatful if trunc is set to 'var')
+            variance threshold for reconstruction (only impactful if trunc is set to 'var')
 
         Returns
         -------
@@ -881,21 +881,25 @@ class Series:
         res = tsutils.is_evenly_spaced(self.time)
         return res
 
-    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', settings=None):
-        ''' Filtering the timeseries
+    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
+        ''' Apply a filter to the timeseries
 
         Parameters
         ----------
 
-        method : str, {'savitzky-golay', 'butterworth'}
+        method : str, {'savitzky-golay', 'butterworth', 'firwin', 'lanczos'}
+
             the filtering method
-            - 'butterworth': the Butterworth method (default)
-            - 'savitzky-golay': the Savitzky-Golay method
+            - 'butterworth': a Butterworth filter (default = 4th order)
+            - 'savitzky-golay': Savitzky-Golay filter
+            - 'firwin': finite impulse response filter design using the window method, with default window as Hamming
+            - 'lanczos': Lanczos zero-phase filter 
 
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
             If a float, it is interpreted as a low-frequency cutoff (lowpass).
-            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
+            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass). 
+            Note that only the Butterworth option (default) currently supports bandpass filtering. 
 
         cutoff_scale : float or list
             cutoff_freq = 1 / cutoff_scale
@@ -903,9 +907,9 @@ class Series:
             If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
 
-        settings : dict
+        kwargs : dict
             a dictionary of the keyword arguments for the filtering method,
-            see `pyleoclim.utils.filter.savitzky_golay` and `pyleoclim.utils.filter.butterworth` for the details
+            see `pyleoclim.utils.filter.savitzky_golay`, `pyleoclim.utils.filter.butterworth`, `pyleoclim.utils.filter.lanczos` and `pyleoclim.utils.filter.firwin` for the details
 
         Returns
         -------
@@ -917,6 +921,9 @@ class Series:
 
         pyleoclim.utils.filter.butterworth : Butterworth method
         pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
+        pyleoclim.utils.filter.firwin : FIR filter design using the window method
+        pyleoclim.utils.filter.lanczos : lowpass filter via Lanczos resampling
+
 
         Examples
         --------
@@ -974,11 +981,21 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
+        Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:
+        .. ipython:: python
+            :okwarning:
+
+            fig, ax = ts.plot(mute=True, label='mix')
+            ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
+            ts2.plot(ax=ax, label='20 Hz')
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
+            @savefig ts_filter4.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+
         '''
         if not self.is_evenly_spaced():
             raise ValueError('This  method assumes evenly-spaced timeseries, while the input is not. Use the ".interp()", ".bin()" or ".gkernel()" methods prior to ".filter()".')
-
-        settings = {} if settings is None else settings.copy()
 
         new = self.copy()
         
@@ -988,24 +1005,32 @@ class Series:
         method_func = {
             'savitzky-golay': filterutils.savitzky_golay,
             'butterworth': filterutils.butterworth,
+            'firwin': filterutils.firwin,
+            'lanczos': filterutils.lanczos,
         }
 
         args = {}
 
-        if method == 'butterworth':
+        if method in ['butterworth', 'firwin', 'lanczos']:
             if cutoff_freq is None:
                 if cutoff_scale is None:
                     raise ValueError('Please set the cutoff frequency or scale argument: "cutoff_freq" or "cutoff_scale".')
                 else:
-                    if np.isscalar(cutoff_scale) :
+                    if np.isscalar(cutoff_scale):
                         cutoff_freq = 1 / cutoff_scale
-                    elif len(cutoff_scale) == 2:
+                    elif len(cutoff_scale) == 2 and method in ['butterworth', 'firwin']:
                         cutoff_scale = np.array(cutoff_scale)
                         cutoff_freq = np.sort(1 / cutoff_scale)
                         cutoff_freq = list(cutoff_freq)
+                    elif len(cutoff_scale) > 1 and method == 'lanczos':
+                        raise ValueError('Lanczos filter requires a scalar input as cutoff scale/frequency')
+                    else:
+                        raise ValueError('Wrong cutoff_scale; should be either one float value (lowpass) or a list two float values (bandpass).')
 
         args['butterworth'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
-        args[method].update(settings)
+        args['firwin'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
+        args['lanczos'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
+        args[method].update(kwargs)
 
         new_val = method_func[method](y, **args[method])
         new.value = new_val + mu # restore the mean
@@ -1431,6 +1456,51 @@ class Series:
         new.time = self.time[mask]
         new.value = self.value[mask]
         return new
+
+    def fill_na(self, timespan=None, dt=1):
+        ''' Fill NaNs into the timespan
+
+        Parameters
+        ----------
+
+        timespan : tuple or list
+            The list of time points for slicing, whose length must be 2.
+            For example, if timespan = [a, b], then the sliced output includes one segment [a, b].
+            If None, will use the start point and end point of the original timeseries
+
+        dt : float
+            The time spacing to fill the NaNs; default is 1.
+
+        Returns
+        -------
+
+        new : Series
+            The sliced Series object.
+
+        '''
+        new = self.copy()
+        if timespan is None:
+            start = np.min(self.time)
+            end = np.max(self.time)
+        else:
+            start = timespan[0]
+            end = timespan[-1]
+
+        new_time = np.arange(start, end+dt, dt)
+        new_value = np.empty(np.size(new_time))
+
+        for i, t in enumerate(new_time):
+            if t in self.time:
+                loc = list(self.time).index(t)
+                new_value[i] = self.value[loc]
+            else:
+                new_value[i] = np.nan
+
+        new.time = new_time
+        new.value = new_value
+
+        return new
+
 
     def detrend(self, method='emd', **kwargs):
         '''Detrend Series object
@@ -3351,16 +3421,18 @@ class MultipleSeries:
         new_ms.series_list = new_ts_list
         return new_ms
 
-    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', settings=None):
+    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
         ''' Filtering the timeseries in the MultipleSeries object
 
         Parameters
         ----------
 
-        method : str, {'savitzky-golay', 'butterworth'}
+        method : str, {'savitzky-golay', 'butterworth', 'firwin'}
             the filtering method
             - 'butterworth': the Butterworth method (default)
             - 'savitzky-golay': the Savitzky-Golay method
+            - 'firwin': FIR filter design using the window method, with default window as Hamming
+            - 'lanczos': lowpass filter via Lanczos resampling
 
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
@@ -3373,9 +3445,9 @@ class MultipleSeries:
             If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
 
-        settings : dict
+        kwargs : dict
             a dictionary of the keyword arguments for the filtering method,
-            see `pyleoclim.utils.filter.savitzky_golay` and `pyleoclim.utils.filter.butterworth` for the details
+            see `pyleoclim.utils.filter.savitzky_golay`, `pyleoclim.utils.filter.butterworth`, and `pyleoclim.utils.filter.firwin` for the details
 
         Returns
         -------
@@ -3387,6 +3459,8 @@ class MultipleSeries:
 
         pyleoclim.utils.filter.butterworth : Butterworth method
         pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
+        pyleoclim.utils.filter.firwin : FIR filter design using the window method
+        pyleoclim.utils.filter.lanczos : lowpass filter via Lanczos resampling
 
         '''
 
@@ -3394,7 +3468,7 @@ class MultipleSeries:
 
         new_tslist = []
         for ts in self.series_list:
-            new_tslist.append(ts.filter(cutoff_freq=cutoff_freq, cutoff_scale=cutoff_scale, method=method, settings=settings))
+            new_tslist.append(ts.filter(cutoff_freq=cutoff_freq, cutoff_scale=cutoff_scale, method=method, **kwargs))
 
         ms.series_list = new_tslist
 
@@ -3440,9 +3514,9 @@ class MultipleSeries:
         return ms
 
     def common_time(self, method='interp', common_step = 'max', start=None, stop = None, step=None, step_style = None, **kwargs):
-        ''' Aligns the time axes of a MultipleSeries object, via either binning
-        or interpolation. This is critical for workflows that need to assume a
-        common time axis for the group of series under consideration.
+        ''' Aligns the time axes of a MultipleSeries object, via binning
+        interpolation., or Gaussian kernel. Alignmentis critical for workflows
+        that need to assume a common time axis for the group of series under consideration.
 
 
         The common time axis is characterized by the following parameters:
@@ -3453,7 +3527,7 @@ class MultipleSeries:
 
         Optional arguments for binning or interpolation are those of the underling functions.
 
-        Note that by default, all MultipleSeries objects have prograde time grids
+        If the time axis are retrograde, this step makes them prograde.
 
         Parameters
         ----------
@@ -4626,7 +4700,7 @@ class EnsembleSeries(MultipleSeries):
                 value2 = target.value
                 time2 = target.time
 
-            ts2 = Series(time=time2, value=value2)
+            ts2 = Series(time=time2, value=value2, verbose=idx==0)
             corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res['r'])
             signif_list.append(corr_res['signif'])
@@ -4774,7 +4848,7 @@ class EnsembleSeries(MultipleSeries):
                       xlim=None, ylim=None, savefig_settings=None, ax=None, plot_legend=True,
                       curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
                       inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None, mute=False):
-        '''Plot EnsembleSeries as an envelope.
+        ''' Plot EnsembleSeries as an envelope.
 
         Parameters
         ----------
@@ -5174,7 +5248,7 @@ class MultiplePSD:
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, legend=True,
-             plot_kwargs=None, lgd_kwargs=None, mute=False):
+             colors=None, cmap=None, norm=None, plot_kwargs=None, lgd_kwargs=None, mute=False):
         '''Plot multiple PSD on the same plot
 
         Parameters
@@ -5195,6 +5269,16 @@ class MultiplePSD:
             Limits for the x-axis. The default is None.
         ylim : list, optional
             limits for the y-axis. The default is None.
+        colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
+            Colors for plotting.
+            If None, the plotting will cycle the 'tab10' colormap;
+            if only one color is specified, then all curves will be plotted with that single color;
+            if a list of colors are specified, then the plotting will cycle that color list.
+        cmap : str
+            The colormap to use when "colors" is None.
+        norm : matplotlib.colors.Normalize like
+            The nomorlization for the colormap.
+            If None, a linear normalization will be used.
         savefig_settings : dict, optional
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -5232,11 +5316,53 @@ class MultiplePSD:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
-        for psd in self.psd_list:
+        for idx, psd in enumerate(self.psd_list):
+
             tmp_plot_kwargs = {}
             if psd.plot_kwargs is not None:
                 tmp_plot_kwargs.update(psd.plot_kwargs)
+
             tmp_plot_kwargs.update(plot_kwargs)
+
+            # get color for each psd curve
+            use_clr = False
+
+            if 'color' not in tmp_plot_kwargs and 'c' not in 'tmp_plot_kwargs':
+                use_clr = True
+            
+            if 'color' in tmp_plot_kwargs and tmp_plot_kwargs['color'] is None:
+                use_clr = True
+
+            if 'c' in tmp_plot_kwargs and tmp_plot_kwargs['c'] is None:
+                use_clr = True
+
+            if colors is not None or cmap is not None:
+                use_clr = True
+
+            if use_clr:
+                # use the color based on the argument 'colors' or 'cmap'
+                if colors is None:
+                    cmap = 'tab10' if cmap is None else cmap
+                    cmap_obj = plt.get_cmap(cmap)
+                    if hasattr(cmap_obj, 'colors'):
+                        nc = len(cmap_obj.colors)
+                    else:
+                        nc = len(self.psd_list)
+
+                    if norm is None:
+                        norm = mpl.colors.Normalize(vmin=0, vmax=nc-1)
+
+                    clr = cmap_obj(norm(idx%nc))
+                elif type(colors) is str:
+                    clr = colors
+                elif type(colors) is list:
+                    nc = len(colors)
+                    clr = colors[idx%nc]
+                else:
+                    raise TypeError('"colors" should be a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)')
+
+                tmp_plot_kwargs.update({'color': clr})
+
             ax = psd.plot(
                 figsize=figsize, in_loglog=in_loglog, in_period=in_period, xlabel=xlabel, ylabel=ylabel,
                 title=title, xlim=xlim, ylim=ylim, savefig_settings=savefig_settings, ax=ax,
@@ -5795,10 +5921,21 @@ class Lipd:
 
         res=[]
 
-        for item in ts_list:
+        for idx, item in enumerate(ts_list):
             try:
                 res.append(LipdSeries(item))
             except:
+                if mode == 'paleo':
+                    txt = 'The timeseries from ' + str(idx) + ': ' +\
+                            item['dataSetName'] + ': ' + \
+                            item['paleoData_variableName'] + \
+                            ' could not be coerced into a LipdSeries object, passing'
+                else:
+                    txt = 'The timeseries from ' + str(idx) + ': ' +\
+                            item['dataSetName'] + ': ' + \
+                            item['chronData_variableName'] + \
+                            ' could not be coerced into a LipdSeries object, passing'  
+                warnings.warn(txt)
                 pass
 
         return res
