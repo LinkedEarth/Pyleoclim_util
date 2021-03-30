@@ -45,6 +45,7 @@ extensions = [
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
     'IPython.sphinxext.ipython_directive',
+    'sphinx_search.extension'
 ]
 
 plot_include_source = True
