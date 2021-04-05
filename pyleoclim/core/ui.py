@@ -41,6 +41,19 @@ import os
 
 import lipd as lpd
 
+def pval_format(p, threshold=0.01):
+    ''' Print p-value with proper format when p is close to 0
+    '''
+    if p < threshold:
+        if p == 0:
+            s = '< 0.01'
+        else:
+            n = int(np.ceil(np.log10(p)))
+            s = f'< {10**n}'
+    else:
+        s = f'{p:.2f}'
+
+    return s
 
 def dict2namedtuple(d):
     ''' Convert a dictionary to a namedtuple
@@ -5593,6 +5606,9 @@ class CorrEns:
     p: list
         the list of p-values
 
+    p_fmt_td: float
+        the threshold for p-value formating (0.01 by default, i.e., if p<0.01, will print "< 0.01" instead of "0")
+
     signif: list
         the list of significance without FDR
 
@@ -5611,9 +5627,10 @@ class CorrEns:
     pyleoclim.utils.correlation.corr_sig : Correlation function
     pyleoclim.utils.correlation.fdr : FDR function
     '''
-    def __init__(self, r, p, signif, signif_fdr, alpha):
+    def __init__(self, r, p, signif, signif_fdr, alpha, p_fmt_td=0.01):
         self.r = r
         self.p = p
+        self.p_fmt_td = p_fmt_td
         self.signif = signif
         self.signif_fdr = signif_fdr
         self.alpha = alpha
@@ -5623,9 +5640,13 @@ class CorrEns:
         Prints out the correlation results
         '''
 
+        pi_list = []
+        for pi in self.p:
+            pi_list.append(pval_format(pi, threshold=self.p_fmt_td))
+
         table = {
             'correlation': self.r,
-            'p-value': self.p,
+            'p-value': pi_list,
             f'signif. w/o FDR (α: {self.alpha})': self.signif,
             f'signif. w/ FDR (α: {self.alpha})': self.signif_fdr,
         }
@@ -5635,7 +5656,7 @@ class CorrEns:
         return f'Ensemble size: {len(self.r)}'
 
 
-    def plot(self, figsize=[4, 4], title=None, ax=None, savefig_settings=None, hist_kwargs=None, title_kwargs=None,
+    def plot(self, figsize=[4, 4], title=None, ax=None, savefig_settings=None, hist_kwargs=None, title_kwargs=None, xlim=None,
              clr_insignif=sns.xkcd_rgb['grey'], clr_signif=sns.xkcd_rgb['teal'], clr_signif_fdr=sns.xkcd_rgb['pale orange'],
              clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None, mute=False):
         ''' Plot the correlation ensembles
@@ -5667,6 +5688,9 @@ class CorrEns:
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+
+        xlim : list, optional
+            x-axis limits. The default is None.
 
         See Also
         --------
@@ -5710,6 +5734,9 @@ class CorrEns:
         ax.set_xlabel(r'$r$')
         ax.set_ylabel('Count')
         ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+
+        if xlim is not None:
+            ax.set_xlim(xlim)
 
 
         if title is not None:
