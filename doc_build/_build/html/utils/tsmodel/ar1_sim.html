@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ar1_sim (pyleoclim.utils.tsmodel.ar1_sim) &mdash; Pyleoclim 0.6.2beta documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/js/rtd_sphinx_search.min.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+            
+            <img src="../../_static/pyleoclim_insigna_full_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.2beta
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Working with Pyleoclim</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../core/ui.html">The Pyleoclim User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced functionalities</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting Involved</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../citation.html">Citing Pyleoclim</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>ar1_sim (pyleoclim.utils.tsmodel.ar1_sim)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/utils/tsmodel/ar1_sim.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="ar1-sim-pyleoclim-utils-tsmodel-ar1-sim">
+<span id="utils-ar1-sim"></span><h1>ar1_sim (pyleoclim.utils.tsmodel.ar1_sim)<a class="headerlink" href="#ar1-sim-pyleoclim-utils-tsmodel-ar1-sim" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="pyleoclim.utils.tsmodel.ar1_sim">
+<code class="sig-prename descclassname"><span class="pre">pyleoclim.utils.tsmodel.</span></code><code class="sig-name descname"><span class="pre">ar1_sim</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/tsmodel.html#ar1_sim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.utils.tsmodel.ar1_sim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from <cite>y</cite> and (if provided) <cite>t</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y</strong> (<em>array</em>) – a time series; NaNs not allowed</p></li>
+<li><p><strong>p</strong> (<em>int</em>) – column dimension (number of surrogates)</p></li>
+<li><p><strong>t</strong> (<em>array</em>) – the time axis of the series</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>ysim</strong> – n by p matrix of simulated AR(1) vector</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="ar1_model.html#pyleoclim.utils.tsmodel.ar1_model" title="pyleoclim.utils.tsmodel.ar1_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.tsmodel.ar1_model</span></code></a></dt><dd><p>Simulates a (possibly irregularly-sampled) AR(1) process with given decay constant tau, à la REDFIT.</p>
+</dd>
+<dt><a class="reference internal" href="ar1_fit.html#pyleoclim.utils.tsmodel.ar1_fit" title="pyleoclim.utils.tsmodel.ar1_fit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.tsmodel.ar1_fit</span></code></a></dt><dd><p>Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.</p>
+</dd>
+<dt><a class="reference internal" href="ar1_fit_evenly.html#pyleoclim.utils.tsmodel.ar1_fit_evenly" title="pyleoclim.utils.tsmodel.ar1_fit_evenly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.tsmodel.ar1_fit_evenly</span></code></a></dt><dd><p>Returns the lag-1 autocorrelation from AR(1) fit assuming even temporal spacing.</p>
+</dd>
+<dt><a class="reference internal" href="tau_estimation.html#pyleoclim.utils.tsmodel.tau_estimation" title="pyleoclim.utils.tsmodel.tau_estimation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.tsmodel.tau_estimation</span></code></a></dt><dd><p>Estimates the  temporal decay scale of an (un)evenly spaced time series.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
