@@ -41,15 +41,21 @@ import os
 
 import lipd as lpd
 
-def pval_format(p, threshold=0.01):
+def pval_format(p, threshold=0.01, style='float'):
     ''' Print p-value with proper format when p is close to 0
     '''
     if p < threshold:
         if p == 0:
-            s = '< 0.01'
+            if style == 'float':
+                s = '< 0.01'
+            else:
+                s = '< 10^{-2}'
         else:
             n = int(np.ceil(np.log10(p)))
-            s = f'< {10**n}'
+            if style == 'float':
+                s = f'< {10**n}'
+            else:
+                s = '< 10^{'+f'{n}'+'}'
     else:
         s = f'{p:.2f}'
 
