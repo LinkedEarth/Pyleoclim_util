@@ -41,21 +41,25 @@ import os
 
 import lipd as lpd
 
-def pval_format(p, threshold=0.01, style='float'):
+def pval_format(p, threshold=0.01, style='exp'):
     ''' Print p-value with proper format when p is close to 0
     '''
     if p < threshold:
         if p == 0:
             if style == 'float':
-                s = '< 0.01'
+                s = '< 0.0001'
+            elif style == 'exp':
+                s = '< 1e-4'
             else:
-                s = '< 10^{-2}'
+                raise ValueError('Wrong style.')
         else:
             n = int(np.ceil(np.log10(p)))
             if style == 'float':
                 s = f'< {10**n}'
+            elif style == 'exp':
+                s = f'< 1e{n}'
             else:
-                s = '< 10^{'+f'{n}'+'}'
+                raise ValueError('Wrong style.')
     else:
         s = f'{p:.2f}'
 
@@ -5615,6 +5619,9 @@ class CorrEns:
     p_fmt_td: float
         the threshold for p-value formating (0.01 by default, i.e., if p<0.01, will print "< 0.01" instead of "0")
 
+    p_fmt_style: str
+        the style for p-value formating (exponential notation by default)
+
     signif: list
         the list of significance without FDR
 
@@ -5633,10 +5640,11 @@ class CorrEns:
     pyleoclim.utils.correlation.corr_sig : Correlation function
     pyleoclim.utils.correlation.fdr : FDR function
     '''
-    def __init__(self, r, p, signif, signif_fdr, alpha, p_fmt_td=0.01):
+    def __init__(self, r, p, signif, signif_fdr, alpha, p_fmt_td=0.01, p_fmt_style='exp'):
         self.r = r
         self.p = p
         self.p_fmt_td = p_fmt_td
+        self.p_fmt_style = p_fmt_style
         self.signif = signif
         self.signif_fdr = signif_fdr
         self.alpha = alpha
@@ -5648,7 +5656,7 @@ class CorrEns:
 
         pi_list = []
         for pi in self.p:
-            pi_list.append(pval_format(pi, threshold=self.p_fmt_td))
+            pi_list.append(pval_format(pi, threshold=self.p_fmt_td, style=self.p_fmt_style))
 
         table = {
             'correlation': self.r,
