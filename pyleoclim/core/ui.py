@@ -41,15 +41,25 @@ import os
 
 import lipd as lpd
 
-def pval_format(p, threshold=0.01):
+def pval_format(p, threshold=0.01, style='exp'):
     ''' Print p-value with proper format when p is close to 0
     '''
     if p < threshold:
         if p == 0:
-            s = '< 0.01'
+            if style == 'float':
+                s = '< 0.0001'
+            elif style == 'exp':
+                s = '< 1e-4'
+            else:
+                raise ValueError('Wrong style.')
         else:
             n = int(np.ceil(np.log10(p)))
-            s = f'< {10**n}'
+            if style == 'float':
+                s = f'< {10**n}'
+            elif style == 'exp':
+                s = f'< 1e{n}'
+            else:
+                raise ValueError('Wrong style.')
     else:
         s = f'{p:.2f}'
 
@@ -1089,27 +1099,6 @@ class Series:
 
         plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
-
-
-        ax : matplotlib.axis, optional
-            A matplotlib axis
-
-        ylabel : str
-            Label for the count axis
-
-        vertical : {True,False}
-            Whether to flip the plot vertically
-
-        edgecolor : matplotlib.color
-            The color of the edges of the bar
-
-        mute : {True,False}
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-
-        plot_kwargs : dict
-            Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
-
 
         See also
         --------
@@ -5153,6 +5142,86 @@ class EnsembleSeries(MultipleSeries):
         # reset the plotting style
         mpl.rcParams.update(current_style)
         return fig, ax
+    
+    def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
+                 ax=None, ylabel='KDE', vertical=False, edgecolor='w',mute=False, **plot_kwargs):
+        """
+        Plots the distribution of the timeseries across ensembles
+
+        Parameters
+        ----------
+        figsize : list, optional
+            The size of the figure. The default is [10, 4].
+        title : str, optional
+            Title for the figure. The default is None.
+        savefig_settings : dict, optional
+            the dictionary of arguments for plt.savefig(); some notes below:
+              - "path" must be specified; it can be any existed or non-existed path,
+                with or without a suffix; if the suffix is not given in "path", it will follow "format"
+              - "format" can be one of {"pdf", "eps", "png", "ps"}. 
+            The default is None.
+        ax : matplotlib.axis, optional
+            A matplotlib axis. The default is None.
+        ylabel : str, optional
+            Label for the count axis. The default is 'KDE'.
+        vertical : {True,False}, optional
+            Whether to flip the plot vertically. The default is False.
+        edgecolor : matplotlib.color, optional
+            The color of the edges of the bar. The default is 'w'.
+        mute : {True,False}, optional
+           if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax. The default is False.
+        **plot_kwargs : dict
+            Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html.
+            
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+
+        """
+        
+        
+        # Turn the interactive mode off.
+        plt.ioff()
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        #make the data into a dataframe so we can flip the figure
+        time_label, value_label = self.make_labels()
+        
+        #append all the values together for the plot
+        for item in self.series_list:
+            try:
+                val=np.append(val,item.value)
+            except:
+                val=item.value
+        
+        if vertical == True:
+            data=pd.DataFrame({'value':val})
+            ax = sns.histplot(data=data, y="value", ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
+            ax.set_ylabel(value_label)
+            ax.set_xlabel(ylabel)
+        else:
+            ax = sns.histplot(val, ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
+            ax.set_xlabel(value_label)
+            ax.set_ylabel(ylabel)
+
+        if title is not None:
+            ax.set_title(title)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            else:
+                if not mute:
+                    plotting.showfig(fig)
+            return fig, ax
+        else:
+            return ax        
+        
 
 class MultiplePSD:
     ''' Object for multiple PSD.
@@ -5609,6 +5678,9 @@ class CorrEns:
     p_fmt_td: float
         the threshold for p-value formating (0.01 by default, i.e., if p<0.01, will print "< 0.01" instead of "0")
 
+    p_fmt_style: str
+        the style for p-value formating (exponential notation by default)
+
     signif: list
         the list of significance without FDR
 
@@ -5627,10 +5699,11 @@ class CorrEns:
     pyleoclim.utils.correlation.corr_sig : Correlation function
     pyleoclim.utils.correlation.fdr : FDR function
     '''
-    def __init__(self, r, p, signif, signif_fdr, alpha, p_fmt_td=0.01):
+    def __init__(self, r, p, signif, signif_fdr, alpha, p_fmt_td=0.01, p_fmt_style='exp'):
         self.r = r
         self.p = p
         self.p_fmt_td = p_fmt_td
+        self.p_fmt_style = p_fmt_style
         self.signif = signif
         self.signif_fdr = signif_fdr
         self.alpha = alpha
@@ -5642,7 +5715,7 @@ class CorrEns:
 
         pi_list = []
         for pi in self.p:
-            pi_list.append(pval_format(pi, threshold=self.p_fmt_td))
+            pi_list.append(pval_format(pi, threshold=self.p_fmt_td, style=self.p_fmt_style))
 
         table = {
             'correlation': self.r,
@@ -6337,7 +6410,12 @@ class LipdSeries(Series):
                 key.append(item)
         key=key[0]
         ds= np.array(self.lipd_ts[key],dtype='float64')
-        ys= np.array(self.lipd_ts['paleoData_values'],dtype='float64')
+        if 'paleoData_values' in self.lipd_ts.keys():
+            ys= np.array(self.lipd_ts['paleoData_values'],dtype='float64')
+        elif 'chronData_values' in self.lipd_ts.keys():
+            ys= np.array(self.lipd_ts['chronData_values'],dtype='float64')
+        else:
+            raise KeyError('no y-axis values available')
         #Remove NaNs
         ys_tmp=np.copy(ys)
         ds=ds[~np.isnan(ys_tmp)]
@@ -6664,7 +6742,7 @@ class LipdSeries(Series):
 
     def dashboard(self, figsize = [11,8], plt_kwargs=None, distplt_kwargs=None, spectral_kwargs=None,
                   spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None, metadata = True,
-                  savefig_settings=None, mute=False):
+                  savefig_settings=None, mute=False, ensemble = False, D=None):
         '''
 
 
@@ -6673,15 +6751,15 @@ class LipdSeries(Series):
         figsize : list, optional
             Figure size. The default is [11,8].
         plt_kwargs : dict, optional
-            Optional arguments for the timeseries plot. See Series.plot(). The default is None.
+            Optional arguments for the timeseries plot. See Series.plot() or EnsembleSeries.plot_envelope(). The default is None.
         distplt_kwargs : dict, optional
-            Optional arguments for the distribution plot. See Series.distplot(). The default is None.
+            Optional arguments for the distribution plot. See Series.distplot() or EnsembleSeries.plot_displot(). The default is None.
         spectral_kwargs : dict, optional
-            Optional arguments for the spectral method. Default is to use Lomb-Scargle method. See Series.spectral(). The default is None.
+            Optional arguments for the spectral method. Default is to use Lomb-Scargle method. See Series.spectral() or EnsembleSeries.spectral(). The default is None.
         spectralsignif_kwargs : dict, optional
-            Optional arguments to estimate the significance of the power spectrum. See PSD.signif_test. Note that the default number of simulations has been changed to 1000. The default is None.
+            Optional arguments to estimate the significance of the power spectrum. See PSD.signif_test. Note that we currently do not support significance testing for ensembles. The default is None.
         spectralfig_kwargs : dict, optional
-            Optional arguments for the power spectrum figure. See PSD.plot(). The default is None.
+            Optional arguments for the power spectrum figure. See PSD.plot() or MultiplePSD.plot_envelope(). The default is None.
         map_kwargs : dict, optional
             Optional arguments for the map. See LipdSeries.map(). The default is None.
         metadata : {True,False}, optional
@@ -6695,6 +6773,10 @@ class LipdSeries(Series):
         mute : {True,False}, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
+        ensemble : {True, False}, optional
+            If True, will return the dashboard in ensemble modes if ensembles are available
+        D : pyleoclim.Lipd
+            If asking for an ensemble plot, a pyleoclim.Lipd object must be provided
 
         Returns
         -------
@@ -6707,14 +6789,22 @@ class LipdSeries(Series):
         --------
 
         pyleoclim.Series.plot : plot a timeseries
+        
+        pyleoclim.EnsembleSeries.plot_envelope: Envelope plots for an ensemble
 
         pyleoclim.Series.distplot : plot a distribution of the timeseries
+        
+        pyleoclim.EnsembleSeries.distplot : plot a distribution of the timeseries across ensembles
 
         pyleoclim.Series.spectral : spectral analysis method.
+        
+        pyleoclim.MultipleSeries.spectral : spectral analysis method for multiple series.
 
         pyleoclim.PSD.signif_test : significance test for timeseries analysis
 
         pyleoclim.PSD.plot : plot power spectrum
+        
+        pyleoclim.MulitplePSD.plot : plot envelope of power spectrum
 
         pyleoclim.LipdSeries.map : map location of dataset
 
@@ -6737,13 +6827,23 @@ class LipdSeries(Series):
             pyleo.closefig(fig)
 
         '''
-
+        
+        if ensemble == True and D is None:
+            raise ValueError("When an ensemble dashboard is requested, the corresponsind Lipd object must be supplied")
+            
+        if ensemble == True:
+            warnings.warn('Some of the computation in ensemble mode can require a few minutes to complete.')
+            
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         res=self.getMetadata()
         # start plotting
         fig = plt.figure(figsize=figsize)
         gs = gridspec.GridSpec(2,5)
         gs.update(left=0,right=1.1)
+        
+        if ensemble==True:
+           ens = self.chronEnsembleToPaleo(D)
+           ensc = ens.common_time()
 
         ax={}
        # Plot the timeseries
@@ -6751,14 +6851,26 @@ class LipdSeries(Series):
         ax['ts'] = plt.subplot(gs[0,:-3])
         plt_kwargs.update({'ax':ax['ts']})
         # use the defaults if color/markers not specified
-        if 'marker' not in plt_kwargs.keys():
-            archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
-            plt_kwargs.update({'marker':self.plot_default[archiveType][1]})
-        if 'color' not in plt_kwargs.keys():
-            archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
-            plt_kwargs.update({'color':self.plot_default[archiveType][0]})
-        ax['ts'] = self.plot(**plt_kwargs)
+        if ensemble == False:
+            if 'marker' not in plt_kwargs.keys():
+                archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
+                plt_kwargs.update({'marker':self.plot_default[archiveType][1]})
+            if 'color' not in plt_kwargs.keys():
+                archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
+                plt_kwargs.update({'color':self.plot_default[archiveType][0]})
+            ax['ts'] = self.plot(**plt_kwargs)
+        elif ensemble == True:
+            if 'curve_clr' not in plt_kwargs.keys():
+                archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
+                plt_kwargs.update({'curve_clr':self.plot_default[archiveType][0]})
+            if 'shade_clr' not in plt_kwargs.keys():
+                archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
+                plt_kwargs.update({'shade_clr':self.plot_default[archiveType][0]})
+            ax['ts'] = ensc.plot_envelope(**plt_kwargs)
+        else:
+            raise ValueError("Invalid argument value for ensemble")
         ymin, ymax = ax['ts'].get_ylim()
+            
 
         #plot the distplot
         distplt_kwargs={} if distplt_kwargs is None else distplt_kwargs.copy()
@@ -6769,7 +6881,10 @@ class LipdSeries(Series):
         if 'color' not in distplt_kwargs.keys():
             archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
             distplt_kwargs.update({'color':self.plot_default[archiveType][0]})
-        ax['dts'] = self.distplot(**distplt_kwargs)
+        if ensemble == False:   
+            ax['dts'] = self.distplot(**distplt_kwargs)
+        elif ensemble == True:
+            ax['dts'] = ensc.distplot(**distplt_kwargs)
         ax['dts'].set_ylim([ymin,ymax])
         ax['dts'].set_yticklabels([])
         ax['dts'].set_ylabel('')
@@ -6867,26 +6982,43 @@ class LipdSeries(Series):
         if 'freq_method' in spectral_kwargs.keys():
             pass
         else:
-            spectral_kwargs.update({'freq_method':'lomb_scargle'})
-        ts_preprocess = self.detrend().standardize()
-        psd=ts_preprocess.spectral(**spectral_kwargs)
+            if ensemble == False:
+                spectral_kwargs.update({'freq_method':'lomb_scargle'})
+            elif ensemble == True:
+                pass
+        
+        ax['spec'] = plt.subplot(gs[1,1:3])
+        spectralfig_kwargs={} if spectralfig_kwargs is None else spectralfig_kwargs.copy()
+        spectralfig_kwargs.update({'ax':ax['spec']})
+        
+        if ensemble == False:
+            ts_preprocess = self.detrend().standardize()
+            psd = ts_preprocess.spectral(**spectral_kwargs)
 
-        #Significance test
-        spectralsignif_kwargs={} if spectralsignif_kwargs is None else spectralsignif_kwargs.copy()
-
-
-        psd_signif = psd.signif_test(**spectralsignif_kwargs)
+            #Significance test
+            spectralsignif_kwargs={} if spectralsignif_kwargs is None else spectralsignif_kwargs.copy()
+            psd_signif = psd.signif_test(**spectralsignif_kwargs)
+           #plot
+            if 'color' not in spectralfig_kwargs.keys():
+                archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
+                spectralfig_kwargs.update({'color':self.plot_default[archiveType][0]})
+            if 'signif_clr' not in spectralfig_kwargs.keys():
+                spectralfig_kwargs.update({'signif_clr':'grey'})
+            ax['spec'] = psd_signif.plot(**spectralfig_kwargs)
+        
+        elif ensemble == True:
+            if 'curve_clr' not in spectralfig_kwargs.keys():
+                archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
+                spectralfig_kwargs.update({'curve_clr':self.plot_default[archiveType][0]})
+            if 'shade_clr' not in spectralfig_kwargs.keys():
+                archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
+                spectralfig_kwargs.update({'shade_clr':self.plot_default[archiveType][0]})
+            psd = ensc.detrend().standardize().spectral(**spectral_kwargs)
+            #plot
+            ax['spec'] = psd.plot_envelope(**spectralfig_kwargs)
 
         #Make the plot
-        spectralfig_kwargs={} if spectralfig_kwargs is None else spectralfig_kwargs.copy()
-        if 'color' not in spectralfig_kwargs.keys():
-            archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
-            spectralfig_kwargs.update({'color':self.plot_default[archiveType][0]})
-        if 'signif_clr' not in spectralfig_kwargs.keys():
-            spectralfig_kwargs.update({'signif_clr':'grey'})
-        ax['spec'] = plt.subplot(gs[1,1:3])
-        spectralfig_kwargs.update({'ax':ax['spec']})
-        ax['spec'] = psd_signif.plot(**spectralfig_kwargs)
+        
 
         if metadata == True:
             # get metadata
