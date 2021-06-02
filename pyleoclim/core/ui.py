@@ -3563,7 +3563,7 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.utils.tsutils.bin : put timeseries values into equal bins (possibly leaving NaNs in).
+        pyleoclim.utils.tsutils.bin : put timeseries values into bins of equal size (possibly leaving NaNs in).
         pyleoclim.utils.tsutils.gkernel : coarse-graining using a Gaussian kernel
         pyleoclim.utils.tsutils.interp : interpolation onto a regular grid (default = linear interpolation)
         pyleoclim.utils.tsutils.grid_properties : infer grid properties
