@@ -2026,8 +2026,8 @@ class Series:
         Returns
         -------
 
-        corr_res_dict : dict
-            the result dictionary, containing
+        corr : pyleoclim.ui.Corr
+            the result object, containing
 
             - r : float
                 correlation coefficient
@@ -2036,6 +2036,8 @@ class Series:
             - signif : bool
                 true if significant; false otherwise
                 Note that signif = True if and only if p <= alpha.
+            - alpha : float
+                the significance level
 
         See also
         --------
@@ -3717,14 +3719,15 @@ class MultipleSeries:
         Returns
         -------
 
-        res : dict
-            Containing a list of the Pearson's correlation coefficient, associated significance and p-value.
+        corr : pyleoclim.ui.CorrEns
+            the result object, see `pyleoclim.ui.CorrEns`
 
         See also
         --------
 
         pyleoclim.utils.correlation.corr_sig : Correlation function
         pyleoclim.utils.correlation.fdr : FDR function
+        pyleoclim.ui.CorrEns : the correlation ensemble object
 
         Examples
         --------
@@ -4649,14 +4652,15 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
 
-        res : dict
-            Containing a list of the Pearson's correlation coefficient, associated significance and p-value.
+        corr : pyleoclim.ui.CorrEns
+            the result object, see `pyleoclim.ui.CorrEns`
 
         See also
         --------
 
         pyleoclim.utils.correlation.corr_sig : Correlation function
         pyleoclim.utils.correlation.fdr : FDR function
+        pyleoclim.ui.CorrEns : the correlation ensemble object
 
         Examples
         --------
@@ -5750,7 +5754,7 @@ class CorrEns:
         the list of significance with FDR
 
     alpha : float
-        The significance level (0.05 by default)
+        The significance level
 
     See also
     --------
