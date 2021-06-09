@@ -47,9 +47,9 @@ def pval_format(p, threshold=0.01, style='exp'):
     if p < threshold:
         if p == 0:
             if style == 'float':
-                s = '< 0.0001'
+                s = '< 0.000001'
             elif style == 'exp':
-                s = '< 1e-4'
+                s = '< 1e-6'
             else:
                 raise ValueError('Wrong style.')
         else:
@@ -2100,13 +2100,9 @@ class Series:
 
         corr_res = corrutils.corr_sig(value1, value2, **corr_args)
         signif = True if corr_res['signif'] == 1 else False
-        corr_res_dict = {
-            'r': corr_res['r'],
-            'p': corr_res['p'],
-            'signif': signif,
-            'alpha': alpha,
-        }
-        return corr_res_dict
+        corr = Corr(corr_res['r'], corr_res['p'], signif, alpha)
+
+        return corr
 
     def causality(self, target_series, method='liang', settings=None):
         ''' Perform causality analysis with the target timeseries
@@ -3682,7 +3678,7 @@ class MultipleSeries:
 
         return ms
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None, mute_pbar=False, seed=None):
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
 
         If the target Series is not specified, then the 1st member of MultipleSeries will be the target
@@ -3697,6 +3693,9 @@ class MultipleSeries:
 
         alpha : float
             The significance level (0.05 by default)
+
+        fdr_kwargs : dict
+            Parameters for the FDR function
 
         settings : dict
             Parameters for the correlation function, including:
@@ -3725,6 +3724,7 @@ class MultipleSeries:
         --------
 
         pyleoclim.utils.correlation.corr_sig : Correlation function
+        pyleoclim.utils.correlation.fdr : FDR function
 
         Examples
         --------
@@ -3734,6 +3734,7 @@ class MultipleSeries:
 
             import pyleoclim as pyleo
             from pyleoclim.utils.tsmodel import colored_noise
+            import numpy as np
 
             nt = 100
             t0 = np.arange(nt)
@@ -3768,21 +3769,25 @@ class MultipleSeries:
 
         for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):
             corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
-            r_list.append(corr_res['r'])
-            signif_list.append(corr_res['signif'])
-            p_list.append(corr_res['p'])
+            r_list.append(corr_res.r)
+            signif_list.append(corr_res.signif)
+            p_list.append(corr_res.p)
 
-        r_lsit = np.array(r_list)
-        p_lsit = np.array(p_list)
+        r_list = np.array(r_list)
+        signif_fdr_list = []
+        fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
+        args = {}
+        args.update(fdr_kwargs)
+        for i in range(np.size(signif_list)):
+            signif_fdr_list.append(False)
 
-        corr_res = {
-            'r': r_list,
-            'p': p_list,
-            'signif': signif_list,
-            'alpha': alpha,
-        }
+        fdr_res = corrutils.fdr(p_list, **fdr_kwargs)
+        if fdr_res is not None:
+            for i in fdr_res:
+                signif_fdr_list[i] = True
 
-        return corr_res
+        corr_ens = CorrEns(r_list, p_list, signif_list, signif_fdr_list, alpha)
+        return corr_ens
 
     # def mssa(self, M, MC=0, f=0.5):
     #     data = []
@@ -4660,6 +4665,7 @@ class EnsembleSeries(MultipleSeries):
             :okwarning:
 
             import pyleoclim as pyleo
+            import numpy as np
             from pyleoclim.utils.tsmodel import colored_noise
 
             nt = 100
@@ -4704,12 +4710,12 @@ class EnsembleSeries(MultipleSeries):
 
             ts2 = Series(time=time2, value=value2, verbose=idx==0)
             corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
-            r_list.append(corr_res['r'])
-            signif_list.append(corr_res['signif'])
-            p_list.append(corr_res['p'])
+            r_list.append(corr_res.r)
+            signif_list.append(corr_res.signif)
+            p_list.append(corr_res.p)
 
-        r_lsit = np.array(r_list)
-        p_lsit = np.array(p_list)
+        r_list = np.array(r_list)
+        p_list = np.array(p_list)
 
         signif_fdr_list = []
         fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
@@ -5661,7 +5667,60 @@ class MultipleScalogram:
         scals = MultipleScalogram(scalogram_list=scal_list)
         return scals
 
+ 
+class Corr:
+    ''' The object for correlation result in order to format the print message
 
+    Parameters
+    ----------
+
+    r: float
+        the correlation coefficient
+
+    p: float
+        the p-value
+
+    p_fmt_td: float
+        the threshold for p-value formating (0.01 by default, i.e., if p<0.01, will print "< 0.01" instead of "0")
+
+    p_fmt_style: str
+        the style for p-value formating (exponential notation by default)
+
+    signif: bool
+        the significance
+
+    alpha : float
+        The significance level (0.05 by default)
+
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Correlation function
+    pyleoclim.utils.correlation.fdr : FDR function
+    '''
+    def __init__(self, r, p, signif, alpha, p_fmt_td=0.01, p_fmt_style='exp'):
+        self.r = r
+        self.p = p
+        self.p_fmt_td = p_fmt_td
+        self.p_fmt_style = p_fmt_style
+        self.signif = signif
+        self.alpha = alpha
+
+    def __str__(self):
+        '''
+        Prints out the correlation results
+        '''
+        formatted_p = pval_format(self.p, threshold=self.p_fmt_td, style=self.p_fmt_style)
+
+        table = {
+            'correlation': [self.r],
+            'p-value': [formatted_p],
+            f'signif. (α: {self.alpha})': [self.signif],
+        }
+
+        msg = print(tabulate(table, headers='keys'))
+
+        return ''
 
 class CorrEns:
     ''' Correlation Ensemble
