@@ -700,25 +700,25 @@ class TestUISeriesWavelet():
         freq = np.linspace(1/500, 1/2, 20)
         scal = ts.wavelet(method=wave_method, settings={'freq': freq})
 
-class TestUISeriesSsa():
-    ''' Test the SSA functionalities
-    '''
+# class TestUISeriesSsa():
+#     ''' Test the SSA functionalities
+#     '''
 
-    def test_ssa_t0(self):
-        ''' Test Series.ssa() with available methods using default arguments
-        '''
-        t, v = gen_colored_noise(nt=500, alpha=1.0)
-        ts = pyleo.Series(time=t, value=v)
-        res = ts.ssa()
+#     def test_ssa_t0(self):
+#         ''' Test Series.ssa() with available methods using default arguments
+#         '''
+#         t, v = gen_colored_noise(nt=500, alpha=1.0)
+#         ts = pyleo.Series(time=t, value=v)
+#         res = ts.ssa()
 
-    def test_ssa_t1(self):
-        '''Test Series.ssa() with var truncation
-        '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=1.0)
-        ts = pyleo.Series(time=t, value=v)
+#     def test_ssa_t1(self):
+#         '''Test Series.ssa() with var truncation
+#         '''
+#         alpha = 1
+#         t, v = gen_colored_noise(nt=500, alpha=1.0)
+#         ts = pyleo.Series(time=t, value=v)
 
-        res = ts.ssa(trunc='var')
+#         res = ts.ssa(trunc='var')
 
 class TestUISeriesSsa():
     ''' Test the SSA functionalities
@@ -748,7 +748,8 @@ class TestUISeriesSsa():
         t, v = gen_colored_noise(nt=500, alpha=1.0)
         ts = pyleo.Series(time=t, value=v)
 
-        res = ts.ssa(M=60, nMC=10, trunc='mc-ssa')
+        res = ts.ssa(M=60, nMC=10, trunc='mcssa')
+        res.screeplot()
 
     def test_ssa_t3(self):
         '''Test Series.ssa() with Kaiser truncation
@@ -757,6 +758,15 @@ class TestUISeriesSsa():
         t, v = gen_colored_noise(nt=500, alpha=1.0)
         ts  = pyleo.Series(time=t, value=v)
         res = ts.ssa(trunc='kaiser')
+        
+    def test_ssa_t4(self):
+        '''Test Series.ssa() on Allen&Smith dataset
+        '''
+        df = pd.read_csv('../../example_data/mratest.txt',delim_whitespace=True,names=['Total','Signal','Noise'])
+        mra = pyleo.Series(time=df.index, value=df['Total'], value_name='Allen&Smith test data', time_name='Time', time_unit='yr')
+        mraSsa = mra.ssa(nMC=10)
+        mraSsa.screeplot()
+        mraSsa.modeplot(mode=1)    
 
 class TestUiSeriesPlot:
     '''Test for Series.plot()

@@ -366,7 +366,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     trunc : str
         if present, truncates the expansion to a level K < M owing to one of 3 criteria:
             (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
-            (2) 'mc-ssa': Monte-Carlo SSA (use modes above the 95% threshold)
+            (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% threshold)
             (3) 'var': first K modes that explain at least var_thresh % of the variance.
         Default is None, which bypasses truncation (K = M)
         
@@ -376,22 +376,21 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     Returns
     -------
 
-    res : dict
-        Containing:
+    res : dict containing:
 
-        - eigvals : (M, ) array of eigenvalue spectrum
+        - eigvals : (M, ) array of eigenvalues
 
-        - eigvecs : Matrix of temporal eigenvectors
+        - eigvecs : (M, M) Matrix of temporal eigenvectors (T-EOFs)
 
-        - PC : (N - M + 1, M) array of principal components
+        - PC : (N - M + 1, M) array of principal components (T-PCs)
 
         - RCmat : (N,  M) array of reconstructed components
         
-        - RCseries : (N,) reconstructed series
+        - RCseries : (N,) reconstructed series, with mean and variance restored
 
         - pctvar: (M, ) array of the fraction of variance (%) associated with each mode
 
-        - eigvals_q : (M, ) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
+        - eigvals_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
 
     References
     ----------
@@ -469,13 +468,15 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         eigvals_q = np.empty((M,2))
         eigvals_q[:,0] = np.percentile(eigvals_R, 5, axis=1)
         eigvals_q[:,1] = np.percentile(eigvals_R, 95, axis=1)
-        mode_idx = np.where(eigvals>=eigvals_q[:,1])[0] # modes to retain
     else:
         eigvals_q = None
 
     if trunc == 'mcssa':
         if nMC == 0:
             raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
+        else:
+            mode_idx = np.where(eigvals>=eigvals_q[:,1])[0] # modes to retain
+            
     elif trunc == 'kaiser':
         mval = np.median(eigvals) # median eigenvalues
         mode_idx = np.where(eigvals>=mval)[0]
