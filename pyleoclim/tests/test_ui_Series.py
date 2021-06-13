@@ -444,7 +444,7 @@ class TestUiSeriesCorrelation:
         ts2 = pyleo.Series(time=t, value=v2)
 
         corr_res = ts1.correlation(ts2, settings={'method': corr_method})
-        r = corr_res['r']
+        r = corr_res.r
         assert np.abs(r-1) < eps
 
     @pytest.mark.parametrize('corr_method', ['ttest', 'isopersistent', 'isospectral'])
@@ -461,7 +461,7 @@ class TestUiSeriesCorrelation:
         ts2 = pyleo.Series(time=t, value=v2)
 
         corr_res = ts1.correlation(ts2, settings={'method': corr_method})
-        r = corr_res['r']
+        r = corr_res.r
         assert np.abs(r-0) < eps
 
     @pytest.mark.parametrize('corr_method', ['ttest', 'isopersistent', 'isospectral'])
@@ -485,13 +485,13 @@ class TestUiSeriesCorrelation:
         ts1_evenly = pyleo.Series(time=t, value=air)
         ts2_evenly = pyleo.Series(time=t, value=nino)
         corr_res_evenly = ts1_evenly.correlation(ts2_evenly, settings={'method': corr_method})
-        r_evenly = corr_res_evenly['r']
+        r_evenly = corr_res_evenly.r
 
         ts1 = pyleo.Series(time=air_time_unevenly, value=air_value_unevenly)
         ts2 = pyleo.Series(time=nino_time_unevenly, value=nino_value_unevenly)
 
         corr_res = ts1.correlation(ts2, settings={'method': corr_method}, common_time_kwargs={'method': 'interp'})
-        r = corr_res['r']
+        r = corr_res.r
         assert np.abs(r-r_evenly) < eps
 
 class TestUiSeriesCausality:

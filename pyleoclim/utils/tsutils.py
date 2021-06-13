@@ -631,8 +631,8 @@ def sort_ts(ys, ts, verbose=False):
         Independent variable, sorted in ascending order
 
     '''
-    ys = np.asarray(ys, dtype=np.float)
-    ts = np.asarray(ts, dtype=np.float)
+    ys = np.asarray(ys, dtype=float)
+    ts = np.asarray(ts, dtype=float)
     assert ys.size == ts.size, 'time and value arrays must be of equal length'
 
     # sort the time series so that the time axis will be ascending
