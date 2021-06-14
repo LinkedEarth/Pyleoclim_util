@@ -128,6 +128,7 @@ class TestUiSeriesSpectral:
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
         '''
+        np.random.seed(2333)  # fix the random seed to avoid random failures
         alpha = 1
         t, v = gen_colored_noise(nt=1000, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
@@ -762,7 +763,7 @@ class TestUISeriesSsa():
     def test_ssa_t4(self):
         '''Test Series.ssa() on Allen&Smith dataset
         '''
-        df = pd.read_csv('../../example_data/mratest.txt',delim_whitespace=True,names=['Total','Signal','Noise'])
+        df = pd.read_csv(os.path.join(test_dirpath,'../../example_data/mratest.txt'),delim_whitespace=True,names=['Total','Signal','Noise'])
         mra = pyleo.Series(time=df.index, value=df['Total'], value_name='Allen&Smith test data', time_name='Time', time_unit='yr')
         mraSsa = mra.ssa(nMC=10)
         mraSsa.screeplot()

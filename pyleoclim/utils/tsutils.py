@@ -595,8 +595,8 @@ def dropna(ys, ts, verbose=False):
         The time axis of the time series without nans
 
     '''
-    ys = np.asarray(ys, dtype=np.float)
-    ts = np.asarray(ts, dtype=np.float)
+    ys = np.asarray(ys, dtype=float)
+    ts = np.asarray(ts, dtype=float)
     assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
 
     ys_tmp = np.copy(ys)
@@ -666,8 +666,8 @@ def reduce_duplicated_timestamps(ys, ts, verbose=False):
         Independent variable, with duplicated timestamps reduced by averaging the values
 
     '''
-    ys = np.asarray(ys, dtype=np.float)
-    ts = np.asarray(ts, dtype=np.float)
+    ys = np.asarray(ys, dtype=float)
+    ts = np.asarray(ts, dtype=float)
     assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
 
     if len(ts) != len(set(ts)):
@@ -709,8 +709,8 @@ def annualize(ys, ts):
               The time axis of the annualized time series
 
     '''
-    ys = np.asarray(ys, dtype=np.float)
-    ts = np.asarray(ts, dtype=np.float)
+    ys = np.asarray(ys, dtype=float)
+    ts = np.asarray(ts, dtype=float)
     assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
 
     year_int = list(set(np.floor(ts)))
