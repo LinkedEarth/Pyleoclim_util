@@ -3640,14 +3640,15 @@ class MultipleSeries:
         if start > stop:
             raise ValueError('At least one series has no common time interval with others. Please check the time axis of the series.')
 
-        if common_step == 'mean':
-            step = gp[:,2].mean()
-        elif common_step == 'max':
-            step = gp[:,2].max()
-        elif common_step == 'mode':
-            step = stats.mode(gp[:,2])[0][0]
-        else:
-            step = np.median(gp[:,2])
+        if step is None:
+            if common_step == 'mean':
+                step = gp[:,2].mean()
+            elif common_step == 'max':
+                step = gp[:,2].max()
+            elif common_step == 'mode':
+                step = stats.mode(gp[:,2])[0][0]
+            else:
+                step = np.median(gp[:,2])
 
         ms = self.copy()
 

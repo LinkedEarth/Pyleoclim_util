@@ -339,7 +339,7 @@ def mssa(ys, M=None, nMC=0, f=0.3):
 
     return res
 
-def     (y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
+def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     '''Singular spectrum analysis
 
     Nonparametric eigendecomposition of timeseries into orthogonal oscillations.
