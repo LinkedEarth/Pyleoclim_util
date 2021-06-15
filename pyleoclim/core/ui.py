@@ -900,7 +900,7 @@ class Series:
         method : str, {'savitzky-golay', 'butterworth', 'firwin', 'lanczos'}
 
             the filtering method
-            - 'butterworth': a Butterworth filter (default = 4th order)
+            - 'butterworth': a Butterworth filter (default = 3rd order)
             - 'savitzky-golay': Savitzky-Golay filter
             - 'firwin': finite impulse response filter design using the window method, with default window as Hamming
             - 'lanczos': Lanczos zero-phase filter 
@@ -1011,6 +1011,8 @@ class Series:
         
         mu = np.mean(self.value) # extract the mean
         y = self.value - mu
+        
+        fs = 1/np.mean(np.diff(self.time))
 
         method_func = {
             'savitzky-golay': filterutils.savitzky_golay,
@@ -1036,11 +1038,22 @@ class Series:
                         raise ValueError('Lanczos filter requires a scalar input as cutoff scale/frequency')
                     else:
                         raise ValueError('Wrong cutoff_scale; should be either one float value (lowpass) or a list two float values (bandpass).')
-
-        args['butterworth'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
-        args['firwin'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
-        args['lanczos'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
-        args[method].update(kwargs)
+            # assign optional arguments            
+            args['butterworth'] = {'fc': cutoff_freq, 'fs': fs}
+            args['firwin'] = {'fc': cutoff_freq, 'fs': fs}
+            args['lanczos'] = {'fc': cutoff_freq, 'fs': fs}
+        
+        else: # for Savitzky-Golay only
+            if cutoff_scale and cutoff_freq is None:
+                raise ValueError('No cutoff_scale or cutoff_freq argument provided')
+            elif cutoff_freq is not None:
+                cutoff_scale = 1 / cutoff_freq
+            
+            window_length = int(cutoff_scale*fs)
+            if window_length % 2 == 0:
+                window_length += 1   # window length needs to be an odd integer
+            args['savitzky-golay'] = {'window_length': window_length}
+            args[method].update(kwargs)
 
         new_val = method_func[method](y, **args[method])
         new.value = new_val + mu # restore the mean
