@@ -47,9 +47,9 @@ def pval_format(p, threshold=0.01, style='exp'):
     if p < threshold:
         if p == 0:
             if style == 'float':
-                s = '< 0.0001'
+                s = '< 0.000001'
             elif style == 'exp':
-                s = '< 1e-4'
+                s = '< 1e-6'
             else:
                 raise ValueError('Wrong style.')
         else:
@@ -762,19 +762,23 @@ class Series:
 
         Returns
         -------
-        res : dict
-            Containing:
+        res : object of the SsaRes class containing:
 
-            - eigval : (M, 1) array of eigenvalue spectrum of length r, the number of SSA modes. As in Principal Component Analysis, eigenvaluesare closely related to the fraction of variance accounted for ("explained", a common but not-so-helpful term) by each mode.
+        - eigvals : (M, ) array of eigenvalues
 
-            - eig_vec : is a matrix of the temporal eigenvectors (T-EOFs), i.e. the temporal patterns that explain most of the variations in the original series.
+        - eigvecs : (M, M) Matrix of temporal eigenvectors (T-EOFs)
 
-            - PC : (N - M + 1, M) array of principal components, i.e. the loadings that, convolved with the T-EOFs, produce the reconstructed components, or RCs
+        - PC : (N - M + 1, M) array of principal components (T-PCs)
 
-            - RC : (N,  M) array of reconstructed components, One can think of each RC as the contribution of each mode to the timeseries, weighted by their eigenvalue (loosely speaking, their "amplitude"). Summing over all columns of RC recovers the original series. (synthesis, the reciprocal operation of analysis).
+        - RCmat : (N,  M) array of reconstructed components
+        
+        - RCseries : (N,) reconstructed series, with mean and variance restored
 
-            - eigval_q : (M, 2) array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC >0 ]
+        - pctvar: (M, ) array of the fraction of variance (%) associated with each mode
 
+        - eigvals_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
+        
+            
         Examples
         --------
 
@@ -801,24 +805,11 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-
-            import matplotlib.pyplot as plt
-            import matplotlib.gridspec as gridspec
-            import numpy as np
-
-            d  = nino_ssa['eigvals'] # extract eigenvalue vector
-            M  = len(d)  # infer window size
-            de = d*np.sqrt(2/(M-1))
             var_pct = nino_ssa['pctvar'] # extract the fraction of variance attributable to each mode
 
             # plot eigenvalues
-            r = 20
-            rk = np.arange(0,r)+1
-            fig, ax = plt.subplots()
-            ax.errorbar(rk,d[:r],yerr=de[:r],label='SSA eigenvalues w/ 95% CI')
-            ax.set_title('Scree plot of SSA eigenvalues')
-            ax.set_xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
-            ax.legend(loc='upper right')
+           
+            nino_ssa.screeplot()
             @savefig ts_eigen.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
@@ -834,14 +825,14 @@ class Series:
         .. ipython:: python
             :okwarning:
 
-            print(var_pct[15:].sum()*100)
+            print(nino_ssa.var_pct[15:].sum()*100)
 
         That is, over 95% of the variance is in the first 15 modes. That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
 
         .. ipython:: python
             :okwarning:
 
-            RCk = nino_ssa['RCmat'][:,:14].sum(axis=1)
+            RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
             fig, ax = ts.plot(title='ONI',mute=True) # we mute the first call to only get the plot with 2 lines
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
@@ -868,19 +859,7 @@ class Series:
         .. ipython:: python
             :okwarning:
 
-            d  = nino_mcssa['eigvals'] # extract eigenvalue vector
-            de = d*np.sqrt(2/(M-1))
-            du = nino_mcssa['eigvals_q'][:,0]  # extract upper quantile of MC-SSA eigenvalues
-            dl = nino_mcssa['eigvals_q'][:,1]  # extract lower quantile of MC-SSA eigenvalues
-
-            # plot eigenvalues
-            rk = np.arange(0,20)+1
-            fig = plt.figure()
-            plt.fill_between(rk, dl[:20], du[:20], color='silver', alpha=0.5, label='MC-SSA 95% CI')
-            plt.errorbar(rk,d[:20],yerr=de[:20],label='SSA eigenvalues w/ 95% CI')
-            plt.title('Scree plot of SSA eigenvalues, w/ MC-SSA bounds')
-            plt.xlabel('Rank $i$'); plt.ylabel(r'$\lambda_i$')
-            plt.legend(loc='upper right')
+            nino_mcssa.screeplot()
             @savefig scree_nmc.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
@@ -890,7 +869,15 @@ class Series:
         '''
 
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
-        return res
+        
+                
+        resc = SsaRes(name=self.value_name, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
+                        pctvar = res['pctvar'], PC = res['PC'], RCmat = res['RCmat'], 
+                        RCseries=res['RCseries'], mode_idx=res['mode_idx'])
+        if nMC >= 0:
+           resc.eigvals_q=res['eigvals_q'] # assign eigenvalue quantiles if Monte-Carlo SSA was called
+        
+        return resc
 
     def is_evenly_spaced(self):
         ''' Check if the timeseries is evenly-spaced
@@ -913,7 +900,7 @@ class Series:
         method : str, {'savitzky-golay', 'butterworth', 'firwin', 'lanczos'}
 
             the filtering method
-            - 'butterworth': a Butterworth filter (default = 4th order)
+            - 'butterworth': a Butterworth filter (default = 3rd order)
             - 'savitzky-golay': Savitzky-Golay filter
             - 'firwin': finite impulse response filter design using the window method, with default window as Hamming
             - 'lanczos': Lanczos zero-phase filter 
@@ -1024,6 +1011,8 @@ class Series:
         
         mu = np.mean(self.value) # extract the mean
         y = self.value - mu
+        
+        fs = 1/np.mean(np.diff(self.time))
 
         method_func = {
             'savitzky-golay': filterutils.savitzky_golay,
@@ -1049,11 +1038,22 @@ class Series:
                         raise ValueError('Lanczos filter requires a scalar input as cutoff scale/frequency')
                     else:
                         raise ValueError('Wrong cutoff_scale; should be either one float value (lowpass) or a list two float values (bandpass).')
-
-        args['butterworth'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
-        args['firwin'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
-        args['lanczos'] = {'fc': cutoff_freq, 'fs': 1/np.mean(np.diff(self.time))}
-        args[method].update(kwargs)
+            # assign optional arguments            
+            args['butterworth'] = {'fc': cutoff_freq, 'fs': fs}
+            args['firwin'] = {'fc': cutoff_freq, 'fs': fs}
+            args['lanczos'] = {'fc': cutoff_freq, 'fs': fs}
+        
+        else: # for Savitzky-Golay only
+            if cutoff_scale and cutoff_freq is None:
+                raise ValueError('No cutoff_scale or cutoff_freq argument provided')
+            elif cutoff_freq is not None:
+                cutoff_scale = 1 / cutoff_freq
+            
+            window_length = int(cutoff_scale*fs)
+            if window_length % 2 == 0:
+                window_length += 1   # window length needs to be an odd integer
+            args['savitzky-golay'] = {'window_length': window_length}
+            args[method].update(kwargs)
 
         new_val = method_func[method](y, **args[method])
         new.value = new_val + mu # restore the mean
@@ -2026,8 +2026,8 @@ class Series:
         Returns
         -------
 
-        corr_res_dict : dict
-            the result dictionary, containing
+        corr : pyleoclim.ui.Corr
+            the result object, containing
 
             - r : float
                 correlation coefficient
@@ -2036,6 +2036,8 @@ class Series:
             - signif : bool
                 true if significant; false otherwise
                 Note that signif = True if and only if p <= alpha.
+            - alpha : float
+                the significance level
 
         See also
         --------
@@ -2071,7 +2073,7 @@ class Series:
             print(corr_res)
 
             # using the method "isopersistent"
-            # set an arbitrary randome seed to fix the result
+            # set an arbitrary random seed to fix the result
             corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'isopersistent'}, seed=2333)
             print(corr_res)
         '''
@@ -2100,13 +2102,9 @@ class Series:
 
         corr_res = corrutils.corr_sig(value1, value2, **corr_args)
         signif = True if corr_res['signif'] == 1 else False
-        corr_res_dict = {
-            'r': corr_res['r'],
-            'p': corr_res['p'],
-            'signif': signif,
-            'alpha': alpha,
-        }
-        return corr_res_dict
+        corr = Corr(corr_res['r'], corr_res['p'], signif, alpha)
+
+        return corr
 
     def causality(self, target_series, method='liang', settings=None):
         ''' Perform causality analysis with the target timeseries
@@ -3563,7 +3561,7 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.utils.tsutils.bin : put timeseries values into equal bins (possibly leaving NaNs in).
+        pyleoclim.utils.tsutils.bin : put timeseries values into bins of equal size (possibly leaving NaNs in).
         pyleoclim.utils.tsutils.gkernel : coarse-graining using a Gaussian kernel
         pyleoclim.utils.tsutils.interp : interpolation onto a regular grid (default = linear interpolation)
         pyleoclim.utils.tsutils.grid_properties : infer grid properties
@@ -3642,14 +3640,15 @@ class MultipleSeries:
         if start > stop:
             raise ValueError('At least one series has no common time interval with others. Please check the time axis of the series.')
 
-        if common_step == 'mean':
-            step = gp[:,2].mean()
-        elif common_step == 'max':
-            step = gp[:,2].max()
-        elif common_step == 'mode':
-            step = stats.mode(gp[:,2])[0][0]
-        else:
-            step = np.median(gp[:,2])
+        if step is None:
+            if common_step == 'mean':
+                step = gp[:,2].mean()
+            elif common_step == 'max':
+                step = gp[:,2].max()
+            elif common_step == 'mode':
+                step = stats.mode(gp[:,2])[0][0]
+            else:
+                step = np.median(gp[:,2])
 
         ms = self.copy()
 
@@ -3682,7 +3681,7 @@ class MultipleSeries:
 
         return ms
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None, mute_pbar=False, seed=None):
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
 
         If the target Series is not specified, then the 1st member of MultipleSeries will be the target
@@ -3697,6 +3696,9 @@ class MultipleSeries:
 
         alpha : float
             The significance level (0.05 by default)
+
+        fdr_kwargs : dict
+            Parameters for the FDR function
 
         settings : dict
             Parameters for the correlation function, including:
@@ -3718,13 +3720,15 @@ class MultipleSeries:
         Returns
         -------
 
-        res : dict
-            Containing a list of the Pearson's correlation coefficient, associated significance and p-value.
+        corr : pyleoclim.ui.CorrEns
+            the result object, see `pyleoclim.ui.CorrEns`
 
         See also
         --------
 
         pyleoclim.utils.correlation.corr_sig : Correlation function
+        pyleoclim.utils.correlation.fdr : FDR function
+        pyleoclim.ui.CorrEns : the correlation ensemble object
 
         Examples
         --------
@@ -3734,6 +3738,7 @@ class MultipleSeries:
 
             import pyleoclim as pyleo
             from pyleoclim.utils.tsmodel import colored_noise
+            import numpy as np
 
             nt = 100
             t0 = np.arange(nt)
@@ -3768,21 +3773,25 @@ class MultipleSeries:
 
         for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):
             corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
-            r_list.append(corr_res['r'])
-            signif_list.append(corr_res['signif'])
-            p_list.append(corr_res['p'])
+            r_list.append(corr_res.r)
+            signif_list.append(corr_res.signif)
+            p_list.append(corr_res.p)
 
-        r_lsit = np.array(r_list)
-        p_lsit = np.array(p_list)
+        r_list = np.array(r_list)
+        signif_fdr_list = []
+        fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
+        args = {}
+        args.update(fdr_kwargs)
+        for i in range(np.size(signif_list)):
+            signif_fdr_list.append(False)
 
-        corr_res = {
-            'r': r_list,
-            'p': p_list,
-            'signif': signif_list,
-            'alpha': alpha,
-        }
+        fdr_res = corrutils.fdr(p_list, **fdr_kwargs)
+        if fdr_res is not None:
+            for i in fdr_res:
+                signif_fdr_list[i] = True
 
-        return corr_res
+        corr_ens = CorrEns(r_list, p_list, signif_list, signif_fdr_list, alpha)
+        return corr_ens
 
     # def mssa(self, M, MC=0, f=0.5):
     #     data = []
@@ -4644,14 +4653,15 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
 
-        res : dict
-            Containing a list of the Pearson's correlation coefficient, associated significance and p-value.
+        corr : pyleoclim.ui.CorrEns
+            the result object, see `pyleoclim.ui.CorrEns`
 
         See also
         --------
 
         pyleoclim.utils.correlation.corr_sig : Correlation function
         pyleoclim.utils.correlation.fdr : FDR function
+        pyleoclim.ui.CorrEns : the correlation ensemble object
 
         Examples
         --------
@@ -4660,6 +4670,7 @@ class EnsembleSeries(MultipleSeries):
             :okwarning:
 
             import pyleoclim as pyleo
+            import numpy as np
             from pyleoclim.utils.tsmodel import colored_noise
 
             nt = 100
@@ -4704,12 +4715,12 @@ class EnsembleSeries(MultipleSeries):
 
             ts2 = Series(time=time2, value=value2, verbose=idx==0)
             corr_res = ts1.correlation(ts2, timespan=timespan, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
-            r_list.append(corr_res['r'])
-            signif_list.append(corr_res['signif'])
-            p_list.append(corr_res['p'])
+            r_list.append(corr_res.r)
+            signif_list.append(corr_res.signif)
+            p_list.append(corr_res.p)
 
-        r_lsit = np.array(r_list)
-        p_lsit = np.array(p_list)
+        r_list = np.array(r_list)
+        p_list = np.array(p_list)
 
         signif_fdr_list = []
         fdr_kwargs = {} if fdr_kwargs is None else fdr_kwargs.copy()
@@ -5661,7 +5672,60 @@ class MultipleScalogram:
         scals = MultipleScalogram(scalogram_list=scal_list)
         return scals
 
+ 
+class Corr:
+    ''' The object for correlation result in order to format the print message
 
+    Parameters
+    ----------
+
+    r: float
+        the correlation coefficient
+
+    p: float
+        the p-value
+
+    p_fmt_td: float
+        the threshold for p-value formating (0.01 by default, i.e., if p<0.01, will print "< 0.01" instead of "0")
+
+    p_fmt_style: str
+        the style for p-value formating (exponential notation by default)
+
+    signif: bool
+        the significance
+
+    alpha : float
+        The significance level (0.05 by default)
+
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Correlation function
+    pyleoclim.utils.correlation.fdr : FDR function
+    '''
+    def __init__(self, r, p, signif, alpha, p_fmt_td=0.01, p_fmt_style='exp'):
+        self.r = r
+        self.p = p
+        self.p_fmt_td = p_fmt_td
+        self.p_fmt_style = p_fmt_style
+        self.signif = signif
+        self.alpha = alpha
+
+    def __str__(self):
+        '''
+        Prints out the correlation results
+        '''
+        formatted_p = pval_format(self.p, threshold=self.p_fmt_td, style=self.p_fmt_style)
+
+        table = {
+            'correlation': [self.r],
+            'p-value': [formatted_p],
+            f'signif. (α: {self.alpha})': [self.signif],
+        }
+
+        msg = print(tabulate(table, headers='keys'))
+
+        return ''
 
 class CorrEns:
     ''' Correlation Ensemble
@@ -5691,7 +5755,7 @@ class CorrEns:
         the list of significance with FDR
 
     alpha : float
-        The significance level (0.05 by default)
+        The significance level
 
     See also
     --------
@@ -5824,6 +5888,207 @@ class CorrEns:
             if not mute:
                 plotting.showfig(fig)
         return fig, ax
+
+class SsaRes:
+    ''' Class to hold the results of SSA method
+
+    Parameters
+    ----------
+
+    eigvals: float (M, 1)
+        a vector of real eigenvalues derived from the signal
+    
+    pctvar: float (M, 1)
+        same vector, expressed in % variance accounted for by each mode. 
+    
+    eigvals_q: float (M, 2)
+        array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ assigned NaNs if unused ]
+        
+    eigvecs : float (M, M)
+        a matrix of the temporal eigenvectors (T-EOFs), i.e. the temporal patterns that explain most of the variations in the original series.
+
+    PC : float (N - M + 1, M) 
+        array of principal components, i.e. the loadings that, convolved with the T-EOFs, produce the reconstructed components, or RCs
+
+    RCmat : float (N,  M) 
+        array of reconstructed components, One can think of each RC as the contribution of each mode to the timeseries, weighted by their eigenvalue (loosely speaking, their "amplitude"). Summing over all columns of RC recovers the original series. (synthesis, the reciprocal operation of analysis).
+
+    mode_idx: list 
+        index of retained modes 
+        
+    RCseries : float (N, 1)
+        reconstructed series based on the RCs of mode_idx (scale and mean fit to original series)
+
+
+    See also
+    --------
+
+    pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis
+    '''
+    def __init__(self, time, name, eigvals, eigvecs, pctvar, PC, RCmat, RCseries,mode_idx, eigvals_q=None):
+        self.time       = time
+        self.name       = name
+        self.eigvals    = eigvals
+        self.eigvals_q  = eigvals_q
+        self.eigvecs    = eigvecs
+        self.pctvar     = pctvar
+        self.PC         = PC
+        self.RCseries   = RCseries
+        self.RCmat      = RCmat
+        self.mode_idx   = mode_idx
+        
+        
+
+    def screeplot(self, figsize=[6, 4], title='SSA scree plot', ax=None, savefig_settings=None, title_kwargs=None, xlim=None,
+             clr_mcssa=sns.xkcd_rgb['red'], clr_signif=sns.xkcd_rgb['teal'],
+             clr_eig='black',  mute=False):
+        ''' Scree plot for SSA visualizing the eigenvalue spectrum and indicating which modes were retained.  
+
+        Parameters
+        ----------
+        figsize : list, optional
+            The figure size. The default is [6, 4].
+
+        title : str, optional
+            Plot title. The default is 'SSA scree plot'.
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        title_kwargs : dict
+            the keyword arguments for ax.set_title()
+
+        ax : matplotlib.axis, optional
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+
+        xlim : list, optional
+            x-axis limits. The default is None.
+
+        '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+            
+        v = self.eigvals
+        n = self.PC.shape[0] #sample size
+        dv = v*np.sqrt(2/(n-1)) 
+        idx = np.arange(len(v)) 
+        if self.eigvals_q is not None:
+            plt.fill_between(idx,self.eigvals_q[:,0],self.eigvals_q[:,1], color=clr_mcssa, alpha = 0.3, label='AR(1) 5-95% quantiles') 
+            
+        plt.errorbar(x=idx,y=v,yerr = dv, color=clr_eig,marker='o',ls='',alpha=1.0,label=self.name)
+        plt.plot(idx[self.mode_idx],v[self.mode_idx],color=clr_signif,marker='o',ls='',
+                 markersize=4, label='modes retained',zorder=10)
+        plt.title(title,fontweight='bold'); plt.legend() 
+        plt.xlabel(r'Mode index $i$'); plt.ylabel(r'$\lambda_i$')    
+
+        if xlim is not None:
+            ax.set_xlim(xlim)
+
+        if title is not None:
+            title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
+            t_args = {'y': 1.1, 'weight': 'bold'}
+            t_args.update(title_kwargs)
+            ax.set_title(title, **t_args)
+
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, settings=savefig_settings)
+        else:
+            if not mute:
+                plotting.showfig(fig)
+        return fig, ax
+
+    def modeplot(self, mode=0, figsize=[10, 5], ax=None, savefig_settings=None, 
+             title_kwargs=None, mute=False, NW = 2):
+        ''' Dashboard visualizing the properties of a given SSA mode, including:
+            1. the analyzing function (T-EOF)
+            2. the reconstructed component (RC)
+            3. its spectrum
+
+        Parameters
+        ----------
+        mode : int
+            the (zero-based) index of the mode to visualize
+        
+        figsize : list, optional
+            The figure size. The default is [10, 5].
+        
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        title_kwargs : dict
+            the keyword arguments for ax.set_title()
+
+        ax : matplotlib.axis, optional
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+        
+        NW : float [2, 2.5, 3, 3.5 , 4] 
+            time-bandwidth product for MTM spectral estimate
+            default: 2
+      
+        '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+        
+        RC = self.RCmat[:,mode]    
+        fig = plt.figure(tight_layout=True,figsize=figsize)
+        gs = gridspec.GridSpec(2, 2) # plot RC
+        ax = fig.add_subplot(gs[0, :])
+        ax.plot(self.time,RC)
+        ax.set_xlabel('Time'),  ax.set_ylabel('RC [dimensionless]')
+        ax.set_title('Mode '+str(mode+1)+' RC, '+ '{:3.2f}'.format(self.pctvar[mode]) + '% variance explained',weight='bold')
+        # plot T-EOF
+        ax = fig.add_subplot(gs[1, 0])
+        ax.plot(self.eigvecs[:,mode])
+        ax.set_title('T-EOF (analyzing function)')
+        ax.set_xlabel('Time'), ax.set_ylabel('T-EOF values')
+        # plot spectrum
+        ax = fig.add_subplot(gs[1, 1])
+        ts_rc = Series(time=self.time, value=RC) # define timeseries object for the RC
+        psd_mtm_rc = ts_rc.interp().spectral(method='mtm', settings={'NW': NW})
+    
+        _ = psd_mtm_rc.plot(ax=ax)
+        ax.set_xlabel('Period')
+        ax.set_title('Multitaper spectrum')
+
+        # if title is not None:
+        #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
+        #     t_args = {'y': 1.1, 'weight': 'bold'}
+        #     t_args.update(title_kwargs)
+        #     ax.set_title(title, **t_args)
+
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, settings=savefig_settings)
+        else:
+            if not mute:
+                plotting.showfig(fig)
+        return fig, ax
+
 
 class Lipd:
     '''Create a Lipd object from Lipd Files

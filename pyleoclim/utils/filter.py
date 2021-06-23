@@ -19,12 +19,12 @@ import numpy as np
 import statsmodels.api as sm
 from scipy import signal
 
-#----
+# ----
 # Main functions
-#-----
+# ----
 
-def savitzky_golay(ys,window_length=None, polyorder=2, deriv=0, delta=1,
-                   axis=-1,mode='interp',cval=0):
+def savitzky_golay(ys, window_length=None, polyorder=2, deriv=0, delta=1,
+                   axis=-1, mode='mirror', cval=0):
     """ Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     The Savitzky-Golay filter removes high frequency noise from data.
@@ -69,7 +69,7 @@ def savitzky_golay(ys,window_length=None, polyorder=2, deriv=0, delta=1,
         The axis of the array ys along which the filter will be applied. Default is -1
     
     mode : str
-        Must be ‘mirror’, ‘constant’, ‘nearest’, ‘wrap’ or ‘interp’. This determines the type of extension to use for the padded signal to which the filter is applied. When mode is ‘constant’, the padding value is given by cval. See the Notes for more details on ‘mirror’, ‘constant’, ‘wrap’, and ‘nearest’. When the ‘interp’ mode is selected (the default), no extension is used. Instead, a degree polyorder polynomial is fit to the last window_length values of the edges, and this polynomial is used to evaluate the last window_length // 2 output values.
+        Must be ‘mirror’ (the default), ‘constant’, ‘nearest’, ‘wrap’ or ‘interp’. This determines the type of extension to use for the padded signal to which the filter is applied. When mode is ‘constant’, the padding value is given by cval. See the Notes for more details on ‘mirror’, ‘constant’, ‘wrap’, and ‘nearest’. When the ‘interp’ mode is selected, no extension is used. Instead, a degree polyorder polynomial is fit to the last window_length values of the edges, and this polynomial is used to evaluate the last window_length // 2 output values.
     
     cval : scalar
         Value to fill past the edges of the input if mode is ‘constant’. Default is 0.0.
@@ -115,7 +115,7 @@ def savitzky_golay(ys,window_length=None, polyorder=2, deriv=0, delta=1,
     if window_length % 2 != 1 or window_length < 1:
         raise TypeError("window_length size must be a positive odd number")
     if window_length < polyorder + 2:
-        raise TypeError("window_length is too small for the polynomials order")
+        raise TypeError("window_length is too small for the polynomial's order")
     
     yf=signal.savgol_filter(ys,window_length=window_length,
                             polyorder=polyorder,
@@ -140,7 +140,7 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
     method : string
         The method to use to pad the series
         - ARIMA: uses a fitted ARIMA model
-        - reflect (default): Reflects the time series
+        - reflect (default): Reflects the time series around either end.
     params : tuple ARIMA model order parameters (p,d,q), Default corresponds to an AR(1) model
     reflect_type : string
          {‘even’, ‘odd’}, optional
@@ -196,7 +196,7 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
 
 
 def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
-                reflect_type='odd',params=(2,1,2),padFrac=0.1):
+                reflect_type='odd',params=(1,0,0),padFrac=0.1):
     '''Applies a Butterworth filter with frequency fc, with padding
        Supports both lowpass and band-pass filtering.  
 
@@ -262,7 +262,7 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
     return yf
 
 def lanczos(ys,fc,fs=1,pad='reflect',
-                reflect_type='odd',params=(2,1,2),padFrac=0.1):
+                reflect_type='odd',params=(1,0,0),padFrac=0.1):
     '''Applies a Lanczos (lowpass) filter with frequency fc, with optional padding
 
     Parameters
@@ -333,7 +333,7 @@ def lanczos(ys,fc,fs=1,pad='reflect',
     return yf    
 
 
-def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_type='odd', params=(2,1,2), padFrac=0.1, **kwargs):
+def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_type='odd', params=(1,0,0), padFrac=0.1, **kwargs):
     '''Applies a Finite Impulse Response filter design with window method and frequency fc, with padding
 
     Parameters
