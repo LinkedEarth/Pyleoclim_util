@@ -240,7 +240,7 @@ class TestMultipleSeriesCommonTime:
     '''Test for MultipleSeries.common_time()
     '''
     @pytest.mark.parametrize('method', ['bin', 'interp', 'gkernel'])
-    def test_common_time(self, method):
+    def test_common_time_t0(self, method):
         t_0, v_0 = gen_colored_noise()
         t_1, v_1 = gen_colored_noise()
 
@@ -257,3 +257,21 @@ class TestMultipleSeriesCommonTime:
         x_axis_1 = ts_M_ct.series_list[1].time
 
         assert_array_equal(x_axis_0, x_axis_1)
+        
+    def test_common_time_t1(self):
+        time = np.arange(1900, 2020, step=1/12)
+        ndel = 200
+        seriesList = []
+        for j in range(4):
+            v = pyleo.gen_ts(model='colored_noise',alpha=1, t=time)
+            deleted_idx = np.random.choice(range(np.size(time)), ndel, replace=False)
+            tu =  np.delete(time.copy(), deleted_idx)
+            vu =  np.delete(v.value, deleted_idx)
+            ts = pyleo.Series(time=tu, value=vu,  value_name='Series_'+str(j+1))
+            seriesList.append(ts)
+    
+        ms = pyleo.MultipleSeries(seriesList)
+
+        ms1 = ms.common_time(method='interp', start=1910, stop=2010, step=1/12)
+        
+        assert (np.diff(ms1.series_list[0].time)[0] - 1/12) < 1e-3
