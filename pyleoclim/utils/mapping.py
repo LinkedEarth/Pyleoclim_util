@@ -406,4 +406,81 @@ def map_all(lat, lon, criteria, marker=None, color =None,
         return ax
   
         
+def distSphere(lat1,lon1,lat2,lon2):
+    """Uses the harversine formula to calculate distance on a sphere
+    
+    Parameters
+    ----------
+    lat1: float
+        Latitude of the first point, in radians
+    lon1: float
+        Longitude of the first point, in radians
+    lat2: float
+        Latitude of the second point, in radians
+    lon2: float
+        Longitude of the second point, in radians
+        
+    Returns
+    -------
+    dist: float
+        The distance between the two point in km
+    """
+    R = 6371  #km. Earth's radius
+    dlat = lat2-lat1
+    dlon = lon2-lon1
 
+    a = np.sin(dlat/2)**2+np.cos(lat1)*np.cos(lat2)*np.sin(dlon/2)**2
+    c = 2*np.arctan2(np.sqrt(a),np.sqrt(1-a))
+    dist =R*c
+
+    return dist
+
+def computeDist(lat_r, lon_r, lat_c, lon_c):
+    """ Computes the distance in (km) between a reference point and an array
+    of other coordinates.
+    
+    Parameters
+    ----------
+    lat_r: float
+        The reference latitude, in deg
+    lon_r: float
+        The reference longitude, in deg
+    lat_c: list
+        A list of latitudes for the comparison points, in deg
+    lon_c: list
+        A list of longitudes for the comparison points, in deg
+    
+    Returns
+    -------
+    dist: list
+        A list of distances in km.
+    """
+    dist = []
+
+    for idx, val in enumerate (lat_c):
+        lat1 = np.radians(lat_r)
+        lon1 = np.radians(lon_r)
+        lat2 = np.radians(val)
+        lon2 = np.radians(lon_c[idx])
+        dist.append(distSphere(lat1,lon1,lat2,lon2))
+
+    return dist
+
+def withinDistance(distance, radius):
+    """ Returns the index of the records that are within a certain distance
+    
+    Parameters:
+    -----------    
+    distance: list
+        A list containing the distance
+    radius: float
+        The radius to be considered
+        
+    Returns
+    -------
+    idx: list
+        a list of index
+    """
+    idx = [idx for idx,val in enumerate(distance) if val <= radius]
+
+    return idx

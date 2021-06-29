@@ -6213,12 +6213,6 @@ class Lipd:
 
         return res
 
-    #def mapNearRecord():
-
-        #res={}
-
-        #return res
-
 class LipdSeries(Series):
     '''Lipd time series object
 
@@ -6507,11 +6501,11 @@ class LipdSeries(Series):
         #get the information from the timeseries
         lat=[self.lipd_ts['geo_meanLat']]
         lon=[self.lipd_ts['geo_meanLon']]
-        lon=[self.lipd_ts['geo_meanLon']]
+        
         if 'archiveType' in self.lipd_ts.keys():
             archiveType=lipdutils.LipdToOntology(self.lipd_ts['archiveType']).lower().replace(" ","")
         else:
-            archiveType=('other')
+            archiveType='other'
 
         # make sure criteria is in the plot_default list
         if archiveType not in self.plot_default.keys():
@@ -7044,3 +7038,107 @@ class LipdSeries(Series):
             if not mute:
                 plotting.showfig(fig)
         return fig, ax
+
+    # def mapNearRecord(self, D, n=5, radius = None, sameArchive = False, 
+    #                   projection='Orthographic',proj_default = True,
+    #                   background = True,borders = False, rivers = False, 
+    #                   lakes = False, figsize = None, ax = None, 
+    #                   maker_ref= None, color_ref=None, marker=None, color=None,
+    #                   markersize_adjust=True, scatter_kwargs=None,
+    #                   legend = True, lgd_kwargs=None, savefig_settings=None, 
+    #                   mute=False):
+        
+    #     scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
+        
+    #     #get the information about the original timeseries
+    #     lat_ref=[self.lipd_ts['geo_meanLat']]
+    #     lon_ref=[self.lipd_ts['geo_meanLon']]
+        
+    #     if 'archiveType' in self.lipd_ts.keys():
+    #         archiveType_ref=lipdutils.LipdToOntology(self.lipd_ts['archiveType']).lower().replace(" ","")
+    #     else:
+    #         archiveType_ref='other'
+
+    #     # make sure criteria is in the plot_default list
+    #     if archiveType_ref not in self.plot_default.keys():
+    #         archiveType_ref = 'other'
+        
+    #     # get information about the other timeseries
+    #     lat=[]
+    #     lon=[]
+    #     archiveType=[]
+        
+    #     dataSetName_ref = self.lipd_ts['dataSetName']
+
+    #     for idx, key in enumerate(D.lipd):
+    #         if key != dataSetName_ref:
+    #             d = D.lipd[key]
+    #             lat.append(d['geo']['geometry']['coordinates'][1])
+    #             lon.append(d['geo']['geometry']['coordinates'][0])
+    #             if 'archiveType' in d.keys():
+    #                 archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower().replace(" ",""))
+    #             else:
+    #                 archiveType.append('other')
+
+    #     # make sure criteria is in the plot_default list
+    #     for idx,val in enumerate(archiveType):
+    #         if val not in self.plot_default.keys():
+    #             archiveType[idx] = 'other'
+        
+    #     if len(lat)==0: #this should not happen unless the coordinates are not available in the LiPD file
+    #         raise ValueError('no matching record found')
+        
+    #     # Filter by the same type of archive if asked
+    #     if sameArchive == True:
+    #         idx_archive = [idx for idx,val in enumerate(archiveType) if val==archiveType_ref]
+    #         if len(idx_archive)==0:
+    #             raise ValueError('No records corresponding to the same archiveType available. Widen your search criteria.')
+    #         else:
+    #             lat = lat[idx_archive]
+    #             lon = lon[idx_archive]
+    #             archiveType=archiveType[idx_archive]
+                       
+    #     #compute the distance
+    #     dist = mapping.computeDist(lat_ref,lon_ref,lat,lon)
+        
+    #     if radius: 
+    #         idx_radius = mapping.withinDistance(dist, radius)
+    #         if len(idx_radius) == 0:
+    #             raise ValueError('No records withing matching radius distance. Widen your search criteria')
+    #         else:
+    #             lat = lat[idx_radius]
+    #             lon = lon[idx_radius]
+    #             archiveType = archiveType[idx_radius]
+    #             dist = dist[idx_radius]
+        
+    #     #print a warning if plotting less than asked because of the filters
+        
+    #     if n>len(dist):
+    #         warnings.warn('Number of matching records is less"+\
+    #           " than the number of neighbors chosen. Including all records "+\
+    #           " in the analysis."')
+    #         n=len(dist)
+        
+    #     #Sort the distance array
+    #     sort_idx = np.argsort(dist)
+    #     dist = dist[sort_idx]
+    #     lat = lat[sort_idx]
+    #     lon = lon[sort_idx]
+    #     archiveType = archiveType[sort_idx]
+        
+    #     # Grab the right number of records
+    #     dist = dist[0:n-1]
+    #     lat = lat[0:n-1]
+    #     lon = lon[0:n-1]
+    #     archiveType = archiveType[0:n-1]
+                
+    #     # Start plotting 
+        
+        
+        
+    #     if 'path' in savefig_settings:
+    #         plotting.savefig(fig, settings=savefig_settings)
+    #     else:
+    #         if not mute:
+    #             plotting.showfig(fig)
+    #     return fig, ax
