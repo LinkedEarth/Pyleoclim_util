@@ -293,6 +293,12 @@ def map_all(lat, lon, criteria, marker=None, color =None,
     pyleoclim.utils.mapping.set_proj : Set the projection for Cartopy-based maps
     """
     
+    #Take care of duplicate legends
+    def legend_without_duplicate_labels(ax):
+        handles, labels = ax.get_legend_handles_labels()
+        unique = [(h, l) for i, (h, l) in enumerate(zip(handles, labels)) if l not in labels[:i]]
+        ax.legend(*zip(*unique))
+    
     #Check that the lists have the same length and convert to numpy arrays
     if len(lat)!=len(lon) or len(lat)!=len(criteria) or len(lon)!=len(criteria):
         raise ValueError("Latitude, Longitude, and criteria list must be the same" +\
@@ -312,21 +318,38 @@ def map_all(lat, lon, criteria, marker=None, color =None,
         if 'marker' in scatter_kwargs.keys(): 
             print('marker has been set as a parameter to the map_all function, overriding scatter_kwargs')
             del scatter_kwargs['marker']
-        if len(marker)!=len(criteria):
-            raise ValueError('The marker vector should have the same length as the criteria vector')
+        if type(marker) == list and len(marker)!=len(criteria):
+            raise ValueError('The marker vector should have the same length as the lat/lon/criteria vector')
     
     
     if color!=None:
         if 'facecolor' in scatter_kwargs.keys(): 
             print('facecolor has been set as a parameter to the map_all function, overriding scatter_kwargs')
             del scatter_kwargs['facecolor']
-        if len(color)!=len(criteria):
-            raise ValueError('The color vector should have the same length as the criteria vector')
+        if type(color) == list and len(color)!=len(criteria):
+            raise ValueError('The color vector should have the same length as the lon/lat/criteria vector')
     
-    #get unique criteria/color/marker
+
+    # Prepare scatter information
+    if 's' in scatter_kwargs.keys():
+        if type(scatter_kwargs['s']) == list and len(scatter_kwargs['s']) !=len(criteria):
+            raise ValueError('If s is a list, it should have the same length as lon/lat/criteria')
+    else:
+        scatter_kwargs['s'] = None        
     
-    color_data=pd.DataFrame({'criteria':criteria,'color':color,'marker':marker})
-    palette = color_data.drop_duplicates(subset='criteria')
+    if 'edgecolors' in scatter_kwargs.keys():
+        if type(scatter_kwargs['edgecolors']) == list and len(scatter_kwargs['edgecolors']) !=len(criteria):
+            raise ValueError('If edgecolors is a list, it should have the same length as lon/lat/criteria')
+    else:
+        scatter_kwargs['edgecolors'] = None
+
+        
+    color_data=pd.DataFrame({'criteria':criteria,'color':color,'marker':marker,
+                             's': scatter_kwargs['s'], 'edgecolors': scatter_kwargs['edgecolors']})
+    
+    #delete extra scatter_kwargs
+    del scatter_kwargs['s']
+    del scatter_kwargs['edgecolors']
     
     # get the projection:
     proj = set_proj(projection=projection, proj_default=proj_default) 
@@ -335,7 +358,7 @@ def map_all(lat, lon, criteria, marker=None, color =None,
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize,subplot_kw=dict(projection=proj))     
     # draw the coastlines    
-    ax.coastlines()
+    ax.add_feature(cfeature.COASTLINE)
     # Background
     if background is True:
         ax.stock_img()     
@@ -346,54 +369,27 @@ def map_all(lat, lon, criteria, marker=None, color =None,
         ax.add_feature(cfeature.LAKES)
     if rivers is True:
         ax.add_feature(cfeature.RIVERS)
+        
     
     # Get the indexes by criteria
+    for index, crit in enumerate(criteria): 
+        ax.scatter(np.array(lon)[index],np.array(lat)[index],
+                    zorder = 10,
+                    label = crit,
+                    transform=data_crs,
+                    marker = color_data['marker'].iloc[index],
+                    color = color_data['color'].iloc[index],
+                    s = color_data['s'].iloc[index],
+                    edgecolors= color_data['edgecolors'].iloc[index], 
+                    **scatter_kwargs)
     
-    if color==None and marker==None:
-        for crit in set(criteria):
-            # Grab the indices with same criteria
-            index = [i for i,x in enumerate(criteria) if x == crit]
-            ax.scatter(np.array(lon)[index],np.array(lat)[index],
-                        zorder = 10,
-                        label = crit,
-                        transform=data_crs,
-                        **scatter_kwargs)
-    elif color==None and marker!=None:
-        for crit in set(criteria):
-            # Grab the indices with same criteria
-            index = [i for i,x in enumerate(criteria) if x == crit]
-            ax.scatter(np.array(lon)[index],np.array(lat)[index],
-                        zorder = 10,
-                        label = crit,
-                        transform=data_crs,
-                        marker = palette[palette['criteria']==crit]['marker'].iloc[0],
-                        **scatter_kwargs)
-    elif color!=None and marker==None:
-        for crit in set(criteria):
-            # Grab the indices with same criteria
-            index = [i for i,x in enumerate(criteria) if x == crit]
-            ax.scatter(np.array(lon)[index],np.array(lat)[index],
-                        zorder = 10,
-                        label = crit,
-                        transform=data_crs,
-                        facecolor = palette[palette['criteria']==crit]['color'].iloc[0],
-                        **scatter_kwargs)
-    elif color!=None and marker!=None:
-        for crit in set(criteria):
-            # Grab the indices with same criteria
-            index = [i for i,x in enumerate(criteria) if x == crit]
-            ax.scatter(np.array(lon)[index],np.array(lat)[index],
-                        zorder = 10,
-                        label = crit,
-                        transform=data_crs,
-                        facecolor = palette[palette['criteria']==crit]['color'].iloc[0],
-                        marker=palette[palette['criteria']==crit]['marker'].iloc[0],
-                        **scatter_kwargs)
-    
+
     if legend == True:
         ax.legend(**lgd_kwargs)
+        legend_without_duplicate_labels(ax)
     else:
         ax.legend().remove()
+        
     
     if 'fig' in locals():
         if 'path' in savefig_settings:
@@ -406,7 +402,7 @@ def map_all(lat, lon, criteria, marker=None, color =None,
         return ax
   
         
-def distSphere(lat1,lon1,lat2,lon2):
+def dist_sphere(lat1,lon1,lat2,lon2):
     """Uses the harversine formula to calculate distance on a sphere
     
     Parameters
@@ -433,9 +429,9 @@ def distSphere(lat1,lon1,lat2,lon2):
     c = 2*np.arctan2(np.sqrt(a),np.sqrt(1-a))
     dist =R*c
 
-    return dist
+    return float(dist)
 
-def computeDist(lat_r, lon_r, lat_c, lon_c):
+def compute_dist(lat_r, lon_r, lat_c, lon_c):
     """ Computes the distance in (km) between a reference point and an array
     of other coordinates.
     
@@ -450,6 +446,11 @@ def computeDist(lat_r, lon_r, lat_c, lon_c):
     lon_c: list
         A list of longitudes for the comparison points, in deg
     
+    See also
+    --------
+    
+    pyleoclim.utils.mapping.dist_sphere: calculate distance on a sphere
+    
     Returns
     -------
     dist: list
@@ -462,11 +463,11 @@ def computeDist(lat_r, lon_r, lat_c, lon_c):
         lon1 = np.radians(lon_r)
         lat2 = np.radians(val)
         lon2 = np.radians(lon_c[idx])
-        dist.append(distSphere(lat1,lon1,lat2,lon2))
+        dist.append(dist_sphere(lat1,lon1,lat2,lon2))
 
     return dist
 
-def withinDistance(distance, radius):
+def within_distance(distance, radius):
     """ Returns the index of the records that are within a certain distance
     
     Parameters:

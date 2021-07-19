@@ -106,7 +106,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#surrogateseries-pyleoclim-surrogateseries">SurrogateSeries (pyleoclim.SurrogateSeries)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#multiplepsd-pyleoclim-multiplepsd">MultiplePSD (pyleoclim.MultiplePSD)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#multiplescalogram-pyleoclim-multiplescalogram">MultipleScalogram (pyleoclim.MultipleScalogram)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#corr-pyleoclim-corr">Corr (pyleoclim.Corr)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#correns-pyleoclim-correns">CorrEns (pyleoclim.CorrEns)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ssares-pyleoclim-ssares">SsaRes (pyleoclim.SsaRes)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gen-ts-pyleoclim-gen-ts">gen_ts (pyleoclim.gen_ts)</a></li>
 </ul>
 </li>
@@ -274,7 +276,7 @@ Default is True</p></li>
 <span class="gp">   ...: </span>
 
 <span class="gp">In [7]: </span><span class="n">ts</span>
-<span class="gh">Out[7]: </span><span class="go">&lt;pyleoclim.core.ui.Series at 0x7fafce61c9d0&gt;</span>
+<span class="gh">Out[7]: </span><span class="go">&lt;pyleoclim.core.ui.Series at 0x7ff151dc44c0&gt;</span>
 
 <span class="gp">In [8]: </span><span class="n">ts</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 <span class="gh">Out[8]: </span><span class="go">dict_keys([&#39;time&#39;, &#39;value&#39;, &#39;time_name&#39;, &#39;time_unit&#39;, &#39;value_name&#39;, &#39;value_unit&#39;, &#39;label&#39;])</span>
@@ -314,58 +316,61 @@ Default is True</p></li>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.distplot" title="pyleoclim.core.ui.Series.distplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">distplot</span></code></a>([figsize, title, savefig_settings, …])</p></td>
 <td><p>Plot the distribution of the timeseries values</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.filter" title="pyleoclim.core.ui.Series.filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span></code></a>([cutoff_freq, cutoff_scale, method])</p></td>
-<td><p>Filtering the timeseries</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.fill_na" title="pyleoclim.core.ui.Series.fill_na"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fill_na</span></code></a>([timespan, dt])</p></td>
+<td><p>Fill NaNs into the timespan</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.gaussianize" title="pyleoclim.core.ui.Series.gaussianize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussianize</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.filter" title="pyleoclim.core.ui.Series.filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span></code></a>([cutoff_freq, cutoff_scale, method])</p></td>
+<td><p>Apply a filter to the timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.gaussianize" title="pyleoclim.core.ui.Series.gaussianize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussianize</span></code></a>()</p></td>
 <td><p>Gaussianizes the timeseries</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.gkernel" title="pyleoclim.core.ui.Series.gkernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gkernel</span></code></a>([step_type])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.gkernel" title="pyleoclim.core.ui.Series.gkernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gkernel</span></code></a>([step_type])</p></td>
 <td><p>Coarse-grain a Series object via a Gaussian kernel.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.interp" title="pyleoclim.core.ui.Series.interp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code></a>([method])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.interp" title="pyleoclim.core.ui.Series.interp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code></a>([method])</p></td>
 <td><p>Interpolate a Series object onto a new time axis</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.is_evenly_spaced" title="pyleoclim.core.ui.Series.is_evenly_spaced"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_evenly_spaced</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.is_evenly_spaced" title="pyleoclim.core.ui.Series.is_evenly_spaced"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_evenly_spaced</span></code></a>()</p></td>
 <td><p>Check if the timeseries is evenly-spaced</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.make_labels" title="pyleoclim.core.ui.Series.make_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.make_labels" title="pyleoclim.core.ui.Series.make_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code></a>()</p></td>
 <td><p>Initialization of labels</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.outliers" title="pyleoclim.core.ui.Series.outliers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">outliers</span></code></a>([auto, remove, fig_outliers, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.outliers" title="pyleoclim.core.ui.Series.outliers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">outliers</span></code></a>([auto, remove, fig_outliers, …])</p></td>
 <td><p>Detects outliers in a timeseries and removes if specified</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.plot" title="pyleoclim.core.ui.Series.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([figsize, marker, markersize, color, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.plot" title="pyleoclim.core.ui.Series.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([figsize, marker, markersize, color, …])</p></td>
 <td><p>Plot the timeseries</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.segment" title="pyleoclim.core.ui.Series.segment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">segment</span></code></a>([factor])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.segment" title="pyleoclim.core.ui.Series.segment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">segment</span></code></a>([factor])</p></td>
 <td><p>Gap detection</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.slice" title="pyleoclim.core.ui.Series.slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slice</span></code></a>(timespan)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.slice" title="pyleoclim.core.ui.Series.slice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">slice</span></code></a>(timespan)</p></td>
 <td><p>Slicing the timeseries with a timespan (tuple or list)</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.spectral" title="pyleoclim.core.ui.Series.spectral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral</span></code></a>([method, freq_method, freq_kwargs, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.spectral" title="pyleoclim.core.ui.Series.spectral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral</span></code></a>([method, freq_method, freq_kwargs, …])</p></td>
 <td><p>Perform spectral analysis on the timeseries</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.ssa" title="pyleoclim.core.ui.Series.ssa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ssa</span></code></a>([M, nMC, f, trunc, var_thresh])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.ssa" title="pyleoclim.core.ui.Series.ssa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ssa</span></code></a>([M, nMC, f, trunc, var_thresh])</p></td>
 <td><p>Singular Spectrum Analysis</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.standardize" title="pyleoclim.core.ui.Series.standardize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.standardize" title="pyleoclim.core.ui.Series.standardize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code></a>()</p></td>
 <td><p>Standardizes the time series</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.stats" title="pyleoclim.core.ui.Series.stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stats</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.stats" title="pyleoclim.core.ui.Series.stats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stats</span></code></a>()</p></td>
 <td><p>Compute basic statistics for the time series</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.summary_plot" title="pyleoclim.core.ui.Series.summary_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary_plot</span></code></a>([psd, scalogram, figsize, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.summary_plot" title="pyleoclim.core.ui.Series.summary_plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">summary_plot</span></code></a>([psd, scalogram, figsize, …])</p></td>
 <td><p>Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.surrogates" title="pyleoclim.core.ui.Series.surrogates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">surrogates</span></code></a>([method, number, length, seed, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.surrogates" title="pyleoclim.core.ui.Series.surrogates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">surrogates</span></code></a>([method, number, length, seed, …])</p></td>
 <td><p>Generate surrogates with increasing time axis</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet" title="pyleoclim.core.ui.Series.wavelet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code></a>([method, settings, freq_method, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet" title="pyleoclim.core.ui.Series.wavelet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code></a>([method, settings, freq_method, …])</p></td>
 <td><p>Perform wavelet analysis on the timeseries</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet_coherence" title="pyleoclim.core.ui.Series.wavelet_coherence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet_coherence</span></code></a>(target_series[, method, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet_coherence" title="pyleoclim.core.ui.Series.wavelet_coherence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet_coherence</span></code></a>(target_series[, method, …])</p></td>
 <td><p>Perform wavelet coherence analysis with the target timeseries</p></td>
 </tr>
 </tbody>
@@ -474,9 +479,9 @@ It is in form of [a, b], where a, b are two time points.</p>
 <span class="gp">In [13]: </span><span class="n">caus_res</span> <span class="o">=</span> <span class="n">ts_nino</span><span class="o">.</span><span class="n">causality</span><span class="p">(</span><span class="n">ts_air</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nsim&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;signif_test&#39;</span><span class="p">:</span> <span class="s1">&#39;isopersist&#39;</span><span class="p">})</span>
 
 <span class="gp">In [14]: </span><span class="nb">print</span><span class="p">(</span><span class="n">caus_res</span><span class="p">)</span>
-<span class="go">{&#39;T21&#39;: 0.0058402187949833225, &#39;tau21&#39;: 0.04731826159975569, &#39;Z&#39;: 0.12342420447275004, &#39;dH1_star&#39;: -0.5094709112673714, &#39;dH1_noise&#39;: 0.44321082713287285, &#39;signif_qs&#39;: [0.005, 0.025, 0.05, 0.95, 0.975, 0.995], &#39;T21_noise&#39;: array([-5.53816686e-05, -5.53816686e-05, -5.53816686e-05, -1.18881484e-05,</span>
-<span class="go">       -1.18881484e-05, -1.18881484e-05]), &#39;tau21_noise&#39;: array([-4.33434353e-04, -4.33434353e-04, -4.33434353e-04, -7.37070659e-05,</span>
-<span class="go">       -7.37070659e-05, -7.37070659e-05])}</span>
+<span class="go">{&#39;T21&#39;: 0.0058402187949833225, &#39;tau21&#39;: 0.04731826159975569, &#39;Z&#39;: 0.12342420447275004, &#39;dH1_star&#39;: -0.5094709112673714, &#39;dH1_noise&#39;: 0.44321082713287285, &#39;signif_qs&#39;: [0.005, 0.025, 0.05, 0.95, 0.975, 0.995], &#39;T21_noise&#39;: array([-1.11386675e-04, -1.11386675e-04, -1.11386675e-04,  2.12747686e-07,</span>
+<span class="go">        2.12747686e-07,  2.12747686e-07]), &#39;tau21_noise&#39;: array([-8.92281915e-04, -8.92281915e-04, -8.92281915e-04,  1.69489720e-06,</span>
+<span class="go">        1.69489720e-06,  1.69489720e-06])}</span>
 </pre></div>
 </div>
 <img alt="../_images/ts_nino.png" src="../_images/ts_nino.png" />
@@ -492,7 +497,7 @@ It is in form of [a, b], where a, b are two time points.</p>
 <span class="go">parameter F test:         F=20.8492 , p=0.0000  , df_denom=1592, df_num=1</span>
 
 <span class="gp">In [16]: </span><span class="nb">print</span><span class="p">(</span><span class="n">caus_res</span><span class="p">)</span>
-<span class="go">{1: ({&#39;ssr_ftest&#39;: (20.84920423926827, 5.350981736046677e-06, 1592.0, 1), &#39;ssr_chi2test&#39;: (20.88849294072418, 4.868102345429421e-06, 1), &#39;lrtest&#39;: (20.752895243242165, 5.22525200803166e-06, 1), &#39;params_ftest&#39;: (20.849204239268097, 5.350981736047143e-06, 1592.0, 1.0)}, [&lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x7fafd702e190&gt;, &lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x7fafd702e220&gt;, array([[0., 1., 0.]])])}</span>
+<span class="go">{1: ({&#39;ssr_ftest&#39;: (20.84920423926827, 5.350981736046677e-06, 1592.0, 1), &#39;ssr_chi2test&#39;: (20.88849294072418, 4.868102345429421e-06, 1), &#39;lrtest&#39;: (20.752895243242165, 5.22525200803166e-06, 1), &#39;params_ftest&#39;: (20.849204239268097, 5.350981736047143e-06, 1592.0, 1.0)}, [&lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x7ff158ec2220&gt;, &lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x7ff158ec22b0&gt;, array([[0., 1., 0.]])])}</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -895,7 +900,7 @@ The others are non-parametric, but their computational requirements scale with t
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p><strong>corr_res_dict</strong> – the result dictionary, containing</p>
+<dd class="field-even"><p><p><strong>corr</strong> – the result object, containing</p>
 <ul class="simple">
 <li><dl class="simple">
 <dt>r<span class="classifier">float</span></dt><dd><p>correlation coefficient</p>
@@ -913,11 +918,16 @@ Note that signif = True if and only if p &lt;= alpha.</p>
 </dd>
 </dl>
 </li>
+<li><dl class="simple">
+<dt>alpha<span class="classifier">float</span></dt><dd><p>the significance level</p>
+</dd>
+</dl>
+</li>
 </ul>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p>pyleoclim.ui.Corr</p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -950,21 +960,29 @@ Note that signif = True if and only if p &lt;= alpha.</p>
 <span class="gp">In [9]: </span><span class="n">corr_res</span> <span class="o">=</span> <span class="n">ts_nino</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">ts_air</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nsim&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2333</span><span class="p">)</span>
 
 <span class="gp">In [10]: </span><span class="nb">print</span><span class="p">(</span><span class="n">corr_res</span><span class="p">)</span>
-<span class="go">{&#39;r&#39;: -0.15239413332839047, &#39;p&#39;: 0.0, &#39;signif&#39;: True, &#39;alpha&#39;: 0.05}</span>
+<span class="go">  correlation  p-value    signif. (α: 0.05)</span>
+<span class="go">-------------  ---------  -------------------</span>
+<span class="go">    -0.152394  &lt; 1e-6     True</span>
+
 
 <span class="go"># using a simple t-test</span>
 <span class="go"># set an arbitrary randome seed to fix the result</span>
 <span class="gp">In [11]: </span><span class="n">corr_res</span> <span class="o">=</span> <span class="n">ts_nino</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">ts_air</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nsim&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;ttest&#39;</span><span class="p">},</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2333</span><span class="p">)</span>
 
 <span class="gp">In [12]: </span><span class="nb">print</span><span class="p">(</span><span class="n">corr_res</span><span class="p">)</span>
-<span class="go">{&#39;r&#39;: -0.15239413332839047, &#39;p&#39;: 6.567495539580617e-08, &#39;signif&#39;: True, &#39;alpha&#39;: 0.05}</span>
+<span class="go">  correlation  p-value    signif. (α: 0.05)</span>
+<span class="go">-------------  ---------  -------------------</span>
+<span class="go">    -0.152394  &lt; 1e-7     True</span>
+
 
 <span class="go"># using the method &quot;isopersistent&quot;</span>
-<span class="go"># set an arbitrary randome seed to fix the result</span>
+<span class="go"># set an arbitrary random seed to fix the result</span>
 <span class="gp">In [13]: </span><span class="n">corr_res</span> <span class="o">=</span> <span class="n">ts_nino</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">ts_air</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nsim&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;isopersistent&#39;</span><span class="p">},</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2333</span><span class="p">)</span>
 
 <span class="gp">In [14]: </span><span class="nb">print</span><span class="p">(</span><span class="n">corr_res</span><span class="p">)</span>
-<span class="go">{&#39;r&#39;: -0.15239413332839047, &#39;p&#39;: 2.618346723029915e-05, &#39;signif&#39;: True, &#39;alpha&#39;: 0.05}</span>
+<span class="go">  correlation  p-value    signif. (α: 0.05)</span>
+<span class="go">-------------  ---------  -------------------</span>
+<span class="go">    -0.152394  &lt; 1e-4     True</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1102,21 +1120,6 @@ recommend to turn on when more modifications are going to be made on ax</p></li>
 </ul>
 </dd>
 </dl>
-<dl class="simple">
-<dt>ax<span class="classifier">matplotlib.axis, optional</span></dt><dd><p>A matplotlib axis</p>
-</dd>
-<dt>ylabel<span class="classifier">str</span></dt><dd><p>Label for the count axis</p>
-</dd>
-<dt>vertical<span class="classifier">{True,False}</span></dt><dd><p>Whether to flip the plot vertically</p>
-</dd>
-<dt>edgecolor<span class="classifier">matplotlib.color</span></dt><dd><p>The color of the edges of the bar</p>
-</dd>
-<dt>mute<span class="classifier">{True,False}</span></dt><dd><p>if True, the plot will not show;
-recommend to turn on when more modifications are going to be made on ax</p>
-</dd>
-<dt>plot_kwargs<span class="classifier">dict</span></dt><dd><p>Plotting arguments for seaborn histplot: <a class="reference external" href="https://seaborn.pydata.org/generated/seaborn.histplot.html">https://seaborn.pydata.org/generated/seaborn.histplot.html</a></p>
-</dd>
-</dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
@@ -1154,25 +1157,49 @@ recommend to turn on when more modifications are going to be made on ax</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyleoclim.core.ui.Series.filter">
-<code class="sig-name descname"><span class="pre">filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutoff_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'butterworth'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Series.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Series.filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filtering the timeseries</p>
+<dt id="pyleoclim.core.ui.Series.fill_na">
+<code class="sig-name descname"><span class="pre">fill_na</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timespan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Series.fill_na"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Series.fill_na" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill NaNs into the timespan</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>method</strong> (<em>str</em><em>, </em><em>{'savitzky-golay'</em><em>, </em><em>'butterworth'}</em>) – the filtering method
-- ‘butterworth’: the Butterworth method (default)
-- ‘savitzky-golay’: the Savitzky-Golay method
-- ‘firwin’: FIR filter design using the window method, with default window as Hanning</p></li>
+<li><p><strong>timespan</strong> (<em>tuple</em><em> or </em><em>list</em>) – The list of time points for slicing, whose length must be 2.
+For example, if timespan = [a, b], then the sliced output includes one segment [a, b].
+If None, will use the start point and end point of the original timeseries</p></li>
+<li><p><strong>dt</strong> (<em>float</em>) – The time spacing to fill the NaNs; default is 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>new</strong> – The sliced Series object.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyleoclim.core.ui.Series" title="pyleoclim.core.ui.Series">Series</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyleoclim.core.ui.Series.filter">
+<code class="sig-name descname"><span class="pre">filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cutoff_freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'butterworth'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Series.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Series.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a filter to the timeseries</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<em>str</em><em>, </em><em>{'savitzky-golay'</em><em>, </em><em>'butterworth'</em><em>, </em><em>'firwin'</em><em>, </em><em>'lanczos'}</em>) – the filtering method
+- ‘butterworth’: a Butterworth filter (default = 3rd order)
+- ‘savitzky-golay’: Savitzky-Golay filter
+- ‘firwin’: finite impulse response filter design using the window method, with default window as Hamming
+- ‘lanczos’: Lanczos zero-phase filter</p></li>
 <li><p><strong>cutoff_freq</strong> (<em>float</em><em> or </em><em>list</em>) – The cutoff frequency only works with the Butterworth method.
 If a float, it is interpreted as a low-frequency cutoff (lowpass).
-If a list,  it is interpreted as a frequency band (f1, f2), with f1 &lt; f2 (bandpass).</p></li>
+If a list,  it is interpreted as a frequency band (f1, f2), with f1 &lt; f2 (bandpass).
+Note that only the Butterworth option (default) currently supports bandpass filtering.</p></li>
 <li><p><strong>cutoff_scale</strong> (<em>float</em><em> or </em><em>list</em>) – cutoff_freq = 1 / cutoff_scale
 The cutoff scale only works with the Butterworth method and when cutoff_freq is None.
 If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
 If a list,  it is interpreted as a frequency band (f1, f2), with f1 &lt; f2 (bandpass).</p></li>
 <li><p><strong>kwargs</strong> (<em>dict</em>) – a dictionary of the keyword arguments for the filtering method,
-see <cite>pyleoclim.utils.filter.savitzky_golay</cite>, <cite>pyleoclim.utils.filter.butterworth</cite>, and <cite>pyleoclim.utils.filter.firwin</cite> for the details</p></li>
+see <cite>pyleoclim.utils.filter.savitzky_golay</cite>, <cite>pyleoclim.utils.filter.butterworth</cite>, <cite>pyleoclim.utils.filter.lanczos</cite> and <cite>pyleoclim.utils.filter.firwin</cite> for the details</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1190,6 +1217,8 @@ see <cite>pyleoclim.utils.filter.savitzky_golay</cite>, <cite>pyleoclim.utils.fi
 <dt><a class="reference internal" href="../utils/filter/savitzky_golay.html#pyleoclim.utils.filter.savitzky_golay" title="pyleoclim.utils.filter.savitzky_golay"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.savitzky_golay</span></code></a></dt><dd><p>Savitzky-Golay method</p>
 </dd>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.firwin</span></code></dt><dd><p>FIR filter design using the window method</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.lanczos</span></code></dt><dd><p>lowpass filter via Lanczos resampling</p>
 </dd>
 </dl>
 </div>
@@ -1227,7 +1256,7 @@ After that, we apply a band-pass filter with the band 15-25 Hz, and compare the 
 <span class="gh">Out[12]: </span><span class="go">&lt;AxesSubplot:xlabel=&#39;time&#39;, ylabel=&#39;value&#39;&gt;</span>
 
 <span class="gp">In [13]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gh">Out[13]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fafbaa293a0&gt;</span>
+<span class="gh">Out[13]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7ff12c08af10&gt;</span>
 
 <span class="gp">In [14]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
@@ -1248,7 +1277,7 @@ After that, we apply a band-pass filter with the band 15-25 Hz, and compare the 
 <span class="gh">Out[18]: </span><span class="go">&lt;AxesSubplot:xlabel=&#39;time&#39;, ylabel=&#39;value&#39;&gt;</span>
 
 <span class="gp">In [19]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gh">Out[19]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fafbac93610&gt;</span>
+<span class="gh">Out[19]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7ff12c2cde80&gt;</span>
 
 <span class="gp">In [20]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
@@ -1269,7 +1298,7 @@ After that, we apply a band-pass filter with the band 15-25 Hz, and compare the 
 <span class="gh">Out[24]: </span><span class="go">&lt;AxesSubplot:xlabel=&#39;time&#39;, ylabel=&#39;value&#39;&gt;</span>
 
 <span class="gp">In [25]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gh">Out[25]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fafbaf064f0&gt;</span>
+<span class="gh">Out[25]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7ff12c556d30&gt;</span>
 
 <span class="gp">In [26]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
@@ -1799,22 +1828,21 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 </dl>
 <p>Default is None, which bypasses truncation (K = M)</p>
 </p></li>
-<li><p><strong>var_thresh</strong> (<em>float</em>) – variance threshold for reconstruction (only impcatful if trunc is set to ‘var’)</p></li>
+<li><p><strong>var_thresh</strong> (<em>float</em>) – variance threshold for reconstruction (only impactful if trunc is set to ‘var’)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p><strong>res</strong> – Containing:</p>
-<ul class="simple">
-<li><p>eigval : (M, 1) array of eigenvalue spectrum of length r, the number of SSA modes. As in Principal Component Analysis, eigenvaluesare closely related to the fraction of variance accounted for (“explained”, a common but not-so-helpful term) by each mode.</p></li>
-<li><p>eig_vec : is a matrix of the temporal eigenvectors (T-EOFs), i.e. the temporal patterns that explain most of the variations in the original series.</p></li>
-<li><p>PC : (N - M + 1, M) array of principal components, i.e. the loadings that, convolved with the T-EOFs, produce the reconstructed components, or RCs</p></li>
-<li><p>RC : (N,  M) array of reconstructed components, One can think of each RC as the contribution of each mode to the timeseries, weighted by their eigenvalue (loosely speaking, their “amplitude”). Summing over all columns of RC recovers the original series. (synthesis, the reciprocal operation of analysis).</p></li>
-<li><p>eigval_q : (M, 2) array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if MC &gt;0 ]</p></li>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>res</strong> (<em>object of the SsaRes class containing:</em>)</p></li>
+<li><p><strong>- eigvals</strong> (<em>(M, ) array of eigenvalues</em>)</p></li>
+<li><p><strong>- eigvecs</strong> (<em>(M, M) Matrix of temporal eigenvectors (T-EOFs)</em>)</p></li>
+<li><p><strong>- PC</strong> (<em>(N - M + 1, M) array of principal components (T-PCs)</em>)</p></li>
+<li><p><strong>- RCmat</strong> (<em>(N,  M) array of reconstructed components</em>)</p></li>
+<li><p><strong>- RCseries</strong> (<em>(N,) reconstructed series, with mean and variance restored</em>)</p></li>
+<li><p><strong>- pctvar</strong> (<em>(M, ) array of the fraction of variance (%) associated with each mode</em>)</p></li>
+<li><p><strong>- eigvals_q</strong> (<em>(M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC &gt;0 ]</em>)</p></li>
 </ul>
 </p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1843,46 +1871,6 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 </div>
 <img alt="../_images/ts_plot4.png" src="../_images/ts_plot4.png" />
 <p>Let us now see how to make use of all these arrays. The first step is too inspect the eigenvalue spectrum (“scree plot”) to identify remarkable modes. Let us restrict ourselves to the first 40, so we can see something:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [10]: </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-
-<span class="gp">In [11]: </span><span class="kn">import</span> <span class="nn">matplotlib.gridspec</span> <span class="k">as</span> <span class="nn">gridspec</span>
-
-<span class="gp">In [12]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-<span class="gp">In [13]: </span><span class="n">d</span>  <span class="o">=</span> <span class="n">nino_ssa</span><span class="p">[</span><span class="s1">&#39;eigvals&#39;</span><span class="p">]</span> <span class="c1"># extract eigenvalue vector</span>
-
-<span class="gp">In [14]: </span><span class="n">M</span>  <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>  <span class="c1"># infer window size</span>
-
-<span class="gp">In [15]: </span><span class="n">de</span> <span class="o">=</span> <span class="n">d</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-
-<span class="gp">In [16]: </span><span class="n">var_pct</span> <span class="o">=</span> <span class="n">nino_ssa</span><span class="p">[</span><span class="s1">&#39;pctvar&#39;</span><span class="p">]</span> <span class="c1"># extract the fraction of variance attributable to each mode</span>
-
-<span class="go"># plot eigenvalues</span>
-<span class="gp">In [17]: </span><span class="n">r</span> <span class="o">=</span> <span class="mi">20</span>
-
-<span class="gp">In [18]: </span><span class="n">rk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
-
-<span class="gp">In [19]: </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-
-<span class="gp">In [20]: </span><span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">rk</span><span class="p">,</span><span class="n">d</span><span class="p">[:</span><span class="n">r</span><span class="p">],</span><span class="n">yerr</span><span class="o">=</span><span class="n">de</span><span class="p">[:</span><span class="n">r</span><span class="p">],</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;SSA eigenvalues w/ 95% CI&#39;</span><span class="p">)</span>
-<span class="gh">Out[20]: </span><span class="go">&lt;ErrorbarContainer object of 3 artists&gt;</span>
-
-<span class="gp">In [21]: </span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Scree plot of SSA eigenvalues&#39;</span><span class="p">)</span>
-<span class="gh">Out[21]: </span><span class="go">Text(0.5, 1.0, &#39;Scree plot of SSA eigenvalues&#39;)</span>
-
-<span class="gp">In [22]: </span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Rank $i$&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\lambda_i$&#39;</span><span class="p">)</span>
-<span class="gh">Out[22]: </span><span class="go">Text(0, 0.5, &#39;$\\lambda_i$&#39;)</span>
-
-<span class="gp">In [23]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
-<span class="gh">Out[23]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fafbbc10970&gt;</span>
-
-<span class="gp">In [24]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
-<span class="go">&lt;Figure size 640x480 with 1 Axes&gt;</span>
-
-<span class="gp">In [25]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">closefig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
-</pre></div>
-</div>
-<img alt="../_images/ts_eigen.png" src="../_images/ts_eigen.png" />
 <dl class="simple">
 <dt>This highlights a few common phenomena with SSA:</dt><dd><ul class="simple">
 <li><p>the eigenvalues are in descending order</p></li>
@@ -1893,25 +1881,25 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 </dd>
 </dl>
 <p>So, summing the variance of all modes higher than 19, we get:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [26]: </span><span class="nb">print</span><span class="p">(</span><span class="n">var_pct</span><span class="p">[</span><span class="mi">15</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [10]: </span><span class="nb">print</span><span class="p">(</span><span class="n">nino_ssa</span><span class="o">.</span><span class="n">pctvar</span><span class="p">[</span><span class="mi">15</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
 <span class="go">282.3019309505682</span>
 </pre></div>
 </div>
 <p>That is, over 95% of the variance is in the first 15 modes. That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let’s use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [27]: </span><span class="n">RCk</span> <span class="o">=</span> <span class="n">nino_ssa</span><span class="p">[</span><span class="s1">&#39;RCmat&#39;</span><span class="p">][:,:</span><span class="mi">14</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [11]: </span><span class="n">RCk</span> <span class="o">=</span> <span class="n">nino_ssa</span><span class="o">.</span><span class="n">RCmat</span><span class="p">[:,:</span><span class="mi">14</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="gp">In [28]: </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;ONI&#39;</span><span class="p">,</span><span class="n">mute</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># we mute the first call to only get the plot with 2 lines</span>
+<span class="gp">In [12]: </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;ONI&#39;</span><span class="p">,</span><span class="n">mute</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># we mute the first call to only get the plot with 2 lines</span>
 
-<span class="gp">In [29]: </span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">RCk</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;SSA reconstruction, 14 modes&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
-<span class="gh">Out[29]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x7fafbb5f5ca0&gt;]</span>
+<span class="gp">In [13]: </span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">RCk</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;SSA reconstruction, 14 modes&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
+<span class="gh">Out[13]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x7ff12d975430&gt;]</span>
 
-<span class="gp">In [30]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="gh">Out[30]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fafbca445b0&gt;</span>
+<span class="gp">In [14]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="gh">Out[14]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7ff12d98d790&gt;</span>
 
-<span class="gp">In [31]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+<span class="gp">In [15]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
 
-<span class="gp">In [32]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">closefig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+<span class="gp">In [16]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">closefig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../_images/ssa_recon.png" src="../_images/ssa_recon.png" />
@@ -1925,42 +1913,20 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 </dl>
 <p>Monte-Carlo SSA</p>
 <p>Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, introduced by Allen &amp; Smith, (1996) to identiy SSA modes that rise above what one would expect from “red noise”, specifically an AR(1) process_process). To run it, simply provide the parameter MC, ideally with a number of iterations sufficient to get decent statistics. Here’s let’s use MC = 1000. The result will be stored in the eigval_q array, which has the same length as eigval, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [33]: </span><span class="n">nino_mcssa</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">ssa</span><span class="p">(</span><span class="n">M</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="n">nMC</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [17]: </span><span class="n">nino_mcssa</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">ssa</span><span class="p">(</span><span class="n">M</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="n">nMC</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now let’s look at the result:</p>
-<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [34]: </span><span class="n">d</span>  <span class="o">=</span> <span class="n">nino_mcssa</span><span class="p">[</span><span class="s1">&#39;eigvals&#39;</span><span class="p">]</span> <span class="c1"># extract eigenvalue vector</span>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [18]: </span><span class="n">nino_mcssa</span><span class="o">.</span><span class="n">screeplot</span><span class="p">()</span>
+<span class="go">&lt;Figure size 600x400 with 1 Axes&gt;</span>
+<span class="gh">Out[18]: </span><span class="go"></span>
+<span class="go">(&lt;Figure size 600x400 with 1 Axes&gt;,</span>
+<span class="go"> &lt;AxesSubplot:title={&#39;center&#39;:&#39;SSA scree plot&#39;}, xlabel=&#39;Mode index $i$&#39;, ylabel=&#39;$\\lambda_i$&#39;&gt;)</span>
 
-<span class="gp">In [35]: </span><span class="n">de</span> <span class="o">=</span> <span class="n">d</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">M</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">In [19]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+<span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
 
-<span class="gp">In [36]: </span><span class="n">du</span> <span class="o">=</span> <span class="n">nino_mcssa</span><span class="p">[</span><span class="s1">&#39;eigvals_q&#39;</span><span class="p">][:,</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># extract upper quantile of MC-SSA eigenvalues</span>
-
-<span class="gp">In [37]: </span><span class="n">dl</span> <span class="o">=</span> <span class="n">nino_mcssa</span><span class="p">[</span><span class="s1">&#39;eigvals_q&#39;</span><span class="p">][:,</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># extract lower quantile of MC-SSA eigenvalues</span>
-
-<span class="go"># plot eigenvalues</span>
-<span class="gp">In [38]: </span><span class="n">rk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
-
-<span class="gp">In [39]: </span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-
-<span class="gp">In [40]: </span><span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">rk</span><span class="p">,</span> <span class="n">dl</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span> <span class="n">du</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;silver&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MC-SSA 95% CI&#39;</span><span class="p">)</span>
-<span class="gh">Out[40]: </span><span class="go">&lt;matplotlib.collections.PolyCollection at 0x7fafb99ca340&gt;</span>
-
-<span class="gp">In [41]: </span><span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">rk</span><span class="p">,</span><span class="n">d</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span><span class="n">yerr</span><span class="o">=</span><span class="n">de</span><span class="p">[:</span><span class="mi">20</span><span class="p">],</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;SSA eigenvalues w/ 95% CI&#39;</span><span class="p">)</span>
-<span class="gh">Out[41]: </span><span class="go">&lt;ErrorbarContainer object of 3 artists&gt;</span>
-
-<span class="gp">In [42]: </span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Scree plot of SSA eigenvalues, w/ MC-SSA bounds&#39;</span><span class="p">)</span>
-<span class="gh">Out[42]: </span><span class="go">Text(0.5, 1.0, &#39;Scree plot of SSA eigenvalues, w/ MC-SSA bounds&#39;)</span>
-
-<span class="gp">In [43]: </span><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Rank $i$&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\lambda_i$&#39;</span><span class="p">)</span>
-<span class="gh">Out[43]: </span><span class="go">Text(0, 0.5, &#39;$\\lambda_i$&#39;)</span>
-
-<span class="gp">In [44]: </span><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper right&#39;</span><span class="p">)</span>
-<span class="gh">Out[44]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fafb99ca7c0&gt;</span>
-
-<span class="gp">In [45]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
-<span class="go">&lt;Figure size 640x480 with 1 Axes&gt;</span>
-
-<span class="gp">In [46]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">closefig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+<span class="gp">In [20]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">closefig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 </pre></div>
 </div>
 <img alt="../_images/scree_nmc.png" src="../_images/scree_nmc.png" />
@@ -2439,7 +2405,7 @@ Valid entries: ‘median’ [default], ‘mean’, ‘mode’ or ‘max’</p></
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="../utils/tsutils/bin_values.html#pyleoclim.utils.tsutils.bin" title="pyleoclim.utils.tsutils.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.tsutils.bin</span></code></a></dt><dd><p>put timeseries values into equal bins (possibly leaving NaNs in).</p>
+<dt><a class="reference internal" href="../utils/tsutils/bin_values.html#pyleoclim.utils.tsutils.bin" title="pyleoclim.utils.tsutils.bin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.tsutils.bin</span></code></a></dt><dd><p>put timeseries values into bins of equal size (possibly leaving NaNs in).</p>
 </dd>
 <dt><a class="reference internal" href="../utils/tsutils/gkernel.html#pyleoclim.utils.tsutils.gkernel" title="pyleoclim.utils.tsutils.gkernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.tsutils.gkernel</span></code></a></dt><dd><p>coarse-graining using a Gaussian kernel</p>
 </dd>
@@ -2583,7 +2549,7 @@ Valid entries: ‘median’ [default], ‘mean’, ‘mode’ or ‘max’</p></
 
 <dl class="py method">
 <dt id="pyleoclim.core.ui.MultipleSeries.correlation">
-<code class="sig-name descname"><span class="pre">correlation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timespan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_time_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleSeries.correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries.correlation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">correlation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timespan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fdr_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">common_time_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleSeries.correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries.correlation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the correlation between a MultipleSeries and a target Series</p>
 <p>If the target Series is not specified, then the 1st member of MultipleSeries will be the target</p>
 <dl class="field-list simple">
@@ -2592,6 +2558,7 @@ Valid entries: ‘median’ [default], ‘mean’, ‘mode’ or ‘max’</p></
 <li><p><strong>target</strong> (<em>pyleoclim.Series</em><em>, </em><em>optional</em>) – A pyleoclim Series object.</p></li>
 <li><p><strong>timespan</strong> (<em>tuple</em>) – The time interval over which to perform the calculation</p></li>
 <li><p><strong>alpha</strong> (<em>float</em>) – The significance level (0.05 by default)</p></li>
+<li><p><strong>fdr_kwargs</strong> (<em>dict</em>) – Parameters for the FDR function</p></li>
 <li><p><strong>settings</strong> (<em>dict</em>) – <p>Parameters for the correlation function, including:</p>
 <dl class="simple">
 <dt>nsim<span class="classifier">int</span></dt><dd><p>the number of simulations (default: 1000)</p>
@@ -2606,16 +2573,20 @@ Valid entries: ‘median’ [default], ‘mean’, ‘mode’ or ‘max’</p></
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>res</strong> – Containing a list of the Pearson’s correlation coefficient, associated significance and p-value.</p>
+<dd class="field-even"><p><strong>corr</strong> – the result object, see <cite>pyleoclim.ui.CorrEns</cite></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p>pyleoclim.ui.CorrEns</p>
 </dd>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
 <dt><a class="reference internal" href="../utils/correlation/corr_sig.html#pyleoclim.utils.correlation.corr_sig" title="pyleoclim.utils.correlation.corr_sig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.correlation.corr_sig</span></code></a></dt><dd><p>Correlation function</p>
+</dd>
+<dt><a class="reference internal" href="../utils/correlation/fdr.html#pyleoclim.utils.correlation.fdr" title="pyleoclim.utils.correlation.fdr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.correlation.fdr</span></code></a></dt><dd><p>FDR function</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.ui.CorrEns</span></code></dt><dd><p>the correlation ensemble object</p>
 </dd>
 </dl>
 </div>
@@ -2624,39 +2595,51 @@ Valid entries: ‘median’ [default], ‘mean’, ‘mode’ or ‘max’</p></
 
 <span class="gp">In [2]: </span><span class="kn">from</span> <span class="nn">pyleoclim.utils.tsmodel</span> <span class="kn">import</span> <span class="n">colored_noise</span>
 
-<span class="gp">In [3]: </span><span class="n">nt</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">In [3]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="gp">In [4]: </span><span class="n">t0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
+<span class="gp">In [4]: </span><span class="n">nt</span> <span class="o">=</span> <span class="mi">100</span>
 
-<span class="gp">In [5]: </span><span class="n">v0</span> <span class="o">=</span> <span class="n">colored_noise</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t0</span><span class="p">)</span>
+<span class="gp">In [5]: </span><span class="n">t0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
 
-<span class="gp">In [6]: </span><span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nt</span><span class="p">)</span>
+<span class="gp">In [6]: </span><span class="n">v0</span> <span class="o">=</span> <span class="n">colored_noise</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t0</span><span class="p">)</span>
 
-<span class="gp">In [7]: </span><span class="n">ts0</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="p">)</span>
+<span class="gp">In [7]: </span><span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nt</span><span class="p">)</span>
 
-<span class="gp">In [8]: </span><span class="n">ts1</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="n">noise</span><span class="p">)</span>
+<span class="gp">In [8]: </span><span class="n">ts0</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="p">)</span>
 
-<span class="gp">In [9]: </span><span class="n">ts2</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">noise</span><span class="p">)</span>
+<span class="gp">In [9]: </span><span class="n">ts1</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="n">noise</span><span class="p">)</span>
 
-<span class="gp">In [10]: </span><span class="n">ts3</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">noise</span><span class="p">)</span>
+<span class="gp">In [10]: </span><span class="n">ts2</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">noise</span><span class="p">)</span>
 
-<span class="gp">In [11]: </span><span class="n">ts_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts1</span><span class="p">,</span> <span class="n">ts2</span><span class="p">,</span> <span class="n">ts3</span><span class="p">]</span>
+<span class="gp">In [11]: </span><span class="n">ts3</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">noise</span><span class="p">)</span>
 
-<span class="gp">In [12]: </span><span class="n">ms</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">MultipleSeries</span><span class="p">(</span><span class="n">ts_list</span><span class="p">)</span>
+<span class="gp">In [12]: </span><span class="n">ts_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts1</span><span class="p">,</span> <span class="n">ts2</span><span class="p">,</span> <span class="n">ts3</span><span class="p">]</span>
 
-<span class="gp">In [13]: </span><span class="n">ts_target</span> <span class="o">=</span> <span class="n">ts0</span>
+<span class="gp">In [13]: </span><span class="n">ms</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">MultipleSeries</span><span class="p">(</span><span class="n">ts_list</span><span class="p">)</span>
 
-<span class="go"># set an arbitrary randome seed to fix the result</span>
-<span class="gp">In [14]: </span><span class="n">corr_res</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">ts_target</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nsim&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2333</span><span class="p">)</span>
-
-<span class="gp">In [15]: </span><span class="nb">print</span><span class="p">(</span><span class="n">corr_res</span><span class="p">)</span>
-<span class="go">{&#39;r&#39;: [0.9971216064442687, 0.988444118743943, 0.9992840580741884], &#39;p&#39;: [0.0, 0.0, 0.0], &#39;signif&#39;: [True, True, True], &#39;alpha&#39;: 0.05}</span>
+<span class="gp">In [14]: </span><span class="n">ts_target</span> <span class="o">=</span> <span class="n">ts0</span>
 
 <span class="go"># set an arbitrary randome seed to fix the result</span>
-<span class="gp">In [16]: </span><span class="n">corr_res</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nsim&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2333</span><span class="p">)</span>
+<span class="gp">In [15]: </span><span class="n">corr_res</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">ts_target</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nsim&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2333</span><span class="p">)</span>
 
-<span class="gp">In [17]: </span><span class="nb">print</span><span class="p">(</span><span class="n">corr_res</span><span class="p">)</span>
-<span class="go">{&#39;r&#39;: [1.0, 0.9970920448770966, 0.9992762162788777], &#39;p&#39;: [0.0, 0.0, 0.0], &#39;signif&#39;: [True, True, True], &#39;alpha&#39;: 0.05}</span>
+<span class="gp">In [16]: </span><span class="nb">print</span><span class="p">(</span><span class="n">corr_res</span><span class="p">)</span>
+<span class="go">  correlation  p-value    signif. w/o FDR (α: 0.05)    signif. w/ FDR (α: 0.05)</span>
+<span class="go">-------------  ---------  ---------------------------  --------------------------</span>
+<span class="go">     0.997122  &lt; 1e-6     True                         True</span>
+<span class="go">     0.988444  &lt; 1e-6     True                         True</span>
+<span class="go">     0.999284  &lt; 1e-6     True                         True</span>
+<span class="go">Ensemble size: 3</span>
+
+<span class="go"># set an arbitrary randome seed to fix the result</span>
+<span class="gp">In [17]: </span><span class="n">corr_res</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nsim&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2333</span><span class="p">)</span>
+
+<span class="gp">In [18]: </span><span class="nb">print</span><span class="p">(</span><span class="n">corr_res</span><span class="p">)</span>
+<span class="go">  correlation  p-value    signif. w/o FDR (α: 0.05)    signif. w/ FDR (α: 0.05)</span>
+<span class="go">-------------  ---------  ---------------------------  --------------------------</span>
+<span class="go">     1         &lt; 1e-6     True                         True</span>
+<span class="go">     0.997092  &lt; 1e-6     True                         True</span>
+<span class="go">     0.999276  &lt; 1e-6     True                         True</span>
+<span class="go">Ensemble size: 3</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -2728,7 +2711,8 @@ Options include:</p>
 <li><p><strong>method</strong> (<em>str</em><em>, </em><em>{'savitzky-golay'</em><em>, </em><em>'butterworth'</em><em>, </em><em>'firwin'}</em>) – the filtering method
 - ‘butterworth’: the Butterworth method (default)
 - ‘savitzky-golay’: the Savitzky-Golay method
-- ‘firwin’: FIR filter design using the window method, with default window as Hanning</p></li>
+- ‘firwin’: FIR filter design using the window method, with default window as Hamming
+- ‘lanczos’: lowpass filter via Lanczos resampling</p></li>
 <li><p><strong>cutoff_freq</strong> (<em>float</em><em> or </em><em>list</em>) – The cutoff frequency only works with the Butterworth method.
 If a float, it is interpreted as a low-frequency cutoff (lowpass).
 If a list,  it is interpreted as a frequency band (f1, f2), with f1 &lt; f2 (bandpass).</p></li>
@@ -2755,6 +2739,8 @@ see <cite>pyleoclim.utils.filter.savitzky_golay</cite>, <cite>pyleoclim.utils.fi
 <dt><a class="reference internal" href="../utils/filter/savitzky_golay.html#pyleoclim.utils.filter.savitzky_golay" title="pyleoclim.utils.filter.savitzky_golay"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.savitzky_golay</span></code></a></dt><dd><p>Savitzky-Golay method</p>
 </dd>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.firwin</span></code></dt><dd><p>FIR filter design using the window method</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.lanczos</span></code></dt><dd><p>lowpass filter via Lanczos resampling</p>
 </dd>
 </dl>
 </div>
@@ -3211,46 +3197,49 @@ Ensembles usually arise from age modeling or Bayesian calibrations. All members 
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">detrend</span></code>([method])</p></td>
 <td><p>Detrend timeseries</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">equal_lengths</span></code>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.distplot" title="pyleoclim.core.ui.EnsembleSeries.distplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">distplot</span></code></a>([figsize, title, savefig_settings, …])</p></td>
+<td><p>Plots the distribution of the timeseries across ensembles</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">equal_lengths</span></code>()</p></td>
 <td><p>Test whether all series in object have equal length</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span></code>([cutoff_freq, cutoff_scale, method])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span></code>([cutoff_freq, cutoff_scale, method])</p></td>
 <td><p>Filtering the timeseries in the MultipleSeries object</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gkernel</span></code>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gkernel</span></code>(**kwargs)</p></td>
 <td><p>Aligns the time axes of a MultipleSeries object, via Gaussian kernel.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>(**kwargs)</p></td>
 <td><p>Aligns the time axes of a MultipleSeries object, via interpolation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.make_labels" title="pyleoclim.core.ui.EnsembleSeries.make_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.make_labels" title="pyleoclim.core.ui.EnsembleSeries.make_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code></a>()</p></td>
 <td><p>Initialization of labels</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code>([nMC])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code>([nMC])</p></td>
 <td><p>Principal Component Analysis</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>([figsize, marker, markersize, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>([figsize, marker, markersize, …])</p></td>
 <td><p>Plot multiple timeseries on the same axis</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.plot_envelope" title="pyleoclim.core.ui.EnsembleSeries.plot_envelope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_envelope</span></code></a>([figsize, qs, xlabel, ylabel, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.plot_envelope" title="pyleoclim.core.ui.EnsembleSeries.plot_envelope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_envelope</span></code></a>([figsize, qs, xlabel, ylabel, …])</p></td>
 <td><p>Plot EnsembleSeries as an envelope.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.plot_traces" title="pyleoclim.core.ui.EnsembleSeries.plot_traces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_traces</span></code></a>([figsize, xlabel, ylabel, …])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.plot_traces" title="pyleoclim.core.ui.EnsembleSeries.plot_traces"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_traces</span></code></a>([figsize, xlabel, ylabel, …])</p></td>
 <td><p>Plot EnsembleSeries as a subset of traces.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.quantiles" title="pyleoclim.core.ui.EnsembleSeries.quantiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantiles</span></code></a>([qs])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.quantiles" title="pyleoclim.core.ui.EnsembleSeries.quantiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quantiles</span></code></a>([qs])</p></td>
 <td><p>Calculate quantiles of an EnsembleSeries object</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral</span></code>([method, settings, mute_pbar, …])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral</span></code>([method, settings, mute_pbar, …])</p></td>
 <td><p>Perform spectral analysis on the timeseries</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.stackplot" title="pyleoclim.core.ui.EnsembleSeries.stackplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stackplot</span></code></a>([figsize, savefig_settings, xlim, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.stackplot" title="pyleoclim.core.ui.EnsembleSeries.stackplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stackplot</span></code></a>([figsize, savefig_settings, xlim, …])</p></td>
 <td><p>Stack plot of multiple series</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code>()</p></td>
 <td><p>Standardize each series object</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code>([method, settings, freq_method, …])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code>([method, settings, freq_method, …])</p></td>
 <td><p>Wavelet analysis</p></td>
 </tr>
 </tbody>
@@ -3287,10 +3276,10 @@ otherwise, if the target contains only n-m Series, then the first m Series in th
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>res</strong> – Containing a list of the Pearson’s correlation coefficient, associated significance and p-value.</p>
+<dd class="field-even"><p><strong>corr</strong> – the result object, see <cite>pyleoclim.ui.CorrEns</cite></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p>pyleoclim.ui.CorrEns</p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -3300,47 +3289,92 @@ otherwise, if the target contains only n-m Series, then the first m Series in th
 </dd>
 <dt><a class="reference internal" href="../utils/correlation/fdr.html#pyleoclim.utils.correlation.fdr" title="pyleoclim.utils.correlation.fdr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.correlation.fdr</span></code></a></dt><dd><p>FDR function</p>
 </dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.ui.CorrEns</span></code></dt><dd><p>the correlation ensemble object</p>
+</dd>
 </dl>
 </div>
 <p class="rubric">Examples</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">pyleoclim</span> <span class="k">as</span> <span class="nn">pyleo</span>
 
-<span class="gp">In [2]: </span><span class="kn">from</span> <span class="nn">pyleoclim.utils.tsmodel</span> <span class="kn">import</span> <span class="n">colored_noise</span>
+<span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="gp">In [3]: </span><span class="n">nt</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">In [3]: </span><span class="kn">from</span> <span class="nn">pyleoclim.utils.tsmodel</span> <span class="kn">import</span> <span class="n">colored_noise</span>
 
-<span class="gp">In [4]: </span><span class="n">t0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
+<span class="gp">In [4]: </span><span class="n">nt</span> <span class="o">=</span> <span class="mi">100</span>
 
-<span class="gp">In [5]: </span><span class="n">v0</span> <span class="o">=</span> <span class="n">colored_noise</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t0</span><span class="p">)</span>
+<span class="gp">In [5]: </span><span class="n">t0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
 
-<span class="gp">In [6]: </span><span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nt</span><span class="p">)</span>
+<span class="gp">In [6]: </span><span class="n">v0</span> <span class="o">=</span> <span class="n">colored_noise</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="n">t0</span><span class="p">)</span>
 
-<span class="gp">In [7]: </span><span class="n">ts0</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="p">)</span>
+<span class="gp">In [7]: </span><span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">nt</span><span class="p">)</span>
 
-<span class="gp">In [8]: </span><span class="n">ts1</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="n">noise</span><span class="p">)</span>
+<span class="gp">In [8]: </span><span class="n">ts0</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="p">)</span>
 
-<span class="gp">In [9]: </span><span class="n">ts2</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">noise</span><span class="p">)</span>
+<span class="gp">In [9]: </span><span class="n">ts1</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="n">noise</span><span class="p">)</span>
 
-<span class="gp">In [10]: </span><span class="n">ts3</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">noise</span><span class="p">)</span>
+<span class="gp">In [10]: </span><span class="n">ts2</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">noise</span><span class="p">)</span>
 
-<span class="gp">In [11]: </span><span class="n">ts_list1</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts0</span><span class="p">,</span> <span class="n">ts1</span><span class="p">]</span>
+<span class="gp">In [11]: </span><span class="n">ts3</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">t0</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v0</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">noise</span><span class="p">)</span>
 
-<span class="gp">In [12]: </span><span class="n">ts_list2</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts2</span><span class="p">,</span> <span class="n">ts3</span><span class="p">]</span>
+<span class="gp">In [12]: </span><span class="n">ts_list1</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts0</span><span class="p">,</span> <span class="n">ts1</span><span class="p">]</span>
 
-<span class="gp">In [13]: </span><span class="n">ts_ens</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">EnsembleSeries</span><span class="p">(</span><span class="n">ts_list1</span><span class="p">)</span>
+<span class="gp">In [13]: </span><span class="n">ts_list2</span> <span class="o">=</span> <span class="p">[</span><span class="n">ts2</span><span class="p">,</span> <span class="n">ts3</span><span class="p">]</span>
 
-<span class="gp">In [14]: </span><span class="n">ts_target</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">EnsembleSeries</span><span class="p">(</span><span class="n">ts_list2</span><span class="p">)</span>
+<span class="gp">In [14]: </span><span class="n">ts_ens</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">EnsembleSeries</span><span class="p">(</span><span class="n">ts_list1</span><span class="p">)</span>
+
+<span class="gp">In [15]: </span><span class="n">ts_target</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">EnsembleSeries</span><span class="p">(</span><span class="n">ts_list2</span><span class="p">)</span>
 
 <span class="go"># set an arbitrary randome seed to fix the result</span>
-<span class="gp">In [15]: </span><span class="n">corr_res</span> <span class="o">=</span> <span class="n">ts_ens</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">ts_target</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2333</span><span class="p">)</span>
+<span class="gp">In [16]: </span><span class="n">corr_res</span> <span class="o">=</span> <span class="n">ts_ens</span><span class="o">.</span><span class="n">correlation</span><span class="p">(</span><span class="n">ts_target</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2333</span><span class="p">)</span>
 
-<span class="gp">In [16]: </span><span class="nb">print</span><span class="p">(</span><span class="n">corr_res</span><span class="p">)</span>
-<span class="go">  correlation    p-value  signif. w/o FDR (α: 0.05)    signif. w/ FDR (α: 0.05)</span>
+<span class="gp">In [17]: </span><span class="nb">print</span><span class="p">(</span><span class="n">corr_res</span><span class="p">)</span>
+<span class="go">  correlation  p-value    signif. w/o FDR (α: 0.05)    signif. w/ FDR (α: 0.05)</span>
 <span class="go">-------------  ---------  ---------------------------  --------------------------</span>
-<span class="go">     0.991122          0  True                         True</span>
-<span class="go">     0.999445          0  True                         True</span>
+<span class="go">     0.991122  &lt; 1e-6     True                         True</span>
+<span class="go">     0.999445  &lt; 1e-6     True                         True</span>
 <span class="go">Ensemble size: 2</span>
 </pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyleoclim.core.ui.EnsembleSeries.distplot">
+<code class="sig-name descname"><span class="pre">distplot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[10,</span> <span class="pre">4]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'KDE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edgecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'w'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">plot_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#EnsembleSeries.distplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.EnsembleSeries.distplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the distribution of the timeseries across ensembles</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – The size of the figure. The default is [10, 4].</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Title for the figure. The default is None.</p></li>
+<li><p><strong>savefig_settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>the dictionary of arguments for plt.savefig(); some notes below:</dt><dd><ul>
+<li><p>”path” must be specified; it can be any existed or non-existed path,
+with or without a suffix; if the suffix is not given in “path”, it will follow “format”</p></li>
+<li><p>”format” can be one of {“pdf”, “eps”, “png”, “ps”}.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The default is None.</p>
+</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axis</em><em>, </em><em>optional</em>) – A matplotlib axis. The default is None.</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for the count axis. The default is ‘KDE’.</p></li>
+<li><p><strong>vertical</strong> (<em>{True</em><em>,</em><em>False}</em><em>, </em><em>optional</em>) – Whether to flip the plot vertically. The default is False.</p></li>
+<li><p><strong>edgecolor</strong> (<em>matplotlib.color</em><em>, </em><em>optional</em>) – The color of the edges of the bar. The default is ‘w’.</p></li>
+<li><p><strong>mute</strong> (<em>{True</em><em>,</em><em>False}</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>if True, the plot will not show;</dt><dd><p>recommend to turn on when more modifications are going to be made on ax. The default is False.</p>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>**plot_kwargs</strong> (<em>dict</em>) – Plotting arguments for seaborn histplot: <a class="reference external" href="https://seaborn.pydata.org/generated/seaborn.histplot.html">https://seaborn.pydata.org/generated/seaborn.histplot.html</a>.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../utils/plotting/savefig.html#pyleoclim.utils.plotting.savefig" title="pyleoclim.utils.plotting.savefig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.plotting.savefig</span></code></a></dt><dd><p>saving figure in Pyleoclim</p>
+</dd>
+</dl>
 </div>
 </dd></dl>
 
@@ -3402,7 +3436,7 @@ recommend to turn on when more modifications are going to be made on ax. The def
 <dd class="field-odd"><p>fig, ax</p>
 </dd>
 </dl>
-<p class="rubric">Example</p>
+<p class="rubric">Examples</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="n">nn</span> <span class="o">=</span> <span class="mi">30</span> <span class="c1"># number of noise realizations</span>
 
 <span class="gp">In [2]: </span><span class="n">nt</span> <span class="o">=</span> <span class="mi">500</span>
@@ -3927,29 +3961,35 @@ If you already now the number of the timeseries object you’re interested in, t
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">distplot</span></code>([figsize, title, savefig_settings, …])</p></td>
 <td><p>Plot the distribution of the timeseries values</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span></code>([cutoff_freq, cutoff_scale, method])</p></td>
-<td><p>Filtering the timeseries</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fill_na</span></code>([timespan, dt])</p></td>
+<td><p>Fill NaNs into the timespan</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussianize</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span></code>([cutoff_freq, cutoff_scale, method])</p></td>
+<td><p>Apply a filter to the timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gaussianize</span></code>()</p></td>
 <td><p>Gaussianizes the timeseries</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.LipdSeries.getMetadata" title="pyleoclim.core.ui.LipdSeries.getMetadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getMetadata</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.LipdSeries.getMetadata" title="pyleoclim.core.ui.LipdSeries.getMetadata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getMetadata</span></code></a>()</p></td>
 <td><p>Get the necessary metadata for the ensemble plots</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gkernel</span></code>([step_type])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gkernel</span></code>([step_type])</p></td>
 <td><p>Coarse-grain a Series object via a Gaussian kernel.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>([method])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>([method])</p></td>
 <td><p>Interpolate a Series object onto a new time axis</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_evenly_spaced</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_evenly_spaced</span></code>()</p></td>
 <td><p>Check if the timeseries is evenly-spaced</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code>()</p></td>
 <td><p>Initialization of labels</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.LipdSeries.map" title="pyleoclim.core.ui.LipdSeries.map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map</span></code></a>([projection, proj_default, background, …])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.LipdSeries.map" title="pyleoclim.core.ui.LipdSeries.map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">map</span></code></a>([projection, proj_default, background, …])</p></td>
 <td><p>Map the location of the record</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.LipdSeries.mapNearRecord" title="pyleoclim.core.ui.LipdSeries.mapNearRecord"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mapNearRecord</span></code></a>(D[, n, radius, sameArchive, …])</p></td>
+<td><p>Map records that are near the timeseries of interest</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">outliers</span></code>([auto, remove, fig_outliers, …])</p></td>
 <td><p>Detects outliers in a timeseries and removes if specified</p></td>
@@ -4021,16 +4061,16 @@ If you already now the number of the timeseries object you’re interested in, t
 
 <dl class="py method">
 <dt id="pyleoclim.core.ui.LipdSeries.dashboard">
-<code class="sig-name descname"><span class="pre">dashboard</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[11,</span> <span class="pre">8]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distplt_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectralsignif_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectralfig_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#LipdSeries.dashboard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.LipdSeries.dashboard" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">dashboard</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[11,</span> <span class="pre">8]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plt_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distplt_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectral_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectralsignif_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectralfig_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#LipdSeries.dashboard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.LipdSeries.dashboard" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – Figure size. The default is [11,8].</p></li>
-<li><p><strong>plt_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional arguments for the timeseries plot. See Series.plot(). The default is None.</p></li>
-<li><p><strong>distplt_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional arguments for the distribution plot. See Series.distplot(). The default is None.</p></li>
-<li><p><strong>spectral_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional arguments for the spectral method. Default is to use Lomb-Scargle method. See Series.spectral(). The default is None.</p></li>
-<li><p><strong>spectralsignif_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional arguments to estimate the significance of the power spectrum. See PSD.signif_test. Note that the default number of simulations has been changed to 1000. The default is None.</p></li>
-<li><p><strong>spectralfig_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional arguments for the power spectrum figure. See PSD.plot(). The default is None.</p></li>
+<li><p><strong>plt_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional arguments for the timeseries plot. See Series.plot() or EnsembleSeries.plot_envelope(). The default is None.</p></li>
+<li><p><strong>distplt_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional arguments for the distribution plot. See Series.distplot() or EnsembleSeries.plot_displot(). The default is None.</p></li>
+<li><p><strong>spectral_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional arguments for the spectral method. Default is to use Lomb-Scargle method. See Series.spectral() or EnsembleSeries.spectral(). The default is None.</p></li>
+<li><p><strong>spectralsignif_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional arguments to estimate the significance of the power spectrum. See PSD.signif_test. Note that we currently do not support significance testing for ensembles. The default is None.</p></li>
+<li><p><strong>spectralfig_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional arguments for the power spectrum figure. See PSD.plot() or MultiplePSD.plot_envelope(). The default is None.</p></li>
 <li><p><strong>map_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Optional arguments for the map. See LipdSeries.map(). The default is None.</p></li>
 <li><p><strong>metadata</strong> (<em>{True</em><em>,</em><em>False}</em><em>, </em><em>optional</em>) – Whether or not to produce a dashboard with printed metadata. The default is True.</p></li>
 <li><p><strong>savefig_settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>the dictionary of arguments for plt.savefig(); some notes below:
@@ -4045,6 +4085,8 @@ If you already now the number of the timeseries object you’re interested in, t
 </p></li>
 <li><p><strong>mute</strong> (<em>{True</em><em>,</em><em>False}</em><em>, </em><em>optional</em>) – if True, the plot will not show;
 recommend to turn on when more modifications are going to be made on ax. The default is False.</p></li>
+<li><p><strong>ensemble</strong> (<em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em>) – If True, will return the dashboard in ensemble modes if ensembles are available</p></li>
+<li><p><strong>D</strong> (<em>pyleoclim.Lipd</em>) – If asking for an ensemble plot, a pyleoclim.Lipd object must be provided</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -4060,13 +4102,21 @@ recommend to turn on when more modifications are going to be made on ax. The def
 <dl class="simple">
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.Series.plot</span></code></dt><dd><p>plot a timeseries</p>
 </dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.EnsembleSeries.plot_envelope</span></code></dt><dd><p>Envelope plots for an ensemble</p>
+</dd>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.Series.distplot</span></code></dt><dd><p>plot a distribution of the timeseries</p>
 </dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.EnsembleSeries.distplot</span></code></dt><dd><p>plot a distribution of the timeseries across ensembles</p>
+</dd>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.Series.spectral</span></code></dt><dd><p>spectral analysis method.</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.MultipleSeries.spectral</span></code></dt><dd><p>spectral analysis method for multiple series.</p>
 </dd>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.PSD.signif_test</span></code></dt><dd><p>significance test for timeseries analysis</p>
 </dd>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.PSD.plot</span></code></dt><dd><p>plot power spectrum</p>
+</dd>
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.MulitplePSD.plot</span></code></dt><dd><p>plot envelope of power spectrum</p>
 </dd>
 <dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.LipdSeries.map</span></code></dt><dd><p>map location of dataset</p>
 </dd>
@@ -4203,6 +4253,71 @@ recommend to turn on when more modifications are going to be made on ax. The def
 </pre></div>
 </div>
 <img alt="../_images/mapone.png" src="../_images/mapone.png" />
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyleoclim.core.ui.LipdSeries.mapNearRecord">
+<code class="sig-name descname"><span class="pre">mapNearRecord</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sameArchive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">projection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Orthographic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">borders</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rivers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lakes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_ref</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markersize_adjust</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">legend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lgd_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#LipdSeries.mapNearRecord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.LipdSeries.mapNearRecord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Map records that are near the timeseries of interest</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>D</strong> (<em>pyleoclim.Lipd</em>) – A pyleoclim LiPD object</p></li>
+<li><p><strong>n</strong> (<em>int</em><em>, </em><em>optional</em>) – The n number of closest records. The default is 5.</p></li>
+<li><p><strong>radius</strong> (<em>float</em><em>, </em><em>optional</em>) – The radius to take into consideration when looking for records (in km). The default is None.</p></li>
+<li><p><strong>sameArchive</strong> (<em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em>) – Whether to consider records from the same archiveType as the original record. The default is False.</p></li>
+<li><p><strong>projection</strong> (<em>string</em><em>, </em><em>optional</em>) – A valid cartopy projection. The default is ‘Orthographic’.</p></li>
+<li><p><strong>proj_default</strong> (<em>True</em><em> or </em><em>dict</em><em>, </em><em>optional</em>) – The projection arguments. If not True, then use a dictionary to pass the appropriate arguments depending on the projection. The default is True.</p></li>
+<li><p><strong>background</strong> (<em>{True</em><em>,</em><em>False}</em><em>, </em><em>optional</em>) – Whether to use a background. The default is True.</p></li>
+<li><p><strong>borders</strong> (<em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em>) – Whether to plot country borders. The default is False.</p></li>
+<li><p><strong>rivers</strong> (<em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em>) – Whether to plot rivers. The default is False.</p></li>
+<li><p><strong>lakes</strong> (<em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em>) – Whether to plot rivers. The default is False.</p></li>
+<li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – the size of the figure. The default is None.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.ax</em><em>, </em><em>optional</em>) – The matplotlib axis onto which to return the map. The default is None.</p></li>
+<li><p><strong>marker_ref</strong> (<em>str</em><em>, </em><em>optional</em>) – Marker shape to use for the main record. The default is None, which corresponds to the default marker for the archiveType</p></li>
+<li><p><strong>color_ref</strong> (<em>str</em><em>, </em><em>optional</em>) – The color for the main record. The default is None, which corresponds to the default color for the archiveType.</p></li>
+<li><p><strong>marker</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – Marker shape to use for the other records. The default is None, which corresponds to the marker shape for each archiveType.</p></li>
+<li><p><strong>color</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – Color for each marker. The default is None, which corresponds to the color for each archiveType</p></li>
+<li><p><strong>markersize_adjust</strong> (<em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em>) – Whether to adjust the marker size according to distance from record of interest. The default is False.</p></li>
+<li><p><strong>scale_factor</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum marker size. The default is 100.</p></li>
+<li><p><strong>scatter_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Parameters for the scatter plot. The default is None.</p></li>
+<li><p><strong>legend</strong> (<em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em>) – Whether to show the legend. The default is True.</p></li>
+<li><p><strong>lgd_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Parameters for the legend. The default is None.</p></li>
+<li><p><strong>savefig_settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>the dictionary of arguments for plt.savefig(); some notes below:
+- “path” must be specified; it can be any existed or non-existed path,</p>
+<blockquote>
+<div><p>with or without a suffix; if the suffix is not given in “path”, it will follow “format”</p>
+</div></blockquote>
+<ul>
+<li><p>”format” can be one of {“pdf”, “eps”, “png”, “ps”}. The default is None.</p></li>
+</ul>
+</p></li>
+<li><p><strong>mute</strong> (<em>{True</em><em>, </em><em>False}</em><em>, </em><em>optional</em>) – if True, the plot will not show;
+recommend to turn on when more modifications are going to be made on ax. The default is False.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../utils/mapping/map_all.html#pyleoclim.utils.mapping.map_all" title="pyleoclim.utils.mapping.map_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.mapping.map_all</span></code></a></dt><dd><p>Underlying mapping function for Pyleoclim</p>
+</dd>
+<dt><a class="reference internal" href="../utils/mapping/dist_sphere.html#pyleoclim.utils.mapping.dist_sphere" title="pyleoclim.utils.mapping.dist_sphere"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.mapping.dist_sphere</span></code></a></dt><dd><p>Calculate distance on a sphere</p>
+</dd>
+<dt><a class="reference internal" href="../utils/mapping/compute_dist.html#pyleoclim.utils.mapping.compute_dist" title="pyleoclim.utils.mapping.compute_dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.mapping.compute_dist</span></code></a></dt><dd><p>Compute the distance between a point and an array</p>
+</dd>
+<dt><a class="reference internal" href="../utils/mapping/within_distance.html#pyleoclim.utils.mapping.within_distance" title="pyleoclim.utils.mapping.within_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.mapping.within_distance</span></code></a></dt><dd><p>Returns point in an array within a certain distance</p>
+</dd>
+</dl>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>res</strong> – contains fig and ax</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -4938,21 +5053,53 @@ recommend to turn on when more modifications are going to be made on ax. The def
 </dd></dl>
 
 </div>
+<div class="section" id="corr-pyleoclim-corr">
+<h2>Corr (pyleoclim.Corr)<a class="headerlink" href="#corr-pyleoclim-corr" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.Corr">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></code><code class="sig-name descname"><span class="pre">Corr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_fmt_td</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_fmt_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Corr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Corr" title="Permalink to this definition">¶</a></dt>
+<dd><p>The object for correlation result in order to format the print message</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>float</em>) – the correlation coefficient</p></li>
+<li><p><strong>p</strong> (<em>float</em>) – the p-value</p></li>
+<li><p><strong>p_fmt_td</strong> (<em>float</em>) – the threshold for p-value formating (0.01 by default, i.e., if p&lt;0.01, will print “&lt; 0.01” instead of “0”)</p></li>
+<li><p><strong>p_fmt_style</strong> (<em>str</em>) – the style for p-value formating (exponential notation by default)</p></li>
+<li><p><strong>signif</strong> (<em>bool</em>) – the significance</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – The significance level (0.05 by default)</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../utils/correlation/corr_sig.html#pyleoclim.utils.correlation.corr_sig" title="pyleoclim.utils.correlation.corr_sig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.correlation.corr_sig</span></code></a></dt><dd><p>Correlation function</p>
+</dd>
+<dt><a class="reference internal" href="../utils/correlation/fdr.html#pyleoclim.utils.correlation.fdr" title="pyleoclim.utils.correlation.fdr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.correlation.fdr</span></code></a></dt><dd><p>FDR function</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</div>
 <div class="section" id="correns-pyleoclim-correns">
 <h2>CorrEns (pyleoclim.CorrEns)<a class="headerlink" href="#correns-pyleoclim-correns" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="pyleoclim.core.ui.CorrEns">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></code><code class="sig-name descname"><span class="pre">CorrEns</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_fdr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#CorrEns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.CorrEns" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></code><code class="sig-name descname"><span class="pre">CorrEns</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_fdr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_fmt_td</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_fmt_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exp'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#CorrEns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.CorrEns" title="Permalink to this definition">¶</a></dt>
 <dd><p>Correlation Ensemble</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>list</em>) – the list of correlation coefficients</p></li>
 <li><p><strong>p</strong> (<em>list</em>) – the list of p-values</p></li>
+<li><p><strong>p_fmt_td</strong> (<em>float</em>) – the threshold for p-value formating (0.01 by default, i.e., if p&lt;0.01, will print “&lt; 0.01” instead of “0”)</p></li>
+<li><p><strong>p_fmt_style</strong> (<em>str</em>) – the style for p-value formating (exponential notation by default)</p></li>
 <li><p><strong>signif</strong> (<em>list</em>) – the list of significance without FDR</p></li>
 <li><p><strong>signif_fdr</strong> (<em>list</em>) – the list of significance with FDR</p></li>
 <li><p><strong>signif_fdr</strong> – the list of significance with FDR</p></li>
-<li><p><strong>alpha</strong> (<em>float</em>) – The significance level (0.05 by default)</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – The significance level</p></li>
 </ul>
 </dd>
 </dl>
@@ -4979,7 +5126,7 @@ recommend to turn on when more modifications are going to be made on ax. The def
 </table>
 <dl class="py method">
 <dt id="pyleoclim.core.ui.CorrEns.plot">
-<code class="sig-name descname"><span class="pre">plot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[4,</span> <span class="pre">4]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_insignif</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#929591'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_signif</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#029386'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_signif_fdr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#ffa756'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_percentile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#ff796c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#CorrEns.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.CorrEns.plot" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">plot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[4,</span> <span class="pre">4]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_insignif</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#929591'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_signif</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#029386'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_signif_fdr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#ffa756'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_percentile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#ff796c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrange</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#CorrEns.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.CorrEns.plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot the correlation ensembles</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -5001,6 +5148,7 @@ recommend to turn on when more modifications are going to be made on ax. The def
 See [matplotlib.axes](<a class="reference external" href="https://matplotlib.org/api/axes_api.html">https://matplotlib.org/api/axes_api.html</a>) for details.</p></li>
 <li><p><strong>mute</strong> (<em>{True</em><em>,</em><em>False}</em>) – if True, the plot will not show;
 recommend to turn on when more modifications are going to be made on ax</p></li>
+<li><p><strong>xlim</strong> (<em>list</em><em>, </em><em>optional</em>) – x-axis limits. The default is None.</p></li>
 </ul>
 </dd>
 </dl>
@@ -5011,6 +5159,117 @@ recommend to turn on when more modifications are going to be made on ax</p></li>
 </dd>
 </dl>
 </div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="ssares-pyleoclim-ssares">
+<h2>SsaRes (pyleoclim.SsaRes)<a class="headerlink" href="#ssares-pyleoclim-ssares" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="pyleoclim.core.ui.SsaRes">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></code><code class="sig-name descname"><span class="pre">SsaRes</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigvals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigvecs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pctvar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PC</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RCmat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">RCseries</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigvals_q</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SsaRes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.SsaRes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to hold the results of SSA method</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eigvals</strong> (<em>float</em><em> (</em><em>M</em><em>, </em><em>1</em><em>)</em>) – a vector of real eigenvalues derived from the signal</p></li>
+<li><p><strong>pctvar</strong> (<em>float</em><em> (</em><em>M</em><em>, </em><em>1</em><em>)</em>) – same vector, expressed in % variance accounted for by each mode.</p></li>
+<li><p><strong>eigvals_q</strong> (<em>float</em><em> (</em><em>M</em><em>, </em><em>2</em><em>)</em>) – array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ assigned NaNs if unused ]</p></li>
+<li><p><strong>eigvecs</strong> (<em>float</em><em> (</em><em>M</em><em>, </em><em>M</em><em>)</em>) – a matrix of the temporal eigenvectors (T-EOFs), i.e. the temporal patterns that explain most of the variations in the original series.</p></li>
+<li><p><strong>PC</strong> (<em>float</em><em> (</em><em>N - M + 1</em><em>, </em><em>M</em><em>)</em>) – array of principal components, i.e. the loadings that, convolved with the T-EOFs, produce the reconstructed components, or RCs</p></li>
+<li><p><strong>RCmat</strong> (<em>float</em><em> (</em><em>N</em><em>,  </em><em>M</em><em>)</em>) – array of reconstructed components, One can think of each RC as the contribution of each mode to the timeseries, weighted by their eigenvalue (loosely speaking, their “amplitude”). Summing over all columns of RC recovers the original series. (synthesis, the reciprocal operation of analysis).</p></li>
+<li><p><strong>mode_idx</strong> (<em>list</em>) – index of retained modes</p></li>
+<li><p><strong>RCseries</strong> (<em>float</em><em> (</em><em>N</em><em>, </em><em>1</em><em>)</em>) – reconstructed series based on the RCs of mode_idx (scale and mean fit to original series)</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../utils/decomposition/ssa.html#pyleoclim.utils.decomposition.ssa" title="pyleoclim.utils.decomposition.ssa"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.decomposition.ssa</span></code></a></dt><dd><p>Singular Spectrum Analysis</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.SsaRes.modeplot" title="pyleoclim.core.ui.SsaRes.modeplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modeplot</span></code></a>([mode, figsize, ax, …])</p></td>
+<td><p>Dashboard visualizing the properties of a given SSA mode, including:</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.SsaRes.screeplot" title="pyleoclim.core.ui.SsaRes.screeplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">screeplot</span></code></a>([figsize, title, ax, …])</p></td>
+<td><p>Scree plot for SSA visualizing the eigenvalue spectrum and indicating which modes were retained.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="pyleoclim.core.ui.SsaRes.modeplot">
+<code class="sig-name descname"><span class="pre">modeplot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[10,</span> <span class="pre">5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SsaRes.modeplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.SsaRes.modeplot" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Dashboard visualizing the properties of a given SSA mode, including:</dt><dd><ol class="arabic simple">
+<li><p>the analyzing function (T-EOF)</p></li>
+<li><p>the reconstructed component (RC)</p></li>
+<li><p>its spectrum</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>int</em>) – the (zero-based) index of the mode to visualize</p></li>
+<li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – The figure size. The default is [10, 5].</p></li>
+<li><p><strong>savefig_settings</strong> (<em>dict</em>) – <p>the dictionary of arguments for plt.savefig(); some notes below:
+- “path” must be specified; it can be any existed or non-existed path,</p>
+<blockquote>
+<div><p>with or without a suffix; if the suffix is not given in “path”, it will follow “format”</p>
+</div></blockquote>
+<ul>
+<li><p>”format” can be one of {“pdf”, “eps”, “png”, “ps”}</p></li>
+</ul>
+</p></li>
+<li><p><strong>title_kwargs</strong> (<em>dict</em>) – the keyword arguments for ax.set_title()</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axis</em><em>, </em><em>optional</em>) – the axis object from matplotlib
+See [matplotlib.axes](<a class="reference external" href="https://matplotlib.org/api/axes_api.html">https://matplotlib.org/api/axes_api.html</a>) for details.</p></li>
+<li><p><strong>mute</strong> (<em>{True</em><em>,</em><em>False}</em>) – if True, the plot will not show;
+recommend to turn on when more modifications are going to be made on ax</p></li>
+<li><p><strong>NW</strong> (<em>float</em><em> [</em><em>2</em><em>, </em><em>2.5</em><em>, </em><em>3</em><em>, </em><em>3.5</em><em> , </em><em>4</em><em>]</em>) – time-bandwidth product for MTM spectral estimate
+default: 2</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyleoclim.core.ui.SsaRes.screeplot">
+<code class="sig-name descname"><span class="pre">screeplot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[6,</span> <span class="pre">4]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SSA</span> <span class="pre">scree</span> <span class="pre">plot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_mcssa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#e50000'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_signif</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#029386'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_eig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SsaRes.screeplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.SsaRes.screeplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scree plot for SSA visualizing the eigenvalue spectrum and indicating which modes were retained.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – The figure size. The default is [6, 4].</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Plot title. The default is ‘SSA scree plot’.</p></li>
+<li><p><strong>savefig_settings</strong> (<em>dict</em>) – <p>the dictionary of arguments for plt.savefig(); some notes below:
+- “path” must be specified; it can be any existed or non-existed path,</p>
+<blockquote>
+<div><p>with or without a suffix; if the suffix is not given in “path”, it will follow “format”</p>
+</div></blockquote>
+<ul>
+<li><p>”format” can be one of {“pdf”, “eps”, “png”, “ps”}</p></li>
+</ul>
+</p></li>
+<li><p><strong>title_kwargs</strong> (<em>dict</em>) – the keyword arguments for ax.set_title()</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axis</em><em>, </em><em>optional</em>) – the axis object from matplotlib
+See [matplotlib.axes](<a class="reference external" href="https://matplotlib.org/api/axes_api.html">https://matplotlib.org/api/axes_api.html</a>) for details.</p></li>
+<li><p><strong>mute</strong> (<em>{True</em><em>,</em><em>False}</em>) – if True, the plot will not show;
+recommend to turn on when more modifications are going to be made on ax</p></li>
+<li><p><strong>xlim</strong> (<em>list</em><em>, </em><em>optional</em>) – x-axis limits. The default is None.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
