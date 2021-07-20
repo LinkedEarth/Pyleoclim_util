@@ -46,5 +46,5 @@ setup(
         "PyWavelets>=1.1.1",
         "Unidecode>=1.1.1"
     ],
-    python_requires=">=3.8.0, <3.9"
+    python_requires=">=3.8.0"
 )
