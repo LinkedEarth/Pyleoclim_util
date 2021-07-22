@@ -7498,22 +7498,23 @@ class LipdSeries(Series):
             color = [color]*len(lon)
         
         if 'edgecolors' not in scatter_kwargs.keys():
-            edgecolors= ['k']
+            edgecolors = []
             for item in marker:
                 edgecolors.append('w')
+            edgecolors.append('k')
             scatter_kwargs.update({'edgecolors':edgecolors})
         
         #Start plotting
-        lat_all = lat_ref + lat
-        lon_all = lon_ref + lon
-        dist_all = [0]+dist
+        lat_all = lat + lat_ref
+        lon_all = lon + lon_ref
+        dist_all = dist + [0]
         archiveType_all = archiveType
-        archiveType_all.insert(0,archiveType_ref) 
+        archiveType_all.append(archiveType_ref) 
         
         color_all = color
-        color_all.insert(0,color_ref)
+        color_all.append(color_ref)
         marker_all= marker
-        marker_all.insert(0,marker_ref)
+        marker_all.append(marker_ref)
         
         if markersize_adjust == True:
             scale = dist_all[-1]/(scale_factor-30)
