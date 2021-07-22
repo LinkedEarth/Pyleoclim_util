@@ -3,9 +3,9 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.8
+  - python=3.9
   - numpy
-  - cartopy>=0.18.0
+  - cartopy>=0.19.0
   - pip:
     - sphinx
     - pylint
