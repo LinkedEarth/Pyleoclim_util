@@ -469,10 +469,10 @@ class TestUiSeriesCorrelation:
     def test_correlation_t2(self, corr_method, eps=0.1):
         ''' Test correlation between two series with inconsistent time axis
         '''
-        data = sio.loadmat(os.path.join(test_dirpath, '../../example_data/wtc_test_data_nino.mat'))
-        nino = data['nino'][:, 0]
-        air  = data['air'][:, 0]
-        t = data['datayear'][:, 0]
+        data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/wtc_test_data_nino.csv')
+        nino = np.array(data['nino'])
+        air  = np.array(data['air'])
+        t = np.array(data['t'])
 
         # randomly delete 500 data pts
         n_del = 500
@@ -763,7 +763,7 @@ class TestUISeriesSsa():
     def test_ssa_t4(self):
         '''Test Series.ssa() on Allen&Smith dataset
         '''
-        df = pd.read_csv(os.path.join(test_dirpath,'../../example_data/mratest.txt'),delim_whitespace=True,names=['Total','Signal','Noise'])
+        df = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/mratest.txt',delim_whitespace=True,names=['Total','Signal','Noise'])
         mra = pyleo.Series(time=df.index, value=df['Total'], value_name='Allen&Smith test data', time_name='Time', time_unit='yr')
         mraSsa = mra.ssa(nMC=10)
         mraSsa.screeplot()
