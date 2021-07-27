@@ -116,6 +116,12 @@ MultipleScalogram (pyleoclim.MultipleScalogram)
 .. autoclass:: pyleoclim.core.ui.MultipleScalogram
    :members:
 
+Corr (pyleoclim.Corr)
+"""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.ui.Corr
+   :members:
+
 
 CorrEns (pyleoclim.CorrEns)
 """""""""""""""""""""""""""
@@ -123,6 +129,11 @@ CorrEns (pyleoclim.CorrEns)
 .. autoclass:: pyleoclim.core.ui.CorrEns
    :members:
 
+SsaRes (pyleoclim.SsaRes)
+"""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.ui.SsaRes
+   :members:
 
 gen_ts (pyleoclim.gen_ts)
 """""""""""""""""""""""""

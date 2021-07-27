@@ -1,0 +1,335 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Contributing to Pyleoclim &mdash; Pyleoclim 0.6.2beta documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/rtd_sphinx_search.min.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/js/rtd_sphinx_search.min.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+          
+
+          
+            
+            <img src="_static/pyleoclim_insigna_full_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.2beta
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Working with Pyleoclim</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core/ui.html">The Pyleoclim User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Advanced functionalities</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="utils/introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Getting Involved</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="citation.html">Citing Pyleoclim</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Contributing to Pyleoclim</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/contribution_guide.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="contributing-to-pyleoclim">
+<span id="id1"></span><h1>Contributing to Pyleoclim<a class="headerlink" href="#contributing-to-pyleoclim" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="where-to-start">
+<h2>Where to start?<a class="headerlink" href="#where-to-start" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="bug-reports-and-enhancement-requests">
+<h2>Bug reports and enhancement requests<a class="headerlink" href="#bug-reports-and-enhancement-requests" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="working-with-the-code">
+<h2>Working with the code<a class="headerlink" href="#working-with-the-code" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="version-control-git-and-github">
+<h3>Version control, Git, and Github<a class="headerlink" href="#version-control-git-and-github" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="getting-started-with-git">
+<h3>Getting started with Git<a class="headerlink" href="#getting-started-with-git" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="forking">
+<h3>Forking<a class="headerlink" href="#forking" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="creating-a-development-environment">
+<h3>Creating a development environment<a class="headerlink" href="#creating-a-development-environment" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="creating-a-branch">
+<h3>Creating a branch<a class="headerlink" href="#creating-a-branch" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="contributing-to-the-documentation">
+<h2>Contributing to the documentation<a class="headerlink" href="#contributing-to-the-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="about-the-pyleoclim-documentation">
+<h3>About the pyleoclim documentation<a class="headerlink" href="#about-the-pyleoclim-documentation" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="updating-a-pyleoclim-docstring">
+<h3>Updating a pyleoclim docstring<a class="headerlink" href="#updating-a-pyleoclim-docstring" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="how-to-build-the-pyleoclim-documentation">
+<h3>How to build the pyleoclim documentation<a class="headerlink" href="#how-to-build-the-pyleoclim-documentation" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="contributing-to-the-code-base">
+<h2>Contributing to the code base<a class="headerlink" href="#contributing-to-the-code-base" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="code-standards">
+<h3>Code standards<a class="headerlink" href="#code-standards" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="pre-commit">
+<h3>Pre-commit<a class="headerlink" href="#pre-commit" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="optional-dependencies">
+<h3>Optional dependencies<a class="headerlink" href="#optional-dependencies" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="type-hints">
+<h3>Type hints<a class="headerlink" href="#type-hints" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="testing-with-continuous-integration">
+<h3>Testing with continuous integration<a class="headerlink" href="#testing-with-continuous-integration" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="test-driven-development-code-writing">
+<h3>Test-driven development/code writing<a class="headerlink" href="#test-driven-development-code-writing" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="running-the-test-suite">
+<h3>Running the test suite<a class="headerlink" href="#running-the-test-suite" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="running-the-performance-test-suite">
+<h3>Running the performance test suite<a class="headerlink" href="#running-the-performance-test-suite" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="documenting-your-code">
+<h3>Documenting your code<a class="headerlink" href="#documenting-your-code" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="contributing-your-changes-to-pyleoclim">
+<h2>Contributing your changes to pyleoclim<a class="headerlink" href="#contributing-your-changes-to-pyleoclim" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="committing-your-code">
+<h3>Committing your code<a class="headerlink" href="#committing-your-code" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="pushing-your-changes">
+<h3>Pushing your changes<a class="headerlink" href="#pushing-your-changes" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="review-your-code">
+<h3>Review your code<a class="headerlink" href="#review-your-code" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="finally-make-the-pull-request">
+<h3>Finally, make the pull request<a class="headerlink" href="#finally-make-the-pull-request" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="updating-your-pull-request">
+<h3>Updating your pull request<a class="headerlink" href="#updating-your-pull-request" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="delete-your-merged-branch-optional">
+<h3>Delete your merged branch(optional)<a class="headerlink" href="#delete-your-merged-branch-optional" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="tips-for-a-successful-pull-request">
+<h3>Tips for a successful pull request<a class="headerlink" href="#tips-for-a-successful-pull-request" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

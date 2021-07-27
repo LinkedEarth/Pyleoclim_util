@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ts_pad (pyleoclim.utils.filter.ts_pad) &mdash; Pyleoclim 0.6.2beta documentation</title>
+  <title>within_distance (pyleoclim.utils.mapping.within_distance) &mdash; Pyleoclim 0.6.2beta documentation</title>
   
 
   
@@ -148,13 +148,13 @@
     
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>ts_pad (pyleoclim.utils.filter.ts_pad)</li>
+      <li>within_distance (pyleoclim.utils.mapping.within_distance)</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/utils/filter/ts_pad.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/utils/mapping/within_distance.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -191,36 +191,12 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="ts-pad-pyleoclim-utils-filter-ts-pad">
-<span id="utils-filter-ts-pad"></span><h1>ts_pad (pyleoclim.utils.filter.ts_pad)<a class="headerlink" href="#ts-pad-pyleoclim-utils-filter-ts-pad" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="within-distance-pyleoclim-utils-mapping-within-distance">
+<span id="utils-mapping-withindistance"></span><h1>within_distance (pyleoclim.utils.mapping.within_distance)<a class="headerlink" href="#within-distance-pyleoclim-utils-mapping-within-distance" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pyleoclim.utils.filter.ts_pad">
-<code class="sig-prename descclassname"><span class="pre">pyleoclim.utils.filter.</span></code><code class="sig-name descname"><span class="pre">ts_pad</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'reflect'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reflect_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'odd'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padFrac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/filter.html#ts_pad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.utils.filter.ts_pad" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pad a timeseries based on timeseries model predictions</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ys</strong> (<em>numpy array</em>) – Evenly-spaced timeseries</p></li>
-<li><p><strong>ts</strong> (<em>numpy array</em>) – Time axis</p></li>
-<li><p><strong>method</strong> (<em>string</em>) – The method to use to pad the series
-- ARIMA: uses a fitted ARIMA model
-- reflect (default): Reflects the time series around either end.</p></li>
-<li><p><strong>params</strong> (<em>tuple ARIMA model order parameters</em><em> (</em><em>p</em><em>,</em><em>d</em><em>,</em><em>q</em><em>)</em><em>, </em><em>Default corresponds to an AR</em><em>(</em><em>1</em><em>) </em><em>model</em>) – </p></li>
-<li><p><strong>reflect_type</strong> (<em>string</em>) – {‘even’, ‘odd’}, optional
-Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
-For the ‘odd’ style, the extented part of the array is created by subtracting the reflected values from two times the edge value.
-For more details, see np.lib.pad()</p></li>
-<li><p><strong>padFrac</strong> (<em>float</em>) – padding fraction (scalar) such that padLength = padFrac*length(series)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>yp</strong> (<em>array</em>) – padded timeseries</p></li>
-<li><p><strong>tp</strong> (<em>array</em>) – augmented time axis</p></li>
-</ul>
-</p>
-</dd>
-</dl>
+<dt id="pyleoclim.utils.mapping.within_distance">
+<code class="sig-prename descclassname"><span class="pre">pyleoclim.utils.mapping.</span></code><code class="sig-name descname"><span class="pre">within_distance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/mapping.html#within_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.utils.mapping.within_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the index of the records that are within a certain distance</p>
 </dd></dl>
 
 </div>

@@ -212,7 +212,7 @@ Currently only supported for evenly-spaced, gap-free data.</p></li>
 <li><p><strong>trunc</strong> (<em>str</em>) – <dl class="simple">
 <dt>if present, truncates the expansion to a level K &lt; M owing to one of 3 criteria:</dt><dd><ol class="arabic simple">
 <li><p>’kaiser’: variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median</p></li>
-<li><p>’mc-ssa’: Monte-Carlo SSA (use modes above the 95% threshold)</p></li>
+<li><p>’mcssa’: Monte-Carlo SSA (use modes above the 95% threshold)</p></li>
 <li><p>’var’: first K modes that explain at least var_thresh % of the variance.</p></li>
 </ol>
 </dd>
@@ -223,20 +223,20 @@ Currently only supported for evenly-spaced, gap-free data.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p><strong>res</strong> – Containing:</p>
+<dd class="field-even"><p><p><strong>res</strong> –</p>
 <ul class="simple">
-<li><p>eigvals : (M, ) array of eigenvalue spectrum</p></li>
-<li><p>eigvecs : Matrix of temporal eigenvectors</p></li>
-<li><p>PC : (N - M + 1, M) array of principal components</p></li>
+<li><p>eigvals : (M, ) array of eigenvalues</p></li>
+<li><p>eigvecs : (M, M) Matrix of temporal eigenvectors (T-EOFs)</p></li>
+<li><p>PC : (N - M + 1, M) array of principal components (T-PCs)</p></li>
 <li><p>RCmat : (N,  M) array of reconstructed components</p></li>
-<li><p>RCseries : (N,) reconstructed series</p></li>
+<li><p>RCseries : (N,) reconstructed series, with mean and variance restored</p></li>
 <li><p>pctvar: (M, ) array of the fraction of variance (%) associated with each mode</p></li>
-<li><p>eigvals_q : (M, ) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC &gt;0 ]</p></li>
+<li><p>eigvals_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC &gt;0 ]</p></li>
 </ul>
 </p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p>dict containing:</p>
 </dd>
 </dl>
 <p class="rubric">References</p>

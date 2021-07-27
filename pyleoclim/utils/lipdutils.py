@@ -438,14 +438,21 @@ def enumerateTs(timeseries_list):
     available_y = []
     dataSetName =[]
     at =[]
-    for index,val in enumerate(timeseries_list):
-        for key, value in val.items():
-            if 'dataSetName' in key:
-                dataSetName.append(value)
-            if 'Data_variableName' in key:
-                available_y.append(value)
-            if 'archiveType' in key:
-                at.append(value)
+    for item in timeseries_list:
+        if 'dataSetName' in item.keys():
+            dataSetName.append(item['dataSetName'])
+        else:
+            dataSetName.append('NA')
+        if 'paleoData_variableName' in item.keys():
+            available_y.append(item['paleoData_variableName'])
+        elif 'chronData_variableName' in item.keys():
+            available_y.append(item['chronData_variableName'])
+        else:
+            available_y.append('NA')
+        if 'archiveType' in item.keys():
+            at.append(item['archiveType'])
+        else:
+            at.append('NA')
 
     for idx,val in enumerate(available_y):
         print(idx,': ',dataSetName[idx], ': ',at[idx],': ', val)

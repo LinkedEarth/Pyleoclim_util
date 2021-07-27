@@ -1,6 +1,7 @@
 language: python
 python:
   - '3.8'
+  - '3.9'
 
 
 before_install:
@@ -15,7 +16,7 @@ before_install:
   - conda info -a
 
 install:
-  - conda create -n pyleoenv python=3.8
+  - conda create -n pyleoenv python=3.9
   - source activate pyleoenv
   - conda install numpy
   - conda install -c conda-forge cartopy

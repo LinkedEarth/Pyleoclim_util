@@ -825,7 +825,7 @@ class Series:
         .. ipython:: python
             :okwarning:
 
-            print(nino_ssa.var_pct[15:].sum()*100)
+            print(nino_ssa.pctvar[15:].sum()*100)
 
         That is, over 95% of the variance is in the first 15 modes. That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
 
@@ -4910,7 +4910,7 @@ class EnsembleSeries(MultipleSeries):
         -------
         fig, ax
         
-        Example
+        Examples
         --------
         .. ipython:: python
             :okwarning:
@@ -6478,12 +6478,6 @@ class Lipd:
 
         return res
 
-    #def mapNearRecord():
-
-        #res={}
-
-        #return res
-
 class LipdSeries(Series):
     '''Lipd time series object
 
@@ -6772,11 +6766,11 @@ class LipdSeries(Series):
         #get the information from the timeseries
         lat=[self.lipd_ts['geo_meanLat']]
         lon=[self.lipd_ts['geo_meanLon']]
-        lon=[self.lipd_ts['geo_meanLon']]
+        
         if 'archiveType' in self.lipd_ts.keys():
             archiveType=lipdutils.LipdToOntology(self.lipd_ts['archiveType']).lower().replace(" ","")
         else:
-            archiveType=('other')
+            archiveType='other'
 
         # make sure criteria is in the plot_default list
         if archiveType not in self.plot_default.keys():
@@ -7309,3 +7303,276 @@ class LipdSeries(Series):
             if not mute:
                 plotting.showfig(fig)
         return fig, ax
+
+    def mapNearRecord(self, D, n=5, radius = None, sameArchive = False, 
+                      projection='Orthographic',proj_default = True,
+                      background = True,borders = False, rivers = False, 
+                      lakes = False, figsize = None, ax = None, 
+                      marker_ref= None, color_ref=None, marker=None, color=None,
+                      markersize_adjust=False, scale_factor = 100, scatter_kwargs=None,
+                      legend = True, lgd_kwargs=None, savefig_settings=None, 
+                      mute=False):
+        """ Map records that are near the timeseries of interest
+        
+
+        Parameters
+        ----------
+        D : pyleoclim.Lipd
+            A pyleoclim LiPD object
+        n : int, optional
+            The n number of closest records. The default is 5.
+        radius : float, optional
+            The radius to take into consideration when looking for records (in km). The default is None.
+        sameArchive : {True, False}, optional
+            Whether to consider records from the same archiveType as the original record. The default is False.
+        projection : string, optional
+            A valid cartopy projection. The default is 'Orthographic'.
+        proj_default : True or dict, optional
+            The projection arguments. If not True, then use a dictionary to pass the appropriate arguments depending on the projection. The default is True.
+        background : {True,False}, optional
+            Whether to use a background. The default is True.
+        borders : {True, False}, optional
+            Whether to plot country borders. The default is False.
+        rivers : {True, False}, optional
+            Whether to plot rivers. The default is False.
+        lakes : {True, False}, optional
+            Whether to plot rivers. The default is False.
+        figsize : list, optional
+            the size of the figure. The default is None.
+        ax : matplotlib.ax, optional
+            The matplotlib axis onto which to return the map. The default is None.
+        marker_ref : str, optional
+            Marker shape to use for the main record. The default is None, which corresponds to the default marker for the archiveType
+        color_ref : str, optional
+            The color for the main record. The default is None, which corresponds to the default color for the archiveType.
+        marker : str or list, optional
+            Marker shape to use for the other records. The default is None, which corresponds to the marker shape for each archiveType.
+        color : str or list, optional
+            Color for each marker. The default is None, which corresponds to the color for each archiveType
+        markersize_adjust : {True, False}, optional
+            Whether to adjust the marker size according to distance from record of interest. The default is False.
+        scale_factor : int, optional
+            The maximum marker size. The default is 100.
+        scatter_kwargs : dict, optional
+            Parameters for the scatter plot. The default is None.
+        legend : {True, False}, optional
+            Whether to show the legend. The default is True.
+        lgd_kwargs : dict, optional
+            Parameters for the legend. The default is None.
+        savefig_settings : dict, optional
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
+        mute : {True, False}, optional
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax. The default is False.
+
+        See also
+        --------
+
+        pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
+        
+        pyleoclim.utils.mapping.dist_sphere: Calculate distance on a sphere
+        
+        pyleoclim.utils.mapping.compute_dist: Compute the distance between a point and an array
+        
+        pyleoclim.utils.mapping.within_distance: Returns point in an array within a certain distance
+
+        Returns
+        -------
+        res : dict
+            contains fig and ax
+
+        """
+        
+        scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
+        
+        #get the information about the original timeseries
+        lat_ref=[self.lipd_ts['geo_meanLat']]
+        lon_ref=[self.lipd_ts['geo_meanLon']]
+        
+        if 'archiveType' in self.lipd_ts.keys():
+            archiveType_ref=lipdutils.LipdToOntology(self.lipd_ts['archiveType']).lower().replace(" ","")
+        else:
+            archiveType_ref='other'
+
+        # make sure criteria is in the plot_default list
+        if archiveType_ref not in self.plot_default.keys():
+            archiveType_ref = 'other'
+        
+        # get information about the other timeseries
+        lat=[]
+        lon=[]
+        archiveType=[]
+        
+        dataSetName_ref = self.lipd_ts['dataSetName']
+
+        for idx, key in enumerate(D.lipd):
+            if key != dataSetName_ref:
+                d = D.lipd[key]
+                lat.append(d['geo']['geometry']['coordinates'][1])
+                lon.append(d['geo']['geometry']['coordinates'][0])
+                if 'archiveType' in d.keys():
+                    archiveType.append(lipdutils.LipdToOntology(d['archiveType']).lower().replace(" ",""))
+                else:
+                    archiveType.append('other')
+
+        # make sure criteria is in the plot_default list
+        for idx,val in enumerate(archiveType):
+            if val not in self.plot_default.keys():
+                archiveType[idx] = 'other'
+        
+        if len(lat)==0: #this should not happen unless the coordinates are not available in the LiPD file
+            raise ValueError('no matching record found')
+        
+        # Filter by the same type of archive if asked
+        if sameArchive == True:
+            idx_archive = [idx for idx,val in enumerate(archiveType) if val==archiveType_ref]
+            if len(idx_archive)==0:
+                raise ValueError('No records corresponding to the same archiveType available. Widen your search criteria.')
+            else:
+                lat = [lat[idx] for idx in idx_archive]
+                lon = [lon[idx] for idx in idx_archive]
+                archiveType=[archiveType[idx] for idx in idx_archive]
+                       
+        #compute the distance
+        dist = mapping.compute_dist(lat_ref,lon_ref,lat,lon)
+        
+        if radius: 
+            idx_radius = mapping.within_distance(dist, radius)
+            if len(idx_radius) == 0:
+                raise ValueError('No records withing matching radius distance. Widen your search criteria')
+            else:
+                lat = [lat[idx] for idx in idx_radius]
+                lon = [lon[idx] for idx in idx_radius]
+                archiveType = [archiveType[idx] for idx in idx_radius]
+                dist = [dist[idx] for idx in idx_radius]
+        
+        #print a warning if plotting less than asked because of the filters
+        
+        if n>len(dist):
+            warnings.warn("Number of matching records is less"+\
+              " than the number of neighbors chosen. Including all records "+\
+              " in the analysis.")
+            n=len(dist)
+        
+        #Sort the distance array
+        sort_idx = np.argsort(dist)
+        dist = [dist[idx] for idx in sort_idx]
+        lat = [lat[idx] for idx in sort_idx]
+        lon = [lon[idx] for idx in sort_idx]
+        archiveType = [archiveType[idx] for idx in sort_idx]
+        
+        # Grab the right number of records
+        dist = dist[0:n]
+        lat = lat[0:n]
+        lon = lon[0:n]
+        archiveType = archiveType[0:n]
+         
+        # Get plotting information
+        
+        if marker_ref == None:
+            marker_ref = self.plot_default[archiveType_ref][1]
+        if color_ref == None:
+            color_ref = self.plot_default[archiveType_ref][0] 
+        
+        if marker == None:
+            marker=[]
+            for item in archiveType:
+                marker.append(self.plot_default[item][1])
+        elif type(marker) ==list:
+            if len(marker)!=len(lon):
+                raise ValueError('When providing a list, it should be the same length as the number of records')
+        elif type(marker) == str:
+            marker = [marker]*len(lon)
+
+        if color == None:
+            color=[]
+            for item in archiveType:
+                color.append(self.plot_default[item][0])
+        elif type(color) ==list:
+            if len(color)!=len(lon):
+                raise ValueError('When providing a list, it should be the same length as the number of records')
+        elif type(color) == str:
+            color = [color]*len(lon)
+        
+        if 'edgecolors' not in scatter_kwargs.keys():
+            edgecolors = []
+            for item in marker:
+                edgecolors.append('w')
+            edgecolors.append('k')
+            scatter_kwargs.update({'edgecolors':edgecolors})
+        
+        #Start plotting
+        lat_all = lat + lat_ref
+        lon_all = lon + lon_ref
+        dist_all = dist + [0]
+        archiveType_all = archiveType
+        archiveType_all.append(archiveType_ref) 
+        
+        color_all = color
+        color_all.append(color_ref)
+        marker_all= marker
+        marker_all.append(marker_ref)
+        
+        if markersize_adjust == True:
+            scale = dist_all[-1]/(scale_factor-30)
+            s = list(np.array(dist_all)*1/(scale)+30)
+            s.reverse()
+            scatter_kwargs.update({'s':s})
+        
+        proj1={'central_latitude':lat_ref[0],
+       'central_longitude':lon_ref[0]}
+        proj2={'central_latitude':lat_ref[0]}
+        proj3={'central_longitude':lon_ref[0]}
+        
+        if proj_default==True:
+            try:
+                res = mapping.map_all(lat=lat_all, lon=lon_all, 
+                      criteria=archiveType_all,
+                      marker=marker_all, color =color_all,
+                      projection = projection, proj_default = proj1,
+                      background = background,borders = borders,
+                      rivers = rivers, lakes = lakes,
+                      figsize = figsize, ax = ax,
+                      scatter_kwargs=scatter_kwargs, legend=legend,
+                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
+                      mute=mute)
+            except:
+                try:
+                    res = mapping.map_all(lat=lat_all, lon=lon_all, 
+                      criteria=archiveType_all,
+                      marker=marker_all, color =color_all,
+                      projection = projection, proj_default = proj2,
+                      background = background,borders = borders,
+                      rivers = rivers, lakes = lakes,
+                      figsize = figsize, ax = ax,
+                      scatter_kwargs=scatter_kwargs, legend=legend,
+                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
+                      mute=mute)
+                except:
+                    res = mapping.map_all(lat=lat_all, lon=lon_all, 
+                      criteria=archiveType_all,
+                      marker=marker_all, color =color_all,
+                      projection = projection, proj_default = proj3,
+                      background = background,borders = borders,
+                      rivers = rivers, lakes = lakes,
+                      figsize = figsize, ax = ax,
+                      scatter_kwargs=scatter_kwargs, legend=legend,
+                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
+                      mute=mute)
+        
+        else:
+            res = mapping.map_all(lat=lat_all, lon=lon_all, 
+                      criteria=archiveType_all,
+                      marker=marker_all, color =color_all,
+                      projection = projection, proj_default = proj_default,
+                      background = background,borders = borders,
+                      rivers = rivers, lakes = lakes,
+                      figsize = figsize, ax = ax,
+                      scatter_kwargs=scatter_kwargs, legend=legend,
+                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
+                      mute=mute)
+        
+        return res
