@@ -49,3 +49,13 @@ class TestUiLipdSeriesDashboard():
         ts=get_ts()
         res = ts.dashboard(mute=True)
     
+class TestUiLipdSeriesPlotAgeModel():
+    '''test LipdSeries.plot_age_model
+    '''
+
+    def test_plot_age_model(self):
+        path = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD98-2170.Stott.2004'
+        lipd = pyleo.Lipd(usr_path = path)
+        ts = lipd.to_tso()
+        series = pyleo.LipdSeries(ts[2])
+        fig,ax = series.plot_age_model()
