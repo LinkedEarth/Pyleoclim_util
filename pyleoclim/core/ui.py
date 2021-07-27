@@ -7576,3 +7576,142 @@ class LipdSeries(Series):
                       mute=mute)
         
         return res
+
+    def plot_age_model(self, figsize = [10,4], xlabel = None, ylabel = None, title = None,
+                   xlim = None, ylim = None, plot_kwargs = None, lipd_file = None,
+                   plot_envelope = False, plot_traces = False, envelope_kwargs = None,
+                   traces_kwargs = None, ax = None, savefig_settings = None,
+                   mute = False):
+    
+        '''Plot age-depth model of LipdSeries
+    
+        Parameters
+        ----------
+        figsize : list, optional
+            The size of the figure. The default is [10, 4].
+        xlabel : str, optional
+            Label for the age axis. The default is 'Age [units]'.
+        ylabel : str, optional
+            Label for the depth axis. The default is 'Depth [units]'.
+        title : str, optional
+            Title for the figure. The default is None.
+        xlim : float, optinal
+            Limits on the x-axis. The default is the full axis.
+        ylim : float, optional
+            Limits on the y-axis. The default is the full axis.
+        plot_kwargs : dict, optional
+            Plotting arguments for LipdSeries.plot(). See documentation for further details.
+        lipd_file: lipd, optional
+            The LiPD file from which the LipdSeries is derived. If provided this will enable ensemble plotting functionality.
+        plot_envelope: bool, optional
+            Whether to plot the ensemble as an envelope. The default is False.
+        plot_traces: bool, optional
+            Whether to plot the traces of the ensemble members. The default is False.
+        envelope_kwargs: dict, optional
+            Plotting arguments for EnsembleSeries.plot_envelope(). See documentation for further details.
+        traces_kwargs: dict, optional
+            Plotting arguments for Ensembleseries.plot_traceS(). See documentation for further details.
+        ax: matplotlib.ax, optional
+            Matplotlib axis on which to return the plot. The default is None.
+        savefig_settings : dict, optional
+            the dictionary of arguments for plt.savefig(); some notes below:
+              - "path" must be specified; it can be any existed or non-existed path,
+                with or without a suffix; if the suffix is not given in "path", it will follow "format"
+              - "format" can be one of {"pdf", "eps", "png", "ps"}.
+            The default is None.
+        ax : matplotlib.axis, optional
+            A matplotlib axis. The default is None.
+        mute : {True,False}, optional
+           if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax. The default is False.
+    
+        Returns
+        -------
+    
+        fig, ax
+    
+        Examples
+        --------
+    
+        .. ipython:: python
+            :okwarning:
+    
+            url='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+    
+            lipd = pyleo.Lipd(usr_path = url, validate = False)
+    
+            ts = lipd.to_tso()
+    
+            #Finding the depth time series and creating a LipdSeries from it
+            for idx, item in enumerate(ts):
+                if item['paleoData_variableName'] == 'depth':
+                    series = pyleo.LipdSeries(ts[idx])
+                    break
+    
+            fig, ax = series.plot_age_model()
+    
+        '''
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+    
+        try:
+            series_variable = self.__dict__['value_name'].lower().replace(" ","")
+            if series_variable != 'depth':
+                raise Exception("This doesn't appear to be depth data. Make sure you're using the depth timeseries from your lipd object")
+        except:
+            print("Depth data is either not present or unnamed, proceed with caution")
+    
+        if ax == None:
+            fig, ax = plt.subplots(figsize = figsize);
+    
+        # if lipd_file != None:
+        #     try:
+        #         depth_ens = self.chronEnsembleToPaleo(lipd_file)
+        #         has_ensemble = True
+        #     except:
+        #         print('Could not find Ensemble! Continuing without...')
+        #         has_ensemble = False
+        # else:
+        #     has_ensemble = False
+        # 
+        # if has_ensemble == True:
+        #     if traces_kwargs == None:
+        #         traces_kwargs = {}
+        #     if envelope_kwargs == None:
+        #         envelope_kwargs = {}
+        #     if plot_traces == True:
+        #         depth_ens.plot_traces(mute = True, ax = ax, **traces_kwargs);
+        #     if plot_envelope == True:
+        #         try:
+        #             depth_ens.common_time().plot_envelope(mute = True, ax = ax, **envelope_kwargs);
+        #         except:
+        #             print('Could not align time axis to allow for plot envelope functionality.')
+    
+        if plot_kwargs == None:
+            plot_kwargs = {}
+    
+        self.plot(**plot_kwargs, ax = ax, mute = True)
+    
+        if xlabel != None:
+            ax.set_xlabel(xlabel)
+    
+        if ylabel != None:
+            ax.set_ylabel(ylabel)
+    
+        if xlim != None:
+            ax.set_xlim(xlim)
+    
+        if ylim != None:
+            ax.set_ylim(ylim)
+    
+        if title != None:
+            ax.set_title(title)
+    
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            else:
+                if not mute:
+                    plotting.showfig(fig)
+            return fig, ax
+        else:
+            return ax
