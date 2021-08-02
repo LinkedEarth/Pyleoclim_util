@@ -1505,13 +1505,13 @@ def getEnsemble(csv_dict, csvName):
         The matrix of Ensemble values
     """
     ensemble_dict=csv_dict[csvName]
+    ensembleValues=[]
     for val in ensemble_dict.keys():
-        number = ensemble_dict[val]["number"]
-        if type(number) is int:
+        if 'depth' in val:
             depth = ensemble_dict[val]["values"]
         else:
-            ensembleValues = ensemble_dict[val]["values"]
-            ensembleValues= np.transpose(np.array(ensembleValues))
+            ensembleValues.append(ensemble_dict[val]["values"])
+    ensembleValues= np.transpose(np.array(ensembleValues))
 
     return depth, ensembleValues
 

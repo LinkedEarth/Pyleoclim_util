@@ -23,6 +23,16 @@ Notes on how to test:
 
 import pytest
 import pyleoclim as pyleo
+from urllib.request import urlopen
+import json
+
+# For some of the testing importa JSON file with a dictionary of possible LiDPs
+
+def  importLiPD():
+    url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/lipds.json'
+    response = urlopen(url)
+    d = json.loads(response.read())
+    return d
 
 class TestUiLipdTo_tso():
     ''' Test Lipd.to_tso()
@@ -31,14 +41,19 @@ class TestUiLipdTo_tso():
         
         d=pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD98-2170.Stott.2004')
         ts=d.to_tso()
+        assert len(ts)>0
 
 class TestUiLipdExtract():
     '''Test Lipd.extract()
     '''
     
     def test_extract_t0(self):
-        d=pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD98-2170.Stott.2004')
-        d2=d.extract('MD98-2170.Stott.2004')
+        D= importLiPD()
+        d = pyleo.Lipd(lipd_dict=D)
+        name = 'Eur-SpannagelCave.Mangini.2005'
+        d2=d.extract(name)
+        
+        assert d2.__dict__['lipd']['dataSetName'] == name
 
 class TestUiLipdTo_LipdSeriesList():
     ''' Test Lipd.to_LipdSeriesList
@@ -58,5 +73,6 @@ class TestUiLipdMapAllArchive():
     ''' Test Lipd.mapAllArchive
     '''
     def test_mapAllArchive_t0(self):
-        d=pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD98-2170.Stott.2004')
-        res = d.mapAllArchive()
+        D= importLiPD()
+        d = pyleo.Lipd(lipd_dict=D)
+        res = d.mapAllArchive(mute=True)
