@@ -6,9 +6,8 @@ import numpy as np
 from statsmodels.tsa.arima_process import arma_generate_sample
 from statsmodels.tsa.arima.model import ARIMA
 
-from .tsutils import (
-    is_evenly_spaced,
-    #clean_ts,
+from .tsbase import (
+    is_evenly_spaced
 )
 #from .tsutils import preprocess   # no longer used here
 from scipy import optimize

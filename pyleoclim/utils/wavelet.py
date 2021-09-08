@@ -24,15 +24,18 @@ from numba.core.errors import NumbaPerformanceWarning
 import warnings
 import collections
 import scipy.fftpack as fft
-import pywt
 from scipy import optimize
+from scipy.optimize import fminbound
+from scipy.special._ufuncs import gamma, gammainc
 
 #from .tsmodel import ar1_sim
-from .tsutils import (
+from .tsutils import preprocess
+from .tsbase import (
     clean_ts,
-    dropna,
-    preprocess,
+    is_evenly_spaced,
 )
+
+from .filter import ts_pad
 
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
@@ -168,49 +171,49 @@ class AliasFilter(object):
 
         return spectr
     
-def cwt(ys,ts,scales,wavelet='morl',sampling_period=1.0,method='conv',axis=-1):
-    '''Continous wavelet transform for evenly spaced data
+# def cwt(ys,ts,scales,wavelet='morl',sampling_period=1.0,method='conv',axis=-1):
+#     '''Continous wavelet transform for evenly spaced data
     
-    pywavelet documentation: https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
+#     pywavelet documentation: https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
     
-    Parameters
-    ----------
-    ys : array
-        signal
-    ts : array
-        time 
-    scales : array (float)
-        different wavelet scales to use
-    wavelet : str
-        types of wavelet options in function documentation link. The default is 'morl' for a morlet wavelet.
-    sampling_period : float, optional
-        sampling period for frequencies output. The default is 1.0.
-    method : str, optional
-        cwt computation  method. 'conv','fft'. or 'auto' The default is 'conv'.
-    axis : int, optional
-        axis over which to compute cwt. The default is -1, the last axis.
+#     Parameters
+#     ----------
+#     ys : array
+#         signal
+#     ts : array
+#         time 
+#     scales : array (float)
+#         different wavelet scales to use
+#     wavelet : str
+#         types of wavelet options in function documentation link. The default is 'morl' for a morlet wavelet.
+#     sampling_period : float, optional
+#         sampling period for frequencies output. The default is 1.0.
+#     method : str, optional
+#         cwt computation  method. 'conv','fft'. or 'auto' The default is 'conv'.
+#     axis : int, optional
+#         axis over which to compute cwt. The default is -1, the last axis.
 
 
-    Returns
-    -------
-    res : dictionary
-        'freq' - array(float) 
-            frequencies
-        'time' - array(float)
-        'amplitude' - array(float)
-        'coi' - array(float)
-            cone of inference
+#     Returns
+#     -------
+#     res : dictionary
+#         'freq' - array(float) 
+#             frequencies
+#         'time' - array(float)
+#         'amplitude' - array(float)
+#         'coi' - array(float)
+#             cone of inference
 
-    '''    
-    coeff,freq=pywt.cwt(data=ys,scales=scales,wavelet=wavelet,sampling_period=sampling_period,method=method,axis=axis)
-    amplitude=abs(coeff).T
-    if wavelet=='morl' or wavelet[:4]=='cmor':
-        coi=make_coi(tau=ts,Neff=6)
-    else:
-        coi=make_coi(tau=ts)
-    Results = collections.namedtuple('Results', ['amplitude','coi', 'freq', 'time', 'coeff'])
-    res = Results(amplitude=amplitude, coi=coi, freq=freq, time=ts, coeff=coeff)
-    return res
+#     '''    
+#     coeff,freq=pywt.cwt(data=ys,scales=scales,wavelet=wavelet,sampling_period=sampling_period,method=method,axis=axis)
+#     amplitude=abs(coeff).T
+#     if wavelet=='morl' or wavelet[:4]=='cmor':
+#         coi=make_coi(tau=ts,Neff=6)
+#     else:
+#         coi=make_coi(tau=ts)
+#     Results = collections.namedtuple('Results', ['amplitude','coi', 'freq', 'time', 'coeff'])
+#     res = Results(amplitude=amplitude, coi=coi, freq=freq, time=ts, coeff=coeff)
+#     return res
 
 def assertPositiveInt(*args):
     ''' Assert that the arguments are all positive integers.
@@ -1663,8 +1666,8 @@ def freq_vector_nfft(ts):
 
     return freq
 
-def freq_vector_scale(ts, nv=12):
-    ''' Return the frequency vector based on scales
+def freq_vector_scale(ts, nv=12, fourier_factor=1):
+    ''' Return the frequency vector based on scales for wavelet analysis
 
     Parameters
     ----------
@@ -1701,7 +1704,7 @@ def freq_vector_scale(ts, nv=12):
     a0 = 2**(1/nv)
     noct = np.floor(np.log2(np.size(ts)))-1  # number of octave
     scale = s0*a0**(np.arange(noct*nv+1))
-    freq = 1/scale[::-1]
+    freq = 1/(scale[::-1]*fourier_factor)
 
     return freq
 
@@ -2442,4 +2445,177 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
     rec_ts = preprocess(rec_ts, t, detrend=False, gaussianize=False, standardize=False)
 
     return rec_ts, t
+
+## Methods for Torrence and compo
+
+# This is the main function, which has been rewritten to work with functionalities in Pyleoclim
+
+def cwt(ys,ts,mother='morlet',param=None,freq=None,freq_method='scale',
+        freq_kwargs={},detrend=False, sg_kwargs={}, gaussianize=False,
+        standardize=False,pad=False,pad_kwargs={}):
+    
+    ys=np.array(ys)
+    ts=np.array(ts)
+    
+    ys, ts = clean_ts(ys, ts) #clean up time
+    
+    #make sure that the time series is evenly-spaced
+    if is_evenly_spaced(ts) == True:
+        dt = np.mean(np.diff(ts))
+    else:
+        raise ValueError('Time series must be evenly spaced in time')
+       
+    # prepare the time series 
+    pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs, 
+                       gaussianize=gaussianize, standardize=standardize)
+    
+    # Get the fourier factor
+    if mother.lower() == 'morlet':
+        if param is None:
+            param = 6.
+        fourier_factor = 4 * np.pi / (param + np.sqrt(2 + param**2))
+    elif mother.lower() == 'paul':
+        if param is None:
+            param = 4.
+        fourier_factor = 4 * np.pi / (2 * param + 1)
+    elif mother.lower() == 'dog':
+        if param is None:
+            param = 2.
+        fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * param + 1))
+    else:
+        fourier_factor = 1
+    
+    #get the frequency/scale information
+    if freq is None: 
+        freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+        if freq_method == 'scale':
+            freq_kwargs.update({'fourier_factor':fourier_factor})
+        freq = make_freq_vector(ts, method=freq_method, **freq_kwargs)
+    # Use scales
+    scale = np.sort(1/(freq*fourier_factor))
+    
+    #Normalize
+    n_ys = pd_ys-np.mean(pd_ys)
+    
+    #pad if wanted
+    if pad == True:
+        pad_kwargs = {} if pad_kwargs is None else pad_kwargs.copy()
+        yp,tp = ts_pad(n_ys,ts,**pad_kwargs)
+    else:
+        yp=n_ys
+        tp=ts
+        
+    # Wave calculation
+    n = len(yp)
+    
+    # construct wavenumber array used in transform [Eqn(5)]
+    kplus = np.arange(1, int(n / 2) + 1)
+    kplus = (kplus * 2 * np.pi / (n * dt))
+    kminus = np.arange(1, int((n - 1) / 2) + 1)
+    kminus = np.sort((-kminus * 2 * np.pi / (n * dt)))
+    k = np.concatenate(([0.], kplus, kminus))
+
+    # compute FFT of the (padded) time series
+    f = np.fft.fft(yp) 
+    
+    # define the wavelet array
+    wave = np.zeros(shape=(len(scale), n), dtype=complex)
+
+    # loop through all scales and compute transform
+    for a1 in range(0, len(scale)):
+        daughter, fourier_factor, coi, _ = \
+            wave_bases(mother, k, scale[a1], param)
+        wave[a1, :] = np.fft.ifft(f * daughter)  # wavelet transform[Eqn(4)]
+    
+    #COI
+    coi = coi * dt * np.concatenate((
+        np.insert(np.arange(int((len(ys) + 1) / 2) - 1), [0], [1E-5]),
+        np.insert(np.flipud(np.arange(0, int(len(ys) / 2) - 1)), [-1], [1E-5])))
+    
+    #Remove the padding 
+    
+
+def wave_bases(mother, k, scale, param):
+    n = len(k)
+    kplus = np.array(k > 0., dtype=float)
+
+    if mother == 'morlet':  # -----------------------------------  Morlet
+
+        if param == -1:
+            param = 6.
+
+        k0 = np.copy(param)
+        # calc psi_0(s omega) from Table 1
+        expnt = -(scale * k - k0) ** 2 / 2. * kplus
+        norm = np.sqrt(scale * k[1]) * (np.pi ** (-0.25)) * np.sqrt(n)
+        daughter = norm * np.exp(expnt)
+        daughter = daughter * kplus  # Heaviside step function
+        # Scale-->Fourier [Sec.3h]
+        fourier_factor = (4 * np.pi) / (k0 + np.sqrt(2 + k0 ** 2))
+        coi = fourier_factor / np.sqrt(2)  # Cone-of-influence [Sec.3g]
+        dofmin = 2  # Degrees of freedom
+    elif mother == 'paul':  # --------------------------------  Paul
+        if param == -1:
+            param = 4.
+        m = param
+        # calc psi_0(s omega) from Table 1
+        expnt = -scale * k * kplus
+        norm_bottom = np.sqrt(m * np.prod(np.arange(1, (2 * m))))
+        norm = np.sqrt(scale * k[1]) * (2 ** m / norm_bottom) * np.sqrt(n)
+        daughter = norm * ((scale * k) ** m) * np.exp(expnt) * kplus
+        fourier_factor = 4 * np.pi / (2 * m + 1)
+        coi = fourier_factor * np.sqrt(2)
+        dofmin = 2
+    elif mother == 'dog':  # --------------------------------  DOG
+        if param == -1:
+            param = 2.
+        m = param
+        # calc psi_0(s omega) from Table 1
+        expnt = -(scale * k) ** 2 / 2.0
+        norm = np.sqrt(scale * k[1] / gamma(m + 0.5)) * np.sqrt(n)
+        daughter = -norm * (1j ** m) * ((scale * k) ** m) * np.exp(expnt)
+        fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * m + 1))
+        coi = fourier_factor / np.sqrt(2)
+        dofmin = 1
+    else:
+        raise KeyError('Mother must be one of "morlet", "paul", "dog"')
+
+    return daughter, fourier_factor, coi, dofmin
+        
+    
+def chisquare_inv(P, V):
+
+    if (1 - P) < 1E-4:
+        print('P must be < 0.9999')
+
+    if P == 0.95 and V == 2:  # this is a no-brainer
+        X = 5.9915
+        return X
+
+    MINN = 0.01  # hopefully this is small enough
+    MAXX = 1  # actually starts at 10 (see while loop below)
+    X = 1
+    TOLERANCE = 1E-4  # this should be accurate enough
+
+    while (X + TOLERANCE) >= MAXX:  # should only need to loop thru once
+        MAXX = MAXX * 10.
+    # this calculates value for X, NORMALIZED by V
+        X = fminbound(chisquare_solve, MINN, MAXX, args=(P, V), xtol=TOLERANCE)
+        MINN = MAXX
+
+    X = X * V  # put back in the goofy V factor
+
+    return X  
+
+def chisquare_solve(XGUESS, P, V):
+
+    PGUESS = gammainc(V / 2, V * XGUESS / 2)  # incomplete Gamma function
+
+    PDIFF = np.abs(PGUESS - P)            # error in calculated P
+
+    TOL = 1E-4
+    if PGUESS >= 1 - TOL:  # if P is very close to 1 (i.e. a bad guess)
+        PDIFF = XGUESS   # then just assign some big number like XGUESS
+
+    return PDIFF
 
