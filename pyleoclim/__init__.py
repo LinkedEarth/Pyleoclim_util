@@ -12,8 +12,10 @@ https://github.com/LinkedEarth/Pyleoclim_util/blob/master/license
 
 from .utils import *
 from .core import *
-#from .workflow import *
 
 from .utils import plotting
 plotting.set_style()
 
+# get the version
+from importlib.metadata import version
+__version__ = version('pyleoclim')
