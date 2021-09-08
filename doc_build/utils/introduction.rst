@@ -1,7 +1,7 @@
 .. _utils_introduction:
 
-Pyleoclim Utilities (pyleoclim.utils)
-=====================================
+Pyleoclim Utilities API (pyleoclim.utils)
+=========================================
 
 Pyleoclim makes extensive use of functions from `numpy <https://numpy.org>`_, `Pandas <https://pandas.pydata.org>`_, `Scipy <https://www.scipy.org>`_, and `scikit-learn <https://scikit-learn.org/stable/>`_. Please note that some default parameter values for these functions have been changed to more appropriate values for paleoclimate datasets.
 
@@ -176,7 +176,7 @@ This modules contain pre-processing functions for time series analysis.
    * - :ref:`sort_ts <utils_sort_ts>`
      - Sort time values in ascending order
    * - :ref:`reduce_duplicated_timestamps <utils_reduce_duplicated_timestamps>`
-     - Reduce duplicated timestamps in a timeseries by averaging the values       
+     - Reduce duplicated timestamps in a timeseries by averaging the values
    * - :ref:`annualize <utils_annualize>`
      - Annualize a time series whose time resolution is finer than 1 year
    * - :ref:`gaussianize <utils_gaussianize>`

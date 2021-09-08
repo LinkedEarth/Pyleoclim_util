@@ -2,7 +2,7 @@
 
 .. note::
 
-   Pyleoclim requires the use of Python 3.8.
+   Pyleoclim requires the use of Python 3.8 or 3.9.
 
 Installing Pyleoclim
 ====================
