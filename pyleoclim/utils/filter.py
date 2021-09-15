@@ -19,6 +19,10 @@ import numpy as np
 import statsmodels.api as sm
 from scipy import signal
 
+from .tsbase import (
+    is_evenly_spaced
+)
+
 # ----
 # Main functions
 # ----
@@ -160,11 +164,14 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
     """
     padLength =  np.round(len(ts)*padFrac).astype(np.int64)
 
-    if not (np.std(np.diff(ts)) == 0):
+    if is_evenly_spaced(ts)==False:
         raise ValueError("ts needs to be composed of even increments")
     else:
         dt = np.diff(ts)[0] # computp time interval
-
+    
+    #time axis
+    tp = np.arange(ts[0]-padLength*dt,ts[-1]+padLength*dt+dt,dt)
+    
     if method == 'ARIMA':
         # fit ARIMA model
         fwd_mod = sm.tsa.ARIMA(ys,params).fit()  # model with time going forward
@@ -174,20 +181,14 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
         fwd_pred  = fwd_mod.forecast(padLength); yf = fwd_pred[0]
         bwd_pred  = bwd_mod.forecast(padLength); yb = np.flip(bwd_pred[0],0)
 
-        # define extra time axes
-        tf = np.linspace(max(ts)+dt, max(ts)+padLength*dt,padLength)
-        tb = np.linspace(min(ts)-padLength*dt, min(ts)-1, padLength)
-
         # extend time series
-        tp = np.arange(ts[0]-padLength*dt,ts[-1]+padLength*dt+1,dt)
         yp = np.empty(len(tp))
-        yp[np.isin(tp,ts)] =ys
-        yp[np.isin(tp,tb)]=yb
-        yp[np.isin(tp,tf)]=yf
+        yp[0:padLength]=yb
+        yp[padLength:len(ts)+padLength]=ys
+        yp[len(ts)+padLength:]=yf
 
     elif method == 'reflect':
         yp = np.pad(ys,(padLength,padLength),mode='reflect',reflect_type=reflect_type)
-        tp = np.arange(ts[0]-padLength,ts[-1]+padLength+1,1)
 
     else:
         raise ValueError('Not a valid argument. Enter "ARIMA" or "reflect"')

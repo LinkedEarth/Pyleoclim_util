@@ -4,7 +4,7 @@
 
 Created on Jan 31, 2020
 '''
-from ..utils import tsutils, plotting, mapping, lipdutils, tsmodel
+from ..utils import tsutils, plotting, mapping, lipdutils, tsmodel, tsbase
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
@@ -35,7 +35,7 @@ import cartopy.feature as cfeature
 
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
-from scipy import stats, signal
+from scipy import stats
 import warnings
 import os
 
@@ -314,7 +314,7 @@ class Series:
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True, verbose=False):
 
         if clean_ts==True:
-            value, time = tsutils.clean_ts(np.array(value), np.array(time), verbose=verbose)
+            value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
 
         self.time = time
         self.value = value
@@ -444,7 +444,7 @@ class Series:
 
         dt = np.diff(new_time)
         if any(dt<=0):
-            new_value, new_time = tsutils.sort_ts(self.value, new_time)
+            new_value, new_time = tsbase.sort_ts(self.value, new_time)
         else:
             new_value = self.copy().value
 
@@ -888,7 +888,7 @@ class Series:
         res : bool
         '''
 
-        res = tsutils.is_evenly_spaced(self.time)
+        res = tsbase.is_evenly_spaced(self.time)
         return res
 
     def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
@@ -1281,16 +1281,16 @@ class Series:
             ax['ts'].set_title(title)
 
         if value_label is not None:
-            time_label, value_label = self.make_labels()
+            #time_label, value_label = self.make_labels()
             ax['ts'].set_ylabel(value_label)
 
         if time_label is not None:
-            time_label, value_label = self.make_labels()
+            #time_label, value_label = self.make_labels()
             ax['scal'].set_xlabel(time_label)
 
         if period_label is not None:
-            period_unit = infer_period_unit_from_time_unit(self.time_unit)
-            period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
+            #period_unit = infer_period_unit_from_time_unit(self.time_unit)
+            #period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
             ax['scal'].set_ylabel(period_label)
 
         if psd_label is not None:
@@ -1330,7 +1330,7 @@ class Series:
 
         '''
         new = self.copy()
-        v_mod, t_mod = tsutils.clean_ts(self.value, self.time, verbose=verbose)
+        v_mod, t_mod = tsbase.clean_ts(self.value, self.time, verbose=verbose)
         new.time = t_mod
         new.value = v_mod
         return new

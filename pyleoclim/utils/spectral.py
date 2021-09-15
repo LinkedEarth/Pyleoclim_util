@@ -22,11 +22,12 @@ __all__ = [
     'periodogram'
 ]
 
-from .tsutils import (
+from .tsbase import (
     is_evenly_spaced,
-    preprocess,
     clean_ts
 )
+
+from .tsutils import preprocess
 
 from .wavelet import (
     make_freq_vector,

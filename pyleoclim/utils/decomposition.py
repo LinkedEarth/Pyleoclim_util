@@ -21,7 +21,7 @@ from .tsutils import standardize
 from .tsmodel import ar1_sim
 from scipy.linalg import eigh, toeplitz
 from nitime import algorithms as alg
-from statsmodels.multivariate.pca import PCA
+#from statsmodels.multivariate.pca import PCA
 import copy
 
 #------

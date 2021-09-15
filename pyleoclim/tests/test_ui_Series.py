@@ -32,6 +32,7 @@ from pyleoclim.utils.tsmodel import (
 )
 
 from statsmodels.tsa.arima_process import arma_generate_sample
+import matplotlib.pyplot as plt
 
 # a collection of useful functions
 
@@ -427,6 +428,7 @@ class TestUiSeriesSummaryPlot:
             mute=True,
         )
 
+        plt.close(fig)
 
 class TestUiSeriesCorrelation:
     ''' Test Series.correlation()
@@ -681,7 +683,8 @@ class TestUISeriesWavelet():
     ''' Test the wavelet functionalities
     '''
 
-    @pytest.mark.parametrize('wave_method',['wwz','cwt'])
+    #@pytest.mark.parametrize('wave_method',['wwz','cwt'])
+    @pytest.mark.parametrize('wave_method',['wwz'])
     def test_wave_t0(self, wave_method):
         ''' Test Series.wavelet() with available methods using default arguments
         '''
@@ -690,7 +693,8 @@ class TestUISeriesWavelet():
         ts = pyleo.Series(time=t, value=v)
         scal = ts.wavelet(method=wave_method)
 
-    @pytest.mark.parametrize('wave_method',['wwz','cwt'])
+    #@pytest.mark.parametrize('wave_method',['wwz','cwt'])
+    @pytest.mark.parametrize('wave_method',['wwz'])
     def test_wave_t1(self,wave_method):
         '''Test Series.spectral() with WWZ/cwt with specified frequency vector passed via `settings`
         '''
@@ -787,9 +791,12 @@ class TestUiSeriesPlot:
 
         x_plot = line.get_xdata()
         y_plot = line.get_ydata()
+        
 
         assert_array_equal(t, x_plot)
         assert_array_equal(v, y_plot)
+        
+        plt.close(fig)
 
 class TestUiSeriesDistplot:
     '''Test for Series.distplot()'''
@@ -807,6 +814,8 @@ class TestUiSeriesDistplot:
         y_plot = line.get_ydata()
 
         assert max(x_plot) < max_axis
+        
+        plt.close(fig)
 
     def test_distplot_t1(self, vertical = True):
         t, v = gen_normal()
@@ -814,6 +823,8 @@ class TestUiSeriesDistplot:
         ts = pyleo.Series(time = t, value = v)
 
         fig, ax = ts.distplot(vertical=vertical, mute=True)
+        
+        plt.close(fig)
 
 class TestUiSeriesFilter:
     '''Test for Series.filter()'''

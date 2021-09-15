@@ -1,7 +1,7 @@
 .. _utils_introduction:
 
-Pyleoclim Utilities (pyleoclim.utils)
-=====================================
+Pyleoclim Utilities API (pyleoclim.utils)
+=========================================
 
 Pyleoclim makes extensive use of functions from `numpy <https://numpy.org>`_, `Pandas <https://pandas.pydata.org>`_, `Scipy <https://www.scipy.org>`_, and `scikit-learn <https://scikit-learn.org/stable/>`_. Please note that some default parameter values for these functions have been changed to more appropriate values for paleoclimate datasets.
 
@@ -169,14 +169,6 @@ This modules contain pre-processing functions for time series analysis.
      - Standardizes a timeseries
    * - :ref:`ts2segments <utils_ts2segments>`
      - Chop a timeseries into several segments based on gap detection
-   * - :ref:`clean_ts <utils_clean_ts>`
-     - Remove NaNs in the time series and sort it in ascending time order
-   * - :ref:`dropna <utils_dropna>`
-     - Remove NaNs
-   * - :ref:`sort_ts <utils_sort_ts>`
-     - Sort time values in ascending order
-   * - :ref:`reduce_duplicated_timestamps <utils_reduce_duplicated_timestamps>`
-     - Reduce duplicated timestamps in a timeseries by averaging the values       
    * - :ref:`annualize <utils_annualize>`
      - Annualize a time series whose time resolution is finer than 1 year
    * - :ref:`gaussianize <utils_gaussianize>`
@@ -189,6 +181,25 @@ This modules contain pre-processing functions for time series analysis.
      - Detect outliers in a timeseries
    * - :ref:`remove_outliers <utils_remove_outliers>`
      - Remove outliers in a timeseries
+
+
+Tsbase
+""""""
+
+This module contains simple cleaning routines.
+
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`clean_ts <utils_clean_ts>`
+     - Remove NaNs in the time series and sort it in ascending time order
+   * - :ref:`dropna <utils_dropna>`
+     - Remove NaNs
+   * - :ref:`sort_ts <utils_sort_ts>`
+     - Sort time values in ascending order
+   * - :ref:`reduce_duplicated_timestamps <utils_reduce_duplicated_timestamps>`
+     - Reduce duplicated timestamps in a timeseries by averaging the values
    * - :ref:`is_evenly_spaced <utils_is_evenly_spaced>`
      - Detect whether a timeseries is evenly spaced in time
 
