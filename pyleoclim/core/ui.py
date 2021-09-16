@@ -1163,7 +1163,9 @@ class Series:
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
-                    time_label=None, value_label=None, period_label=None, psd_label='PSD', mute=False):
+                    time_label=None, value_label=None, period_label=None, psd_label='PSD', 
+                    wavelet_kwargs = None, psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None, 
+                    psd_plot_kwargs = None, mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
 
@@ -1208,6 +1210,26 @@ class Series:
 
         psd_label : str
             the label for the amplitude axis of PDS
+            
+        wavelet_kwargs : dict
+            arguments to be passed to the wavelet function, see pyleoclim.core.ui.Series.wavelet for details
+        
+        psd_kwargs : dict
+            arguments to be passed to the spectral function, see pyleoclim.core.ui.Series.spectral for details
+            
+        ts_plot_kwargs : dict
+            arguments to be passed to the timeseries subplot, see pyleoclim.core.ui.Series.plot for details
+        
+        wavelet_plot_kwargs : dict
+            arguments to be passed to the scalogram plot, see pyleoclim.core.ui.Scalogram.plot for details
+        
+        psd_plot_kwargs : dict
+            arguments to be passed to the psd plot, see pyleoclim.core.ui.PSD.plot for details
+                Certain psd plot settings are required by summary plot formatting. These include:
+                    - ylabel
+                    - legend
+                    - tick parameters
+                These will be overriden by summary plot to prevent formatting errors
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
@@ -1241,12 +1263,18 @@ class Series:
         gs = gridspec.GridSpec(6, 12)
         gs.update(wspace=0, hspace=0)
 
+        wavelet_kwargs={} if wavelet_kwargs is None else wavelet_kwargs.copy()
+        wavelet_plot_kwargs={} if wavelet_plot_kwargs is None else wavelet_plot_kwargs.copy()
+        psd_kwargs={} if psd_kwargs is None else psd_kwargs.copy()
+        psd_plot_kwargs={} if psd_plot_kwargs is None else psd_plot_kwargs.copy()
+        ts_plot_kwargs={} if ts_plot_kwargs is None else ts_plot_kwargs.copy()
+        
         ax = {}
         ax['ts'] = plt.subplot(gs[0:1, :-3])
-        ax['ts'] = self.plot(ax=ax['ts'])
-        if time_lim is not None:
+        ax['ts'] = self.plot(ax=ax['ts'], **ts_plot_kwargs)
+        if time_lim is not None and 'xlim' not in ts_plot_kwargs:
             ax['ts'].set_xlim(time_lim)
-        if value_lim is not None:
+        if value_lim is not None and 'ylim' not in ts_plot_kwargs:
             ax['ts'].set_ylim(value_lim)
 
         ax['ts'].spines['bottom'].set_visible(False)
@@ -1254,46 +1282,50 @@ class Series:
         ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
         if scalogram is None:
             if n_signif_test > 0:
-                scalogram = self.wavelet().signif_test(number=n_signif_test)
+                scalogram = self.wavelet(**wavelet_kwargs).signif_test(number=n_signif_test)
             else:
-                scalogram = self.wavelet()
+                scalogram = self.wavelet(**wavelet_kwargs)
+        
+        if 'cbar_style' not in wavelet_plot_kwargs:
+            wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.1}})
 
-        ax['scal'] = scalogram.plot(ax=ax['scal'], cbar_style={'orientation': 'horizontal', 'pad': 0.1})
+        ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
         if psd is None:
             if n_signif_test > 0:
-                psd = self.spectral().signif_test(number=n_signif_test)
+                psd = self.spectral(**psd_kwargs).signif_test(number=n_signif_test)
             else:
-                psd = self.spectral()
+                psd = self.spectral(**psd_kwargs)
 
-        ax['psd'] = psd.plot(ax=ax['psd'], transpose=True)
-        if period_lim is not None:
+        ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, **psd_plot_kwargs)
+        if period_lim is not None and 'ylim' not in psd_plot_kwargs:
             ax['psd'].set_ylim(period_lim)
+            
         ax['psd'].set_ylabel(None)
         ax['psd'].tick_params(axis='y', direction='in', labelleft=False)
         ax['psd'].legend().remove()
 
-        if psd_lim is not None:
+        if psd_lim is not None and 'xlim' not in psd_plot_kwargs:
             ax['psd'].set_xlim(psd_lim)
 
-        if title is not None:
+        if title is not None and 'title' not in ts_plot_kwargs:
             ax['ts'].set_title(title)
 
-        if value_label is not None:
+        if value_label is not None and 'ylabel' not in ts_plot_kwargs:
             #time_label, value_label = self.make_labels()
             ax['ts'].set_ylabel(value_label)
 
-        if time_label is not None:
+        if time_label is not None and 'xlabel' not in wavelet_plot_kwargs:
             #time_label, value_label = self.make_labels()
             ax['scal'].set_xlabel(time_label)
 
-        if period_label is not None:
+        if period_label is not None and 'ylabel' not in wavelet_plot_kwargs:
             #period_unit = infer_period_unit_from_time_unit(self.time_unit)
             #period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
             ax['scal'].set_ylabel(period_label)
 
-        if psd_label is not None:
+        if psd_label is not None and 'xlabel' not in wavelet_plot_kwargs:
             ax['psd'].set_xlabel(psd_label)
 
         if 'path' in savefig_settings:
