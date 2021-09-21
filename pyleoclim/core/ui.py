@@ -5180,10 +5180,15 @@ class EnsembleSeries(MultipleSeries):
         for x in xt:
             ax[n_ts].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
 
-        if 'path' in savefig_settings:
-            plotting.savefig(fig, settings=savefig_settings)
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            else:
+                if not mute:
+                    plotting.showfig(fig)
+            return fig, ax
         else:
-            plotting.showfig(fig)
+            return ax
 
         # reset the plotting style
         mpl.rcParams.update(current_style)
