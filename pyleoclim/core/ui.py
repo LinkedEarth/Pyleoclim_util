@@ -1161,11 +1161,11 @@ class Series:
         else:
             return ax
 
-    def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None, savefig_settings=None,
+    def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
                     time_label=None, value_label=None, period_label=None, psd_label='PSD', 
                     wavelet_kwargs = None, psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None, 
-                    psd_plot_kwargs = None, mute=False):
+                    psd_plot_kwargs = None, trunc_series = None, savefig_settings=None, mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
 
@@ -1185,10 +1185,10 @@ class Series:
             the title for the figure
 
         time_lim : list or tuple
-            the limitation of the time axis
+            the limitation of the time axis. This is for display purposes only, the scalogram and psd will still be calculated using the full time series.
 
         value_lim : list or tuple
-            the limitation of the value axis of the timeseries
+            the limitation of the value axis of the timeseries. This is for display purposes only, the scalogram and psd will still be calculated using the full time series.
 
         period_lim : list or tuple
             the limitation of the period axis
@@ -1230,6 +1230,9 @@ class Series:
                     - legend
                     - tick parameters
                 These will be overriden by summary plot to prevent formatting errors
+                
+        trunc_series : list or tuple
+            the limitation of the time axis. This will slice the actual time series into one contained within the passed boundaries and as such effect the resulting scalogram and psd objects.
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
@@ -1269,17 +1272,39 @@ class Series:
         psd_plot_kwargs={} if psd_plot_kwargs is None else psd_plot_kwargs.copy()
         ts_plot_kwargs={} if ts_plot_kwargs is None else ts_plot_kwargs.copy()
         
+        if trunc_series is not None:
+            sub_time = []
+            if trunc_series[0] <= self.time[0] and trunc_series[1] >= self.time[-1]:
+                print('Truncation period encapsulates entire series, continuing with defaults.')
+            else:
+                for i in self.time:
+                    if i >= trunc_series[0] and i <= trunc_series[1]:
+                        sub_time.append(i)
+                try:
+                    self = self.slice(sub_time)
+                except:
+                    print('Number of time points in given truncation period is not even. Removing last time point to fix.')
+                    sub_time.pop(-1)
+                    self = self.slice(sub_time)
+        
         ax = {}
         ax['ts'] = plt.subplot(gs[0:1, :-3])
         ax['ts'] = self.plot(ax=ax['ts'], **ts_plot_kwargs)
-        if time_lim is not None and 'xlim' not in ts_plot_kwargs:
+        
+        if time_lim is not None:
             ax['ts'].set_xlim(time_lim)
-        if value_lim is not None and 'ylim' not in ts_plot_kwargs:
+            if 'xlim' in ts_plot_kwargs:
+                print('Xlim passed to time series plot through exposed argument and key word argument. Exposed argument takes precedence.')
+            
+        if value_lim is not None:
             ax['ts'].set_ylim(value_lim)
+            if 'ylim' in ts_plot_kwargs:
+                print('Ylim passed to time series plot through exposed argument and key word argument. Exposed argument takes precedence.')
 
         ax['ts'].spines['bottom'].set_visible(False)
 
         ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
+        
         if scalogram is None:
             if n_signif_test > 0:
                 scalogram = self.wavelet(**wavelet_kwargs).signif_test(number=n_signif_test)
@@ -1299,34 +1324,49 @@ class Series:
                 psd = self.spectral(**psd_kwargs)
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, **psd_plot_kwargs)
-        if period_lim is not None and 'ylim' not in psd_plot_kwargs:
+        
+        if period_lim is not None:
             ax['psd'].set_ylim(period_lim)
+            if 'ylim' in psd_plot_kwargs:
+               print('Ylim passed to psd plot through exposed argument and key word argument. Exposed argument takes precedence.')
             
         ax['psd'].set_ylabel(None)
         ax['psd'].tick_params(axis='y', direction='in', labelleft=False)
         ax['psd'].legend().remove()
 
-        if psd_lim is not None and 'xlim' not in psd_plot_kwargs:
+        if psd_lim is not None:
             ax['psd'].set_xlim(psd_lim)
+            if 'xlim' in psd_plot_kwargs:
+                print('Xlim passed to psd plot through exposed argument and key word argument. Exposed argument takes precedence.')
 
-        if title is not None and 'title' not in ts_plot_kwargs:
+        if title is not None:
             ax['ts'].set_title(title)
+            if 'title' in ts_plot_kwargs:
+                print('Title passed to time series plot through exposed argument and key word argument. Exposed argument takes precedence.')
 
-        if value_label is not None and 'ylabel' not in ts_plot_kwargs:
+        if value_label is not None:
             #time_label, value_label = self.make_labels()
             ax['ts'].set_ylabel(value_label)
+            if 'ylabel' in ts_plot_kwargs:
+                print('Ylabel passed to time series plot through exposed argument and key word argument. Exposed argument takes precedence.')
 
-        if time_label is not None and 'xlabel' not in wavelet_plot_kwargs:
+        if time_label is not None:
             #time_label, value_label = self.make_labels()
             ax['scal'].set_xlabel(time_label)
+            if  'xlabel' in wavelet_plot_kwargs:
+                print('Xlabel passed to scalogram plot through exposed argument and key word argument. Exposed argument takes precedence.')
 
-        if period_label is not None and 'ylabel' not in wavelet_plot_kwargs:
+        if period_label is not None:
             #period_unit = infer_period_unit_from_time_unit(self.time_unit)
             #period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
             ax['scal'].set_ylabel(period_label)
+            if 'ylabel' in wavelet_plot_kwargs:
+                print('Ylabel passed to scalogram plot through exposed argument and key word argument. Exposed argument takes precedence.')
 
-        if psd_label is not None and 'xlabel' not in wavelet_plot_kwargs:
+        if psd_label is not None:
             ax['psd'].set_xlabel(psd_label)
+            if 'xlabel' in psd_plot_kwargs:
+                print('Xlabel passed to psd plot through exposed argument and key word argument. Exposed argument takes precedence.')
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
