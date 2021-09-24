@@ -36,6 +36,7 @@ import cartopy.feature as cfeature
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
 from scipy import stats
+from statsmodels.multivariate.pca import PCA
 import warnings
 import os
 
@@ -3825,9 +3826,141 @@ class MultipleSeries:
         flag = all (l==L for l in r)
 
         return flag, lengths
+    
+    def pca(self,weights=None,missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
+        '''Principal Component Analysis (Empirical Orthogonal Functions)
 
-    def pca(self,nMC=200,**pca_kwargs):
-        ''' Principal Component Analysis
+        Decomposition of dataset ys in terms of orthogonal basis functions.
+        Tolerant to missing values, infilled by an EM algorithm. Do make sure the time axes are aligned, however!
+        
+        
+        Algorithm from statsmodels: https://www.statsmodels.org/stable/generated/statsmodels.multivariate.pca.PCA.html
+        
+        
+        Parameters
+        ----------
+        data : array_like
+            Variables in columns, observations in rows.
+        ncomp : int, optional
+            Number of components to return.  If None, returns the as many as the
+            smaller of the number of rows or columns in data.
+        standardize : bool, optional
+            Flag indicating to use standardized data with mean 0 and unit
+            variance.  standardized being True implies demean.  Using standardized
+            data is equivalent to computing principal components from the
+            correlation matrix of data.
+        demean : bool, optional
+            Flag indicating whether to demean data before computing principal
+            components.  demean is ignored if standardize is True. Demeaning data
+            but not standardizing is equivalent to computing principal components
+            from the covariance matrix of data.
+        normalize : bool , optional
+            Indicates whether to normalize the factors to have unit inner product.
+            If False, the loadings will have unit inner product.
+        gls : bool, optional
+            Flag indicating to implement a two-step GLS estimator where
+            in the first step principal components are used to estimate residuals,
+            and then the inverse residual variance is used as a set of weights to
+            estimate the final principal components.  Setting gls to True requires
+            ncomp to be less then the min of the number of rows or columns.
+        weights : ndarray, optional
+            Series weights to use after transforming data according to standardize
+            or demean when computing the principal components.
+        method : str, optional
+            Sets the linear algebra routine used to compute eigenvectors:
+        
+            * 'svd' uses a singular value decomposition (default).
+            * 'eig' uses an eigenvalue decomposition of a quadratic form
+            * 'nipals' uses the NIPALS algorithm and can be faster than SVD when
+              ncomp is small and nvars is large. See notes about additional changes
+              when using NIPALS.
+        missing : {str, None}
+            Method for missing data.  Choices are:
+        
+            * 'drop-row' - drop rows with missing values.
+            * 'drop-col' - drop columns with missing values.
+            * 'drop-min' - drop either rows or columns, choosing by data retention.
+            * 'fill-em' - use EM algorithm to fill missing value.  ncomp should be
+              set to the number of factors required.
+            * `None` raises if data contains NaN values.
+        tol : float, optional
+            Tolerance to use when checking for convergence when using NIPALS.
+        max_iter : int, optional
+            Maximum iterations when using NIPALS.
+        tol_em : float
+            Tolerance to use when checking for convergence of the EM algorithm.
+        max_em_iter : int
+            Maximum iterations for the EM algorithm.
+        
+        Attributes
+        ----------
+        factors : array or DataFrame
+            nobs by ncomp array of of principal components (scores)
+        scores :  array or DataFrame
+            nobs by ncomp array of of principal components - identical to factors
+        loadings : array or DataFrame
+            ncomp by nvar array of  principal component loadings for constructing
+            the factors
+        coeff : array or DataFrame
+            nvar by ncomp array of  principal component loadings for constructing
+            the projections
+        projection : array or DataFrame
+            nobs by var array containing the projection of the data onto the ncomp
+            estimated factors
+        rsquare : array or Series
+            ncomp array where the element in the ith position is the R-square
+            of including the fist i principal components.  Note: values are
+            calculated on the transformed data, not the original data
+        ic : array or DataFrame
+            ncomp by 3 array containing the Bai and Ng (2003) Information
+            criteria.  Each column is a different criteria, and each row
+            represents the number of included factors.
+        eigenvals : array or Series
+            nvar array of eigenvalues
+        eigenvecs : array or DataFrame
+            nvar by nvar array of eigenvectors
+        weights : ndarray
+            nvar array of weights used to compute the principal components,
+            normalized to unit length
+        transformed_data : ndarray
+            Standardized, demeaned and weighted data used to compute
+            principal components and related quantities
+        cols : ndarray
+            Array of indices indicating columns used in the PCA
+        rows : ndarray
+            Array of indices indicating rows used in the PCA
+
+        
+        '''
+        flag, lengths = self.equal_lengths()
+
+        if flag==False:
+            print('All Time Series should be of same length. Apply common_time() first')
+        else: # if all series have equal length
+            p = len(lengths)
+            n = lengths[0]
+            ys = np.empty((n,p))
+            for j in range(p):
+                ys[:,j] = self.series_list[j].value  # fill in data matrix
+        
+        out  = PCA(ys,weights=weights,missing=missing,tol_em=tol_em, max_em_iter=max_em_iter,**pca_kwargs)
+        
+        # compute effective sample size
+        PC1  = out.factors[:,0]
+        neff = tsutils.eff_sample_size(PC1) 
+        
+        # compute percent variance
+        pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
+        
+        # assign result to SpatiamDecomp class
+        # Note: need to grab coordinates from Series or LiPDSeries        
+        res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+                            pcs = out.scores, pctvar = pctvar,  locs = None,
+                            eigvals = out.eigenvals, eigvecs = out.eigenvecs)
+        return res    
+
+    def mcpca(self,nMC=200,**pca_kwargs):
+        ''' Monte Carlo Principal Component Analysis
 
         Parameters
         ----------
@@ -5892,6 +6025,207 @@ class CorrEns:
                 plotting.showfig(fig)
         return fig, ax
 
+class SpatialDecomp:
+    ''' Class to hold the results of spatial decompositions
+        applies to : `pca()`, `mcpca()`, `mssa()` 
+        
+        Attributes
+        ----------
+
+        time: float
+            the common time axis
+            
+        locs: float (p, 2)
+            a p x 2 array of coordinates (latitude, longitude) for mapping the spatial patterns ("EOFs")
+            
+        name: str
+            name of the dataset/analysis to use in plots
+            
+        eigvals: float
+            vector of eigenvalues from the decomposition
+            
+        eigvecs: float
+            array of eigenvectors from the decomposition  
+         
+        pctvar: float    
+            array of pct variance accounted for by each mode
+            
+        neff: float
+            scalar representing the effective sample size of the leading mode
+    
+    '''
+    def __init__(self, time, locs, name, eigvals, eigvecs, pctvar, pcs, neff):
+        self.time       = time
+        self.name       = name
+        self.locs       = locs 
+        self.eigvals    = eigvals
+        self.eigvecs    = eigvecs
+        self.pctvar     = pctvar
+        self.pcs        = pcs
+        self.neff       = neff
+        
+    def screeplot(self, trunc = 10, figsize=[6, 4], title='scree plot', ax=None, savefig_settings=None, 
+                  title_kwargs=None, xlim=None, clr_eig='C0',  mute=False):
+        ''' Plot the eigenvalue spectrum with uncertainties
+            Uses the North et al "rule of thumb" with effective sample size 
+            computed as in [1]. 
+
+        Parameters
+        ----------
+        figsize : list, optional
+            The figure size. The default is [6, 4].
+
+        title : str, optional
+            Plot title. The default is 'scree plot'.
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        title_kwargs : dict
+            the keyword arguments for ax.set_title()
+
+        ax : matplotlib.axis, optional
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+
+        xlim : list, optional
+            x-axis limits. The default is None.
+            
+        trunc : int
+            the number of eigenvalues to plot. Default: 10
+            
+        References
+        ----------
+        [1] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical orthogonal functions
+        and related techniques in atmospheric science: A review, International Journal of Climatology, 27(9), 
+        1119–1152, doi:10.1002/joc.1499.
+
+        '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+        
+        # compute 95% CI    
+        Lmean = self.eigvals
+        Lerr  = np.tile(Lmean,(2,1)) # declare array
+        Lerr[0,:]  = Lmean*np.sqrt(1-np.sqrt(2/self.neff))
+        Lerr[1,:]  = Lmean*np.sqrt(1+np.sqrt(2/self.neff))
+        
+        idx = np.arange(len(Lmean)) + 1
+        
+        plt.errorbar(x=idx,y=Lmean,yerr = Lerr, color=clr_eig,marker='o',ls='',alpha=1.0,label=self.name)
+        
+        plt.title(title,fontweight='bold'); plt.legend(); plt.xlim(0, trunc) 
+        plt.xlabel(r'Mode index $i$'); plt.ylabel(r'$\lambda_i$ and 95% CI')    
+
+        if xlim is not None:
+            ax.set_xlim(xlim)
+
+        if title is not None:
+            title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
+            t_args = {'y': 1.1, 'weight': 'bold'}
+            t_args.update(title_kwargs)
+            ax.set_title(title, **t_args)
+
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, settings=savefig_settings)
+        else:
+            if not mute:
+                plotting.showfig(fig)
+        return fig, ax
+
+    # def modeplot(self, mode=0, figsize=[10, 5], ax=None, savefig_settings=None, 
+    #          title_kwargs=None, mute=False, NW = 2):
+    #     ''' Dashboard visualizing the properties of a given SSA mode, including:
+    #         1. the analyzing function (T-EOF)
+    #         2. the reconstructed component (RC)
+    #         3. its spectrum
+
+    #     Parameters
+    #     ----------
+    #     mode : int
+    #         the (zero-based) index of the mode to visualize
+        
+    #     figsize : list, optional
+    #         The figure size. The default is [10, 5].
+        
+    #     savefig_settings : dict
+    #         the dictionary of arguments for plt.savefig(); some notes below:
+    #         - "path" must be specified; it can be any existed or non-existed path,
+    #           with or without a suffix; if the suffix is not given in "path", it will follow "format"
+    #         - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+    #     title_kwargs : dict
+    #         the keyword arguments for ax.set_title()
+
+    #     ax : matplotlib.axis, optional
+    #         the axis object from matplotlib
+    #         See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+    #     mute : {True,False}
+    #         if True, the plot will not show;
+    #         recommend to turn on when more modifications are going to be made on ax
+        
+    #     NW : float [2, 2.5, 3, 3.5 , 4] 
+    #         time-bandwidth product for MTM spectral estimate
+    #         default: 2
+      
+    #     '''
+    #     # Turn the interactive mode off.
+    #     plt.ioff()
+
+    #     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+
+    #     if ax is None:
+    #         fig, ax = plt.subplots(figsize=figsize)
+        
+    #     RC = self.RCmat[:,mode]    
+    #     fig = plt.figure(tight_layout=True,figsize=figsize)
+    #     gs = gridspec.GridSpec(2, 2) # plot RC
+    #     ax = fig.add_subplot(gs[0, :])
+    #     ax.plot(self.time,RC)
+    #     ax.set_xlabel('Time'),  ax.set_ylabel('RC [dimensionless]')
+    #     ax.set_title('Mode '+str(mode+1)+' RC, '+ '{:3.2f}'.format(self.pctvar[mode]) + '% variance explained',weight='bold')
+    #     # plot T-EOF
+    #     ax = fig.add_subplot(gs[1, 0])
+    #     ax.plot(self.eigvecs[:,mode])
+    #     ax.set_title('T-EOF (analyzing function)')
+    #     ax.set_xlabel('Time'), ax.set_ylabel('T-EOF values')
+    #     # plot spectrum
+    #     ax = fig.add_subplot(gs[1, 1])
+    #     ts_rc = Series(time=self.time, value=RC) # define timeseries object for the RC
+    #     psd_mtm_rc = ts_rc.interp().spectral(method='mtm', settings={'NW': NW})
+    
+    #     _ = psd_mtm_rc.plot(ax=ax)
+    #     ax.set_xlabel('Period')
+    #     ax.set_title('Multitaper spectrum')
+
+    #     # if title is not None:
+    #     #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
+    #     #     t_args = {'y': 1.1, 'weight': 'bold'}
+    #     #     t_args.update(title_kwargs)
+    #     #     ax.set_title(title, **t_args)
+
+    #     if 'path' in savefig_settings:
+    #         plotting.savefig(fig, settings=savefig_settings)
+    #     else:
+    #         if not mute:
+    #             plotting.showfig(fig)
+    #     return fig, ax
+
+
+
 class SsaRes:
     ''' Class to hold the results of SSA method
 
@@ -6485,8 +6819,8 @@ class LipdSeries(Series):
     '''Lipd time series object
 
 
-    These objects can be obtained from a LiPD either through Pyleoclim or the LiPD utilities.
-    If multiple objects (i.e., list) is given, then the user will be prompted to choose one timeseries.
+    These objects can be obtained from a LiPD file/object either through Pyleoclim or the LiPD utilities.
+    If multiple objects (i.e., a list) is given, then the user will be prompted to choose one timeseries.
 
     LipdSeries is a child of Series, therefore all the methods available for Series apply to LipdSeries in addition to some specific methods.
 

@@ -10,18 +10,17 @@ Principal Component Analysis, Singular Spectrum Analysis, Multi-channel SSA
 
 __all__ = [
     'mcpca',
-    'pca',
     'ssa',
     'mssa',
 ]
 
 import numpy as np
-from sklearn.decomposition import PCA
+#from sklearn.decomposition import PCA
+from statsmodels.multivariate.pca import PCA
 from .tsutils import standardize
 from .tsmodel import ar1_sim
 from scipy.linalg import eigh, toeplitz
 from nitime import algorithms as alg
-#from statsmodels.multivariate.pca import PCA
 import copy
 
 #------
@@ -79,8 +78,8 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     eig_ar1 = np.zeros((nrec,nMC))
 
     # apply PCA algorithm to the data matrix     
-    pc = PCA(ys,ncomp=nrec, **pca_kwargs) # TODO : implement EM infilling with missing = ‘fill-em’ 
-    eigvals = pc.eigenvals
+    pca_res = PCA(ys,ncomp=nrec, **pca_kwargs) # TODO : implement EM infilling with missing = ‘fill-em’ 
+    eigvals = pca_res.eigenvals
     
     # generate surrogate matrix
     y_ar1 = np.full((nt,nrec,nMC), 0, dtype=np.double)
@@ -96,6 +95,9 @@ def mcpca(ys, nMC=200, **pca_kwargs):
         else:   # flip sign (arbitrary)
             eof_mc[:,i]  = -pc.loadings[:,i] 
             pc_mc[:,i]   = -pc.factors[:,i]
+        # estimate effective sample size
+        #PC1 = 
+        neff[i] = tsutils.eff_sample_size(PC1)
             
     # loop over Monte Carlo iterations     
     for m in range(nMC):    
@@ -103,6 +105,7 @@ def mcpca(ys, nMC=200, **pca_kwargs):
         eig_ar1[:,m] = pc_ar1.eigenvals
  
     eig95 = np.percentile(eig_ar1, 95, axis=1)
+    
                 
     # assign result
     res = {'eigvals': eigvals, 'eigvals95': eig95, 'pcs': pc_mc, 'eofs': eof_mc}
@@ -111,7 +114,8 @@ def mcpca(ys, nMC=200, **pca_kwargs):
 
 
 
-def pca(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,iterated_power='auto',random_state=None):
+
+def pca_sklearn(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,iterated_power='auto',random_state=None):
     '''Principal Component Analysis (Empirical Orthogonal Functions)
 
     Decomposition of a signal or data set in terms of orthogonal basis functions.
@@ -207,7 +211,7 @@ def pca(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,i
             Equal to the average of (min(n_features, n_samples) - n_components) smallest eigenvalues of the covariance matrix of X.
     '''
     if np.any(np.isnan(ys)):
-        raise ValueError('matrix may not have null values.')
+        raise ValueError('data may not contain missing values.')
     pca=PCA(n_components=n_components,copy=copy,whiten=whiten,svd_solver=svd_solver,tol=tol,iterated_power=iterated_power,random_state=random_state)
     return pca.fit(ys).__dict__
 

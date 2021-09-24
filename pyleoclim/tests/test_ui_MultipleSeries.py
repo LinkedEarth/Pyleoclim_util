@@ -14,7 +14,7 @@ Notes on how to test:
 '''
 import numpy as np
 import pandas as pd
-from statsmodels.multivariate.pca import PCA
+#from statsmodels.multivariate.pca import PCA
 
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
@@ -26,6 +26,7 @@ from pyleoclim.utils.tsmodel import (
     ar1_sim,
     colored_noise,
 )
+from pyleoclim.utils.decomposition import pca
 
 # a collection of useful functions
 
@@ -216,24 +217,43 @@ class TestMultipleSeriesPca:
     Testing the PCA function 
     '''
 
-    def test_pca(self):
-        p = 20
-        x = np.random.randn(100)[:, None]
-        x = x + np.random.randn(100, p)
-        pc = PCA(x, ncomp=p, missing= None)
+    def test_pca_t0(self):
+        p = 20; n = 200
+        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        noise = np.random.randn(n,p)
+        X = signal.value[:,None] + noise
+                
     
-        t = np.arange(100)
+        t = np.arange(n)
     
         mslist = []
         for i in range(p):
-            mslist.append(pyleo.Series(time = t, value = x[:,i]))
+            mslist.append(pyleo.Series(time = t, value = X[:,i]))
         ms = pyleo.MultipleSeries(mslist)
 
         #res = ms.pca(nMC=20, missing='fill-em', standardize=False)
-        res = ms.pca(nMC=20)
+        res = ms.pca()
     
         # assert what?
-        assert_array_equal(pc.eigenvals, res['eigvals'])    
+        assert_array_equal(pc.eigenvals, res['eigvals'])   
+    
+        
+class TestMultipleSeriesMcPca:
+    '''Test for MultipleSeries.mcpca()
+
+    Testing the M-PCA function 
+    '''
+    
+    def test_mcpca_t0(self):
+        url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+        data = pyleo.Lipd(usr_path = url)
+        tslist = data.to_LipdSeriesList()
+        tslist = tslist[2:] # drop the first two series which only concerns age and depth
+        ms = pyleo.MultipleSeries(tslist)
+    
+        # msc = ms.common_time()
+    
+        # res = msc.pca(nMC=20)   
 
     
 class TestMultipleSeriesCommonTime:
