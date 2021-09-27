@@ -14,7 +14,6 @@ Notes on how to test:
 '''
 import numpy as np
 import pandas as pd
-#from statsmodels.multivariate.pca import PCA
 
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
@@ -26,7 +25,7 @@ from pyleoclim.utils.tsmodel import (
     ar1_sim,
     colored_noise,
 )
-from pyleoclim.utils.decomposition import pca
+from pyleoclim.utils.decomposition import mcpca
 
 # a collection of useful functions
 
@@ -307,6 +306,7 @@ class TestMultipleSeriesPca:
         res = msl.pca()
         
         res.screeplot()
+        res.modeplot()
  
 class TestMultipleSeriesGridProperties:
     '''Test for MultipleSeries.grid_properties()

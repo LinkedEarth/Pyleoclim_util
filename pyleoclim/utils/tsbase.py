@@ -165,14 +165,17 @@ def reduce_duplicated_timestamps(ys, ts, verbose=False):
             print('Duplicate timestamps have been combined by averaging values.')
     return ys, ts
 
-def is_evenly_spaced(ts):
-    ''' Check if a time axis is evenly spaced.
+def is_evenly_spaced(ts, tol=1e-4):
+    ''' Check if a time axis is evenly spaced, within a given tolerance
 
     Parameters
     ----------
 
     ts : array
         the time axis of a time series
+        
+    tol : float64
+        numerical tolerance for the relative difference
 
     Returns
     -------
@@ -184,13 +187,10 @@ def is_evenly_spaced(ts):
     if ts is None:
         check = True
     else:
-        dts = np.diff(ts)
-        dt_mean = np.mean(dts)
-        if any(dt == dt_mean for dt in np.diff(ts)):
-            check = True
-        else:
-            check = False
-
+        dts = ts.diff()
+        dt_mean = dts.mean()   
+        check = all(np.abs((dt - dt_mean)/dt_mean) < tol for dt in ts.diff()) # compare relative spacing to the mean
+        
     return check
 
 

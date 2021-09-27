@@ -1,4 +1,4 @@
-''' The application interface for the users
+''' The application programming interface for Pyleoclim
 
 @author: fengzhu
 
@@ -880,8 +880,8 @@ class Series:
         
         return resc
 
-    def is_evenly_spaced(self):
-        ''' Check if the timeseries is evenly-spaced
+    def is_evenly_spaced(self, tol=1e-3):
+        ''' Check if the Series time axis is evenly-spaced, within tolerance
 
         Returns
         ------
@@ -889,7 +889,7 @@ class Series:
         res : bool
         '''
 
-        res = tsbase.is_evenly_spaced(self.time)
+        res = tsbase.is_evenly_spaced(self.time, tol)
         return res
 
     def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
