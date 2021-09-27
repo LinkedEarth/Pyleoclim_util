@@ -32,9 +32,10 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     
     Carries out Principal Component Analysis  (most unfortunately named EOF analysis in the meteorology
     and climate literature) on a data matrix ys.  
-    If NaNs are present, they will be infilled via the EM algorithm.
     
     The significance of eigenvalues is gauged against those of AR(1) surrogates fit to the data.
+
+    TODO: enable for ensembles and generally debug
               
     Parameters
     ----------
@@ -71,6 +72,8 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     '''
     nt, nrec = ys.shape
     
+    ncomp = min(nt,nrec)
+    
     pc_mc = np.zeros((nt,nrec)) # principal components
     eof_mc = np.zeros((nrec,nrec))  #eof (spatial loadings)
     #eigenvalue matrices
@@ -78,7 +81,7 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     eig_ar1 = np.zeros((nrec,nMC))
 
     # apply PCA algorithm to the data matrix     
-    pca_res = PCA(ys,ncomp=nrec, **pca_kwargs) # TODO : implement EM infilling with missing = ‘fill-em’ 
+    pca_res = PCA(ys,ncomp=ncomp, **pca_kwargs) 
     eigvals = pca_res.eigenvals
     
     # generate surrogate matrix
@@ -108,8 +111,21 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     
                 
     # assign result
-    res = {'eigvals': eigvals, 'eigvals95': eig95, 'pcs': pc_mc, 'eofs': eof_mc}
-
+    #res = {'eigvals': eigvals, 'eigvals95': eig95, 'pcs': pc_mc, 'eofs': eof_mc}
+    
+    # compute effective sample size
+    PC1  = out.factors[:,0]
+    neff = tsutils.eff_sample_size(PC1) 
+    
+    # compute percent variance
+    pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
+    
+    # assign result to SpatiamDecomp class
+    # Note: need to grab coordinates from Series or LiPDSeries        
+    res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+                        pcs = out.scores, pctvar = pctvar,  locs = None,
+                        eigvals = out.eigenvals, eigvecs = out.eigenvecs)
+    
     return res
 
 

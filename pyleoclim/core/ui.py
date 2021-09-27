@@ -4003,6 +4003,8 @@ class MultipleSeries:
 
     def mcpca(self,nMC=200,**pca_kwargs):
         ''' Monte Carlo Principal Component Analysis
+        
+        (UNDER REPAIR - USE AT YOUR OWN RISK)
 
         Parameters
         ----------

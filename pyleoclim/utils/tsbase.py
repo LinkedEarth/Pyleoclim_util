@@ -187,9 +187,9 @@ def is_evenly_spaced(ts, tol=1e-4):
     if ts is None:
         check = True
     else:
-        dts = ts.diff()
+        dts = np.diff(ts)
         dt_mean = dts.mean()   
-        check = all(np.abs((dt - dt_mean)/dt_mean) < tol for dt in ts.diff()) # compare relative spacing to the mean
+        check = all(np.abs((dt - dt_mean)/dt_mean) < tol for dt in np.diff(ts)) # compare relative spacing to the mean
         
     return check
 

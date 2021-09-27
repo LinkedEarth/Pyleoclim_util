@@ -330,23 +330,23 @@ class TestMultipleSeriesGridProperties:
         
         
         
-class TestMultipleSeriesMcPca:
-    '''Test for MultipleSeries.mcpca()
+# class TestMultipleSeriesMcPca:
+#     '''Test for MultipleSeries.mcpca()
 
-    Testing the MC-PCA function 
-    '''    
-    def test_mcpca_t0(self):
-        url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-        data = pyleo.Lipd(usr_path = url)
-        tslist = data.to_LipdSeriesList()
-        tslist = tslist[2:] # drop the first two series which only concerns age and depth
-        ms = pyleo.MultipleSeries(tslist)
+#     Testing the MC-PCA function 
+#     '''    
+#     def test_mcpca_t0(self):
+#         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+#         data = pyleo.Lipd(usr_path = url)
+#         tslist = data.to_LipdSeriesList()
+#         tslist = tslist[2:] # drop the first two series which only concerns age and depth
+#         ms = pyleo.MultipleSeries(tslist)
     
-        # TO DO !!!!
+#         # TO DO !!!!
     
-        # msc = ms.common_time()
+#         # msc = ms.common_time()
     
-        # res = msc.pca(nMC=20)   
+#         # res = msc.pca(nMC=20)   
 
     
 class TestMultipleSeriesCommonTime:
