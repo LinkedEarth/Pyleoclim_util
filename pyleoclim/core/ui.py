@@ -3325,9 +3325,9 @@ class Coherence:
 class MultipleSeries:
     '''MultipleSeries object.
 
-    This object handles multiple objects of the type Series and can be created from a list of Series objects.
+    This object handles a collection of the type Series and can be created from a list of such objects.
     MultipleSeries should be used when the need to run analysis on multiple records arises, such as running principal component analysis.
-    Some of the methods automatically rescale the time axis prior to analysis to ensure that the analysis is run over the same time period.
+    Some of the methods automatically refocus the time axis prior to analysis to ensure that the analysis is run over the same time period.
 
     Parameters
     ----------
@@ -3498,7 +3498,7 @@ class MultipleSeries:
         return deepcopy(self)
 
     def standardize(self):
-        '''Standardize each series object
+        '''Standardize each series object in a collection 
 
         Returns
         -------
@@ -3513,6 +3513,35 @@ class MultipleSeries:
             s.value=v_mod
             ms.series_list[idx]=s
         return ms
+    
+    def grid_properties(self, step_style='median'):
+        '''
+        Extract grid properties (start, stop, step) of all the Series objects in 
+        a collection.
+        
+        Parameters
+        ----------
+        step_style : str
+            Method to obtain a representative step if x is not evenly spaced.
+            Valid entries: 'median' [default], 'mean', 'mode' or 'max'
+            The mode is the most frequent entry in a dataset, and may be a good choice if the timeseries
+            is nearly equally spaced but for a few gaps. 
+            
+            Max is a conservative choice, appropriate for binning methods and Gaussian kernel coarse-graining
+
+        Returns
+        -------
+        
+        grid_properties : numpy array
+            n x 3 array, where n is the number of series
+            
+        '''
+        gp = np.empty((len(self.series_list),3)) # obtain grid parameters
+        for idx,item in enumerate(self.series_list):
+            item      = item.clean(verbose=idx==0)
+            gp[idx,:] = tsutils.grid_properties(item.time, step_style=step_style)
+            
+        return gp
 
     def common_time(self, method='interp', common_step = 'max', start=None, stop = None, step=None, step_style = None, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via binning
@@ -3609,7 +3638,7 @@ class MultipleSeries:
             msc = ms.common_time(method='gkernel')
             msc.plot(title=r'Gaussian kernel ($h=3$)',ax=ax[2],legend=False)
 
-            # apply common_time with gkernel modified
+            # apply common_time with gkernel and a large bandwidth
             msc = ms.common_time(method='gkernel', h=11)
             msc.plot(title=r'Gaussian kernel ($h=11$)',ax=ax[3],legend=False)
 
@@ -3627,13 +3656,7 @@ class MultipleSeries:
             elif  method == 'interp':
                step_style = 'mean'
 
-        gp = np.empty((len(self.series_list),3)) # obtain grid parameters
-        for idx,item in enumerate(self.series_list):
-            item      = item.clean(verbose=idx==0)
-            gp[idx,:] = tsutils.grid_properties(item.time, step_style=step_style)
-            # if gp[idx,2] < 0:  # flip time axis if retrograde
-            #     item = item.clean(verbose=idx==0)
-            #     gp[idx,2] = abs(gp[idx,2])
+        gp = self.grid_properties(step_style=step_style)        
 
         # define parameters for common time axis
         start = gp[:,0].max()
@@ -3831,8 +3854,10 @@ class MultipleSeries:
         '''Principal Component Analysis (Empirical Orthogonal Functions)
 
         Decomposition of dataset ys in terms of orthogonal basis functions.
-        Tolerant to missing values, infilled by an EM algorithm. Do make sure the time axes are aligned, however!
+        Tolerant to missing values, infilled by an EM algorithm. 
+        Requires ncomp to be less than the number of missing values.
         
+        Do make sure the time axes are aligned, however! (e.g. use `common_time()`)
         
         Algorithm from statsmodels: https://www.statsmodels.org/stable/generated/statsmodels.multivariate.pca.PCA.html
         
@@ -3930,7 +3955,22 @@ class MultipleSeries:
         rows : ndarray
             Array of indices indicating rows used in the PCA
 
-        
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            tslist = data.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
+
+            res = ms.pca()
+            
+            res.screeplot()
         '''
         flag, lengths = self.equal_lengths()
 
@@ -3942,6 +3982,8 @@ class MultipleSeries:
             ys = np.empty((n,p))
             for j in range(p):
                 ys[:,j] = self.series_list[j].value  # fill in data matrix
+        
+        nc = min(ys.shape) # number of components to return
         
         out  = PCA(ys,weights=weights,missing=missing,tol_em=tol_em, max_em_iter=max_em_iter,**pca_kwargs)
         
@@ -6064,11 +6106,9 @@ class SpatialDecomp:
         self.pcs        = pcs
         self.neff       = neff
         
-    def screeplot(self, trunc = 10, figsize=[6, 4], title='scree plot', ax=None, savefig_settings=None, 
-                  title_kwargs=None, xlim=None, clr_eig='C0',  mute=False):
+    def screeplot(self, figsize=[6, 4], uq='N82' ,title='scree plot', ax=None, savefig_settings=None, 
+                  title_kwargs=None, xlim=[0,10], clr_eig='C0',  mute=False):
         ''' Plot the eigenvalue spectrum with uncertainties
-            Uses the North et al "rule of thumb" with effective sample size 
-            computed as in [1]. 
 
         Parameters
         ----------
@@ -6096,16 +6136,24 @@ class SpatialDecomp:
             recommend to turn on when more modifications are going to be made on ax
 
         xlim : list, optional
-            x-axis limits. The default is None.
+            x-axis limits. The default is [0, 10] (first 10 eigenvalues)
             
-        trunc : int
-            the number of eigenvalues to plot. Default: 10
+        uq : str
+            Method used for uncertainty quantification of the eigenvalues.
+            'N82' uses the North et al "rule of thumb" [1] with effective sample size 
+            computed as in [2]. 
+            'MC' uses Monte-Carlo simulations (e.g. MC-EOF). Returns an error if no ensemble is found.
+            
             
         References
         ----------
-        [1] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical orthogonal functions
-        and related techniques in atmospheric science: A review, International Journal of Climatology, 27(9), 
-        1119–1152, doi:10.1002/joc.1499.
+        [1] North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982), 
+            Sampling errors in the estimation of empirical orthogonal functions,
+            Mon. Weather Rev., 110, 699–706.
+        [2] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical
+            orthogonal functions and related techniques in atmospheric science: 
+            A review, International Journal of Climatology, 27(9), 
+            1119–1152, doi:10.1002/joc.1499.
 
         '''
         # Turn the interactive mode off.
@@ -6115,22 +6163,40 @@ class SpatialDecomp:
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
+            
+        
+        
+        if self.neff < 2:
+            self.neff = 2
         
         # compute 95% CI    
-        Lmean = self.eigvals
-        Lerr  = np.tile(Lmean,(2,1)) # declare array
-        Lerr[0,:]  = Lmean*np.sqrt(1-np.sqrt(2/self.neff))
-        Lerr[1,:]  = Lmean*np.sqrt(1+np.sqrt(2/self.neff))
+        if uq == 'N82':
+            eb_lbl =  r'95% CI ($n_\mathrm{eff} = $'+ '{:.1f}'.format(self.neff) +')' # declare method
+            Lc = self.eigvals # central estimate 
+            Lerr  = np.tile(Lc,(2,1)) # declare array
+            Lerr[0,:]  = Lc*np.sqrt(1-np.sqrt(2/self.neff))
+            Lerr[1,:]  = Lc*np.sqrt(1+np.sqrt(2/self.neff))
+        elif uq =='MC':
+            eb_lbl =  '95% CI (Monte Carlo)' # declare method
+            try:
+                Lq = np.quantile(self.eigvals,[0.025,0.5,0.975],axis = 1)
+                Lc = Lq[1,:]
+            except ValueError:
+                print("Eigenvalue array must have more than 1 non-singleton dimension.")             
+        else:
+            raise NameError("unkown UQ method. No action taken")
+           
+            
+        idx = np.arange(len(Lc)) + 1
         
-        idx = np.arange(len(Lmean)) + 1
+        ax.errorbar(x=idx,y=Lc,yerr = Lerr, color=clr_eig,marker='o',ls='',
+                    alpha=1.0,label=eb_lbl)
         
-        plt.errorbar(x=idx,y=Lmean,yerr = Lerr, color=clr_eig,marker='o',ls='',alpha=1.0,label=self.name)
-        
-        plt.title(title,fontweight='bold'); plt.legend(); plt.xlim(0, trunc) 
-        plt.xlabel(r'Mode index $i$'); plt.ylabel(r'$\lambda_i$ and 95% CI')    
+        ax.set_title(title,fontweight='bold'); ax.legend(); 
+        ax.set_xlabel(r'Mode index $i$'); ax.set_ylabel(r'$\lambda_i$')    
 
         if xlim is not None:
-            ax.set_xlim(xlim)
+            ax.set_xlim(0,min(max(xlim),len(Lc)))
 
         if title is not None:
             title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
@@ -6145,84 +6211,86 @@ class SpatialDecomp:
                 plotting.showfig(fig)
         return fig, ax
 
-    # def modeplot(self, mode=0, figsize=[10, 5], ax=None, savefig_settings=None, 
-    #          title_kwargs=None, mute=False, NW = 2):
-    #     ''' Dashboard visualizing the properties of a given SSA mode, including:
-    #         1. the analyzing function (T-EOF)
-    #         2. the reconstructed component (RC)
-    #         3. its spectrum
+    def modeplot(self, mode=0, figsize=[10, 5], ax=None, savefig_settings=None, 
+              title_kwargs=None, mute=False, NW = 2):
+        ''' Dashboard visualizing the properties of a given mode, including:
+            1. The temporal coefficient (PC or similar)
+            2. its spectrum
+            3. The spatial coefficients (EOF or similar)
 
-    #     Parameters
-    #     ----------
-    #     mode : int
-    #         the (zero-based) index of the mode to visualize
+        Parameters
+        ----------
+        mode : int
+            the (zero-based) index of the mode to visualize
         
-    #     figsize : list, optional
-    #         The figure size. The default is [10, 5].
+        figsize : list, optional
+            The figure size. The default is [10, 5].
         
-    #     savefig_settings : dict
-    #         the dictionary of arguments for plt.savefig(); some notes below:
-    #         - "path" must be specified; it can be any existed or non-existed path,
-    #           with or without a suffix; if the suffix is not given in "path", it will follow "format"
-    #         - "format" can be one of {"pdf", "eps", "png", "ps"}
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
 
-    #     title_kwargs : dict
-    #         the keyword arguments for ax.set_title()
+        title_kwargs : dict
+            the keyword arguments for ax.set_title()
 
-    #     ax : matplotlib.axis, optional
-    #         the axis object from matplotlib
-    #         See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+        gs : matplotlib.gridspec object, optional
+            the axis object from matplotlib
+            See [matplotlib.gridspec.GridSpec](https://matplotlib.org/stable/tutorials/intermediate/gridspec.html) for details.
 
-    #     mute : {True,False}
-    #         if True, the plot will not show;
-    #         recommend to turn on when more modifications are going to be made on ax
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
         
-    #     NW : float [2, 2.5, 3, 3.5 , 4] 
-    #         time-bandwidth product for MTM spectral estimate
-    #         default: 2
+        NW : float [2, 2.5, 3, 3.5 , 4] 
+            time-bandwidth product for MTM spectral estimate
+            default: 2
       
-    #     '''
-    #     # Turn the interactive mode off.
-    #     plt.ioff()
+        '''
+        # Turn the interactive mode off.
+        plt.ioff()
 
-    #     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
-    #     if ax is None:
-    #         fig, ax = plt.subplots(figsize=figsize)
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
         
-    #     RC = self.RCmat[:,mode]    
-    #     fig = plt.figure(tight_layout=True,figsize=figsize)
-    #     gs = gridspec.GridSpec(2, 2) # plot RC
-    #     ax = fig.add_subplot(gs[0, :])
-    #     ax.plot(self.time,RC)
-    #     ax.set_xlabel('Time'),  ax.set_ylabel('RC [dimensionless]')
-    #     ax.set_title('Mode '+str(mode+1)+' RC, '+ '{:3.2f}'.format(self.pctvar[mode]) + '% variance explained',weight='bold')
-    #     # plot T-EOF
-    #     ax = fig.add_subplot(gs[1, 0])
-    #     ax.plot(self.eigvecs[:,mode])
-    #     ax.set_title('T-EOF (analyzing function)')
-    #     ax.set_xlabel('Time'), ax.set_ylabel('T-EOF values')
-    #     # plot spectrum
-    #     ax = fig.add_subplot(gs[1, 1])
-    #     ts_rc = Series(time=self.time, value=RC) # define timeseries object for the RC
-    #     psd_mtm_rc = ts_rc.interp().spectral(method='mtm', settings={'NW': NW})
+        PC = self.pcs[:,mode]    
+        ts = Series(time=self.time, value=PC) # define timeseries object for the PC
+
+        fig = plt.figure(tight_layout=True,figsize=figsize)
+        gs = gridspec.GridSpec(2, 2) # define grid for subplots
+        ax1 = fig.add_subplot(gs[0, :])
+        ts.plot(ax=ax1)
+        ax1.set_ylabel('PC '+str(mode+1))
+        ax1.set_title('Mode '+str(mode+1)+', '+ '{:3.2f}'.format(self.pctvar[mode]) + '% variance explained',weight='bold')
+        
+        # plot spectrum
+        ax2 = fig.add_subplot(gs[1, 0])
+        psd_mtm_rc = ts.interp().spectral(method='mtm', settings={'NW': NW})
     
-    #     _ = psd_mtm_rc.plot(ax=ax)
-    #     ax.set_xlabel('Period')
-    #     ax.set_title('Multitaper spectrum')
+        _ = psd_mtm_rc.plot(ax=ax2)
+        ax2.set_xlabel('Period')
+        ax2.set_title('Multitaper spectrum',weight='bold')
+        
+        # plot T-EOF
+        ax3 = fig.add_subplot(gs[1, 1])
+        #EOF = self.eigvecs[:,mode]
+        ax3.set_title('Spatial loadings \n (under construction)',weight='bold')
 
-    #     # if title is not None:
-    #     #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
-    #     #     t_args = {'y': 1.1, 'weight': 'bold'}
-    #     #     t_args.update(title_kwargs)
-    #     #     ax.set_title(title, **t_args)
+        # if title is not None:
+        #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
+        #     t_args = {'y': 1.1, 'weight': 'bold'}
+        #     t_args.update(title_kwargs)
+        #     ax.set_title(title, **t_args)
 
-    #     if 'path' in savefig_settings:
-    #         plotting.savefig(fig, settings=savefig_settings)
-    #     else:
-    #         if not mute:
-    #             plotting.showfig(fig)
-    #     return fig, ax
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, settings=savefig_settings)
+        else:
+            if not mute:
+                plotting.showfig(fig)
+        return fig, gs
 
 
 

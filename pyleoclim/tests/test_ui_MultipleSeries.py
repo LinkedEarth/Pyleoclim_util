@@ -212,18 +212,23 @@ class TestMultipleSeriesGkernel:
         assert_array_equal(x_axis_0, x_axis_1)    
 
 class TestMultipleSeriesPca:
-    '''Test for MultipleSeries.pca()
+    '''Tests for MultipleSeries.pca()
 
     Testing the PCA function 
     '''
 
     def test_pca_t0(self):
-        p = 20; n = 200
+        '''
+        Test with synthetic data, no missing values, scree_plot()
+
+        Returns
+        -------
+        None.
+
+        '''
+        p = 10; n = 100
         signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
-        noise = np.random.randn(n,p)
-        X = signal.value[:,None] + noise
-                
-    
+        X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
     
         mslist = []
@@ -231,25 +236,113 @@ class TestMultipleSeriesPca:
             mslist.append(pyleo.Series(time = t, value = X[:,i]))
         ms = pyleo.MultipleSeries(mslist)
 
-        #res = ms.pca(nMC=20, missing='fill-em', standardize=False)
         res = ms.pca()
+        
+        fig, ax = res.screeplot()
+        
+    def test_pca_t1(self):
+        '''
+        Test with synthetic data, non missing values, mode_plot()
+
+        Returns
+        -------
+        None.
+
+        '''
+        p = 10; n = 100
+        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        X = signal.value[:,None] + np.random.randn(n,p)
+        t = np.arange(n)
     
-        # assert what?
-        assert_array_equal(pc.eigenvals, res['eigvals'])   
+        mslist = []
+        for i in range(p):
+            mslist.append(pyleo.Series(time = t, value = X[:,i]))
+        ms = pyleo.MultipleSeries(mslist)
+
+        res = ms.pca()
+        
+        fig, ax = res.modeplot()
+        
+    def test_pca_t2(self):
+        '''
+        Test with synthetic data, with missing values
+
+        '''
+        p = 10; n = 100
+        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        X = signal.value[:,None] + np.random.randn(n,p)
+        t = np.arange(n)
+        
+        # poke some holes at random in the array
+        Xflat = X.flatten()
+        Xflat[np.random.randint(n*p, size=p-1)]=np.nan  # note: at most ncomp missing vals
+        X = np.reshape(Xflat, (n,p))
     
+        #X[-1,0] = np.nan
+    
+        mslist = []
+        for i in range(p):
+            mslist.append(pyleo.Series(time = t, value = X[:,i],clean_ts=False))
+        ms = pyleo.MultipleSeries(mslist)
+
+        res = ms.pca(ncomp=4)  
+        
+        # ValueError: Implementation requires that all columns and all rows have at least ncomp non-missing values
+        
+        fig, ax = res.screeplot() 
+        
+    def test_pca_t3(self):
+        '''
+        Test with real data, same time axis
+    
+        ''' 
+        import pyleoclim as pyleo
+        url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+        data = pyleo.Lipd(usr_path = url)
+        tslist = data.to_LipdSeriesList()
+        tslist = tslist[2:] # drop the first two series which only concerns age and depth
+        ms = pyleo.MultipleSeries(tslist)
+        msl = ms.common_time()  # put on common time
+    
+        res = msl.pca()
+        
+        res.screeplot()
+ 
+class TestMultipleSeriesGridProperties:
+    '''Test for MultipleSeries.grid_properties()
+    
+    '''
+    @pytest.mark.parametrize('step_style', ['min', 'max', 'mean', 'median'])
+    def test_grid_properties(self, step_style):
+        p = 10; n = 100
+        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        X = signal.value[:,None] + np.random.randn(n,p)
+        t = np.arange(n)
+    
+        mslist = []
+        for i in range(p):
+            mslist.append(pyleo.Series(time = t, value = X[:,i]))
+        ms = pyleo.MultipleSeries(mslist)
+        
+        gp = ms.grid_properties(step_style=step_style)
+        
+        assert (gp[0,:] == np.array((t.min(), t.max(), 1.))).all()
+        
+        
         
 class TestMultipleSeriesMcPca:
     '''Test for MultipleSeries.mcpca()
 
-    Testing the M-PCA function 
-    '''
-    
+    Testing the MC-PCA function 
+    '''    
     def test_mcpca_t0(self):
         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
         data = pyleo.Lipd(usr_path = url)
         tslist = data.to_LipdSeriesList()
         tslist = tslist[2:] # drop the first two series which only concerns age and depth
         ms = pyleo.MultipleSeries(tslist)
+    
+        # TO DO !!!!
     
         # msc = ms.common_time()
     
