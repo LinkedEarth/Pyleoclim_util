@@ -297,7 +297,7 @@ def map_all(lat, lon, criteria, marker=None, color =None,
     def legend_without_duplicate_labels(ax):
         handles, labels = ax.get_legend_handles_labels()
         unique = [(h, l) for i, (h, l) in enumerate(zip(handles, labels)) if l not in labels[:i]]
-        ax.legend(*zip(*unique))
+        ax.legend(*zip(*unique),**lgd_kwargs)
     
     #Check that the lists have the same length and convert to numpy arrays
     if len(lat)!=len(lon) or len(lat)!=len(criteria) or len(lon)!=len(criteria):
@@ -385,7 +385,7 @@ def map_all(lat, lon, criteria, marker=None, color =None,
     
 
     if legend == True:
-        ax.legend(**lgd_kwargs)
+        #ax.legend(**lgd_kwargs)
         legend_without_duplicate_labels(ax)
     else:
         ax.legend().remove()

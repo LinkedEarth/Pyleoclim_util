@@ -10,7 +10,7 @@ Functions concerning wavelet analysis
 
 
 __all__ = [
-    'cwt',
+    #'cwt',
     'wwz',
     'xwc',
 ]
@@ -2446,176 +2446,215 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 
     return rec_ts, t
 
-## Methods for Torrence and compo
+# ## Methods for Torrence and compo
 
-# This is the main function, which has been rewritten to work with functionalities in Pyleoclim
+# # This is the main function, which has been rewritten to work with functionalities in Pyleoclim
 
-def cwt(ys,ts,mother='morlet',param=None,freq=None,freq_method='scale',
-        freq_kwargs={},detrend=False, sg_kwargs={}, gaussianize=False,
-        standardize=False,pad=False,pad_kwargs={}):
+# def cwt(ys,ts,mother='morlet',param=None,freq=None,freq_method='scale',
+#         freq_kwargs={},detrend=False, sg_kwargs={}, gaussianize=False,
+#         standardize=False,pad=False,pad_kwargs={}):
     
-    ys=np.array(ys)
-    ts=np.array(ts)
+#     ys=np.array(ys)
+#     ts=np.array(ts)
     
-    ys, ts = clean_ts(ys, ts) #clean up time
+#     ys, ts = clean_ts(ys, ts) #clean up time
     
-    #make sure that the time series is evenly-spaced
-    if is_evenly_spaced(ts) == True:
-        dt = np.mean(np.diff(ts))
-    else:
-        raise ValueError('Time series must be evenly spaced in time')
+#     #make sure that the time series is evenly-spaced
+#     if is_evenly_spaced(ts) == True:
+#         dt = np.mean(np.diff(ts))
+#     else:
+#         raise ValueError('Time series must be evenly spaced in time')
        
-    # prepare the time series 
-    pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs, 
-                       gaussianize=gaussianize, standardize=standardize)
+#     # prepare the time series 
+#     pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs, 
+#                        gaussianize=gaussianize, standardize=standardize)
     
-    # Get the fourier factor
-    if mother.lower() == 'morlet':
-        if param is None:
-            param = 6.
-        fourier_factor = 4 * np.pi / (param + np.sqrt(2 + param**2))
-    elif mother.lower() == 'paul':
-        if param is None:
-            param = 4.
-        fourier_factor = 4 * np.pi / (2 * param + 1)
-    elif mother.lower() == 'dog':
-        if param is None:
-            param = 2.
-        fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * param + 1))
-    else:
-        fourier_factor = 1
+#     # Get the fourier factor
+#     if mother.lower() == 'morlet':
+#         if param is None:
+#             param = 6.
+#         fourier_factor = 4 * np.pi / (param + np.sqrt(2 + param**2))
+#     elif mother.lower() == 'paul':
+#         if param is None:
+#             param = 4.
+#         fourier_factor = 4 * np.pi / (2 * param + 1)
+#     elif mother.lower() == 'dog':
+#         if param is None:
+#             param = 2.
+#         fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * param + 1))
+#     else:
+#         fourier_factor = 1
     
-    #get the frequency/scale information
-    if freq is None: 
-        freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        if freq_method == 'scale':
-            freq_kwargs.update({'fourier_factor':fourier_factor})
-        freq = make_freq_vector(ts, method=freq_method, **freq_kwargs)
-    # Use scales
-    scale = np.sort(1/(freq*fourier_factor))
+#     #get the frequency/scale information
+#     if freq is None: 
+#         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+#         if freq_method == 'scale':
+#             freq_kwargs.update({'fourier_factor':fourier_factor})
+#         freq = make_freq_vector(ts, method=freq_method, **freq_kwargs)
+#     # Use scales
+#     scale = np.sort(1/(freq*fourier_factor))
     
-    #Normalize
-    n_ys = pd_ys-np.mean(pd_ys)
+#     #Normalize
+#     #n_ys = pd_ys-np.mean(pd_ys)
     
-    #pad if wanted
-    if pad == True:
-        pad_kwargs = {} if pad_kwargs is None else pad_kwargs.copy()
-        yp,tp = ts_pad(n_ys,ts,**pad_kwargs)
-    else:
-        yp=n_ys
-        tp=ts
+#     #pad if wanted
+#     if pad == True:
+#         pad_kwargs = {} if pad_kwargs is None else pad_kwargs.copy()
+#         yp,tp = ts_pad(pd_ys,ts,**pad_kwargs)
+#     else:
+#         yp=pd_ys
+#         tp=ts
         
-    # Wave calculation
-    n = len(yp)
+#     # Wave calculation
+#     n = len(yp)
     
-    # construct wavenumber array used in transform [Eqn(5)]
-    kplus = np.arange(1, int(n / 2) + 1)
-    kplus = (kplus * 2 * np.pi / (n * dt))
-    kminus = np.arange(1, int((n - 1) / 2) + 1)
-    kminus = np.sort((-kminus * 2 * np.pi / (n * dt)))
-    k = np.concatenate(([0.], kplus, kminus))
+#     # construct wavenumber array used in transform [Eqn(5)]
+#     kplus = np.arange(1, int(n / 2) + 1)
+#     kplus = (kplus * 2 * np.pi / (n * dt))
+#     kminus = np.arange(1, int((n - 1) / 2) + 1)
+#     kminus = np.sort((-kminus * 2 * np.pi / (n * dt)))
+#     k = np.concatenate(([0.], kplus, kminus))
 
-    # compute FFT of the (padded) time series
-    f = np.fft.fft(yp) 
+#     # compute FFT of the (padded) time series
+#     f = np.fft.fft(yp) 
     
-    # define the wavelet array
-    wave = np.zeros(shape=(len(scale), n), dtype=complex)
+#     # define the wavelet array
+#     wave = np.zeros(shape=(len(scale), n), dtype=complex)
 
-    # loop through all scales and compute transform
-    for a1 in range(0, len(scale)):
-        daughter, fourier_factor, coi, _ = \
-            wave_bases(mother, k, scale[a1], param)
-        wave[a1, :] = np.fft.ifft(f * daughter)  # wavelet transform[Eqn(4)]
+#     # loop through all scales and compute transform
+#     for a1 in range(0, len(scale)):
+#         daughter, fourier_factor, coi, _ = \
+#             wave_bases(mother, k, scale[a1], param)
+#         wave[a1, :] = np.fft.ifft(f * daughter)  # wavelet transform[Eqn(4)]
     
-    #COI
-    coi = coi * dt * np.concatenate((
-        np.insert(np.arange(int((len(ys) + 1) / 2) - 1), [0], [1E-5]),
-        np.insert(np.flipud(np.arange(0, int(len(ys) / 2) - 1)), [-1], [1E-5])))
+#     #COI
+#     coi = coi * dt * np.concatenate((
+#         np.insert(np.arange(int((len(ys) + 1) / 2) - 1), [0], [1E-5]),
+#         np.insert(np.flipud(np.arange(0, int(len(ys) / 2) - 1)), [-1], [1E-5])))
     
-    #Remove the padding 
+#     #Remove the padding 
+#     if pad == True:
+#         idx = np.in1d(tp,ts)
+#         wave = wave[:,idx]
+        
+#     res = {}
+    
+#     return res
     
 
-def wave_bases(mother, k, scale, param):
-    n = len(k)
-    kplus = np.array(k > 0., dtype=float)
+# def wave_bases(mother, k, scale, param):
+#     '''
+    
 
-    if mother == 'morlet':  # -----------------------------------  Morlet
+#     Parameters
+#     ----------
+#     mother : string, {}
+#         DESCRIPTION.
+#     k : TYPE
+#         DESCRIPTION.
+#     scale : TYPE
+#         DESCRIPTION.
+#     param : TYPE
+#         DESCRIPTION.
 
-        if param == -1:
-            param = 6.
+#     Raises
+#     ------
+#     KeyError
+#         DESCRIPTION.
 
-        k0 = np.copy(param)
-        # calc psi_0(s omega) from Table 1
-        expnt = -(scale * k - k0) ** 2 / 2. * kplus
-        norm = np.sqrt(scale * k[1]) * (np.pi ** (-0.25)) * np.sqrt(n)
-        daughter = norm * np.exp(expnt)
-        daughter = daughter * kplus  # Heaviside step function
-        # Scale-->Fourier [Sec.3h]
-        fourier_factor = (4 * np.pi) / (k0 + np.sqrt(2 + k0 ** 2))
-        coi = fourier_factor / np.sqrt(2)  # Cone-of-influence [Sec.3g]
-        dofmin = 2  # Degrees of freedom
-    elif mother == 'paul':  # --------------------------------  Paul
-        if param == -1:
-            param = 4.
-        m = param
-        # calc psi_0(s omega) from Table 1
-        expnt = -scale * k * kplus
-        norm_bottom = np.sqrt(m * np.prod(np.arange(1, (2 * m))))
-        norm = np.sqrt(scale * k[1]) * (2 ** m / norm_bottom) * np.sqrt(n)
-        daughter = norm * ((scale * k) ** m) * np.exp(expnt) * kplus
-        fourier_factor = 4 * np.pi / (2 * m + 1)
-        coi = fourier_factor * np.sqrt(2)
-        dofmin = 2
-    elif mother == 'dog':  # --------------------------------  DOG
-        if param == -1:
-            param = 2.
-        m = param
-        # calc psi_0(s omega) from Table 1
-        expnt = -(scale * k) ** 2 / 2.0
-        norm = np.sqrt(scale * k[1] / gamma(m + 0.5)) * np.sqrt(n)
-        daughter = -norm * (1j ** m) * ((scale * k) ** m) * np.exp(expnt)
-        fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * m + 1))
-        coi = fourier_factor / np.sqrt(2)
-        dofmin = 1
-    else:
-        raise KeyError('Mother must be one of "morlet", "paul", "dog"')
+#     Returns
+#     -------
+#     daughter : TYPE
+#         DESCRIPTION.
+#     fourier_factor : TYPE
+#         DESCRIPTION.
+#     coi : TYPE
+#         DESCRIPTION.
+#     dofmin : TYPE
+#         DESCRIPTION.
 
-    return daughter, fourier_factor, coi, dofmin
+#     '''
+    
+#     n = len(k)
+#     kplus = np.array(k > 0., dtype=float)
+
+#     if mother == 'morlet':  # -----------------------------------  Morlet
+
+#         if param == -1:
+#             param = 6.
+
+#         k0 = np.copy(param)
+#         # calc psi_0(s omega) from Table 1
+#         expnt = -(scale * k - k0) ** 2 / 2. * kplus
+#         norm = np.sqrt(scale * k[1]) * (np.pi ** (-0.25)) * np.sqrt(n)
+#         daughter = norm * np.exp(expnt)
+#         daughter = daughter * kplus  # Heaviside step function
+#         # Scale-->Fourier [Sec.3h]
+#         fourier_factor = (4 * np.pi) / (k0 + np.sqrt(2 + k0 ** 2))
+#         coi = fourier_factor / np.sqrt(2)  # Cone-of-influence [Sec.3g]
+#         dofmin = 2  # Degrees of freedom
+#     elif mother == 'paul':  # --------------------------------  Paul
+#         if param == -1:
+#             param = 4.
+#         m = param
+#         # calc psi_0(s omega) from Table 1
+#         expnt = -scale * k * kplus
+#         norm_bottom = np.sqrt(m * np.prod(np.arange(1, (2 * m))))
+#         norm = np.sqrt(scale * k[1]) * (2 ** m / norm_bottom) * np.sqrt(n)
+#         daughter = norm * ((scale * k) ** m) * np.exp(expnt) * kplus
+#         fourier_factor = 4 * np.pi / (2 * m + 1)
+#         coi = fourier_factor * np.sqrt(2)
+#         dofmin = 2
+#     elif mother == 'dog':  # --------------------------------  DOG
+#         if param == -1:
+#             param = 2.
+#         m = param
+#         # calc psi_0(s omega) from Table 1
+#         expnt = -(scale * k) ** 2 / 2.0
+#         norm = np.sqrt(scale * k[1] / gamma(m + 0.5)) * np.sqrt(n)
+#         daughter = -norm * (1j ** m) * ((scale * k) ** m) * np.exp(expnt)
+#         fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * m + 1))
+#         coi = fourier_factor / np.sqrt(2)
+#         dofmin = 1
+#     else:
+#         raise KeyError('Mother must be one of "morlet", "paul", "dog"')
+
+#     return daughter, fourier_factor, coi, dofmin
         
     
-def chisquare_inv(P, V):
+# def chisquare_inv(P, V):
 
-    if (1 - P) < 1E-4:
-        print('P must be < 0.9999')
+#     if (1 - P) < 1E-4:
+#         print('P must be < 0.9999')
 
-    if P == 0.95 and V == 2:  # this is a no-brainer
-        X = 5.9915
-        return X
+#     if P == 0.95 and V == 2:  # this is a no-brainer
+#         X = 5.9915
+#         return X
 
-    MINN = 0.01  # hopefully this is small enough
-    MAXX = 1  # actually starts at 10 (see while loop below)
-    X = 1
-    TOLERANCE = 1E-4  # this should be accurate enough
+#     MINN = 0.01  # hopefully this is small enough
+#     MAXX = 1  # actually starts at 10 (see while loop below)
+#     X = 1
+#     TOLERANCE = 1E-4  # this should be accurate enough
 
-    while (X + TOLERANCE) >= MAXX:  # should only need to loop thru once
-        MAXX = MAXX * 10.
-    # this calculates value for X, NORMALIZED by V
-        X = fminbound(chisquare_solve, MINN, MAXX, args=(P, V), xtol=TOLERANCE)
-        MINN = MAXX
+#     while (X + TOLERANCE) >= MAXX:  # should only need to loop thru once
+#         MAXX = MAXX * 10.
+#     # this calculates value for X, NORMALIZED by V
+#         X = fminbound(chisquare_solve, MINN, MAXX, args=(P, V), xtol=TOLERANCE)
+#         MINN = MAXX
 
-    X = X * V  # put back in the goofy V factor
+#     X = X * V  # put back in the goofy V factor
 
-    return X  
+#     return X  
 
-def chisquare_solve(XGUESS, P, V):
+# def chisquare_solve(XGUESS, P, V):
 
-    PGUESS = gammainc(V / 2, V * XGUESS / 2)  # incomplete Gamma function
+#     PGUESS = gammainc(V / 2, V * XGUESS / 2)  # incomplete Gamma function
 
-    PDIFF = np.abs(PGUESS - P)            # error in calculated P
+#     PDIFF = np.abs(PGUESS - P)            # error in calculated P
 
-    TOL = 1E-4
-    if PGUESS >= 1 - TOL:  # if P is very close to 1 (i.e. a bad guess)
-        PDIFF = XGUESS   # then just assign some big number like XGUESS
+#     TOL = 1E-4
+#     if PGUESS >= 1 - TOL:  # if P is very close to 1 (i.e. a bad guess)
+#         PDIFF = XGUESS   # then just assign some big number like XGUESS
 
-    return PDIFF
+#     return PDIFF
 

@@ -7651,7 +7651,7 @@ class LipdSeries(Series):
         '''
         
         if ensemble == True and D is None:
-            raise ValueError("When an ensemble dashboard is requested, the corresponsind Lipd object must be supplied")
+            raise ValueError("When an ensemble is requested, the corresponsind Lipd object must be supplied")
         
         meta=self.getMetadata()
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
