@@ -5069,7 +5069,7 @@ class EnsembleSeries(MultipleSeries):
 
 
     def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
+                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, mute=False):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
@@ -5226,13 +5226,14 @@ class EnsembleSeries(MultipleSeries):
             else:
                 if not mute:
                     plotting.showfig(fig)
+            # reset the plotting style
+            mpl.rcParams.update(current_style)
             return fig, ax
         else:
+            # reset the plotting style
+            mpl.rcParams.update(current_style)
             return ax
 
-        # reset the plotting style
-        mpl.rcParams.update(current_style)
-        return fig, ax
     
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                  ax=None, ylabel='KDE', vertical=False, edgecolor='w',mute=False, **plot_kwargs):
