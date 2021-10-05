@@ -1929,8 +1929,8 @@ class Series:
 
         settings = {} if settings is None else settings.copy()
         wave_func = {
-            'wwz': waveutils.wwz,
-            'cwt': waveutils.cwt,
+            'wwz': waveutils.wwz
+            # 'cwt': waveutils.cwt,
         }
 
         if method == 'cwt' and 'freq' in settings.keys():
