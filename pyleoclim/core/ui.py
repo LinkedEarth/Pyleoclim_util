@@ -1256,6 +1256,21 @@ class Series:
         pyleoclim.core.ui.PSD : PSD object
 
         pyleoclim.core.ui.MultiplePSD : Multiple PSD object
+        
+        Examples
+        --------
+
+        Wavelet analysis on the SOI record.
+
+        .. ipython:: python
+            :okwarning:
+            
+            import pyleoclim as pyleo
+            d=pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD98-2170.Stott.2004')
+            ts=d.to_tso()
+            series = pyleo.Series(time = ts[5]['age'],value = ts[5]['paleoData_values'])
+            fig, ax = series.summary_plot(n_signif_test=1)
+            pyleo.closefig(fig)
 
         '''
         # Turn the interactive mode off.
@@ -1301,7 +1316,7 @@ class Series:
             if 'ylim' in ts_plot_kwargs:
                 print('Ylim passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
-        ax['ts'].spines['bottom'].set_visible(False)
+        ax['ts'].xaxis.set_visible(False)
 
         ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
         
@@ -1317,6 +1332,7 @@ class Series:
         ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
+        
         if psd is None:
             if n_signif_test > 0:
                 psd = self.spectral(**psd_kwargs).signif_test(number=n_signif_test)
@@ -1329,7 +1345,8 @@ class Series:
             ax['psd'].set_ylim(period_lim)
             if 'ylim' in psd_plot_kwargs:
                print('Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-            
+        
+        ax['psd'].yaxis.set_visible(False)    
         ax['psd'].set_ylabel(None)
         ax['psd'].tick_params(axis='y', direction='in', labelleft=False)
         ax['psd'].legend().remove()
