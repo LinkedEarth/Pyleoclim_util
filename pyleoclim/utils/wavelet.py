@@ -1355,7 +1355,8 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau=None, freq=None, freq_method='log', freq_kwargs=None,
         c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
         nMC=200,
-        gaussianize=False, standardize=False, method='Kirchner_numba'):
+        gaussianize=False, standardize=False, method='Kirchner_numba',
+        verbose=False):
     ''' Return the cross-wavelet coherence of two time series.
 
     Parameters
@@ -1399,6 +1400,8 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         - 'Kirchner': the method Kirchner adapted from Foster;
         - 'Kirchner_f2py': the method Kirchner adapted from Foster with f2py
         - 'Kirchner_numba': Kirchner's algorithm with Numba support for acceleration (default)
+    verbose : bool
+        If True, print warning messages
 
     Returns
     -------
@@ -1448,7 +1451,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     ys2_cut, ts2_cut, freq2, tau2 = prepare_wwz(ys2, ts2, freq=freq, tau=tau)
 
     if np.any(tau1 != tau2):
-        print('inconsistent `tau`, recalculating...')
+        if verbose: print('inconsistent `tau`, recalculating...')
         tau_min = np.min([np.min(tau1), np.min(tau2)])
         tau_max = np.max([np.max(tau1), np.max(tau2)])
         ntau = np.max([np.size(tau1), np.size(tau2)])
@@ -1457,7 +1460,7 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau = tau1
 
     if np.any(freq1 != freq2):
-        print('inconsistent `freq`, recalculating...')
+        if verbose: print('inconsistent `freq`, recalculating...')
         freq_min = np.min([np.min(freq1), np.min(freq2)])
         freq_max = np.max([np.max(freq1), np.max(freq2)])
         nfreq = np.max([np.size(freq1), np.size(freq2)])

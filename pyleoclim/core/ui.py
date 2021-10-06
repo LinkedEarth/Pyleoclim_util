@@ -1969,7 +1969,7 @@ class Series:
 
         return scal
 
-    def wavelet_coherence(self, target_series, method='wwz', settings=None, freq_method='log', ntau=None, freq_kwargs=None, verbose=False):
+    def wavelet_coherence(self, target_series, method='wwz', settings=None, freq_method='log', ntau=None, tau=None, freq_kwargs=None, verbose=False):
         ''' Perform wavelet coherence analysis with the target timeseries
 
         Parameters
@@ -1985,6 +1985,10 @@ class Series:
 
         freq_kwargs : dict
             Arguments for frequency vector
+
+        tau : array
+            The time shift points that determins the temporal resolution of the result.
+            If None, it will be calculated using ntau.
 
         ntau : int
             The length of the time shift points that determins the temporal resolution of the result.
@@ -2034,10 +2038,11 @@ class Series:
         if ntau is None:
             ntau = np.min([np.size(overlap), 50])
 
-        tau = np.linspace(np.min(overlap), np.max(overlap), ntau)
+        if tau is None:
+            tau = np.linspace(np.min(overlap), np.max(overlap), ntau)
 
         args = {}
-        args['wwz'] = {'tau': tau, 'freq': freq}
+        args['wwz'] = {'tau': tau, 'freq': freq, 'verbose': verbose}
         args[method].update(settings)
         xwc_res = xwc_func[method](self.value, self.time, target_series.value, target_series.time, **args[method])
 
@@ -3368,7 +3373,7 @@ class Coherence:
 
         cohs = []
         for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', total=number, disable=mute_pbar):
-            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i], freq_method=self.freq_method, freq_kwargs=self.freq_kwargs)
+            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i], tau=self.time, freq_method=self.freq_method, freq_kwargs=self.freq_kwargs)
             cohs.append(coh_tmp.coherence)
 
         cohs = np.array(cohs)
