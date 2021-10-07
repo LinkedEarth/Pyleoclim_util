@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>pyleoclim.utils.tsutils &mdash; Pyleoclim 0.6.2beta documentation</title>
   
@@ -13,11 +13,17 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -27,6 +33,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -51,7 +58,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+            <a href="../../../index.html" class="icon icon-home"> Pyleoclim
           
 
           
@@ -89,19 +96,20 @@
               
             
             
-              <p class="caption"><span class="caption-text">Working with Pyleoclim</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Working with Pyleoclim</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing Pyleoclim</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../core/ui.html">The Pyleoclim User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/ui.html">Pyleoclim User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced functionalities</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced functionalities</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../utils/introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils/introduction.html">Pyleoclim Utilities API (pyleoclim.utils)</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Involved</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Involved</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contribution_guide.html">Contributing to Pyleoclim</a></li>
 </ul>
 
             
@@ -127,6 +135,8 @@
         <div class="rst-content">
         
           
+
+
 
 
 
@@ -184,20 +194,15 @@
     <span class="s1">&#39;grid_properties&#39;</span><span class="p">,</span>
     <span class="s1">&#39;standardize&#39;</span><span class="p">,</span>
     <span class="s1">&#39;ts2segments&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;clean_ts&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;dropna&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;sort_ts&#39;</span><span class="p">,</span>
     <span class="s1">&#39;annualize&#39;</span><span class="p">,</span>
     <span class="s1">&#39;gaussianize&#39;</span><span class="p">,</span>
     <span class="s1">&#39;gaussianize_single&#39;</span><span class="p">,</span>
     <span class="s1">&#39;detrend&#39;</span><span class="p">,</span>
     <span class="s1">&#39;detect_outliers&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;is_evenly_spaced&#39;</span><span class="p">,</span>
     <span class="s1">&#39;remove_outliers&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;reduce_duplicated_timestamps&#39;</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -208,7 +213,6 @@
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
 <span class="kn">from</span> <span class="nn">pyhht</span> <span class="kn">import</span> <span class="n">EMD</span>
 <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">DBSCAN</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
@@ -217,7 +221,9 @@
 <span class="kn">from</span> <span class="nn">.plotting</span> <span class="kn">import</span> <span class="n">plot_scatter_xy</span><span class="p">,</span><span class="n">plot_xy</span><span class="p">,</span><span class="n">savefig</span><span class="p">,</span><span class="n">showfig</span>
 <span class="kn">from</span> <span class="nn">.filter</span> <span class="kn">import</span> <span class="n">savitzky_golay</span>
 
-
+<span class="kn">from</span> <span class="nn">.tsbase</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">clean_ts</span>
+<span class="p">)</span>
 
 <div class="viewcode-block" id="simple_stats"><a class="viewcode-back" href="../../../utils/tsutils/simple_stats.html#pyleoclim.utils.tsutils.simple_stats">[docs]</a><span class="k">def</span> <span class="nf">simple_stats</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Computes simple statistics</span>
@@ -715,149 +721,7 @@
 
     <span class="k">return</span> <span class="n">seg_ys</span><span class="p">,</span> <span class="n">seg_ts</span><span class="p">,</span> <span class="n">n_segs</span></div>
 
-<div class="viewcode-block" id="clean_ts"><a class="viewcode-back" href="../../../utils/tsutils/clean_ts.html#pyleoclim.utils.tsutils.clean_ts">[docs]</a><span class="k">def</span> <span class="nf">clean_ts</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Cleaning the timeseries</span>
 
-<span class="sd">    Delete the NaNs in the time series and sort it with time axis ascending,</span>
-<span class="sd">    duplicate timestamps will be reduced by averaging the values.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    ys : array</span>
-<span class="sd">        A time series, NaNs allowed</span>
-<span class="sd">    ts : array</span>
-<span class="sd">        The time axis of the time series, NaNs allowed</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    ys : array</span>
-<span class="sd">        The time series without nans</span>
-<span class="sd">    ts : array</span>
-<span class="sd">        The time axis of the time series without nans</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">dropna</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-    <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">sort_ts</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-    <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span> <span class="o">=</span> <span class="n">reduce_duplicated_timestamps</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span></div>
-
-
-<div class="viewcode-block" id="dropna"><a class="viewcode-back" href="../../../utils/tsutils/dropna.html#pyleoclim.utils.tsutils.dropna">[docs]</a><span class="k">def</span> <span class="nf">dropna</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Remove entries of ys or ts that bear NaNs</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    ys : array</span>
-<span class="sd">        A time series, NaNs allowed</span>
-<span class="sd">    ts : array</span>
-<span class="sd">        The time axis of the time series, NaNs allowed</span>
-<span class="sd">    verbose : bool</span>
-<span class="sd">        If True, will print a warning message</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    ys : array</span>
-<span class="sd">        The time series without nans</span>
-<span class="sd">    ts : array</span>
-<span class="sd">        The time axis of the time series without nans</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">ys</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">ts</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="s1">&#39;The size of time axis and data value should be equal!&#39;</span>
-
-    <span class="n">ys_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">ys</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ys_tmp</span><span class="p">)]</span>
-    <span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ys_tmp</span><span class="p">)]</span>
-    <span class="n">ts_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">ys</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ts_tmp</span><span class="p">)]</span>
-    <span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ts_tmp</span><span class="p">)]</span>
-
-    <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">ys_tmp</span><span class="p">)):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;NaNs have been detected and dropped.&#39;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span></div>
-
-<div class="viewcode-block" id="sort_ts"><a class="viewcode-back" href="../../../utils/tsutils/sort_ts.html#pyleoclim.utils.tsutils.sort_ts">[docs]</a><span class="k">def</span> <span class="nf">sort_ts</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Sort ts values in ascending order</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    ys : array</span>
-<span class="sd">        Dependent variable</span>
-<span class="sd">    ts : array</span>
-<span class="sd">        Independent variable</span>
-<span class="sd">    verbose : bool</span>
-<span class="sd">        If True, will print a warning message</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    ys : array</span>
-<span class="sd">        Dependent variable</span>
-<span class="sd">    ts : array</span>
-<span class="sd">        Independent variable, sorted in ascending order</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">ys</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">ts</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="s1">&#39;time and value arrays must be of equal length&#39;</span>
-
-    <span class="c1"># sort the time series so that the time axis will be ascending</span>
-    <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">dt</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">sort_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
-        <span class="n">ys</span> <span class="o">=</span> <span class="n">ys</span><span class="p">[</span><span class="n">sort_ind</span><span class="p">]</span>
-        <span class="n">ts</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="n">sort_ind</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The time axis has been adjusted to be prograde&#39;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span></div>
-
-<div class="viewcode-block" id="reduce_duplicated_timestamps"><a class="viewcode-back" href="../../../utils/tsutils/reduce_duplicated_timestamp.html#pyleoclim.utils.tsutils.reduce_duplicated_timestamps">[docs]</a><span class="k">def</span> <span class="nf">reduce_duplicated_timestamps</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Reduce duplicated timestamps in a timeseries by averaging the values</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    ys : array</span>
-<span class="sd">        Dependent variable</span>
-<span class="sd">    ts : array</span>
-<span class="sd">        Independent variable</span>
-<span class="sd">    verbose : bool</span>
-<span class="sd">        If True, will print a warning message</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    ys : array</span>
-<span class="sd">        Dependent variable</span>
-<span class="sd">    ts : array</span>
-<span class="sd">        Independent variable, with duplicated timestamps reduced by averaging the values</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">ys</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">ts</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="s1">&#39;The size of time axis and data value should be equal!&#39;</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">ts</span><span class="p">)):</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">ys</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
-                <span class="n">value</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">y</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">value</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-
-        <span class="n">ts</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">ys</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">ts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="n">ys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
-
-        <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
-        <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Duplicate timestamps have been combined by averaging values.&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ys</span><span class="p">,</span> <span class="n">ts</span></div>
 
 <div class="viewcode-block" id="annualize"><a class="viewcode-back" href="../../../utils/tsutils/annualize.html#pyleoclim.utils.tsutils.annualize">[docs]</a><span class="k">def</span> <span class="nf">annualize</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Annualize a time series whose time resolution is finer than 1 year</span>
@@ -1230,35 +1094,6 @@
 
     <span class="k">return</span> <span class="n">ys</span><span class="p">,</span><span class="n">ts</span></div>
 
-<div class="viewcode-block" id="is_evenly_spaced"><a class="viewcode-back" href="../../../utils/tsutils/is_evenly_spaced.html#pyleoclim.utils.tsutils.is_evenly_spaced">[docs]</a><span class="k">def</span> <span class="nf">is_evenly_spaced</span><span class="p">(</span><span class="n">ts</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Check if a time axis is evenly spaced.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-
-<span class="sd">    ts : array</span>
-<span class="sd">        the time axis of a time series</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-
-<span class="sd">    check : bool</span>
-<span class="sd">        True - evenly spaced; False - unevenly spaced.</span>
-
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="k">if</span> <span class="n">ts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">check</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">dts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
-        <span class="n">dt_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dts</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">dt</span> <span class="o">==</span> <span class="n">dt_mean</span> <span class="k">for</span> <span class="n">dt</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts</span><span class="p">)):</span>
-            <span class="n">check</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">check</span> <span class="o">=</span> <span class="kc">False</span>
-
-    <span class="k">return</span> <span class="n">check</span></div>
-
-
 <span class="c1"># alias</span>
 <span class="n">std</span> <span class="o">=</span> <span class="n">standardize</span>
 <span class="n">gauss</span> <span class="o">=</span> <span class="n">gaussianize</span>
@@ -1320,28 +1155,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James
+        &#169; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

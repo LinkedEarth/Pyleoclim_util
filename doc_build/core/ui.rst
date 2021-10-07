@@ -11,8 +11,6 @@ A major advantage of object-oriented design is that you, the user, can harness t
 The flipside is that any user would do well to understand Pyleoclim classes, what they are intended for, and what methods they can and cannot support.
 
 .. image:: Pyleoclim_UI.png
-   :width: 1477px
-   :height: 946px
    :scale: 80 %
    :alt: The Pyleoclim UI. Credit: Feng Zhu
    :align: center

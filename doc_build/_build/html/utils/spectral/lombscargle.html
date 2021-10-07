@@ -3,9 +3,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>lomb_scargle (pyleoclim.utils.spectral.lomb_scargle) &mdash; Pyleoclim 0.6.2beta documentation</title>
   
@@ -13,11 +14,17 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -27,6 +34,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
@@ -51,7 +59,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+            <a href="../../index.html" class="icon icon-home"> Pyleoclim
           
 
           
@@ -89,19 +97,20 @@
               
             
             
-              <p class="caption"><span class="caption-text">Working with Pyleoclim</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Working with Pyleoclim</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installing Pyleoclim</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../core/ui.html">The Pyleoclim User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../core/ui.html">Pyleoclim User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced functionalities</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced functionalities</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Pyleoclim Utilities API (pyleoclim.utils)</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Involved</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Involved</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contribution_guide.html">Contributing to Pyleoclim</a></li>
 </ul>
 
             
@@ -142,6 +151,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -153,7 +164,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../../_sources/utils/spectral/lombscargle.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -191,11 +202,11 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="lomb-scargle-pyleoclim-utils-spectral-lomb-scargle">
+<section id="lomb-scargle-pyleoclim-utils-spectral-lomb-scargle">
 <span id="utils-lombscargle"></span><h1>lomb_scargle (pyleoclim.utils.spectral.lomb_scargle)<a class="headerlink" href="#lomb-scargle-pyleoclim-utils-spectral-lomb-scargle" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
-<dt id="pyleoclim.utils.spectral.lomb_scargle">
-<code class="sig-prename descclassname"><span class="pre">pyleoclim.utils.spectral.</span></code><code class="sig-name descname"><span class="pre">lomb_scargle</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lomb_scargle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n50</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hann'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detrend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sg_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gaussianize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standardize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/spectral.html#lomb_scargle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.utils.spectral.lomb_scargle" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyleoclim.utils.spectral.lomb_scargle">
+<span class="sig-prename descclassname"><span class="pre">pyleoclim.utils.spectral.</span></span><span class="sig-name descname"><span class="pre">lomb_scargle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lomb_scargle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n50</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hann'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detrend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sg_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gaussianize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standardize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/spectral.html#lomb_scargle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.utils.spectral.lomb_scargle" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the computed periodogram using lomb-scargle algorithm</p>
 <p>Uses the lombscargle implementation from scipy.signal: <a class="reference external" href="https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle">https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle</a></p>
 <dl class="field-list simple">
@@ -310,35 +321,32 @@ If window is a floating point number, it is interpreted as the beta parameter of
 <p>Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.</p>
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James
+        &#169; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

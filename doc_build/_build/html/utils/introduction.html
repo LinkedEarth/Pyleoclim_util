@@ -3,21 +3,28 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Pyleoclim Utilities (pyleoclim.utils) &mdash; Pyleoclim 0.6.2beta documentation</title>
+  <title>Pyleoclim Utilities API (pyleoclim.utils) &mdash; Pyleoclim 0.6.2beta documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/rtd_sphinx_search.min.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -27,6 +34,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
@@ -53,7 +61,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+            <a href="../index.html" class="icon icon-home"> Pyleoclim
           
 
           
@@ -91,15 +99,15 @@
               
             
             
-              <p class="caption"><span class="caption-text">Working with Pyleoclim</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Working with Pyleoclim</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installing Pyleoclim</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../core/ui.html">The Pyleoclim User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../core/ui.html">Pyleoclim User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced functionalities</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced functionalities</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Pyleoclim Utilities (pyleoclim.utils)</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pyleoclim Utilities API (pyleoclim.utils)</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#causality">Causality</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#correlation">Correlation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#decomposition">Decomposition</a></li>
@@ -110,14 +118,16 @@
 <li class="toctree-l2"><a class="reference internal" href="#tsmodel">Tsmodel</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#wavelet">Wavelet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#tsutils">Tsutils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tsbase">Tsbase</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#lipdutils">Lipdutils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jsonutils">jsonutils</a></li>
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Involved</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Involved</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contribution_guide.html">Contributing to Pyleoclim</a></li>
 </ul>
 
             
@@ -158,18 +168,20 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Pyleoclim Utilities (pyleoclim.utils)</li>
+      <li>Pyleoclim Utilities API (pyleoclim.utils)</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/utils/introduction.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -207,10 +219,10 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="pyleoclim-utilities-pyleoclim-utils">
-<span id="utils-introduction"></span><h1>Pyleoclim Utilities (pyleoclim.utils)<a class="headerlink" href="#pyleoclim-utilities-pyleoclim-utils" title="Permalink to this headline">¶</a></h1>
+<section id="pyleoclim-utilities-api-pyleoclim-utils">
+<span id="utils-introduction"></span><h1>Pyleoclim Utilities API (pyleoclim.utils)<a class="headerlink" href="#pyleoclim-utilities-api-pyleoclim-utils" title="Permalink to this headline">¶</a></h1>
 <p>Pyleoclim makes extensive use of functions from <a class="reference external" href="https://numpy.org">numpy</a>, <a class="reference external" href="https://pandas.pydata.org">Pandas</a>, <a class="reference external" href="https://www.scipy.org">Scipy</a>, and <a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn</a>. Please note that some default parameter values for these functions have been changed to more appropriate values for paleoclimate datasets.</p>
-<div class="section" id="causality">
+<section id="causality">
 <h2>Causality<a class="headerlink" href="#causality" title="Permalink to this headline">¶</a></h2>
 <table class="colwidths-given docutils align-default">
 <colgroup>
@@ -226,8 +238,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="correlation">
+</section>
+<section id="correlation">
 <h2>Correlation<a class="headerlink" href="#correlation" title="Permalink to this headline">¶</a></h2>
 <table class="colwidths-given docutils align-default">
 <colgroup>
@@ -243,12 +255,12 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="decomposition">
+</section>
+<section id="decomposition">
 <h2>Decomposition<a class="headerlink" href="#decomposition" title="Permalink to this headline">¶</a></h2>
 <p>Methods used for decomposing timeseries into orthogonal components.</p>
-</div>
-<div class="section" id="filter">
+</section>
+<section id="filter">
 <h2>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h2>
 <p>Filtering functions</p>
 <table class="colwidths-given docutils align-default">
@@ -265,8 +277,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="mapping">
+</section>
+<section id="mapping">
 <h2>Mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h2>
 <p>This module contains mapping function based on <cite>cartopy &lt;https://scitools.org.uk/cartopy/docs/latest/&gt;_</cite></p>
 <table class="colwidths-given docutils align-default">
@@ -280,8 +292,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="plotting">
+</section>
+<section id="plotting">
 <h2>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h2>
 <p>The functions contained in this module rely heavily on <cite>matplotlib &lt;https://matplotlib.org&gt;_</cite>. See <a class="reference internal" href="plotting/private.html#plotting-private"><span class="std std-ref">here</span></a> for details. If considering plotting without making use of the functions in the ui module, we recommend using matplotlib directly.</p>
 <p>However, the following functions can be used to manipulate the default style and save settings.</p>
@@ -302,8 +314,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="spectral">
+</section>
+<section id="spectral">
 <h2>Spectral<a class="headerlink" href="#spectral" title="Permalink to this headline">¶</a></h2>
 <p>This modules contains several spectral methods applicable to paleoclimate data</p>
 <table class="colwidths-given docutils align-default">
@@ -329,8 +341,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="tsmodel">
+</section>
+<section id="tsmodel">
 <h2>Tsmodel<a class="headerlink" href="#tsmodel" title="Permalink to this headline">¶</a></h2>
 <p>This module generates simulated time series that can be used for significance testing.</p>
 <table class="colwidths-given docutils align-default">
@@ -350,8 +362,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="wavelet">
+</section>
+<section id="wavelet">
 <h2>Wavelet<a class="headerlink" href="#wavelet" title="Permalink to this headline">¶</a></h2>
 <p>Functions for wavelet analysis. Includes some pre-processing and post-processing functions for spectral and wavelet analysis described <a class="reference internal" href="wavelet/private.html#wavelet-private"><span class="std std-ref">here</span></a>.</p>
 <table class="colwidths-given docutils align-default">
@@ -371,8 +383,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="tsutils">
+</section>
+<section id="tsutils">
 <h2>Tsutils<a class="headerlink" href="#tsutils" title="Permalink to this headline">¶</a></h2>
 <p>This modules contain pre-processing functions for time series analysis.</p>
 <table class="colwidths-given docutils align-default">
@@ -405,18 +417,6 @@
 <tr class="row-even"><td><p><a class="reference internal" href="tsutils/ts2segments.html#utils-ts2segments"><span class="std std-ref">ts2segments</span></a></p></td>
 <td><p>Chop a timeseries into several segments based on gap detection</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="tsutils/clean_ts.html#utils-clean-ts"><span class="std std-ref">clean_ts</span></a></p></td>
-<td><p>Remove NaNs in the time series and sort it in ascending time order</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="tsutils/dropna.html#utils-dropna"><span class="std std-ref">dropna</span></a></p></td>
-<td><p>Remove NaNs</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="tsutils/sort_ts.html#utils-sort-ts"><span class="std std-ref">sort_ts</span></a></p></td>
-<td><p>Sort time values in ascending order</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="tsutils/reduce_duplicated_timestamp.html#utils-reduce-duplicated-timestamps"><span class="std std-ref">reduce_duplicated_timestamps</span></a></p></td>
-<td><p>Reduce duplicated timestamps in a timeseries by averaging the values</p></td>
-</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="tsutils/annualize.html#utils-annualize"><span class="std std-ref">annualize</span></a></p></td>
 <td><p>Annualize a time series whose time resolution is finer than 1 year</p></td>
 </tr>
@@ -435,13 +435,37 @@
 <tr class="row-even"><td><p><a class="reference internal" href="tsutils/remove_outliers.html#utils-remove-outliers"><span class="std std-ref">remove_outliers</span></a></p></td>
 <td><p>Remove outliers in a timeseries</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="tsutils/is_evenly_spaced.html#utils-is-evenly-spaced"><span class="std std-ref">is_evenly_spaced</span></a></p></td>
+</tbody>
+</table>
+</section>
+<section id="tsbase">
+<h2>Tsbase<a class="headerlink" href="#tsbase" title="Permalink to this headline">¶</a></h2>
+<p>This module contains simple cleaning routines.</p>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 70%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="tsbase/clean_ts.html#utils-clean-ts"><span class="std std-ref">clean_ts</span></a></p></td>
+<td><p>Remove NaNs in the time series and sort it in ascending time order</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="tsbase/dropna.html#utils-dropna"><span class="std std-ref">dropna</span></a></p></td>
+<td><p>Remove NaNs</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="tsbase/sort_ts.html#utils-sort-ts"><span class="std std-ref">sort_ts</span></a></p></td>
+<td><p>Sort time values in ascending order</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="tsbase/reduce_duplicated_timestamp.html#utils-reduce-duplicated-timestamps"><span class="std std-ref">reduce_duplicated_timestamps</span></a></p></td>
+<td><p>Reduce duplicated timestamps in a timeseries by averaging the values</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="tsbase/is_evenly_spaced.html#utils-is-evenly-spaced"><span class="std std-ref">is_evenly_spaced</span></a></p></td>
 <td><p>Detect whether a timeseries is evenly spaced in time</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="lipdutils">
+</section>
+<section id="lipdutils">
 <h2>Lipdutils<a class="headerlink" href="#lipdutils" title="Permalink to this headline">¶</a></h2>
 <p>This module contains functions to manipulate LiPD files and automate data transformation whenever possible. These functions are used throughout Pyleoclim but are not meant for direct interactions. A list of these functions can be found <a class="reference internal" href="lipdutils/private.html#lipdutils-private"><span class="std std-ref">here</span></a>.</p>
 <p>The most relevant functions concern querying the LinkedEarth wiki. The first 5 functions can be used to get relevant query terms.</p>
@@ -471,8 +495,8 @@
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="jsonutils">
+</section>
+<section id="jsonutils">
 <h2>jsonutils<a class="headerlink" href="#jsonutils" title="Permalink to this headline">¶</a></h2>
 <p>This module converts Pyleoclim objects to and from JSON files. Useful for obtaining a human-readable output and keeping the results of an analysis.</p>
 <table class="colwidths-given docutils align-default">
@@ -495,45 +519,37 @@
 </tr>
 </tbody>
 </table>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../citation.html" class="btn btn-neutral float-right" title="Citing Pyleoclim" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="../tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="../citation.html" class="btn btn-neutral float-right" title="Citing Pyleoclim" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James
+        &#169; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

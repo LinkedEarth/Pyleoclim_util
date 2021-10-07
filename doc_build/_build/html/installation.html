@@ -3,9 +3,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Installing Pyleoclim &mdash; Pyleoclim 0.6.2beta documentation</title>
   
@@ -13,11 +14,17 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/rtd_sphinx_search.min.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -27,6 +34,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
@@ -38,7 +46,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="The Pyleoclim User Interface" href="core/ui.html" />
+    <link rel="next" title="Pyleoclim User API" href="core/ui.html" />
     <link rel="prev" title="Introduction" href="index.html" /> 
 </head>
 
@@ -53,7 +61,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+            <a href="index.html" class="icon icon-home"> Pyleoclim
           
 
           
@@ -91,7 +99,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">Working with Pyleoclim</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Working with Pyleoclim</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installing Pyleoclim</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installing-anaconda-or-miniconda">Installing Anaconda or Miniconda</a></li>
@@ -100,16 +108,17 @@
 <li class="toctree-l2"><a class="reference internal" href="#building-from-source-for-the-f2py-feature-of-wwz">Building from source for the f2py feature of WWZ</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="core/ui.html">The Pyleoclim User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core/ui.html">Pyleoclim User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced functionalities</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced functionalities</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="utils/introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils/introduction.html">Pyleoclim Utilities API (pyleoclim.utils)</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Involved</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Involved</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribution_guide.html">Contributing to Pyleoclim</a></li>
 </ul>
 
             
@@ -150,6 +159,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -161,7 +172,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -201,18 +212,18 @@
 </style>
 <div class="admonition note" id="installation">
 <p class="admonition-title">Note</p>
-<p>Pyleoclim requires the use of Python 3.8.</p>
+<p>Pyleoclim requires the use of Python 3.8 or 3.9.</p>
 </div>
-<div class="section" id="installing-pyleoclim">
+<section id="installing-pyleoclim">
 <h1>Installing Pyleoclim<a class="headerlink" href="#installing-pyleoclim" title="Permalink to this headline">¶</a></h1>
 <p>We recommend the use of Anaconda or Miniconda, with Pyleoclim setup in
 its own <cite>conda</cite> environment. Some default packages shipping with the full Anaconda distribution are known to cause conflicts with the required Pyleoclim packages, so we recommend Miniconda, especially for beginners.</p>
-<div class="section" id="installing-anaconda-or-miniconda">
+<section id="installing-anaconda-or-miniconda">
 <h2>Installing Anaconda or Miniconda<a class="headerlink" href="#installing-anaconda-or-miniconda" title="Permalink to this headline">¶</a></h2>
 <p>To install Anaconda or Miniconda on your platform, follow the instructions from <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html">this page</a>.</p>
 <p>Click <a class="reference internal" href="anaconda_install.html#anaconda-installation"><span class="std std-ref">here</span></a> for a quick tutorial on MacOs and Linux systems.</p>
-</div>
-<div class="section" id="creating-a-new-conda-environment">
+</section>
+<section id="creating-a-new-conda-environment">
 <h2>Creating a new conda environment<a class="headerlink" href="#creating-a-new-conda-environment" title="Permalink to this headline">¶</a></h2>
 <p>To create a new environment using Python 3.8 via command line:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -n pyleoenv <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8
@@ -235,8 +246,8 @@ its own <cite>conda</cite> environment. Some default packages shipping with the 
 </pre></div>
 </div>
 <p>More information about managing conda environments can be found <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#">here</a>.</p>
-</div>
-<div class="section" id="id1">
+</section>
+<section id="id1">
 <h2>Installing Pyleoclim<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Make sure that the pyleoenv environment is activated.</p>
 <p><strong>First</strong> install numpy and Cartopy:</p>
@@ -266,8 +277,8 @@ pip install jupyter
 pip install <span class="s1">&#39;pyqtwebengine&lt;5.13&#39;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="building-from-source-for-the-f2py-feature-of-wwz">
+</section>
+<section id="building-from-source-for-the-f2py-feature-of-wwz">
 <h2>Building from source for the f2py feature of WWZ<a class="headerlink" href="#building-from-source-for-the-f2py-feature-of-wwz" title="Permalink to this headline">¶</a></h2>
 <p>The default version of WWZ that comes with the installation steps mentioned above is relying on <a class="reference external" href="http://numba.pydata.org/">Numba</a>.
 It is fast enough for lightweight spectral &amp; wavelet analysis tasks, in which case we recommend using the default installation.</p>
@@ -285,45 +296,37 @@ It is fast enough for lightweight spectral &amp; wavelet analysis tasks, in whic
 </pre></div>
 </div>
 <p>Again, unless you are planning to make heavy use of the WWZ functionality, we recommend using the default installation.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="core/ui.html" class="btn btn-neutral float-right" title="The Pyleoclim User Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="core/ui.html" class="btn btn-neutral float-right" title="Pyleoclim User API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James
+        &#169; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
