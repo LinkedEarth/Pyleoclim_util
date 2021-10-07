@@ -1256,6 +1256,50 @@ class Series:
         pyleoclim.core.ui.PSD : PSD object
 
         pyleoclim.core.ui.MultiplePSD : Multiple PSD object
+        
+        Examples
+        --------
+
+        Simple summary_plot with n_signif_test = 1 for computational ease, defaults otherwise.
+
+        .. ipython:: python
+            :okwarning:
+            
+            import pyleoclim as pyleo
+            import pandas as pd
+            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
+            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+            fig, ax = series.summary_plot(n_signif_test=1)
+            pyleo.closefig(fig)
+            
+        Summary_plot with pre-generated psd and scalogram objects.
+        
+        .. ipython:: python
+            :okwarning:
+            
+            import pyleoclim as pyleo
+            import pandas as pd
+            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
+            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+            psd = series.spectral(freq_method = 'welch')
+            scalogram = series.wavelet(freq_method = 'welch')
+            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
+            pyleo.closefig(fig)
+        
+        Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed.
+        
+        .. ipython:: python
+            :okwarning:
+            
+            import pyleoclim as pyleo
+            import pandas as pd
+            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
+            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+            psd = series.spectral(freq_method = 'welch')
+            scalogram = series.wavelet(freq_method = 'welch')
+            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
+            pyleo.closefig(fig)
+        
 
         '''
         # Turn the interactive mode off.
@@ -1290,6 +1334,7 @@ class Series:
         ax = {}
         ax['ts'] = plt.subplot(gs[0:1, :-3])
         ax['ts'] = self.plot(ax=ax['ts'], **ts_plot_kwargs)
+        ax['ts'].xaxis.set_visible(False)
         
         if time_lim is not None:
             ax['ts'].set_xlim(time_lim)
@@ -1300,8 +1345,6 @@ class Series:
             ax['ts'].set_ylim(value_lim)
             if 'ylim' in ts_plot_kwargs:
                 print('Ylim passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-
-        ax['ts'].spines['bottom'].set_visible(False)
 
         ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
         
@@ -1315,8 +1358,10 @@ class Series:
             wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.1}})
 
         ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
+        ax['scal'].invert_yaxis()
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
+        
         if psd is None:
             if n_signif_test > 0:
                 psd = self.spectral(**psd_kwargs).signif_test(number=n_signif_test)
@@ -1329,7 +1374,9 @@ class Series:
             ax['psd'].set_ylim(period_lim)
             if 'ylim' in psd_plot_kwargs:
                print('Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-            
+        
+        ax['psd'].yaxis.set_visible(False)
+        ax['psd'].invert_yaxis()
         ax['psd'].set_ylabel(None)
         ax['psd'].tick_params(axis='y', direction='in', labelleft=False)
         ax['psd'].legend().remove()
