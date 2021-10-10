@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>pyleoclim.utils.filter &mdash; Pyleoclim 0.6.2beta documentation</title>
   
@@ -13,11 +13,17 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -27,6 +33,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -51,7 +58,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+            <a href="../../../index.html" class="icon icon-home"> Pyleoclim
           
 
           
@@ -89,19 +96,20 @@
               
             
             
-              <p class="caption"><span class="caption-text">Working with Pyleoclim</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Working with Pyleoclim</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing Pyleoclim</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../core/ui.html">The Pyleoclim User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/ui.html">Pyleoclim User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced functionalities</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced functionalities</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../utils/introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils/introduction.html">Pyleoclim Utilities API (pyleoclim.utils)</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Involved</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Involved</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contribution_guide.html">Contributing to Pyleoclim</a></li>
 </ul>
 
             
@@ -127,6 +135,8 @@
         <div class="rst-content">
         
           
+
+
 
 
 
@@ -186,6 +196,10 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">signal</span>
+
+<span class="kn">from</span> <span class="nn">.tsbase</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">is_evenly_spaced</span>
+<span class="p">)</span>
 
 <span class="c1"># ----</span>
 <span class="c1"># Main functions</span>
@@ -328,11 +342,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">padLength</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="o">*</span><span class="n">padFrac</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_evenly_spaced</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ts needs to be composed of even increments&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">dt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">ts</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># computp time interval</span>
-
+    
+    <span class="c1">#time axis</span>
+    <span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">padLength</span><span class="o">*</span><span class="n">dt</span><span class="p">,</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">padLength</span><span class="o">*</span><span class="n">dt</span><span class="o">+</span><span class="n">dt</span><span class="p">,</span><span class="n">dt</span><span class="p">)</span>
+    
     <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;ARIMA&#39;</span><span class="p">:</span>
         <span class="c1"># fit ARIMA model</span>
         <span class="n">fwd_mod</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">tsa</span><span class="o">.</span><span class="n">ARIMA</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>  <span class="c1"># model with time going forward</span>
@@ -342,20 +359,14 @@
         <span class="n">fwd_pred</span>  <span class="o">=</span> <span class="n">fwd_mod</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">padLength</span><span class="p">);</span> <span class="n">yf</span> <span class="o">=</span> <span class="n">fwd_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">bwd_pred</span>  <span class="o">=</span> <span class="n">bwd_mod</span><span class="o">.</span><span class="n">forecast</span><span class="p">(</span><span class="n">padLength</span><span class="p">);</span> <span class="n">yb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">bwd_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="c1"># define extra time axes</span>
-        <span class="n">tf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="o">+</span><span class="n">dt</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="o">+</span><span class="n">padLength</span><span class="o">*</span><span class="n">dt</span><span class="p">,</span><span class="n">padLength</span><span class="p">)</span>
-        <span class="n">tb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="o">-</span><span class="n">padLength</span><span class="o">*</span><span class="n">dt</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">padLength</span><span class="p">)</span>
-
         <span class="c1"># extend time series</span>
-        <span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">padLength</span><span class="o">*</span><span class="n">dt</span><span class="p">,</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">padLength</span><span class="o">*</span><span class="n">dt</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="n">dt</span><span class="p">)</span>
         <span class="n">yp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tp</span><span class="p">))</span>
-        <span class="n">yp</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span><span class="n">ts</span><span class="p">)]</span> <span class="o">=</span><span class="n">ys</span>
-        <span class="n">yp</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span><span class="n">tb</span><span class="p">)]</span><span class="o">=</span><span class="n">yb</span>
-        <span class="n">yp</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">tp</span><span class="p">,</span><span class="n">tf</span><span class="p">)]</span><span class="o">=</span><span class="n">yf</span>
+        <span class="n">yp</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">padLength</span><span class="p">]</span><span class="o">=</span><span class="n">yb</span>
+        <span class="n">yp</span><span class="p">[</span><span class="n">padLength</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="o">+</span><span class="n">padLength</span><span class="p">]</span><span class="o">=</span><span class="n">ys</span>
+        <span class="n">yp</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span><span class="o">+</span><span class="n">padLength</span><span class="p">:]</span><span class="o">=</span><span class="n">yf</span>
 
     <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;reflect&#39;</span><span class="p">:</span>
         <span class="n">yp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">ys</span><span class="p">,(</span><span class="n">padLength</span><span class="p">,</span><span class="n">padLength</span><span class="p">),</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span><span class="n">reflect_type</span><span class="o">=</span><span class="n">reflect_type</span><span class="p">)</span>
-        <span class="n">tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">padLength</span><span class="p">,</span><span class="n">ts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">padLength</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Not a valid argument. Enter &quot;ARIMA&quot; or &quot;reflect&quot;&#39;</span><span class="p">)</span>
@@ -581,28 +592,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James
+        &#169; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

@@ -3,9 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>pyleoclim.utils.wavelet &mdash; Pyleoclim 0.6.2beta documentation</title>
   
@@ -13,11 +13,17 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -27,6 +33,7 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
@@ -51,7 +58,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> Pyleoclim
+            <a href="../../../index.html" class="icon icon-home"> Pyleoclim
           
 
           
@@ -89,19 +96,20 @@
               
             
             
-              <p class="caption"><span class="caption-text">Working with Pyleoclim</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Working with Pyleoclim</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing Pyleoclim</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../core/ui.html">The Pyleoclim User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/ui.html">Pyleoclim User API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Advanced functionalities</span></p>
+<p class="caption" role="heading"><span class="caption-text">Advanced functionalities</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../utils/introduction.html">Pyleoclim Utilities (pyleoclim.utils)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils/introduction.html">Pyleoclim Utilities API (pyleoclim.utils)</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Getting Involved</span></p>
+<p class="caption" role="heading"><span class="caption-text">Getting Involved</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contribution_guide.html">Contributing to Pyleoclim</a></li>
 </ul>
 
             
@@ -127,6 +135,8 @@
         <div class="rst-content">
         
           
+
+
 
 
 
@@ -178,7 +188,7 @@
 
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;cwt&#39;</span><span class="p">,</span>
+    <span class="c1">#&#39;cwt&#39;,</span>
     <span class="s1">&#39;wwz&#39;</span><span class="p">,</span>
     <span class="s1">&#39;xwc&#39;</span><span class="p">,</span>
 <span class="p">]</span>
@@ -192,15 +202,18 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">collections</span>
 <span class="kn">import</span> <span class="nn">scipy.fftpack</span> <span class="k">as</span> <span class="nn">fft</span>
-<span class="kn">import</span> <span class="nn">pywt</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">optimize</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">fminbound</span>
+<span class="kn">from</span> <span class="nn">scipy.special._ufuncs</span> <span class="kn">import</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">gammainc</span>
 
 <span class="c1">#from .tsmodel import ar1_sim</span>
-<span class="kn">from</span> <span class="nn">.tsutils</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">.tsutils</span> <span class="kn">import</span> <span class="n">preprocess</span>
+<span class="kn">from</span> <span class="nn">.tsbase</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">clean_ts</span><span class="p">,</span>
-    <span class="n">dropna</span><span class="p">,</span>
-    <span class="n">preprocess</span><span class="p">,</span>
+    <span class="n">is_evenly_spaced</span><span class="p">,</span>
 <span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">.filter</span> <span class="kn">import</span> <span class="n">ts_pad</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">NumbaPerformanceWarning</span><span class="p">)</span>
 
@@ -336,49 +349,49 @@
 
         <span class="k">return</span> <span class="n">spectr</span></div>
     
-<div class="viewcode-block" id="cwt"><a class="viewcode-back" href="../../../utils/wavelet/cwt.html#pyleoclim.utils.wavelet.cwt">[docs]</a><span class="k">def</span> <span class="nf">cwt</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span><span class="n">ts</span><span class="p">,</span><span class="n">scales</span><span class="p">,</span><span class="n">wavelet</span><span class="o">=</span><span class="s1">&#39;morl&#39;</span><span class="p">,</span><span class="n">sampling_period</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;conv&#39;</span><span class="p">,</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;Continous wavelet transform for evenly spaced data</span>
-<span class="sd">    </span>
-<span class="sd">    pywavelet documentation: https://pywavelets.readthedocs.io/en/latest/ref/cwt.html</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    ys : array</span>
-<span class="sd">        signal</span>
-<span class="sd">    ts : array</span>
-<span class="sd">        time </span>
-<span class="sd">    scales : array (float)</span>
-<span class="sd">        different wavelet scales to use</span>
-<span class="sd">    wavelet : str</span>
-<span class="sd">        types of wavelet options in function documentation link. The default is &#39;morl&#39; for a morlet wavelet.</span>
-<span class="sd">    sampling_period : float, optional</span>
-<span class="sd">        sampling period for frequencies output. The default is 1.0.</span>
-<span class="sd">    method : str, optional</span>
-<span class="sd">        cwt computation  method. &#39;conv&#39;,&#39;fft&#39;. or &#39;auto&#39; The default is &#39;conv&#39;.</span>
-<span class="sd">    axis : int, optional</span>
-<span class="sd">        axis over which to compute cwt. The default is -1, the last axis.</span>
+<span class="c1"># def cwt(ys,ts,scales,wavelet=&#39;morl&#39;,sampling_period=1.0,method=&#39;conv&#39;,axis=-1):</span>
+<span class="c1">#     &#39;&#39;&#39;Continous wavelet transform for evenly spaced data</span>
+    
+<span class="c1">#     pywavelet documentation: https://pywavelets.readthedocs.io/en/latest/ref/cwt.html</span>
+    
+<span class="c1">#     Parameters</span>
+<span class="c1">#     ----------</span>
+<span class="c1">#     ys : array</span>
+<span class="c1">#         signal</span>
+<span class="c1">#     ts : array</span>
+<span class="c1">#         time </span>
+<span class="c1">#     scales : array (float)</span>
+<span class="c1">#         different wavelet scales to use</span>
+<span class="c1">#     wavelet : str</span>
+<span class="c1">#         types of wavelet options in function documentation link. The default is &#39;morl&#39; for a morlet wavelet.</span>
+<span class="c1">#     sampling_period : float, optional</span>
+<span class="c1">#         sampling period for frequencies output. The default is 1.0.</span>
+<span class="c1">#     method : str, optional</span>
+<span class="c1">#         cwt computation  method. &#39;conv&#39;,&#39;fft&#39;. or &#39;auto&#39; The default is &#39;conv&#39;.</span>
+<span class="c1">#     axis : int, optional</span>
+<span class="c1">#         axis over which to compute cwt. The default is -1, the last axis.</span>
 
 
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    res : dictionary</span>
-<span class="sd">        &#39;freq&#39; - array(float) </span>
-<span class="sd">            frequencies</span>
-<span class="sd">        &#39;time&#39; - array(float)</span>
-<span class="sd">        &#39;amplitude&#39; - array(float)</span>
-<span class="sd">        &#39;coi&#39; - array(float)</span>
-<span class="sd">            cone of inference</span>
+<span class="c1">#     Returns</span>
+<span class="c1">#     -------</span>
+<span class="c1">#     res : dictionary</span>
+<span class="c1">#         &#39;freq&#39; - array(float) </span>
+<span class="c1">#             frequencies</span>
+<span class="c1">#         &#39;time&#39; - array(float)</span>
+<span class="c1">#         &#39;amplitude&#39; - array(float)</span>
+<span class="c1">#         &#39;coi&#39; - array(float)</span>
+<span class="c1">#             cone of inference</span>
 
-<span class="sd">    &#39;&#39;&#39;</span>    
-    <span class="n">coeff</span><span class="p">,</span><span class="n">freq</span><span class="o">=</span><span class="n">pywt</span><span class="o">.</span><span class="n">cwt</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ys</span><span class="p">,</span><span class="n">scales</span><span class="o">=</span><span class="n">scales</span><span class="p">,</span><span class="n">wavelet</span><span class="o">=</span><span class="n">wavelet</span><span class="p">,</span><span class="n">sampling_period</span><span class="o">=</span><span class="n">sampling_period</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
-    <span class="n">amplitude</span><span class="o">=</span><span class="nb">abs</span><span class="p">(</span><span class="n">coeff</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-    <span class="k">if</span> <span class="n">wavelet</span><span class="o">==</span><span class="s1">&#39;morl&#39;</span> <span class="ow">or</span> <span class="n">wavelet</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;cmor&#39;</span><span class="p">:</span>
-        <span class="n">coi</span><span class="o">=</span><span class="n">make_coi</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span><span class="n">Neff</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">coi</span><span class="o">=</span><span class="n">make_coi</span><span class="p">(</span><span class="n">tau</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
-    <span class="n">Results</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Results&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">,</span><span class="s1">&#39;coi&#39;</span><span class="p">,</span> <span class="s1">&#39;freq&#39;</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;coeff&#39;</span><span class="p">])</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">Results</span><span class="p">(</span><span class="n">amplitude</span><span class="o">=</span><span class="n">amplitude</span><span class="p">,</span> <span class="n">coi</span><span class="o">=</span><span class="n">coi</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="n">coeff</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span></div>
+<span class="c1">#     &#39;&#39;&#39;    </span>
+<span class="c1">#     coeff,freq=pywt.cwt(data=ys,scales=scales,wavelet=wavelet,sampling_period=sampling_period,method=method,axis=axis)</span>
+<span class="c1">#     amplitude=abs(coeff).T</span>
+<span class="c1">#     if wavelet==&#39;morl&#39; or wavelet[:4]==&#39;cmor&#39;:</span>
+<span class="c1">#         coi=make_coi(tau=ts,Neff=6)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         coi=make_coi(tau=ts)</span>
+<span class="c1">#     Results = collections.namedtuple(&#39;Results&#39;, [&#39;amplitude&#39;,&#39;coi&#39;, &#39;freq&#39;, &#39;time&#39;, &#39;coeff&#39;])</span>
+<span class="c1">#     res = Results(amplitude=amplitude, coi=coi, freq=freq, time=ts, coeff=coeff)</span>
+<span class="c1">#     return res</span>
 
 <div class="viewcode-block" id="assertPositiveInt"><a class="viewcode-back" href="../../../utils/wavelet/assertPositiveInt.html#pyleoclim.utils.wavelet.assertPositiveInt">[docs]</a><span class="k">def</span> <span class="nf">assertPositiveInt</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Assert that the arguments are all positive integers.</span>
@@ -1520,7 +1533,8 @@
         <span class="n">tau</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq_method</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span> <span class="n">freq_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">c</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">8</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span> <span class="n">Neff</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">nproc</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">detrend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sg_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">nMC</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-        <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;Kirchner_numba&#39;</span><span class="p">):</span>
+        <span class="n">gaussianize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">standardize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;Kirchner_numba&#39;</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39; Return the cross-wavelet coherence of two time series.</span>
 
 <span class="sd">    Parameters</span>
@@ -1564,6 +1578,8 @@
 <span class="sd">        - &#39;Kirchner&#39;: the method Kirchner adapted from Foster;</span>
 <span class="sd">        - &#39;Kirchner_f2py&#39;: the method Kirchner adapted from Foster with f2py</span>
 <span class="sd">        - &#39;Kirchner_numba&#39;: Kirchner&#39;s algorithm with Numba support for acceleration (default)</span>
+<span class="sd">    verbose : bool</span>
+<span class="sd">        If True, print warning messages</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1613,7 +1629,7 @@
     <span class="n">ys2_cut</span><span class="p">,</span> <span class="n">ts2_cut</span><span class="p">,</span> <span class="n">freq2</span><span class="p">,</span> <span class="n">tau2</span> <span class="o">=</span> <span class="n">prepare_wwz</span><span class="p">(</span><span class="n">ys2</span><span class="p">,</span> <span class="n">ts2</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="n">freq</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="n">tau</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">tau1</span> <span class="o">!=</span> <span class="n">tau2</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;inconsistent `tau`, recalculating...&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;inconsistent `tau`, recalculating...&#39;</span><span class="p">)</span>
         <span class="n">tau_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">tau1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">tau2</span><span class="p">)])</span>
         <span class="n">tau_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">tau1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">tau2</span><span class="p">)])</span>
         <span class="n">ntau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">tau1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">tau2</span><span class="p">)])</span>
@@ -1622,7 +1638,7 @@
         <span class="n">tau</span> <span class="o">=</span> <span class="n">tau1</span>
 
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">freq1</span> <span class="o">!=</span> <span class="n">freq2</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;inconsistent `freq`, recalculating...&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;inconsistent `freq`, recalculating...&#39;</span><span class="p">)</span>
         <span class="n">freq_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">freq1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">freq2</span><span class="p">)])</span>
         <span class="n">freq_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">freq1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">freq2</span><span class="p">)])</span>
         <span class="n">nfreq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">freq1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">freq2</span><span class="p">)])</span>
@@ -1831,8 +1847,8 @@
 
     <span class="k">return</span> <span class="n">freq</span></div>
 
-<div class="viewcode-block" id="freq_vector_scale"><a class="viewcode-back" href="../../../utils/wavelet/freq_vector_scale.html#pyleoclim.utils.wavelet.freq_vector_scale">[docs]</a><span class="k">def</span> <span class="nf">freq_vector_scale</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">nv</span><span class="o">=</span><span class="mi">12</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39; Return the frequency vector based on scales</span>
+<div class="viewcode-block" id="freq_vector_scale"><a class="viewcode-back" href="../../../utils/wavelet/freq_vector_scale.html#pyleoclim.utils.wavelet.freq_vector_scale">[docs]</a><span class="k">def</span> <span class="nf">freq_vector_scale</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">nv</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">fourier_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39; Return the frequency vector based on scales for wavelet analysis</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1869,7 +1885,7 @@
     <span class="n">a0</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">nv</span><span class="p">)</span>
     <span class="n">noct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">ts</span><span class="p">)))</span><span class="o">-</span><span class="mi">1</span>  <span class="c1"># number of octave</span>
     <span class="n">scale</span> <span class="o">=</span> <span class="n">s0</span><span class="o">*</span><span class="n">a0</span><span class="o">**</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">noct</span><span class="o">*</span><span class="n">nv</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
-    <span class="n">freq</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">scale</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">freq</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">scale</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">fourier_factor</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">freq</span></div>
 
@@ -2611,34 +2627,243 @@
 
     <span class="k">return</span> <span class="n">rec_ts</span><span class="p">,</span> <span class="n">t</span></div>
 
+<span class="c1"># ## Methods for Torrence and compo</span>
+
+<span class="c1"># # This is the main function, which has been rewritten to work with functionalities in Pyleoclim</span>
+
+<span class="c1"># def cwt(ys,ts,mother=&#39;morlet&#39;,param=None,freq=None,freq_method=&#39;scale&#39;,</span>
+<span class="c1">#         freq_kwargs={},detrend=False, sg_kwargs={}, gaussianize=False,</span>
+<span class="c1">#         standardize=False,pad=False,pad_kwargs={}):</span>
+    
+<span class="c1">#     ys=np.array(ys)</span>
+<span class="c1">#     ts=np.array(ts)</span>
+    
+<span class="c1">#     ys, ts = clean_ts(ys, ts) #clean up time</span>
+    
+<span class="c1">#     #make sure that the time series is evenly-spaced</span>
+<span class="c1">#     if is_evenly_spaced(ts) == True:</span>
+<span class="c1">#         dt = np.mean(np.diff(ts))</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         raise ValueError(&#39;Time series must be evenly spaced in time&#39;)</span>
+       
+<span class="c1">#     # prepare the time series </span>
+<span class="c1">#     pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs, </span>
+<span class="c1">#                        gaussianize=gaussianize, standardize=standardize)</span>
+    
+<span class="c1">#     # Get the fourier factor</span>
+<span class="c1">#     if mother.lower() == &#39;morlet&#39;:</span>
+<span class="c1">#         if param is None:</span>
+<span class="c1">#             param = 6.</span>
+<span class="c1">#         fourier_factor = 4 * np.pi / (param + np.sqrt(2 + param**2))</span>
+<span class="c1">#     elif mother.lower() == &#39;paul&#39;:</span>
+<span class="c1">#         if param is None:</span>
+<span class="c1">#             param = 4.</span>
+<span class="c1">#         fourier_factor = 4 * np.pi / (2 * param + 1)</span>
+<span class="c1">#     elif mother.lower() == &#39;dog&#39;:</span>
+<span class="c1">#         if param is None:</span>
+<span class="c1">#             param = 2.</span>
+<span class="c1">#         fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * param + 1))</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         fourier_factor = 1</span>
+    
+<span class="c1">#     #get the frequency/scale information</span>
+<span class="c1">#     if freq is None: </span>
+<span class="c1">#         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()</span>
+<span class="c1">#         if freq_method == &#39;scale&#39;:</span>
+<span class="c1">#             freq_kwargs.update({&#39;fourier_factor&#39;:fourier_factor})</span>
+<span class="c1">#         freq = make_freq_vector(ts, method=freq_method, **freq_kwargs)</span>
+<span class="c1">#     # Use scales</span>
+<span class="c1">#     scale = np.sort(1/(freq*fourier_factor))</span>
+    
+<span class="c1">#     #Normalize</span>
+<span class="c1">#     #n_ys = pd_ys-np.mean(pd_ys)</span>
+    
+<span class="c1">#     #pad if wanted</span>
+<span class="c1">#     if pad == True:</span>
+<span class="c1">#         pad_kwargs = {} if pad_kwargs is None else pad_kwargs.copy()</span>
+<span class="c1">#         yp,tp = ts_pad(pd_ys,ts,**pad_kwargs)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         yp=pd_ys</span>
+<span class="c1">#         tp=ts</span>
+        
+<span class="c1">#     # Wave calculation</span>
+<span class="c1">#     n = len(yp)</span>
+    
+<span class="c1">#     # construct wavenumber array used in transform [Eqn(5)]</span>
+<span class="c1">#     kplus = np.arange(1, int(n / 2) + 1)</span>
+<span class="c1">#     kplus = (kplus * 2 * np.pi / (n * dt))</span>
+<span class="c1">#     kminus = np.arange(1, int((n - 1) / 2) + 1)</span>
+<span class="c1">#     kminus = np.sort((-kminus * 2 * np.pi / (n * dt)))</span>
+<span class="c1">#     k = np.concatenate(([0.], kplus, kminus))</span>
+
+<span class="c1">#     # compute FFT of the (padded) time series</span>
+<span class="c1">#     f = np.fft.fft(yp) </span>
+    
+<span class="c1">#     # define the wavelet array</span>
+<span class="c1">#     wave = np.zeros(shape=(len(scale), n), dtype=complex)</span>
+
+<span class="c1">#     # loop through all scales and compute transform</span>
+<span class="c1">#     for a1 in range(0, len(scale)):</span>
+<span class="c1">#         daughter, fourier_factor, coi, _ = \</span>
+<span class="c1">#             wave_bases(mother, k, scale[a1], param)</span>
+<span class="c1">#         wave[a1, :] = np.fft.ifft(f * daughter)  # wavelet transform[Eqn(4)]</span>
+    
+<span class="c1">#     #COI</span>
+<span class="c1">#     coi = coi * dt * np.concatenate((</span>
+<span class="c1">#         np.insert(np.arange(int((len(ys) + 1) / 2) - 1), [0], [1E-5]),</span>
+<span class="c1">#         np.insert(np.flipud(np.arange(0, int(len(ys) / 2) - 1)), [-1], [1E-5])))</span>
+    
+<span class="c1">#     #Remove the padding </span>
+<span class="c1">#     if pad == True:</span>
+<span class="c1">#         idx = np.in1d(tp,ts)</span>
+<span class="c1">#         wave = wave[:,idx]</span>
+        
+<span class="c1">#     res = {}</span>
+    
+<span class="c1">#     return res</span>
+    
+
+<span class="c1"># def wave_bases(mother, k, scale, param):</span>
+<span class="c1">#     &#39;&#39;&#39;</span>
+    
+
+<span class="c1">#     Parameters</span>
+<span class="c1">#     ----------</span>
+<span class="c1">#     mother : string, {}</span>
+<span class="c1">#         DESCRIPTION.</span>
+<span class="c1">#     k : TYPE</span>
+<span class="c1">#         DESCRIPTION.</span>
+<span class="c1">#     scale : TYPE</span>
+<span class="c1">#         DESCRIPTION.</span>
+<span class="c1">#     param : TYPE</span>
+<span class="c1">#         DESCRIPTION.</span>
+
+<span class="c1">#     Raises</span>
+<span class="c1">#     ------</span>
+<span class="c1">#     KeyError</span>
+<span class="c1">#         DESCRIPTION.</span>
+
+<span class="c1">#     Returns</span>
+<span class="c1">#     -------</span>
+<span class="c1">#     daughter : TYPE</span>
+<span class="c1">#         DESCRIPTION.</span>
+<span class="c1">#     fourier_factor : TYPE</span>
+<span class="c1">#         DESCRIPTION.</span>
+<span class="c1">#     coi : TYPE</span>
+<span class="c1">#         DESCRIPTION.</span>
+<span class="c1">#     dofmin : TYPE</span>
+<span class="c1">#         DESCRIPTION.</span>
+
+<span class="c1">#     &#39;&#39;&#39;</span>
+    
+<span class="c1">#     n = len(k)</span>
+<span class="c1">#     kplus = np.array(k &gt; 0., dtype=float)</span>
+
+<span class="c1">#     if mother == &#39;morlet&#39;:  # -----------------------------------  Morlet</span>
+
+<span class="c1">#         if param == -1:</span>
+<span class="c1">#             param = 6.</span>
+
+<span class="c1">#         k0 = np.copy(param)</span>
+<span class="c1">#         # calc psi_0(s omega) from Table 1</span>
+<span class="c1">#         expnt = -(scale * k - k0) ** 2 / 2. * kplus</span>
+<span class="c1">#         norm = np.sqrt(scale * k[1]) * (np.pi ** (-0.25)) * np.sqrt(n)</span>
+<span class="c1">#         daughter = norm * np.exp(expnt)</span>
+<span class="c1">#         daughter = daughter * kplus  # Heaviside step function</span>
+<span class="c1">#         # Scale--&gt;Fourier [Sec.3h]</span>
+<span class="c1">#         fourier_factor = (4 * np.pi) / (k0 + np.sqrt(2 + k0 ** 2))</span>
+<span class="c1">#         coi = fourier_factor / np.sqrt(2)  # Cone-of-influence [Sec.3g]</span>
+<span class="c1">#         dofmin = 2  # Degrees of freedom</span>
+<span class="c1">#     elif mother == &#39;paul&#39;:  # --------------------------------  Paul</span>
+<span class="c1">#         if param == -1:</span>
+<span class="c1">#             param = 4.</span>
+<span class="c1">#         m = param</span>
+<span class="c1">#         # calc psi_0(s omega) from Table 1</span>
+<span class="c1">#         expnt = -scale * k * kplus</span>
+<span class="c1">#         norm_bottom = np.sqrt(m * np.prod(np.arange(1, (2 * m))))</span>
+<span class="c1">#         norm = np.sqrt(scale * k[1]) * (2 ** m / norm_bottom) * np.sqrt(n)</span>
+<span class="c1">#         daughter = norm * ((scale * k) ** m) * np.exp(expnt) * kplus</span>
+<span class="c1">#         fourier_factor = 4 * np.pi / (2 * m + 1)</span>
+<span class="c1">#         coi = fourier_factor * np.sqrt(2)</span>
+<span class="c1">#         dofmin = 2</span>
+<span class="c1">#     elif mother == &#39;dog&#39;:  # --------------------------------  DOG</span>
+<span class="c1">#         if param == -1:</span>
+<span class="c1">#             param = 2.</span>
+<span class="c1">#         m = param</span>
+<span class="c1">#         # calc psi_0(s omega) from Table 1</span>
+<span class="c1">#         expnt = -(scale * k) ** 2 / 2.0</span>
+<span class="c1">#         norm = np.sqrt(scale * k[1] / gamma(m + 0.5)) * np.sqrt(n)</span>
+<span class="c1">#         daughter = -norm * (1j ** m) * ((scale * k) ** m) * np.exp(expnt)</span>
+<span class="c1">#         fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * m + 1))</span>
+<span class="c1">#         coi = fourier_factor / np.sqrt(2)</span>
+<span class="c1">#         dofmin = 1</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         raise KeyError(&#39;Mother must be one of &quot;morlet&quot;, &quot;paul&quot;, &quot;dog&quot;&#39;)</span>
+
+<span class="c1">#     return daughter, fourier_factor, coi, dofmin</span>
+        
+    
+<span class="c1"># def chisquare_inv(P, V):</span>
+
+<span class="c1">#     if (1 - P) &lt; 1E-4:</span>
+<span class="c1">#         print(&#39;P must be &lt; 0.9999&#39;)</span>
+
+<span class="c1">#     if P == 0.95 and V == 2:  # this is a no-brainer</span>
+<span class="c1">#         X = 5.9915</span>
+<span class="c1">#         return X</span>
+
+<span class="c1">#     MINN = 0.01  # hopefully this is small enough</span>
+<span class="c1">#     MAXX = 1  # actually starts at 10 (see while loop below)</span>
+<span class="c1">#     X = 1</span>
+<span class="c1">#     TOLERANCE = 1E-4  # this should be accurate enough</span>
+
+<span class="c1">#     while (X + TOLERANCE) &gt;= MAXX:  # should only need to loop thru once</span>
+<span class="c1">#         MAXX = MAXX * 10.</span>
+<span class="c1">#     # this calculates value for X, NORMALIZED by V</span>
+<span class="c1">#         X = fminbound(chisquare_solve, MINN, MAXX, args=(P, V), xtol=TOLERANCE)</span>
+<span class="c1">#         MINN = MAXX</span>
+
+<span class="c1">#     X = X * V  # put back in the goofy V factor</span>
+
+<span class="c1">#     return X  </span>
+
+<span class="c1"># def chisquare_solve(XGUESS, P, V):</span>
+
+<span class="c1">#     PGUESS = gammainc(V / 2, V * XGUESS / 2)  # incomplete Gamma function</span>
+
+<span class="c1">#     PDIFF = np.abs(PGUESS - P)            # error in calculated P</span>
+
+<span class="c1">#     TOL = 1E-4</span>
+<span class="c1">#     if PGUESS &gt;= 1 - TOL:  # if P is very close to 1 (i.e. a bad guess)</span>
+<span class="c1">#         PDIFF = XGUESS   # then just assign some big number like XGUESS</span>
+
+<span class="c1">#     return PDIFF</span>
+
 </pre></div>
 
            </div>
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James
+        &#169; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 

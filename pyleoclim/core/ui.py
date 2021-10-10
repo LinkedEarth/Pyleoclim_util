@@ -2063,6 +2063,51 @@ class Series:
 
         pyleoclim.core.ui.Coherence : Coherence object
 
+        Examples
+        --------
+
+        Wavelet coherence with the default arguments:
+
+        .. ipython:: python
+            :okwarning:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
+            time = data['t'].values
+            air = data['air'].values
+            nino = data['nino'].values
+            ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)')
+            ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)')
+
+            # without any arguments, the `tau` will be determined automatically
+            coh = ts_air.wavelet_coherence(ts_nino)
+
+            @savefig coh.png
+            fig, ax = coh.plot()
+            pyleo.closefig()
+
+        We may specify `ntau` to adjust the temporal resolution of the scalogram, which will affect the time consumption of calculation and the result itself:
+
+        .. ipython:: python
+            :okwarning:
+
+            coh_ntau = ts_air.wavelet_coherence(ts_nino, ntau=30)
+
+            @savefig coh_ntau.png
+            fig, ax = coh_ntau.plot()
+            pyleo.closefig()
+
+        We may also specify the `tau` vector explicitly:
+
+        .. ipython:: python
+            :okwarning:
+
+            coh_tau = ts_air.wavelet_coherence(ts_nino, tau=np.arange(1880, 2001))
+
+            @savefig coh_tau.png
+            fig, ax = coh_tau.plot()
+            pyleo.closefig()
 
         '''
         if not verbose:
