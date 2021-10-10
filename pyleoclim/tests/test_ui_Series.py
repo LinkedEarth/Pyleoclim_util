@@ -421,12 +421,21 @@ class TestUiSeriesSummaryPlot:
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral()
         scal = ts.wavelet()
+        period_label='Period'
+        psd_label='PSD'
+        time_label='Time'
+        value_label='Value'
         fig, ax = ts.summary_plot(
             psd=psd, scalogram=scal, figsize=[4, 5], title='Test',
-            period_label='Period', psd_label='PSD',
-            value_label='Value', time_label='Time',
+            period_label=period_label, psd_label=psd_label,
+            value_label=value_label, time_label=time_label,
             mute=True,
         )
+        
+        assert ax['scal'].properties()['ylabel'] == period_label, 'Period label is not being passed properly'
+        assert ax['psd'].properties()['xlabel'] == psd_label, 'PSD label is not being passed properly'
+        assert ax['scal'].properties()['xlabel'] == time_label, 'Time label is not being passed properly'
+        assert ax['ts'].properties()['ylabel'] == value_label, 'Value label is not being passed properly'
 
         plt.close(fig)
 
