@@ -295,7 +295,6 @@ class TestMultipleSeriesPca:
         Test with real data, same time axis
     
         ''' 
-        import pyleoclim as pyleo
         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
         data = pyleo.Lipd(usr_path = url)
         tslist = data.to_LipdSeriesList()

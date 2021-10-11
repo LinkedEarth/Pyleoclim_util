@@ -3864,41 +3864,12 @@ class MultipleSeries:
         
         Parameters
         ----------
-        data : array_like
-            Variables in columns, observations in rows.
-        ncomp : int, optional
-            Number of components to return.  If None, returns the as many as the
-            smaller of the number of rows or columns in data.
-        standardize : bool, optional
-            Flag indicating to use standardized data with mean 0 and unit
-            variance.  standardized being True implies demean.  Using standardized
-            data is equivalent to computing principal components from the
-            correlation matrix of data.
-        demean : bool, optional
-            Flag indicating whether to demean data before computing principal
-            components.  demean is ignored if standardize is True. Demeaning data
-            but not standardizing is equivalent to computing principal components
-            from the covariance matrix of data.
-        normalize : bool , optional
-            Indicates whether to normalize the factors to have unit inner product.
-            If False, the loadings will have unit inner product.
-        gls : bool, optional
-            Flag indicating to implement a two-step GLS estimator where
-            in the first step principal components are used to estimate residuals,
-            and then the inverse residual variance is used as a set of weights to
-            estimate the final principal components.  Setting gls to True requires
-            ncomp to be less then the min of the number of rows or columns.
+
+        
         weights : ndarray, optional
             Series weights to use after transforming data according to standardize
             or demean when computing the principal components.
-        method : str, optional
-            Sets the linear algebra routine used to compute eigenvectors:
         
-            * 'svd' uses a singular value decomposition (default).
-            * 'eig' uses an eigenvalue decomposition of a quadratic form
-            * 'nipals' uses the NIPALS algorithm and can be faster than SVD when
-              ncomp is small and nvars is large. See notes about additional changes
-              when using NIPALS.
         missing : {str, None}
             Method for missing data.  Choices are:
         
@@ -3908,10 +3879,7 @@ class MultipleSeries:
             * 'fill-em' - use EM algorithm to fill missing value.  ncomp should be
               set to the number of factors required.
             * `None` raises if data contains NaN values.
-        tol : float, optional
-            Tolerance to use when checking for convergence when using NIPALS.
-        max_iter : int, optional
-            Maximum iterations when using NIPALS.
+        
         tol_em : float
             Tolerance to use when checking for convergence of the EM algorithm.
         max_em_iter : int
@@ -3919,41 +3887,9 @@ class MultipleSeries:
         
         Attributes
         ----------
-        factors : array or DataFrame
-            nobs by ncomp array of of principal components (scores)
-        scores :  array or DataFrame
-            nobs by ncomp array of of principal components - identical to factors
-        loadings : array or DataFrame
-            ncomp by nvar array of  principal component loadings for constructing
-            the factors
-        coeff : array or DataFrame
-            nvar by ncomp array of  principal component loadings for constructing
-            the projections
-        projection : array or DataFrame
-            nobs by var array containing the projection of the data onto the ncomp
-            estimated factors
-        rsquare : array or Series
-            ncomp array where the element in the ith position is the R-square
-            of including the fist i principal components.  Note: values are
-            calculated on the transformed data, not the original data
-        ic : array or DataFrame
-            ncomp by 3 array containing the Bai and Ng (2003) Information
-            criteria.  Each column is a different criteria, and each row
-            represents the number of included factors.
-        eigenvals : array or Series
-            nvar array of eigenvalues
-        eigenvecs : array or DataFrame
-            nvar by nvar array of eigenvectors
-        weights : ndarray
-            nvar array of weights used to compute the principal components,
-            normalized to unit length
-        transformed_data : ndarray
-            Standardized, demeaned and weighted data used to compute
-            principal components and related quantities
-        cols : ndarray
-            Array of indices indicating columns used in the PCA
-        rows : ndarray
-            Array of indices indicating rows used in the PCA
+        res: pyleoclim.ui.SpatialDecomp
+            the result object, see `pyleoclim.ui.SpatialDecomp`
+            
 
         Examples
         --------
@@ -3966,11 +3902,12 @@ class MultipleSeries:
             data = pyleo.Lipd(usr_path = url)
             tslist = data.to_LipdSeriesList()
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
-
-            res = ms.pca()
+            ms = pyleo.MultipleSeries(tslist).common_time()
+        
+            res = ms.pca() # carry out PCA
             
-            res.screeplot()
+            res.screeplot() # plot the eigenvalue spectrum
+            res.modeplot() # plot the first mode
         '''
         flag, lengths = self.equal_lengths()
 
@@ -6126,7 +6063,7 @@ class SpatialDecomp:
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
 
-        title_kwargs : dict
+        title_kwargs : dict, optional
             the keyword arguments for ax.set_title()
 
         ax : matplotlib.axis, optional
@@ -6140,12 +6077,15 @@ class SpatialDecomp:
         xlim : list, optional
             x-axis limits. The default is [0, 10] (first 10 eigenvalues)
             
-        uq : str
+        uq : str, optional
             Method used for uncertainty quantification of the eigenvalues.
             'N82' uses the North et al "rule of thumb" [1] with effective sample size 
             computed as in [2]. 
             'MC' uses Monte-Carlo simulations (e.g. MC-EOF). Returns an error if no ensemble is found.
             
+        clr_eig : str, optional
+            color to be used for plotting eigenvalues
+        
             
         References
         ----------
@@ -6183,10 +6123,14 @@ class SpatialDecomp:
             try:
                 Lq = np.quantile(self.eigvals,[0.025,0.5,0.975],axis = 1)
                 Lc = Lq[1,:]
+                Lerr  = np.tile(Lc,(2,1)) # declare array
+                Lerr[0,:]  = Lq[0,:]
+                Lerr[1,:]  = Lq[2,:]
+        
             except ValueError:
                 print("Eigenvalue array must have more than 1 non-singleton dimension.")             
         else:
-            raise NameError("unkown UQ method. No action taken")
+            raise NameError("unknown UQ method. No action taken")
            
             
         idx = np.arange(len(Lc)) + 1
@@ -6195,10 +6139,12 @@ class SpatialDecomp:
                     alpha=1.0,label=eb_lbl)
         
         ax.set_title(title,fontweight='bold'); ax.legend(); 
-        ax.set_xlabel(r'Mode index $i$'); ax.set_ylabel(r'$\lambda_i$')    
+        ax.set_xlabel(r'Mode index $i$'); ax.set_ylabel(r'$\lambda_i$')
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True)) # enforce integer values
+
 
         if xlim is not None:
-            ax.set_xlim(0,min(max(xlim),len(Lc)))
+            ax.set_xlim(0.5,min(max(xlim),len(Lc)))
 
         if title is not None:
             title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
@@ -6213,17 +6159,17 @@ class SpatialDecomp:
                 plotting.showfig(fig)
         return fig, ax
 
-    def modeplot(self, mode=0, figsize=[10, 5], ax=None, savefig_settings=None, 
-              title_kwargs=None, mute=False, NW = 2):
+    def modeplot(self, mode=1, figsize=[10, 5], ax=None, savefig_settings=None, 
+              title_kwargs=None, mute=False, spec_method = 'mtm'):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
-            3. The spatial coefficients (EOF or similar)
+            3. The spatial loadings (EOF or similar)
 
         Parameters
         ----------
         mode : int
-            the (zero-based) index of the mode to visualize
+            the (one-based) index of the mode to visualize
         
         figsize : list, optional
             The figure size. The default is [10, 5].
@@ -6245,9 +6191,11 @@ class SpatialDecomp:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
         
-        NW : float [2, 2.5, 3, 3.5 , 4] 
-            time-bandwidth product for MTM spectral estimate
-            default: 2
+        spec_method: str, optional
+            The name of the spectral method to be applied on the PC. Default: MTM
+            Note that the data are evenly-spaced, so any spectral method that
+            assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
+            'wwz' is relevant too if scaling exponents need to be estimated. 
       
         '''
         # Turn the interactive mode off.
@@ -6258,23 +6206,22 @@ class SpatialDecomp:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
         
-        PC = self.pcs[:,mode]    
+        PC = self.pcs[:,mode-1]    
         ts = Series(time=self.time, value=PC) # define timeseries object for the PC
 
         fig = plt.figure(tight_layout=True,figsize=figsize)
         gs = gridspec.GridSpec(2, 2) # define grid for subplots
         ax1 = fig.add_subplot(gs[0, :])
         ts.plot(ax=ax1)
-        ax1.set_ylabel('PC '+str(mode+1))
-        ax1.set_title('Mode '+str(mode+1)+', '+ '{:3.2f}'.format(self.pctvar[mode]) + '% variance explained',weight='bold')
+        ax1.set_ylabel('PC '+str(mode))
+        ax1.set_title('Mode '+str(mode)+', '+ '{:3.2f}'.format(self.pctvar[mode-1]) + '% variance explained',weight='bold')
         
         # plot spectrum
         ax2 = fig.add_subplot(gs[1, 0])
-        psd_mtm_rc = ts.interp().spectral(method='mtm', settings={'NW': NW})
-    
+        psd_mtm_rc = ts.interp().spectral(method=spec_method)    
         _ = psd_mtm_rc.plot(ax=ax2)
         ax2.set_xlabel('Period')
-        ax2.set_title('Multitaper spectrum',weight='bold')
+        ax2.set_title('Spectrum ('+spec_method+')',weight='bold')
         
         # plot T-EOF
         ax3 = fig.add_subplot(gs[1, 1])
@@ -6349,7 +6296,7 @@ class SsaRes:
     def screeplot(self, figsize=[6, 4], title='SSA scree plot', ax=None, savefig_settings=None, title_kwargs=None, xlim=None,
              clr_mcssa=sns.xkcd_rgb['red'], clr_signif=sns.xkcd_rgb['teal'],
              clr_eig='black',  mute=False):
-        ''' Scree plot for SSA visualizing the eigenvalue spectrum and indicating which modes were retained.  
+        ''' Scree plot for SSA, visualizing the eigenvalue spectrum and indicating which modes were retained.  
 
         Parameters
         ----------
@@ -6378,6 +6325,17 @@ class SsaRes:
 
         xlim : list, optional
             x-axis limits. The default is None.
+            
+        clr_mcssa : str, optional
+            color of the Monte Carlo SSA AR(1) shading (if data are provided)
+            default: red
+            
+        clr_eig : str, optional
+            color of the eigenvalues, default: black
+            
+        clr_signif: str, optional 
+            color of the highlights for significant eigenvalue.
+               default: teal 
 
         '''
         # Turn the interactive mode off.
@@ -6400,9 +6358,11 @@ class SsaRes:
                  markersize=4, label='modes retained',zorder=10)
         plt.title(title,fontweight='bold'); plt.legend() 
         plt.xlabel(r'Mode index $i$'); plt.ylabel(r'$\lambda_i$')    
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True)) # enforce integer values
+
 
         if xlim is not None:
-            ax.set_xlim(xlim)
+            ax.set_xlim(0.5,min(max(xlim),len(v)))
 
         if title is not None:
             title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
@@ -6417,8 +6377,8 @@ class SsaRes:
                 plotting.showfig(fig)
         return fig, ax
 
-    def modeplot(self, mode=0, figsize=[10, 5], ax=None, savefig_settings=None, 
-             title_kwargs=None, mute=False, NW = 2):
+    def modeplot(self, mode=1, figsize=[10, 5], ax=None, savefig_settings=None, 
+             title_kwargs=None, mute=False, spec_method = 'mtm'):
         ''' Dashboard visualizing the properties of a given SSA mode, including:
             1. the analyzing function (T-EOF)
             2. the reconstructed component (RC)
@@ -6427,7 +6387,7 @@ class SsaRes:
         Parameters
         ----------
         mode : int
-            the (zero-based) index of the mode to visualize
+            the (one-based) index of the mode to visualize
         
         figsize : list, optional
             The figure size. The default is [10, 5].
@@ -6449,9 +6409,11 @@ class SsaRes:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
         
-        NW : float [2, 2.5, 3, 3.5 , 4] 
-            time-bandwidth product for MTM spectral estimate
-            default: 2
+        spec_method: str, optional
+            The name of the spectral method to be applied on the PC. Default: MTM
+            Note that the data are evenly-spaced, so any spectral method that
+            assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
+            'wwz' is relevant too if scaling exponents need to be estimated. 
       
         '''
         # Turn the interactive mode off.
@@ -6462,32 +6424,26 @@ class SsaRes:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
         
-        RC = self.RCmat[:,mode]    
+        RC = self.RCmat[:,mode-1]    
         fig = plt.figure(tight_layout=True,figsize=figsize)
-        gs = gridspec.GridSpec(2, 2) # plot RC
+        gs = gridspec.GridSpec(2, 2)
+        # plot RC
         ax = fig.add_subplot(gs[0, :])
-        ax.plot(self.time,RC)
+        ax.plot(self.time,RC)  
         ax.set_xlabel('Time'),  ax.set_ylabel('RC [dimensionless]')
-        ax.set_title('Mode '+str(mode+1)+' RC, '+ '{:3.2f}'.format(self.pctvar[mode]) + '% variance explained',weight='bold')
+        ax.set_title('Mode '+str(mode)+' RC, '+ '{:3.2f}'.format(self.pctvar[mode-1]) + '% variance explained',weight='bold')
         # plot T-EOF
         ax = fig.add_subplot(gs[1, 0])
-        ax.plot(self.eigvecs[:,mode])
-        ax.set_title('T-EOF (analyzing function)')
-        ax.set_xlabel('Time'), ax.set_ylabel('T-EOF values')
+        ax.plot(self.eigvecs[:,mode-1])
+        ax.set_title('Analyzing function)')
+        ax.set_xlabel('Time'), ax.set_ylabel('T-EOF')
         # plot spectrum
         ax = fig.add_subplot(gs[1, 1])
         ts_rc = Series(time=self.time, value=RC) # define timeseries object for the RC
-        psd_mtm_rc = ts_rc.interp().spectral(method='mtm', settings={'NW': NW})
-    
+        psd_mtm_rc = ts_rc.interp().spectral(method=spec_method)
         _ = psd_mtm_rc.plot(ax=ax)
         ax.set_xlabel('Period')
-        ax.set_title('Multitaper spectrum')
-
-        # if title is not None:
-        #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
-        #     t_args = {'y': 1.1, 'weight': 'bold'}
-        #     t_args.update(title_kwargs)
-        #     ax.set_title(title, **t_args)
+        ax.set_title('Spectrum ('+spec_method+')')
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
