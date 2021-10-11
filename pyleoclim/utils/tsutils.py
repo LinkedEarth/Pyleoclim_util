@@ -22,6 +22,7 @@ __all__ = [
     'detrend',
     'detect_outliers',
     'remove_outliers',
+    'eff_sample_size'
 ]
 
 
@@ -38,6 +39,8 @@ from sklearn.cluster import DBSCAN
 import matplotlib.pyplot as plt
 
 from sklearn.neighbors import NearestNeighbors
+import statsmodels.tsa.stattools as sms
+
 import math
 from sys import exit
 from .plotting import plot_scatter_xy,plot_xy,savefig,showfig
@@ -916,6 +919,43 @@ def remove_outliers(ts,ys,outlier_points):
 
     return ys,ts
 
+def eff_sample_size(y):
+    '''
+    Effective Sample Size of timeseries y
+
+    Parameters
+    ----------
+    y : float 
+       1d array 
+
+    Returns
+    -------
+    neff : float
+        The effective sample size
+        
+        
+    Reference
+    ---------
+    Thiébaux HJ, Zwiers FW. 1984. The interpretation and estimation of
+    effective sample sizes. Journal of Climate and Applied Meteorology 23: 800–811.
+
+    '''
+    if len(y) < 100:
+        fft = False
+        nlags = 40
+    else:
+        fft = True
+        nlags = None
+        
+    rho   = sms.acf(y,adjusted=True,fft=fft,nlags=nlags) # compute autocorrelation function
+    nl = len(rho)      
+    kvec = np.arange(1,nl)
+    fac = (1-kvec/nl)*rho[1:]
+    neff = len(y)/(1+2*np.sum(fac))   # Thiébaux & Zwiers 84, Eq 2.1
+    
+    return neff
+
+
 # alias
 std = standardize
 gauss = gaussianize
@@ -971,3 +1011,4 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
         res = gauss(res)
 
     return res
+
