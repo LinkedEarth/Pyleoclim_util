@@ -6528,7 +6528,7 @@ class SsaRes:
         v = self.eigvals
         n = self.PC.shape[0] #sample size
         dv = v*np.sqrt(2/(n-1)) 
-        idx = np.arange(len(v)) 
+        idx = np.arange(len(v))+1 
         if self.eigvals_q is not None:
             plt.fill_between(idx,self.eigvals_q[:,0],self.eigvals_q[:,1], color=clr_mcssa, alpha = 0.3, label='AR(1) 5-95% quantiles') 
             
