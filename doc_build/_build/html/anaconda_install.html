@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Installing Miniconda (Mac, Linux) &mdash; Pyleoclim 0.6.2beta documentation</title>
@@ -202,26 +201,26 @@
     text-align: unset;
 }
 </style>
-<section id="installing-miniconda-mac-linux">
+<div class="section" id="installing-miniconda-mac-linux">
 <span id="anaconda-installation"></span><h1>Installing Miniconda (Mac, Linux)<a class="headerlink" href="#installing-miniconda-mac-linux" title="Permalink to this headline">¶</a></h1>
 <p>Anaconda is a very large install, containing not only Python, but also R, and a host of other things that are not necessary to run pyleoclim.
 Users may find it preferable to install the more minimalist “miniconda” package.</p>
-<section id="step-1-download-the-installation-script-for-miniconda3">
+<div class="section" id="step-1-download-the-installation-script-for-miniconda3">
 <h2>Step 1: Download the installation script for miniconda3<a class="headerlink" href="#step-1-download-the-installation-script-for-miniconda3" title="Permalink to this headline">¶</a></h2>
-<section id="macos">
+<div class="section" id="macos">
 <h3>MacOS<a class="headerlink" href="#macos" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
 </pre></div>
 </div>
-</section>
-<section id="linux">
+</div>
+<div class="section" id="linux">
 <h3>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 </pre></div>
 </div>
-</section>
-</section>
-<section id="step-2-install-miniconda3">
+</div>
+</div>
+<div class="section" id="step-2-install-miniconda3">
 <h2>Step 2: Install Miniconda3<a class="headerlink" href="#step-2-install-miniconda3" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chmod +x Miniconda3-latest-*.sh <span class="o">&amp;&amp;</span> ./Miniconda3-latest-Linux-x86_64.sh
 </pre></div>
@@ -232,16 +231,16 @@ After the installation is done, we need to add the two lines into your shell env
 . &lt;base-path&gt;/etc/profile.d/conda.sh
 </pre></div>
 </div>
-</section>
-<section id="step-3-test-your-installation">
+</div>
+<div class="section" id="step-3-test-your-installation">
 <h2>Step 3: Test your Installation<a class="headerlink" href="#step-3-test-your-installation" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">source</span> ~/.bashrc  <span class="c1"># assume you are using Bash shell</span>
 which python  <span class="c1"># should return a path under &lt;base-path&gt;</span>
 which conda  <span class="c1"># should return a path under &lt;base-path&gt;</span>
 </pre></div>
 </div>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

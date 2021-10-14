@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Pyleoclim User API &mdash; Pyleoclim 0.6.2beta documentation</title>
@@ -106,16 +105,17 @@
 <li class="toctree-l2"><a class="reference internal" href="#series-pyleoclim-series">Series (pyleoclim.Series)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#multipleseries-pyleoclim-multipleseries">MultipleSeries (pyleoclim.MultipleSeries)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ensembleseries-pyleoclim-ensembleseries">EnsembleSeries (pyleoclim.EnsembleSeries)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#surrogateseries-pyleoclim-surrogateseries">SurrogateSeries (pyleoclim.SurrogateSeries)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#lipd-pyleoclim-lipd">Lipd (pyleoclim.Lipd)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#lipdseries-pyleoclim-lipdseries">LipdSeries (pyleoclim.LipdSeries)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#psd-pyleoclim-psd">PSD (pyleoclim.PSD)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#scalogram-pyleoclim-scalogram">Scalogram (pyleoclim.Scalogram)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#coherence-pyleoclim-coherence">Coherence (pyleoclim.Coherence)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#surrogateseries-pyleoclim-surrogateseries">SurrogateSeries (pyleoclim.SurrogateSeries)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#multiplepsd-pyleoclim-multiplepsd">MultiplePSD (pyleoclim.MultiplePSD)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scalogram-pyleoclim-scalogram">Scalogram (pyleoclim.Scalogram)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#multiplescalogram-pyleoclim-multiplescalogram">MultipleScalogram (pyleoclim.MultipleScalogram)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#coherence-pyleoclim-coherence">Coherence (pyleoclim.Coherence)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#corr-pyleoclim-corr">Corr (pyleoclim.Corr)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#correns-pyleoclim-correns">CorrEns (pyleoclim.CorrEns)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spatialdecomp-pyleoclim-spatialdecomp">SpatialDecomp (pyleoclim.SpatialDecomp)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#ssares-pyleoclim-ssares">SsaRes (pyleoclim.SsaRes)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#gen-ts-pyleoclim-gen-ts">gen_ts (pyleoclim.gen_ts)</a></li>
 </ul>
@@ -221,15 +221,15 @@
     text-align: unset;
 }
 </style>
-<section id="pyleoclim-user-api">
+<div class="section" id="pyleoclim-user-api">
 <h1>Pyleoclim User API<a class="headerlink" href="#pyleoclim-user-api" title="Permalink to this headline">¶</a></h1>
 <p>Pyleoclim, like a lot of other Python packages, follows an object-oriented design. It sounds fancy, but it really is <a class="reference external" href="https://www.freecodecamp.org/news/object-oriented-programming-concepts-21bb035f7260/">quite simple</a>. What this means for you is that we’ve gone through the trouble of coding up a lot of timeseries analysis methods that apply in various situations - so you don’t have to worry about that.
 These situations are described in classes, the beauty of which is called “inheritance” (see link above). Basically, it allows to define methods that will automatically apply to your dataset, as long as you put your data within one of those classes.
 A major advantage of object-oriented design is that you, the user, can harness the power of Pyleoclim methods in very few lines of code through the user API without ever having to get your hands dirty with our code (unless you want to, of course).
 The flipside is that any user would do well to understand Pyleoclim classes, what they are intended for, and what methods they can and cannot support.</p>
-<a class="reference internal image-reference" href="../_images/Pyleoclim_UI.png"><img alt="The Pyleoclim UI. Credit: Feng Zhu" class="align-center" src="../_images/Pyleoclim_UI.png" style="width: 1181.6000000000001px; height: 756.8000000000001px;" /></a>
+<a class="reference internal image-reference" href="../_images/Pyleoclim_API.png"><img alt="The Pyleoclim User API. Credit: Feng Zhu" class="align-center" src="../_images/Pyleoclim_API.png" style="width: 1846.5px; height: 1182.6px;" /></a>
 <p>The following describes the various classes that undergird the Pyleoclim edifice.</p>
-<section id="series-pyleoclim-series">
+<div class="section" id="series-pyleoclim-series">
 <h2>Series (pyleoclim.Series)<a class="headerlink" href="#series-pyleoclim-series" title="Permalink to this headline">¶</a></h2>
 <p>The Series class describes the most basic objects in Pyleoclim. A Series is a simple <a class="reference external" href="https://docs.python.org/3/tutorial/datastructures.html#dictionaries">dictionary</a> that contains 3 things:
 - a series of real-valued numbers;
@@ -287,7 +287,7 @@ Default is True</p></li>
 <span class="gp">   ...: </span>
 
 <span class="gp">In [7]: </span><span class="n">ts</span>
-<span class="gh">Out[7]: </span><span class="go">&lt;pyleoclim.core.ui.Series at 0x7fcaf21a5a90&gt;</span>
+<span class="gh">Out[7]: </span><span class="go">&lt;pyleoclim.core.ui.Series at 0x1617588e0&gt;</span>
 
 <span class="gp">In [8]: </span><span class="n">ts</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 <span class="gh">Out[8]: </span><span class="go">dict_keys([&#39;time&#39;, &#39;value&#39;, &#39;time_name&#39;, &#39;time_unit&#39;, &#39;value_name&#39;, &#39;value_unit&#39;, &#39;label&#39;])</span>
@@ -342,8 +342,8 @@ Default is True</p></li>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.interp" title="pyleoclim.core.ui.Series.interp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code></a>([method])</p></td>
 <td><p>Interpolate a Series object onto a new time axis</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.is_evenly_spaced" title="pyleoclim.core.ui.Series.is_evenly_spaced"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_evenly_spaced</span></code></a>()</p></td>
-<td><p>Check if the timeseries is evenly-spaced</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.is_evenly_spaced" title="pyleoclim.core.ui.Series.is_evenly_spaced"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_evenly_spaced</span></code></a>([tol])</p></td>
+<td><p>Check if the Series time axis is evenly-spaced, within tolerance</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Series.make_labels" title="pyleoclim.core.ui.Series.make_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code></a>()</p></td>
 <td><p>Initialization of labels</p></td>
@@ -490,9 +490,9 @@ It is in form of [a, b], where a, b are two time points.</p>
 <span class="gp">In [13]: </span><span class="n">caus_res</span> <span class="o">=</span> <span class="n">ts_nino</span><span class="o">.</span><span class="n">causality</span><span class="p">(</span><span class="n">ts_air</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nsim&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;signif_test&#39;</span><span class="p">:</span> <span class="s1">&#39;isopersist&#39;</span><span class="p">})</span>
 
 <span class="gp">In [14]: </span><span class="nb">print</span><span class="p">(</span><span class="n">caus_res</span><span class="p">)</span>
-<span class="go">{&#39;T21&#39;: 0.005840218794983322, &#39;tau21&#39;: 0.04731826159975568, &#39;Z&#39;: 0.12342420447275003, &#39;dH1_star&#39;: -0.5094709112673714, &#39;dH1_noise&#39;: 0.4432108271328729, &#39;signif_qs&#39;: [0.005, 0.025, 0.05, 0.95, 0.975, 0.995], &#39;T21_noise&#39;: array([-0.00027146, -0.00027146, -0.00027146,  0.0001297 ,  0.0001297 ,</span>
-<span class="go">        0.0001297 ]), &#39;tau21_noise&#39;: array([-0.00254239, -0.00254239, -0.00254239,  0.00124693,  0.00124693,</span>
-<span class="go">        0.00124693])}</span>
+<span class="go">{&#39;T21&#39;: 0.005840218794983322, &#39;tau21&#39;: 0.04731826159975568, &#39;Z&#39;: 0.12342420447275003, &#39;dH1_star&#39;: -0.5094709112673714, &#39;dH1_noise&#39;: 0.4432108271328729, &#39;signif_qs&#39;: [0.005, 0.025, 0.05, 0.95, 0.975, 0.995], &#39;T21_noise&#39;: array([-4.33449389e-05, -4.33449389e-05, -4.33449389e-05,  1.22654768e-05,</span>
+<span class="go">        1.22654768e-05,  1.22654768e-05]), &#39;tau21_noise&#39;: array([-3.97030100e-04, -3.97030100e-04, -3.97030100e-04,  9.29228321e-05,</span>
+<span class="go">        9.29228321e-05,  9.29228321e-05])}</span>
 </pre></div>
 </div>
 <img alt="../_images/ts_nino.png" src="../_images/ts_nino.png" />
@@ -508,7 +508,7 @@ It is in form of [a, b], where a, b are two time points.</p>
 <span class="go">parameter F test:         F=20.8492 , p=0.0000  , df_denom=1592, df_num=1</span>
 
 <span class="gp">In [16]: </span><span class="nb">print</span><span class="p">(</span><span class="n">caus_res</span><span class="p">)</span>
-<span class="go">{1: ({&#39;ssr_ftest&#39;: (20.849204239268076, 5.350981736047143e-06, 1592.0, 1), &#39;ssr_chi2test&#39;: (20.88849294072398, 4.868102345429935e-06, 1), &#39;lrtest&#39;: (20.752895243242165, 5.22525200803166e-06, 1), &#39;params_ftest&#39;: (20.84920423926806, 5.350981736047143e-06, 1592.0, 1.0)}, [&lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x7fcaf261b3a0&gt;, &lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x7fcaf261b340&gt;, array([[0., 1., 0.]])])}</span>
+<span class="go">{1: ({&#39;ssr_ftest&#39;: (20.849204239268076, 5.350981736047143e-06, 1592.0, 1), &#39;ssr_chi2test&#39;: (20.88849294072398, 4.868102345429935e-06, 1), &#39;lrtest&#39;: (20.752895243242165, 5.22525200803166e-06, 1), &#39;params_ftest&#39;: (20.84920423926806, 5.350981736047143e-06, 1592.0, 1.0)}, [&lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x1619b2ac0&gt;, &lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x1619b27f0&gt;, array([[0., 1., 0.]])])}</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1227,9 +1227,9 @@ see <cite>pyleoclim.utils.filter.savitzky_golay</cite>, <cite>pyleoclim.utils.fi
 </dd>
 <dt><a class="reference internal" href="../utils/filter/savitzky_golay.html#pyleoclim.utils.filter.savitzky_golay" title="pyleoclim.utils.filter.savitzky_golay"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.savitzky_golay</span></code></a></dt><dd><p>Savitzky-Golay method</p>
 </dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.firwin</span></code></dt><dd><p>FIR filter design using the window method</p>
+<dt><a class="reference internal" href="../utils/filter/firwin.html#pyleoclim.utils.filter.firwin" title="pyleoclim.utils.filter.firwin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.firwin</span></code></a></dt><dd><p>FIR filter design using the window method</p>
 </dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.lanczos</span></code></dt><dd><p>lowpass filter via Lanczos resampling</p>
+<dt><a class="reference internal" href="../utils/filter/lanczos.html#pyleoclim.utils.filter.lanczos" title="pyleoclim.utils.filter.lanczos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.lanczos</span></code></a></dt><dd><p>lowpass filter via Lanczos resampling</p>
 </dd>
 </dl>
 </div>
@@ -1267,7 +1267,7 @@ After that, we apply a band-pass filter with the band 15-25 Hz, and compare the 
 <span class="gh">Out[12]: </span><span class="go">&lt;AxesSubplot:xlabel=&#39;time&#39;, ylabel=&#39;value&#39;&gt;</span>
 
 <span class="gp">In [13]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gh">Out[13]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fcb01e24eb0&gt;</span>
+<span class="gh">Out[13]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x161d9e940&gt;</span>
 
 <span class="gp">In [14]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
@@ -1288,7 +1288,7 @@ After that, we apply a band-pass filter with the band 15-25 Hz, and compare the 
 <span class="gh">Out[18]: </span><span class="go">&lt;AxesSubplot:xlabel=&#39;time&#39;, ylabel=&#39;value&#39;&gt;</span>
 
 <span class="gp">In [19]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gh">Out[19]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fcae09b1310&gt;</span>
+<span class="gh">Out[19]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x161e02e50&gt;</span>
 
 <span class="gp">In [20]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
@@ -1309,7 +1309,7 @@ After that, we apply a band-pass filter with the band 15-25 Hz, and compare the 
 <span class="gh">Out[24]: </span><span class="go">&lt;AxesSubplot:xlabel=&#39;time&#39;, ylabel=&#39;value&#39;&gt;</span>
 
 <span class="gp">In [25]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gh">Out[25]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fcb01e45cd0&gt;</span>
+<span class="gh">Out[25]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x161f77f10&gt;</span>
 
 <span class="gp">In [26]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
@@ -1405,8 +1405,8 @@ pyleo.closefig(fig)</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pyleoclim.core.ui.Series.is_evenly_spaced">
-<span class="sig-name descname"><span class="pre">is_evenly_spaced</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Series.is_evenly_spaced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Series.is_evenly_spaced" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check if the timeseries is evenly-spaced</p>
+<span class="sig-name descname"><span class="pre">is_evenly_spaced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Series.is_evenly_spaced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Series.is_evenly_spaced" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the Series time axis is evenly-spaced, within tolerance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>res</strong></p>
@@ -1893,7 +1893,7 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 </dl>
 <p>So, summing the variance of all modes higher than 19, we get:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [10]: </span><span class="nb">print</span><span class="p">(</span><span class="n">nino_ssa</span><span class="o">.</span><span class="n">pctvar</span><span class="p">[</span><span class="mi">15</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
-<span class="go">282.30193095056813</span>
+<span class="go">282.3019309505681</span>
 </pre></div>
 </div>
 <p>That is, over 95% of the variance is in the first 15 modes. That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let’s use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:</p>
@@ -1902,10 +1902,10 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 <span class="gp">In [12]: </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;ONI&#39;</span><span class="p">,</span><span class="n">mute</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># we mute the first call to only get the plot with 2 lines</span>
 
 <span class="gp">In [13]: </span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">RCk</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;SSA reconstruction, 14 modes&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
-<span class="gh">Out[13]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x7fcae23aaf70&gt;]</span>
+<span class="gh">Out[13]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x1674f14f0&gt;]</span>
 
 <span class="gp">In [14]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="gh">Out[14]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x7fcae23aa040&gt;</span>
+<span class="gh">Out[14]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x1674cd700&gt;</span>
 
 <span class="gp">In [15]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
@@ -2064,6 +2064,60 @@ recommend to turn on when more modifications are going to be made on ax</p></li>
 <dt><a class="reference internal" href="#pyleoclim.core.ui.MultiplePSD" title="pyleoclim.core.ui.MultiplePSD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.core.ui.MultiplePSD</span></code></a></dt><dd><p>Multiple PSD object</p>
 </dd>
 </dl>
+</div>
+<p class="rubric">Examples</p>
+<p>Simple summary_plot with n_signif_test = 1 for computational ease, defaults otherwise.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">pyleoclim</span> <span class="k">as</span> <span class="nn">pyleo</span>
+
+<span class="gp">In [2]: </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="gp">In [3]: </span><span class="n">ts</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv&#39;</span><span class="p">,</span><span class="n">skiprows</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="gp">In [4]: </span><span class="n">series</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">],</span><span class="n">value</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">],</span> <span class="n">time_name</span> <span class="o">=</span> <span class="s1">&#39;Years&#39;</span><span class="p">,</span> <span class="n">time_unit</span> <span class="o">=</span> <span class="s1">&#39;AD&#39;</span><span class="p">)</span>
+
+<span class="gp">In [5]: </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">summary_plot</span><span class="p">(</span><span class="n">n_signif_test</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&lt;Figure size 800x1000 with 4 Axes&gt;</span>
+
+<span class="gp">In [6]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">closefig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Summary_plot with pre-generated psd and scalogram objects.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [7]: </span><span class="kn">import</span> <span class="nn">pyleoclim</span> <span class="k">as</span> <span class="nn">pyleo</span>
+
+<span class="gp">In [8]: </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="gp">In [9]: </span><span class="n">ts</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv&#39;</span><span class="p">,</span><span class="n">skiprows</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="gp">In [10]: </span><span class="n">series</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">],</span><span class="n">value</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">],</span> <span class="n">time_name</span> <span class="o">=</span> <span class="s1">&#39;Years&#39;</span><span class="p">,</span> <span class="n">time_unit</span> <span class="o">=</span> <span class="s1">&#39;AD&#39;</span><span class="p">)</span>
+
+<span class="gp">In [11]: </span><span class="n">psd</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">spectral</span><span class="p">(</span><span class="n">freq_method</span> <span class="o">=</span> <span class="s1">&#39;welch&#39;</span><span class="p">)</span>
+
+<span class="gp">In [12]: </span><span class="n">scalogram</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">wavelet</span><span class="p">(</span><span class="n">freq_method</span> <span class="o">=</span> <span class="s1">&#39;welch&#39;</span><span class="p">)</span>
+
+<span class="gp">In [13]: </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">summary_plot</span><span class="p">(</span><span class="n">psd</span> <span class="o">=</span> <span class="n">psd</span><span class="p">,</span><span class="n">scalogram</span> <span class="o">=</span> <span class="n">scalogram</span><span class="p">)</span>
+<span class="go">&lt;Figure size 800x1000 with 4 Axes&gt;</span>
+
+<span class="gp">In [14]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">closefig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [15]: </span><span class="kn">import</span> <span class="nn">pyleoclim</span> <span class="k">as</span> <span class="nn">pyleo</span>
+
+<span class="gp">In [16]: </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="gp">In [17]: </span><span class="n">ts</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv&#39;</span><span class="p">,</span><span class="n">skiprows</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="gp">In [18]: </span><span class="n">series</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="s1">&#39;Year&#39;</span><span class="p">],</span><span class="n">value</span> <span class="o">=</span> <span class="n">ts</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">],</span> <span class="n">time_name</span> <span class="o">=</span> <span class="s1">&#39;Years&#39;</span><span class="p">,</span> <span class="n">time_unit</span> <span class="o">=</span> <span class="s1">&#39;AD&#39;</span><span class="p">)</span>
+
+<span class="gp">In [19]: </span><span class="n">psd</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">spectral</span><span class="p">(</span><span class="n">freq_method</span> <span class="o">=</span> <span class="s1">&#39;welch&#39;</span><span class="p">)</span>
+
+<span class="gp">In [20]: </span><span class="n">scalogram</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">wavelet</span><span class="p">(</span><span class="n">freq_method</span> <span class="o">=</span> <span class="s1">&#39;welch&#39;</span><span class="p">)</span>
+
+<span class="gp">In [21]: </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">summary_plot</span><span class="p">(</span><span class="n">psd</span> <span class="o">=</span> <span class="n">psd</span><span class="p">,</span><span class="n">scalogram</span> <span class="o">=</span> <span class="n">scalogram</span><span class="p">,</span> <span class="n">period_lim</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">ts_plot_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span><span class="s1">&#39;red&#39;</span><span class="p">,</span><span class="s1">&#39;linewidth&#39;</span><span class="p">:</span><span class="mf">.5</span><span class="p">},</span> <span class="n">psd_plot_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span><span class="s1">&#39;red&#39;</span><span class="p">,</span><span class="s1">&#39;linewidth&#39;</span><span class="p">:</span><span class="mf">.5</span><span class="p">})</span>
+<span class="go">&lt;Figure size 800x1000 with 4 Axes&gt;</span>
+
+<span class="gp">In [22]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">closefig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+</pre></div>
 </div>
 </dd></dl>
 
@@ -2257,8 +2311,8 @@ If None, it will be either the length of the input time axis, or at most 50.</p>
 
 </dd></dl>
 
-</section>
-<section id="multipleseries-pyleoclim-multipleseries">
+</div>
+<div class="section" id="multipleseries-pyleoclim-multipleseries">
 <h2>MultipleSeries (pyleoclim.MultipleSeries)<a class="headerlink" href="#multipleseries-pyleoclim-multipleseries" title="Permalink to this headline">¶</a></h2>
 <p>As the name implies, a MultipleSeries object is a collection (more precisely, a <a class="reference external" href="https://docs.python.org/3/tutorial/introduction.html#lists">list</a>) of multiple Series objects. This is handy in case you want to apply the same method to such a collection at once (e.g. process a bunch of series in a consistent fashion).</p>
 <dl class="py class">
@@ -2266,9 +2320,9 @@ If None, it will be either the length of the input time axis, or at most 50.</p>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></span><span class="sig-name descname"><span class="pre">MultipleSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleSeries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries" title="Permalink to this definition">¶</a></dt>
 <dd><p>MultipleSeries object.</p>
 <blockquote>
-<div><p>This object handles multiple objects of the type Series and can be created from a list of Series objects.
+<div><p>This object handles a collection of the type Series and can be created from a list of such objects.
 MultipleSeries should be used when the need to run analysis on multiple records arises, such as running principal component analysis.
-Some of the methods automatically rescale the time axis prior to analysis to ensure that the analysis is run over the same time period.</p>
+Some of the methods automatically refocus the time axis prior to analysis to ensure that the analysis is run over the same time period.</p>
 </div></blockquote>
 <dl class="field-list">
 <dt class="field-odd">Parameters</dt>
@@ -2347,11 +2401,17 @@ Otherwise, the time unit of every series in the list will be converted to the ta
 <tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.MultipleSeries.gkernel" title="pyleoclim.core.ui.MultipleSeries.gkernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gkernel</span></code></a>(**kwargs)</p></td>
 <td><p>Aligns the time axes of a MultipleSeries object, via Gaussian kernel.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.MultipleSeries.interp" title="pyleoclim.core.ui.MultipleSeries.interp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code></a>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.MultipleSeries.grid_properties" title="pyleoclim.core.ui.MultipleSeries.grid_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">grid_properties</span></code></a>([step_style])</p></td>
+<td><p>Extract grid properties (start, stop, step) of all the Series objects in a collection.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.MultipleSeries.interp" title="pyleoclim.core.ui.MultipleSeries.interp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code></a>(**kwargs)</p></td>
 <td><p>Aligns the time axes of a MultipleSeries object, via interpolation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.MultipleSeries.pca" title="pyleoclim.core.ui.MultipleSeries.pca"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code></a>([nMC])</p></td>
-<td><p>Principal Component Analysis</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.MultipleSeries.mcpca" title="pyleoclim.core.ui.MultipleSeries.mcpca"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mcpca</span></code></a>([nMC])</p></td>
+<td><p>Monte Carlo Principal Component Analysis</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.MultipleSeries.pca" title="pyleoclim.core.ui.MultipleSeries.pca"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code></a>([weights, missing, tol_em, max_em_iter])</p></td>
+<td><p>Principal Component Analysis (Empirical Orthogonal Functions)</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.MultipleSeries.plot" title="pyleoclim.core.ui.MultipleSeries.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([figsize, marker, markersize, ...])</p></td>
 <td><p>Plot multiple timeseries on the same axis</p></td>
@@ -2363,7 +2423,7 @@ Otherwise, the time unit of every series in the list will be converted to the ta
 <td><p>Stack plot of multiple series</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.MultipleSeries.standardize" title="pyleoclim.core.ui.MultipleSeries.standardize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code></a>()</p></td>
-<td><p>Standardize each series object</p></td>
+<td><p>Standardize each series object in a collection</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.MultipleSeries.wavelet" title="pyleoclim.core.ui.MultipleSeries.wavelet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code></a>([method, settings, freq_method, ...])</p></td>
 <td><p>Wavelet analysis</p></td>
@@ -2543,7 +2603,7 @@ Valid entries: ‘median’ [default], ‘mean’, ‘mode’ or ‘max’</p></
 <span class="gp">In [16]: </span><span class="n">msc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Gaussian kernel ($h=3$)&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="gh">Out[16]: </span><span class="go">&lt;AxesSubplot:title={&#39;center&#39;:&#39;Gaussian kernel ($h=3$)&#39;}, xlabel=&#39;time&#39;, ylabel=&#39;value&#39;&gt;</span>
 
-<span class="go"># apply common_time with gkernel modified</span>
+<span class="go"># apply common_time with gkernel and a large bandwidth</span>
 <span class="gp">In [17]: </span><span class="n">msc</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">common_time</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;gkernel&#39;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
 
 <span class="gp">In [18]: </span><span class="n">msc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;Gaussian kernel ($h=11$)&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span><span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -2704,9 +2764,9 @@ Valid entries: ‘median’ [default], ‘mean’, ‘mode’ or ‘max’</p></
 <span class="gp">In [16]: </span><span class="nb">print</span><span class="p">(</span><span class="n">corr_res</span><span class="p">)</span>
 <span class="go">  correlation  p-value    signif. w/o FDR (α: 0.05)    signif. w/ FDR (α: 0.05)</span>
 <span class="go">-------------  ---------  ---------------------------  --------------------------</span>
-<span class="go">     0.997122  &lt; 1e-6     True                         True</span>
-<span class="go">     0.988444  &lt; 1e-6     True                         True</span>
-<span class="go">     0.999284  &lt; 1e-6     True                         True</span>
+<span class="go">     0.998192  &lt; 1e-6     True                         True</span>
+<span class="go">     0.992961  &lt; 1e-6     True                         True</span>
+<span class="go">     0.999543  &lt; 1e-6     True                         True</span>
 <span class="go">Ensemble size: 3</span>
 
 <span class="go"># set an arbitrary randome seed to fix the result</span>
@@ -2716,8 +2776,8 @@ Valid entries: ‘median’ [default], ‘mean’, ‘mode’ or ‘max’</p></
 <span class="go">  correlation  p-value    signif. w/o FDR (α: 0.05)    signif. w/ FDR (α: 0.05)</span>
 <span class="go">-------------  ---------  ---------------------------  --------------------------</span>
 <span class="go">     1         &lt; 1e-6     True                         True</span>
-<span class="go">     0.997092  &lt; 1e-6     True                         True</span>
-<span class="go">     0.999276  &lt; 1e-6     True                         True</span>
+<span class="go">     0.998285  &lt; 1e-6     True                         True</span>
+<span class="go">     0.999553  &lt; 1e-6     True                         True</span>
 <span class="go">Ensemble size: 3</span>
 </pre></div>
 </div>
@@ -2817,9 +2877,9 @@ see <cite>pyleoclim.utils.filter.savitzky_golay</cite>, <cite>pyleoclim.utils.fi
 </dd>
 <dt><a class="reference internal" href="../utils/filter/savitzky_golay.html#pyleoclim.utils.filter.savitzky_golay" title="pyleoclim.utils.filter.savitzky_golay"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.savitzky_golay</span></code></a></dt><dd><p>Savitzky-Golay method</p>
 </dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.firwin</span></code></dt><dd><p>FIR filter design using the window method</p>
+<dt><a class="reference internal" href="../utils/filter/firwin.html#pyleoclim.utils.filter.firwin" title="pyleoclim.utils.filter.firwin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.firwin</span></code></a></dt><dd><p>FIR filter design using the window method</p>
 </dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.lanczos</span></code></dt><dd><p>lowpass filter via Lanczos resampling</p>
+<dt><a class="reference internal" href="../utils/filter/lanczos.html#pyleoclim.utils.filter.lanczos" title="pyleoclim.utils.filter.lanczos"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.lanczos</span></code></a></dt><dd><p>lowpass filter via Lanczos resampling</p>
 </dd>
 </dl>
 </div>
@@ -2882,6 +2942,29 @@ step  : The representative spacing between consecutive values (mean of the media
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.MultipleSeries.grid_properties">
+<span class="sig-name descname"><span class="pre">grid_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'median'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleSeries.grid_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries.grid_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract grid properties (start, stop, step) of all the Series objects in
+a collection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>step_style</strong> (<em>str</em>) – <p>Method to obtain a representative step if x is not evenly spaced.
+Valid entries: ‘median’ [default], ‘mean’, ‘mode’ or ‘max’
+The mode is the most frequent entry in a dataset, and may be a good choice if the timeseries
+is nearly equally spaced but for a few gaps.</p>
+<p>Max is a conservative choice, appropriate for binning methods and Gaussian kernel coarse-graining</p>
+</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>grid_properties</strong> – n x 3 array, where n is the number of series</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pyleoclim.core.ui.MultipleSeries.interp">
 <span class="sig-name descname"><span class="pre">interp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleSeries.interp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries.interp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Aligns the time axes of a MultipleSeries object, via interpolation.
@@ -2940,9 +3023,10 @@ step  : The representative spacing between consecutive values (mean of the media
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pyleoclim.core.ui.MultipleSeries.pca">
-<span class="sig-name descname"><span class="pre">pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nMC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">pca_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleSeries.pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries.pca" title="Permalink to this definition">¶</a></dt>
-<dd><p>Principal Component Analysis</p>
+<dt class="sig sig-object py" id="pyleoclim.core.ui.MultipleSeries.mcpca">
+<span class="sig-name descname"><span class="pre">mcpca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nMC</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">pca_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleSeries.mcpca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries.mcpca" title="Permalink to this definition">¶</a></dt>
+<dd><p>Monte Carlo Principal Component Analysis</p>
+<p>(UNDER REPAIR - USE AT YOUR OWN RISK)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2998,6 +3082,81 @@ step  : The representative spacing between consecutive values (mean of the media
 
 <span class="go"># msc = ms.common_time()</span>
 <span class="go"># res = msc.pca(nMC=20)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.MultipleSeries.pca">
+<span class="sig-name descname"><span class="pre">pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fill-em'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol_em</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_em_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">pca_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleSeries.pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries.pca" title="Permalink to this definition">¶</a></dt>
+<dd><p>Principal Component Analysis (Empirical Orthogonal Functions)</p>
+<p>Decomposition of dataset ys in terms of orthogonal basis functions.
+Tolerant to missing values, infilled by an EM algorithm.
+Requires ncomp to be less than the number of missing values.</p>
+<p>Do make sure the time axes are aligned, however! (e.g. use <cite>common_time()</cite>)</p>
+<p>Algorithm from statsmodels: <a class="reference external" href="https://www.statsmodels.org/stable/generated/statsmodels.multivariate.pca.PCA.html">https://www.statsmodels.org/stable/generated/statsmodels.multivariate.pca.PCA.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – Series weights to use after transforming data according to standardize
+or demean when computing the principal components.</p></li>
+<li><p><strong>missing</strong> (<em>{str</em><em>, </em><em>None}</em>) – <p>Method for missing data.  Choices are:</p>
+<ul>
+<li><p>’drop-row’ - drop rows with missing values.</p></li>
+<li><p>’drop-col’ - drop columns with missing values.</p></li>
+<li><p>’drop-min’ - drop either rows or columns, choosing by data retention.</p></li>
+<li><p>’fill-em’ - use EM algorithm to fill missing value.  ncomp should be
+set to the number of factors required.</p></li>
+<li><p><cite>None</cite> raises if data contains NaN values.</p></li>
+</ul>
+</p></li>
+<li><p><strong>tol_em</strong> (<em>float</em>) – Tolerance to use when checking for convergence of the EM algorithm.</p></li>
+<li><p><strong>max_em_iter</strong> (<em>int</em>) – Maximum iterations for the EM algorithm.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.MultipleSeries.res">
+<span class="sig-name descname"><span class="pre">res</span></span><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries.res" title="Permalink to this definition">¶</a></dt>
+<dd><p>the result object, see <cite>pyleoclim.ui.SpatialDecomp</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>pyleoclim.ui.SpatialDecomp</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Examples</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="gp">In [1]: </span><span class="kn">import</span> <span class="nn">pyleoclim</span> <span class="k">as</span> <span class="nn">pyleo</span>
+
+<span class="gp">In [2]: </span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
+
+<span class="gp">In [3]: </span><span class="n">data</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Lipd</span><span class="p">(</span><span class="n">usr_path</span> <span class="o">=</span> <span class="n">url</span><span class="p">)</span>
+<span class="go">Disclaimer: LiPD files may be updated and modified to adhere to standards</span>
+
+<span class="go">reading: MD982176.Stott.2004.lpd</span>
+<span class="go">Finished read: 1 record</span>
+
+<span class="gp">In [4]: </span><span class="n">tslist</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">to_LipdSeriesList</span><span class="p">()</span>
+<span class="go">extracting paleoData...</span>
+<span class="go">extracting: MD982176.Stott.2004</span>
+<span class="go">Created time series: 6 entries</span>
+
+<span class="gp">In [5]: </span><span class="n">tslist</span> <span class="o">=</span> <span class="n">tslist</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="c1"># drop the first two series which only concerns age and depth</span>
+
+<span class="gp">In [6]: </span><span class="n">ms</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">MultipleSeries</span><span class="p">(</span><span class="n">tslist</span><span class="p">)</span><span class="o">.</span><span class="n">common_time</span><span class="p">()</span>
+
+<span class="gp">In [7]: </span><span class="n">res</span> <span class="o">=</span> <span class="n">ms</span><span class="o">.</span><span class="n">pca</span><span class="p">()</span> <span class="c1"># carry out PCA</span>
+
+<span class="gp">In [8]: </span><span class="n">res</span><span class="o">.</span><span class="n">screeplot</span><span class="p">()</span> <span class="c1"># plot the eigenvalue spectrum</span>
+<span class="go">&lt;Figure size 600x400 with 1 Axes&gt;</span>
+<span class="gh">Out[8]: </span><span class="go"></span>
+<span class="go">(&lt;Figure size 600x400 with 1 Axes&gt;,</span>
+<span class="go"> &lt;AxesSubplot:title={&#39;center&#39;:&#39;scree plot&#39;}, xlabel=&#39;Mode index $i$&#39;, ylabel=&#39;$\\lambda_i$&#39;&gt;)</span>
+
+<span class="gp">In [9]: </span><span class="n">res</span><span class="o">.</span><span class="n">modeplot</span><span class="p">()</span> <span class="c1"># plot the first mode</span>
+<span class="go">&lt;Figure size 1000x500 with 3 Axes&gt;</span>
+<span class="gh">Out[9]: </span><span class="go">(&lt;Figure size 1000x500 with 3 Axes&gt;, GridSpec(2, 2))</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -3176,7 +3335,7 @@ The default value 3/4 means the top of the next axis will be located at 3/4 of t
 <dl class="py method">
 <dt class="sig sig-object py" id="pyleoclim.core.ui.MultipleSeries.standardize">
 <span class="sig-name descname"><span class="pre">standardize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#MultipleSeries.standardize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.MultipleSeries.standardize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Standardize each series object</p>
+<dd><p>Standardize each series object in a collection</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>ms</strong> – The standardized Series</p>
@@ -3236,8 +3395,8 @@ If None, it will be either the length of the input time axis, or at most 100.</p
 
 </dd></dl>
 
-</section>
-<section id="ensembleseries-pyleoclim-ensembleseries">
+</div>
+<div class="section" id="ensembleseries-pyleoclim-ensembleseries">
 <h2>EnsembleSeries (pyleoclim.EnsembleSeries)<a class="headerlink" href="#ensembleseries-pyleoclim-ensembleseries" title="Permalink to this headline">¶</a></h2>
 <p>The EnsembleSeries class is a child of MultipleSeries, designed for ensemble applications (e.g. draws from a posterior distribution of ages, model ensembles with randomized initial conditions, or some other stochastic ensemble).
 Compared to a MultipleSeries object, an EnsembleSeries object has the following properties:  [TO BE COMPLETED]</p>
@@ -3288,14 +3447,20 @@ Ensembles usually arise from age modeling or Bayesian calibrations. All members 
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gkernel</span></code>(**kwargs)</p></td>
 <td><p>Aligns the time axes of a MultipleSeries object, via Gaussian kernel.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">grid_properties</span></code>([step_style])</p></td>
+<td><p>Extract grid properties (start, stop, step) of all the Series objects in a collection.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>(**kwargs)</p></td>
 <td><p>Aligns the time axes of a MultipleSeries object, via interpolation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.make_labels" title="pyleoclim.core.ui.EnsembleSeries.make_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.EnsembleSeries.make_labels" title="pyleoclim.core.ui.EnsembleSeries.make_labels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code></a>()</p></td>
 <td><p>Initialization of labels</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code>([nMC])</p></td>
-<td><p>Principal Component Analysis</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mcpca</span></code>([nMC])</p></td>
+<td><p>Monte Carlo Principal Component Analysis</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code>([weights, missing, tol_em, max_em_iter])</p></td>
+<td><p>Principal Component Analysis (Empirical Orthogonal Functions)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>([figsize, marker, markersize, ...])</p></td>
 <td><p>Plot multiple timeseries on the same axis</p></td>
@@ -3316,7 +3481,7 @@ Ensembles usually arise from age modeling or Bayesian calibrations. All members 
 <td><p>Stack plot of multiple series</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code>()</p></td>
-<td><p>Standardize each series object</p></td>
+<td><p>Standardize each series object in a collection</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code>([method, settings, freq_method, ...])</p></td>
 <td><p>Wavelet analysis</p></td>
@@ -3686,8 +3851,84 @@ The default value 3/4 means the top of the next axis will be located at 3/4 of t
 
 </dd></dl>
 
-</section>
-<section id="lipd-pyleoclim-lipd">
+</div>
+<div class="section" id="surrogateseries-pyleoclim-surrogateseries">
+<h2>SurrogateSeries (pyleoclim.SurrogateSeries)<a class="headerlink" href="#surrogateseries-pyleoclim-surrogateseries" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.SurrogateSeries">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></span><span class="sig-name descname"><span class="pre">SurrogateSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surrogate_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surrogate_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SurrogateSeries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.SurrogateSeries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object containing surrogate timeseries, usually obtained through recursive modeling (e.g., AR1)</p>
+<p>Surrogate Series is a child of MultipleSeries. All methods available for MultipleSeries are available for surrogate series.</p>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code>(ts)</p></td>
+<td><p>Append timeseries ts to MultipleSeries object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin</span></code>(**kwargs)</p></td>
+<td><p>Aligns the time axes of a MultipleSeries object, via binning.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">common_time</span></code>([method, common_step, start, ...])</p></td>
+<td><p>Aligns the time axes of a MultipleSeries object, via binning interpolation., or Gaussian kernel.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_time_unit</span></code>([time_unit])</p></td>
+<td><p>Convert the time unit of the timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
+<td><p>Copy the object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">correlation</span></code>([target, timespan, alpha, ...])</p></td>
+<td><p>Calculate the correlation between a MultipleSeries and a target Series</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">detrend</span></code>([method])</p></td>
+<td><p>Detrend timeseries</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">equal_lengths</span></code>()</p></td>
+<td><p>Test whether all series in object have equal length</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span></code>([cutoff_freq, cutoff_scale, method])</p></td>
+<td><p>Filtering the timeseries in the MultipleSeries object</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gkernel</span></code>(**kwargs)</p></td>
+<td><p>Aligns the time axes of a MultipleSeries object, via Gaussian kernel.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">grid_properties</span></code>([step_style])</p></td>
+<td><p>Extract grid properties (start, stop, step) of all the Series objects in a collection.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>(**kwargs)</p></td>
+<td><p>Aligns the time axes of a MultipleSeries object, via interpolation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">mcpca</span></code>([nMC])</p></td>
+<td><p>Monte Carlo Principal Component Analysis</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code>([weights, missing, tol_em, max_em_iter])</p></td>
+<td><p>Principal Component Analysis (Empirical Orthogonal Functions)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>([figsize, marker, markersize, ...])</p></td>
+<td><p>Plot multiple timeseries on the same axis</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral</span></code>([method, settings, mute_pbar, ...])</p></td>
+<td><p>Perform spectral analysis on the timeseries</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stackplot</span></code>([figsize, savefig_settings, xlim, ...])</p></td>
+<td><p>Stack plot of multiple series</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code>()</p></td>
+<td><p>Standardize each series object in a collection</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code>([method, settings, freq_method, ...])</p></td>
+<td><p>Wavelet analysis</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="lipd-pyleoclim-lipd">
 <h2>Lipd (pyleoclim.Lipd)<a class="headerlink" href="#lipd-pyleoclim-lipd" title="Permalink to this headline">¶</a></h2>
 <p>This class allows to manipulate LiPD objects.</p>
 <dl class="py class">
@@ -3933,8 +4174,8 @@ recommend to turn on when more modifications are going to be made on ax. The def
 
 </dd></dl>
 
-</section>
-<section id="lipdseries-pyleoclim-lipdseries">
+</div>
+<div class="section" id="lipdseries-pyleoclim-lipdseries">
 <h2>LipdSeries (pyleoclim.LipdSeries)<a class="headerlink" href="#lipdseries-pyleoclim-lipdseries" title="Permalink to this headline">¶</a></h2>
 <p>LipdSeries are (you guessed it), Series objects that are created from LiPD objects. As a subclass of Series, they inherit all its methods.
 When created, LiPDSeries automatically instantiates the time, value and other parameters from what’s in the lipd file.</p>
@@ -3942,8 +4183,8 @@ When created, LiPDSeries automatically instantiates the time, value and other pa
 <dt class="sig sig-object py" id="pyleoclim.core.ui.LipdSeries">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></span><span class="sig-name descname"><span class="pre">LipdSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tso</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#LipdSeries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.LipdSeries" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lipd time series object</p>
-<p>These objects can be obtained from a LiPD either through Pyleoclim or the LiPD utilities.
-If multiple objects (i.e., list) is given, then the user will be prompted to choose one timeseries.</p>
+<p>These objects can be obtained from a LiPD file/object either through Pyleoclim or the LiPD utilities.
+If multiple objects (i.e., a list) is given, then the user will be prompted to choose one timeseries.</p>
 <p>LipdSeries is a child of Series, therefore all the methods available for Series apply to LipdSeries in addition to some specific methods.</p>
 <p class="rubric">Examples</p>
 <p>In this example, we will import a LiPD file and explore the various options to create a series object.</p>
@@ -4063,8 +4304,8 @@ If you already now the number of the timeseries object you’re interested in, t
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>([method])</p></td>
 <td><p>Interpolate a Series object onto a new time axis</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_evenly_spaced</span></code>()</p></td>
-<td><p>Check if the timeseries is evenly-spaced</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_evenly_spaced</span></code>([tol])</p></td>
+<td><p>Check if the Series time axis is evenly-spaced, within tolerance</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">make_labels</span></code>()</p></td>
 <td><p>Initialization of labels</p></td>
@@ -4494,8 +4735,8 @@ If no ensemble can be found, will error out.</p></li>
 
 </dd></dl>
 
-</section>
-<section id="psd-pyleoclim-psd">
+</div>
+<div class="section" id="psd-pyleoclim-psd">
 <h2>PSD (pyleoclim.PSD)<a class="headerlink" href="#psd-pyleoclim-psd" title="Permalink to this headline">¶</a></h2>
 <p>The PSD (Power spectral density) class is intended for conveniently manipulating the result of spectral methods, including performing significance tests, estimating scaling coefficients, and plotting.
 Available methods:</p>
@@ -4617,7 +4858,7 @@ recommend to turn on when more modifications are going to be made on ax The defa
 <li><p><strong>zorder</strong> (<em>int</em><em>, </em><em>optional</em>) – Order for the plot. The default is None.</p></li>
 <li><p><strong>plot_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – Other plotting argument. The default is None.</p></li>
 <li><p><strong>signif_clr</strong> (<em>str</em><em>, </em><em>optional</em>) – Color for the significance line. The default is ‘red’.</p></li>
-<li><p><strong>signif_linestyles</strong> (<em>list of str</em><em>, </em><em>optional</em>) – Linestyles for significance. The default is [’–’, ‘-.’, ‘:’].</p></li>
+<li><p><strong>signif_linestyles</strong> (<em>list of str</em><em>, </em><em>optional</em>) – Linestyles for significance. The default is [‘–’, ‘-.’, ‘:’].</p></li>
 <li><p><strong>signif_linewidth</strong> (<em>float</em><em>, </em><em>optional</em>) – width of the significance line. The default is 1.</p></li>
 </ul>
 </dd>
@@ -4661,314 +4902,8 @@ recommend to turn on when more modifications are going to be made on ax The defa
 
 </dd></dl>
 
-</section>
-<section id="scalogram-pyleoclim-scalogram">
-<h2>Scalogram (pyleoclim.Scalogram)<a class="headerlink" href="#scalogram-pyleoclim-scalogram" title="Permalink to this headline">¶</a></h2>
-<p>The Scalogram class is analogous to PSD, but for wavelet spectra (scalograms)</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="pyleoclim.core.ui.Scalogram">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></span><span class="sig-name descname"><span class="pre">Scalogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Neff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wave_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wave_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Scalogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Scalogram" title="Permalink to this definition">¶</a></dt>
-<dd><p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Scalogram.copy" title="pyleoclim.core.ui.Scalogram.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
-<td><p>Copy object</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Scalogram.plot" title="pyleoclim.core.ui.Scalogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([in_period, xlabel, ylabel, title, ...])</p></td>
-<td><p>Plot the scalogram</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Scalogram.signif_test" title="pyleoclim.core.ui.Scalogram.signif_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signif_test</span></code></a>([number, method, seed, qs, settings])</p></td>
-<td><p>Significance test for wavelet analysis</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="py method">
-<dt class="sig sig-object py" id="pyleoclim.core.ui.Scalogram.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Scalogram.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Scalogram.copy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Copy object</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyleoclim.core.ui.Scalogram.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[10,</span> <span class="pre">8]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_clr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'white'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_linestyles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_linewidths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contourf_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Scalogram.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Scalogram.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the scalogram</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>in_period</strong> (<em>bool</em><em>, </em><em>optional</em>) – Plot the in period instead of frequency space. The default is True.</p></li>
-<li><p><strong>xlabel</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for the x-axis. The default is None.</p></li>
-<li><p><strong>ylabel</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for the y-axis. The default is None.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Title for the figure. The default is None.</p></li>
-<li><p><strong>ylim</strong> (<em>list</em><em>, </em><em>optional</em>) – Limits for the y-axis. The default is None.</p></li>
-<li><p><strong>xlim</strong> (<em>list</em><em>, </em><em>optional</em>) – Limits for the x-axis. The default is None.</p></li>
-<li><p><strong>yticks</strong> (<em>list</em><em>, </em><em>optional</em>) – yticks label. The default is None.</p></li>
-<li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – Figure size The default is [10, 8].</p></li>
-<li><p><strong>mute</strong> (<em>bool</em><em>, </em><em>optional</em>) – if True, the plot will not show;
-recommend to turn on when more modifications are going to be made on ax The default is False.</p></li>
-<li><p><strong>signif_clr</strong> (<em>str</em><em>, </em><em>optional</em>) – Color of the singificance line. The default is ‘white’.</p></li>
-<li><p><strong>signif_linestyles</strong> (<em>str</em><em>, </em><em>optional</em>) – Linestyle of the significance line. The default is ‘-‘.</p></li>
-<li><p><strong>signif_linewidths</strong> (<em>float</em><em>, </em><em>optional</em>) – Width for the significance line. The default is 1.</p></li>
-<li><p><strong>contourf_style</strong> (<em>dict</em><em>, </em><em>optional</em>) – Arguments for the contour plot. The default is {}.</p></li>
-<li><p><strong>cbar_style</strong> (<em>dict</em><em>, </em><em>optional</em>) – Arguments for the colarbar. The default is {}.</p></li>
-<li><p><strong>savefig_settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – saving options for the figure. The default is {}.</p></li>
-<li><p><strong>ax</strong> (<em>ax</em><em>, </em><em>optional</em>) – Matplotlib Axis on which to return the figure. The default is None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>fig, ax</p>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet" title="pyleoclim.core.ui.Series.wavelet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.wavelet</span></code></a></dt><dd><p>Wavelet analysis</p>
-</dd>
-</dl>
 </div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyleoclim.core.ui.Scalogram.signif_test">
-<span class="sig-name descname"><span class="pre">signif_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ar1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.95]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Scalogram.signif_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Scalogram.signif_test" title="Permalink to this definition">¶</a></dt>
-<dd><p>Significance test for wavelet analysis</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>number</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of surrogates to generate for significance analysis. The default is 200.</p></li>
-<li><p><strong>method</strong> (<em>{'ar1'}</em><em>, </em><em>optional</em>) – Method to use to generate the surrogates. The default is ‘ar1’.</p></li>
-<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Set the seed for the random number generator. Useful for reproducibility The default is None.</p></li>
-<li><p><strong>qs</strong> (<em>list</em><em>, </em><em>optional</em>) – Significane level to consider. The default is [0.95].</p></li>
-<li><p><strong>settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – Parameters for the model. The default is None.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>ValueError</strong> – qs should be a list with at least one value.</p>
-</dd>
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><strong>new</strong> – A new Scalogram object with the significance level</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>pyleoclim.Scalogram</p>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet" title="pyleoclim.core.ui.Series.wavelet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.wavelet</span></code></a></dt><dd><p>wavelet analysis</p>
-</dd>
-</dl>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="coherence-pyleoclim-coherence">
-<h2>Coherence (pyleoclim.Coherence)<a class="headerlink" href="#coherence-pyleoclim-coherence" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="pyleoclim.core.ui.Coherence">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></span><span class="sig-name descname"><span class="pre">Coherence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coherence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Neff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Coherence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Coherence" title="Permalink to this definition">¶</a></dt>
-<dd><p>Coherence object</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet_coherence" title="pyleoclim.core.ui.Series.wavelet_coherence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.wavelet_coherence</span></code></a></dt><dd><p>Wavelet coherence</p>
-</dd>
-</dl>
-</div>
-<p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Coherence.copy" title="pyleoclim.core.ui.Coherence.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
-<td><p>Copy object</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Coherence.plot" title="pyleoclim.core.ui.Coherence.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([xlabel, ylabel, title, figsize, ylim, ...])</p></td>
-<td><p>Plot the cross-wavelet results</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Coherence.signif_test" title="pyleoclim.core.ui.Coherence.signif_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signif_test</span></code></a>([number, method, seed, qs, ...])</p></td>
-<td><p>Significance testing</p></td>
-</tr>
-</tbody>
-</table>
-<dl class="py method">
-<dt class="sig sig-object py" id="pyleoclim.core.ui.Coherence.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Coherence.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Coherence.copy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Copy object</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyleoclim.core.ui.Coherence.plot">
-<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[10,</span> <span class="pre">8]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contourf_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_clr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'white'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_linestyles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_linewidths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">under_clr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ivory'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">over_clr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bad_clr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dimgray'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Coherence.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Coherence.plot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot the cross-wavelet results</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>xlabel</strong> (<em>str</em><em>, </em><em>optional</em>) – x-axis label. The default is None.</p></li>
-<li><p><strong>ylabel</strong> (<em>str</em><em>, </em><em>optional</em>) – y-axis label. The default is None.</p></li>
-<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Title of the plot. The default is None.</p></li>
-<li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – Figure size. The default is [10, 8].</p></li>
-<li><p><strong>ylim</strong> (<em>list</em><em>, </em><em>optional</em>) – y-axis limits. The default is None.</p></li>
-<li><p><strong>xlim</strong> (<em>list</em><em>, </em><em>optional</em>) – x-axis limits. The default is None.</p></li>
-<li><p><strong>in_period</strong> (<em>bool</em><em>, </em><em>optional</em>) – Plots periods instead of frequencies The default is True.</p></li>
-<li><p><strong>yticks</strong> (<em>list</em><em>, </em><em>optional</em>) – y-ticks label. The default is None.</p></li>
-<li><p><strong>mute</strong> (<em>bool</em><em>, </em><em>optional</em>) – if True, the plot will not show;
-recommend to turn on when more modifications are going to be made on ax The default is False. The default is False.</p></li>
-<li><p><strong>contourf_style</strong> (<em>dict</em><em>, </em><em>optional</em>) – Arguments for the contour plot. The default is {}.</p></li>
-<li><p><strong>phase_style</strong> (<em>dict</em><em>, </em><em>optional</em>) – Arguments for the phase arrows. The default is {}. It includes:
-- ‘pt’: the default threshold above which phase arrows will be plotted
-- ‘skip_x’: the number of points to skip between phase arrows along the x-axis
-- ‘skip_y’:  the number of points to skip between phase arrows along the y-axis
-- ‘scale’: number of data units per arrow length unit (see matplotlib.pyplot.quiver)
-- ‘width’: shaft width in arrow units (see matplotlib.pyplot.quiver)</p></li>
-<li><p><strong>cbar_style</strong> (<em>dict</em><em>, </em><em>optional</em>) – Arguments for the color bar. The default is {}.</p></li>
-<li><p><strong>savefig_settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>The default is {}.
-the dictionary of arguments for plt.savefig(); some notes below:
-- “path” must be specified; it can be any existed or non-existed path,</p>
-<blockquote>
-<div><p>with or without a suffix; if the suffix is not given in “path”, it will follow “format”</p>
-</div></blockquote>
-<ul>
-<li><p>”format” can be one of {“pdf”, “eps”, “png”, “ps”}</p></li>
-</ul>
-</p></li>
-<li><p><strong>ax</strong> (<em>ax</em><em>, </em><em>optional</em>) – Matplotlib axis on which to return the figure. The default is None.</p></li>
-<li><p><strong>signif_clr</strong> (<em>str</em><em>, </em><em>optional</em>) – Color of the singificance line. The default is ‘white’.</p></li>
-<li><p><strong>signif_linestyles</strong> (<em>str</em><em>, </em><em>optional</em>) – Style of the significance line. The default is ‘-‘.</p></li>
-<li><p><strong>signif_linewidths</strong> (<em>float</em><em>, </em><em>optional</em>) – Width of the significance line. The default is 1.</p></li>
-<li><p><strong>under_clr</strong> (<em>str</em><em>, </em><em>optional</em>) – Color for under 0. The default is ‘ivory’.</p></li>
-<li><p><strong>over_clr</strong> (<em>str</em><em>, </em><em>optional</em>) – Color for over 1. The default is ‘black’.</p></li>
-<li><p><strong>bad_clr</strong> (<em>str</em><em>, </em><em>optional</em>) – Color for missing values. The default is ‘dimgray’.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>fig, ax</p>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<p><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet_coherence" title="pyleoclim.core.ui.Series.wavelet_coherence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.wavelet_coherence</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.quiver</span></code></p>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pyleoclim.core.ui.Coherence.signif_test">
-<span class="sig-name descname"><span class="pre">signif_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ar1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.95]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Coherence.signif_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Coherence.signif_test" title="Permalink to this definition">¶</a></dt>
-<dd><p>Significance testing</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>number</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of surrogate series to create for significance testing. The default is 200.</p></li>
-<li><p><strong>method</strong> (<em>{'ar1'}</em><em>, </em><em>optional</em>) – Method through which to generate the surrogate series. The default is ‘ar1’.</p></li>
-<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Fixes the seed for the random number generator. Useful for reproducibility. The default is None.</p></li>
-<li><p><strong>qs</strong> (<em>list</em><em>, </em><em>optional</em>) – Significanc level to return. The default is [0.95].</p></li>
-<li><p><strong>settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – Parameters for surrogate model. The default is None.</p></li>
-<li><p><strong>mute_pbar</strong> (<em>bool</em><em>, </em><em>optional</em>) – Mute the progress bar. The default is False.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>new</strong> – Coherence with significance level</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pyleoclim.Coherence</p>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet_coherence" title="pyleoclim.core.ui.Series.wavelet_coherence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.wavelet_coherence</span></code></a></dt><dd><p>Wavelet coherence</p>
-</dd>
-</dl>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="surrogateseries-pyleoclim-surrogateseries">
-<h2>SurrogateSeries (pyleoclim.SurrogateSeries)<a class="headerlink" href="#surrogateseries-pyleoclim-surrogateseries" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="pyleoclim.core.ui.SurrogateSeries">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></span><span class="sig-name descname"><span class="pre">SurrogateSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surrogate_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">surrogate_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SurrogateSeries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.SurrogateSeries" title="Permalink to this definition">¶</a></dt>
-<dd><p>Object containing surrogate timeseries, usually obtained through recursive modeling (e.g., AR1)</p>
-<p>Surrogate Series is a child of MultipleSeries. All methods available for MultipleSeries are available for surrogate series.</p>
-<p class="rubric">Methods</p>
-<table class="longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code>(ts)</p></td>
-<td><p>Append timeseries ts to MultipleSeries object</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bin</span></code>(**kwargs)</p></td>
-<td><p>Aligns the time axes of a MultipleSeries object, via binning.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">common_time</span></code>([method, common_step, start, ...])</p></td>
-<td><p>Aligns the time axes of a MultipleSeries object, via binning interpolation., or Gaussian kernel.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_time_unit</span></code>([time_unit])</p></td>
-<td><p>Convert the time unit of the timeseries</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code>()</p></td>
-<td><p>Copy the object</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">correlation</span></code>([target, timespan, alpha, ...])</p></td>
-<td><p>Calculate the correlation between a MultipleSeries and a target Series</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">detrend</span></code>([method])</p></td>
-<td><p>Detrend timeseries</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">equal_lengths</span></code>()</p></td>
-<td><p>Test whether all series in object have equal length</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span></code>([cutoff_freq, cutoff_scale, method])</p></td>
-<td><p>Filtering the timeseries in the MultipleSeries object</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">gkernel</span></code>(**kwargs)</p></td>
-<td><p>Aligns the time axes of a MultipleSeries object, via Gaussian kernel.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">interp</span></code>(**kwargs)</p></td>
-<td><p>Aligns the time axes of a MultipleSeries object, via interpolation.</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pca</span></code>([nMC])</p></td>
-<td><p>Principal Component Analysis</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code>([figsize, marker, markersize, ...])</p></td>
-<td><p>Plot multiple timeseries on the same axis</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">spectral</span></code>([method, settings, mute_pbar, ...])</p></td>
-<td><p>Perform spectral analysis on the timeseries</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stackplot</span></code>([figsize, savefig_settings, xlim, ...])</p></td>
-<td><p>Stack plot of multiple series</p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">standardize</span></code>()</p></td>
-<td><p>Standardize each series object</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelet</span></code>([method, settings, freq_method, ...])</p></td>
-<td><p>Wavelet analysis</p></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</section>
-<section id="multiplepsd-pyleoclim-multiplepsd">
+<div class="section" id="multiplepsd-pyleoclim-multiplepsd">
 <h2>MultiplePSD (pyleoclim.MultiplePSD)<a class="headerlink" href="#multiplepsd-pyleoclim-multiplepsd" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyleoclim.core.ui.MultiplePSD">
@@ -5171,8 +5106,116 @@ recommend to turn on when more modifications are going to be made on ax. The def
 
 </dd></dl>
 
-</section>
-<section id="multiplescalogram-pyleoclim-multiplescalogram">
+</div>
+<div class="section" id="scalogram-pyleoclim-scalogram">
+<h2>Scalogram (pyleoclim.Scalogram)<a class="headerlink" href="#scalogram-pyleoclim-scalogram" title="Permalink to this headline">¶</a></h2>
+<p>The Scalogram class is analogous to PSD, but for wavelet spectra (scalograms)</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.Scalogram">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></span><span class="sig-name descname"><span class="pre">Scalogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Neff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wave_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wave_args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Scalogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Scalogram" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Scalogram.copy" title="pyleoclim.core.ui.Scalogram.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p>Copy object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Scalogram.plot" title="pyleoclim.core.ui.Scalogram.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([in_period, xlabel, ylabel, title, ...])</p></td>
+<td><p>Plot the scalogram</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Scalogram.signif_test" title="pyleoclim.core.ui.Scalogram.signif_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signif_test</span></code></a>([number, method, seed, qs, settings])</p></td>
+<td><p>Significance test for wavelet analysis</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.Scalogram.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Scalogram.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Scalogram.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.Scalogram.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[10,</span> <span class="pre">8]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_clr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'white'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_linestyles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_linewidths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contourf_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Scalogram.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Scalogram.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the scalogram</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_period</strong> (<em>bool</em><em>, </em><em>optional</em>) – Plot the in period instead of frequency space. The default is True.</p></li>
+<li><p><strong>xlabel</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for the x-axis. The default is None.</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for the y-axis. The default is None.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Title for the figure. The default is None.</p></li>
+<li><p><strong>ylim</strong> (<em>list</em><em>, </em><em>optional</em>) – Limits for the y-axis. The default is None.</p></li>
+<li><p><strong>xlim</strong> (<em>list</em><em>, </em><em>optional</em>) – Limits for the x-axis. The default is None.</p></li>
+<li><p><strong>yticks</strong> (<em>list</em><em>, </em><em>optional</em>) – yticks label. The default is None.</p></li>
+<li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – Figure size The default is [10, 8].</p></li>
+<li><p><strong>mute</strong> (<em>bool</em><em>, </em><em>optional</em>) – if True, the plot will not show;
+recommend to turn on when more modifications are going to be made on ax The default is False.</p></li>
+<li><p><strong>signif_clr</strong> (<em>str</em><em>, </em><em>optional</em>) – Color of the singificance line. The default is ‘white’.</p></li>
+<li><p><strong>signif_linestyles</strong> (<em>str</em><em>, </em><em>optional</em>) – Linestyle of the significance line. The default is ‘-‘.</p></li>
+<li><p><strong>signif_linewidths</strong> (<em>float</em><em>, </em><em>optional</em>) – Width for the significance line. The default is 1.</p></li>
+<li><p><strong>contourf_style</strong> (<em>dict</em><em>, </em><em>optional</em>) – Arguments for the contour plot. The default is {}.</p></li>
+<li><p><strong>cbar_style</strong> (<em>dict</em><em>, </em><em>optional</em>) – Arguments for the colarbar. The default is {}.</p></li>
+<li><p><strong>savefig_settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – saving options for the figure. The default is {}.</p></li>
+<li><p><strong>ax</strong> (<em>ax</em><em>, </em><em>optional</em>) – Matplotlib Axis on which to return the figure. The default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>fig, ax</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet" title="pyleoclim.core.ui.Series.wavelet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.wavelet</span></code></a></dt><dd><p>Wavelet analysis</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.Scalogram.signif_test">
+<span class="sig-name descname"><span class="pre">signif_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ar1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.95]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Scalogram.signif_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Scalogram.signif_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Significance test for wavelet analysis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>number</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of surrogates to generate for significance analysis. The default is 200.</p></li>
+<li><p><strong>method</strong> (<em>{'ar1'}</em><em>, </em><em>optional</em>) – Method to use to generate the surrogates. The default is ‘ar1’.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Set the seed for the random number generator. Useful for reproducibility The default is None.</p></li>
+<li><p><strong>qs</strong> (<em>list</em><em>, </em><em>optional</em>) – Significane level to consider. The default is [0.95].</p></li>
+<li><p><strong>settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – Parameters for the model. The default is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – qs should be a list with at least one value.</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>new</strong> – A new Scalogram object with the significance level</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>pyleoclim.Scalogram</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet" title="pyleoclim.core.ui.Series.wavelet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.wavelet</span></code></a></dt><dd><p>wavelet analysis</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="multiplescalogram-pyleoclim-multiplescalogram">
 <h2>MultipleScalogram (pyleoclim.MultipleScalogram)<a class="headerlink" href="#multiplescalogram-pyleoclim-multiplescalogram" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyleoclim.core.ui.MultipleScalogram">
@@ -5224,8 +5267,136 @@ recommend to turn on when more modifications are going to be made on ax. The def
 
 </dd></dl>
 
-</section>
-<section id="corr-pyleoclim-corr">
+</div>
+<div class="section" id="coherence-pyleoclim-coherence">
+<h2>Coherence (pyleoclim.Coherence)<a class="headerlink" href="#coherence-pyleoclim-coherence" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.Coherence">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></span><span class="sig-name descname"><span class="pre">Coherence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frequency</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coherence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeseries2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Neff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">period_unit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Coherence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Coherence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Coherence object</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet_coherence" title="pyleoclim.core.ui.Series.wavelet_coherence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.wavelet_coherence</span></code></a></dt><dd><p>Wavelet coherence</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Coherence.copy" title="pyleoclim.core.ui.Coherence.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p>Copy object</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Coherence.plot" title="pyleoclim.core.ui.Coherence.plot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot</span></code></a>([xlabel, ylabel, title, figsize, ylim, ...])</p></td>
+<td><p>Plot the cross-wavelet results</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.Coherence.signif_test" title="pyleoclim.core.ui.Coherence.signif_test"><code class="xref py py-obj docutils literal notranslate"><span class="pre">signif_test</span></code></a>([number, method, seed, qs, ...])</p></td>
+<td><p>Significance testing</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.Coherence.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Coherence.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Coherence.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.Coherence.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[10,</span> <span class="pre">8]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_period</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contourf_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cbar_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_clr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'white'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_linestyles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'-'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signif_linewidths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">under_clr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ivory'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">over_clr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bad_clr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dimgray'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Coherence.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Coherence.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the cross-wavelet results</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xlabel</strong> (<em>str</em><em>, </em><em>optional</em>) – x-axis label. The default is None.</p></li>
+<li><p><strong>ylabel</strong> (<em>str</em><em>, </em><em>optional</em>) – y-axis label. The default is None.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Title of the plot. The default is None.</p></li>
+<li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – Figure size. The default is [10, 8].</p></li>
+<li><p><strong>ylim</strong> (<em>list</em><em>, </em><em>optional</em>) – y-axis limits. The default is None.</p></li>
+<li><p><strong>xlim</strong> (<em>list</em><em>, </em><em>optional</em>) – x-axis limits. The default is None.</p></li>
+<li><p><strong>in_period</strong> (<em>bool</em><em>, </em><em>optional</em>) – Plots periods instead of frequencies The default is True.</p></li>
+<li><p><strong>yticks</strong> (<em>list</em><em>, </em><em>optional</em>) – y-ticks label. The default is None.</p></li>
+<li><p><strong>mute</strong> (<em>bool</em><em>, </em><em>optional</em>) – if True, the plot will not show;
+recommend to turn on when more modifications are going to be made on ax The default is False. The default is False.</p></li>
+<li><p><strong>contourf_style</strong> (<em>dict</em><em>, </em><em>optional</em>) – Arguments for the contour plot. The default is {}.</p></li>
+<li><p><strong>phase_style</strong> (<em>dict</em><em>, </em><em>optional</em>) – Arguments for the phase arrows. The default is {}. It includes:
+- ‘pt’: the default threshold above which phase arrows will be plotted
+- ‘skip_x’: the number of points to skip between phase arrows along the x-axis
+- ‘skip_y’:  the number of points to skip between phase arrows along the y-axis
+- ‘scale’: number of data units per arrow length unit (see matplotlib.pyplot.quiver)
+- ‘width’: shaft width in arrow units (see matplotlib.pyplot.quiver)</p></li>
+<li><p><strong>cbar_style</strong> (<em>dict</em><em>, </em><em>optional</em>) – Arguments for the color bar. The default is {}.</p></li>
+<li><p><strong>savefig_settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – <p>The default is {}.
+the dictionary of arguments for plt.savefig(); some notes below:
+- “path” must be specified; it can be any existed or non-existed path,</p>
+<blockquote>
+<div><p>with or without a suffix; if the suffix is not given in “path”, it will follow “format”</p>
+</div></blockquote>
+<ul>
+<li><p>”format” can be one of {“pdf”, “eps”, “png”, “ps”}</p></li>
+</ul>
+</p></li>
+<li><p><strong>ax</strong> (<em>ax</em><em>, </em><em>optional</em>) – Matplotlib axis on which to return the figure. The default is None.</p></li>
+<li><p><strong>signif_clr</strong> (<em>str</em><em>, </em><em>optional</em>) – Color of the singificance line. The default is ‘white’.</p></li>
+<li><p><strong>signif_linestyles</strong> (<em>str</em><em>, </em><em>optional</em>) – Style of the significance line. The default is ‘-‘.</p></li>
+<li><p><strong>signif_linewidths</strong> (<em>float</em><em>, </em><em>optional</em>) – Width of the significance line. The default is 1.</p></li>
+<li><p><strong>under_clr</strong> (<em>str</em><em>, </em><em>optional</em>) – Color for under 0. The default is ‘ivory’.</p></li>
+<li><p><strong>over_clr</strong> (<em>str</em><em>, </em><em>optional</em>) – Color for over 1. The default is ‘black’.</p></li>
+<li><p><strong>bad_clr</strong> (<em>str</em><em>, </em><em>optional</em>) – Color for missing values. The default is ‘dimgray’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>fig, ax</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet_coherence" title="pyleoclim.core.ui.Series.wavelet_coherence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.wavelet_coherence</span></code></a>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">matplotlib.pyplot.quiver</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.Coherence.signif_test">
+<span class="sig-name descname"><span class="pre">signif_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ar1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0.95]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute_pbar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#Coherence.signif_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.Coherence.signif_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Significance testing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>number</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of surrogate series to create for significance testing. The default is 200.</p></li>
+<li><p><strong>method</strong> (<em>{'ar1'}</em><em>, </em><em>optional</em>) – Method through which to generate the surrogate series. The default is ‘ar1’.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Fixes the seed for the random number generator. Useful for reproducibility. The default is None.</p></li>
+<li><p><strong>qs</strong> (<em>list</em><em>, </em><em>optional</em>) – Significanc level to return. The default is [0.95].</p></li>
+<li><p><strong>settings</strong> (<em>dict</em><em>, </em><em>optional</em>) – Parameters for surrogate model. The default is None.</p></li>
+<li><p><strong>mute_pbar</strong> (<em>bool</em><em>, </em><em>optional</em>) – Mute the progress bar. The default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>new</strong> – Coherence with significance level</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>pyleoclim.Coherence</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#pyleoclim.core.ui.Series.wavelet_coherence" title="pyleoclim.core.ui.Series.wavelet_coherence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.core.ui.Series.wavelet_coherence</span></code></a></dt><dd><p>Wavelet coherence</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="corr-pyleoclim-corr">
 <h2>Corr (pyleoclim.Corr)<a class="headerlink" href="#corr-pyleoclim-corr" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyleoclim.core.ui.Corr">
@@ -5254,8 +5425,8 @@ recommend to turn on when more modifications are going to be made on ax. The def
 </div>
 </dd></dl>
 
-</section>
-<section id="correns-pyleoclim-correns">
+</div>
+<div class="section" id="correns-pyleoclim-correns">
 <h2>CorrEns (pyleoclim.CorrEns)<a class="headerlink" href="#correns-pyleoclim-correns" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyleoclim.core.ui.CorrEns">
@@ -5335,8 +5506,193 @@ recommend to turn on when more modifications are going to be made on ax</p></li>
 
 </dd></dl>
 
-</section>
-<section id="ssares-pyleoclim-ssares">
+</div>
+<div class="section" id="spatialdecomp-pyleoclim-spatialdecomp">
+<h2>SpatialDecomp (pyleoclim.SpatialDecomp)<a class="headerlink" href="#spatialdecomp-pyleoclim-spatialdecomp" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.SpatialDecomp">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">pyleoclim.core.ui.</span></span><span class="sig-name descname"><span class="pre">SpatialDecomp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigvals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigvecs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pctvar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pcs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neff</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SpatialDecomp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.SpatialDecomp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to hold the results of spatial decompositions
+applies to : <cite>pca()</cite>, <cite>mcpca()</cite>, <cite>mssa()</cite></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.SpatialDecomp.time">
+<span class="sig-name descname"><span class="pre">time</span></span><a class="headerlink" href="#pyleoclim.core.ui.SpatialDecomp.time" title="Permalink to this definition">¶</a></dt>
+<dd><p>the common time axis</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.SpatialDecomp.locs">
+<span class="sig-name descname"><span class="pre">locs</span></span><a class="headerlink" href="#pyleoclim.core.ui.SpatialDecomp.locs" title="Permalink to this definition">¶</a></dt>
+<dd><p>a p x 2 array of coordinates (latitude, longitude) for mapping the spatial patterns (“EOFs”)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float (p, 2)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.SpatialDecomp.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pyleoclim.core.ui.SpatialDecomp.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>name of the dataset/analysis to use in plots</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.SpatialDecomp.eigvals">
+<span class="sig-name descname"><span class="pre">eigvals</span></span><a class="headerlink" href="#pyleoclim.core.ui.SpatialDecomp.eigvals" title="Permalink to this definition">¶</a></dt>
+<dd><p>vector of eigenvalues from the decomposition</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.SpatialDecomp.eigvecs">
+<span class="sig-name descname"><span class="pre">eigvecs</span></span><a class="headerlink" href="#pyleoclim.core.ui.SpatialDecomp.eigvecs" title="Permalink to this definition">¶</a></dt>
+<dd><p>array of eigenvectors from the decomposition</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.SpatialDecomp.pctvar">
+<span class="sig-name descname"><span class="pre">pctvar</span></span><a class="headerlink" href="#pyleoclim.core.ui.SpatialDecomp.pctvar" title="Permalink to this definition">¶</a></dt>
+<dd><p>array of pct variance accounted for by each mode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.SpatialDecomp.neff">
+<span class="sig-name descname"><span class="pre">neff</span></span><a class="headerlink" href="#pyleoclim.core.ui.SpatialDecomp.neff" title="Permalink to this definition">¶</a></dt>
+<dd><p>scalar representing the effective sample size of the leading mode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pyleoclim.core.ui.SpatialDecomp.modeplot" title="pyleoclim.core.ui.SpatialDecomp.modeplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modeplot</span></code></a>([mode, figsize, ax, ...])</p></td>
+<td><p>Dashboard visualizing the properties of a given mode, including:</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.SpatialDecomp.screeplot" title="pyleoclim.core.ui.SpatialDecomp.screeplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">screeplot</span></code></a>([figsize, uq, title, ax, ...])</p></td>
+<td><p>Plot the eigenvalue spectrum with uncertainties</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.SpatialDecomp.modeplot">
+<span class="sig-name descname"><span class="pre">modeplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[10,</span> <span class="pre">5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mtm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SpatialDecomp.modeplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.SpatialDecomp.modeplot" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Dashboard visualizing the properties of a given mode, including:</dt><dd><ol class="arabic simple">
+<li><p>The temporal coefficient (PC or similar)</p></li>
+<li><p>its spectrum</p></li>
+<li><p>The spatial loadings (EOF or similar)</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<em>int</em>) – the (one-based) index of the mode to visualize</p></li>
+<li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – The figure size. The default is [10, 5].</p></li>
+<li><p><strong>savefig_settings</strong> (<em>dict</em>) – <p>the dictionary of arguments for plt.savefig(); some notes below:
+- “path” must be specified; it can be any existed or non-existed path,</p>
+<blockquote>
+<div><p>with or without a suffix; if the suffix is not given in “path”, it will follow “format”</p>
+</div></blockquote>
+<ul>
+<li><p>”format” can be one of {“pdf”, “eps”, “png”, “ps”}</p></li>
+</ul>
+</p></li>
+<li><p><strong>title_kwargs</strong> (<em>dict</em>) – the keyword arguments for ax.set_title()</p></li>
+<li><p><strong>gs</strong> (<em>matplotlib.gridspec object</em><em>, </em><em>optional</em>) – the axis object from matplotlib
+See [matplotlib.gridspec.GridSpec](<a class="reference external" href="https://matplotlib.org/stable/tutorials/intermediate/gridspec.html">https://matplotlib.org/stable/tutorials/intermediate/gridspec.html</a>) for details.</p></li>
+<li><p><strong>mute</strong> (<em>{True</em><em>,</em><em>False}</em>) – if True, the plot will not show;
+recommend to turn on when more modifications are going to be made on ax</p></li>
+<li><p><strong>spec_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the spectral method to be applied on the PC. Default: MTM
+Note that the data are evenly-spaced, so any spectral method that
+assumes even spacing is applicable here:  ‘mtm’, ‘welch’, ‘periodogram’
+‘wwz’ is relevant too if scaling exponents need to be estimated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pyleoclim.core.ui.SpatialDecomp.screeplot">
+<span class="sig-name descname"><span class="pre">screeplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[6,</span> <span class="pre">4]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'N82'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scree</span> <span class="pre">plot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">10]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_eig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'C0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SpatialDecomp.screeplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.SpatialDecomp.screeplot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot the eigenvalue spectrum with uncertainties</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – The figure size. The default is [6, 4].</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Plot title. The default is ‘scree plot’.</p></li>
+<li><p><strong>savefig_settings</strong> (<em>dict</em>) – <p>the dictionary of arguments for plt.savefig(); some notes below:
+- “path” must be specified; it can be any existed or non-existed path,</p>
+<blockquote>
+<div><p>with or without a suffix; if the suffix is not given in “path”, it will follow “format”</p>
+</div></blockquote>
+<ul>
+<li><p>”format” can be one of {“pdf”, “eps”, “png”, “ps”}</p></li>
+</ul>
+</p></li>
+<li><p><strong>title_kwargs</strong> (<em>dict</em><em>, </em><em>optional</em>) – the keyword arguments for ax.set_title()</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib.axis</em><em>, </em><em>optional</em>) – the axis object from matplotlib
+See [matplotlib.axes](<a class="reference external" href="https://matplotlib.org/api/axes_api.html">https://matplotlib.org/api/axes_api.html</a>) for details.</p></li>
+<li><p><strong>mute</strong> (<em>{True</em><em>,</em><em>False}</em>) – if True, the plot will not show;
+recommend to turn on when more modifications are going to be made on ax</p></li>
+<li><p><strong>xlim</strong> (<em>list</em><em>, </em><em>optional</em>) – x-axis limits. The default is [0, 10] (first 10 eigenvalues)</p></li>
+<li><p><strong>uq</strong> (<em>str</em><em>, </em><em>optional</em>) – Method used for uncertainty quantification of the eigenvalues.
+‘N82’ uses the North et al “rule of thumb” [1] with effective sample size
+computed as in [2].
+‘MC’ uses Monte-Carlo simulations (e.g. MC-EOF). Returns an error if no ensemble is found.</p></li>
+<li><p><strong>clr_eig</strong> (<em>str</em><em>, </em><em>optional</em>) – color to be used for plotting eigenvalues</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<dl class="simple">
+<dt>[1] North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982),</dt><dd><p>Sampling errors in the estimation of empirical orthogonal functions,
+Mon. Weather Rev., 110, 699–706.</p>
+</dd>
+<dt>[2] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical</dt><dd><p>orthogonal functions and related techniques in atmospheric science:
+A review, International Journal of Climatology, 27(9),
+1119–1152, doi:10.1002/joc.1499.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="ssares-pyleoclim-ssares">
 <h2>SsaRes (pyleoclim.SsaRes)<a class="headerlink" href="#ssares-pyleoclim-ssares" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="pyleoclim.core.ui.SsaRes">
@@ -5374,13 +5730,13 @@ recommend to turn on when more modifications are going to be made on ax</p></li>
 <td><p>Dashboard visualizing the properties of a given SSA mode, including:</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pyleoclim.core.ui.SsaRes.screeplot" title="pyleoclim.core.ui.SsaRes.screeplot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">screeplot</span></code></a>([figsize, title, ax, ...])</p></td>
-<td><p>Scree plot for SSA visualizing the eigenvalue spectrum and indicating which modes were retained.</p></td>
+<td><p>Scree plot for SSA, visualizing the eigenvalue spectrum and indicating which modes were retained.</p></td>
 </tr>
 </tbody>
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyleoclim.core.ui.SsaRes.modeplot">
-<span class="sig-name descname"><span class="pre">modeplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[10,</span> <span class="pre">5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">NW</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SsaRes.modeplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.SsaRes.modeplot" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">modeplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[10,</span> <span class="pre">5]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mtm'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SsaRes.modeplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.SsaRes.modeplot" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Dashboard visualizing the properties of a given SSA mode, including:</dt><dd><ol class="arabic simple">
 <li><p>the analyzing function (T-EOF)</p></li>
@@ -5392,7 +5748,7 @@ recommend to turn on when more modifications are going to be made on ax</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong> (<em>int</em>) – the (zero-based) index of the mode to visualize</p></li>
+<li><p><strong>mode</strong> (<em>int</em>) – the (one-based) index of the mode to visualize</p></li>
 <li><p><strong>figsize</strong> (<em>list</em><em>, </em><em>optional</em>) – The figure size. The default is [10, 5].</p></li>
 <li><p><strong>savefig_settings</strong> (<em>dict</em>) – <p>the dictionary of arguments for plt.savefig(); some notes below:
 - “path” must be specified; it can be any existed or non-existed path,</p>
@@ -5408,8 +5764,10 @@ recommend to turn on when more modifications are going to be made on ax</p></li>
 See [matplotlib.axes](<a class="reference external" href="https://matplotlib.org/api/axes_api.html">https://matplotlib.org/api/axes_api.html</a>) for details.</p></li>
 <li><p><strong>mute</strong> (<em>{True</em><em>,</em><em>False}</em>) – if True, the plot will not show;
 recommend to turn on when more modifications are going to be made on ax</p></li>
-<li><p><strong>NW</strong> (<em>float</em><em> [</em><em>2</em><em>, </em><em>2.5</em><em>, </em><em>3</em><em>, </em><em>3.5</em><em> , </em><em>4</em><em>]</em>) – time-bandwidth product for MTM spectral estimate
-default: 2</p></li>
+<li><p><strong>spec_method</strong> (<em>str</em><em>, </em><em>optional</em>) – The name of the spectral method to be applied on the PC. Default: MTM
+Note that the data are evenly-spaced, so any spectral method that
+assumes even spacing is applicable here:  ‘mtm’, ‘welch’, ‘periodogram’
+‘wwz’ is relevant too if scaling exponents need to be estimated.</p></li>
 </ul>
 </dd>
 </dl>
@@ -5418,7 +5776,7 @@ default: 2</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="pyleoclim.core.ui.SsaRes.screeplot">
 <span class="sig-name descname"><span class="pre">screeplot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[6,</span> <span class="pre">4]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'SSA</span> <span class="pre">scree</span> <span class="pre">plot'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savefig_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_mcssa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#e50000'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_signif</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#029386'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clr_eig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyleoclim/core/ui.html#SsaRes.screeplot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.core.ui.SsaRes.screeplot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Scree plot for SSA visualizing the eigenvalue spectrum and indicating which modes were retained.</p>
+<dd><p>Scree plot for SSA, visualizing the eigenvalue spectrum and indicating which modes were retained.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -5439,6 +5797,14 @@ See [matplotlib.axes](<a class="reference external" href="https://matplotlib.org
 <li><p><strong>mute</strong> (<em>{True</em><em>,</em><em>False}</em>) – if True, the plot will not show;
 recommend to turn on when more modifications are going to be made on ax</p></li>
 <li><p><strong>xlim</strong> (<em>list</em><em>, </em><em>optional</em>) – x-axis limits. The default is None.</p></li>
+<li><p><strong>clr_mcssa</strong> (<em>str</em><em>, </em><em>optional</em>) – color of the Monte Carlo SSA AR(1) shading (if data are provided)
+default: red</p></li>
+<li><p><strong>clr_eig</strong> (<em>str</em><em>, </em><em>optional</em>) – color of the eigenvalues, default: black</p></li>
+<li><p><strong>clr_signif</strong> (<em>str</em><em>, </em><em>optional</em>) – <dl class="simple">
+<dt>color of the highlights for significant eigenvalue.</dt><dd><p>default: teal</p>
+</dd>
+</dl>
+</p></li>
 </ul>
 </dd>
 </dl>
@@ -5446,8 +5812,8 @@ recommend to turn on when more modifications are going to be made on ax</p></li>
 
 </dd></dl>
 
-</section>
-<section id="gen-ts-pyleoclim-gen-ts">
+</div>
+<div class="section" id="gen-ts-pyleoclim-gen-ts">
 <h2>gen_ts (pyleoclim.gen_ts)<a class="headerlink" href="#gen-ts-pyleoclim-gen-ts" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pyleoclim.gen_ts">
@@ -5479,7 +5845,7 @@ recommend to turn on when more modifications are going to be made on ax</p></li>
 </dd>
 <dt><a class="reference internal" href="../utils/tsmodel/colored_noise_2regimes.html#pyleoclim.utils.tsmodel.colored_noise_2regimes" title="pyleoclim.utils.tsmodel.colored_noise_2regimes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.tsmodel.colored_noise_2regimes</span></code></a></dt><dd><p>generate a colored noise timeseries with two regimes</p>
 </dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.tsmodel.gen_ar1_evenly</span></code></dt><dd><p>generate an AR(1) series</p>
+<dt><a class="reference internal" href="../utils/tsmodel/gen_ar1_evenly.html#pyleoclim.utils.tsmodel.gen_ar1_evenly" title="pyleoclim.utils.tsmodel.gen_ar1_evenly"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.tsmodel.gen_ar1_evenly</span></code></a></dt><dd><p>generate an AR(1) series</p>
 </dd>
 </dl>
 </div>
@@ -5615,8 +5981,8 @@ recommend to turn on when more modifications are going to be made on ax</p></li>
 <img alt="../_images/gen_cn2_t1.png" src="../_images/gen_cn2_t1.png" />
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

@@ -10,9 +10,9 @@ These situations are described in classes, the beauty of which is called "inheri
 A major advantage of object-oriented design is that you, the user, can harness the power of Pyleoclim methods in very few lines of code through the user API without ever having to get your hands dirty with our code (unless you want to, of course).
 The flipside is that any user would do well to understand Pyleoclim classes, what they are intended for, and what methods they can and cannot support.
 
-.. image:: Pyleoclim_UI.png
-   :scale: 80 %
-   :alt: The Pyleoclim UI. Credit: Feng Zhu
+.. image:: Pyleoclim_API.png
+   :scale: 30 %
+   :alt: The Pyleoclim User API. Credit: Feng Zhu
    :align: center
 
 The following describes the various classes that undergird the Pyleoclim edifice.
@@ -50,6 +50,12 @@ Compared to a MultipleSeries object, an EnsembleSeries object has the following 
 .. autoclass:: pyleoclim.core.ui.EnsembleSeries
    :members:
 
+SurrogateSeries (pyleoclim.SurrogateSeries)
+"""""""""""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.ui.SurrogateSeries
+  :members:
+
 Lipd (pyleoclim.Lipd)
 """""""""""""""""""""
 
@@ -78,6 +84,11 @@ Available methods:
 .. autoclass:: pyleoclim.core.ui.PSD
    :members:
 
+MultiplePSD (pyleoclim.MultiplePSD)
+"""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.ui.MultiplePSD
+  :members:
 
 Scalogram (pyleoclim.Scalogram)
 """""""""""""""""""""""""""""""
@@ -86,32 +97,16 @@ The Scalogram class is analogous to PSD, but for wavelet spectra (scalograms)
 .. autoclass:: pyleoclim.core.ui.Scalogram
    :members:
 
+MultipleScalogram (pyleoclim.MultipleScalogram)
+"""""""""""""""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.ui.MultipleScalogram
+  :members:
 
 Coherence (pyleoclim.Coherence)
 """""""""""""""""""""""""""""""
 
 .. autoclass:: pyleoclim.core.ui.Coherence
-   :members:
-
-
-SurrogateSeries (pyleoclim.SurrogateSeries)
-"""""""""""""""""""""""""""""""""""""""""""
-
-.. autoclass:: pyleoclim.core.ui.SurrogateSeries
-   :members:
-
-
-MultiplePSD (pyleoclim.MultiplePSD)
-"""""""""""""""""""""""""""""""""""
-
-.. autoclass:: pyleoclim.core.ui.MultiplePSD
-   :members:
-
-
-MultipleScalogram (pyleoclim.MultipleScalogram)
-"""""""""""""""""""""""""""""""""""""""""""""""
-
-.. autoclass:: pyleoclim.core.ui.MultipleScalogram
    :members:
 
 Corr (pyleoclim.Corr)
@@ -126,6 +121,13 @@ CorrEns (pyleoclim.CorrEns)
 
 .. autoclass:: pyleoclim.core.ui.CorrEns
    :members:
+
+SpatialDecomp (pyleoclim.SpatialDecomp)
+"""""""""""""""""""""""""""""""""""""""
+
+.. autoclass:: pyleoclim.core.ui.SpatialDecomp
+  :members:
+
 
 SsaRes (pyleoclim.SsaRes)
 """""""""""""""""""""""""""
