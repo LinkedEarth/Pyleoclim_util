@@ -4108,71 +4108,71 @@ class MultipleSeries:
                             eigvals = out.eigenvals, eigvecs = out.eigenvecs)
         return res    
 
-    def mcpca(self,nMC=200,**pca_kwargs):
-        ''' Monte Carlo Principal Component Analysis
+    # def mcpca(self,nMC=200,**pca_kwargs):
+    #     ''' Monte Carlo Principal Component Analysis
         
-        (UNDER REPAIR - USE AT YOUR OWN RISK)
+    #     (UNDER REPAIR)
 
-        Parameters
-        ----------
+    #     Parameters
+    #     ----------
 
-        nMC : int
-            number of Monte Carlo simulations
+    #     nMC : int
+    #         number of Monte Carlo simulations
 
-        pca_kwargs : tuple
+    #     pca_kwargs : tuple
 
 
-        Returns
-        -------
-        res : dictionary containing:
+    #     Returns
+    #     -------
+    #     res : dictionary containing:
 
-            - eigval : eigenvalues (nrec,)
-            - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)
-            - pcs  : PC series of all components (nrec, nt)
-            - eofs : EOFs of all components (nrec, nrec)
+    #         - eigval : eigenvalues (nrec,)
+    #         - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)
+    #         - pcs  : PC series of all components (nrec, nt)
+    #         - eofs : EOFs of all components (nrec, nrec)
 
-        References:
-        ----------
-        Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene
-        European speleothem δ18O records linked to North Atlantic Ocean circulation.
-        Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8
+    #     References:
+    #     ----------
+    #     Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene
+    #     European speleothem δ18O records linked to North Atlantic Ocean circulation.
+    #     Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8
 
-        See also
-        --------
+    #     See also
+    #     --------
 
-        pyleoclim.utils.decomposition.mcpca: Monte Carlo PCA
+    #     pyleoclim.utils.decomposition.mcpca: Monte Carlo PCA
 
-        Examples
-        --------
+    #     Examples
+    #     --------
 
-        .. ipython:: python
-            :okwarning:
+    #     .. ipython:: python
+    #         :okwarning:
 
-            import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
+    #         import pyleoclim as pyleo
+    #         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+    #         data = pyleo.Lipd(usr_path = url)
+    #         tslist = data.to_LipdSeriesList()
+    #         tslist = tslist[2:] # drop the first two series which only concerns age and depth
+    #         ms = pyleo.MultipleSeries(tslist)
 
-            # msc = ms.common_time()
+    #         # msc = ms.common_time()
 
-            # res = msc.pca(nMC=20)
+    #         # res = msc.pca(nMC=20)
 
-        '''
-        flag, lengths = self.equal_lengths()
+    #     '''
+    #     flag, lengths = self.equal_lengths()
 
-        if flag==False:
-            print('All Time Series should be of same length. Apply common_time() first')
-        else: # if all series have equal length
-            p = len(lengths)
-            n = lengths[0]
-            ys = np.empty((n,p))
-            for j in range(p):
-                ys[:,j] = self.series_list[j].value
+    #     if flag==False:
+    #         print('All Time Series should be of same length. Apply common_time() first')
+    #     else: # if all series have equal length
+    #         p = len(lengths)
+    #         n = lengths[0]
+    #         ys = np.empty((n,p))
+    #         for j in range(p):
+    #             ys[:,j] = self.series_list[j].value
 
-        res = decomposition.mcpca(ys, nMC, **pca_kwargs)
-        return res
+    #     res = decomposition.mcpca(ys, nMC, **pca_kwargs)
+    #     return res
 
     def bin(self, **kwargs):
         '''Aligns the time axes of a MultipleSeries object, via binning.
@@ -6529,7 +6529,7 @@ class SsaRes:
         v = self.eigvals
         n = self.PC.shape[0] #sample size
         dv = v*np.sqrt(2/(n-1)) 
-        idx = np.arange(len(v)) 
+        idx = np.arange(len(v))+1 
         if self.eigvals_q is not None:
             plt.fill_between(idx,self.eigvals_q[:,0],self.eigvals_q[:,1], color=clr_mcssa, alpha = 0.3, label='AR(1) 5-95% quantiles') 
             

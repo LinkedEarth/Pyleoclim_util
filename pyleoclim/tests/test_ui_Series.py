@@ -714,25 +714,6 @@ class TestUISeriesWavelet():
         freq = np.linspace(1/500, 1/2, 20)
         scal = ts.wavelet(method=wave_method, settings={'freq': freq})
 
-# class TestUISeriesSsa():
-#     ''' Test the SSA functionalities
-#     '''
-
-#     def test_ssa_t0(self):
-#         ''' Test Series.ssa() with available methods using default arguments
-#         '''
-#         t, v = gen_colored_noise(nt=500, alpha=1.0)
-#         ts = pyleo.Series(time=t, value=v)
-#         res = ts.ssa()
-
-#     def test_ssa_t1(self):
-#         '''Test Series.ssa() with var truncation
-#         '''
-#         alpha = 1
-#         t, v = gen_colored_noise(nt=500, alpha=1.0)
-#         ts = pyleo.Series(time=t, value=v)
-
-#         res = ts.ssa(trunc='var')
 
 class TestUISeriesSsa():
     ''' Test the SSA functionalities
@@ -741,9 +722,13 @@ class TestUISeriesSsa():
     def test_ssa_t0(self):
         ''' Test Series.ssa() with available methods using default arguments
         '''
-        t, v = gen_colored_noise(nt=500, alpha=1.0)
-        ts = pyleo.Series(time=t, value=v)
-        res = ts.ssa()
+        nt = 500
+        t  = np.arange(nt)
+        cn = pyleo.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
+
+        res = cn.ssa()
+        assert abs(res.pctvar.sum() - 100.0)<0.01
+        
 
     def test_ssa_t1(self):
         '''Test Series.ssa() with var truncation
@@ -763,7 +748,7 @@ class TestUISeriesSsa():
         ts = pyleo.Series(time=t, value=v)
 
         res = ts.ssa(M=60, nMC=10, trunc='mcssa')
-        res.screeplot()
+        res.screeplot(mute=True)
 
     def test_ssa_t3(self):
         '''Test Series.ssa() with Kaiser truncation
@@ -779,8 +764,7 @@ class TestUISeriesSsa():
         df = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/mratest.txt',delim_whitespace=True,names=['Total','Signal','Noise'])
         mra = pyleo.Series(time=df.index, value=df['Total'], value_name='Allen&Smith test data', time_name='Time', time_unit='yr')
         mraSsa = mra.ssa(nMC=10)
-        mraSsa.screeplot()
-        mraSsa.modeplot(mode=1)    
+        mraSsa.screeplot(mute=True)
 
 class TestUiSeriesPlot:
     '''Test for Series.plot()
