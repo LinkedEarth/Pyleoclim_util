@@ -4174,7 +4174,8 @@ class MultipleSeries:
         return res
 
     def bin(self, **kwargs):
-        ''' Aligns the time axes of a MultipleSeries object, via binning.
+        '''Aligns the time axes of a MultipleSeries object, via binning.
+        
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
 
@@ -4209,9 +4210,10 @@ class MultipleSeries:
 
         Examples
         --------
-
+        
         .. ipython:: python
             :okwarning:
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
