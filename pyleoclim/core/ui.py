@@ -4269,6 +4269,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
