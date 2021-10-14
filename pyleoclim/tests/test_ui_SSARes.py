@@ -20,10 +20,9 @@ import numpy as np
 
 
 # Tests below
-
-         
+      
 class TestUiSSAResScreeplot:
-    ''' Tests for SSARes.modeplot()
+    ''' Tests for SSARes.screeplot()
     '''
 
     def test_plot_t0(self):
@@ -35,7 +34,7 @@ class TestUiSSAResScreeplot:
         cn = pyleo.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
 
         cn_ssa = cn.ssa()
-        fig, ax = cn_ssa.screeplot(title="A useless test",mute=True) 
+        fig, ax = cn_ssa.screeplot(title="Non default title",mute=True) 
         
         
 class TestUiSSAResModeplot:

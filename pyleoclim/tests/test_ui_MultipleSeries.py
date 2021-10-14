@@ -218,7 +218,7 @@ class TestMultipleSeriesPca:
 
     def test_pca_t0(self):
         '''
-        Test with synthetic data, no missing values, scree_plot()
+        Test with synthetic data, no missing values, screeplot()
 
         Returns
         -------
@@ -237,32 +237,11 @@ class TestMultipleSeriesPca:
 
         res = ms.pca()
         
-        fig, ax = res.screeplot()
+        # check that all variance was recovered
+        assert abs(res.pctvar.sum() - 100)<0.1 
         
+    
     def test_pca_t1(self):
-        '''
-        Test with synthetic data, non missing values, mode_plot()
-
-        Returns
-        -------
-        None.
-
-        '''
-        p = 10; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
-        X = signal.value[:,None] + np.random.randn(n,p)
-        t = np.arange(n)
-    
-        mslist = []
-        for i in range(p):
-            mslist.append(pyleo.Series(time = t, value = X[:,i]))
-        ms = pyleo.MultipleSeries(mslist)
-
-        res = ms.pca()
-        
-        fig, ax = res.modeplot()
-        
-    def test_pca_t2(self):
         '''
         Test with synthetic data, with missing values
 
@@ -284,13 +263,11 @@ class TestMultipleSeriesPca:
             mslist.append(pyleo.Series(time = t, value = X[:,i],clean_ts=False))
         ms = pyleo.MultipleSeries(mslist)
 
-        res = ms.pca(ncomp=4)  
+        res = ms.pca(ncomp=4,gls=True)  
+                
+        fig, ax = res.screeplot(mute=True) 
         
-        # ValueError: Implementation requires that all columns and all rows have at least ncomp non-missing values
-        
-        fig, ax = res.screeplot() 
-        
-    def test_pca_t3(self):
+    def test_pca_t2(self):
         '''
         Test with real data, same time axis
     
@@ -304,8 +281,32 @@ class TestMultipleSeriesPca:
     
         res = msl.pca()
         
-        res.screeplot()
-        res.modeplot()
+        res.screeplot(mute=True)
+        res.modeplot(mute=True)
+        
+    def test_pca_t3(self):
+        '''
+        Test with synthetic data, no missing values, kwargs
+
+        Returns
+        -------
+        None.
+
+        '''
+        p = 10; n = 100
+        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0)
+        X = signal.value[:,None] + np.random.randn(n,p)
+        t = np.arange(n)
+    
+        mslist = []
+        for i in range(p):
+            mslist.append(pyleo.Series(time = t, value = X[:,i]))
+        ms = pyleo.MultipleSeries(mslist)
+
+        res = ms.pca(method='eig',standardize=True,demean=False,normalize=True)
+        # check that all variance was recovered
+        assert abs(res.pctvar.sum() - 100)<0.001 
+        
  
 class TestMultipleSeriesGridProperties:
     '''Test for MultipleSeries.grid_properties()
@@ -326,9 +327,7 @@ class TestMultipleSeriesGridProperties:
         gp = ms.grid_properties(step_style=step_style)
         
         assert (gp[0,:] == np.array((t.min(), t.max(), 1.))).all()
-        
-        
-        
+               
 # class TestMultipleSeriesMcPca:
 #     '''Test for MultipleSeries.mcpca()
 
