@@ -134,6 +134,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
 
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         import pyleoclim as pyleo
 
@@ -162,6 +163,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
 
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         # default scaling slope 'alpha' is 1
         ts = pyleo.gen_ts(model='colored_noise')
@@ -193,6 +195,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
 
     .. ipython:: python
         :okwarning
+        :okexcept:
 
         # default scaling slopes 'alpha1' is 0.5 and 'alpha2' is 2, with break at 1/20
         ts = pyleo.gen_ts(model='colored_noise_2regimes')
@@ -295,6 +298,7 @@ class Series:
 
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         import pyleoclim as pyleo
         import pandas as pd
@@ -344,6 +348,7 @@ class Series:
         --------
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -528,6 +533,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -653,6 +659,7 @@ class Series:
 
             .. ipython:: python
                 :okwarning:
+                :okexcept:    
 
                 import pyleoclim as pyleo
                 import pandas as pd
@@ -668,6 +675,7 @@ class Series:
 
             .. ipython:: python
                 :okwarning:
+                :okexcept:    
 
                 @savefig ts_plot2.png
                 fig, ax = ts.plot(color='r')
@@ -679,6 +687,7 @@ class Series:
 
             .. ipython:: python
                 :okwarning:
+                :okexcept:    
 
                 fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'})
                 pyleo.savefig(fig,path='ts_plot3.png')
@@ -787,6 +796,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -806,6 +816,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
             var_pct = nino_ssa['pctvar'] # extract the fraction of variance attributable to each mode
 
             # plot eigenvalues
@@ -825,6 +836,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             print(nino_ssa.pctvar[15:].sum()*100)
 
@@ -832,6 +844,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
             fig, ax = ts.plot(title='ONI',mute=True) # we mute the first call to only get the plot with 2 lines
@@ -852,6 +865,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             nino_mcssa = ts.ssa(M = 60, nMC=1000)
 
@@ -859,6 +873,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             nino_mcssa.screeplot()
             @savefig scree_nmc.png
@@ -947,6 +962,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import numpy as np
@@ -970,6 +986,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             fig, ax = ts.plot(mute=True, label='mix')
             ts.filter(cutoff_freq=15).plot(ax=ax, label='After 15 Hz low-pass filter')
@@ -983,6 +1000,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             fig, ax = ts.plot(mute=True, label='mix')
             ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label='After 15-25 Hz band-pass filter')
@@ -995,6 +1013,7 @@ class Series:
         Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             fig, ax = ts.plot(mute=True, label='mix')
             ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
@@ -1113,6 +1132,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -1265,6 +1285,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
             
             import pyleoclim as pyleo
             import pandas as pd
@@ -1277,6 +1298,7 @@ class Series:
         
         .. ipython:: python
             :okwarning:
+            :okexcept:    
             
             import pyleoclim as pyleo
             import pandas as pd
@@ -1291,6 +1313,7 @@ class Series:
         
         .. ipython:: python
             :okwarning:
+            :okexcept:    
             
             import pyleoclim as pyleo
             import pandas as pd
@@ -1655,6 +1678,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import numpy as np
@@ -1764,6 +1788,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -1778,6 +1803,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             psd_ls = ts_std.spectral(method='lomb_scargle')
             psd_ls_signif = psd_ls.signif_test(number=20) #in practice, need more AR1 simulations
@@ -1791,6 +1817,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import numpy as np
             psd_LS_n50 = ts_std.spectral(method='lomb_scargle', settings={'n50': 4})  # c=1e-2 yields lower frequency resolution
@@ -1820,6 +1847,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             psd_wwz = ts_std.spectral(method='wwz')  # wwz is the default method
             psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger
@@ -1831,6 +1859,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             ts_interp = ts_std.interp()
             psd_perio = ts_interp.spectral(method='periodogram')
@@ -1843,6 +1872,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             ts_interp = ts_std.interp()
             psd_welch = ts_interp.spectral(method='welch')
@@ -1855,6 +1885,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             ts_interp = ts_std.interp()
             psd_mtm = ts_interp.spectral(method='mtm')
@@ -1957,6 +1988,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2071,6 +2103,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:                   
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2092,6 +2125,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:
 
             coh_ntau = ts_air.wavelet_coherence(ts_nino, ntau=30)
 
@@ -2103,6 +2137,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             coh_tau = ts_air.wavelet_coherence(ts_nino, tau=np.arange(1880, 2001))
 
@@ -2221,6 +2256,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2311,6 +2347,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2339,6 +2376,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             caus_res = ts_nino.causality(ts_air, method='granger')
             print(caus_res)
@@ -3516,6 +3554,7 @@ class MultipleSeries:
     --------
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         import pyleoclim as pyleo
         import pandas as pd
@@ -3561,6 +3600,7 @@ class MultipleSeries:
         --------
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -3770,6 +3810,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import numpy as np
             import pyleoclim as pyleo
@@ -3928,6 +3969,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             from pyleoclim.utils.tsmodel import colored_noise
@@ -4677,6 +4719,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -5080,6 +5123,7 @@ class EnsembleSeries(MultipleSeries):
 
             .. ipython:: python
                 :okwarning:
+                :okexcept:    
                 
                 nn = 30 # number of noise realizations
                 nt = 500
@@ -5204,6 +5248,7 @@ class EnsembleSeries(MultipleSeries):
         --------
         .. ipython:: python
             :okwarning:
+            :okexcept:    
             
             nn = 30 # number of noise realizations
             nt = 500
@@ -6662,6 +6707,7 @@ class Lipd:
 
     .. ipython:: python
         :okwarning:
+        :okexcept:
 
         import pyleoclim as pyleo
         url='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -6951,6 +6997,7 @@ class Lipd:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -6963,6 +7010,7 @@ class Lipd:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -7039,7 +7087,8 @@ class LipdSeries(Series):
 
     .. ipython:: python
         :okwarning:
-
+        :okexcept:
+            
         import pyleoclim as pyleo
         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
         data = pyleo.Lipd(usr_path = url)
@@ -7055,6 +7104,7 @@ class LipdSeries(Series):
 
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         ts1 = data.to_LipdSeries(number=5)
 
@@ -7064,6 +7114,7 @@ class LipdSeries(Series):
 
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         ts_list = data.to_LipdSeriesList()
         # only keep the Mg/Ca and SST
@@ -7295,6 +7346,7 @@ class LipdSeries(Series):
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -7619,6 +7671,7 @@ class LipdSeries(Series):
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -8182,6 +8235,7 @@ class LipdSeries(Series):
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
                 
             D = pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=Crystal.McCabe-Glynn.2013')
             ts=D.to_LipdSeries(number=2)
