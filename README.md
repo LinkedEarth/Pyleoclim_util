@@ -31,7 +31,7 @@ Online documentation is available through readthedocs:
 
 ### Dependencies
 
-pyleoclim **only** supports Python 3.8
+pyleoclim **only** supports Python 3.8, 3.9
 
 ### Installation
 
