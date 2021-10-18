@@ -7279,7 +7279,13 @@ class LipdSeries(Series):
         #create multipleseries
         s_list=[]
         for i, s in enumerate(ensembleValuestoPaleo.T):
-            s_tmp = Series(time=s,value=ys, verbose=i==0, clean_ts=False)
+            s_tmp = Series(time=s,value=ys,
+                           verbose=i==0, 
+                           clean_ts=False, 
+                           value_name=self.value_name,
+                           value_unit=self.value_unit,
+                           time_name=self.time_name,
+                           time_unit=self.time_unit)
             s_list.append(s_tmp)
 
         ens = EnsembleSeries(series_list=s_list)
@@ -7721,6 +7727,7 @@ class LipdSeries(Series):
             if 'shade_clr' not in plt_kwargs.keys():
                 archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
                 plt_kwargs.update({'shade_clr':self.plot_default[archiveType][0]})
+            #plt_kwargs.update({'ylabel':self.value_name})
             ax['ts'] = ensc.plot_envelope(**plt_kwargs)
         else:
             raise ValueError("Invalid argument value for ensemble")
