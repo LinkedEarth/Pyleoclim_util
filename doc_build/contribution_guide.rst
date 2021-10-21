@@ -279,4 +279,4 @@ For the latter, make sure the example is:
 How to build the Pyleoclim documentation
 """"""""""""""""""""""""""""""""""""""""
 
-TBD
+Navigate to the doc_build folder and type :command: `make html`. This may require installing other packages (sphinx, nbsphinx, etc).

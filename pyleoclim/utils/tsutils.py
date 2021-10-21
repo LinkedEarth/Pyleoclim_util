@@ -919,7 +919,7 @@ def remove_outliers(ts,ys,outlier_points):
 
     return ys,ts
 
-def eff_sample_size(y):
+def eff_sample_size(y, detrend_flag=False):
     '''
     Effective Sample Size of timeseries y
 
@@ -927,6 +927,9 @@ def eff_sample_size(y):
     ----------
     y : float 
        1d array 
+       
+    detrend : boolean
+        if True (default), detrends y before estimation.         
 
     Returns
     -------
@@ -942,16 +945,20 @@ def eff_sample_size(y):
     '''
     if len(y) < 100:
         fft = False
-        nlags = 40
     else:
         fft = True
-        nlags = None
         
-    rho   = sms.acf(y,adjusted=True,fft=fft,nlags=nlags) # compute autocorrelation function
-    nl = len(rho)      
-    kvec = np.arange(1,nl)
-    fac = (1-kvec/nl)*rho[1:]
-    neff = len(y)/(1+2*np.sum(fac))   # Thiébaux & Zwiers 84, Eq 2.1
+    if detrend_flag:
+        yd = detrend(y)
+    else:
+        yd = y
+    
+    n     = len(y)
+    nl    = max(np.sqrt(n),10)     # rule of thumb for choosing number of lags
+    rho   = sms.acf(yd,adjusted=True,fft=fft,nlags=nl) # compute autocorrelation function         
+    kvec  = np.arange(nl)
+    fac   = (1-kvec/nl)*rho[1:]
+    neff  = n/(1+2*np.sum(fac))   # Thiébaux & Zwiers 84, Eq 2.1
     
     return neff
 
