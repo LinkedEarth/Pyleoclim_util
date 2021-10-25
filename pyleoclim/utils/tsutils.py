@@ -954,7 +954,7 @@ def eff_sample_size(y, detrend_flag=False):
         yd = y
     
     n     = len(y)
-    nl    = max(np.sqrt(n),10)     # rule of thumb for choosing number of lags
+    nl    = math.floor(max(np.sqrt(n),10))     # rule of thumb for choosing number of lags
     rho   = sms.acf(yd,adjusted=True,fft=fft,nlags=nl) # compute autocorrelation function         
     kvec  = np.arange(nl)
     fac   = (1-kvec/nl)*rho[1:]
