@@ -1,6 +1,6 @@
 <!---[![PyPI](https://img.shields.io/pypi/dm/pyleoclim.svg)](https://pypi.python.org/pypi/Pyleoclim)-->
 [![PyPI version](https://badge.fury.io/py/pyleoclim.svg)](https://badge.fury.io/py/pyleoclim)
-[![PyPI](https://img.shields.io/badge/python-3.8-yellow.svg)]()
+[![PyPI](https://img.shields.io/badge/python-3.9-yellow.svg)]()
 [![license](https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg)]()
 [![DOI](https://zenodo.org/badge/59611213.svg)](https://zenodo.org/badge/latestdoi/59611213)
 [![NSF-1541029](https://img.shields.io/badge/NSF-1541029-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1541029)
@@ -44,14 +44,13 @@ Pyleoclim development takes place on GitHub: https://github.com/LinkedEarth/Pyle
 
 Please submit any reproducible bugs you encounter to the [issue tracker](https://github.com/LinkedEarth/Pyleoclim_util/issues)
 
-Guidelines for contributors are described _here_ (placeholder)
 
 ### License
 
 The project is licensed under the GNU Public License. Please refer to the file call license.
 If you use the code in publications, please credit the work using this citation:
 
-_Deborah Khider, Feng Zhu, Julien Emile-Geay, Jun Hu, Alexander James, Pratheek Athreya, Myron Kwan, Daniel Garijo. (2021). Pyleoclim: v0.6.1 Release. Zenodo. http://doi.org/10.5281/zenodo.1212692_
+_Deborah Khider, Feng Zhu, Julien Emile-Geay, Jun Hu, Alexander James, Pratheek Athreya, Myron Kwan, Daniel Garijo. (2021). Pyleoclim: v0.7.0 Release. Zenodo. http://doi.org/10.5281/zenodo.1212692_
 
 
 ### Disclaimer
