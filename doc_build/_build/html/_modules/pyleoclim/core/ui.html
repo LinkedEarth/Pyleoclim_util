@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>pyleoclim.core.ui &mdash; Pyleoclim 0.6.2beta documentation</title>
+  <title>pyleoclim.core.ui &mdash; Pyleoclim 0.6.3beta documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.6.2beta
+                0.6.3beta
               </div>
             
           
@@ -312,6 +312,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        import pyleoclim as pyleo</span>
 
@@ -340,6 +341,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        # default scaling slope &#39;alpha&#39; is 1</span>
 <span class="sd">        ts = pyleo.gen_ts(model=&#39;colored_noise&#39;)</span>
@@ -371,6 +373,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning</span>
+<span class="sd">        :okexcept:</span>
 
 <span class="sd">        # default scaling slopes &#39;alpha1&#39; is 0.5 and &#39;alpha2&#39; is 2, with break at 1/20</span>
 <span class="sd">        ts = pyleo.gen_ts(model=&#39;colored_noise_2regimes&#39;)</span>
@@ -473,6 +476,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        import pyleoclim as pyleo</span>
 <span class="sd">        import pandas as pd</span>
@@ -522,6 +526,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -706,6 +711,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -831,6 +837,7 @@
 
 <span class="sd">            .. ipython:: python</span>
 <span class="sd">                :okwarning:</span>
+<span class="sd">                :okexcept:    </span>
 
 <span class="sd">                import pyleoclim as pyleo</span>
 <span class="sd">                import pandas as pd</span>
@@ -846,6 +853,7 @@
 
 <span class="sd">            .. ipython:: python</span>
 <span class="sd">                :okwarning:</span>
+<span class="sd">                :okexcept:    </span>
 
 <span class="sd">                @savefig ts_plot2.png</span>
 <span class="sd">                fig, ax = ts.plot(color=&#39;r&#39;)</span>
@@ -857,6 +865,7 @@
 
 <span class="sd">            .. ipython:: python</span>
 <span class="sd">                :okwarning:</span>
+<span class="sd">                :okexcept:    </span>
 
 <span class="sd">                fig, ax = ts.plot(color=&#39;k&#39;, savefig_settings={&#39;path&#39;: &#39;ts_plot3.png&#39;})</span>
 <span class="sd">                pyleo.savefig(fig,path=&#39;ts_plot3.png&#39;)</span>
@@ -965,6 +974,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -984,6 +994,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 <span class="sd">            var_pct = nino_ssa[&#39;pctvar&#39;] # extract the fraction of variance attributable to each mode</span>
 
 <span class="sd">            # plot eigenvalues</span>
@@ -1003,6 +1014,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            print(nino_ssa.pctvar[15:].sum()*100)</span>
 
@@ -1010,6 +1022,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            RCk = nino_ssa.RCmat[:,:14].sum(axis=1)</span>
 <span class="sd">            fig, ax = ts.plot(title=&#39;ONI&#39;,mute=True) # we mute the first call to only get the plot with 2 lines</span>
@@ -1030,6 +1043,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            nino_mcssa = ts.ssa(M = 60, nMC=1000)</span>
 
@@ -1037,6 +1051,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            nino_mcssa.screeplot()</span>
 <span class="sd">            @savefig scree_nmc.png</span>
@@ -1125,6 +1140,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import numpy as np</span>
@@ -1148,6 +1164,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            fig, ax = ts.plot(mute=True, label=&#39;mix&#39;)</span>
 <span class="sd">            ts.filter(cutoff_freq=15).plot(ax=ax, label=&#39;After 15 Hz low-pass filter&#39;)</span>
@@ -1161,6 +1178,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            fig, ax = ts.plot(mute=True, label=&#39;mix&#39;)</span>
 <span class="sd">            ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label=&#39;After 15-25 Hz band-pass filter&#39;)</span>
@@ -1173,6 +1191,7 @@
 <span class="sd">        Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:</span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            fig, ax = ts.plot(mute=True, label=&#39;mix&#39;)</span>
 <span class="sd">            ts.filter(cutoff_freq=[15, 25], method=&#39;firwin&#39;, window=&#39;hanning&#39;).plot(ax=ax, label=&#39;After 15-25 Hz band-pass filter&#39;)</span>
@@ -1291,6 +1310,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -1443,6 +1463,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 <span class="sd">            </span>
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -1455,6 +1476,7 @@
 <span class="sd">        </span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 <span class="sd">            </span>
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -1469,6 +1491,7 @@
 <span class="sd">        </span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 <span class="sd">            </span>
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -1833,6 +1856,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import numpy as np</span>
@@ -1942,6 +1966,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -1956,6 +1981,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            psd_ls = ts_std.spectral(method=&#39;lomb_scargle&#39;)</span>
 <span class="sd">            psd_ls_signif = psd_ls.signif_test(number=20) #in practice, need more AR1 simulations</span>
@@ -1969,6 +1995,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import numpy as np</span>
 <span class="sd">            psd_LS_n50 = ts_std.spectral(method=&#39;lomb_scargle&#39;, settings={&#39;n50&#39;: 4})  # c=1e-2 yields lower frequency resolution</span>
@@ -1998,6 +2025,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            psd_wwz = ts_std.spectral(method=&#39;wwz&#39;)  # wwz is the default method</span>
 <span class="sd">            psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger</span>
@@ -2009,6 +2037,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            ts_interp = ts_std.interp()</span>
 <span class="sd">            psd_perio = ts_interp.spectral(method=&#39;periodogram&#39;)</span>
@@ -2021,6 +2050,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            ts_interp = ts_std.interp()</span>
 <span class="sd">            psd_welch = ts_interp.spectral(method=&#39;welch&#39;)</span>
@@ -2033,6 +2063,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            ts_interp = ts_std.interp()</span>
 <span class="sd">            psd_mtm = ts_interp.spectral(method=&#39;mtm&#39;)</span>
@@ -2135,6 +2166,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -2249,6 +2281,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:                   </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -2270,6 +2303,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:</span>
 
 <span class="sd">            coh_ntau = ts_air.wavelet_coherence(ts_nino, ntau=30)</span>
 
@@ -2281,6 +2315,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            coh_tau = ts_air.wavelet_coherence(ts_nino, tau=np.arange(1880, 2001))</span>
 
@@ -2399,6 +2434,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -2489,6 +2525,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -2517,6 +2554,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            caus_res = ts_nino.causality(ts_air, method=&#39;granger&#39;)</span>
 <span class="sd">            print(caus_res)</span>
@@ -3694,6 +3732,7 @@
 <span class="sd">    --------</span>
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        import pyleoclim as pyleo</span>
 <span class="sd">        import pandas as pd</span>
@@ -3739,6 +3778,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -3948,6 +3988,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import numpy as np</span>
 <span class="sd">            import pyleoclim as pyleo</span>
@@ -4106,6 +4147,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            from pyleoclim.utils.tsmodel import colored_noise</span>
@@ -4243,6 +4285,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -4285,74 +4328,75 @@
                             <span class="n">eigvals</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">eigenvals</span><span class="p">,</span> <span class="n">eigvecs</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">eigenvecs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span>    </div>
 
-<div class="viewcode-block" id="MultipleSeries.mcpca"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.MultipleSeries.mcpca">[docs]</a>    <span class="k">def</span> <span class="nf">mcpca</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nMC</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="o">**</span><span class="n">pca_kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Monte Carlo Principal Component Analysis</span>
-<span class="sd">        </span>
-<span class="sd">        (UNDER REPAIR - USE AT YOUR OWN RISK)</span>
+    <span class="c1"># def mcpca(self,nMC=200,**pca_kwargs):</span>
+    <span class="c1">#     &#39;&#39;&#39; Monte Carlo Principal Component Analysis</span>
+        
+    <span class="c1">#     (UNDER REPAIR)</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
+    <span class="c1">#     Parameters</span>
+    <span class="c1">#     ----------</span>
 
-<span class="sd">        nMC : int</span>
-<span class="sd">            number of Monte Carlo simulations</span>
+    <span class="c1">#     nMC : int</span>
+    <span class="c1">#         number of Monte Carlo simulations</span>
 
-<span class="sd">        pca_kwargs : tuple</span>
+    <span class="c1">#     pca_kwargs : tuple</span>
 
 
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        res : dictionary containing:</span>
+    <span class="c1">#     Returns</span>
+    <span class="c1">#     -------</span>
+    <span class="c1">#     res : dictionary containing:</span>
 
-<span class="sd">            - eigval : eigenvalues (nrec,)</span>
-<span class="sd">            - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)</span>
-<span class="sd">            - pcs  : PC series of all components (nrec, nt)</span>
-<span class="sd">            - eofs : EOFs of all components (nrec, nrec)</span>
+    <span class="c1">#         - eigval : eigenvalues (nrec,)</span>
+    <span class="c1">#         - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)</span>
+    <span class="c1">#         - pcs  : PC series of all components (nrec, nt)</span>
+    <span class="c1">#         - eofs : EOFs of all components (nrec, nrec)</span>
 
-<span class="sd">        References:</span>
-<span class="sd">        ----------</span>
-<span class="sd">        Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene</span>
-<span class="sd">        European speleothem δ18O records linked to North Atlantic Ocean circulation.</span>
-<span class="sd">        Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8</span>
+    <span class="c1">#     References:</span>
+    <span class="c1">#     ----------</span>
+    <span class="c1">#     Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene</span>
+    <span class="c1">#     European speleothem δ18O records linked to North Atlantic Ocean circulation.</span>
+    <span class="c1">#     Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8</span>
 
-<span class="sd">        See also</span>
-<span class="sd">        --------</span>
+    <span class="c1">#     See also</span>
+    <span class="c1">#     --------</span>
 
-<span class="sd">        pyleoclim.utils.decomposition.mcpca: Monte Carlo PCA</span>
+    <span class="c1">#     pyleoclim.utils.decomposition.mcpca: Monte Carlo PCA</span>
 
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
+    <span class="c1">#     Examples</span>
+    <span class="c1">#     --------</span>
 
-<span class="sd">        .. ipython:: python</span>
-<span class="sd">            :okwarning:</span>
+    <span class="c1">#     .. ipython:: python</span>
+    <span class="c1">#         :okwarning:</span>
 
-<span class="sd">            import pyleoclim as pyleo</span>
-<span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
-<span class="sd">            data = pyleo.Lipd(usr_path = url)</span>
-<span class="sd">            tslist = data.to_LipdSeriesList()</span>
-<span class="sd">            tslist = tslist[2:] # drop the first two series which only concerns age and depth</span>
-<span class="sd">            ms = pyleo.MultipleSeries(tslist)</span>
+    <span class="c1">#         import pyleoclim as pyleo</span>
+    <span class="c1">#         url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
+    <span class="c1">#         data = pyleo.Lipd(usr_path = url)</span>
+    <span class="c1">#         tslist = data.to_LipdSeriesList()</span>
+    <span class="c1">#         tslist = tslist[2:] # drop the first two series which only concerns age and depth</span>
+    <span class="c1">#         ms = pyleo.MultipleSeries(tslist)</span>
 
-<span class="sd">            # msc = ms.common_time()</span>
+    <span class="c1">#         # msc = ms.common_time()</span>
 
-<span class="sd">            # res = msc.pca(nMC=20)</span>
+    <span class="c1">#         # res = msc.pca(nMC=20)</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">flag</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">equal_lengths</span><span class="p">()</span>
+    <span class="c1">#     &#39;&#39;&#39;</span>
+    <span class="c1">#     flag, lengths = self.equal_lengths()</span>
 
-        <span class="k">if</span> <span class="n">flag</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;All Time Series should be of same length. Apply common_time() first&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span> <span class="c1"># if all series have equal length</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">p</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
-                <span class="n">ys</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">series_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+    <span class="c1">#     if flag==False:</span>
+    <span class="c1">#         print(&#39;All Time Series should be of same length. Apply common_time() first&#39;)</span>
+    <span class="c1">#     else: # if all series have equal length</span>
+    <span class="c1">#         p = len(lengths)</span>
+    <span class="c1">#         n = lengths[0]</span>
+    <span class="c1">#         ys = np.empty((n,p))</span>
+    <span class="c1">#         for j in range(p):</span>
+    <span class="c1">#             ys[:,j] = self.series_list[j].value</span>
 
-        <span class="n">res</span> <span class="o">=</span> <span class="n">decomposition</span><span class="o">.</span><span class="n">mcpca</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">nMC</span><span class="p">,</span> <span class="o">**</span><span class="n">pca_kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">res</span></div>
+    <span class="c1">#     res = decomposition.mcpca(ys, nMC, **pca_kwargs)</span>
+    <span class="c1">#     return res</span>
 
 <div class="viewcode-block" id="MultipleSeries.bin"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.MultipleSeries.bin">[docs]</a>    <span class="k">def</span> <span class="nf">bin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Aligns the time axes of a MultipleSeries object, via binning.</span>
+        <span class="sd">&#39;&#39;&#39;Aligns the time axes of a MultipleSeries object, via binning.</span>
+<span class="sd">        </span>
 <span class="sd">        This is critical for workflows that need to assume a common time axis</span>
 <span class="sd">        for the group of series under consideration.</span>
 
@@ -4387,9 +4431,10 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-
+<span class="sd">        </span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:</span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -4445,6 +4490,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -4500,6 +4546,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -4850,6 +4897,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -5253,6 +5301,7 @@
 
 <span class="sd">            .. ipython:: python</span>
 <span class="sd">                :okwarning:</span>
+<span class="sd">                :okexcept:    </span>
 <span class="sd">                </span>
 <span class="sd">                nn = 30 # number of noise realizations</span>
 <span class="sd">                nt = 500</span>
@@ -5377,6 +5426,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 <span class="sd">            </span>
 <span class="sd">            nn = 30 # number of noise realizations</span>
 <span class="sd">            nt = 500</span>
@@ -6702,7 +6752,7 @@
         <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigvals</span>
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PC</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#sample size</span>
         <span class="n">dv</span> <span class="o">=</span> <span class="n">v</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> 
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> 
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span> 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigvals_q</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">eigvals_q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">eigvals_q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">clr_mcssa</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;AR(1) 5-95% quantiles&#39;</span><span class="p">)</span> 
             
@@ -6835,6 +6885,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:</span>
 
 <span class="sd">        import pyleoclim as pyleo</span>
 <span class="sd">        url=&#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -7124,6 +7175,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -7136,6 +7188,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -7212,7 +7265,8 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
-
+<span class="sd">        :okexcept:</span>
+<span class="sd">            </span>
 <span class="sd">        import pyleoclim as pyleo</span>
 <span class="sd">        url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
 <span class="sd">        data = pyleo.Lipd(usr_path = url)</span>
@@ -7228,6 +7282,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        ts1 = data.to_LipdSeries(number=5)</span>
 
@@ -7237,6 +7292,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        ts_list = data.to_LipdSeriesList()</span>
 <span class="sd">        # only keep the Mg/Ca and SST</span>
@@ -7401,7 +7457,13 @@
         <span class="c1">#create multipleseries</span>
         <span class="n">s_list</span><span class="o">=</span><span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ensembleValuestoPaleo</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
-            <span class="n">s_tmp</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">s</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="n">ys</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="n">clean_ts</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">s_tmp</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">s</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="n">ys</span><span class="p">,</span>
+                           <span class="n">verbose</span><span class="o">=</span><span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> 
+                           <span class="n">clean_ts</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                           <span class="n">value_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value_name</span><span class="p">,</span>
+                           <span class="n">value_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value_unit</span><span class="p">,</span>
+                           <span class="n">time_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time_name</span><span class="p">,</span>
+                           <span class="n">time_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span><span class="p">)</span>
             <span class="n">s_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s_tmp</span><span class="p">)</span>
 
         <span class="n">ens</span> <span class="o">=</span> <span class="n">EnsembleSeries</span><span class="p">(</span><span class="n">series_list</span><span class="o">=</span><span class="n">s_list</span><span class="p">)</span>
@@ -7468,6 +7530,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -7792,6 +7855,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -7841,6 +7905,7 @@
             <span class="k">if</span> <span class="s1">&#39;shade_clr&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plt_kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">archiveType</span> <span class="o">=</span> <span class="n">lipdutils</span><span class="o">.</span><span class="n">LipdToOntology</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;archiveType&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
                 <span class="n">plt_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;shade_clr&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_default</span><span class="p">[</span><span class="n">archiveType</span><span class="p">][</span><span class="mi">0</span><span class="p">]})</span>
+            <span class="c1">#plt_kwargs.update({&#39;ylabel&#39;:self.value_name})</span>
             <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ensc</span><span class="o">.</span><span class="n">plot_envelope</span><span class="p">(</span><span class="o">**</span><span class="n">plt_kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid argument value for ensemble&quot;</span><span class="p">)</span>
@@ -8355,6 +8420,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 <span class="sd">                </span>
 <span class="sd">            D = pyleo.Lipd(&#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=Crystal.McCabe-Glynn.2013&#39;)</span>
 <span class="sd">            ts=D.to_LipdSeries(number=2)</span>
