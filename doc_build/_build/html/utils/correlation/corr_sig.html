@@ -1,0 +1,328 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>corr_sig (pyleoclim.utils.correlation.corr_sig) &mdash; Pyleoclim 0.6.3beta documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/js/rtd_sphinx_search.min.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Pyleoclim
+          
+
+          
+            
+            <img src="../../_static/pyleoclim_insigna_full_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.3beta
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Working with Pyleoclim</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../core/ui.html">Pyleoclim User API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced functionalities</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Pyleoclim Utilities API (pyleoclim.utils)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Involved</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contribution_guide.html">Contributing to Pyleoclim</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>corr_sig (pyleoclim.utils.correlation.corr_sig)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/utils/correlation/corr_sig.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="corr-sig-pyleoclim-utils-correlation-corr-sig">
+<span id="utils-corr-sig"></span><h1>corr_sig (pyleoclim.utils.correlation.corr_sig)<a class="headerlink" href="#corr-sig-pyleoclim-utils-correlation-corr-sig" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyleoclim.utils.correlation.corr_sig">
+<span class="sig-prename descclassname"><span class="pre">pyleoclim.utils.correlation.</span></span><span class="sig-name descname"><span class="pre">corr_sig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'isospectral'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/correlation.html#corr_sig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.utils.correlation.corr_sig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimates the Pearson’s correlation and associated significance between two non IID time series</p>
+<p>The significance of the correlation is assessed using one of the following methods:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>‘ttest’: T-test adjusted for effective sample size.</dt><dd><p>This is a parametric test (data are Gaussian and identically distributed) with a rather ad-hoc adjustment.
+It is instantaneous but makes a lot of assumptions about the data, many of which may not be met.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘isopersistent’: AR(1) modeling of x and y.</dt><dd><p>This is a parametric test as well (series follow an AR(1) model) but
+solves the issue by direct simulation.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>‘isospectral’: phase randomization of original inputs. (default)</dt><dd><p>This is a non-parametric method, assuming only wide-sense stationarity.</p>
+</dd>
+</dl>
+</li>
+</ol>
+<p>For 2 and 3, computational requirements scale with nsim.
+When possible, nsim should be at least 1000.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y1</strong> (<em>array</em>) – vector of (real) numbers of same length as y2, no NaNs allowed</p></li>
+<li><p><strong>y2</strong> (<em>array</em>) – vector of (real) numbers of same length as y1, no NaNs allowed</p></li>
+<li><p><strong>nsim</strong> (<em>int</em>) – the number of simulations [default: 1000]</p></li>
+<li><p><strong>method</strong> (<em>{'ttest'</em><em>,</em><em>'isopersistent'</em><em>,</em><em>'isospectral'</em><em> (</em><em>default</em><em>)</em><em>}</em>) – method for significance testing</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>) – significance level for critical value estimation [default: 0.05]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p><strong>res</strong> – the result dictionary, containing</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>r<span class="classifier">float</span></dt><dd><p>correlation coefficient</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>p<span class="classifier">float</span></dt><dd><p>the p-value</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>signif<span class="classifier">bool</span></dt><dd><p>true if significant; false otherwise
+Note that signif = True if and only if p &lt;= alpha.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="corr_ttest.html#pyleoclim.utils.correlation.corr_ttest" title="pyleoclim.utils.correlation.corr_ttest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.correlation.corr_ttest</span></code></a></dt><dd><p>Estimates the significance of correlations between 2 time series using the classical T-test adjusted for effective sample size.</p>
+</dd>
+<dt><a class="reference internal" href="corr_isopersist.html#pyleoclim.utils.correlation.corr_isopersist" title="pyleoclim.utils.correlation.corr_isopersist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.correlation.corr_isopersist</span></code></a></dt><dd><p>Computes correlation between two timeseries, and their significance using Ar(1) modeling.</p>
+</dd>
+<dt><a class="reference internal" href="corr_isospec.html#pyleoclim.utils.correlation.corr_isospec" title="pyleoclim.utils.correlation.corr_isospec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.correlation.corr_isospec</span></code></a></dt><dd><p>Estimates the significance of the correlation using phase randomization</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

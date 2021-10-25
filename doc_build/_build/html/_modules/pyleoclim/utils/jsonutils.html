@@ -1,0 +1,488 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>pyleoclim.utils.jsonutils &mdash; Pyleoclim 0.6.2beta documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/js/rtd_sphinx_search.min.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Pyleoclim
+          
+
+          
+            
+            <img src="../../../_static/pyleoclim_insigna_full_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.2beta
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Working with Pyleoclim</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../core/ui.html">Pyleoclim User API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced functionalities</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../utils/introduction.html">Pyleoclim Utilities API (pyleoclim.utils)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Involved</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contribution_guide.html">Contributing to Pyleoclim</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyleoclim.utils.jsonutils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyleoclim.utils.jsonutils</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Created on Mon Oct 19 14:09:03 2020</span>
+
+<span class="sd">@author: deborahkhider</span>
+
+<span class="sd">Utilities to import/export Pyleoclim objects from JSON files</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span><span class="p">[</span><span class="s1">&#39;PyleoObj_to_json&#39;</span><span class="p">,</span> <span class="s1">&#39;json_to_Series&#39;</span><span class="p">,</span><span class="s1">&#39;json_to_PSD&#39;</span><span class="p">,</span><span class="s1">&#39;json_to_Scalogram&#39;</span><span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pyleoclim</span> <span class="k">as</span> <span class="nn">pyleo</span>
+
+<span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This function recursively transform pyleoclim object into dictionaries</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj_dict : dict</span>
+<span class="sd">        A dictionary-like object</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    obj_dict : dict</span>
+<span class="sd">        A dictionary of the pyleoclim objects</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">obj_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">],(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+            <span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">],(</span><span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span><span class="n">pyleo</span><span class="o">.</span><span class="n">Scalogram</span><span class="p">)):</span>
+            <span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="n">PyleoObj_to_json</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">],</span><span class="n">dict_return</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">],</span><span class="n">pyleo</span><span class="o">.</span><span class="n">MultiplePSD</span><span class="p">):</span>
+            <span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="n">PyleoObj_to_json</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">],</span><span class="n">dict_return</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">c</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;psd_list&#39;</span><span class="p">]),</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">:</span>
+                <span class="n">PSD_dict</span><span class="o">=</span><span class="n">PyleoObj_to_json</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;psd_list&#39;</span><span class="p">][</span><span class="n">item</span><span class="p">],</span><span class="n">dict_return</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PSD_dict</span><span class="p">)</span>
+            <span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;psd_list&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">c</span>    
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">],</span><span class="n">pyleo</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">MultipleScalogram</span><span class="p">):</span>
+            <span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="n">PyleoObj_to_json</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">],</span><span class="n">dict_return</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">c</span><span class="o">=</span><span class="p">[]</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;scalogram_list&#39;</span><span class="p">]),</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">:</span>
+                <span class="n">PSD_dict</span><span class="o">=</span><span class="n">PyleoObj_to_json</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;scalogram_list&#39;</span><span class="p">][</span><span class="n">item</span><span class="p">],</span><span class="n">dict_return</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PSD_dict</span><span class="p">)</span>
+            <span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;scalogram_list&#39;</span><span class="p">]</span><span class="o">=</span><span class="n">c</span>            
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">],(</span><span class="nb">dict</span><span class="p">)):</span>
+            <span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="n">transform</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">obj_dict</span>
+
+<span class="k">def</span> <span class="nf">list_to_array</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Recusively transforms lists of dictionaries</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    obj_dict : dict</span>
+<span class="sd">        A dict-like object</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    obj_dict : dict</span>
+<span class="sd">        A dictionary</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">obj_dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span><span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="n">list_to_array</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+            <span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">=</span><span class="n">obj_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">obj_dict</span>
+
+<div class="viewcode-block" id="PyleoObj_to_json"><a class="viewcode-back" href="../../../utils/jsonutils/PyleoObj_to_json.html#pyleoclim.utils.jsonutils.PyleoObj_to_json">[docs]</a><span class="k">def</span> <span class="nf">PyleoObj_to_json</span><span class="p">(</span><span class="n">PyleoObj</span><span class="p">,</span><span class="n">filename</span><span class="p">,</span><span class="n">dict_return</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    PyleoObj : a Pyleoclim object</span>
+<span class="sd">       Can be a Series, PSD, Scalogram, MultipleSeries, MultiplePSD object</span>
+<span class="sd">    filename : str</span>
+<span class="sd">       The name of the output JSON file - ignored if dict_return == True</span>
+<span class="sd">    dict_return : {True,False}, optional</span>
+<span class="sd">        Whether the return the dictionary for further use. Default is False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    obj_dict : dict</span>
+<span class="sd">        If dict_return is True, returns a dictionary like object from the JSON file. </span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">obj_dict</span> <span class="o">=</span> <span class="n">PyleoObj</span><span class="o">.</span><span class="vm">__dict__</span>
+    <span class="n">obj_dict</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dict_return</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">dict_return</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">return</span>  <span class="n">obj_dict</span></div>
+
+<div class="viewcode-block" id="json_to_Series"><a class="viewcode-back" href="../../../utils/jsonutils/json_to_Series.html#pyleoclim.utils.jsonutils.json_to_Series">[docs]</a><span class="k">def</span> <span class="nf">json_to_Series</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Open a JSON file and returns a pyleoclim.Series object</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        The name of the JSON file containing the Series information</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ts : pyleoclim.Series</span>
+<span class="sd">        A pyleoclim.Series object</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">with</span>  <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]),</span>
+                     <span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]),</span>
+                     <span class="n">time_name</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;time_name&#39;</span><span class="p">],</span>
+                     <span class="n">time_unit</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;time_unit&#39;</span><span class="p">],</span>
+                     <span class="n">value_name</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;value_name&#39;</span><span class="p">],</span>
+                     <span class="n">value_unit</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;value_unit&#39;</span><span class="p">],</span>
+                     <span class="n">label</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">])</span> 
+    <span class="k">return</span> <span class="n">ts</span></div>
+
+<span class="k">def</span> <span class="nf">PSD_to_MultiplePSD</span><span class="p">(</span><span class="n">series_list</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Transforms a list of PSD into a MutiplePSD object</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    series_list : list</span>
+<span class="sd">        A list of multiple PSD objects.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    MPSD : pyleoclim.MultiplePSD</span>
+<span class="sd">        A pyleoclim MultiplePSD object</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">series_list</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">d</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">:</span>
+        <span class="n">t</span><span class="o">=</span><span class="n">series_list</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="n">PSD_obj</span><span class="o">=</span><span class="n">pyleo</span><span class="o">.</span><span class="n">PSD</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">]),</span>
+                        <span class="n">amplitude</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">]),</span>
+                        <span class="n">label</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">],</span>
+                        <span class="n">timeseries</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;timeseries&#39;</span><span class="p">],</span>
+                        <span class="n">spec_method</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;spec_method&#39;</span><span class="p">],</span>
+                        <span class="n">spec_args</span> <span class="o">=</span>  <span class="n">t</span><span class="p">[</span><span class="s1">&#39;spec_args&#39;</span><span class="p">],</span>
+                        <span class="n">signif_qs</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_qs&#39;</span><span class="p">],</span>
+                    <span class="n">signif_method</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_method&#39;</span><span class="p">])</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PSD_obj</span><span class="p">)</span>
+    <span class="n">MPSD</span><span class="o">=</span><span class="n">pyleo</span><span class="o">.</span><span class="n">MultiplePSD</span><span class="p">(</span><span class="n">psd_list</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">MPSD</span>
+        
+
+<div class="viewcode-block" id="json_to_PSD"><a class="viewcode-back" href="../../../utils/jsonutils/json_to_PSD.html#pyleoclim.utils.jsonutils.json_to_PSD">[docs]</a><span class="k">def</span> <span class="nf">json_to_PSD</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Creates a PSD object from a JSON file</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        Name of the json file containing the necessary information</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    psd : pyleoclim.PSD</span>
+<span class="sd">        a pyleoclim PSD object</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">with</span>  <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">list_to_array</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    
+    <span class="c1">#Deal with significance testing </span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_qs&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">PSD_to_MultiplePSD</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_qs&#39;</span><span class="p">][</span><span class="s1">&#39;psd_list&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_qs&#39;</span><span class="p">]</span>
+        
+    <span class="n">psd</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">PSD</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">]),</span>
+                    <span class="n">amplitude</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">]),</span>
+                    <span class="n">label</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">],</span>
+                    <span class="n">timeseries</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">]),</span>
+                                             <span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]),</span>
+                                             <span class="n">time_name</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;time_name&#39;</span><span class="p">],</span>
+                                             <span class="n">time_unit</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;time_unit&#39;</span><span class="p">],</span>
+                                             <span class="n">value_name</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;value_name&#39;</span><span class="p">],</span>
+                                             <span class="n">value_unit</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;value_unit&#39;</span><span class="p">],</span>
+                                             <span class="n">label</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;timeseries&#39;</span><span class="p">][</span><span class="s1">&#39;label&#39;</span><span class="p">]),</span>
+                    <span class="n">spec_method</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;spec_method&#39;</span><span class="p">],</span>
+                    <span class="n">spec_args</span> <span class="o">=</span>  <span class="n">t</span><span class="p">[</span><span class="s1">&#39;spec_args&#39;</span><span class="p">],</span>
+                    <span class="n">signif_qs</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span>
+                    <span class="n">signif_method</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_method&#39;</span><span class="p">])</span>
+    
+    <span class="k">return</span>  <span class="n">psd</span></div>
+
+<span class="k">def</span> <span class="nf">Scalogram_to_MultipleScalogram</span><span class="p">(</span><span class="n">series_list</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Creates a MultipleScalogram object from a list of Scalogram objects</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    series_list : list</span>
+<span class="sd">        List of Scalograms object</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mscalogram : pyleoclim.MultipleScalogram</span>
+<span class="sd">        A pyleoclim MultipleScalogram object.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">series_list</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">d</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">:</span>
+        <span class="n">t</span><span class="o">=</span><span class="n">series_list</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="n">scalogram_obj</span><span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Scalogram</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">]),</span><span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]),</span>
+                               <span class="n">amplitude</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">]),</span><span class="n">coi</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;coi&#39;</span><span class="p">]</span>
+                               <span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">],</span><span class="n">timeseries</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;timeseries&#39;</span><span class="p">],</span>
+                               <span class="n">wave_method</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;wave_method&#39;</span><span class="p">]</span>
+                               <span class="p">,</span><span class="n">wave_args</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;wave_args&#39;</span><span class="p">],</span>
+                               <span class="n">signif_qs</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_qs&#39;</span><span class="p">],</span>
+                               <span class="n">signif_method</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_method&#39;</span><span class="p">])</span>
+
+        <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scalogram_obj</span><span class="p">)</span>
+    <span class="n">mscalogram</span><span class="o">=</span><span class="n">pyleo</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">MultipleScalogram</span><span class="p">(</span><span class="n">scalogram_list</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mscalogram</span>
+
+<div class="viewcode-block" id="json_to_Scalogram"><a class="viewcode-back" href="../../../utils/jsonutils/json_to_Scalogram.html#pyleoclim.utils.jsonutils.json_to_Scalogram">[docs]</a><span class="k">def</span> <span class="nf">json_to_Scalogram</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">list_to_array</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;timeseries&#39;</span><span class="p">]</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]),</span>
+                     <span class="n">value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]),</span>
+                     <span class="n">time_name</span><span class="o">=</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;time_name&#39;</span><span class="p">],</span>
+                     <span class="n">time_unit</span><span class="o">=</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;time_unit&#39;</span><span class="p">],</span>
+                     <span class="n">value_name</span><span class="o">=</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;value_name&#39;</span><span class="p">],</span>
+                     <span class="n">value_unit</span><span class="o">=</span><span class="n">temp</span><span class="p">[</span><span class="s1">&#39;value_unit&#39;</span><span class="p">],</span>
+                     <span class="n">label</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">])</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_qs&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">Scalogram_to_MultipleScalogram</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_qs&#39;</span><span class="p">][</span><span class="s1">&#39;scalogram_list&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_qs&#39;</span><span class="p">]</span>
+                             
+    <span class="n">scalogram</span> <span class="o">=</span> <span class="n">pyleo</span><span class="o">.</span><span class="n">Scalogram</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;frequency&#39;</span><span class="p">]),</span><span class="n">time</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]),</span>
+                               <span class="n">amplitude</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">]),</span><span class="n">coi</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;coi&#39;</span><span class="p">]</span>
+                               <span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">],</span><span class="n">timeseries</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span>
+                               <span class="n">wave_method</span> <span class="o">=</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;wave_method&#39;</span><span class="p">]</span>
+                               <span class="p">,</span><span class="n">wave_args</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;wave_args&#39;</span><span class="p">],</span>
+                               <span class="n">signif_qs</span> <span class="o">=</span> <span class="n">c</span><span class="p">,</span>
+                               <span class="n">signif_method</span><span class="o">=</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;signif_method&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">scalogram</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

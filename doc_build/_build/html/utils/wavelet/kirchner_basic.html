@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>kirchner_basic (pyleoclim.utils.wavelet.kirchner_basic) &mdash; Pyleoclim 0.6.3beta documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/js/rtd_sphinx_search.min.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Pyleoclim
+          
+
+          
+            
+            <img src="../../_static/pyleoclim_insigna_full_white.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.6.3beta
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Working with Pyleoclim</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../core/ui.html">Pyleoclim User API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Advanced functionalities</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Pyleoclim Utilities API (pyleoclim.utils)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting Involved</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../citation.html">Citing Pyleoclim</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contribution_guide.html">Contributing to Pyleoclim</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Pyleoclim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>kirchner_basic (pyleoclim.utils.wavelet.kirchner_basic)</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/utils/wavelet/kirchner_basic.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="kirchner-basic-pyleoclim-utils-wavelet-kirchner-basic">
+<span id="wavelet-kirchner-basic"></span><h1>kirchner_basic (pyleoclim.utils.wavelet.kirchner_basic)<a class="headerlink" href="#kirchner-basic-pyleoclim-utils-wavelet-kirchner-basic" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pyleoclim.utils.wavelet.kirchner_basic">
+<span class="sig-prename descclassname"><span class="pre">pyleoclim.utils.wavelet.</span></span><span class="sig-name descname"><span class="pre">kirchner_basic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.012665147955292222</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Neff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nproc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detrend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sg_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gaussianize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standardize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/pyleoclim/utils/wavelet.html#kirchner_basic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyleoclim.utils.wavelet.kirchner_basic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the weighted wavelet amplitude (WWA) modified by Kirchner.</p>
+<p>Method modified by Kirchner. No multiprocessing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ys</strong> (<em>array</em>) – a time series</p></li>
+<li><p><strong>ts</strong> (<em>array</em>) – time axis of the time series</p></li>
+<li><p><strong>freq</strong> (<em>array</em>) – vector of frequency</p></li>
+<li><p><strong>tau</strong> (<em>array</em>) – the evenly-spaced time points, namely the time shift for wavelet analysis</p></li>
+<li><p><strong>c</strong> (<em>float</em>) – the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
+the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases</p></li>
+<li><p><strong>Neff</strong> (<em>int</em>) – the threshold of the number of effective degree of freedom</p></li>
+<li><p><strong>nproc</strong> (<em>int</em>) – fake argument for convenience, for parameter consistency between functions, does not need to be specified</p></li>
+<li><p><strong>detrend</strong> (<em>string</em>) – None - the original time series is assumed to have no trend;
+‘linear’ - a linear least-squares fit to <cite>ys</cite> is subtracted;
+‘constant’ - the mean of <cite>ys</cite> is subtracted
+‘savitzy-golay’ - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series</p></li>
+<li><p><strong>sg_kwargs</strong> (<em>dict</em>) – The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.</p></li>
+<li><p><strong>gaussianize</strong> (<em>bool</em>) – If True, gaussianizes the timeseries</p></li>
+<li><p><strong>standardize</strong> (<em>bool</em>) – If True, standardizes the timeseries</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>wwa</strong> (<em>array</em>) – the weighted wavelet amplitude</p></li>
+<li><p><strong>phase</strong> (<em>array</em>) – the weighted wavelet phase</p></li>
+<li><p><strong>Neffs</strong> (<em>array</em>) – the matrix of effective number of points in the time-scale coordinates</p></li>
+<li><p><strong>coeff</strong> (<em>array</em>) – the wavelet transform coefficients (a0, a1, a2)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<p>Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+Witt, A. &amp; Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
+Nonlinear Processes in Geophysics 12, 345–352 (2005).</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="wwz_basic.html#pyleoclim.utils.wavelet.wwz_basic" title="pyleoclim.utils.wavelet.wwz_basic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.wavelet.wwz_basic</span></code></a></dt><dd><p>Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing</p>
+</dd>
+<dt><a class="reference internal" href="wwz_nproc.html#pyleoclim.utils.wavelet.wwz_nproc" title="pyleoclim.utils.wavelet.wwz_nproc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.wavelet.wwz_nproc</span></code></a></dt><dd><p>Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing</p>
+</dd>
+<dt><a class="reference internal" href="kirchner_nproc.html#pyleoclim.utils.wavelet.kirchner_nproc" title="pyleoclim.utils.wavelet.kirchner_nproc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.wavelet.kirchner_nproc</span></code></a></dt><dd><p>Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing</p>
+</dd>
+<dt><a class="reference internal" href="kirchner_numba.html#pyleoclim.utils.wavelet.kirchner_numba" title="pyleoclim.utils.wavelet.kirchner_numba"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.wavelet.kirchner_numba</span></code></a></dt><dd><p>Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.</p>
+</dd>
+<dt><a class="reference internal" href="kirchner_f2py.html#pyleoclim.utils.wavelet.kirchner_f2py" title="pyleoclim.utils.wavelet.kirchner_f2py"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.wavelet.kirchner_f2py</span></code></a></dt><dd><p>Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.</p>
+</dd>
+<dt><a class="reference internal" href="../filter/savitzky_golay.html#pyleoclim.utils.filter.savitzky_golay" title="pyleoclim.utils.filter.savitzky_golay"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pyleoclim.utils.filter.savitzky_golay</span></code></a></dt><dd><p>Smooth (and optionally differentiate) data with a Savitzky-Golay filter.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

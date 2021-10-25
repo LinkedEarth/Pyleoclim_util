@@ -19,11 +19,25 @@ Notes on how to test:
 """
 import pytest
 import pyleoclim as pyleo
+from urllib.request import urlopen
+import json
 
 def get_ts():
     d=pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD98-2170.Stott.2004')
     ts=d.to_LipdSeries(number=5)
     return ts
+
+def importLiPD():
+    url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/lipds.json'
+    response = urlopen(url)
+    d = json.loads(response.read())
+    return d
+
+def importEnsLiPD():
+    url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/crystalcave_ens.json'
+    response = urlopen(url)
+    d = json.loads(response.read())
+    return d
 
 class TestUiLipdSeriesMap():
     ''' test LipdSeries.map()
@@ -31,7 +45,8 @@ class TestUiLipdSeriesMap():
     
     def test_map_t0(self):
         ts=get_ts()
-        res=ts.map(mute=True)
+        fig,ax=ts.map(mute=True)
+        pyleo.closefig(fig)
 
 class TestUiLipdSeriesgetMetadata():
     ''' test LipdSeries.getMetadata
@@ -47,5 +62,62 @@ class TestUiLipdSeriesDashboard():
     
     def test_dashboard_t0(self):
         ts=get_ts()
-        res = ts.dashboard(mute=True)
+        fig,ax = ts.dashboard(mute=True)
+        pyleo.closefig(fig)
+
+class TestUiLipdSeriesMapNearRecord():
+    '''Test LipdSeries.MapNear Record
     
+    Requires a dictionary of LiPDs and selection
+    '''
+    
+    def test_mapNearRecord_t0(self):
+        D=importLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
+        ts = d.to_LipdSeries(number=6)
+        res=ts.mapNearRecord(d,mute=True)
+    
+    def test_mapNearRecord_t1(self):
+        D=importLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
+        ts = d.to_LipdSeries(number=6)
+        res=ts.mapNearRecord(d,n=6,mute=True)
+    
+    def test_mapNearRecord_t2(self):
+        D=importLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
+        ts = d.to_LipdSeries(number=6)
+        res=ts.mapNearRecord(d,radius=1000,mute=True)
+
+class TestUiLipdSeriesChronEnsembleToPaleo():
+    ''' Test the ability to get the chron ensemble tables
+    '''
+
+    def test_chronEnsembletoPaleo_t0(self):
+        D=importEnsLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
+        ts = d.to_LipdSeries(number=2)
+        ens = ts.chronEnsembleToPaleo(d)
+        
+        assert type(ens)==pyleo.core.ui.EnsembleSeries
+        
+        
+class TestUiLipdSeriesPlotAgeDepth():
+    '''test LipdSeries.plot_age_depth
+    '''
+
+    def test_plot_age_depth_t0(self):
+        D=importEnsLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
+        ts = d.to_LipdSeries(number=2)
+        fig,ax = ts.plot_age_depth()
+        pyleo.closefig(fig)
+    
+    @pytest.mark.parametrize('traces', [10,0])
+    def test_plot_age_depth_t1(self,traces):
+        D=importEnsLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
+        ts = d.to_LipdSeries(number=2)
+        fig,ax = ts.plot_age_depth(ensemble=True, D=d, num_traces=traces)
+        pyleo.closefig(fig)
+        

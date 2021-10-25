@@ -4,7 +4,7 @@ import io
 
 from setuptools import setup, find_packages
 
-version = '0.6.2'
+version = '0.6.3b'
 
 # Read the readme file contents into variable
 def read(fname):
@@ -27,14 +27,14 @@ setup(
     keywords=['Paleoclimate, Data Analysis, LiPD'],
     classifiers=[],
     install_requires=[
-        "LiPD==0.2.8.5",
-        "pandas>=1.0.5",
-        "numpy>=1.18.5",
-        "matplotlib>=3.3.1",
-        "scipy>=1.5.0",
+        "LiPD==0.2.8.7",
+        "pandas>=1.3.0",
+        "numpy>=1.21.1",
+        "matplotlib>=3.4.2",
+        "scipy>=1.7.0",
         "statsmodels>=0.11.1",
         "seaborn>=0.11",
-        "scikit-learn>=0.23.1",
+        "scikit-learn>=0.24.2",
         "pathos>=0.2.6",
         "tqdm>=4.47.0",
         "tftb>=0.1.1",
@@ -43,8 +43,7 @@ setup(
         "numba>=0.50.1",
         "nitime>=0.8.1",
         "tabulate>=0.8.7",
-        "PyWavelets>=1.1.1",
-        "Unidecode>=1.1.1"
+        "Unidecode>=1.1.1",
     ],
-    python_requires=">=3.8.0, <3.9"
+    python_requires=">=3.8.0"
 )

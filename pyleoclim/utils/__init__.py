@@ -21,5 +21,6 @@ from .decomposition import *
 from .filter import *
 from .wavelet import *
 from .jsonutils import *
+from .tsbase import *
 
 

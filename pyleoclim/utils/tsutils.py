@@ -16,20 +16,16 @@ __all__ = [
     'grid_properties',
     'standardize',
     'ts2segments',
-    'clean_ts',
-    'dropna',
-    'sort_ts',
     'annualize',
     'gaussianize',
     'gaussianize_single',
     'detrend',
     'detect_outliers',
-    'is_evenly_spaced',
     'remove_outliers',
-    'reduce_duplicated_timestamps',
+    'eff_sample_size'
 ]
 
-from typing import OrderedDict
+
 import numpy as np
 import pandas as pd
 import warnings
@@ -40,16 +36,19 @@ from scipy import interpolate
 from scipy import stats
 from pyhht import EMD
 from sklearn.cluster import DBSCAN
-import warnings
 import matplotlib.pyplot as plt
 
 from sklearn.neighbors import NearestNeighbors
+import statsmodels.tsa.stattools as sms
+
 import math
 from sys import exit
 from .plotting import plot_scatter_xy,plot_xy,savefig,showfig
 from .filter import savitzky_golay
 
-
+from .tsbase import (
+    clean_ts
+)
 
 def simple_stats(y, axis=None):
     """ Computes simple statistics
@@ -547,149 +546,7 @@ def ts2segments(ys, ts, factor=10):
 
     return seg_ys, seg_ts, n_segs
 
-def clean_ts(ys, ts, verbose=False):
-    ''' Cleaning the timeseries
 
-    Delete the NaNs in the time series and sort it with time axis ascending,
-    duplicate timestamps will be reduced by averaging the values.
-
-    Parameters
-    ----------
-    ys : array
-        A time series, NaNs allowed
-    ts : array
-        The time axis of the time series, NaNs allowed
-
-    Returns
-    -------
-    ys : array
-        The time series without nans
-    ts : array
-        The time axis of the time series without nans
-
-    '''
-    ys, ts = dropna(ys, ts, verbose=verbose)
-    ys, ts = sort_ts(ys, ts, verbose=verbose)
-    ys, ts = reduce_duplicated_timestamps(ys, ts, verbose=verbose)
-
-    return ys, ts
-
-
-def dropna(ys, ts, verbose=False):
-    ''' Remove entries of ys or ts that bear NaNs
-
-    Parameters
-    ----------
-    ys : array
-        A time series, NaNs allowed
-    ts : array
-        The time axis of the time series, NaNs allowed
-    verbose : bool
-        If True, will print a warning message
-
-    Returns
-    -------
-    ys : array
-        The time series without nans
-    ts : array
-        The time axis of the time series without nans
-
-    '''
-    ys = np.asarray(ys, dtype=np.float)
-    ts = np.asarray(ts, dtype=np.float)
-    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
-
-    ys_tmp = np.copy(ys)
-    ys = ys[~np.isnan(ys_tmp)]
-    ts = ts[~np.isnan(ys_tmp)]
-    ts_tmp = np.copy(ts)
-    ys = ys[~np.isnan(ts_tmp)]
-    ts = ts[~np.isnan(ts_tmp)]
-
-    if verbose and any(np.isnan(ys_tmp)):
-        print('NaNs have been detected and dropped.')
-
-    return ys, ts
-
-def sort_ts(ys, ts, verbose=False):
-    ''' Sort ts values in ascending order
-
-    Parameters
-    ----------
-    ys : array
-        Dependent variable
-    ts : array
-        Independent variable
-    verbose : bool
-        If True, will print a warning message
-
-    Returns
-    -------
-    ys : array
-        Dependent variable
-    ts : array
-        Independent variable, sorted in ascending order
-
-    '''
-    ys = np.asarray(ys, dtype=np.float)
-    ts = np.asarray(ts, dtype=np.float)
-    assert ys.size == ts.size, 'time and value arrays must be of equal length'
-
-    # sort the time series so that the time axis will be ascending
-    dt = np.median(np.diff(ts))
-    if dt < 0:
-        sort_ind = np.argsort(ts)
-        ys = ys[sort_ind]
-        ts = ts[sort_ind]
-        if verbose:
-            print('The time axis has been adjusted to be prograde')
-
-    return ys, ts
-
-def reduce_duplicated_timestamps(ys, ts, verbose=False):
-    ''' Reduce duplicated timestamps in a timeseries by averaging the values
-
-    Parameters
-    ----------
-    ys : array
-        Dependent variable
-    ts : array
-        Independent variable
-    verbose : bool
-        If True, will print a warning message
-
-    Returns
-    -------
-    ys : array
-        Dependent variable
-    ts : array
-        Independent variable, with duplicated timestamps reduced by averaging the values
-
-    '''
-    ys = np.asarray(ys, dtype=np.float)
-    ts = np.asarray(ts, dtype=np.float)
-    assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
-
-    if len(ts) != len(set(ts)):
-        value = OrderedDict()
-        for t, y in zip(ts, ys):
-            if t not in value:
-                value[t] = [y]
-            else:
-                value[t].append(y)
-
-        ts = []
-        ys = []
-        for k, v in value.items():
-            ts.append(k)
-            ys.append(np.mean(v))
-
-        ts = np.array(ts)
-        ys = np.array(ys)
-
-        if verbose:
-            print('Duplicate timestamps have been combined by averaging values.')
-    return ys, ts
 
 def annualize(ys, ts):
     ''' Annualize a time series whose time resolution is finer than 1 year
@@ -709,8 +566,8 @@ def annualize(ys, ts):
               The time axis of the annualized time series
 
     '''
-    ys = np.asarray(ys, dtype=np.float)
-    ts = np.asarray(ts, dtype=np.float)
+    ys = np.asarray(ys, dtype=float)
+    ts = np.asarray(ts, dtype=float)
     assert ys.size == ts.size, 'The size of time axis and data value should be equal!'
 
     year_int = list(set(np.floor(ts)))
@@ -1062,33 +919,48 @@ def remove_outliers(ts,ys,outlier_points):
 
     return ys,ts
 
-def is_evenly_spaced(ts):
-    ''' Check if a time axis is evenly spaced.
+def eff_sample_size(y, detrend_flag=False):
+    '''
+    Effective Sample Size of timeseries y
 
     Parameters
     ----------
-
-    ts : array
-        the time axis of a time series
+    y : float 
+       1d array 
+       
+    detrend : boolean
+        if True (default), detrends y before estimation.         
 
     Returns
     -------
-
-    check : bool
-        True - evenly spaced; False - unevenly spaced.
+    neff : float
+        The effective sample size
+        
+        
+    Reference
+    ---------
+    Thiébaux HJ, Zwiers FW. 1984. The interpretation and estimation of
+    effective sample sizes. Journal of Climate and Applied Meteorology 23: 800–811.
 
     '''
-    if ts is None:
-        check = True
+    if len(y) < 100:
+        fft = False
     else:
-        dts = np.diff(ts)
-        dt_mean = np.mean(dts)
-        if any(dt == dt_mean for dt in np.diff(ts)):
-            check = True
-        else:
-            check = False
-
-    return check
+        fft = True
+        
+    if detrend_flag:
+        yd = detrend(y)
+    else:
+        yd = y
+    
+    n     = len(y)
+    nl    = math.floor(max(np.sqrt(n),10))     # rule of thumb for choosing number of lags
+    rho   = sms.acf(yd,adjusted=True,fft=fft,nlags=nl) # compute autocorrelation function         
+    kvec  = np.arange(nl)
+    fac   = (1-kvec/nl)*rho[1:]
+    neff  = n/(1+2*np.sum(fac))   # Thiébaux & Zwiers 84, Eq 2.1
+    
+    return neff
 
 
 # alias
@@ -1146,3 +1018,4 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
         res = gauss(res)
 
     return res
+
