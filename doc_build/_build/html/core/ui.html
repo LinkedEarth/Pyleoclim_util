@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pyleoclim User API &mdash; Pyleoclim 0.6.3beta documentation</title>
+  <title>Pyleoclim User API &mdash; Pyleoclim 0.7.1beta documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/plot_directive.css" type="text/css" />
@@ -35,7 +35,7 @@
             <img src="../_static/pyleoclim_insigna_full_white.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.6.3beta
+                0.7.1beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -193,7 +193,7 @@ Default is True</p></li>
 <span class="gp">   ...: </span>
 
 <span class="gp">In [7]: </span><span class="n">ts</span>
-<span class="gh">Out[7]: </span><span class="go">&lt;pyleoclim.core.ui.Series at 0x19dca4dc0&gt;</span>
+<span class="gh">Out[7]: </span><span class="go">&lt;pyleoclim.core.ui.Series at 0x19f60d160&gt;</span>
 
 <span class="gp">In [8]: </span><span class="n">ts</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 <span class="gh">Out[8]: </span><span class="go">dict_keys([&#39;time&#39;, &#39;value&#39;, &#39;time_name&#39;, &#39;time_unit&#39;, &#39;value_name&#39;, &#39;value_unit&#39;, &#39;label&#39;])</span>
@@ -396,9 +396,9 @@ It is in form of [a, b], where a, b are two time points.</p>
 <span class="gp">In [13]: </span><span class="n">caus_res</span> <span class="o">=</span> <span class="n">ts_nino</span><span class="o">.</span><span class="n">causality</span><span class="p">(</span><span class="n">ts_air</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nsim&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;signif_test&#39;</span><span class="p">:</span> <span class="s1">&#39;isopersist&#39;</span><span class="p">})</span>
 
 <span class="gp">In [14]: </span><span class="nb">print</span><span class="p">(</span><span class="n">caus_res</span><span class="p">)</span>
-<span class="go">{&#39;T21&#39;: 0.005840218794983322, &#39;tau21&#39;: 0.04731826159975568, &#39;Z&#39;: 0.12342420447275003, &#39;dH1_star&#39;: -0.5094709112673714, &#39;dH1_noise&#39;: 0.4432108271328729, &#39;signif_qs&#39;: [0.005, 0.025, 0.05, 0.95, 0.975, 0.995], &#39;T21_noise&#39;: array([-5.92529664e-07, -5.92529664e-07, -5.92529664e-07,  5.19557191e-06,</span>
-<span class="go">        5.19557191e-06,  5.19557191e-06]), &#39;tau21_noise&#39;: array([-5.66090987e-06, -5.66090987e-06, -5.66090987e-06,  5.14977029e-05,</span>
-<span class="go">        5.14977029e-05,  5.14977029e-05])}</span>
+<span class="go">{&#39;T21&#39;: 0.005840218794983322, &#39;tau21&#39;: 0.04731826159975568, &#39;Z&#39;: 0.12342420447275003, &#39;dH1_star&#39;: -0.5094709112673714, &#39;dH1_noise&#39;: 0.4432108271328729, &#39;signif_qs&#39;: [0.005, 0.025, 0.05, 0.95, 0.975, 0.995], &#39;T21_noise&#39;: array([-2.01784848e-04, -2.01784848e-04, -2.01784848e-04,  7.53723390e-05,</span>
+<span class="go">        7.53723390e-05,  7.53723390e-05]), &#39;tau21_noise&#39;: array([-0.00136797, -0.00136797, -0.00136797,  0.00053635,  0.00053635,</span>
+<span class="go">        0.00053635])}</span>
 </pre></div>
 </div>
 <img alt="../_images/ts_nino.png" src="../_images/ts_nino.png" />
@@ -414,7 +414,7 @@ It is in form of [a, b], where a, b are two time points.</p>
 <span class="go">parameter F test:         F=20.8492 , p=0.0000  , df_denom=1592, df_num=1</span>
 
 <span class="gp">In [16]: </span><span class="nb">print</span><span class="p">(</span><span class="n">caus_res</span><span class="p">)</span>
-<span class="go">{1: ({&#39;ssr_ftest&#39;: (20.849204239268076, 5.350981736047143e-06, 1592.0, 1), &#39;ssr_chi2test&#39;: (20.88849294072398, 4.868102345429935e-06, 1), &#39;lrtest&#39;: (20.752895243242165, 5.22525200803166e-06, 1), &#39;params_ftest&#39;: (20.84920423926806, 5.350981736047143e-06, 1592.0, 1.0)}, [&lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x19e060910&gt;, &lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x19e0607c0&gt;, array([[0., 1., 0.]])])}</span>
+<span class="go">{1: ({&#39;ssr_ftest&#39;: (20.849204239268076, 5.350981736047143e-06, 1592.0, 1), &#39;ssr_chi2test&#39;: (20.88849294072398, 4.868102345429935e-06, 1), &#39;lrtest&#39;: (20.752895243242165, 5.22525200803166e-06, 1), &#39;params_ftest&#39;: (20.84920423926806, 5.350981736047143e-06, 1592.0, 1.0)}, [&lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x19f93eb80&gt;, &lt;statsmodels.regression.linear_model.RegressionResultsWrapper object at 0x19f93ea30&gt;, array([[0., 1., 0.]])])}</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1173,7 +1173,7 @@ After that, we apply a band-pass filter with the band 15-25 Hz, and compare the 
 <span class="gh">Out[12]: </span><span class="go">&lt;AxesSubplot:xlabel=&#39;time&#39;, ylabel=&#39;value&#39;&gt;</span>
 
 <span class="gp">In [13]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gh">Out[13]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x19e5283d0&gt;</span>
+<span class="gh">Out[13]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x19fc85910&gt;</span>
 
 <span class="gp">In [14]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
@@ -1194,7 +1194,7 @@ After that, we apply a band-pass filter with the band 15-25 Hz, and compare the 
 <span class="gh">Out[18]: </span><span class="go">&lt;AxesSubplot:xlabel=&#39;time&#39;, ylabel=&#39;value&#39;&gt;</span>
 
 <span class="gp">In [19]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gh">Out[19]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x19e650eb0&gt;</span>
+<span class="gh">Out[19]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x19ff2bd60&gt;</span>
 
 <span class="gp">In [20]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
@@ -1215,7 +1215,7 @@ After that, we apply a band-pass filter with the band 15-25 Hz, and compare the 
 <span class="gh">Out[24]: </span><span class="go">&lt;AxesSubplot:xlabel=&#39;time&#39;, ylabel=&#39;value&#39;&gt;</span>
 
 <span class="gp">In [25]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;upper left&#39;</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="gh">Out[25]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x19e6e77c0&gt;</span>
+<span class="gh">Out[25]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x19ffc0eb0&gt;</span>
 
 <span class="gp">In [26]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>
@@ -1810,10 +1810,10 @@ The method expects regular spacing, but is tolerant to missing values, up to a f
 <span class="gp">In [12]: </span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;ONI&#39;</span><span class="p">,</span><span class="n">mute</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># we mute the first call to only get the plot with 2 lines</span>
 
 <span class="gp">In [13]: </span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">RCk</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;SSA reconstruction, 14 modes&#39;</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">)</span>
-<span class="gh">Out[13]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x19e3c9be0&gt;]</span>
+<span class="gh">Out[13]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x1a875c190&gt;]</span>
 
 <span class="gp">In [14]: </span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="gh">Out[14]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x1a6faf430&gt;</span>
+<span class="gh">Out[14]: </span><span class="go">&lt;matplotlib.legend.Legend at 0x1a86b3610&gt;</span>
 
 <span class="gp">In [15]: </span><span class="n">pyleo</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
 <span class="go">&lt;Figure size 1000x400 with 1 Axes&gt;</span>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>wwz (pyleoclim.utils.wavelet.wwz) &mdash; Pyleoclim 0.6.3beta documentation</title>
+  <title>wwz (pyleoclim.utils.wavelet.wwz) &mdash; Pyleoclim 0.7.1beta documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/plot_directive.css" type="text/css" />
@@ -33,7 +33,7 @@
             <img src="../../_static/pyleoclim_insigna_full_white.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.6.3beta
+                0.7.1beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -236,21 +236,21 @@ Then performing wavelet analysis should return an energy band around period of 5
 <span class="gp">In [12]: </span><span class="n">cont</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">res</span><span class="o">.</span><span class="n">freq</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">amplitude</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="o">**</span><span class="n">contourf_args</span><span class="p">)</span>
 
 <span class="gp">In [13]: </span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">coi</span><span class="p">,</span> <span class="s1">&#39;k--&#39;</span><span class="p">)</span>  <span class="c1"># plot the cone of influence</span>
-<span class="gh">Out[13]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x1a8473fd0&gt;]</span>
+<span class="gh">Out[13]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x1aa61c640&gt;]</span>
 
 <span class="gp">In [14]: </span><span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
 
 <span class="gp">In [15]: </span><span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">1000</span><span class="p">])</span>
 <span class="gh">Out[15]: </span><span class="go"></span>
-<span class="go">[&lt;matplotlib.axis.YTick at 0x1a765a4c0&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a8455460&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a833bfd0&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a7496be0&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a717a520&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a7cfa7c0&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a717a580&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a789a1c0&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a79e55b0&gt;]</span>
+<span class="go">[&lt;matplotlib.axis.YTick at 0x1aabca3a0&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1aa398ac0&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1a8fd4a60&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1a93ad5b0&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1a9a7bee0&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1a9df4190&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1aa6f79d0&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1a8f4f430&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1a8905910&gt;]</span>
 
 <span class="gp">In [16]: </span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1000</span><span class="p">])</span>
 <span class="gh">Out[16]: </span><span class="go">(2.0, 1000.0)</span>

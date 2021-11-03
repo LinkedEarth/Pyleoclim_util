@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installing Pyleoclim &mdash; Pyleoclim 0.6.3beta documentation</title>
+  <title>Installing Pyleoclim &mdash; Pyleoclim 0.7.1beta documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
@@ -35,7 +35,7 @@
             <img src="_static/pyleoclim_insigna_full_white.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                0.6.3beta
+                0.7.1beta
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -130,8 +130,8 @@ its own <cite>conda</cite> environment. Some default packages shipping with the 
 </section>
 <section id="creating-a-new-conda-environment">
 <h2>Creating a new conda environment<a class="headerlink" href="#creating-a-new-conda-environment" title="Permalink to this headline"></a></h2>
-<p>To create a new environment using Python 3.8 via command line:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -n pyleoenv <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.8
+<p>To create a new environment using Python 3.9 via command line:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -n pyleo <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.9
 </pre></div>
 </div>
 <p>To view a list of available environment:</p>
@@ -139,7 +139,7 @@ its own <cite>conda</cite> environment. Some default packages shipping with the 
 </pre></div>
 </div>
 <p>To activate your new environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate pyleoenv
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda activate pyleo
 </pre></div>
 </div>
 <p>To view the list of packages in your environment:</p>
@@ -147,21 +147,19 @@ its own <cite>conda</cite> environment. Some default packages shipping with the 
 </pre></div>
 </div>
 <p>To remove the environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda remove --name pyleoenv --all
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda remove --name pyleo --all
 </pre></div>
 </div>
 <p>More information about managing conda environments can be found <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#">here</a>.</p>
 </section>
 <section id="id1">
 <h2>Installing Pyleoclim<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h2>
-<p>Make sure that the pyleoenv environment is activated.</p>
-<p><strong>First</strong> install numpy and Cartopy:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install numpy
-conda install -c conda-forge cartopy
+<p>Make sure that the pyleo environment is activated.</p>
+<p>First install Cartopy:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install cartopy
 </pre></div>
 </div>
-<p>Install Pyleoclim through Pypi</p>
-<p>The Pypi release contains the most stable version of Pyleoclim.</p>
+<p>Then install Pyleoclim through Pypi, which contains the most stable version of Pyleoclim:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pyleoclim
 </pre></div>
 </div>
@@ -169,6 +167,16 @@ conda install -c conda-forge cartopy
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
 </pre></div>
 </div>
+<p>Note that Pyleoclim is currently affected by <a class="reference external" href="https://github.com/dmeranda/demjson/issues/40">this issue</a>, so you
+need to use <cite>pip list</cite> to check that the version of <cite>demjson</cite> that was installed is 2.2.4. If it is not, type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install demjson --upgrade
+</pre></div>
+</div>
+<p>In some rare cases this may return an error. If so, you first need to downgrade <cite>setuptools</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install <span class="nv">setuptools</span><span class="o">==</span><span class="m">56</span>.0.0
+</pre></div>
+</div>
+<p>Then upgrade <cite>demjson</cite> as above, and check that the version is 2.2.4 or above.  We hope this glitch gets resolved soon!</p>
 <p>If you would like to use Jupyter Notebooks or Spyder for code development, install these packages in your environment:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install spyder
 pip install jupyter
