@@ -1462,7 +1462,6 @@ class Series:
 
         Parameters
         ----------
-
         verbose : bool
             If True, will print warning messages if there is any
 
@@ -1477,7 +1476,28 @@ class Series:
         new.time = t_mod
         new.value = v_mod
         return new
+    
+    def sort(self, verbose=False):
+        ''' Ensure timeseries is aligned to a prograde axis.
+            If the time axis is prograde to begin with, no transformation is applied.
+            
+        Parameters
+        ----------
+        verbose : bool
+            If True, will print warning messages if there is any
+    
+        Returns
+        -------
+        Series
+            Series object with removed NaNs and sorting
 
+        '''
+        new = self.copy()
+        v_mod, t_mod = tsbase.sort_ts(self.value, self.time, verbose=verbose)
+        new.time = t_mod
+        new.value = v_mod
+        return new
+    
     def gaussianize(self):
         ''' Gaussianizes the timeseries
 
@@ -2314,6 +2334,7 @@ class Series:
 
     def causality(self, target_series, method='liang', settings=None):
         ''' Perform causality analysis with the target timeseries
+            The timeseries are first sorted in ascending order.         
 
         Parameters
         ----------
@@ -2360,7 +2381,7 @@ class Series:
 
             # plot the two timeseries
             @savefig ts_nino.png
-            fig, ax = ts_nino.plot(title='El Nino Region 3 -- SST Anomalies')
+            fig, ax = ts_nino.plot(title='NINO3 -- SST Anomalies')
             pyleo.closefig(fig)
 
             @savefig ts_air.png
@@ -2382,6 +2403,12 @@ class Series:
             print(caus_res)
 
         '''
+        
+        # Sort both timeseries 
+    
+        sorted_self   = self.sort(verbose=True) 
+        sorted_target = target_series.sort(verbose=True)        
+        
         settings = {} if settings is None else settings.copy()
         spec_func={
             'liang':causalutils.liang_causality,
@@ -2390,7 +2417,7 @@ class Series:
         args['liang'] = {}
         args['granger'] = {}
         args[method].update(settings)
-        causal_res = spec_func[method](self.value, target_series.value, **args[method])
+        causal_res = spec_func[method](sorted_self.value, sorted_target.value, **args[method])
         return causal_res
 
     def surrogates(self, method='ar1', number=1, length=None, seed=None, settings=None):
