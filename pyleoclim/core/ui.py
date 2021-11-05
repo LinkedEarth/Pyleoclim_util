@@ -6251,12 +6251,22 @@ class CorrEns:
             t_args.update(title_kwargs)
             ax.set_title(title, **t_args)
 
-        if 'path' in savefig_settings:
-            plotting.savefig(fig, settings=savefig_settings)
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            else:
+                if not mute:
+                    plotting.showfig(fig)
+            return fig, ax
         else:
-            if not mute:
-                plotting.showfig(fig)
-        return fig, ax
+            return ax
+
+        # if 'path' in savefig_settings:
+        #     plotting.savefig(fig, settings=savefig_settings)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
+        # return fig, ax
 
 class SpatialDecomp:
     ''' Class to hold the results of spatial decompositions

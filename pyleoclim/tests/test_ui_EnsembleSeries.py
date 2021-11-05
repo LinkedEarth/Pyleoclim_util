@@ -93,7 +93,7 @@ class TestUIEnsembleSeriesCorrelation():
 
 
     def test_correlation_t2(self):
-        '''Test for EnsembleSeries.correlation() when the target is an EnsembleSeries with less number of Series
+        '''Test for EnsembleSeries.correlation() when the target is an EnsembleSeries with fewer Series
         '''
         nt = 100
         t0, v0 = gen_colored_noise(nt=nt)
@@ -119,8 +119,8 @@ class TestUIEnsembleSeriesCorrelation():
         assert np.size(corr_res.p) == np.size(ts_list1)
 
 
-    def test_correlation_t2(self):
-        '''Test for EnsembleSeries.correlation() when the target is an EnsembleSeries with less number of Series
+    def test_correlation_t3(self):
+        '''Test for EnsembleSeries.correlation() when the target is an EnsembleSeries with more Series
         '''
         nt = 100
         t0, v0 = gen_colored_noise(nt=nt)

@@ -36,6 +36,16 @@ class TestUiSSAResScreeplot:
         cn_ssa = cn.ssa()
         fig, ax = cn_ssa.screeplot(title="Non default title",mute=True) 
         
+    def test_plot_t1(self):
+        ''' Test SSARes.screeplot with MC-SSA 
+        '''
+        nt = 500
+        t  = np.arange(nt)
+        cn = pyleo.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
+
+        cn_ssa = cn.ssa(nMC=200)
+        fig, ax = cn_ssa.screeplot(title="MC-SSA scree plot",mute=True)     
+        
         
 class TestUiSSAResModeplot:
     ''' Tests for SSARes.modeplot()
