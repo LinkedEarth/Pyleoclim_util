@@ -908,7 +908,14 @@ class Series:
         return res
 
     def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
-        ''' Apply a filter to the timeseries
+        ''' Filtering methods for Series objects using four possible methods:
+            - `Butterworth <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.butter.html>`_ 
+            - `Lanczos <http://scitools.org.uk/iris/docs/v1.2/examples/graphics/SOI_filtering.html>`_  
+            - `Finite Impulse Response <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html>`_  
+            - `Savitzky-Golay filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html>`_
+                
+        By default, implement a lowpass filter, though it can easily be turned into a bandpass filter.
+        The documentation also illustrates how to use this function to obtain a high-pass filter. 
 
         Parameters
         ----------
@@ -982,7 +989,7 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
-        - Applying the low-pass filter
+        - Applying a low-pass filter
 
         .. ipython:: python
             :okwarning:
@@ -996,7 +1003,7 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
-        - Applying the band-pass filter
+        - Applying a band-pass filter
 
         .. ipython:: python
             :okwarning:
@@ -1011,6 +1018,7 @@ class Series:
             pyleo.closefig(fig)
 
         Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:
+            
         .. ipython:: python
             :okwarning:
             :okexcept:    
@@ -1018,6 +1026,22 @@ class Series:
             fig, ax = ts.plot(mute=True, label='mix')
             ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
             ts2.plot(ax=ax, label='20 Hz')
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
+            @savefig ts_filter4.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+            
+        - Applying a high-pass filter
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            fig, ax = ts.plot(mute=True, label='mix')
+            ts_low  = ts.filter(cutoff_freq=15)
+            ts_high = ts.copy()
+            ts_high.value = ts.value - ts_low.value # subtract low-pass filtered series from original one
+            ts_high.plot(label='High-pass filter @ 15Hz',ax=ax)
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
             @savefig ts_filter4.png
             pyleo.showfig(fig)
