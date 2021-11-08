@@ -20,11 +20,11 @@ Click :ref:`here <anaconda_installation>` for a quick tutorial on MacOs and Linu
 Creating a new conda environment
 """""""""""""""""""""""""""""""""""
 
-To create a new environment using Python 3.8 via command line:
+To create a new environment using Python 3.9 via command line:
 
 .. code-block:: bash
 
-  conda create -n pyleoenv python=3.8
+  conda create -n pyleo python=3.9
 
 To view a list of available environment:
 
@@ -36,7 +36,7 @@ To activate your new environment:
 
 .. code-block:: bash
 
-  conda activate pyleoenv
+  conda activate pyleo
 
 To view the list of packages in your environment:
 
@@ -48,24 +48,21 @@ To remove the environment:
 
 .. code-block:: bash
 
-  conda remove --name pyleoenv --all
+  conda remove --name pyleo --all
 
 More information about managing conda environments can be found `here <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#>`_.
 
 Installing Pyleoclim
 """"""""""""""""""""
-Make sure that the pyleoenv environment is activated.
+Make sure that the pyleo environment is activated.
 
-**First** install numpy and Cartopy:
+First install Cartopy:
 
 .. code-block:: bash
 
-  conda install numpy
-  conda install -c conda-forge cartopy
+  conda install cartopy
 
-Install Pyleoclim through Pypi
-
-The Pypi release contains the most stable version of Pyleoclim.
+Then install Pyleoclim through Pypi, which contains the most stable version of Pyleoclim:
 
 .. code-block:: bash
 
@@ -76,6 +73,21 @@ To install the development version, which contains the most up-to-date features:
 .. code-block:: bash
 
   pip install git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
+
+Note that Pyleoclim is currently affected by `this issue <https://github.com/dmeranda/demjson/issues/40>`_, so you
+need to use `pip list` to check that the version of `demjson` that was installed is 2.2.4. If it is not, type:
+
+.. code-block:: bash
+
+  pip install demjson --upgrade
+
+In some rare cases this may return an error. If so, you first need to downgrade `setuptools`:
+
+.. code-block:: bash
+
+  pip install setuptools==56.0.0
+
+Then upgrade `demjson` as above, and check that the version is 2.2.4 or above.  We hope this glitch gets resolved soon!
 
 If you would like to use Jupyter Notebooks or Spyder for code development, install these packages in your environment:
 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>pyleoclim.core.ui &mdash; Pyleoclim 0.6.2beta documentation</title>
+  <title>pyleoclim.core.ui &mdash; Pyleoclim 0.6.3beta documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.6.2beta
+                0.6.3beta
               </div>
             
           
@@ -176,7 +176,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for pyleoclim.core.ui</h1><div class="highlight"><pre>
-<span></span><span class="sd">&#39;&#39;&#39; The application interface for the users</span>
+<span></span><span class="sd">&#39;&#39;&#39; The application programming interface for Pyleoclim</span>
 
 <span class="sd">@author: fengzhu</span>
 
@@ -214,6 +214,7 @@
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">scipy.stats.mstats</span> <span class="kn">import</span> <span class="n">mquantiles</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">from</span> <span class="nn">statsmodels.multivariate.pca</span> <span class="kn">import</span> <span class="n">PCA</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
@@ -311,6 +312,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        import pyleoclim as pyleo</span>
 
@@ -339,6 +341,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        # default scaling slope &#39;alpha&#39; is 1</span>
 <span class="sd">        ts = pyleo.gen_ts(model=&#39;colored_noise&#39;)</span>
@@ -370,6 +373,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning</span>
+<span class="sd">        :okexcept:</span>
 
 <span class="sd">        # default scaling slopes &#39;alpha1&#39; is 0.5 and &#39;alpha2&#39; is 2, with break at 1/20</span>
 <span class="sd">        ts = pyleo.gen_ts(model=&#39;colored_noise_2regimes&#39;)</span>
@@ -472,6 +476,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        import pyleoclim as pyleo</span>
 <span class="sd">        import pandas as pd</span>
@@ -521,6 +526,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -705,6 +711,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -830,6 +837,7 @@
 
 <span class="sd">            .. ipython:: python</span>
 <span class="sd">                :okwarning:</span>
+<span class="sd">                :okexcept:    </span>
 
 <span class="sd">                import pyleoclim as pyleo</span>
 <span class="sd">                import pandas as pd</span>
@@ -845,6 +853,7 @@
 
 <span class="sd">            .. ipython:: python</span>
 <span class="sd">                :okwarning:</span>
+<span class="sd">                :okexcept:    </span>
 
 <span class="sd">                @savefig ts_plot2.png</span>
 <span class="sd">                fig, ax = ts.plot(color=&#39;r&#39;)</span>
@@ -856,6 +865,7 @@
 
 <span class="sd">            .. ipython:: python</span>
 <span class="sd">                :okwarning:</span>
+<span class="sd">                :okexcept:    </span>
 
 <span class="sd">                fig, ax = ts.plot(color=&#39;k&#39;, savefig_settings={&#39;path&#39;: &#39;ts_plot3.png&#39;})</span>
 <span class="sd">                pyleo.savefig(fig,path=&#39;ts_plot3.png&#39;)</span>
@@ -964,6 +974,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -983,6 +994,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 <span class="sd">            var_pct = nino_ssa[&#39;pctvar&#39;] # extract the fraction of variance attributable to each mode</span>
 
 <span class="sd">            # plot eigenvalues</span>
@@ -1002,6 +1014,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            print(nino_ssa.pctvar[15:].sum()*100)</span>
 
@@ -1009,6 +1022,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            RCk = nino_ssa.RCmat[:,:14].sum(axis=1)</span>
 <span class="sd">            fig, ax = ts.plot(title=&#39;ONI&#39;,mute=True) # we mute the first call to only get the plot with 2 lines</span>
@@ -1029,6 +1043,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            nino_mcssa = ts.ssa(M = 60, nMC=1000)</span>
 
@@ -1036,6 +1051,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            nino_mcssa.screeplot()</span>
 <span class="sd">            @savefig scree_nmc.png</span>
@@ -1057,8 +1073,8 @@
         
         <span class="k">return</span> <span class="n">resc</span></div>
 
-<div class="viewcode-block" id="Series.is_evenly_spaced"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.Series.is_evenly_spaced">[docs]</a>    <span class="k">def</span> <span class="nf">is_evenly_spaced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Check if the timeseries is evenly-spaced</span>
+<div class="viewcode-block" id="Series.is_evenly_spaced"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.Series.is_evenly_spaced">[docs]</a>    <span class="k">def</span> <span class="nf">is_evenly_spaced</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Check if the Series time axis is evenly-spaced, within tolerance</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        ------</span>
@@ -1066,7 +1082,7 @@
 <span class="sd">        res : bool</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">res</span> <span class="o">=</span> <span class="n">tsbase</span><span class="o">.</span><span class="n">is_evenly_spaced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">tsbase</span><span class="o">.</span><span class="n">is_evenly_spaced</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span></div>
 
 <div class="viewcode-block" id="Series.filter"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.Series.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cutoff_freq</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cutoff_scale</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;butterworth&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -1124,6 +1140,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import numpy as np</span>
@@ -1147,6 +1164,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            fig, ax = ts.plot(mute=True, label=&#39;mix&#39;)</span>
 <span class="sd">            ts.filter(cutoff_freq=15).plot(ax=ax, label=&#39;After 15 Hz low-pass filter&#39;)</span>
@@ -1160,6 +1178,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            fig, ax = ts.plot(mute=True, label=&#39;mix&#39;)</span>
 <span class="sd">            ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label=&#39;After 15-25 Hz band-pass filter&#39;)</span>
@@ -1172,6 +1191,7 @@
 <span class="sd">        Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:</span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            fig, ax = ts.plot(mute=True, label=&#39;mix&#39;)</span>
 <span class="sd">            ts.filter(cutoff_freq=[15, 25], method=&#39;firwin&#39;, window=&#39;hanning&#39;).plot(ax=ax, label=&#39;After 15-25 Hz band-pass filter&#39;)</span>
@@ -1290,6 +1310,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -1434,6 +1455,53 @@
 <span class="sd">        pyleoclim.core.ui.PSD : PSD object</span>
 
 <span class="sd">        pyleoclim.core.ui.MultiplePSD : Multiple PSD object</span>
+<span class="sd">        </span>
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        Simple summary_plot with n_signif_test = 1 for computational ease, defaults otherwise.</span>
+
+<span class="sd">        .. ipython:: python</span>
+<span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
+<span class="sd">            </span>
+<span class="sd">            import pyleoclim as pyleo</span>
+<span class="sd">            import pandas as pd</span>
+<span class="sd">            ts=pd.read_csv(&#39;https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv&#39;,skiprows = 1)</span>
+<span class="sd">            series = pyleo.Series(time = ts[&#39;Year&#39;],value = ts[&#39;Value&#39;], time_name = &#39;Years&#39;, time_unit = &#39;AD&#39;)</span>
+<span class="sd">            fig, ax = series.summary_plot(n_signif_test=1)</span>
+<span class="sd">            pyleo.closefig(fig)</span>
+<span class="sd">            </span>
+<span class="sd">        Summary_plot with pre-generated psd and scalogram objects.</span>
+<span class="sd">        </span>
+<span class="sd">        .. ipython:: python</span>
+<span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
+<span class="sd">            </span>
+<span class="sd">            import pyleoclim as pyleo</span>
+<span class="sd">            import pandas as pd</span>
+<span class="sd">            ts=pd.read_csv(&#39;https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv&#39;,skiprows = 1)</span>
+<span class="sd">            series = pyleo.Series(time = ts[&#39;Year&#39;],value = ts[&#39;Value&#39;], time_name = &#39;Years&#39;, time_unit = &#39;AD&#39;)</span>
+<span class="sd">            psd = series.spectral(freq_method = &#39;welch&#39;)</span>
+<span class="sd">            scalogram = series.wavelet(freq_method = &#39;welch&#39;)</span>
+<span class="sd">            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)</span>
+<span class="sd">            pyleo.closefig(fig)</span>
+<span class="sd">        </span>
+<span class="sd">        Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed.</span>
+<span class="sd">        </span>
+<span class="sd">        .. ipython:: python</span>
+<span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
+<span class="sd">            </span>
+<span class="sd">            import pyleoclim as pyleo</span>
+<span class="sd">            import pandas as pd</span>
+<span class="sd">            ts=pd.read_csv(&#39;https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv&#39;,skiprows = 1)</span>
+<span class="sd">            series = pyleo.Series(time = ts[&#39;Year&#39;],value = ts[&#39;Value&#39;], time_name = &#39;Years&#39;, time_unit = &#39;AD&#39;)</span>
+<span class="sd">            psd = series.spectral(freq_method = &#39;welch&#39;)</span>
+<span class="sd">            scalogram = series.wavelet(freq_method = &#39;welch&#39;)</span>
+<span class="sd">            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {&#39;color&#39;:&#39;red&#39;,&#39;linewidth&#39;:.5}, psd_plot_kwargs = {&#39;color&#39;:&#39;red&#39;,&#39;linewidth&#39;:.5})</span>
+<span class="sd">            pyleo.closefig(fig)</span>
+<span class="sd">        </span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># Turn the interactive mode off.</span>
@@ -1468,6 +1536,7 @@
         <span class="n">ax</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
         <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">ts_plot_kwargs</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="n">time_lim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">time_lim</span><span class="p">)</span>
@@ -1478,8 +1547,6 @@
             <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">value_lim</span><span class="p">)</span>
             <span class="k">if</span> <span class="s1">&#39;ylim&#39;</span> <span class="ow">in</span> <span class="n">ts_plot_kwargs</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Ylim passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.&#39;</span><span class="p">)</span>
-
-        <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="s1">&#39;bottom&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;scal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">],</span> <span class="n">sharex</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">])</span>
         
@@ -1493,8 +1560,10 @@
             <span class="n">wavelet_plot_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cbar_style&#39;</span><span class="p">:{</span><span class="s1">&#39;orientation&#39;</span><span class="p">:</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">,</span> <span class="s1">&#39;pad&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}})</span>
 
         <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;scal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scalogram</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="s1">&#39;scal&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">wavelet_plot_kwargs</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;scal&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
 
         <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;psd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">:],</span> <span class="n">sharey</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="s1">&#39;scal&#39;</span><span class="p">])</span>
+        
         <span class="k">if</span> <span class="n">psd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">n_signif_test</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">psd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spectral</span><span class="p">(</span><span class="o">**</span><span class="n">psd_kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">signif_test</span><span class="p">(</span><span class="n">number</span><span class="o">=</span><span class="n">n_signif_test</span><span class="p">)</span>
@@ -1507,7 +1576,9 @@
             <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;psd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">period_lim</span><span class="p">)</span>
             <span class="k">if</span> <span class="s1">&#39;ylim&#39;</span> <span class="ow">in</span> <span class="n">psd_plot_kwargs</span><span class="p">:</span>
                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.&#39;</span><span class="p">)</span>
-            
+        
+        <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;psd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;psd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">invert_yaxis</span><span class="p">()</span>
         <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;psd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
         <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;psd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">,</span> <span class="n">labelleft</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;psd&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
@@ -1785,6 +1856,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import numpy as np</span>
@@ -1894,6 +1966,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -1908,6 +1981,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            psd_ls = ts_std.spectral(method=&#39;lomb_scargle&#39;)</span>
 <span class="sd">            psd_ls_signif = psd_ls.signif_test(number=20) #in practice, need more AR1 simulations</span>
@@ -1921,6 +1995,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import numpy as np</span>
 <span class="sd">            psd_LS_n50 = ts_std.spectral(method=&#39;lomb_scargle&#39;, settings={&#39;n50&#39;: 4})  # c=1e-2 yields lower frequency resolution</span>
@@ -1950,6 +2025,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            psd_wwz = ts_std.spectral(method=&#39;wwz&#39;)  # wwz is the default method</span>
 <span class="sd">            psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger</span>
@@ -1961,6 +2037,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            ts_interp = ts_std.interp()</span>
 <span class="sd">            psd_perio = ts_interp.spectral(method=&#39;periodogram&#39;)</span>
@@ -1973,6 +2050,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            ts_interp = ts_std.interp()</span>
 <span class="sd">            psd_welch = ts_interp.spectral(method=&#39;welch&#39;)</span>
@@ -1985,6 +2063,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            ts_interp = ts_std.interp()</span>
 <span class="sd">            psd_mtm = ts_interp.spectral(method=&#39;mtm&#39;)</span>
@@ -2087,6 +2166,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -2201,6 +2281,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:                   </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -2222,6 +2303,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:</span>
 
 <span class="sd">            coh_ntau = ts_air.wavelet_coherence(ts_nino, ntau=30)</span>
 
@@ -2233,6 +2315,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            coh_tau = ts_air.wavelet_coherence(ts_nino, tau=np.arange(1880, 2001))</span>
 
@@ -2351,6 +2434,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -2441,6 +2525,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -2469,6 +2554,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            caus_res = ts_nino.causality(ts_air, method=&#39;granger&#39;)</span>
 <span class="sd">            print(caus_res)</span>
@@ -3624,9 +3710,9 @@
 <div class="viewcode-block" id="MultipleSeries"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.MultipleSeries">[docs]</a><span class="k">class</span> <span class="nc">MultipleSeries</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;MultipleSeries object.</span>
 
-<span class="sd">    This object handles multiple objects of the type Series and can be created from a list of Series objects.</span>
+<span class="sd">    This object handles a collection of the type Series and can be created from a list of such objects.</span>
 <span class="sd">    MultipleSeries should be used when the need to run analysis on multiple records arises, such as running principal component analysis.</span>
-<span class="sd">    Some of the methods automatically rescale the time axis prior to analysis to ensure that the analysis is run over the same time period.</span>
+<span class="sd">    Some of the methods automatically refocus the time axis prior to analysis to ensure that the analysis is run over the same time period.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -3646,6 +3732,7 @@
 <span class="sd">    --------</span>
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        import pyleoclim as pyleo</span>
 <span class="sd">        import pandas as pd</span>
@@ -3691,6 +3778,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            import pandas as pd</span>
@@ -3797,7 +3885,7 @@
         <span class="k">return</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MultipleSeries.standardize"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.MultipleSeries.standardize">[docs]</a>    <span class="k">def</span> <span class="nf">standardize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Standardize each series object</span>
+        <span class="sd">&#39;&#39;&#39;Standardize each series object in a collection </span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -3812,6 +3900,35 @@
             <span class="n">s</span><span class="o">.</span><span class="n">value</span><span class="o">=</span><span class="n">v_mod</span>
             <span class="n">ms</span><span class="o">.</span><span class="n">series_list</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">=</span><span class="n">s</span>
         <span class="k">return</span> <span class="n">ms</span></div>
+    
+<div class="viewcode-block" id="MultipleSeries.grid_properties"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.MultipleSeries.grid_properties">[docs]</a>    <span class="k">def</span> <span class="nf">grid_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step_style</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Extract grid properties (start, stop, step) of all the Series objects in </span>
+<span class="sd">        a collection.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        step_style : str</span>
+<span class="sd">            Method to obtain a representative step if x is not evenly spaced.</span>
+<span class="sd">            Valid entries: &#39;median&#39; [default], &#39;mean&#39;, &#39;mode&#39; or &#39;max&#39;</span>
+<span class="sd">            The mode is the most frequent entry in a dataset, and may be a good choice if the timeseries</span>
+<span class="sd">            is nearly equally spaced but for a few gaps. </span>
+<span class="sd">            </span>
+<span class="sd">            Max is a conservative choice, appropriate for binning methods and Gaussian kernel coarse-graining</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        </span>
+<span class="sd">        grid_properties : numpy array</span>
+<span class="sd">            n x 3 array, where n is the number of series</span>
+<span class="sd">            </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">gp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">series_list</span><span class="p">),</span><span class="mi">3</span><span class="p">))</span> <span class="c1"># obtain grid parameters</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">series_list</span><span class="p">):</span>
+            <span class="n">item</span>      <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="n">idx</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">gp</span><span class="p">[</span><span class="n">idx</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">tsutils</span><span class="o">.</span><span class="n">grid_properties</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">step_style</span><span class="o">=</span><span class="n">step_style</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">gp</span></div>
 
 <div class="viewcode-block" id="MultipleSeries.common_time"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.MultipleSeries.common_time">[docs]</a>    <span class="k">def</span> <span class="nf">common_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;interp&#39;</span><span class="p">,</span> <span class="n">common_step</span> <span class="o">=</span> <span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">step_style</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Aligns the time axes of a MultipleSeries object, via binning</span>
@@ -3871,6 +3988,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import numpy as np</span>
 <span class="sd">            import pyleoclim as pyleo</span>
@@ -3908,7 +4026,7 @@
 <span class="sd">            msc = ms.common_time(method=&#39;gkernel&#39;)</span>
 <span class="sd">            msc.plot(title=r&#39;Gaussian kernel ($h=3$)&#39;,ax=ax[2],legend=False)</span>
 
-<span class="sd">            # apply common_time with gkernel modified</span>
+<span class="sd">            # apply common_time with gkernel and a large bandwidth</span>
 <span class="sd">            msc = ms.common_time(method=&#39;gkernel&#39;, h=11)</span>
 <span class="sd">            msc.plot(title=r&#39;Gaussian kernel ($h=11$)&#39;,ax=ax[3],legend=False)</span>
 
@@ -3926,13 +4044,7 @@
             <span class="k">elif</span>  <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;interp&#39;</span><span class="p">:</span>
                <span class="n">step_style</span> <span class="o">=</span> <span class="s1">&#39;mean&#39;</span>
 
-        <span class="n">gp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">series_list</span><span class="p">),</span><span class="mi">3</span><span class="p">))</span> <span class="c1"># obtain grid parameters</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">series_list</span><span class="p">):</span>
-            <span class="n">item</span>      <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">clean</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="n">idx</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">gp</span><span class="p">[</span><span class="n">idx</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">tsutils</span><span class="o">.</span><span class="n">grid_properties</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">step_style</span><span class="o">=</span><span class="n">step_style</span><span class="p">)</span>
-            <span class="c1"># if gp[idx,2] &lt; 0:  # flip time axis if retrograde</span>
-            <span class="c1">#     item = item.clean(verbose=idx==0)</span>
-            <span class="c1">#     gp[idx,2] = abs(gp[idx,2])</span>
+        <span class="n">gp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_properties</span><span class="p">(</span><span class="n">step_style</span><span class="o">=</span><span class="n">step_style</span><span class="p">)</span>        
 
         <span class="c1"># define parameters for common time axis</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">gp</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
@@ -4035,6 +4147,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            from pyleoclim.utils.tsmodel import colored_noise</span>
@@ -4125,56 +4238,66 @@
         <span class="n">flag</span> <span class="o">=</span> <span class="nb">all</span> <span class="p">(</span><span class="n">l</span><span class="o">==</span><span class="n">L</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">r</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">flag</span><span class="p">,</span> <span class="n">lengths</span></div>
+    
+<div class="viewcode-block" id="MultipleSeries.pca"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.MultipleSeries.pca">[docs]</a>    <span class="k">def</span> <span class="nf">pca</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">missing</span><span class="o">=</span><span class="s1">&#39;fill-em&#39;</span><span class="p">,</span><span class="n">tol_em</span><span class="o">=</span><span class="mf">5e-03</span><span class="p">,</span> <span class="n">max_em_iter</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span><span class="o">**</span><span class="n">pca_kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Principal Component Analysis (Empirical Orthogonal Functions)</span>
 
-<div class="viewcode-block" id="MultipleSeries.pca"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.MultipleSeries.pca">[docs]</a>    <span class="k">def</span> <span class="nf">pca</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nMC</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="o">**</span><span class="n">pca_kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Principal Component Analysis</span>
-
+<span class="sd">        Decomposition of dataset ys in terms of orthogonal basis functions.</span>
+<span class="sd">        Tolerant to missing values, infilled by an EM algorithm. </span>
+<span class="sd">        Requires ncomp to be less than the number of missing values.</span>
+<span class="sd">        </span>
+<span class="sd">        Do make sure the time axes are aligned, however! (e.g. use `common_time()`)</span>
+<span class="sd">        </span>
+<span class="sd">        Algorithm from statsmodels: https://www.statsmodels.org/stable/generated/statsmodels.multivariate.pca.PCA.html</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 
-<span class="sd">        nMC : int</span>
-<span class="sd">            number of Monte Carlo simulations</span>
-
-<span class="sd">        pca_kwargs : tuple</span>
-
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        res : dictionary containing:</span>
-
-<span class="sd">            - eigval : eigenvalues (nrec,)</span>
-<span class="sd">            - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)</span>
-<span class="sd">            - pcs  : PC series of all components (nrec, nt)</span>
-<span class="sd">            - eofs : EOFs of all components (nrec, nrec)</span>
-
-<span class="sd">        References:</span>
+<span class="sd">        </span>
+<span class="sd">        weights : ndarray, optional</span>
+<span class="sd">            Series weights to use after transforming data according to standardize</span>
+<span class="sd">            or demean when computing the principal components.</span>
+<span class="sd">        </span>
+<span class="sd">        missing : {str, None}</span>
+<span class="sd">            Method for missing data.  Choices are:</span>
+<span class="sd">        </span>
+<span class="sd">            * &#39;drop-row&#39; - drop rows with missing values.</span>
+<span class="sd">            * &#39;drop-col&#39; - drop columns with missing values.</span>
+<span class="sd">            * &#39;drop-min&#39; - drop either rows or columns, choosing by data retention.</span>
+<span class="sd">            * &#39;fill-em&#39; - use EM algorithm to fill missing value.  ncomp should be</span>
+<span class="sd">              set to the number of factors required.</span>
+<span class="sd">            * `None` raises if data contains NaN values.</span>
+<span class="sd">        </span>
+<span class="sd">        tol_em : float</span>
+<span class="sd">            Tolerance to use when checking for convergence of the EM algorithm.</span>
+<span class="sd">        max_em_iter : int</span>
+<span class="sd">            Maximum iterations for the EM algorithm.</span>
+<span class="sd">        </span>
+<span class="sd">        Attributes</span>
 <span class="sd">        ----------</span>
-<span class="sd">        Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene</span>
-<span class="sd">        European speleothem δ18O records linked to North Atlantic Ocean circulation.</span>
-<span class="sd">        Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8</span>
-
-<span class="sd">        See also</span>
-<span class="sd">        --------</span>
-
-<span class="sd">        pyleoclim.utils.decomposition.mcpca: Monte Carlo PCA</span>
+<span class="sd">        res: pyleoclim.ui.SpatialDecomp</span>
+<span class="sd">            the result object, see `pyleoclim.ui.SpatialDecomp`</span>
+<span class="sd">            </span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
 <span class="sd">            data = pyleo.Lipd(usr_path = url)</span>
 <span class="sd">            tslist = data.to_LipdSeriesList()</span>
 <span class="sd">            tslist = tslist[2:] # drop the first two series which only concerns age and depth</span>
-<span class="sd">            ms = pyleo.MultipleSeries(tslist)</span>
-
-<span class="sd">            # msc = ms.common_time()</span>
-
-<span class="sd">            # res = msc.pca(nMC=20)</span>
-
+<span class="sd">            ms = pyleo.MultipleSeries(tslist).common_time()</span>
+<span class="sd">        </span>
+<span class="sd">            res = ms.pca() # carry out PCA</span>
+<span class="sd">            </span>
+<span class="sd">            res.screeplot() # plot the eigenvalue spectrum</span>
+<span class="sd">            res.modeplot() # plot the first mode</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">flag</span><span class="p">,</span> <span class="n">lengths</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">equal_lengths</span><span class="p">()</span>
 
@@ -4185,13 +4308,95 @@
             <span class="n">n</span> <span class="o">=</span> <span class="n">lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n</span><span class="p">,</span><span class="n">p</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
-                <span class="n">ys</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">series_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">ys</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">series_list</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>  <span class="c1"># fill in data matrix</span>
+        
+        <span class="n">nc</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ys</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="c1"># number of components to return</span>
+        
+        <span class="n">out</span>  <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span><span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span><span class="n">missing</span><span class="o">=</span><span class="n">missing</span><span class="p">,</span><span class="n">tol_em</span><span class="o">=</span><span class="n">tol_em</span><span class="p">,</span> <span class="n">max_em_iter</span><span class="o">=</span><span class="n">max_em_iter</span><span class="p">,</span><span class="o">**</span><span class="n">pca_kwargs</span><span class="p">)</span>
+        
+        <span class="c1"># compute effective sample size</span>
+        <span class="n">PC1</span>  <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">factors</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">neff</span> <span class="o">=</span> <span class="n">tsutils</span><span class="o">.</span><span class="n">eff_sample_size</span><span class="p">(</span><span class="n">PC1</span><span class="p">)</span> 
+        
+        <span class="c1"># compute percent variance</span>
+        <span class="n">pctvar</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">eigenvals</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">eigenvals</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span>
+        
+        <span class="c1"># assign result to SpatiamDecomp class</span>
+        <span class="c1"># Note: need to grab coordinates from Series or LiPDSeries        </span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">SpatialDecomp</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;PCA&#39;</span><span class="p">,</span> <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">series_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">neff</span><span class="o">=</span> <span class="n">neff</span><span class="p">,</span>
+                            <span class="n">pcs</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">scores</span><span class="p">,</span> <span class="n">pctvar</span> <span class="o">=</span> <span class="n">pctvar</span><span class="p">,</span>  <span class="n">locs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                            <span class="n">eigvals</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">eigenvals</span><span class="p">,</span> <span class="n">eigvecs</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">eigenvecs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>    </div>
 
-        <span class="n">res</span> <span class="o">=</span> <span class="n">decomposition</span><span class="o">.</span><span class="n">mcpca</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">nMC</span><span class="p">,</span> <span class="o">**</span><span class="n">pca_kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">res</span></div>
+    <span class="c1"># def mcpca(self,nMC=200,**pca_kwargs):</span>
+    <span class="c1">#     &#39;&#39;&#39; Monte Carlo Principal Component Analysis</span>
+        
+    <span class="c1">#     (UNDER REPAIR)</span>
+
+    <span class="c1">#     Parameters</span>
+    <span class="c1">#     ----------</span>
+
+    <span class="c1">#     nMC : int</span>
+    <span class="c1">#         number of Monte Carlo simulations</span>
+
+    <span class="c1">#     pca_kwargs : tuple</span>
+
+
+    <span class="c1">#     Returns</span>
+    <span class="c1">#     -------</span>
+    <span class="c1">#     res : dictionary containing:</span>
+
+    <span class="c1">#         - eigval : eigenvalues (nrec,)</span>
+    <span class="c1">#         - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)</span>
+    <span class="c1">#         - pcs  : PC series of all components (nrec, nt)</span>
+    <span class="c1">#         - eofs : EOFs of all components (nrec, nrec)</span>
+
+    <span class="c1">#     References:</span>
+    <span class="c1">#     ----------</span>
+    <span class="c1">#     Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene</span>
+    <span class="c1">#     European speleothem δ18O records linked to North Atlantic Ocean circulation.</span>
+    <span class="c1">#     Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8</span>
+
+    <span class="c1">#     See also</span>
+    <span class="c1">#     --------</span>
+
+    <span class="c1">#     pyleoclim.utils.decomposition.mcpca: Monte Carlo PCA</span>
+
+    <span class="c1">#     Examples</span>
+    <span class="c1">#     --------</span>
+
+    <span class="c1">#     .. ipython:: python</span>
+    <span class="c1">#         :okwarning:</span>
+
+    <span class="c1">#         import pyleoclim as pyleo</span>
+    <span class="c1">#         url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
+    <span class="c1">#         data = pyleo.Lipd(usr_path = url)</span>
+    <span class="c1">#         tslist = data.to_LipdSeriesList()</span>
+    <span class="c1">#         tslist = tslist[2:] # drop the first two series which only concerns age and depth</span>
+    <span class="c1">#         ms = pyleo.MultipleSeries(tslist)</span>
+
+    <span class="c1">#         # msc = ms.common_time()</span>
+
+    <span class="c1">#         # res = msc.pca(nMC=20)</span>
+
+    <span class="c1">#     &#39;&#39;&#39;</span>
+    <span class="c1">#     flag, lengths = self.equal_lengths()</span>
+
+    <span class="c1">#     if flag==False:</span>
+    <span class="c1">#         print(&#39;All Time Series should be of same length. Apply common_time() first&#39;)</span>
+    <span class="c1">#     else: # if all series have equal length</span>
+    <span class="c1">#         p = len(lengths)</span>
+    <span class="c1">#         n = lengths[0]</span>
+    <span class="c1">#         ys = np.empty((n,p))</span>
+    <span class="c1">#         for j in range(p):</span>
+    <span class="c1">#             ys[:,j] = self.series_list[j].value</span>
+
+    <span class="c1">#     res = decomposition.mcpca(ys, nMC, **pca_kwargs)</span>
+    <span class="c1">#     return res</span>
 
 <div class="viewcode-block" id="MultipleSeries.bin"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.MultipleSeries.bin">[docs]</a>    <span class="k">def</span> <span class="nf">bin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Aligns the time axes of a MultipleSeries object, via binning.</span>
+        <span class="sd">&#39;&#39;&#39;Aligns the time axes of a MultipleSeries object, via binning.</span>
+<span class="sd">        </span>
 <span class="sd">        This is critical for workflows that need to assume a common time axis</span>
 <span class="sd">        for the group of series under consideration.</span>
 
@@ -4226,9 +4431,10 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-
+<span class="sd">        </span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:</span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -4284,6 +4490,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -4339,6 +4546,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -4689,6 +4897,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -5092,6 +5301,7 @@
 
 <span class="sd">            .. ipython:: python</span>
 <span class="sd">                :okwarning:</span>
+<span class="sd">                :okexcept:    </span>
 <span class="sd">                </span>
 <span class="sd">                nn = 30 # number of noise realizations</span>
 <span class="sd">                nt = 500</span>
@@ -5216,6 +5426,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 <span class="sd">            </span>
 <span class="sd">            nn = 30 # number of noise realizations</span>
 <span class="sd">            nt = 500</span>
@@ -6198,6 +6409,243 @@
                 <span class="n">plotting</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div></div>
 
+<div class="viewcode-block" id="SpatialDecomp"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.SpatialDecomp">[docs]</a><span class="k">class</span> <span class="nc">SpatialDecomp</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39; Class to hold the results of spatial decompositions</span>
+<span class="sd">        applies to : `pca()`, `mcpca()`, `mssa()` </span>
+<span class="sd">        </span>
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        time: float</span>
+<span class="sd">            the common time axis</span>
+<span class="sd">            </span>
+<span class="sd">        locs: float (p, 2)</span>
+<span class="sd">            a p x 2 array of coordinates (latitude, longitude) for mapping the spatial patterns (&quot;EOFs&quot;)</span>
+<span class="sd">            </span>
+<span class="sd">        name: str</span>
+<span class="sd">            name of the dataset/analysis to use in plots</span>
+<span class="sd">            </span>
+<span class="sd">        eigvals: float</span>
+<span class="sd">            vector of eigenvalues from the decomposition</span>
+<span class="sd">            </span>
+<span class="sd">        eigvecs: float</span>
+<span class="sd">            array of eigenvectors from the decomposition  </span>
+<span class="sd">         </span>
+<span class="sd">        pctvar: float    </span>
+<span class="sd">            array of pct variance accounted for by each mode</span>
+<span class="sd">            </span>
+<span class="sd">        neff: float</span>
+<span class="sd">            scalar representing the effective sample size of the leading mode</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">locs</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">eigvals</span><span class="p">,</span> <span class="n">eigvecs</span><span class="p">,</span> <span class="n">pctvar</span><span class="p">,</span> <span class="n">pcs</span><span class="p">,</span> <span class="n">neff</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span>       <span class="o">=</span> <span class="n">time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span>       <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">locs</span>       <span class="o">=</span> <span class="n">locs</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">eigvals</span>    <span class="o">=</span> <span class="n">eigvals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eigvecs</span>    <span class="o">=</span> <span class="n">eigvecs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pctvar</span>     <span class="o">=</span> <span class="n">pctvar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcs</span>        <span class="o">=</span> <span class="n">pcs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neff</span>       <span class="o">=</span> <span class="n">neff</span>
+        
+<div class="viewcode-block" id="SpatialDecomp.screeplot"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.SpatialDecomp.screeplot">[docs]</a>    <span class="k">def</span> <span class="nf">screeplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">uq</span><span class="o">=</span><span class="s1">&#39;N82&#39;</span> <span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="s1">&#39;scree plot&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savefig_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                  <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">],</span> <span class="n">clr_eig</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span>  <span class="n">mute</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Plot the eigenvalue spectrum with uncertainties</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        figsize : list, optional</span>
+<span class="sd">            The figure size. The default is [6, 4].</span>
+
+<span class="sd">        title : str, optional</span>
+<span class="sd">            Plot title. The default is &#39;scree plot&#39;.</span>
+
+<span class="sd">        savefig_settings : dict</span>
+<span class="sd">            the dictionary of arguments for plt.savefig(); some notes below:</span>
+<span class="sd">            - &quot;path&quot; must be specified; it can be any existed or non-existed path,</span>
+<span class="sd">              with or without a suffix; if the suffix is not given in &quot;path&quot;, it will follow &quot;format&quot;</span>
+<span class="sd">            - &quot;format&quot; can be one of {&quot;pdf&quot;, &quot;eps&quot;, &quot;png&quot;, &quot;ps&quot;}</span>
+
+<span class="sd">        title_kwargs : dict, optional</span>
+<span class="sd">            the keyword arguments for ax.set_title()</span>
+
+<span class="sd">        ax : matplotlib.axis, optional</span>
+<span class="sd">            the axis object from matplotlib</span>
+<span class="sd">            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.</span>
+
+<span class="sd">        mute : {True,False}</span>
+<span class="sd">            if True, the plot will not show;</span>
+<span class="sd">            recommend to turn on when more modifications are going to be made on ax</span>
+
+<span class="sd">        xlim : list, optional</span>
+<span class="sd">            x-axis limits. The default is [0, 10] (first 10 eigenvalues)</span>
+<span class="sd">            </span>
+<span class="sd">        uq : str, optional</span>
+<span class="sd">            Method used for uncertainty quantification of the eigenvalues.</span>
+<span class="sd">            &#39;N82&#39; uses the North et al &quot;rule of thumb&quot; [1] with effective sample size </span>
+<span class="sd">            computed as in [2]. </span>
+<span class="sd">            &#39;MC&#39; uses Monte-Carlo simulations (e.g. MC-EOF). Returns an error if no ensemble is found.</span>
+<span class="sd">            </span>
+<span class="sd">        clr_eig : str, optional</span>
+<span class="sd">            color to be used for plotting eigenvalues</span>
+<span class="sd">        </span>
+<span class="sd">            </span>
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        [1] North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982), </span>
+<span class="sd">            Sampling errors in the estimation of empirical orthogonal functions,</span>
+<span class="sd">            Mon. Weather Rev., 110, 699–706.</span>
+<span class="sd">        [2] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical</span>
+<span class="sd">            orthogonal functions and related techniques in atmospheric science: </span>
+<span class="sd">            A review, International Journal of Climatology, 27(9), </span>
+<span class="sd">            1119–1152, doi:10.1002/joc.1499.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># Turn the interactive mode off.</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+
+        <span class="n">savefig_settings</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">savefig_settings</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">savefig_settings</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+            
+        
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">neff</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">neff</span> <span class="o">=</span> <span class="mi">2</span>
+        
+        <span class="c1"># compute 95% CI    </span>
+        <span class="k">if</span> <span class="n">uq</span> <span class="o">==</span> <span class="s1">&#39;N82&#39;</span><span class="p">:</span>
+            <span class="n">eb_lbl</span> <span class="o">=</span>  <span class="sa">r</span><span class="s1">&#39;95% CI ($n_\mathrm</span><span class="si">{eff}</span><span class="s1"> = $&#39;</span><span class="o">+</span> <span class="s1">&#39;</span><span class="si">{:.1f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">neff</span><span class="p">)</span> <span class="o">+</span><span class="s1">&#39;)&#39;</span> <span class="c1"># declare method</span>
+            <span class="n">Lc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigvals</span> <span class="c1"># central estimate </span>
+            <span class="n">Lerr</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">Lc</span><span class="p">,(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span> <span class="c1"># declare array</span>
+            <span class="n">Lerr</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>  <span class="o">=</span> <span class="n">Lc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">neff</span><span class="p">))</span>
+            <span class="n">Lerr</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>  <span class="o">=</span> <span class="n">Lc</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">neff</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">uq</span> <span class="o">==</span><span class="s1">&#39;MC&#39;</span><span class="p">:</span>
+            <span class="n">eb_lbl</span> <span class="o">=</span>  <span class="s1">&#39;95% CI (Monte Carlo)&#39;</span> <span class="c1"># declare method</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">Lq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">quantile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eigvals</span><span class="p">,[</span><span class="mf">0.025</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.975</span><span class="p">],</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">Lc</span> <span class="o">=</span> <span class="n">Lq</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>
+                <span class="n">Lerr</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">Lc</span><span class="p">,(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span> <span class="c1"># declare array</span>
+                <span class="n">Lerr</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>  <span class="o">=</span> <span class="n">Lq</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+                <span class="n">Lerr</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>  <span class="o">=</span> <span class="n">Lq</span><span class="p">[</span><span class="mi">2</span><span class="p">,:]</span>
+        
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Eigenvalue array must have more than 1 non-singleton dimension.&quot;</span><span class="p">)</span>             
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span><span class="s2">&quot;unknown UQ method. No action taken&quot;</span><span class="p">)</span>
+           
+            
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">Lc</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
+        
+        <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">idx</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">Lc</span><span class="p">,</span><span class="n">yerr</span> <span class="o">=</span> <span class="n">Lerr</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">clr_eig</span><span class="p">,</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span><span class="n">ls</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="n">eb_lbl</span><span class="p">)</span>
+        
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span> 
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Mode index $i$&#39;</span><span class="p">);</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\lambda_i$&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">integer</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="c1"># enforce integer values</span>
+
+
+        <span class="k">if</span> <span class="n">xlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">xlim</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">Lc</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">title_kwargs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">title_kwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">title_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">t_args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;y&#39;</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="s1">&#39;bold&#39;</span><span class="p">}</span>
+            <span class="n">t_args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">title_kwargs</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">t_args</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">savefig_settings</span><span class="p">:</span>
+            <span class="n">plotting</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">savefig_settings</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mute</span><span class="p">:</span>
+                <span class="n">plotting</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="SpatialDecomp.modeplot"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.SpatialDecomp.modeplot">[docs]</a>    <span class="k">def</span> <span class="nf">modeplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savefig_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+              <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">spec_method</span> <span class="o">=</span> <span class="s1">&#39;mtm&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39; Dashboard visualizing the properties of a given mode, including:</span>
+<span class="sd">            1. The temporal coefficient (PC or similar)</span>
+<span class="sd">            2. its spectrum</span>
+<span class="sd">            3. The spatial loadings (EOF or similar)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        mode : int</span>
+<span class="sd">            the (one-based) index of the mode to visualize</span>
+<span class="sd">        </span>
+<span class="sd">        figsize : list, optional</span>
+<span class="sd">            The figure size. The default is [10, 5].</span>
+<span class="sd">        </span>
+<span class="sd">        savefig_settings : dict</span>
+<span class="sd">            the dictionary of arguments for plt.savefig(); some notes below:</span>
+<span class="sd">            - &quot;path&quot; must be specified; it can be any existed or non-existed path,</span>
+<span class="sd">              with or without a suffix; if the suffix is not given in &quot;path&quot;, it will follow &quot;format&quot;</span>
+<span class="sd">            - &quot;format&quot; can be one of {&quot;pdf&quot;, &quot;eps&quot;, &quot;png&quot;, &quot;ps&quot;}</span>
+
+<span class="sd">        title_kwargs : dict</span>
+<span class="sd">            the keyword arguments for ax.set_title()</span>
+
+<span class="sd">        gs : matplotlib.gridspec object, optional</span>
+<span class="sd">            the axis object from matplotlib</span>
+<span class="sd">            See [matplotlib.gridspec.GridSpec](https://matplotlib.org/stable/tutorials/intermediate/gridspec.html) for details.</span>
+
+<span class="sd">        mute : {True,False}</span>
+<span class="sd">            if True, the plot will not show;</span>
+<span class="sd">            recommend to turn on when more modifications are going to be made on ax</span>
+<span class="sd">        </span>
+<span class="sd">        spec_method: str, optional</span>
+<span class="sd">            The name of the spectral method to be applied on the PC. Default: MTM</span>
+<span class="sd">            Note that the data are evenly-spaced, so any spectral method that</span>
+<span class="sd">            assumes even spacing is applicable here:  &#39;mtm&#39;, &#39;welch&#39;, &#39;periodogram&#39;</span>
+<span class="sd">            &#39;wwz&#39; is relevant too if scaling exponents need to be estimated. </span>
+<span class="sd">      </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># Turn the interactive mode off.</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ioff</span><span class="p">()</span>
+
+        <span class="n">savefig_settings</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">savefig_settings</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">savefig_settings</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        
+        <span class="n">PC</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pcs</span><span class="p">[:,</span><span class="n">mode</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>    
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">PC</span><span class="p">)</span> <span class="c1"># define timeseries object for the PC</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">tight_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="n">gs</span> <span class="o">=</span> <span class="n">gridspec</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># define grid for subplots</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:])</span>
+        <span class="n">ts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;PC &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mode</span><span class="p">))</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Mode &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;, &#39;</span><span class="o">+</span> <span class="s1">&#39;</span><span class="si">{:3.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pctvar</span><span class="p">[</span><span class="n">mode</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;% variance explained&#39;</span><span class="p">,</span><span class="n">weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># plot spectrum</span>
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">psd_mtm_rc</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">interp</span><span class="p">()</span><span class="o">.</span><span class="n">spectral</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">spec_method</span><span class="p">)</span>    
+        <span class="n">_</span> <span class="o">=</span> <span class="n">psd_mtm_rc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Period&#39;</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Spectrum (&#39;</span><span class="o">+</span><span class="n">spec_method</span><span class="o">+</span><span class="s1">&#39;)&#39;</span><span class="p">,</span><span class="n">weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># plot T-EOF</span>
+        <span class="n">ax3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="c1">#EOF = self.eigvecs[:,mode]</span>
+        <span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Spatial loadings </span><span class="se">\n</span><span class="s1"> (under construction)&#39;</span><span class="p">,</span><span class="n">weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+
+        <span class="c1"># if title is not None:</span>
+        <span class="c1">#     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()</span>
+        <span class="c1">#     t_args = {&#39;y&#39;: 1.1, &#39;weight&#39;: &#39;bold&#39;}</span>
+        <span class="c1">#     t_args.update(title_kwargs)</span>
+        <span class="c1">#     ax.set_title(title, **t_args)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">savefig_settings</span><span class="p">:</span>
+            <span class="n">plotting</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">savefig_settings</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">mute</span><span class="p">:</span>
+                <span class="n">plotting</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">gs</span></div></div>
+
+
+
 <div class="viewcode-block" id="SsaRes"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.SsaRes">[docs]</a><span class="k">class</span> <span class="nc">SsaRes</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39; Class to hold the results of SSA method</span>
 
@@ -6251,7 +6699,7 @@
 <div class="viewcode-block" id="SsaRes.screeplot"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.SsaRes.screeplot">[docs]</a>    <span class="k">def</span> <span class="nf">screeplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;SSA scree plot&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savefig_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">xlim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">clr_mcssa</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">xkcd_rgb</span><span class="p">[</span><span class="s1">&#39;red&#39;</span><span class="p">],</span> <span class="n">clr_signif</span><span class="o">=</span><span class="n">sns</span><span class="o">.</span><span class="n">xkcd_rgb</span><span class="p">[</span><span class="s1">&#39;teal&#39;</span><span class="p">],</span>
              <span class="n">clr_eig</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span>  <span class="n">mute</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Scree plot for SSA visualizing the eigenvalue spectrum and indicating which modes were retained.  </span>
+        <span class="sd">&#39;&#39;&#39; Scree plot for SSA, visualizing the eigenvalue spectrum and indicating which modes were retained.  </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -6280,6 +6728,17 @@
 
 <span class="sd">        xlim : list, optional</span>
 <span class="sd">            x-axis limits. The default is None.</span>
+<span class="sd">            </span>
+<span class="sd">        clr_mcssa : str, optional</span>
+<span class="sd">            color of the Monte Carlo SSA AR(1) shading (if data are provided)</span>
+<span class="sd">            default: red</span>
+<span class="sd">            </span>
+<span class="sd">        clr_eig : str, optional</span>
+<span class="sd">            color of the eigenvalues, default: black</span>
+<span class="sd">            </span>
+<span class="sd">        clr_signif: str, optional </span>
+<span class="sd">            color of the highlights for significant eigenvalue.</span>
+<span class="sd">               default: teal </span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># Turn the interactive mode off.</span>
@@ -6293,7 +6752,7 @@
         <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigvals</span>
         <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PC</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#sample size</span>
         <span class="n">dv</span> <span class="o">=</span> <span class="n">v</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span> 
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> 
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span> 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eigvals_q</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">eigvals_q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">eigvals_q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">clr_mcssa</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;AR(1) 5-95% quantiles&#39;</span><span class="p">)</span> 
             
@@ -6302,9 +6761,11 @@
                  <span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;modes retained&#39;</span><span class="p">,</span><span class="n">zorder</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span> 
         <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Mode index $i$&#39;</span><span class="p">);</span> <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\lambda_i$&#39;</span><span class="p">)</span>    
+        <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">MaxNLocator</span><span class="p">(</span><span class="n">integer</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span> <span class="c1"># enforce integer values</span>
+
 
         <span class="k">if</span> <span class="n">xlim</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">xlim</span><span class="p">),</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
 
         <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">title_kwargs</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">title_kwargs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">title_kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -6319,8 +6780,8 @@
                 <span class="n">plotting</span><span class="o">.</span><span class="n">showfig</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span></div>
 
-<div class="viewcode-block" id="SsaRes.modeplot"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.SsaRes.modeplot">[docs]</a>    <span class="k">def</span> <span class="nf">modeplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savefig_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-             <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">NW</span> <span class="o">=</span> <span class="mi">2</span><span class="p">):</span>
+<div class="viewcode-block" id="SsaRes.modeplot"><a class="viewcode-back" href="../../../core/ui.html#pyleoclim.core.ui.SsaRes.modeplot">[docs]</a>    <span class="k">def</span> <span class="nf">modeplot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">savefig_settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+             <span class="n">title_kwargs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">spec_method</span> <span class="o">=</span> <span class="s1">&#39;mtm&#39;</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39; Dashboard visualizing the properties of a given SSA mode, including:</span>
 <span class="sd">            1. the analyzing function (T-EOF)</span>
 <span class="sd">            2. the reconstructed component (RC)</span>
@@ -6329,7 +6790,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        mode : int</span>
-<span class="sd">            the (zero-based) index of the mode to visualize</span>
+<span class="sd">            the (one-based) index of the mode to visualize</span>
 <span class="sd">        </span>
 <span class="sd">        figsize : list, optional</span>
 <span class="sd">            The figure size. The default is [10, 5].</span>
@@ -6351,9 +6812,11 @@
 <span class="sd">            if True, the plot will not show;</span>
 <span class="sd">            recommend to turn on when more modifications are going to be made on ax</span>
 <span class="sd">        </span>
-<span class="sd">        NW : float [2, 2.5, 3, 3.5 , 4] </span>
-<span class="sd">            time-bandwidth product for MTM spectral estimate</span>
-<span class="sd">            default: 2</span>
+<span class="sd">        spec_method: str, optional</span>
+<span class="sd">            The name of the spectral method to be applied on the PC. Default: MTM</span>
+<span class="sd">            Note that the data are evenly-spaced, so any spectral method that</span>
+<span class="sd">            assumes even spacing is applicable here:  &#39;mtm&#39;, &#39;welch&#39;, &#39;periodogram&#39;</span>
+<span class="sd">            &#39;wwz&#39; is relevant too if scaling exponents need to be estimated. </span>
 <span class="sd">      </span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="c1"># Turn the interactive mode off.</span>
@@ -6364,32 +6827,26 @@
         <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
         
-        <span class="n">RC</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RCmat</span><span class="p">[:,</span><span class="n">mode</span><span class="p">]</span>    
+        <span class="n">RC</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RCmat</span><span class="p">[:,</span><span class="n">mode</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>    
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">tight_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
-        <span class="n">gs</span> <span class="o">=</span> <span class="n">gridspec</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># plot RC</span>
+        <span class="n">gs</span> <span class="o">=</span> <span class="n">gridspec</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># plot RC</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:])</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span><span class="n">RC</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span><span class="n">RC</span><span class="p">)</span>  
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">),</span>  <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;RC [dimensionless]&#39;</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Mode &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mode</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; RC, &#39;</span><span class="o">+</span> <span class="s1">&#39;</span><span class="si">{:3.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pctvar</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;% variance explained&#39;</span><span class="p">,</span><span class="n">weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Mode &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39; RC, &#39;</span><span class="o">+</span> <span class="s1">&#39;</span><span class="si">{:3.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pctvar</span><span class="p">[</span><span class="n">mode</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;% variance explained&#39;</span><span class="p">,</span><span class="n">weight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
         <span class="c1"># plot T-EOF</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eigvecs</span><span class="p">[:,</span><span class="n">mode</span><span class="p">])</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;T-EOF (analyzing function)&#39;</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">),</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;T-EOF values&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eigvecs</span><span class="p">[:,</span><span class="n">mode</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Analyzing function)&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time&#39;</span><span class="p">),</span> <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;T-EOF&#39;</span><span class="p">)</span>
         <span class="c1"># plot spectrum</span>
         <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
         <span class="n">ts_rc</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">RC</span><span class="p">)</span> <span class="c1"># define timeseries object for the RC</span>
-        <span class="n">psd_mtm_rc</span> <span class="o">=</span> <span class="n">ts_rc</span><span class="o">.</span><span class="n">interp</span><span class="p">()</span><span class="o">.</span><span class="n">spectral</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;mtm&#39;</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;NW&#39;</span><span class="p">:</span> <span class="n">NW</span><span class="p">})</span>
-    
+        <span class="n">psd_mtm_rc</span> <span class="o">=</span> <span class="n">ts_rc</span><span class="o">.</span><span class="n">interp</span><span class="p">()</span><span class="o">.</span><span class="n">spectral</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">spec_method</span><span class="p">)</span>
         <span class="n">_</span> <span class="o">=</span> <span class="n">psd_mtm_rc</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Period&#39;</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Multitaper spectrum&#39;</span><span class="p">)</span>
-
-        <span class="c1"># if title is not None:</span>
-        <span class="c1">#     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()</span>
-        <span class="c1">#     t_args = {&#39;y&#39;: 1.1, &#39;weight&#39;: &#39;bold&#39;}</span>
-        <span class="c1">#     t_args.update(title_kwargs)</span>
-        <span class="c1">#     ax.set_title(title, **t_args)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Spectrum (&#39;</span><span class="o">+</span><span class="n">spec_method</span><span class="o">+</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s1">&#39;path&#39;</span> <span class="ow">in</span> <span class="n">savefig_settings</span><span class="p">:</span>
             <span class="n">plotting</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">savefig_settings</span><span class="p">)</span>
@@ -6428,6 +6885,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:</span>
 
 <span class="sd">        import pyleoclim as pyleo</span>
 <span class="sd">        url=&#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -6717,6 +7175,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -6729,6 +7188,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -6791,8 +7251,8 @@
     <span class="sd">&#39;&#39;&#39;Lipd time series object</span>
 
 
-<span class="sd">    These objects can be obtained from a LiPD either through Pyleoclim or the LiPD utilities.</span>
-<span class="sd">    If multiple objects (i.e., list) is given, then the user will be prompted to choose one timeseries.</span>
+<span class="sd">    These objects can be obtained from a LiPD file/object either through Pyleoclim or the LiPD utilities.</span>
+<span class="sd">    If multiple objects (i.e., a list) is given, then the user will be prompted to choose one timeseries.</span>
 
 <span class="sd">    LipdSeries is a child of Series, therefore all the methods available for Series apply to LipdSeries in addition to some specific methods.</span>
 
@@ -6805,7 +7265,8 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
-
+<span class="sd">        :okexcept:</span>
+<span class="sd">            </span>
 <span class="sd">        import pyleoclim as pyleo</span>
 <span class="sd">        url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
 <span class="sd">        data = pyleo.Lipd(usr_path = url)</span>
@@ -6821,6 +7282,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        ts1 = data.to_LipdSeries(number=5)</span>
 
@@ -6830,6 +7292,7 @@
 
 <span class="sd">    .. ipython:: python</span>
 <span class="sd">        :okwarning:</span>
+<span class="sd">        :okexcept:    </span>
 
 <span class="sd">        ts_list = data.to_LipdSeriesList()</span>
 <span class="sd">        # only keep the Mg/Ca and SST</span>
@@ -6994,7 +7457,13 @@
         <span class="c1">#create multipleseries</span>
         <span class="n">s_list</span><span class="o">=</span><span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ensembleValuestoPaleo</span><span class="o">.</span><span class="n">T</span><span class="p">):</span>
-            <span class="n">s_tmp</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">s</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="n">ys</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="n">clean_ts</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">s_tmp</span> <span class="o">=</span> <span class="n">Series</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">s</span><span class="p">,</span><span class="n">value</span><span class="o">=</span><span class="n">ys</span><span class="p">,</span>
+                           <span class="n">verbose</span><span class="o">=</span><span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> 
+                           <span class="n">clean_ts</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+                           <span class="n">value_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value_name</span><span class="p">,</span>
+                           <span class="n">value_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value_unit</span><span class="p">,</span>
+                           <span class="n">time_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time_name</span><span class="p">,</span>
+                           <span class="n">time_unit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time_unit</span><span class="p">)</span>
             <span class="n">s_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s_tmp</span><span class="p">)</span>
 
         <span class="n">ens</span> <span class="o">=</span> <span class="n">EnsembleSeries</span><span class="p">(</span><span class="n">series_list</span><span class="o">=</span><span class="n">s_list</span><span class="p">)</span>
@@ -7061,6 +7530,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -7385,6 +7855,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 
 <span class="sd">            import pyleoclim as pyleo</span>
 <span class="sd">            url = &#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=MD982176.Stott.2004&#39;</span>
@@ -7434,6 +7905,7 @@
             <span class="k">if</span> <span class="s1">&#39;shade_clr&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">plt_kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="n">archiveType</span> <span class="o">=</span> <span class="n">lipdutils</span><span class="o">.</span><span class="n">LipdToOntology</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;archiveType&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
                 <span class="n">plt_kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;shade_clr&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">plot_default</span><span class="p">[</span><span class="n">archiveType</span><span class="p">][</span><span class="mi">0</span><span class="p">]})</span>
+            <span class="c1">#plt_kwargs.update({&#39;ylabel&#39;:self.value_name})</span>
             <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;ts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ensc</span><span class="o">.</span><span class="n">plot_envelope</span><span class="p">(</span><span class="o">**</span><span class="n">plt_kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid argument value for ensemble&quot;</span><span class="p">)</span>
@@ -7948,6 +8420,7 @@
 
 <span class="sd">        .. ipython:: python</span>
 <span class="sd">            :okwarning:</span>
+<span class="sd">            :okexcept:    </span>
 <span class="sd">                </span>
 <span class="sd">            D = pyleo.Lipd(&#39;http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&amp;lipdid=Crystal.McCabe-Glynn.2013&#39;)</span>
 <span class="sd">            ts=D.to_LipdSeries(number=2)</span>

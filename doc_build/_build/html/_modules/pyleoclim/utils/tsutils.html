@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>pyleoclim.utils.tsutils &mdash; Pyleoclim 0.6.2beta documentation</title>
+  <title>pyleoclim.utils.tsutils &mdash; Pyleoclim 0.6.3beta documentation</title>
   
 
   
@@ -71,7 +71,7 @@
             
             
               <div class="version">
-                0.6.2beta
+                0.6.3beta
               </div>
             
           
@@ -200,6 +200,7 @@
     <span class="s1">&#39;detrend&#39;</span><span class="p">,</span>
     <span class="s1">&#39;detect_outliers&#39;</span><span class="p">,</span>
     <span class="s1">&#39;remove_outliers&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;eff_sample_size&#39;</span>
 <span class="p">]</span>
 
 
@@ -216,6 +217,8 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
+<span class="kn">import</span> <span class="nn">statsmodels.tsa.stattools</span> <span class="k">as</span> <span class="nn">sms</span>
+
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">exit</span>
 <span class="kn">from</span> <span class="nn">.plotting</span> <span class="kn">import</span> <span class="n">plot_scatter_xy</span><span class="p">,</span><span class="n">plot_xy</span><span class="p">,</span><span class="n">savefig</span><span class="p">,</span><span class="n">showfig</span>
@@ -1094,6 +1097,50 @@
 
     <span class="k">return</span> <span class="n">ys</span><span class="p">,</span><span class="n">ts</span></div>
 
+<span class="k">def</span> <span class="nf">eff_sample_size</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">detrend_flag</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Effective Sample Size of timeseries y</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y : float </span>
+<span class="sd">       1d array </span>
+<span class="sd">       </span>
+<span class="sd">    detrend : boolean</span>
+<span class="sd">        if True (default), detrends y before estimation.         </span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    neff : float</span>
+<span class="sd">        The effective sample size</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">    Reference</span>
+<span class="sd">    ---------</span>
+<span class="sd">    Thiébaux HJ, Zwiers FW. 1984. The interpretation and estimation of</span>
+<span class="sd">    effective sample sizes. Journal of Climate and Applied Meteorology 23: 800–811.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="n">fft</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fft</span> <span class="o">=</span> <span class="kc">True</span>
+        
+    <span class="k">if</span> <span class="n">detrend_flag</span><span class="p">:</span>
+        <span class="n">yd</span> <span class="o">=</span> <span class="n">detrend</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">yd</span> <span class="o">=</span> <span class="n">y</span>
+    
+    <span class="n">n</span>     <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">nl</span>    <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="mi">10</span><span class="p">)</span>     <span class="c1"># rule of thumb for choosing number of lags</span>
+    <span class="n">rho</span>   <span class="o">=</span> <span class="n">sms</span><span class="o">.</span><span class="n">acf</span><span class="p">(</span><span class="n">yd</span><span class="p">,</span><span class="n">adjusted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">fft</span><span class="o">=</span><span class="n">fft</span><span class="p">,</span><span class="n">nlags</span><span class="o">=</span><span class="n">nl</span><span class="p">)</span> <span class="c1"># compute autocorrelation function         </span>
+    <span class="n">kvec</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">nl</span><span class="p">)</span>
+    <span class="n">fac</span>   <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">kvec</span><span class="o">/</span><span class="n">nl</span><span class="p">)</span><span class="o">*</span><span class="n">rho</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">neff</span>  <span class="o">=</span> <span class="n">n</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">fac</span><span class="p">))</span>   <span class="c1"># Thiébaux &amp; Zwiers 84, Eq 2.1</span>
+    
+    <span class="k">return</span> <span class="n">neff</span>
+
+
 <span class="c1"># alias</span>
 <span class="n">std</span> <span class="o">=</span> <span class="n">standardize</span>
 <span class="n">gauss</span> <span class="o">=</span> <span class="n">gaussianize</span>
@@ -1149,6 +1196,7 @@
         <span class="n">res</span> <span class="o">=</span> <span class="n">gauss</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">res</span></div>
+
 </pre></div>
 
            </div>

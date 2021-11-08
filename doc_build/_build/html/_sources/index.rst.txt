@@ -53,7 +53,7 @@ Getting Involved
 
 Pyleoclim was originally developed to allow scientists to analyze paleoclimate datasets, including visualization, mapping, and time series analysis. Pyleoclim has been made freely available under the terms of the `GNU Public License <https://github.com/LinkedEarth/Pyleoclim_util/blob/master/license>`_.
 
-There are many ways to get `involved in the development of Pyleoclim <_contributing_to_pyleoclim>`:
+There are many ways to get `involved in the development of Pyleoclim <contributing_to_pyleoclim>`:
 
   * If you write a paper making use of Pyleoclim, please cite it :ref:`thus <citing_pyleoclim>`.
   * Report bugs and problems with the code or documentation to our `GitHub repository <https://github.com/LinkedEarth/Pyleoclim_util/issues>`_. Please make sure that there is not outstanding issues that cover the problem you're experiencing.

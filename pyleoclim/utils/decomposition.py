@@ -10,18 +10,17 @@ Principal Component Analysis, Singular Spectrum Analysis, Multi-channel SSA
 
 __all__ = [
     'mcpca',
-    'pca',
     'ssa',
     'mssa',
 ]
 
 import numpy as np
-from sklearn.decomposition import PCA
+#from sklearn.decomposition import PCA
+from statsmodels.multivariate.pca import PCA
 from .tsutils import standardize
 from .tsmodel import ar1_sim
 from scipy.linalg import eigh, toeplitz
 from nitime import algorithms as alg
-#from statsmodels.multivariate.pca import PCA
 import copy
 
 #------
@@ -33,9 +32,10 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     
     Carries out Principal Component Analysis  (most unfortunately named EOF analysis in the meteorology
     and climate literature) on a data matrix ys.  
-    If NaNs are present, they will be infilled via the EM algorithm.
     
     The significance of eigenvalues is gauged against those of AR(1) surrogates fit to the data.
+
+    TODO: enable for ensembles and generally debug
               
     Parameters
     ----------
@@ -72,6 +72,8 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     '''
     nt, nrec = ys.shape
     
+    ncomp = min(nt,nrec)
+    
     pc_mc = np.zeros((nt,nrec)) # principal components
     eof_mc = np.zeros((nrec,nrec))  #eof (spatial loadings)
     #eigenvalue matrices
@@ -79,8 +81,8 @@ def mcpca(ys, nMC=200, **pca_kwargs):
     eig_ar1 = np.zeros((nrec,nMC))
 
     # apply PCA algorithm to the data matrix     
-    pc = PCA(ys,ncomp=nrec, **pca_kwargs) # TODO : implement EM infilling with missing = ‘fill-em’ 
-    eigvals = pc.eigenvals
+    pca_res = PCA(ys,ncomp=ncomp, **pca_kwargs) 
+    eigvals = pca_res.eigenvals
     
     # generate surrogate matrix
     y_ar1 = np.full((nt,nrec,nMC), 0, dtype=np.double)
@@ -96,6 +98,9 @@ def mcpca(ys, nMC=200, **pca_kwargs):
         else:   # flip sign (arbitrary)
             eof_mc[:,i]  = -pc.loadings[:,i] 
             pc_mc[:,i]   = -pc.factors[:,i]
+        # estimate effective sample size
+        #PC1 = 
+        neff[i] = tsutils.eff_sample_size(PC1)
             
     # loop over Monte Carlo iterations     
     for m in range(nMC):    
@@ -103,15 +108,30 @@ def mcpca(ys, nMC=200, **pca_kwargs):
         eig_ar1[:,m] = pc_ar1.eigenvals
  
     eig95 = np.percentile(eig_ar1, 95, axis=1)
+    
                 
     # assign result
-    res = {'eigvals': eigvals, 'eigvals95': eig95, 'pcs': pc_mc, 'eofs': eof_mc}
-
+    #res = {'eigvals': eigvals, 'eigvals95': eig95, 'pcs': pc_mc, 'eofs': eof_mc}
+    
+    # compute effective sample size
+    PC1  = out.factors[:,0]
+    neff = tsutils.eff_sample_size(PC1) 
+    
+    # compute percent variance
+    pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
+    
+    # assign result to SpatiamDecomp class
+    # Note: need to grab coordinates from Series or LiPDSeries        
+    res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+                        pcs = out.scores, pctvar = pctvar,  locs = None,
+                        eigvals = out.eigenvals, eigvecs = out.eigenvecs)
+    
     return res
 
 
 
-def pca(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,iterated_power='auto',random_state=None):
+
+def pca_sklearn(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,iterated_power='auto',random_state=None):
     '''Principal Component Analysis (Empirical Orthogonal Functions)
 
     Decomposition of a signal or data set in terms of orthogonal basis functions.
@@ -207,7 +227,7 @@ def pca(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,i
             Equal to the average of (min(n_features, n_samples) - n_components) smallest eigenvalues of the covariance matrix of X.
     '''
     if np.any(np.isnan(ys)):
-        raise ValueError('matrix may not have null values.')
+        raise ValueError('data may not contain missing values.')
     pca=PCA(n_components=n_components,copy=copy,whiten=whiten,svd_solver=svd_solver,tol=tol,iterated_power=iterated_power,random_state=random_state)
     return pca.fit(ys).__dict__
 
@@ -366,7 +386,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     trunc : str
         if present, truncates the expansion to a level K < M owing to one of 3 criteria:
             (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
-            (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% threshold)
+            (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)
             (3) 'var': first K modes that explain at least var_thresh % of the variance.
         Default is None, which bypasses truncation (K = M)
         
@@ -454,6 +474,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     pctvar = eigvals**2/np.sum(eigvals**2)*100 # percent variance
 
     if nMC > 0: # If Monte-Carlo SSA is requested.
+        trunc == 'mcssa'
         noise = ar1_sim(ys, nMC)  # generate MC AR(1) surrogates of y
         eigvals_R = np.zeros((M,nMC)) # define eigenvalue matrix
         lgs = np.arange(-N + 1, N)
@@ -468,23 +489,24 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         eigvals_q = np.empty((M,2))
         eigvals_q[:,0] = np.percentile(eigvals_R, 5, axis=1)
         eigvals_q[:,1] = np.percentile(eigvals_R, 95, axis=1)
+        mode_idx = np.where(eigvals>=eigvals_q[:,1])[0] 
     else:
         eigvals_q = None
 
-    if trunc == 'mcssa':
-        if nMC == 0:
-            raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
-        else:
-            mode_idx = np.where(eigvals>=eigvals_q[:,1])[0] # modes to retain
-            
+    
+    if trunc is None:
+        mode_idx = np.arange(M)
     elif trunc == 'kaiser':
-        mval = np.median(eigvals) # median eigenvalues
+        mval     = np.median(eigvals) # median eigenvalues
         mode_idx = np.where(eigvals>=mval)[0]
     elif trunc == 'var':
-        mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0]+1)
-    else:
-        mode_idx = np.arange(M)
+        mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0]+1)        
+    if nMC == 0 and trunc == 'mcssa':
+        raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
+    elif nMC>0:
+       mode_idx = np.where(eigvals>=eigvals_q[:,1])[0] 
 
+      
     # compute reconstructed timeseries
     Np = N - M + 1
     RCmat = np.zeros((N, M))
@@ -497,9 +519,11 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
             RCmat[n, im] = np.diagonal(xdum, offset=-(Np - 1 - n)).mean()
         del xdum            
 
-    #RCmat = RCmat + np.tile(mu, reps=[N, M])  # restore the mean and variance
+    RCmat = scale*RCmat + np.tile(mu, reps=[N, M])  # restore the mean and variance
     
-    RCseries = scale*RCmat[:,mode_idx].sum(axis=1) + mu
+    #RCseries = scale*RCmat[:,mode_idx].sum(axis=1) + mu
+    
+    RCseries = RCmat[:,mode_idx].sum(axis=1)
 
     # export results
     res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'PC': PC, 'RCseries': RCseries, 'RCmat': RCmat, 'pctvar': pctvar, 'eigvals_q': eigvals_q, 'mode_idx': mode_idx}

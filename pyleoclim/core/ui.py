@@ -1,4 +1,4 @@
-''' The application interface for the users
+''' The application programming interface for Pyleoclim
 
 @author: fengzhu
 
@@ -36,6 +36,7 @@ import cartopy.feature as cfeature
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
 from scipy import stats
+from statsmodels.multivariate.pca import PCA
 import warnings
 import os
 
@@ -133,6 +134,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
 
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         import pyleoclim as pyleo
 
@@ -161,6 +163,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
 
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         # default scaling slope 'alpha' is 1
         ts = pyleo.gen_ts(model='colored_noise')
@@ -192,6 +195,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
 
     .. ipython:: python
         :okwarning
+        :okexcept:
 
         # default scaling slopes 'alpha1' is 0.5 and 'alpha2' is 2, with break at 1/20
         ts = pyleo.gen_ts(model='colored_noise_2regimes')
@@ -294,6 +298,7 @@ class Series:
 
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         import pyleoclim as pyleo
         import pandas as pd
@@ -343,6 +348,7 @@ class Series:
         --------
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -527,6 +533,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -652,6 +659,7 @@ class Series:
 
             .. ipython:: python
                 :okwarning:
+                :okexcept:    
 
                 import pyleoclim as pyleo
                 import pandas as pd
@@ -667,6 +675,7 @@ class Series:
 
             .. ipython:: python
                 :okwarning:
+                :okexcept:    
 
                 @savefig ts_plot2.png
                 fig, ax = ts.plot(color='r')
@@ -678,6 +687,7 @@ class Series:
 
             .. ipython:: python
                 :okwarning:
+                :okexcept:    
 
                 fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'})
                 pyleo.savefig(fig,path='ts_plot3.png')
@@ -786,6 +796,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -805,6 +816,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
             var_pct = nino_ssa['pctvar'] # extract the fraction of variance attributable to each mode
 
             # plot eigenvalues
@@ -824,6 +836,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             print(nino_ssa.pctvar[15:].sum()*100)
 
@@ -831,6 +844,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
             fig, ax = ts.plot(title='ONI',mute=True) # we mute the first call to only get the plot with 2 lines
@@ -851,6 +865,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             nino_mcssa = ts.ssa(M = 60, nMC=1000)
 
@@ -858,6 +873,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             nino_mcssa.screeplot()
             @savefig scree_nmc.png
@@ -879,8 +895,8 @@ class Series:
         
         return resc
 
-    def is_evenly_spaced(self):
-        ''' Check if the timeseries is evenly-spaced
+    def is_evenly_spaced(self, tol=1e-3):
+        ''' Check if the Series time axis is evenly-spaced, within tolerance
 
         Returns
         ------
@@ -888,7 +904,7 @@ class Series:
         res : bool
         '''
 
-        res = tsbase.is_evenly_spaced(self.time)
+        res = tsbase.is_evenly_spaced(self.time, tol)
         return res
 
     def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
@@ -946,6 +962,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import numpy as np
@@ -969,6 +986,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             fig, ax = ts.plot(mute=True, label='mix')
             ts.filter(cutoff_freq=15).plot(ax=ax, label='After 15 Hz low-pass filter')
@@ -982,6 +1000,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             fig, ax = ts.plot(mute=True, label='mix')
             ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label='After 15-25 Hz band-pass filter')
@@ -994,6 +1013,7 @@ class Series:
         Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             fig, ax = ts.plot(mute=True, label='mix')
             ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
@@ -1112,6 +1132,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -1264,6 +1285,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
             
             import pyleoclim as pyleo
             import pandas as pd
@@ -1276,6 +1298,7 @@ class Series:
         
         .. ipython:: python
             :okwarning:
+            :okexcept:    
             
             import pyleoclim as pyleo
             import pandas as pd
@@ -1290,6 +1313,7 @@ class Series:
         
         .. ipython:: python
             :okwarning:
+            :okexcept:    
             
             import pyleoclim as pyleo
             import pandas as pd
@@ -1438,7 +1462,6 @@ class Series:
 
         Parameters
         ----------
-
         verbose : bool
             If True, will print warning messages if there is any
 
@@ -1453,7 +1476,28 @@ class Series:
         new.time = t_mod
         new.value = v_mod
         return new
+    
+    def sort(self, verbose=False):
+        ''' Ensure timeseries is aligned to a prograde axis.
+            If the time axis is prograde to begin with, no transformation is applied.
+            
+        Parameters
+        ----------
+        verbose : bool
+            If True, will print warning messages if there is any
+    
+        Returns
+        -------
+        Series
+            Series object with removed NaNs and sorting
 
+        '''
+        new = self.copy()
+        v_mod, t_mod = tsbase.sort_ts(self.value, self.time, verbose=verbose)
+        new.time = t_mod
+        new.value = v_mod
+        return new
+    
     def gaussianize(self):
         ''' Gaussianizes the timeseries
 
@@ -1654,6 +1698,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import numpy as np
@@ -1763,6 +1808,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -1777,6 +1823,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             psd_ls = ts_std.spectral(method='lomb_scargle')
             psd_ls_signif = psd_ls.signif_test(number=20) #in practice, need more AR1 simulations
@@ -1790,6 +1837,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import numpy as np
             psd_LS_n50 = ts_std.spectral(method='lomb_scargle', settings={'n50': 4})  # c=1e-2 yields lower frequency resolution
@@ -1819,6 +1867,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             psd_wwz = ts_std.spectral(method='wwz')  # wwz is the default method
             psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger
@@ -1830,6 +1879,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             ts_interp = ts_std.interp()
             psd_perio = ts_interp.spectral(method='periodogram')
@@ -1842,6 +1892,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             ts_interp = ts_std.interp()
             psd_welch = ts_interp.spectral(method='welch')
@@ -1854,6 +1905,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             ts_interp = ts_std.interp()
             psd_mtm = ts_interp.spectral(method='mtm')
@@ -1956,6 +2008,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2070,6 +2123,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:                   
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2091,6 +2145,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:
 
             coh_ntau = ts_air.wavelet_coherence(ts_nino, ntau=30)
 
@@ -2102,6 +2157,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             coh_tau = ts_air.wavelet_coherence(ts_nino, tau=np.arange(1880, 2001))
 
@@ -2220,6 +2276,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2277,6 +2334,7 @@ class Series:
 
     def causality(self, target_series, method='liang', settings=None):
         ''' Perform causality analysis with the target timeseries
+            The timeseries are first sorted in ascending order.         
 
         Parameters
         ----------
@@ -2310,6 +2368,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2322,7 +2381,7 @@ class Series:
 
             # plot the two timeseries
             @savefig ts_nino.png
-            fig, ax = ts_nino.plot(title='El Nino Region 3 -- SST Anomalies')
+            fig, ax = ts_nino.plot(title='NINO3 -- SST Anomalies')
             pyleo.closefig(fig)
 
             @savefig ts_air.png
@@ -2338,11 +2397,18 @@ class Series:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             caus_res = ts_nino.causality(ts_air, method='granger')
             print(caus_res)
 
         '''
+        
+        # Sort both timeseries 
+    
+        sorted_self   = self.sort(verbose=True) 
+        sorted_target = target_series.sort(verbose=True)        
+        
         settings = {} if settings is None else settings.copy()
         spec_func={
             'liang':causalutils.liang_causality,
@@ -2351,7 +2417,7 @@ class Series:
         args['liang'] = {}
         args['granger'] = {}
         args[method].update(settings)
-        causal_res = spec_func[method](self.value, target_series.value, **args[method])
+        causal_res = spec_func[method](sorted_self.value, sorted_target.value, **args[method])
         return causal_res
 
     def surrogates(self, method='ar1', number=1, length=None, seed=None, settings=None):
@@ -3493,9 +3559,9 @@ class Coherence:
 class MultipleSeries:
     '''MultipleSeries object.
 
-    This object handles multiple objects of the type Series and can be created from a list of Series objects.
+    This object handles a collection of the type Series and can be created from a list of such objects.
     MultipleSeries should be used when the need to run analysis on multiple records arises, such as running principal component analysis.
-    Some of the methods automatically rescale the time axis prior to analysis to ensure that the analysis is run over the same time period.
+    Some of the methods automatically refocus the time axis prior to analysis to ensure that the analysis is run over the same time period.
 
     Parameters
     ----------
@@ -3515,6 +3581,7 @@ class MultipleSeries:
     --------
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         import pyleoclim as pyleo
         import pandas as pd
@@ -3560,6 +3627,7 @@ class MultipleSeries:
         --------
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -3666,7 +3734,7 @@ class MultipleSeries:
         return deepcopy(self)
 
     def standardize(self):
-        '''Standardize each series object
+        '''Standardize each series object in a collection 
 
         Returns
         -------
@@ -3681,6 +3749,35 @@ class MultipleSeries:
             s.value=v_mod
             ms.series_list[idx]=s
         return ms
+    
+    def grid_properties(self, step_style='median'):
+        '''
+        Extract grid properties (start, stop, step) of all the Series objects in 
+        a collection.
+        
+        Parameters
+        ----------
+        step_style : str
+            Method to obtain a representative step if x is not evenly spaced.
+            Valid entries: 'median' [default], 'mean', 'mode' or 'max'
+            The mode is the most frequent entry in a dataset, and may be a good choice if the timeseries
+            is nearly equally spaced but for a few gaps. 
+            
+            Max is a conservative choice, appropriate for binning methods and Gaussian kernel coarse-graining
+
+        Returns
+        -------
+        
+        grid_properties : numpy array
+            n x 3 array, where n is the number of series
+            
+        '''
+        gp = np.empty((len(self.series_list),3)) # obtain grid parameters
+        for idx,item in enumerate(self.series_list):
+            item      = item.clean(verbose=idx==0)
+            gp[idx,:] = tsutils.grid_properties(item.time, step_style=step_style)
+            
+        return gp
 
     def common_time(self, method='interp', common_step = 'max', start=None, stop = None, step=None, step_style = None, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via binning
@@ -3740,6 +3837,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import numpy as np
             import pyleoclim as pyleo
@@ -3777,7 +3875,7 @@ class MultipleSeries:
             msc = ms.common_time(method='gkernel')
             msc.plot(title=r'Gaussian kernel ($h=3$)',ax=ax[2],legend=False)
 
-            # apply common_time with gkernel modified
+            # apply common_time with gkernel and a large bandwidth
             msc = ms.common_time(method='gkernel', h=11)
             msc.plot(title=r'Gaussian kernel ($h=11$)',ax=ax[3],legend=False)
 
@@ -3795,13 +3893,7 @@ class MultipleSeries:
             elif  method == 'interp':
                step_style = 'mean'
 
-        gp = np.empty((len(self.series_list),3)) # obtain grid parameters
-        for idx,item in enumerate(self.series_list):
-            item      = item.clean(verbose=idx==0)
-            gp[idx,:] = tsutils.grid_properties(item.time, step_style=step_style)
-            # if gp[idx,2] < 0:  # flip time axis if retrograde
-            #     item = item.clean(verbose=idx==0)
-            #     gp[idx,2] = abs(gp[idx,2])
+        gp = self.grid_properties(step_style=step_style)        
 
         # define parameters for common time axis
         start = gp[:,0].max()
@@ -3904,6 +3996,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             from pyleoclim.utils.tsmodel import colored_noise
@@ -3994,56 +4087,66 @@ class MultipleSeries:
         flag = all (l==L for l in r)
 
         return flag, lengths
+    
+    def pca(self,weights=None,missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
+        '''Principal Component Analysis (Empirical Orthogonal Functions)
 
-    def pca(self,nMC=200,**pca_kwargs):
-        ''' Principal Component Analysis
-
+        Decomposition of dataset ys in terms of orthogonal basis functions.
+        Tolerant to missing values, infilled by an EM algorithm. 
+        Requires ncomp to be less than the number of missing values.
+        
+        Do make sure the time axes are aligned, however! (e.g. use `common_time()`)
+        
+        Algorithm from statsmodels: https://www.statsmodels.org/stable/generated/statsmodels.multivariate.pca.PCA.html
+        
+        
         Parameters
         ----------
 
-        nMC : int
-            number of Monte Carlo simulations
-
-        pca_kwargs : tuple
-
-
-        Returns
-        -------
-        res : dictionary containing:
-
-            - eigval : eigenvalues (nrec,)
-            - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)
-            - pcs  : PC series of all components (nrec, nt)
-            - eofs : EOFs of all components (nrec, nrec)
-
-        References:
+        
+        weights : ndarray, optional
+            Series weights to use after transforming data according to standardize
+            or demean when computing the principal components.
+        
+        missing : {str, None}
+            Method for missing data.  Choices are:
+        
+            * 'drop-row' - drop rows with missing values.
+            * 'drop-col' - drop columns with missing values.
+            * 'drop-min' - drop either rows or columns, choosing by data retention.
+            * 'fill-em' - use EM algorithm to fill missing value.  ncomp should be
+              set to the number of factors required.
+            * `None` raises if data contains NaN values.
+        
+        tol_em : float
+            Tolerance to use when checking for convergence of the EM algorithm.
+        max_em_iter : int
+            Maximum iterations for the EM algorithm.
+        
+        Attributes
         ----------
-        Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene
-        European speleothem δ18O records linked to North Atlantic Ocean circulation.
-        Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8
-
-        See also
-        --------
-
-        pyleoclim.utils.decomposition.mcpca: Monte Carlo PCA
+        res: pyleoclim.ui.SpatialDecomp
+            the result object, see `pyleoclim.ui.SpatialDecomp`
+            
 
         Examples
         --------
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
             tslist = data.to_LipdSeriesList()
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
-            ms = pyleo.MultipleSeries(tslist)
-
-            # msc = ms.common_time()
-
-            # res = msc.pca(nMC=20)
-
+            ms = pyleo.MultipleSeries(tslist).common_time()
+        
+            res = ms.pca() # carry out PCA
+            
+            res.screeplot() # plot the eigenvalue spectrum
+            res.modeplot() # plot the first mode
         '''
         flag, lengths = self.equal_lengths()
 
@@ -4054,13 +4157,95 @@ class MultipleSeries:
             n = lengths[0]
             ys = np.empty((n,p))
             for j in range(p):
-                ys[:,j] = self.series_list[j].value
+                ys[:,j] = self.series_list[j].value  # fill in data matrix
+        
+        nc = min(ys.shape) # number of components to return
+        
+        out  = PCA(ys,weights=weights,missing=missing,tol_em=tol_em, max_em_iter=max_em_iter,**pca_kwargs)
+        
+        # compute effective sample size
+        PC1  = out.factors[:,0]
+        neff = tsutils.eff_sample_size(PC1) 
+        
+        # compute percent variance
+        pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
+        
+        # assign result to SpatiamDecomp class
+        # Note: need to grab coordinates from Series or LiPDSeries        
+        res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+                            pcs = out.scores, pctvar = pctvar,  locs = None,
+                            eigvals = out.eigenvals, eigvecs = out.eigenvecs)
+        return res    
 
-        res = decomposition.mcpca(ys, nMC, **pca_kwargs)
-        return res
+    # def mcpca(self,nMC=200,**pca_kwargs):
+    #     ''' Monte Carlo Principal Component Analysis
+        
+    #     (UNDER REPAIR)
+
+    #     Parameters
+    #     ----------
+
+    #     nMC : int
+    #         number of Monte Carlo simulations
+
+    #     pca_kwargs : tuple
+
+
+    #     Returns
+    #     -------
+    #     res : dictionary containing:
+
+    #         - eigval : eigenvalues (nrec,)
+    #         - eig_ar1 : eigenvalues of the AR(1) ensemble (nrec, nMC)
+    #         - pcs  : PC series of all components (nrec, nt)
+    #         - eofs : EOFs of all components (nrec, nrec)
+
+    #     References:
+    #     ----------
+    #     Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene
+    #     European speleothem δ18O records linked to North Atlantic Ocean circulation.
+    #     Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8
+
+    #     See also
+    #     --------
+
+    #     pyleoclim.utils.decomposition.mcpca: Monte Carlo PCA
+
+    #     Examples
+    #     --------
+
+    #     .. ipython:: python
+    #         :okwarning:
+
+    #         import pyleoclim as pyleo
+    #         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+    #         data = pyleo.Lipd(usr_path = url)
+    #         tslist = data.to_LipdSeriesList()
+    #         tslist = tslist[2:] # drop the first two series which only concerns age and depth
+    #         ms = pyleo.MultipleSeries(tslist)
+
+    #         # msc = ms.common_time()
+
+    #         # res = msc.pca(nMC=20)
+
+    #     '''
+    #     flag, lengths = self.equal_lengths()
+
+    #     if flag==False:
+    #         print('All Time Series should be of same length. Apply common_time() first')
+    #     else: # if all series have equal length
+    #         p = len(lengths)
+    #         n = lengths[0]
+    #         ys = np.empty((n,p))
+    #         for j in range(p):
+    #             ys[:,j] = self.series_list[j].value
+
+    #     res = decomposition.mcpca(ys, nMC, **pca_kwargs)
+    #     return res
 
     def bin(self, **kwargs):
-        ''' Aligns the time axes of a MultipleSeries object, via binning.
+        '''Aligns the time axes of a MultipleSeries object, via binning.
+        
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
 
@@ -4095,9 +4280,10 @@ class MultipleSeries:
 
         Examples
         --------
-
+        
         .. ipython:: python
             :okwarning:
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -4153,6 +4339,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -4208,6 +4395,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -4558,6 +4746,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -4961,6 +5150,7 @@ class EnsembleSeries(MultipleSeries):
 
             .. ipython:: python
                 :okwarning:
+                :okexcept:    
                 
                 nn = 30 # number of noise realizations
                 nt = 500
@@ -5085,6 +5275,7 @@ class EnsembleSeries(MultipleSeries):
         --------
         .. ipython:: python
             :okwarning:
+            :okexcept:    
             
             nn = 30 # number of noise realizations
             nt = 500
@@ -6060,12 +6251,259 @@ class CorrEns:
             t_args.update(title_kwargs)
             ax.set_title(title, **t_args)
 
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            else:
+                if not mute:
+                    plotting.showfig(fig)
+            return fig, ax
+        else:
+            return ax
+
+        # if 'path' in savefig_settings:
+        #     plotting.savefig(fig, settings=savefig_settings)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
+        # return fig, ax
+
+class SpatialDecomp:
+    ''' Class to hold the results of spatial decompositions
+        applies to : `pca()`, `mcpca()`, `mssa()` 
+        
+        Attributes
+        ----------
+
+        time: float
+            the common time axis
+            
+        locs: float (p, 2)
+            a p x 2 array of coordinates (latitude, longitude) for mapping the spatial patterns ("EOFs")
+            
+        name: str
+            name of the dataset/analysis to use in plots
+            
+        eigvals: float
+            vector of eigenvalues from the decomposition
+            
+        eigvecs: float
+            array of eigenvectors from the decomposition  
+         
+        pctvar: float    
+            array of pct variance accounted for by each mode
+            
+        neff: float
+            scalar representing the effective sample size of the leading mode
+    
+    '''
+    def __init__(self, time, locs, name, eigvals, eigvecs, pctvar, pcs, neff):
+        self.time       = time
+        self.name       = name
+        self.locs       = locs 
+        self.eigvals    = eigvals
+        self.eigvecs    = eigvecs
+        self.pctvar     = pctvar
+        self.pcs        = pcs
+        self.neff       = neff
+        
+    def screeplot(self, figsize=[6, 4], uq='N82' ,title='scree plot', ax=None, savefig_settings=None, 
+                  title_kwargs=None, xlim=[0,10], clr_eig='C0',  mute=False):
+        ''' Plot the eigenvalue spectrum with uncertainties
+
+        Parameters
+        ----------
+        figsize : list, optional
+            The figure size. The default is [6, 4].
+
+        title : str, optional
+            Plot title. The default is 'scree plot'.
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        title_kwargs : dict, optional
+            the keyword arguments for ax.set_title()
+
+        ax : matplotlib.axis, optional
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+
+        xlim : list, optional
+            x-axis limits. The default is [0, 10] (first 10 eigenvalues)
+            
+        uq : str, optional
+            Method used for uncertainty quantification of the eigenvalues.
+            'N82' uses the North et al "rule of thumb" [1] with effective sample size 
+            computed as in [2]. 
+            'MC' uses Monte-Carlo simulations (e.g. MC-EOF). Returns an error if no ensemble is found.
+            
+        clr_eig : str, optional
+            color to be used for plotting eigenvalues
+        
+            
+        References
+        ----------
+        [1] North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982), 
+            Sampling errors in the estimation of empirical orthogonal functions,
+            Mon. Weather Rev., 110, 699–706.
+        [2] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical
+            orthogonal functions and related techniques in atmospheric science: 
+            A review, International Journal of Climatology, 27(9), 
+            1119–1152, doi:10.1002/joc.1499.
+
+        '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+            
+        
+        
+        if self.neff < 2:
+            self.neff = 2
+        
+        # compute 95% CI    
+        if uq == 'N82':
+            eb_lbl =  r'95% CI ($n_\mathrm{eff} = $'+ '{:.1f}'.format(self.neff) +')' # declare method
+            Lc = self.eigvals # central estimate 
+            Lerr  = np.tile(Lc,(2,1)) # declare array
+            Lerr[0,:]  = Lc*np.sqrt(1-np.sqrt(2/self.neff))
+            Lerr[1,:]  = Lc*np.sqrt(1+np.sqrt(2/self.neff))
+        elif uq =='MC':
+            eb_lbl =  '95% CI (Monte Carlo)' # declare method
+            try:
+                Lq = np.quantile(self.eigvals,[0.025,0.5,0.975],axis = 1)
+                Lc = Lq[1,:]
+                Lerr  = np.tile(Lc,(2,1)) # declare array
+                Lerr[0,:]  = Lq[0,:]
+                Lerr[1,:]  = Lq[2,:]
+        
+            except ValueError:
+                print("Eigenvalue array must have more than 1 non-singleton dimension.")             
+        else:
+            raise NameError("unknown UQ method. No action taken")
+           
+            
+        idx = np.arange(len(Lc)) + 1
+        
+        ax.errorbar(x=idx,y=Lc,yerr = Lerr, color=clr_eig,marker='o',ls='',
+                    alpha=1.0,label=eb_lbl)
+        
+        ax.set_title(title,fontweight='bold'); ax.legend(); 
+        ax.set_xlabel(r'Mode index $i$'); ax.set_ylabel(r'$\lambda_i$')
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True)) # enforce integer values
+
+
+        if xlim is not None:
+            ax.set_xlim(0.5,min(max(xlim),len(Lc)))
+
+        if title is not None:
+            title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
+            t_args = {'y': 1.1, 'weight': 'bold'}
+            t_args.update(title_kwargs)
+            ax.set_title(title, **t_args)
+
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
         else:
             if not mute:
                 plotting.showfig(fig)
         return fig, ax
+
+    def modeplot(self, mode=1, figsize=[10, 5], ax=None, savefig_settings=None, 
+              title_kwargs=None, mute=False, spec_method = 'mtm'):
+        ''' Dashboard visualizing the properties of a given mode, including:
+            1. The temporal coefficient (PC or similar)
+            2. its spectrum
+            3. The spatial loadings (EOF or similar)
+
+        Parameters
+        ----------
+        mode : int
+            the (one-based) index of the mode to visualize
+        
+        figsize : list, optional
+            The figure size. The default is [10, 5].
+        
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        title_kwargs : dict
+            the keyword arguments for ax.set_title()
+
+        gs : matplotlib.gridspec object, optional
+            the axis object from matplotlib
+            See [matplotlib.gridspec.GridSpec](https://matplotlib.org/stable/tutorials/intermediate/gridspec.html) for details.
+
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+        
+        spec_method: str, optional
+            The name of the spectral method to be applied on the PC. Default: MTM
+            Note that the data are evenly-spaced, so any spectral method that
+            assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
+            'wwz' is relevant too if scaling exponents need to be estimated. 
+      
+        '''
+        # Turn the interactive mode off.
+        plt.ioff()
+
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+        
+        PC = self.pcs[:,mode-1]    
+        ts = Series(time=self.time, value=PC) # define timeseries object for the PC
+
+        fig = plt.figure(tight_layout=True,figsize=figsize)
+        gs = gridspec.GridSpec(2, 2) # define grid for subplots
+        ax1 = fig.add_subplot(gs[0, :])
+        ts.plot(ax=ax1)
+        ax1.set_ylabel('PC '+str(mode))
+        ax1.set_title('Mode '+str(mode)+', '+ '{:3.2f}'.format(self.pctvar[mode-1]) + '% variance explained',weight='bold')
+        
+        # plot spectrum
+        ax2 = fig.add_subplot(gs[1, 0])
+        psd_mtm_rc = ts.interp().spectral(method=spec_method)    
+        _ = psd_mtm_rc.plot(ax=ax2)
+        ax2.set_xlabel('Period')
+        ax2.set_title('Spectrum ('+spec_method+')',weight='bold')
+        
+        # plot T-EOF
+        ax3 = fig.add_subplot(gs[1, 1])
+        #EOF = self.eigvecs[:,mode]
+        ax3.set_title('Spatial loadings \n (under construction)',weight='bold')
+
+        # if title is not None:
+        #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
+        #     t_args = {'y': 1.1, 'weight': 'bold'}
+        #     t_args.update(title_kwargs)
+        #     ax.set_title(title, **t_args)
+
+        if 'path' in savefig_settings:
+            plotting.savefig(fig, settings=savefig_settings)
+        else:
+            if not mute:
+                plotting.showfig(fig)
+        return fig, gs
+
+
 
 class SsaRes:
     ''' Class to hold the results of SSA method
@@ -6120,7 +6558,7 @@ class SsaRes:
     def screeplot(self, figsize=[6, 4], title='SSA scree plot', ax=None, savefig_settings=None, title_kwargs=None, xlim=None,
              clr_mcssa=sns.xkcd_rgb['red'], clr_signif=sns.xkcd_rgb['teal'],
              clr_eig='black',  mute=False):
-        ''' Scree plot for SSA visualizing the eigenvalue spectrum and indicating which modes were retained.  
+        ''' Scree plot for SSA, visualizing the eigenvalue spectrum and indicating which modes were retained.  
 
         Parameters
         ----------
@@ -6149,6 +6587,17 @@ class SsaRes:
 
         xlim : list, optional
             x-axis limits. The default is None.
+            
+        clr_mcssa : str, optional
+            color of the Monte Carlo SSA AR(1) shading (if data are provided)
+            default: red
+            
+        clr_eig : str, optional
+            color of the eigenvalues, default: black
+            
+        clr_signif: str, optional 
+            color of the highlights for significant eigenvalue.
+               default: teal 
 
         '''
         # Turn the interactive mode off.
@@ -6162,7 +6611,7 @@ class SsaRes:
         v = self.eigvals
         n = self.PC.shape[0] #sample size
         dv = v*np.sqrt(2/(n-1)) 
-        idx = np.arange(len(v)) 
+        idx = np.arange(len(v))+1 
         if self.eigvals_q is not None:
             plt.fill_between(idx,self.eigvals_q[:,0],self.eigvals_q[:,1], color=clr_mcssa, alpha = 0.3, label='AR(1) 5-95% quantiles') 
             
@@ -6171,9 +6620,11 @@ class SsaRes:
                  markersize=4, label='modes retained',zorder=10)
         plt.title(title,fontweight='bold'); plt.legend() 
         plt.xlabel(r'Mode index $i$'); plt.ylabel(r'$\lambda_i$')    
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True)) # enforce integer values
+
 
         if xlim is not None:
-            ax.set_xlim(xlim)
+            ax.set_xlim(0.5,min(max(xlim),len(v)))
 
         if title is not None:
             title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
@@ -6188,8 +6639,8 @@ class SsaRes:
                 plotting.showfig(fig)
         return fig, ax
 
-    def modeplot(self, mode=0, figsize=[10, 5], ax=None, savefig_settings=None, 
-             title_kwargs=None, mute=False, NW = 2):
+    def modeplot(self, mode=1, figsize=[10, 5], ax=None, savefig_settings=None, 
+             title_kwargs=None, mute=False, spec_method = 'mtm'):
         ''' Dashboard visualizing the properties of a given SSA mode, including:
             1. the analyzing function (T-EOF)
             2. the reconstructed component (RC)
@@ -6198,7 +6649,7 @@ class SsaRes:
         Parameters
         ----------
         mode : int
-            the (zero-based) index of the mode to visualize
+            the (one-based) index of the mode to visualize
         
         figsize : list, optional
             The figure size. The default is [10, 5].
@@ -6220,9 +6671,11 @@ class SsaRes:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
         
-        NW : float [2, 2.5, 3, 3.5 , 4] 
-            time-bandwidth product for MTM spectral estimate
-            default: 2
+        spec_method: str, optional
+            The name of the spectral method to be applied on the PC. Default: MTM
+            Note that the data are evenly-spaced, so any spectral method that
+            assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
+            'wwz' is relevant too if scaling exponents need to be estimated. 
       
         '''
         # Turn the interactive mode off.
@@ -6233,32 +6686,26 @@ class SsaRes:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
         
-        RC = self.RCmat[:,mode]    
+        RC = self.RCmat[:,mode-1]    
         fig = plt.figure(tight_layout=True,figsize=figsize)
-        gs = gridspec.GridSpec(2, 2) # plot RC
+        gs = gridspec.GridSpec(2, 2)
+        # plot RC
         ax = fig.add_subplot(gs[0, :])
-        ax.plot(self.time,RC)
+        ax.plot(self.time,RC)  
         ax.set_xlabel('Time'),  ax.set_ylabel('RC [dimensionless]')
-        ax.set_title('Mode '+str(mode+1)+' RC, '+ '{:3.2f}'.format(self.pctvar[mode]) + '% variance explained',weight='bold')
+        ax.set_title('Mode '+str(mode)+' RC, '+ '{:3.2f}'.format(self.pctvar[mode-1]) + '% variance explained',weight='bold')
         # plot T-EOF
         ax = fig.add_subplot(gs[1, 0])
-        ax.plot(self.eigvecs[:,mode])
-        ax.set_title('T-EOF (analyzing function)')
-        ax.set_xlabel('Time'), ax.set_ylabel('T-EOF values')
+        ax.plot(self.eigvecs[:,mode-1])
+        ax.set_title('Analyzing function)')
+        ax.set_xlabel('Time'), ax.set_ylabel('T-EOF')
         # plot spectrum
         ax = fig.add_subplot(gs[1, 1])
         ts_rc = Series(time=self.time, value=RC) # define timeseries object for the RC
-        psd_mtm_rc = ts_rc.interp().spectral(method='mtm', settings={'NW': NW})
-    
+        psd_mtm_rc = ts_rc.interp().spectral(method=spec_method)
         _ = psd_mtm_rc.plot(ax=ax)
         ax.set_xlabel('Period')
-        ax.set_title('Multitaper spectrum')
-
-        # if title is not None:
-        #     title_kwargs = {} if title_kwargs is None else title_kwargs.copy()
-        #     t_args = {'y': 1.1, 'weight': 'bold'}
-        #     t_args.update(title_kwargs)
-        #     ax.set_title(title, **t_args)
+        ax.set_title('Spectrum ('+spec_method+')')
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
@@ -6297,6 +6744,7 @@ class Lipd:
 
     .. ipython:: python
         :okwarning:
+        :okexcept:
 
         import pyleoclim as pyleo
         url='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -6586,6 +7034,7 @@ class Lipd:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -6598,6 +7047,7 @@ class Lipd:
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -6660,8 +7110,8 @@ class LipdSeries(Series):
     '''Lipd time series object
 
 
-    These objects can be obtained from a LiPD either through Pyleoclim or the LiPD utilities.
-    If multiple objects (i.e., list) is given, then the user will be prompted to choose one timeseries.
+    These objects can be obtained from a LiPD file/object either through Pyleoclim or the LiPD utilities.
+    If multiple objects (i.e., a list) is given, then the user will be prompted to choose one timeseries.
 
     LipdSeries is a child of Series, therefore all the methods available for Series apply to LipdSeries in addition to some specific methods.
 
@@ -6674,7 +7124,8 @@ class LipdSeries(Series):
 
     .. ipython:: python
         :okwarning:
-
+        :okexcept:
+            
         import pyleoclim as pyleo
         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
         data = pyleo.Lipd(usr_path = url)
@@ -6690,6 +7141,7 @@ class LipdSeries(Series):
 
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         ts1 = data.to_LipdSeries(number=5)
 
@@ -6699,6 +7151,7 @@ class LipdSeries(Series):
 
     .. ipython:: python
         :okwarning:
+        :okexcept:    
 
         ts_list = data.to_LipdSeriesList()
         # only keep the Mg/Ca and SST
@@ -6863,7 +7316,13 @@ class LipdSeries(Series):
         #create multipleseries
         s_list=[]
         for i, s in enumerate(ensembleValuestoPaleo.T):
-            s_tmp = Series(time=s,value=ys, verbose=i==0, clean_ts=False)
+            s_tmp = Series(time=s,value=ys,
+                           verbose=i==0, 
+                           clean_ts=False, 
+                           value_name=self.value_name,
+                           value_unit=self.value_unit,
+                           time_name=self.time_name,
+                           time_unit=self.time_unit)
             s_list.append(s_tmp)
 
         ens = EnsembleSeries(series_list=s_list)
@@ -6930,6 +7389,7 @@ class LipdSeries(Series):
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -7254,6 +7714,7 @@ class LipdSeries(Series):
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -7303,6 +7764,7 @@ class LipdSeries(Series):
             if 'shade_clr' not in plt_kwargs.keys():
                 archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
                 plt_kwargs.update({'shade_clr':self.plot_default[archiveType][0]})
+            #plt_kwargs.update({'ylabel':self.value_name})
             ax['ts'] = ensc.plot_envelope(**plt_kwargs)
         else:
             raise ValueError("Invalid argument value for ensemble")
@@ -7817,6 +8279,7 @@ class LipdSeries(Series):
 
         .. ipython:: python
             :okwarning:
+            :okexcept:    
                 
             D = pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=Crystal.McCabe-Glynn.2013')
             ts=D.to_LipdSeries(number=2)

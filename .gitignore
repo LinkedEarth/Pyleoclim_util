@@ -13,3 +13,8 @@ __pycache__
 ./**/benchmark.log
 ./doc_build/_build/**
 ./doc_build/savefig/**
+*.doctree
+*.pickle
+*.html
+*.js
+*.png

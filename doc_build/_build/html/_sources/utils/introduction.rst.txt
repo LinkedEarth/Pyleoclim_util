@@ -40,8 +40,6 @@ Methods used for decomposing timeseries into orthogonal components.
 
    * - :ref:`mpca <utils_mpca>`
      - Monte-Carlo Principal Component Analysis (PCA, sometimes known as EOF analysis)
-     * - :ref:`pca <utils_pca>`
-     - Principal Component Analysis (PCA, sometimes known as EOF analysis)
    * - :ref:`ssa <utils_ssa>`
      - Singular Spectrum Analysis
    * - :ref:`MSSA <utils_mssa>`
@@ -57,9 +55,13 @@ Filtering functions
    :header-rows: 0
 
    * - :ref:`Savitzky-Golay filter <utils_savitzky_golay>`
-     - Smoothe (and optionally differentiate) data with a Savitzky-Golay filter
+     - Smooth (and optionally differentiate) data with a Savitzky-Golay filter
    * - :ref:`Butterworth filter <utils_butterworth>`
      - Applies a Butterworth filter with frequency fc, with optional padding
+   * - :ref:`firwin filter <utils_firwin>`
+     - Applies a Finite Impulse Response filter design with window method and frequency fc, with padding
+   * - :ref:`lanczos filter <utils_lanczos>`
+     - Applies a Lanczos (lowpass) filter with frequency fc, with optional padding
 
 Mapping
 """""""
@@ -70,7 +72,7 @@ This module contains mapping function based on `cartopy <https://scitools.org.uk
    :widths: 30 70
    :header-rows: 0
 
-   * - :ref:`map <utils_mapall>`
+   * - :ref:`map_all <utils_mapall>`
      - Maps records according to some criteria (e.g, proxy type, interpretation)
 
 Plotting
@@ -88,6 +90,8 @@ However, the following functions can be used to manipulate the default style and
      - Shows the figure
    * - :ref:`savefig <utils_savefig>`
      - Saves the figure to a user specified path
+   * - :ref:`closefig <utils_closefig>`
+     - Closes the figure
    * - :ref:`set_style <utils_set_style>`
      - Modifies the visualization style
 
@@ -126,6 +130,8 @@ This module generates simulated time series that can be used for significance te
      - Generate a colored noise with given scaling factor `alpha`
    * - :ref:`colored_noise_2regimes <utils_colored_noise_2regimes>`
      - Generate a colored noise with two regimes given scaling factors `alpha1` and `alpha2`
+   * - :ref:`gen_ar1_evenly <utils_gen_ar1_evenly>`
+     - Generate AR(1) series samples
 
 Wavelet
 """""""
@@ -138,8 +144,6 @@ Functions for wavelet analysis. Includes some pre-processing and post-processing
 
    * - :ref:`wwz <utils_wwz>`
      - Weighted wavelet amplitude (WWA) for unevenly-spaced data
-   * - :ref:`cwt <utils_cwt>`
-     - Continous wavelet transform for evenly spaced data
    * - :ref:`xwc <utils_xwc>`
      - Cross-wavelet analysis for unevenly-spaced data.
 
