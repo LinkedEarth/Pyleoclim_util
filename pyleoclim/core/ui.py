@@ -914,8 +914,7 @@ class Series:
             - `Finite Impulse Response <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html>`_  
             - `Savitzky-Golay filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html>`_
                 
-        By default, implement a lowpass filter, though it can easily be turned into a bandpass filter.
-        The documentation also illustrates how to use this function to obtain a high-pass filter. 
+        By default, this method implements a lowpass filter, though it can easily be turned into a bandpass or high-pass filter (see examples below).
 
         Parameters
         ----------
@@ -1043,7 +1042,7 @@ class Series:
             ts_high.value = ts.value - ts_low.value # subtract low-pass filtered series from original one
             ts_high.plot(label='High-pass filter @ 15Hz',ax=ax)
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
-            @savefig ts_filter4.png
+            @savefig ts_filter5.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 

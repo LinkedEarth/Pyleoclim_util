@@ -119,6 +119,7 @@
 <li><p><strong>t</strong> (<em>1d array</em>) – the original time axis</p></li>
 <li><p><strong>y</strong> (<em>1d array</em>) – values on the original time axis</p></li>
 <li><p><strong>step</strong> (<em>float</em>) – The interpolation step. Default is max spacing between consecutive points.</p></li>
+<li><p><strong>step_style</strong> (<em>'string'</em>) – step style to be applied from <cite>grid_properties</cite> [default = ‘max’]</p></li>
 <li><p><strong>start</strong> (<em>float</em>) – where/when to start the interpolation. Default is min(t).</p></li>
 <li><p><strong>stop</strong> (<em>float</em>) – where/when to stop the interpolation. Default is max(t).</p></li>
 <li><p><strong>h</strong> (<em>scalar;  kernel e-folding scale</em>) – </p></li>
@@ -126,7 +127,7 @@
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>tc</strong> (<em>1d array</em>) – the coarse time axis</p></li>
+<li><p><strong>tc</strong> (<em>1d array</em>) – the coarse-grained time axis</p></li>
 <li><p><strong>yc</strong> (<em>1d array</em>) – The coarse-grained time series</p></li>
 </ul>
 </p>

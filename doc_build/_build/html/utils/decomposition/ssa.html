@@ -128,7 +128,7 @@ Currently only supported for evenly-spaced, gap-free data.</p></li>
 <li><p><strong>trunc</strong> (<em>str</em>) – <dl class="simple">
 <dt>if present, truncates the expansion to a level K &lt; M owing to one of 3 criteria:</dt><dd><ol class="arabic simple">
 <li><p>’kaiser’: variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median</p></li>
-<li><p>’mcssa’: Monte-Carlo SSA (use modes above the 95% threshold)</p></li>
+<li><p>’mcssa’: Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)</p></li>
 <li><p>’var’: first K modes that explain at least var_thresh % of the variance.</p></li>
 </ol>
 </dd>

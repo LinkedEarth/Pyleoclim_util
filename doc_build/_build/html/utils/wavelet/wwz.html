@@ -236,21 +236,21 @@ Then performing wavelet analysis should return an energy band around period of 5
 <span class="gp">In [12]: </span><span class="n">cont</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contourf</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="n">res</span><span class="o">.</span><span class="n">freq</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">amplitude</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="o">**</span><span class="n">contourf_args</span><span class="p">)</span>
 
 <span class="gp">In [13]: </span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">coi</span><span class="p">,</span> <span class="s1">&#39;k--&#39;</span><span class="p">)</span>  <span class="c1"># plot the cone of influence</span>
-<span class="gh">Out[13]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x1aa61c640&gt;]</span>
+<span class="gh">Out[13]: </span><span class="go">[&lt;matplotlib.lines.Line2D at 0x1af9c2910&gt;]</span>
 
 <span class="gp">In [14]: </span><span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
 
 <span class="gp">In [15]: </span><span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">1000</span><span class="p">])</span>
 <span class="gh">Out[15]: </span><span class="go"></span>
-<span class="go">[&lt;matplotlib.axis.YTick at 0x1aabca3a0&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1aa398ac0&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a8fd4a60&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a93ad5b0&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a9a7bee0&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a9df4190&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1aa6f79d0&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a8f4f430&gt;,</span>
-<span class="go"> &lt;matplotlib.axis.YTick at 0x1a8905910&gt;]</span>
+<span class="go">[&lt;matplotlib.axis.YTick at 0x1b002a220&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1b10d25e0&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1b11baee0&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1af8facd0&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1b12d8370&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1af4872e0&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1b12d8fa0&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1b134ea00&gt;,</span>
+<span class="go"> &lt;matplotlib.axis.YTick at 0x1b099c5e0&gt;]</span>
 
 <span class="gp">In [16]: </span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1000</span><span class="p">])</span>
 <span class="gh">Out[16]: </span><span class="go">(2.0, 1000.0)</span>
