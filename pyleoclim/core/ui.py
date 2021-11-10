@@ -2771,13 +2771,16 @@ class PSD:
             'psd_binned': res.psd_binned,
             'Y_reg': res.Y_reg,
         }
-        return res_dict
+        new = self.copy()
+        new.beta_est_res = res_dict
+        return new
 
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
              legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
-             plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
+             plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1,
+             plot_beta=True, beta_kwargs=None):
 
         '''Plots the PSD estimates and signif level if included
 
@@ -2845,6 +2848,10 @@ class PSD:
             Linestyles for significance. The default is ['--', '-.', ':'].
         signif_linewidth : float, optional
             width of the significance line. The default is 1.
+        plot_beta : boll, optional
+            If True and self.beta_est_res is not None, then the scaling slope line will be plotted
+        beta_kwargs : dict, optional
+            The visualization keyword arguments for the scaling slope
 
         Returns
         -------
@@ -2861,6 +2868,7 @@ class PSD:
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = self.plot_kwargs if plot_kwargs is None else plot_kwargs.copy()
+        beta_kwargs = {} if beta_kwargs is None else beta_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
         if label is None:
@@ -2974,6 +2982,21 @@ class PSD:
 
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
+
+        if plot_beta and self.beta_est_res is not None:
+            plot_beta_kwargs = {
+                'label': fr'$\beta=${self.beta_est_res["beta"]:.2f}$\pm${self.beta_est_res["std_err"]:.2f}',
+                'linestyle': '--',
+                'color': 'k',
+                'linewidth': 1,
+                'zorder': 99,
+            }
+            plot_beta_kwargs.update(beta_kwargs)
+            beta_x_axis = 1/self.beta_est_res['f_binned']
+            beta_y_axis = self.beta_est_res['Y_reg']
+            if transpose:
+                beta_x_axis, beta_y_axis = beta_y_axis, beta_x_axis
+            ax.plot(beta_x_axis, beta_y_axis , **plot_beta_kwargs)
 
         if legend:
             lgd_args = {'frameon': False}
