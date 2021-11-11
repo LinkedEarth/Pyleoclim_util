@@ -44,7 +44,6 @@ Pyleoclim development takes place on GitHub: https://github.com/LinkedEarth/Pyle
 
 Please submit any reproducible bugs you encounter to the [issue tracker](https://github.com/LinkedEarth/Pyleoclim_util/issues)
 
-Guidelines for contributors are described _here_ (placeholder)
 
 ### License
 
