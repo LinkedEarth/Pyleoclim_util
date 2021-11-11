@@ -1,82 +1,39 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>pyleoclim.utils.decomposition &mdash; Pyleoclim 0.6.2beta documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>pyleoclim.utils.decomposition &mdash; Pyleoclim 0.7.1beta documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/rtd_sphinx_search.min.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/js/rtd_sphinx_search.min.js"></script>
         <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../index.html" class="icon icon-home"> Pyleoclim
-          
-
-          
-            
             <img src="../../../_static/pyleoclim_insigna_full_white.png" class="logo" alt="Logo"/>
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                0.6.2beta
+                0.7.1beta
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -84,18 +41,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Working with Pyleoclim</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installing Pyleoclim</a></li>
@@ -112,69 +58,30 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../contribution_guide.html">Contributing to Pyleoclim</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">Pyleoclim</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
-        
       <li>pyleoclim.utils.decomposition</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for pyleoclim.utils.decomposition</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
@@ -564,7 +471,7 @@
 <span class="sd">    trunc : str</span>
 <span class="sd">        if present, truncates the expansion to a level K &lt; M owing to one of 3 criteria:</span>
 <span class="sd">            (1) &#39;kaiser&#39;: variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median</span>
-<span class="sd">            (2) &#39;mcssa&#39;: Monte-Carlo SSA (use modes above the 95% threshold)</span>
+<span class="sd">            (2) &#39;mcssa&#39;: Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)</span>
 <span class="sd">            (3) &#39;var&#39;: first K modes that explain at least var_thresh % of the variance.</span>
 <span class="sd">        Default is None, which bypasses truncation (K = M)</span>
 <span class="sd">        </span>
@@ -652,6 +559,7 @@
     <span class="n">pctvar</span> <span class="o">=</span> <span class="n">eigvals</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">eigvals</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span> <span class="c1"># percent variance</span>
 
     <span class="k">if</span> <span class="n">nMC</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># If Monte-Carlo SSA is requested.</span>
+        <span class="n">trunc</span> <span class="o">==</span> <span class="s1">&#39;mcssa&#39;</span>
         <span class="n">noise</span> <span class="o">=</span> <span class="n">ar1_sim</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">nMC</span><span class="p">)</span>  <span class="c1"># generate MC AR(1) surrogates of y</span>
         <span class="n">eigvals_R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">M</span><span class="p">,</span><span class="n">nMC</span><span class="p">))</span> <span class="c1"># define eigenvalue matrix</span>
         <span class="n">lgs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
@@ -666,23 +574,24 @@
         <span class="n">eigvals_q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">M</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
         <span class="n">eigvals_q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">eigvals_R</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">eigvals_q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">eigvals_R</span><span class="p">,</span> <span class="mi">95</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">mode_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">eigvals</span><span class="o">&gt;=</span><span class="n">eigvals_q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> 
     <span class="k">else</span><span class="p">:</span>
         <span class="n">eigvals_q</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">if</span> <span class="n">trunc</span> <span class="o">==</span> <span class="s1">&#39;mcssa&#39;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">nMC</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;nMC must be larger than 0 to enable MC-SSA truncation&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">mode_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">eigvals</span><span class="o">&gt;=</span><span class="n">eigvals_q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># modes to retain</span>
-            
+    
+    <span class="k">if</span> <span class="n">trunc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mode_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">trunc</span> <span class="o">==</span> <span class="s1">&#39;kaiser&#39;</span><span class="p">:</span>
-        <span class="n">mval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">eigvals</span><span class="p">)</span> <span class="c1"># median eigenvalues</span>
+        <span class="n">mval</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">eigvals</span><span class="p">)</span> <span class="c1"># median eigenvalues</span>
         <span class="n">mode_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">eigvals</span><span class="o">&gt;=</span><span class="n">mval</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">elif</span> <span class="n">trunc</span> <span class="o">==</span> <span class="s1">&#39;var&#39;</span><span class="p">:</span>
-        <span class="n">mode_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">pctvar</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">var_thresh</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">mode_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+        <span class="n">mode_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">pctvar</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">var_thresh</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>        
+    <span class="k">if</span> <span class="n">nMC</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">trunc</span> <span class="o">==</span> <span class="s1">&#39;mcssa&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;nMC must be larger than 0 to enable MC-SSA truncation&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">nMC</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+       <span class="n">mode_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">eigvals</span><span class="o">&gt;=</span><span class="n">eigvals_q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> 
 
+      
     <span class="c1"># compute reconstructed timeseries</span>
     <span class="n">Np</span> <span class="o">=</span> <span class="n">N</span> <span class="o">-</span> <span class="n">M</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">RCmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">))</span>
@@ -695,9 +604,11 @@
             <span class="n">RCmat</span><span class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="n">im</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">xdum</span><span class="p">,</span> <span class="n">offset</span><span class="o">=-</span><span class="p">(</span><span class="n">Np</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
         <span class="k">del</span> <span class="n">xdum</span>            
 
-    <span class="c1">#RCmat = RCmat + np.tile(mu, reps=[N, M])  # restore the mean and variance</span>
+    <span class="n">RCmat</span> <span class="o">=</span> <span class="n">scale</span><span class="o">*</span><span class="n">RCmat</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">reps</span><span class="o">=</span><span class="p">[</span><span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">])</span>  <span class="c1"># restore the mean and variance</span>
     
-    <span class="n">RCseries</span> <span class="o">=</span> <span class="n">scale</span><span class="o">*</span><span class="n">RCmat</span><span class="p">[:,</span><span class="n">mode_idx</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">mu</span>
+    <span class="c1">#RCseries = scale*RCmat[:,mode_idx].sum(axis=1) + mu</span>
+    
+    <span class="n">RCseries</span> <span class="o">=</span> <span class="n">RCmat</span><span class="p">[:,</span><span class="n">mode_idx</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># export results</span>
     <span class="n">res</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;eigvals&#39;</span><span class="p">:</span> <span class="n">eigvals</span><span class="p">,</span> <span class="s1">&#39;eigvecs&#39;</span><span class="p">:</span> <span class="n">eigvecs</span><span class="p">,</span> <span class="s1">&#39;PC&#39;</span><span class="p">:</span> <span class="n">PC</span><span class="p">,</span> <span class="s1">&#39;RCseries&#39;</span><span class="p">:</span> <span class="n">RCseries</span><span class="p">,</span> <span class="s1">&#39;RCmat&#39;</span><span class="p">:</span> <span class="n">RCmat</span><span class="p">,</span> <span class="s1">&#39;pctvar&#39;</span><span class="p">:</span> <span class="n">pctvar</span><span class="p">,</span> <span class="s1">&#39;eigvals_q&#39;</span><span class="p">:</span> <span class="n">eigvals_q</span><span class="p">,</span> <span class="s1">&#39;mode_idx&#39;</span><span class="p">:</span> <span class="n">mode_idx</span><span class="p">}</span>
@@ -705,46 +616,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James.
-
-    </p>
+    <p>&#169; Copyright 2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

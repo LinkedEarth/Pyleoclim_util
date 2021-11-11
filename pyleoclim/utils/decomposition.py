@@ -386,7 +386,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     trunc : str
         if present, truncates the expansion to a level K < M owing to one of 3 criteria:
             (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
-            (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% threshold)
+            (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)
             (3) 'var': first K modes that explain at least var_thresh % of the variance.
         Default is None, which bypasses truncation (K = M)
         
@@ -474,6 +474,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     pctvar = eigvals**2/np.sum(eigvals**2)*100 # percent variance
 
     if nMC > 0: # If Monte-Carlo SSA is requested.
+        trunc == 'mcssa'
         noise = ar1_sim(ys, nMC)  # generate MC AR(1) surrogates of y
         eigvals_R = np.zeros((M,nMC)) # define eigenvalue matrix
         lgs = np.arange(-N + 1, N)
@@ -488,23 +489,24 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         eigvals_q = np.empty((M,2))
         eigvals_q[:,0] = np.percentile(eigvals_R, 5, axis=1)
         eigvals_q[:,1] = np.percentile(eigvals_R, 95, axis=1)
+        mode_idx = np.where(eigvals>=eigvals_q[:,1])[0] 
     else:
         eigvals_q = None
 
-    if trunc == 'mcssa':
-        if nMC == 0:
-            raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
-        else:
-            mode_idx = np.where(eigvals>=eigvals_q[:,1])[0] # modes to retain
-            
+    
+    if trunc is None:
+        mode_idx = np.arange(M)
     elif trunc == 'kaiser':
-        mval = np.median(eigvals) # median eigenvalues
+        mval     = np.median(eigvals) # median eigenvalues
         mode_idx = np.where(eigvals>=mval)[0]
     elif trunc == 'var':
-        mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0]+1)
-    else:
-        mode_idx = np.arange(M)
+        mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0]+1)        
+    if nMC == 0 and trunc == 'mcssa':
+        raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
+    elif nMC>0:
+       mode_idx = np.where(eigvals>=eigvals_q[:,1])[0] 
 
+      
     # compute reconstructed timeseries
     Np = N - M + 1
     RCmat = np.zeros((N, M))
@@ -517,9 +519,11 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
             RCmat[n, im] = np.diagonal(xdum, offset=-(Np - 1 - n)).mean()
         del xdum            
 
-    #RCmat = RCmat + np.tile(mu, reps=[N, M])  # restore the mean and variance
+    RCmat = scale*RCmat + np.tile(mu, reps=[N, M])  # restore the mean and variance
     
-    RCseries = scale*RCmat[:,mode_idx].sum(axis=1) + mu
+    #RCseries = scale*RCmat[:,mode_idx].sum(axis=1) + mu
+    
+    RCseries = RCmat[:,mode_idx].sum(axis=1)
 
     # export results
     res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'PC': PC, 'RCseries': RCseries, 'RCmat': RCmat, 'pctvar': pctvar, 'eigvals_q': eigvals_q, 'mode_idx': mode_idx}

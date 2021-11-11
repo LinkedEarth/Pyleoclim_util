@@ -191,7 +191,10 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
     
     step : float
         The interpolation step. Default is max spacing between consecutive points.
-        
+   
+    step_style : 'string'
+            step style to be applied from `grid_properties` [default = 'max']
+    
     start : float
         where/when to start the interpolation. Default is min(t).
         
@@ -203,7 +206,7 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
     Returns
     -------
     tc : 1d array
-        the coarse time axis
+        the coarse-grained time axis
         
     yc:  1d array
         The coarse-grained time series

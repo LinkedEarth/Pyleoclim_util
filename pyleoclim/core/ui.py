@@ -908,7 +908,13 @@ class Series:
         return res
 
     def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
-        ''' Apply a filter to the timeseries
+        ''' Filtering methods for Series objects using four possible methods:
+            - `Butterworth <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.butter.html>`_ 
+            - `Lanczos <http://scitools.org.uk/iris/docs/v1.2/examples/graphics/SOI_filtering.html>`_  
+            - `Finite Impulse Response <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html>`_  
+            - `Savitzky-Golay filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html>`_
+                
+        By default, this method implements a lowpass filter, though it can easily be turned into a bandpass or high-pass filter (see examples below).
 
         Parameters
         ----------
@@ -982,7 +988,7 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
-        - Applying the low-pass filter
+        - Applying a low-pass filter
 
         .. ipython:: python
             :okwarning:
@@ -996,7 +1002,7 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
-        - Applying the band-pass filter
+        - Applying a band-pass filter
 
         .. ipython:: python
             :okwarning:
@@ -1011,6 +1017,7 @@ class Series:
             pyleo.closefig(fig)
 
         Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:
+            
         .. ipython:: python
             :okwarning:
             :okexcept:    
@@ -1020,6 +1027,22 @@ class Series:
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
             @savefig ts_filter4.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+            
+        - Applying a high-pass filter
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            fig, ax = ts.plot(mute=True, label='mix')
+            ts_low  = ts.filter(cutoff_freq=15)
+            ts_high = ts.copy()
+            ts_high.value = ts.value - ts_low.value # subtract low-pass filtered series from original one
+            ts_high.plot(label='High-pass filter @ 15Hz',ax=ax)
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
+            @savefig ts_filter5.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
@@ -1462,7 +1485,6 @@ class Series:
 
         Parameters
         ----------
-
         verbose : bool
             If True, will print warning messages if there is any
 
@@ -1477,7 +1499,28 @@ class Series:
         new.time = t_mod
         new.value = v_mod
         return new
+    
+    def sort(self, verbose=False):
+        ''' Ensure timeseries is aligned to a prograde axis.
+            If the time axis is prograde to begin with, no transformation is applied.
+            
+        Parameters
+        ----------
+        verbose : bool
+            If True, will print warning messages if there is any
+    
+        Returns
+        -------
+        Series
+            Series object with removed NaNs and sorting
 
+        '''
+        new = self.copy()
+        v_mod, t_mod = tsbase.sort_ts(self.value, self.time, verbose=verbose)
+        new.time = t_mod
+        new.value = v_mod
+        return new
+    
     def gaussianize(self):
         ''' Gaussianizes the timeseries
 
@@ -2314,6 +2357,7 @@ class Series:
 
     def causality(self, target_series, method='liang', settings=None):
         ''' Perform causality analysis with the target timeseries
+            The timeseries are first sorted in ascending order.         
 
         Parameters
         ----------
@@ -2360,7 +2404,7 @@ class Series:
 
             # plot the two timeseries
             @savefig ts_nino.png
-            fig, ax = ts_nino.plot(title='El Nino Region 3 -- SST Anomalies')
+            fig, ax = ts_nino.plot(title='NINO3 -- SST Anomalies')
             pyleo.closefig(fig)
 
             @savefig ts_air.png
@@ -2382,6 +2426,12 @@ class Series:
             print(caus_res)
 
         '''
+        
+        # Sort both timeseries 
+    
+        sorted_self   = self.sort(verbose=True) 
+        sorted_target = target_series.sort(verbose=True)        
+        
         settings = {} if settings is None else settings.copy()
         spec_func={
             'liang':causalutils.liang_causality,
@@ -2390,7 +2440,7 @@ class Series:
         args['liang'] = {}
         args['granger'] = {}
         args[method].update(settings)
-        causal_res = spec_func[method](self.value, target_series.value, **args[method])
+        causal_res = spec_func[method](sorted_self.value, sorted_target.value, **args[method])
         return causal_res
 
     def surrogates(self, method='ar1', number=1, length=None, seed=None, settings=None):
@@ -2721,13 +2771,16 @@ class PSD:
             'psd_binned': res.psd_binned,
             'Y_reg': res.Y_reg,
         }
-        return res_dict
+        new = self.copy()
+        new.beta_est_res = res_dict
+        return new
 
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
              legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
-             plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
+             plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1,
+             plot_beta=True, beta_kwargs=None):
 
         '''Plots the PSD estimates and signif level if included
 
@@ -2795,6 +2848,10 @@ class PSD:
             Linestyles for significance. The default is ['--', '-.', ':'].
         signif_linewidth : float, optional
             width of the significance line. The default is 1.
+        plot_beta : boll, optional
+            If True and self.beta_est_res is not None, then the scaling slope line will be plotted
+        beta_kwargs : dict, optional
+            The visualization keyword arguments for the scaling slope
 
         Returns
         -------
@@ -2811,6 +2868,7 @@ class PSD:
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = self.plot_kwargs if plot_kwargs is None else plot_kwargs.copy()
+        beta_kwargs = {} if beta_kwargs is None else beta_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
         if label is None:
@@ -2924,6 +2982,21 @@ class PSD:
 
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
+
+        if plot_beta and self.beta_est_res is not None:
+            plot_beta_kwargs = {
+                'label': fr'$\beta=${self.beta_est_res["beta"]:.2f}$\pm${self.beta_est_res["std_err"]:.2f}',
+                'linestyle': '--',
+                'color': 'k',
+                'linewidth': 1,
+                'zorder': 99,
+            }
+            plot_beta_kwargs.update(beta_kwargs)
+            beta_x_axis = 1/self.beta_est_res['f_binned']
+            beta_y_axis = self.beta_est_res['Y_reg']
+            if transpose:
+                beta_x_axis, beta_y_axis = beta_y_axis, beta_x_axis
+            ax.plot(beta_x_axis, beta_y_axis , **plot_beta_kwargs)
 
         if legend:
             lgd_args = {'frameon': False}
@@ -6224,12 +6297,22 @@ class CorrEns:
             t_args.update(title_kwargs)
             ax.set_title(title, **t_args)
 
-        if 'path' in savefig_settings:
-            plotting.savefig(fig, settings=savefig_settings)
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            else:
+                if not mute:
+                    plotting.showfig(fig)
+            return fig, ax
         else:
-            if not mute:
-                plotting.showfig(fig)
-        return fig, ax
+            return ax
+
+        # if 'path' in savefig_settings:
+        #     plotting.savefig(fig, settings=savefig_settings)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
+        # return fig, ax
 
 class SpatialDecomp:
     ''' Class to hold the results of spatial decompositions
