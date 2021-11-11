@@ -26,7 +26,7 @@ See our [releases page](https://github.com/LinkedEarth/Pyleoclim_util/releases) 
 ### Documentation
 
 Online documentation is available through readthedocs:
-- [Stable version](https://pyleoclim-util.readthedocs.io/en/stable/) (available through Pypi)
+- [Stable version](https://pyleoclim-util.readthedocs.io/en/master/) (available through Pypi)
 - [Latest version](https://pyleoclim-util.readthedocs.io/en/latest/) (from the development branch)
 
 ### Dependencies
