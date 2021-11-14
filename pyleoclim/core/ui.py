@@ -2872,7 +2872,10 @@ class PSD:
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
         if label is None:
-            label = self.label
+            if plot_beta and self.beta_est_res is not None:
+                label = fr'{self.label} ($\beta=${self.beta_est_res["beta"]:.2f}$\pm${self.beta_est_res["std_err"]:.2f})'
+            else:
+                label = self.label
 
         if label is not None:
             plot_kwargs.update({'label': label})
@@ -2985,7 +2988,6 @@ class PSD:
 
         if plot_beta and self.beta_est_res is not None:
             plot_beta_kwargs = {
-                'label': fr'$\beta=${self.beta_est_res["beta"]:.2f}$\pm${self.beta_est_res["std_err"]:.2f}',
                 'linestyle': '--',
                 'color': 'k',
                 'linewidth': 1,
@@ -4741,7 +4743,7 @@ class MultipleSeries:
             return ax
 
     def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
+                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, mute=False):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
@@ -4911,14 +4913,20 @@ class MultipleSeries:
         for x in xt:
             ax[n_ts].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
 
-        if 'path' in savefig_settings:
-            plotting.savefig(fig, settings=savefig_settings)
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            else:
+                if not mute:
+                    plotting.showfig(fig)
+            # reset the plotting style
+            mpl.rcParams.update(current_style)
+            return fig, ax
         else:
             plotting.showfig(fig)
-
-        # reset the plotting style
-        mpl.rcParams.update(current_style)
-        return fig, ax
+            # reset the plotting style
+            mpl.rcParams.update(current_style)
+            return ax
 
 
 class SurrogateSeries(MultipleSeries):
