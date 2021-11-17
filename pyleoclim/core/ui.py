@@ -170,8 +170,8 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info = psd.beta_est(fmin=1/50, fmax=1/2)
-        print(beta_info['beta'])
+        psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(psd_beta.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn_t0.png
@@ -183,8 +183,8 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info = psd.beta_est(fmin=1/50, fmax=1/2)
-        print(beta_info['beta'])
+        psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(psd_beta.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn_t1.png
@@ -202,10 +202,10 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info_lf = psd.beta_est(fmin=1/50, fmax=1/20)
-        beta_info_hf = psd.beta_est(fmin=1/20, fmax=1/2)
-        print(beta_info_lf['beta'])
-        print(beta_info_hf['beta'])
+        psd_beta_lf = psd.beta_est(fmin=1/50, fmax=1/20)
+        psd_beta_hf = psd.beta_est(fmin=1/20, fmax=1/2)
+        print(psd_beta_lf.beta_est_res['beta'])
+        print(psd_beta_hf.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn2_t0.png
@@ -217,10 +217,10 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info_lf = psd.beta_est(fmin=1/50, fmax=1/10)
-        beta_info_hf = psd.beta_est(fmin=1/10, fmax=1/2)
-        print(beta_info_lf['beta'])
-        print(beta_info_hf['beta'])
+        psd_beta_lf = psd.beta_est(fmin=1/50, fmax=1/10)
+        psd_beta_hf = psd.beta_est(fmin=1/10, fmax=1/2)
+        print(psd_beta_lf.beta_est_res['beta'])
+        print(psd_beta_hf.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn2_t1.png
@@ -2749,12 +2749,32 @@ class PSD:
         Returns
         -------
 
-        res_dict : dictionary
+        new : pyleoclim.PSD
+            New PSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
             - beta: the scaling factor
             - std_err: the one standard deviation error of the scaling factor
             - f_binned: the binned frequency series, used as X for linear regression
             - psd_binned: the binned PSD series, used as Y for linear regression
             - Y_reg: the predicted Y from linear regression, used with f_binned for the slope curve plotting
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            # generate colored noise with default scaling slope 'alpha' equals to 1
+            ts = pyleo.gen_ts(model='colored_noise')
+            ts.label = 'colored noise'
+            psd = ts.spectral()
+
+            # estimate the scaling slope
+            psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+
+            @savefig color_noise_beta.png
+            fig, ax = psd_beta.plot()
+            pyleo.closefig(fig)
 
         '''
         if fmin is None:
@@ -5662,8 +5682,9 @@ class MultiplePSD:
 
     Used for significance level
     '''
-    def __init__(self, psd_list):
+    def __init__(self, psd_list, beta_est_res=None):
         self.psd_list = psd_list
+        self.beta_est_res = beta_est_res
 
     def copy(self):
         '''Copy object
@@ -5734,12 +5755,13 @@ class MultiplePSD:
         Returns
         -------
 
-        res_dict : dictionary
-            - beta: list of the scaling factors
-            - std_err: list of one standard deviation errors of the scaling factor
-            - f_binned: list of the binned frequency series, used as X for linear regression
-            - psd_binned: list of the binned PSD series, used as Y for linear regression
-            - Y_reg: list of the predicted Y from linear regression, used with f_binned for the slope curve plotting
+        new : pyleoclim.MultiplePSD
+            New MultiplePSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
+            - beta: the scaling factor
+            - std_err: the one standard deviation error of the scaling factor
+            - f_binned: the binned frequency series, used as X for linear regression
+            - psd_binned: the binned PSD series, used as Y for linear regression
+            - Y_reg: the predicted Y from linear regression, used with f_binned for the slope curve plotting
 
         See also
         --------
@@ -5754,12 +5776,18 @@ class MultiplePSD:
         res_dict['f_binned'] = []
         res_dict['psd_binned'] = []
         res_dict['Y_reg'] = []
+        psd_beta_list = []
         for psd_obj in self.psd_list:
-            res = psd_obj.beta_est(fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
+            psd_beta = psd_obj.beta_est(fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
+            psd_beta_list.append(psd_beta)
+            res = psd_beta.beta_est_res
             for k in res_dict.keys():
                 res_dict[k].append(res[k])
 
-        return res_dict
+        new = self.copy()
+        new.beta_est_res = res_dict
+        new.psd_list = psd_beta_list
+        return new
 
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
