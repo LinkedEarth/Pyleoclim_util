@@ -4762,7 +4762,7 @@ class MultipleSeries:
         else:
             return ax
 
-    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
+    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
                   spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, mute=False):
         ''' Stack plot of multiple series
 
@@ -4782,6 +4782,11 @@ class MultipleSeries:
         norm : matplotlib.colors.Normalize like
             The nomorlization for the colormap.
             If None, a linear normalization will be used.
+        labels: None, 'auto' or list
+            If None, doesn't add labels to the subplots
+            If 'auto', uses the labels passed during the creation of pyleoclim.Series
+            If list, pass a list of strings for each labels. 
+            Default is 'auto'
         savefig_settings : dictionary
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -4804,7 +4809,11 @@ class MultipleSeries:
         v_shift_factor : float
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
-
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+           
+        
         Returns
         -------
         fig, ax
@@ -4833,6 +4842,10 @@ class MultipleSeries:
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         n_ts = len(self.series_list)
+        
+        if type(labels)==list:
+            if len(labels) != n_ts:
+                raise ValueError("The length of the label list should match the number of timeseries to be plotted")
 
         fig = plt.figure(figsize=figsize)
 
@@ -4884,8 +4897,13 @@ class MultipleSeries:
             ylim = [mu-4*std, mu+4*std]
             ax[idx].fill_between(ts.time, ts.value, y2=mu, alpha=fill_between_alpha, color=clr)
             trans = transforms.blended_transform_factory(ax[idx].transAxes, ax[idx].transData)
-            if ts.label is not None:
-                ax[idx].text(label_x_loc, mu, ts.label, horizontalalignment='right', transform=trans, color=clr, weight='bold')
+            if labels == 'auto':
+                if ts.label is not None:
+                    ax[idx].text(label_x_loc, mu, ts.label, horizontalalignment='right', transform=trans, color=clr, weight='bold')
+            elif type(labels) ==list:
+                ax[idx].text(label_x_loc, mu, labels[idx], horizontalalignment='right', transform=trans, color=clr, weight='bold')
+            elif labels==None:
+                pass
             ax[idx].set_ylim(ylim)
             ax[idx].set_yticks(ylim)
             ax[idx].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
