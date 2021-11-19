@@ -4763,7 +4763,7 @@ class MultipleSeries:
             return ax
 
     def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, mute=False):
+                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None, mute=False):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
@@ -4809,6 +4809,10 @@ class MultipleSeries:
         v_shift_factor : float
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
+        plot_kwargs: dict or list of dict
+            Arguments to further customize the plot from matplotlib.pyplot.plot.
+            Dictionary: Arguments will be applied to all lines in the stackplots
+            List of dictionary: Allows to customize one line at a time. 
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
@@ -4834,6 +4838,70 @@ class MultipleSeries:
             @savefig mts_stackplot.png
             fig, ax = ms.stackplot()
             pyleo.closefig(fig)
+        
+        Let's change the labels on the left
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_customlabels.png
+            fig, ax = ms.stackplot(labels=['sst','d18Osw'])
+            pyleo.closefig(fig)
+            
+        And let's remove them completely
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_nolabels.png
+            fig, ax = ms.stackplot(labels=None)
+            pyleo.closefig(fig)
+        
+        Now, let's add markers to the timeseries.
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_samemarkers.png
+            fig, ax = ms.stackplot(labels=None, plot_kwargs={'marker':'o'})
+            pyleo.closefig(fig)
+        
+        But I really want to use different markers
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_differentmarkers.png
+            fig, ax = ms.stackplot(labels=None, plot_kwargs=[{'marker':'o'},{'marker':'^'}])
+            pyleo.closefig(fig)
 
         '''
         plt.ioff()
@@ -4846,7 +4914,15 @@ class MultipleSeries:
         if type(labels)==list:
             if len(labels) != n_ts:
                 raise ValueError("The length of the label list should match the number of timeseries to be plotted")
-
+        
+        # Deal with plotting arguments
+        if type(plot_kwargs)==dict:
+            plot_kwargs = [plot_kwargs]*n_ts
+        
+        if plot_kwargs is not None and len(plot_kwargs) != n_ts:
+            raise ValueError("When passing a list of dictionaries for kwargs arguments, the number of items should be the same as the number of timeseries")
+            
+                
         fig = plt.figure(figsize=figsize)
 
         if xlim is None:
@@ -4883,10 +4959,15 @@ class MultipleSeries:
                 clr = colors[idx%nc]
             else:
                 raise TypeError('"colors" should be a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)')
-
+            #deal with other plotting arguments
+            if plot_kwargs is None:
+                p_kwargs = {}
+            else:
+                p_kwargs = plot_kwargs[idx]
+            
             bottom -= height*v_shift_factor
             ax[idx] = fig.add_axes([left, bottom, width, height])
-            ax[idx].plot(ts.time, ts.value, color=clr, lw=linewidth)
+            ax[idx].plot(ts.time, ts.value, color=clr, lw=linewidth,**p_kwargs)
             ax[idx].patch.set_alpha(0)
             ax[idx].set_xlim(xlim)
             time_label, value_label = ts.make_labels()
