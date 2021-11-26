@@ -386,3 +386,30 @@ class TestMultipleSeriesCommonTime:
         ms1 = ms.common_time(method='interp', start=1910, stop=2010, step=1/12)
         
         assert (np.diff(ms1.series_list[0].time)[0] - 1/12) < 1e-3
+        
+class TestMultipleSeriesStackPlot():
+    ''' Test for MultipleSeries.Stackplot
+    '''
+    
+    @pytest.mark.parametrize('labels', [None, 'auto', ['sst','d18Osw']])
+    def test_StackPlot_t0(self, labels):
+    
+        d=pyleo.Lipd('https://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
+        sst = d.to_LipdSeries(number=5)
+        d18Osw = d.to_LipdSeries(number=3)
+        ms = pyleo.MultipleSeries([sst,d18Osw])
+        ms.stackplot(labels=labels, mute=True)
+    
+    @pytest.mark.parametrize('plot_kwargs', [{'marker':'o'},[{'marker':'o'},{'marker':'^'}]])
+    def test_StackPlot_t1(self, plot_kwargs):
+    
+        d=pyleo.Lipd('https://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
+        sst = d.to_LipdSeries(number=5)
+        d18Osw = d.to_LipdSeries(number=3)
+        ms = pyleo.MultipleSeries([sst,d18Osw])
+        ms.stackplot(plot_kwargs=plot_kwargs, mute=True)
+        
+        
+        
+        
+        

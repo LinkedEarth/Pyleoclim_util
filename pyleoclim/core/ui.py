@@ -170,8 +170,8 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info = psd.beta_est(fmin=1/50, fmax=1/2)
-        print(beta_info['beta'])
+        psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(psd_beta.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn_t0.png
@@ -183,8 +183,8 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info = psd.beta_est(fmin=1/50, fmax=1/2)
-        print(beta_info['beta'])
+        psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(psd_beta.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn_t1.png
@@ -202,10 +202,10 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info_lf = psd.beta_est(fmin=1/50, fmax=1/20)
-        beta_info_hf = psd.beta_est(fmin=1/20, fmax=1/2)
-        print(beta_info_lf['beta'])
-        print(beta_info_hf['beta'])
+        psd_beta_lf = psd.beta_est(fmin=1/50, fmax=1/20)
+        psd_beta_hf = psd.beta_est(fmin=1/20, fmax=1/2)
+        print(psd_beta_lf.beta_est_res['beta'])
+        print(psd_beta_hf.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn2_t0.png
@@ -217,10 +217,10 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info_lf = psd.beta_est(fmin=1/50, fmax=1/10)
-        beta_info_hf = psd.beta_est(fmin=1/10, fmax=1/2)
-        print(beta_info_lf['beta'])
-        print(beta_info_hf['beta'])
+        psd_beta_lf = psd.beta_est(fmin=1/50, fmax=1/10)
+        psd_beta_hf = psd.beta_est(fmin=1/10, fmax=1/2)
+        print(psd_beta_lf.beta_est_res['beta'])
+        print(psd_beta_hf.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn2_t1.png
@@ -908,7 +908,13 @@ class Series:
         return res
 
     def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
-        ''' Apply a filter to the timeseries
+        ''' Filtering methods for Series objects using four possible methods:
+            - `Butterworth <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.butter.html>`_ 
+            - `Lanczos <http://scitools.org.uk/iris/docs/v1.2/examples/graphics/SOI_filtering.html>`_  
+            - `Finite Impulse Response <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html>`_  
+            - `Savitzky-Golay filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html>`_
+                
+        By default, this method implements a lowpass filter, though it can easily be turned into a bandpass or high-pass filter (see examples below).
 
         Parameters
         ----------
@@ -982,7 +988,7 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
-        - Applying the low-pass filter
+        - Applying a low-pass filter
 
         .. ipython:: python
             :okwarning:
@@ -996,7 +1002,7 @@ class Series:
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
-        - Applying the band-pass filter
+        - Applying a band-pass filter
 
         .. ipython:: python
             :okwarning:
@@ -1011,6 +1017,7 @@ class Series:
             pyleo.closefig(fig)
 
         Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:
+            
         .. ipython:: python
             :okwarning:
             :okexcept:    
@@ -1020,6 +1027,22 @@ class Series:
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
             @savefig ts_filter4.png
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+            
+        - Applying a high-pass filter
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            fig, ax = ts.plot(mute=True, label='mix')
+            ts_low  = ts.filter(cutoff_freq=15)
+            ts_high = ts.copy()
+            ts_high.value = ts.value - ts_low.value # subtract low-pass filtered series from original one
+            ts_high.plot(label='High-pass filter @ 15Hz',ax=ax)
+            ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
+            @savefig ts_filter5.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
@@ -2726,12 +2749,32 @@ class PSD:
         Returns
         -------
 
-        res_dict : dictionary
+        new : pyleoclim.PSD
+            New PSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
             - beta: the scaling factor
             - std_err: the one standard deviation error of the scaling factor
             - f_binned: the binned frequency series, used as X for linear regression
             - psd_binned: the binned PSD series, used as Y for linear regression
             - Y_reg: the predicted Y from linear regression, used with f_binned for the slope curve plotting
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            # generate colored noise with default scaling slope 'alpha' equals to 1
+            ts = pyleo.gen_ts(model='colored_noise')
+            ts.label = 'colored noise'
+            psd = ts.spectral()
+
+            # estimate the scaling slope
+            psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+
+            @savefig color_noise_beta.png
+            fig, ax = psd_beta.plot()
+            pyleo.closefig(fig)
 
         '''
         if fmin is None:
@@ -2748,13 +2791,16 @@ class PSD:
             'psd_binned': res.psd_binned,
             'Y_reg': res.Y_reg,
         }
-        return res_dict
+        new = self.copy()
+        new.beta_est_res = res_dict
+        return new
 
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
              legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
-             plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1):
+             plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1,
+             plot_beta=True, beta_kwargs=None):
 
         '''Plots the PSD estimates and signif level if included
 
@@ -2822,6 +2868,10 @@ class PSD:
             Linestyles for significance. The default is ['--', '-.', ':'].
         signif_linewidth : float, optional
             width of the significance line. The default is 1.
+        plot_beta : boll, optional
+            If True and self.beta_est_res is not None, then the scaling slope line will be plotted
+        beta_kwargs : dict, optional
+            The visualization keyword arguments for the scaling slope
 
         Returns
         -------
@@ -2838,10 +2888,14 @@ class PSD:
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = self.plot_kwargs if plot_kwargs is None else plot_kwargs.copy()
+        beta_kwargs = {} if beta_kwargs is None else beta_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
         if label is None:
-            label = self.label
+            if plot_beta and self.beta_est_res is not None:
+                label = fr'{self.label} ($\beta=${self.beta_est_res["beta"]:.2f}$\pm${self.beta_est_res["std_err"]:.2f})'
+            else:
+                label = self.label
 
         if label is not None:
             plot_kwargs.update({'label': label})
@@ -2951,6 +3005,20 @@ class PSD:
 
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
+
+        if plot_beta and self.beta_est_res is not None:
+            plot_beta_kwargs = {
+                'linestyle': '--',
+                'color': 'k',
+                'linewidth': 1,
+                'zorder': 99,
+            }
+            plot_beta_kwargs.update(beta_kwargs)
+            beta_x_axis = 1/self.beta_est_res['f_binned']
+            beta_y_axis = self.beta_est_res['Y_reg']
+            if transpose:
+                beta_x_axis, beta_y_axis = beta_y_axis, beta_x_axis
+            ax.plot(beta_x_axis, beta_y_axis , **plot_beta_kwargs)
 
         if legend:
             lgd_args = {'frameon': False}
@@ -4694,8 +4762,8 @@ class MultipleSeries:
         else:
             return ax
 
-    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
+    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
+                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None, mute=False):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
@@ -4714,6 +4782,11 @@ class MultipleSeries:
         norm : matplotlib.colors.Normalize like
             The nomorlization for the colormap.
             If None, a linear normalization will be used.
+        labels: None, 'auto' or list
+            If None, doesn't add labels to the subplots
+            If 'auto', uses the labels passed during the creation of pyleoclim.Series
+            If list, pass a list of strings for each labels. 
+            Default is 'auto'
         savefig_settings : dictionary
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -4736,7 +4809,15 @@ class MultipleSeries:
         v_shift_factor : float
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
-
+        plot_kwargs: dict or list of dict
+            Arguments to further customize the plot from matplotlib.pyplot.plot.
+            Dictionary: Arguments will be applied to all lines in the stackplots
+            List of dictionary: Allows to customize one line at a time. 
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+           
+        
         Returns
         -------
         fig, ax
@@ -4757,6 +4838,70 @@ class MultipleSeries:
             @savefig mts_stackplot.png
             fig, ax = ms.stackplot()
             pyleo.closefig(fig)
+        
+        Let's change the labels on the left
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_customlabels.png
+            fig, ax = ms.stackplot(labels=['sst','d18Osw'])
+            pyleo.closefig(fig)
+            
+        And let's remove them completely
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_nolabels.png
+            fig, ax = ms.stackplot(labels=None)
+            pyleo.closefig(fig)
+        
+        Now, let's add markers to the timeseries.
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_samemarkers.png
+            fig, ax = ms.stackplot(labels=None, plot_kwargs={'marker':'o'})
+            pyleo.closefig(fig)
+        
+        But I really want to use different markers
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_differentmarkers.png
+            fig, ax = ms.stackplot(labels=None, plot_kwargs=[{'marker':'o'},{'marker':'^'}])
+            pyleo.closefig(fig)
 
         '''
         plt.ioff()
@@ -4765,7 +4910,19 @@ class MultipleSeries:
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         n_ts = len(self.series_list)
-
+        
+        if type(labels)==list:
+            if len(labels) != n_ts:
+                raise ValueError("The length of the label list should match the number of timeseries to be plotted")
+        
+        # Deal with plotting arguments
+        if type(plot_kwargs)==dict:
+            plot_kwargs = [plot_kwargs]*n_ts
+        
+        if plot_kwargs is not None and len(plot_kwargs) != n_ts:
+            raise ValueError("When passing a list of dictionaries for kwargs arguments, the number of items should be the same as the number of timeseries")
+            
+                
         fig = plt.figure(figsize=figsize)
 
         if xlim is None:
@@ -4802,10 +4959,15 @@ class MultipleSeries:
                 clr = colors[idx%nc]
             else:
                 raise TypeError('"colors" should be a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)')
-
+            #deal with other plotting arguments
+            if plot_kwargs is None:
+                p_kwargs = {}
+            else:
+                p_kwargs = plot_kwargs[idx]
+            
             bottom -= height*v_shift_factor
             ax[idx] = fig.add_axes([left, bottom, width, height])
-            ax[idx].plot(ts.time, ts.value, color=clr, lw=linewidth)
+            ax[idx].plot(ts.time, ts.value, color=clr, lw=linewidth,**p_kwargs)
             ax[idx].patch.set_alpha(0)
             ax[idx].set_xlim(xlim)
             time_label, value_label = ts.make_labels()
@@ -4816,8 +4978,13 @@ class MultipleSeries:
             ylim = [mu-4*std, mu+4*std]
             ax[idx].fill_between(ts.time, ts.value, y2=mu, alpha=fill_between_alpha, color=clr)
             trans = transforms.blended_transform_factory(ax[idx].transAxes, ax[idx].transData)
-            if ts.label is not None:
-                ax[idx].text(label_x_loc, mu, ts.label, horizontalalignment='right', transform=trans, color=clr, weight='bold')
+            if labels == 'auto':
+                if ts.label is not None:
+                    ax[idx].text(label_x_loc, mu, ts.label, horizontalalignment='right', transform=trans, color=clr, weight='bold')
+            elif type(labels) ==list:
+                ax[idx].text(label_x_loc, mu, labels[idx], horizontalalignment='right', transform=trans, color=clr, weight='bold')
+            elif labels==None:
+                pass
             ax[idx].set_ylim(ylim)
             ax[idx].set_yticks(ylim)
             ax[idx].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -4865,14 +5032,20 @@ class MultipleSeries:
         for x in xt:
             ax[n_ts].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
 
-        if 'path' in savefig_settings:
-            plotting.savefig(fig, settings=savefig_settings)
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            else:
+                if not mute:
+                    plotting.showfig(fig)
+            # reset the plotting style
+            mpl.rcParams.update(current_style)
+            return fig, ax
         else:
             plotting.showfig(fig)
-
-        # reset the plotting style
-        mpl.rcParams.update(current_style)
-        return fig, ax
+            # reset the plotting style
+            mpl.rcParams.update(current_style)
+            return ax
 
 
 class SurrogateSeries(MultipleSeries):
@@ -5608,8 +5781,9 @@ class MultiplePSD:
 
     Used for significance level
     '''
-    def __init__(self, psd_list):
+    def __init__(self, psd_list, beta_est_res=None):
         self.psd_list = psd_list
+        self.beta_est_res = beta_est_res
 
     def copy(self):
         '''Copy object
@@ -5680,12 +5854,13 @@ class MultiplePSD:
         Returns
         -------
 
-        res_dict : dictionary
-            - beta: list of the scaling factors
-            - std_err: list of one standard deviation errors of the scaling factor
-            - f_binned: list of the binned frequency series, used as X for linear regression
-            - psd_binned: list of the binned PSD series, used as Y for linear regression
-            - Y_reg: list of the predicted Y from linear regression, used with f_binned for the slope curve plotting
+        new : pyleoclim.MultiplePSD
+            New MultiplePSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
+            - beta: the scaling factor
+            - std_err: the one standard deviation error of the scaling factor
+            - f_binned: the binned frequency series, used as X for linear regression
+            - psd_binned: the binned PSD series, used as Y for linear regression
+            - Y_reg: the predicted Y from linear regression, used with f_binned for the slope curve plotting
 
         See also
         --------
@@ -5700,12 +5875,18 @@ class MultiplePSD:
         res_dict['f_binned'] = []
         res_dict['psd_binned'] = []
         res_dict['Y_reg'] = []
+        psd_beta_list = []
         for psd_obj in self.psd_list:
-            res = psd_obj.beta_est(fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
+            psd_beta = psd_obj.beta_est(fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
+            psd_beta_list.append(psd_beta)
+            res = psd_beta.beta_est_res
             for k in res_dict.keys():
                 res_dict[k].append(res[k])
 
-        return res_dict
+        new = self.copy()
+        new.beta_est_res = res_dict
+        new.psd_list = psd_beta_list
+        return new
 
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
