@@ -658,7 +658,7 @@ def gaussianize_single(X_single):
     return Xn_single
 
 
-def detrend(y, x = None, method = "emd", sg_kwargs = None):
+def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     """Detrend a timeseries according to four methods
 
     Detrending methods include, "linear", "constant", using a low-pass
@@ -678,6 +678,8 @@ def detrend(y, x = None, method = "emd", sg_kwargs = None):
         - constant: only the mean of data is subtrated.
         - "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
         - "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+    n : int
+        Works only if `method == 'emd'`. The number of smoothest modes to remove.
     sg_kwargs : dict
         The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
 
@@ -726,7 +728,9 @@ def detrend(y, x = None, method = "emd", sg_kwargs = None):
         if np.shape(imfs)[0] == 1:
             trend = np.zeros(np.size(y))
         else:
-            trend = imfs[-1]
+            # trend = imfs[-1]
+            trend = np.sum(imfs[-n:], axis=0)  # remove the n smoothest modes
+
         ys = y - trend
     else:
         raise KeyError('Not a valid detrending method')

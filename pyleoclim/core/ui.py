@@ -1741,6 +1741,7 @@ class Series:
             signal_trend = signal + nonlinear_trend
 
             # Add white noise
+            np.random.seed(2333)
             sig_var = np.var(signal)
             noise_var = sig_var / 2 #signal is twice the size of noise
             white_noise = np.random.normal(0, np.sqrt(noise_var), size=np.size(signal))
@@ -1755,10 +1756,16 @@ class Series:
             # kStandardize
             ts_std = ts.standardize()
 
-            # Detrend using EMD
+            # Detrend using EMD (the default method)
             ts_emd = ts_std.detrend()
             @savefig ts_emd.png
             fig, ax = ts_emd.plot(title='Detrended with EMD method')
+            pyleo.closefig(fig)
+
+            # Detrend using EMD with the 3 smoothest modes removed
+            ts_emd = ts_std.detrend(method='emd', n=3)
+            @savefig ts_emd_n2.png
+            fig, ax = ts_emd.plot(title='Detrended with EMD method (n=3)')
             pyleo.closefig(fig)
 
             # Detrend using Savitzky-Golay filter
