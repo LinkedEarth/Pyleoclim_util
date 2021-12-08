@@ -7426,12 +7426,14 @@ class LipdSeries(Series):
         '''
         return deepcopy(self)
 
-    def chronEnsembleToPaleo(self,D,modelNumber=None,tableNumber=None):
+    def chronEnsembleToPaleo(self,D,chronNumber =None, modelNumber=None,tableNumber=None):
         '''Fetch chron ensembles from a lipd object and return the ensemble as MultipleSeries
 
         Parameters
         ----------
         D : a LiPD object
+        chronNumber: int, optional
+            The chron object number. The default is None. 
         modelNumber : int, optional
             Age model number. The default is None.
         tableNumber : int, optional
@@ -7466,13 +7468,14 @@ class LipdSeries(Series):
         if len(chron)==0:
             raise ValueError("No ChronMeasurementTables available")
         elif len(chron)>1:
-            if modelNumber==None or tableNumber==None:
+            if chronNumber==None or modelNumber==None or tableNumber==None:
                 csvName=lipdutils.whichEnsemble(chron)
             else:
+                str0='chron'+str(chronNumber)
                 str1='model'+str(modelNumber)
                 str2='ensemble'+str(tableNumber)
                 for item in chron:
-                    if str1 in item and str2 in item:
+                    if str0 in item and str1 in item and str2 in item:
                         csvName=item
             depth, ensembleValues =lipdutils.getEnsemble(csv_dict,csvName)
         else:

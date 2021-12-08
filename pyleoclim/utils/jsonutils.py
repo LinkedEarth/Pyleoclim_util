@@ -78,7 +78,7 @@ def list_to_array(obj_dict):
             obj_dict[k]=obj_dict[k]
     return obj_dict
 
-def PyleoObj_to_json(PyleoObj,filename,dict_return=False):
+def PyleoObj_to_json(PyleoObj,filename=None,dict_return=False):
     '''
     
     Parameters
@@ -96,6 +96,10 @@ def PyleoObj_to_json(PyleoObj,filename,dict_return=False):
         If dict_return is True, returns a dictionary like object from the JSON file. 
 
     '''
+    
+    if filename is None and dict_return is False:
+        raise ValueError('If a dictionary is not returned, filename must be provided')
+    
     obj_dict = PyleoObj.__dict__
     obj_dict = transform(obj_dict)
     if dict_return == False:
