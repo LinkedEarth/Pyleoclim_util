@@ -7427,12 +7427,14 @@ class LipdSeries(Series):
         '''
         return deepcopy(self)
 
-    def chronEnsembleToPaleo(self,D,chronNumber =None, modelNumber=None,tableNumber=None):
+    def chronEnsembleToPaleo(self,D,number=None,chronNumber=None, modelNumber=None,tableNumber=None):
         '''Fetch chron ensembles from a lipd object and return the ensemble as MultipleSeries
 
         Parameters
         ----------
         D : a LiPD object
+        number: int, optional
+            The number of ensemble members to store. Default is None, which corresponds to all present
         chronNumber: int, optional
             The chron object number. The default is None. 
         modelNumber : int, optional
@@ -7443,7 +7445,6 @@ class LipdSeries(Series):
         Raises
         ------
         ValueError
-            DESCRIPTION.
 
         Returns
         -------
@@ -7485,6 +7486,14 @@ class LipdSeries(Series):
         sort_ind = np.argsort(depth)
         depth=list(np.array(depth)[sort_ind])
         ensembleValues=ensembleValues[sort_ind,:]
+        
+        if number is not None:
+            if number>np.shape(ensembleValues)[1]:
+                warnings.warn('Selected number of ensemble members is greater than number of members in the ensemble table; passing')
+                pass
+            else:
+                ensembleValues=ensembleValues[:,0:number]
+        
         #Map to paleovalues
         key=[]
         for item in self.lipd_ts.keys():
