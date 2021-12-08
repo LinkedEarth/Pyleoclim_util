@@ -2968,11 +2968,6 @@ class PSD:
 
         ax.plot(x_axis, y_axis, **plot_kwargs)
 
-        if xlim is not None:
-            ax.set_xlim(xlim)
-
-        if ylim is not None:
-            ax.set_ylim(ylim)
 
         # plot significance levels
         if self.signif_qs is not None:
@@ -3034,6 +3029,12 @@ class PSD:
 
         if title is not None:
             ax.set_title(title)
+            
+        if xlim is not None:
+            ax.set_xlim(xlim)
+
+        if ylim is not None:
+            ax.set_ylim(ylim)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
