@@ -20,6 +20,7 @@ from pandas.testing import assert_frame_equal
 
 import pytest
 import scipy.io as sio
+import sys
 import os
 import pathlib
 test_dirpath = pathlib.Path(__file__).parent.absolute()
@@ -281,6 +282,23 @@ class TestUiSeriesStats:
         key = {'mean': 4.5,'median': 4.5,'min': 0.0,'max': 9.0,'std': np.std(t),'IQR': 4.5}
 
         assert stats == key
+        
+class TestUiSeriesCenter:
+    '''Test for Series.center()
+
+    Center removes the mean, so we'll simply test maximum and minimum values'''
+
+    def test_center(self):
+        #Generate sample data
+        t, v = gen_colored_noise()
+
+        #Create time series with sample data
+        ts = pyleo.Series(time = t, value = v)
+
+        #Call function to be tested
+        tsc, mu = ts.center()
+
+        assert np.abs(tsc.value.mean()) <= np.sqrt(sys.float_info.epsilon) 
 
 class TestUiSeriesStandardize:
     '''Test for Series.standardize()

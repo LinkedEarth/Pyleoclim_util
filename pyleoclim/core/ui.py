@@ -1561,17 +1561,20 @@ class Series:
 
         Returns
         -------
-        new : pyleoclim.Series
+        tsc : pyleoclim.Series
             The centered series object
+        ts_mean : estimated mean of the original series, in case it needs to be restored later   
 
         '''
-        new = self.copy()
+        tsc = self.copy()
         if timespan is not None:
-            v_mod = self.value - np.nanmean(self.slice(timespan).value)
+            ts_mean  = np.nanmean(self.slice(timespan).value)
+            vc = self.value - ts_mean
         else:
-            v_mod = self.value - np.nanmean(self.value)
-        new.value = v_mod
-        return new
+            ts_mean  = np.nanmean(self.value)
+            vc = self.value - ts_mean
+        tsc.value = vc
+        return tsc, ts_mean
 
     def segment(self, factor=10):
         """Gap detection
