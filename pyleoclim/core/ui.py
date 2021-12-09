@@ -887,7 +887,7 @@ class Series:
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
         
                 
-        resc = SsaRes(name=self.value_name, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
+        resc = SsaRes(name=self.value_name, original=self.value, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
                         pctvar = res['pctvar'], PC = res['PC'], RCmat = res['RCmat'], 
                         RCseries=res['RCseries'], mode_idx=res['mode_idx'])
         if nMC >= 0:
@@ -1536,7 +1536,8 @@ class Series:
         return new
 
     def standardize(self):
-        '''Standardizes the time series
+        '''Standardizes the series ((i.e. renove its estimated mean and divides
+            by its estimated standard deviation)
 
         Returns
         -------
@@ -1549,19 +1550,19 @@ class Series:
         new.value = v_mod
         return new
 
-    def anomaly(self, timespan=None):
-        ''' Calculate the anomaly of the series
+    def center(self, timespan=None):
+        ''' Centers the series (i.e. renove its estimated mean)
 
         Parameters
         ----------
         timespan : tuple or list
-            The timespan of the mean as the reference for anomaly calculation.
-            It is in form of [a, b], where a, b are two time points.
+            The timespan over which the mean must be estimated.
+            In the form [a, b], where a, b are two points along the series' time axis.
 
         Returns
         -------
         new : pyleoclim.Series
-            The standardized series object
+            The centered series object
 
         '''
         new = self.copy()
@@ -6634,7 +6635,7 @@ class SpatialDecomp:
                 plotting.showfig(fig)
         return fig, ax
 
-    def modeplot(self, mode=1, figsize=[10, 5], ax=None, savefig_settings=None, 
+    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None, 
               title_kwargs=None, mute=False, spec_method = 'mtm'):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
@@ -6643,8 +6644,9 @@ class SpatialDecomp:
 
         Parameters
         ----------
-        mode : int
-            the (one-based) index of the mode to visualize
+        index : int
+            the (0-based) index of the mode to visualize. 
+            Default is 0, corresponding to the first mode. 
         
         figsize : list, optional
             The figure size. The default is [10, 5].
@@ -6670,7 +6672,7 @@ class SpatialDecomp:
             The name of the spectral method to be applied on the PC. Default: MTM
             Note that the data are evenly-spaced, so any spectral method that
             assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
-            'wwz' is relevant too if scaling exponents need to be estimated. 
+            'wwz' is relevant if scaling exponents need to be estimated, but ill-advised otherwise, as it is very slow. 
       
         '''
         # Turn the interactive mode off.
@@ -6681,22 +6683,22 @@ class SpatialDecomp:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
         
-        PC = self.pcs[:,mode-1]    
+        PC = self.pcs[:,index]    
         ts = Series(time=self.time, value=PC) # define timeseries object for the PC
 
         fig = plt.figure(tight_layout=True,figsize=figsize)
         gs = gridspec.GridSpec(2, 2) # define grid for subplots
         ax1 = fig.add_subplot(gs[0, :])
         ts.plot(ax=ax1)
-        ax1.set_ylabel('PC '+str(mode))
-        ax1.set_title('Mode '+str(mode)+', '+ '{:3.2f}'.format(self.pctvar[mode-1]) + '% variance explained',weight='bold')
+        ax1.set_ylabel('PC '+str(index+1))
+        ax1.set_title('Mode '+str(index+1)+', '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
         
         # plot spectrum
         ax2 = fig.add_subplot(gs[1, 0])
         psd_mtm_rc = ts.interp().spectral(method=spec_method)    
         _ = psd_mtm_rc.plot(ax=ax2)
         ax2.set_xlabel('Period')
-        ax2.set_title('Spectrum ('+spec_method+')',weight='bold')
+        ax2.set_title('Power spectrum ('+spec_method+')',weight='bold')
         
         # plot T-EOF
         ax3 = fig.add_subplot(gs[1, 1])
@@ -6746,7 +6748,7 @@ class SsaRes:
         index of retained modes 
         
     RCseries : float (N, 1)
-        reconstructed series based on the RCs of mode_idx (scale and mean fit to original series)
+        reconstructed series based on the RCs of mode_idx (scaled to original series; mean must be added after the fact)
 
 
     See also
@@ -6754,8 +6756,9 @@ class SsaRes:
 
     pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis
     '''
-    def __init__(self, time, name, eigvals, eigvecs, pctvar, PC, RCmat, RCseries,mode_idx, eigvals_q=None):
+    def __init__(self, time, original, name, eigvals, eigvecs, pctvar, PC, RCmat, RCseries,mode_idx, eigvals_q=None):
         self.time       = time
+        self.original   = original
         self.name       = name
         self.eigvals    = eigvals
         self.eigvals_q  = eigvals_q
@@ -6852,8 +6855,8 @@ class SsaRes:
                 plotting.showfig(fig)
         return fig, ax
 
-    def modeplot(self, mode=1, figsize=[10, 5], ax=None, savefig_settings=None, 
-             title_kwargs=None, mute=False, spec_method = 'mtm'):
+    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None, 
+             title_kwargs=None, mute=False, spec_method = 'mtm', plot_original=False):
         ''' Dashboard visualizing the properties of a given SSA mode, including:
             1. the analyzing function (T-EOF)
             2. the reconstructed component (RC)
@@ -6861,8 +6864,9 @@ class SsaRes:
 
         Parameters
         ----------
-        mode : int
-            the (one-based) index of the mode to visualize
+        index : int
+            the (0-based) index of the mode to visualize. 
+            Default is 0, corresponding to the first mode. 
         
         figsize : list, optional
             The figure size. The default is [10, 5].
@@ -6899,18 +6903,22 @@ class SsaRes:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
         
-        RC = self.RCmat[:,mode-1]    
+        RC = self.RCmat[:,index]    
         fig = plt.figure(tight_layout=True,figsize=figsize)
         gs = gridspec.GridSpec(2, 2)
         # plot RC
         ax = fig.add_subplot(gs[0, :])
-        ax.plot(self.time,RC)  
-        ax.set_xlabel('Time'),  ax.set_ylabel('RC [dimensionless]')
-        ax.set_title('Mode '+str(mode)+' RC, '+ '{:3.2f}'.format(self.pctvar[mode-1]) + '% variance explained',weight='bold')
+        
+        ax.plot(self.time,RC,label='mode '+str(index+1),zorder=99) 
+        if plot_original:
+            ax.plot(self.time,self.original,color='Silver',lw=1,label='original')
+            ax.legend()
+        ax.set_xlabel('Time'),  ax.set_ylabel('RC')
+        ax.set_title('SSA Mode '+str(index+1)+' RC, '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
         # plot T-EOF
         ax = fig.add_subplot(gs[1, 0])
-        ax.plot(self.eigvecs[:,mode-1])
-        ax.set_title('Analyzing function)')
+        ax.plot(self.eigvecs[:,index])
+        ax.set_title('Analyzing function')
         ax.set_xlabel('Time'), ax.set_ylabel('T-EOF')
         # plot spectrum
         ax = fig.add_subplot(gs[1, 1])

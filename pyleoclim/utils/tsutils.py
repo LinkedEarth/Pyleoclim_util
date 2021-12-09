@@ -464,7 +464,7 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     References
     ----------
 
-    1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
+    1. Tapio Schneider's MATLAB code: https://github.com/tapios/RegEM/blob/master/standardize.m
     2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
 
     See also
@@ -496,6 +496,42 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
         z = (x - mu2) / sig2
 
     return z, mu, sig
+
+def center(y, axis=0):
+    """ Centers array y (i.e. removes the sample mean) 
+
+    Parameters
+    ----------
+
+    y : array
+        vector of (real) numbers as a time series, NaNs allowed
+    axis : int or None
+        axis along which to operate, if None, compute over the whole array
+        
+    Returns
+    -------
+
+    yc : array
+       The centered time series, yc = (y - ybar), NaNs allowed
+    ybar : real
+        The sampled mean of the original time series, y 
+
+    References
+    ----------
+    Tapio Schneider's MATLAB code: https://github.com/tapios/RegEM/blob/master/center.m
+
+    """
+    y = np.asanyarray(y)
+    assert y.ndim <= 2, 'The time series y should be a vector or 2-D array!'
+
+    ybar = np.nanmean(y, axis=axis)  # the mean of the original time series
+
+    if axis and ybar.ndim < y.ndim:
+        yc = y - np.expand_dims(ybar, axis=axis) 
+    else:
+        yc = y - ybar
+
+    return yc, ybar
 
 
 def ts2segments(ys, ts, factor=10):
