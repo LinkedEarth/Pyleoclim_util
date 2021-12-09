@@ -662,7 +662,7 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     """Detrend a timeseries according to four methods
 
     Detrending methods include, "linear", "constant", using a low-pass
-        Savitzky-Golay filter, and using eigen mode decomposition (default).
+        Savitzky-Golay filter, and using Empirical Mode Decomposition (default).
 
     Parameters
     ----------
@@ -674,8 +674,8 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
        the Savitzky-Golay filters method since the series should be evenly spaced.
     method : str
         The type of detrending:
-        - linear: the result of a linear least-squares fit to y is subtracted from y.
-        - constant: only the mean of data is subtrated.
+        - "linear": the result of a linear least-squares fit to y is subtracted from y.
+        - "constant": only the mean of data is subtracted.
         - "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
         - "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
     n : int

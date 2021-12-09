@@ -1698,8 +1698,8 @@ class Series:
         method : str, optional
             The method for detrending. The default is 'emd'.
             Options include:
-                * linear: the result of a linear least-squares fit to y is subtracted from y.
-                * constant: only the mean of data is subtrated.
+                * "linear": the result of a n ordinary least-squares stright line fit to y is subtracted.
+                * "constant": only the mean of data is subtracted.
                 * "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
                 * "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
         **kwargs : dict
@@ -1717,7 +1717,7 @@ class Series:
         Examples
         --------
 
-        We will generate a random signal and use the different detrending functions
+        We will generate a random signal with a nonlinear trend and use two  detrending options to recover the original signal.
 
         .. ipython:: python
             :okwarning:
@@ -1726,53 +1726,77 @@ class Series:
             import pyleoclim as pyleo
             import numpy as np
 
-            # Generate a mixed signal with known frequencies
+            # Generate a mixed harmonic signal with known frequencies
             freqs=[1/20,1/80]
             time=np.arange(2001)
             signals=[]
             for freq in freqs:
                 signals.append(np.cos(2*np.pi*freq*time))
             signal=sum(signals)
-
+            
             # Add a non-linear trend
-            slope = 1e-5
-            intercept = -1
+            slope = 1e-5;  intercept = -1
             nonlinear_trend = slope*time**2 + intercept
-            signal_trend = signal + nonlinear_trend
-
-            # Add white noise
+            
+            # Add a modicum of white noise
             np.random.seed(2333)
             sig_var = np.var(signal)
             noise_var = sig_var / 2 #signal is twice the size of noise
             white_noise = np.random.normal(0, np.sqrt(noise_var), size=np.size(signal))
-            signal_noise = signal_trend + white_noise
-
-            # Create a series object
-            ts = pyleo.Series(time=time,value=signal_noise)
+            signal_noise = signal + white_noise
+            
+            # Place it all in a series object and plot it:
+            ts = pyleo.Series(time=time,value=signal_noise + nonlinear_trend)
             @savefig random_series.png
             fig, ax = ts.plot(title='Timeseries with nonlinear trend')
             pyleo.closefig(fig)
-
-            # kStandardize
-            ts_std = ts.standardize()
-
-            # Detrend using EMD (the default method)
-            ts_emd = ts_std.detrend()
-            @savefig ts_emd.png
-            fig, ax = ts_emd.plot(title='Detrended with EMD method')
+            
+            # Detrending with default parameters (using EMD method with 1 mode)
+            ts_emd1 = ts.detrend()
+            ts_emd1.label = 'default detrending (EMD, last mode)' 
+            @savefig ts_emd1.png
+            
+            fig, ax = ts_emd1.plot(title='Detrended with EMD method',mute=True)
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
             pyleo.closefig(fig)
-
-            # Detrend using EMD with the 3 smoothest modes removed
-            ts_emd = ts_std.detrend(method='emd', n=3)
+            
+            # We see that the default function call results in a "Hockey Stick" at the end, which is undesirable. 
+            # There is no automated way to do this, but with a little trial and error, we find that removing the 2 smoothest modes performs reasonably:
+                
+            ts_emd2 = ts.detrend(method='emd', n=2)
+            ts_emd2.label = 'EMD detrending, last 2 modes' 
             @savefig ts_emd_n2.png
-            fig, ax = ts_emd.plot(title='Detrended with EMD method (n=3)')
+            fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)',mute=True)
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+            
+            # Another option for removing a nonlinear trend is a Savitzky-Golay filter:
+            ts_sg = ts.detrend(method='savitzky-golay')
+            ts_sg.label = 'savitzky-golay detrending, default parameters'
+            @savefig ts_sg.png
+            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter',mute=True)
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+            
+            # As we can see, the result is even worse than with EMD (default). Here it pays to look into the underlying method, which comes from SciPy.
+            # It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges. 
+            # By default, this value is close to the length of the series. Choosing a value 10x smaller fixes the problem here, though you will have to tinker with that parameter until you get the result you seek.
+            
+            ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201})
+            ts_sg2.label = 'savitzky-golay detrending, window_length = 201'
+            @savefig ts_sg2.png
+            fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter',mute=True)
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
             pyleo.closefig(fig)
 
-            # Detrend using Savitzky-Golay filter
-            ts_sg = ts_std.detrend(method='savitzky-golay')
-            @savefig ts_sg.png
-            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter')
-            pyleo.closefig(fig)
 
         '''
         new = self.copy()
