@@ -1808,7 +1808,7 @@ class Series:
         new.value = v_mod
         return new
 
-    def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, verbose=False):
+    def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -1828,6 +1828,9 @@ class Series:
 
         label : str
             Label for the PSD object
+
+        scalogram : pyleoclim.core.ui.Series.Scalogram
+            The return of the wavelet analysis; effective only when the method is 'wwz'
 
         verbose : bool
             If True, will print warning messages if there is any
@@ -1933,6 +1936,19 @@ class Series:
             fig, ax = psd_wwz_signif.plot(title='PSD using WWZ method')
             pyleo.closefig(fig)
 
+        We may take advantage of a pre-calculated scalogram using WWZ to accelerate the spectral analysis
+        (although note that the default parameters for spectral and wavelet analysis using WWZ are different):
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            scal_wwz = ts_std.wavelet(method='wwz')  # wwz is the default method
+            psd_wwz_fast = ts_std.spectral(method='wwz', scalogram=scal_wwz)
+            @savefig spec_wwz_fast.png
+            fig, ax = psd_wwz_fast.plot(title='PSD using WWZ method w/ pre-calculated scalogram')
+            pyleo.closefig(fig)
+
         - Periodogram
 
         .. ipython:: python
@@ -1994,6 +2010,16 @@ class Series:
         args['welch'] = {}
         args['periodogram'] = {}
         args[method].update(settings)
+
+        if method == 'wwz' and scalogram is not None:
+            args['wwz'].update(
+                {
+                    'wwa': scalogram.amplitude,
+                    'wwz_Neffs': scalogram.wwz_Neffs,
+                    'wwz_freq': scalogram.frequency,
+                }
+            )
+
         spec_res = spec_func[method](self.value, self.time, **args[method])
         if type(spec_res) is dict:
             spec_res = dict2namedtuple(spec_res)
@@ -2112,6 +2138,11 @@ class Series:
 
         args[method].update(settings)
         wave_res = wave_func[method](self.value, self.time, **args[method])
+        if method == 'wwz':
+            wwz_Neffs = wave_res.Neffs
+        else:
+            wwz_Neffs = None
+
         scal = Scalogram(
             frequency=wave_res.freq,
             time=wave_res.time,
@@ -2123,6 +2154,7 @@ class Series:
             freq_method=freq_method,
             freq_kwargs=freq_kwargs,
             wave_args=args[method],
+            wwz_Neffs=wwz_Neffs,
         )
 
         return scal
@@ -3075,7 +3107,7 @@ class PSD:
             return ax
 
 class Scalogram:
-    def __init__(self, frequency, time, amplitude, coi=None, label=None, Neff=3, timeseries=None,
+    def __init__(self, frequency, time, amplitude, coi=None, label=None, Neff=3, wwz_Neffs=None, timeseries=None,
                  wave_method=None, wave_args=None, signif_qs=None, signif_method=None, freq_method=None, freq_kwargs=None,
                  period_unit=None, time_label=None):
         '''
@@ -3088,6 +3120,10 @@ class Scalogram:
             amplitude : array
                 the amplitude at each (frequency, time) point;
                 note the dimension is assumed to be (frequency, time)
+            Neff : int
+                the threshold of the number of effective samples
+            wwz_Neffs : array
+                the matrix of effective number of points in the time-scale coordinates obtained from wwz
         '''
         self.frequency = np.array(frequency)
         self.time = np.array(time)
@@ -3104,6 +3140,8 @@ class Scalogram:
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
+        if wave_method == 'wwz':
+            self.wwz_Neffs = wwz_Neffs
 
         if period_unit is not None:
             self.period_unit = period_unit
