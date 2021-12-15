@@ -1385,15 +1385,14 @@ class Series:
                     print('Number of time points in given truncation period is not even. Removing last time point and continuing.')
                     sub_time.pop(-1)
                     self = self.slice(sub_time)
-                    
-        if preprocess:
-            plot_ts = self.copy()
-            self = self.standardize().detrend()
         
         ax = {}
         ax['ts'] = plt.subplot(gs[0:1, :-3])
         ax['ts'] = plot_ts.plot(ax=ax['ts'], **ts_plot_kwargs)
         ax['ts'].xaxis.set_visible(False)
+        
+        if preprocess:
+            self = self.standardize().detrend()
         
         if time_lim is not None:
             ax['ts'].set_xlim(time_lim)
