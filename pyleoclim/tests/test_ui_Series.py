@@ -433,18 +433,20 @@ class TestUiSeriesSummaryPlot:
     def test_summary_plot_t0(self):
         ''' Generate a colored noise and run the summary_plot() function.
         Note that we should avoid pyleo.showfig() in tests.
+        
+        Passing pre generated scalogram and psd.
         '''
         alpha = 1
         t, v = gen_colored_noise(nt=100, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
-        psd = ts.spectral()
         scal = ts.wavelet()
+        psd = ts.spectral()
         period_label='Period'
         psd_label='PSD'
         time_label='Time'
         value_label='Value'
         fig, ax = ts.summary_plot(
-            psd=psd, scalogram=scal, figsize=[4, 5], title='Test',
+            psd = psd, scalogram=scal, figsize=[4, 5], title='Test',
             period_label=period_label, psd_label=psd_label,
             value_label=value_label, time_label=time_label,
             mute=True,
@@ -455,6 +457,34 @@ class TestUiSeriesSummaryPlot:
         assert ax['scal'].properties()['xlabel'] == time_label, 'Time label is not being passed properly'
         assert ax['ts'].properties()['ylabel'] == value_label, 'Value label is not being passed properly'
 
+        plt.close(fig)
+        
+    def test_summary_plot_t1(self):
+        ''' Generate a colored noise and run the summary_plot() function.
+        Note that we should avoid pyleo.showfig() in tests.
+    
+        Passing just a pre generated psd.
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=100, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        psd = ts.spectral()
+        period_label='Period'
+        psd_label='PSD'
+        time_label='Time'
+        value_label='Value'
+        fig, ax = ts.summary_plot(
+            psd = psd, figsize=[4, 5], title='Test',
+            period_label=period_label, psd_label=psd_label,
+            value_label=value_label, time_label=time_label,
+            n_signif_test = 1, mute=True,
+        )
+    
+        assert ax['scal'].properties()['ylabel'] == period_label, 'Period label is not being passed properly'
+        assert ax['psd'].properties()['xlabel'] == psd_label, 'PSD label is not being passed properly'
+        assert ax['scal'].properties()['xlabel'] == time_label, 'Time label is not being passed properly'
+        assert ax['ts'].properties()['ylabel'] == value_label, 'Value label is not being passed properly'
+    
         plt.close(fig)
 
 class TestUiSeriesCorrelation:
