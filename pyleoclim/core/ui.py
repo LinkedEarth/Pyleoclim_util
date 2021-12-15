@@ -1209,7 +1209,7 @@ class Series:
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
                     time_label=None, value_label=None, period_label=None, psd_label='PSD', 
                     wavelet_kwargs = None, psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None, 
-                    psd_plot_kwargs = None, trunc_series = None, savefig_settings=None, mute=False):
+                    psd_plot_kwargs = None, trunc_series = None, preprocess = True, savefig_settings=None, mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
 
@@ -1363,6 +1363,9 @@ class Series:
         psd_kwargs={} if psd_kwargs is None else psd_kwargs.copy()
         psd_plot_kwargs={} if psd_plot_kwargs is None else psd_plot_kwargs.copy()
         ts_plot_kwargs={} if ts_plot_kwargs is None else ts_plot_kwargs.copy()
+        
+        if preprocess:
+            self = self.standardize.detrend
         
         if trunc_series is not None:
             sub_time = []
