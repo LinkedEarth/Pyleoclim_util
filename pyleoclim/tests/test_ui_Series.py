@@ -462,7 +462,7 @@ class TestUiSeriesSummaryPlot:
     def test_summary_plot_t1(self):
         ''' Generate a colored noise and run the summary_plot() function.
         Note that we should avoid pyleo.showfig() in tests.
-        
+    
         Passing just a pre generated psd.
         '''
         alpha = 1
@@ -477,14 +477,14 @@ class TestUiSeriesSummaryPlot:
             psd = psd, figsize=[4, 5], title='Test',
             period_label=period_label, psd_label=psd_label,
             value_label=value_label, time_label=time_label,
-            mute=True,
+            n_signif_test = 1, mute=True,
         )
-        
+    
         assert ax['scal'].properties()['ylabel'] == period_label, 'Period label is not being passed properly'
         assert ax['psd'].properties()['xlabel'] == psd_label, 'PSD label is not being passed properly'
         assert ax['scal'].properties()['xlabel'] == time_label, 'Time label is not being passed properly'
         assert ax['ts'].properties()['ylabel'] == value_label, 'Value label is not being passed properly'
-
+    
         plt.close(fig)
 
 class TestUiSeriesCorrelation:
