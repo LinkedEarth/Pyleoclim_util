@@ -1217,7 +1217,8 @@ class Series:
         ----------
 
         psd : PSD
-            the PSD object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
+            the PSD object of a Series. If None, and psd_kwargs is empty, the PSD from the calculated Scalogram will be used. 
+            Otherwise it will be calculated based on specifications in psd_kwargs.
 
         scalogram : Scalogram
             the Scalogram object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
@@ -1410,10 +1411,13 @@ class Series:
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
         
         if psd is None:
-            if n_signif_test > 0:
-                psd = self.spectral(**psd_kwargs).signif_test(number=n_signif_test)
+            if psd_kwargs:
+                if n_signif_test > 0:
+                    psd = self.spectral(**psd_kwargs).signif_test(number=n_signif_test)
+                else:
+                    psd = self.spectral(**psd_kwargs)
             else:
-                psd = self.spectral(**psd_kwargs)
+                psd = self.spectral(method='wwz',scalogram = scalogram)
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, **psd_plot_kwargs)
         
