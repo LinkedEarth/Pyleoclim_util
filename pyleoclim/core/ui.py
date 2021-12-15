@@ -1388,7 +1388,7 @@ class Series:
         
         ax = {}
         ax['ts'] = plt.subplot(gs[0:1, :-3])
-        ax['ts'] = plot_ts.plot(ax=ax['ts'], **ts_plot_kwargs)
+        ax['ts'] = self.plot(ax=ax['ts'], **ts_plot_kwargs)
         ax['ts'].xaxis.set_visible(False)
         
         if preprocess:
