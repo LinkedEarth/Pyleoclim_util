@@ -887,7 +887,7 @@ class Series:
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
         
                 
-        resc = SsaRes(name=self.value_name, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
+        resc = SsaRes(name=self.value_name, original=self.value, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
                         pctvar = res['pctvar'], PC = res['PC'], RCmat = res['RCmat'], 
                         RCseries=res['RCseries'], mode_idx=res['mode_idx'])
         if nMC >= 0:
@@ -1536,7 +1536,8 @@ class Series:
         return new
 
     def standardize(self):
-        '''Standardizes the time series
+        '''Standardizes the series ((i.e. renove its estimated mean and divides
+            by its estimated standard deviation)
 
         Returns
         -------
@@ -1549,28 +1550,31 @@ class Series:
         new.value = v_mod
         return new
 
-    def anomaly(self, timespan=None):
-        ''' Calculate the anomaly of the series
+    def center(self, timespan=None):
+        ''' Centers the series (i.e. renove its estimated mean)
 
         Parameters
         ----------
         timespan : tuple or list
-            The timespan of the mean as the reference for anomaly calculation.
-            It is in form of [a, b], where a, b are two time points.
+            The timespan over which the mean must be estimated.
+            In the form [a, b], where a, b are two points along the series' time axis.
 
         Returns
         -------
-        new : pyleoclim.Series
-            The standardized series object
+        tsc : pyleoclim.Series
+            The centered series object
+        ts_mean : estimated mean of the original series, in case it needs to be restored later   
 
         '''
-        new = self.copy()
+        tsc = self.copy()
         if timespan is not None:
-            v_mod = self.value - np.nanmean(self.slice(timespan).value)
+            ts_mean  = np.nanmean(self.slice(timespan).value)
+            vc = self.value - ts_mean
         else:
-            v_mod = self.value - np.nanmean(self.value)
-        new.value = v_mod
-        return new
+            ts_mean  = np.nanmean(self.value)
+            vc = self.value - ts_mean
+        tsc.value = vc
+        return tsc, ts_mean
 
     def segment(self, factor=10):
         """Gap detection
@@ -1698,8 +1702,8 @@ class Series:
         method : str, optional
             The method for detrending. The default is 'emd'.
             Options include:
-                * linear: the result of a linear least-squares fit to y is subtracted from y.
-                * constant: only the mean of data is subtrated.
+                * "linear": the result of a n ordinary least-squares stright line fit to y is subtracted.
+                * "constant": only the mean of data is subtracted.
                 * "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
                 * "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
         **kwargs : dict
@@ -1717,7 +1721,7 @@ class Series:
         Examples
         --------
 
-        We will generate a random signal and use the different detrending functions
+        We will generate a random signal with a nonlinear trend and use two  detrending options to recover the original signal.
 
         .. ipython:: python
             :okwarning:
@@ -1726,46 +1730,77 @@ class Series:
             import pyleoclim as pyleo
             import numpy as np
 
-            # Generate a mixed signal with known frequencies
+            # Generate a mixed harmonic signal with known frequencies
             freqs=[1/20,1/80]
             time=np.arange(2001)
             signals=[]
             for freq in freqs:
                 signals.append(np.cos(2*np.pi*freq*time))
             signal=sum(signals)
-
+            
             # Add a non-linear trend
-            slope = 1e-5
-            intercept = -1
+            slope = 1e-5;  intercept = -1
             nonlinear_trend = slope*time**2 + intercept
-            signal_trend = signal + nonlinear_trend
-
-            # Add white noise
+            
+            # Add a modicum of white noise
+            np.random.seed(2333)
             sig_var = np.var(signal)
             noise_var = sig_var / 2 #signal is twice the size of noise
             white_noise = np.random.normal(0, np.sqrt(noise_var), size=np.size(signal))
-            signal_noise = signal_trend + white_noise
-
-            # Create a series object
-            ts = pyleo.Series(time=time,value=signal_noise)
+            signal_noise = signal + white_noise
+            
+            # Place it all in a series object and plot it:
+            ts = pyleo.Series(time=time,value=signal_noise + nonlinear_trend)
             @savefig random_series.png
             fig, ax = ts.plot(title='Timeseries with nonlinear trend')
             pyleo.closefig(fig)
-
-            # kStandardize
-            ts_std = ts.standardize()
-
-            # Detrend using EMD
-            ts_emd = ts_std.detrend()
-            @savefig ts_emd.png
-            fig, ax = ts_emd.plot(title='Detrended with EMD method')
+            
+            # Detrending with default parameters (using EMD method with 1 mode)
+            ts_emd1 = ts.detrend()
+            ts_emd1.label = 'default detrending (EMD, last mode)' 
+            @savefig ts_emd1.png
+            
+            fig, ax = ts_emd1.plot(title='Detrended with EMD method',mute=True)
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
             pyleo.closefig(fig)
-
-            # Detrend using Savitzky-Golay filter
-            ts_sg = ts_std.detrend(method='savitzky-golay')
+            
+            # We see that the default function call results in a "Hockey Stick" at the end, which is undesirable. 
+            # There is no automated way to do this, but with a little trial and error, we find that removing the 2 smoothest modes performs reasonably:
+                
+            ts_emd2 = ts.detrend(method='emd', n=2)
+            ts_emd2.label = 'EMD detrending, last 2 modes' 
+            @savefig ts_emd_n2.png
+            fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)',mute=True)
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+            
+            # Another option for removing a nonlinear trend is a Savitzky-Golay filter:
+            ts_sg = ts.detrend(method='savitzky-golay')
+            ts_sg.label = 'savitzky-golay detrending, default parameters'
             @savefig ts_sg.png
-            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter')
+            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter',mute=True)
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
             pyleo.closefig(fig)
+            
+            # As we can see, the result is even worse than with EMD (default). Here it pays to look into the underlying method, which comes from SciPy.
+            # It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges. 
+            # By default, this value is close to the length of the series. Choosing a value 10x smaller fixes the problem here, though you will have to tinker with that parameter until you get the result you seek.
+            
+            ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201})
+            ts_sg2.label = 'savitzky-golay detrending, window_length = 201'
+            @savefig ts_sg2.png
+            fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter',mute=True)
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+
 
         '''
         new = self.copy()
@@ -1773,7 +1808,7 @@ class Series:
         new.value = v_mod
         return new
 
-    def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, verbose=False):
+    def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -1793,6 +1828,9 @@ class Series:
 
         label : str
             Label for the PSD object
+
+        scalogram : pyleoclim.core.ui.Series.Scalogram
+            The return of the wavelet analysis; effective only when the method is 'wwz'
 
         verbose : bool
             If True, will print warning messages if there is any
@@ -1898,6 +1936,19 @@ class Series:
             fig, ax = psd_wwz_signif.plot(title='PSD using WWZ method')
             pyleo.closefig(fig)
 
+        We may take advantage of a pre-calculated scalogram using WWZ to accelerate the spectral analysis
+        (although note that the default parameters for spectral and wavelet analysis using WWZ are different):
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            scal_wwz = ts_std.wavelet(method='wwz')  # wwz is the default method
+            psd_wwz_fast = ts_std.spectral(method='wwz', scalogram=scal_wwz)
+            @savefig spec_wwz_fast.png
+            fig, ax = psd_wwz_fast.plot(title='PSD using WWZ method w/ pre-calculated scalogram')
+            pyleo.closefig(fig)
+
         - Periodogram
 
         .. ipython:: python
@@ -1959,6 +2010,16 @@ class Series:
         args['welch'] = {}
         args['periodogram'] = {}
         args[method].update(settings)
+
+        if method == 'wwz' and scalogram is not None:
+            args['wwz'].update(
+                {
+                    'wwa': scalogram.amplitude,
+                    'wwz_Neffs': scalogram.wwz_Neffs,
+                    'wwz_freq': scalogram.frequency,
+                }
+            )
+
         spec_res = spec_func[method](self.value, self.time, **args[method])
         if type(spec_res) is dict:
             spec_res = dict2namedtuple(spec_res)
@@ -2077,6 +2138,11 @@ class Series:
 
         args[method].update(settings)
         wave_res = wave_func[method](self.value, self.time, **args[method])
+        if method == 'wwz':
+            wwz_Neffs = wave_res.Neffs
+        else:
+            wwz_Neffs = None
+
         scal = Scalogram(
             frequency=wave_res.freq,
             time=wave_res.time,
@@ -2088,6 +2154,7 @@ class Series:
             freq_method=freq_method,
             freq_kwargs=freq_kwargs,
             wave_args=args[method],
+            wwz_Neffs=wwz_Neffs,
         )
 
         return scal
@@ -2961,11 +3028,6 @@ class PSD:
 
         ax.plot(x_axis, y_axis, **plot_kwargs)
 
-        if xlim is not None:
-            ax.set_xlim(xlim)
-
-        if ylim is not None:
-            ax.set_ylim(ylim)
 
         # plot significance levels
         if self.signif_qs is not None:
@@ -3027,6 +3089,12 @@ class PSD:
 
         if title is not None:
             ax.set_title(title)
+            
+        if xlim is not None:
+            ax.set_xlim(xlim)
+
+        if ylim is not None:
+            ax.set_ylim(ylim)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
@@ -3039,7 +3107,7 @@ class PSD:
             return ax
 
 class Scalogram:
-    def __init__(self, frequency, time, amplitude, coi=None, label=None, Neff=3, timeseries=None,
+    def __init__(self, frequency, time, amplitude, coi=None, label=None, Neff=3, wwz_Neffs=None, timeseries=None,
                  wave_method=None, wave_args=None, signif_qs=None, signif_method=None, freq_method=None, freq_kwargs=None,
                  period_unit=None, time_label=None):
         '''
@@ -3052,6 +3120,10 @@ class Scalogram:
             amplitude : array
                 the amplitude at each (frequency, time) point;
                 note the dimension is assumed to be (frequency, time)
+            Neff : int
+                the threshold of the number of effective samples
+            wwz_Neffs : array
+                the matrix of effective number of points in the time-scale coordinates obtained from wwz
         '''
         self.frequency = np.array(frequency)
         self.time = np.array(time)
@@ -3068,6 +3140,8 @@ class Scalogram:
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
+        if wave_method == 'wwz':
+            self.wwz_Neffs = wwz_Neffs
 
         if period_unit is not None:
             self.period_unit = period_unit
@@ -6602,7 +6676,7 @@ class SpatialDecomp:
                 plotting.showfig(fig)
         return fig, ax
 
-    def modeplot(self, mode=1, figsize=[10, 5], ax=None, savefig_settings=None, 
+    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None, 
               title_kwargs=None, mute=False, spec_method = 'mtm'):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
@@ -6611,8 +6685,9 @@ class SpatialDecomp:
 
         Parameters
         ----------
-        mode : int
-            the (one-based) index of the mode to visualize
+        index : int
+            the (0-based) index of the mode to visualize. 
+            Default is 0, corresponding to the first mode. 
         
         figsize : list, optional
             The figure size. The default is [10, 5].
@@ -6638,7 +6713,7 @@ class SpatialDecomp:
             The name of the spectral method to be applied on the PC. Default: MTM
             Note that the data are evenly-spaced, so any spectral method that
             assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
-            'wwz' is relevant too if scaling exponents need to be estimated. 
+            'wwz' is relevant if scaling exponents need to be estimated, but ill-advised otherwise, as it is very slow. 
       
         '''
         # Turn the interactive mode off.
@@ -6649,22 +6724,22 @@ class SpatialDecomp:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
         
-        PC = self.pcs[:,mode-1]    
+        PC = self.pcs[:,index]    
         ts = Series(time=self.time, value=PC) # define timeseries object for the PC
 
         fig = plt.figure(tight_layout=True,figsize=figsize)
         gs = gridspec.GridSpec(2, 2) # define grid for subplots
         ax1 = fig.add_subplot(gs[0, :])
         ts.plot(ax=ax1)
-        ax1.set_ylabel('PC '+str(mode))
-        ax1.set_title('Mode '+str(mode)+', '+ '{:3.2f}'.format(self.pctvar[mode-1]) + '% variance explained',weight='bold')
+        ax1.set_ylabel('PC '+str(index+1))
+        ax1.set_title('Mode '+str(index+1)+', '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
         
         # plot spectrum
         ax2 = fig.add_subplot(gs[1, 0])
         psd_mtm_rc = ts.interp().spectral(method=spec_method)    
         _ = psd_mtm_rc.plot(ax=ax2)
         ax2.set_xlabel('Period')
-        ax2.set_title('Spectrum ('+spec_method+')',weight='bold')
+        ax2.set_title('Power spectrum ('+spec_method+')',weight='bold')
         
         # plot T-EOF
         ax3 = fig.add_subplot(gs[1, 1])
@@ -6714,7 +6789,7 @@ class SsaRes:
         index of retained modes 
         
     RCseries : float (N, 1)
-        reconstructed series based on the RCs of mode_idx (scale and mean fit to original series)
+        reconstructed series based on the RCs of mode_idx (scaled to original series; mean must be added after the fact)
 
 
     See also
@@ -6722,8 +6797,9 @@ class SsaRes:
 
     pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis
     '''
-    def __init__(self, time, name, eigvals, eigvecs, pctvar, PC, RCmat, RCseries,mode_idx, eigvals_q=None):
+    def __init__(self, time, original, name, eigvals, eigvecs, pctvar, PC, RCmat, RCseries,mode_idx, eigvals_q=None):
         self.time       = time
+        self.original   = original
         self.name       = name
         self.eigvals    = eigvals
         self.eigvals_q  = eigvals_q
@@ -6820,8 +6896,8 @@ class SsaRes:
                 plotting.showfig(fig)
         return fig, ax
 
-    def modeplot(self, mode=1, figsize=[10, 5], ax=None, savefig_settings=None, 
-             title_kwargs=None, mute=False, spec_method = 'mtm'):
+    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None, 
+             title_kwargs=None, mute=False, spec_method = 'mtm', plot_original=False):
         ''' Dashboard visualizing the properties of a given SSA mode, including:
             1. the analyzing function (T-EOF)
             2. the reconstructed component (RC)
@@ -6829,8 +6905,9 @@ class SsaRes:
 
         Parameters
         ----------
-        mode : int
-            the (one-based) index of the mode to visualize
+        index : int
+            the (0-based) index of the mode to visualize. 
+            Default is 0, corresponding to the first mode. 
         
         figsize : list, optional
             The figure size. The default is [10, 5].
@@ -6867,18 +6944,22 @@ class SsaRes:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
         
-        RC = self.RCmat[:,mode-1]    
+        RC = self.RCmat[:,index]    
         fig = plt.figure(tight_layout=True,figsize=figsize)
         gs = gridspec.GridSpec(2, 2)
         # plot RC
         ax = fig.add_subplot(gs[0, :])
-        ax.plot(self.time,RC)  
-        ax.set_xlabel('Time'),  ax.set_ylabel('RC [dimensionless]')
-        ax.set_title('Mode '+str(mode)+' RC, '+ '{:3.2f}'.format(self.pctvar[mode-1]) + '% variance explained',weight='bold')
+        
+        ax.plot(self.time,RC,label='mode '+str(index+1),zorder=99) 
+        if plot_original:
+            ax.plot(self.time,self.original,color='Silver',lw=1,label='original')
+            ax.legend()
+        ax.set_xlabel('Time'),  ax.set_ylabel('RC')
+        ax.set_title('SSA Mode '+str(index+1)+' RC, '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
         # plot T-EOF
         ax = fig.add_subplot(gs[1, 0])
-        ax.plot(self.eigvecs[:,mode-1])
-        ax.set_title('Analyzing function)')
+        ax.plot(self.eigvecs[:,index])
+        ax.set_title('Analyzing function')
         ax.set_xlabel('Time'), ax.set_ylabel('T-EOF')
         # plot spectrum
         ax = fig.add_subplot(gs[1, 1])
@@ -7419,12 +7500,16 @@ class LipdSeries(Series):
         '''
         return deepcopy(self)
 
-    def chronEnsembleToPaleo(self,D,modelNumber=None,tableNumber=None):
+    def chronEnsembleToPaleo(self,D,number=None,chronNumber=None, modelNumber=None,tableNumber=None):
         '''Fetch chron ensembles from a lipd object and return the ensemble as MultipleSeries
 
         Parameters
         ----------
         D : a LiPD object
+        number: int, optional
+            The number of ensemble members to store. Default is None, which corresponds to all present
+        chronNumber: int, optional
+            The chron object number. The default is None. 
         modelNumber : int, optional
             Age model number. The default is None.
         tableNumber : int, optional
@@ -7433,7 +7518,6 @@ class LipdSeries(Series):
         Raises
         ------
         ValueError
-            DESCRIPTION.
 
         Returns
         -------
@@ -7459,13 +7543,14 @@ class LipdSeries(Series):
         if len(chron)==0:
             raise ValueError("No ChronMeasurementTables available")
         elif len(chron)>1:
-            if modelNumber==None or tableNumber==None:
+            if chronNumber==None or modelNumber==None or tableNumber==None:
                 csvName=lipdutils.whichEnsemble(chron)
             else:
+                str0='chron'+str(chronNumber)
                 str1='model'+str(modelNumber)
                 str2='ensemble'+str(tableNumber)
                 for item in chron:
-                    if str1 in item and str2 in item:
+                    if str0 in item and str1 in item and str2 in item:
                         csvName=item
             depth, ensembleValues =lipdutils.getEnsemble(csv_dict,csvName)
         else:
@@ -7474,6 +7559,14 @@ class LipdSeries(Series):
         sort_ind = np.argsort(depth)
         depth=list(np.array(depth)[sort_ind])
         ensembleValues=ensembleValues[sort_ind,:]
+        
+        if number is not None:
+            if number>np.shape(ensembleValues)[1]:
+                warnings.warn('Selected number of ensemble members is greater than number of members in the ensemble table; passing')
+                pass
+            else:
+                ensembleValues=ensembleValues[:,0:number]
+        
         #Map to paleovalues
         key=[]
         for item in self.lipd_ts.keys():

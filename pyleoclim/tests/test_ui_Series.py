@@ -20,6 +20,7 @@ from pandas.testing import assert_frame_equal
 
 import pytest
 import scipy.io as sio
+import sys
 import os
 import pathlib
 test_dirpath = pathlib.Path(__file__).parent.absolute()
@@ -281,6 +282,23 @@ class TestUiSeriesStats:
         key = {'mean': 4.5,'median': 4.5,'min': 0.0,'max': 9.0,'std': np.std(t),'IQR': 4.5}
 
         assert stats == key
+        
+class TestUiSeriesCenter:
+    '''Test for Series.center()
+
+    Center removes the mean, so we'll simply test maximum and minimum values'''
+
+    def test_center(self):
+        #Generate sample data
+        t, v = gen_colored_noise()
+
+        #Create time series with sample data
+        ts = pyleo.Series(time = t, value = v)
+
+        #Call function to be tested
+        tsc, mu = ts.center()
+
+        assert np.abs(tsc.value.mean()) <= np.sqrt(sys.float_info.epsilon) 
 
 class TestUiSeriesStandardize:
     '''Test for Series.standardize()
@@ -722,8 +740,7 @@ class TestUISeriesSsa():
     def test_ssa_t0(self):
         ''' Test Series.ssa() with available methods using default arguments
         '''
-        nt = 500
-        t  = np.arange(nt)
+        t  = np.arange(500)
         cn = pyleo.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
 
         res = cn.ssa()
@@ -733,19 +750,14 @@ class TestUISeriesSsa():
     def test_ssa_t1(self):
         '''Test Series.ssa() with var truncation
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=1.0)
-        ts = pyleo.Series(time=t, value=v)
-
+        ts = pyleo.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
         res = ts.ssa(trunc='var')
 
     def test_ssa_t2(self):
         '''Test Series.ssa() with Monte-Carlo truncation
         '''
 
-        alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=1.0)
-        ts = pyleo.Series(time=t, value=v)
+        ts = pyleo.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
 
         res = ts.ssa(M=60, nMC=10, trunc='mcssa')
         res.screeplot(mute=True)
@@ -753,9 +765,7 @@ class TestUISeriesSsa():
     def test_ssa_t3(self):
         '''Test Series.ssa() with Kaiser truncation
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=1.0)
-        ts  = pyleo.Series(time=t, value=v)
+        ts = pyleo.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
         res = ts.ssa(trunc='kaiser')
         
     def test_ssa_t4(self):

@@ -615,7 +615,7 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             tau=None, c=1e-3, nproc=8,
             detrend=False, sg_kwargs=None, gaussianize=False,
             standardize=False, Neff=3, anti_alias=False, avgs=2,
-            method='Kirchner_numba'):
+            method='Kirchner_numba', wwa=None, wwz_Neffs=None, wwz_freq=None):
     ''' Return the psd of a timeseries using wwz method.
 
     Parameters
@@ -678,6 +678,16 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
         OR from measurements averaged over each sampling interval (avgs==1)
 
+    wwa : array
+        the weighted wavelet amplitude, returned from pyleoclim.utils.wavelet.wwz
+
+    wwz_Neffs : array
+        the matrix of effective number of points in the time-scale coordinates,
+        returned from pyleoclim.utils.wavelet.wwz
+
+    wwz_freq : array
+        the returned frequency vector from pyleoclim.utils.wavelet.wwz
+
     Returns
     -------
 
@@ -710,11 +720,15 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
 
     # get wwa but AR1_q is not needed here so set nMC=0
     #  wwa, _, _, coi, freq, _, Neffs, _ = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
-    res_wwz = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
-              detrend=detrend, sg_kwargs=sg_kwargs,
-              gaussianize=gaussianize, standardize=standardize, method=method)
+    if wwa is None or wwz_Neffs is None or wwz_freq is None:
+        res_wwz = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
+                  detrend=detrend, sg_kwargs=sg_kwargs,
+                  gaussianize=gaussianize, standardize=standardize, method=method)
+        wwa = res_wwz.amplitude
+        wwz_Neffs = res_wwz.Neffs
+        wwz_freq = res_wwz.freq
 
-    psd = wwa2psd(res_wwz.amplitude, ts_cut, res_wwz.Neffs, freq=res_wwz.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+    psd = wwa2psd(wwa, ts_cut, wwz_Neffs, freq=wwz_freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
     #  psd[1/freqs > np.max(coi)] = np.nan  # cut off the unreliable part out of the coi
     #  psd = psd[1/freqs <= np.max(coi)] # cut off the unreliable part out of the coi
     #  freqs = freqs[1/freqs <= np.max(coi)]

@@ -1103,7 +1103,7 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
     ts : array
         the time points, should be pre-truncated so that the span is exactly what is used for wwz
     Neffs : array
-        the matrix of effective number of points in the time-scale coordinates obtained from wwz from wwz
+        the matrix of effective number of points in the time-scale coordinates obtained from wwz
     freq : array
         vector of frequency from wwz
     Neff : int

@@ -78,7 +78,7 @@ def list_to_array(obj_dict):
             obj_dict[k]=obj_dict[k]
     return obj_dict
 
-def PyleoObj_to_json(PyleoObj,filename,dict_return=False):
+def PyleoObj_to_json(PyleoObj,filename=None,dict_return=False):
     '''
     
     Parameters
@@ -96,6 +96,10 @@ def PyleoObj_to_json(PyleoObj,filename,dict_return=False):
         If dict_return is True, returns a dictionary like object from the JSON file. 
 
     '''
+    
+    if filename is None and dict_return is False:
+        raise ValueError('If a dictionary is not returned, filename must be provided')
+    
     obj_dict = PyleoObj.__dict__
     obj_dict = transform(obj_dict)
     if dict_return == False:
@@ -157,7 +161,10 @@ def PSD_to_MultiplePSD(series_list):
                         spec_method = t['spec_method'],
                         spec_args =  t['spec_args'],
                         signif_qs = t['signif_qs'],
-                    signif_method = t['signif_method'])
+                    signif_method = t['signif_method'],
+                    plot_kwargs=t['plot_kwargs'],
+                    period_unit=t['period_unit'],
+                    beta_est_res=t['beta_est_res'])
         d.append(PSD_obj)
     MPSD=pyleo.MultiplePSD(psd_list=d)
     return MPSD
@@ -201,7 +208,10 @@ def json_to_PSD(filename):
                     spec_method = t['spec_method'],
                     spec_args =  t['spec_args'],
                     signif_qs = c,
-                    signif_method = t['signif_method'])
+                    signif_method = t['signif_method'],
+                    plot_kwargs=t['plot_kwargs'],
+                    period_unit=t['period_unit'],
+                    beta_est_res=t['beta_est_res'])
     
     return  psd
 
@@ -230,7 +240,11 @@ def Scalogram_to_MultipleScalogram(series_list):
                                wave_method = t['wave_method']
                                ,wave_args=t['wave_args'],
                                signif_qs = t['signif_qs'],
-                               signif_method=t['signif_method'])
+                               signif_method=t['signif_method'],
+                               freq_method=t['freq_method'],
+                               freq_kwargs=t['freq_kwargs'],
+                               period_unit=t['period_unit'],
+                               time_label=t['time_label'])
 
         d.append(scalogram_obj)
     mscalogram=pyleo.core.ui.MultipleScalogram(scalogram_list=d)
@@ -260,5 +274,64 @@ def json_to_Scalogram(filename):
                                wave_method = t['wave_method']
                                ,wave_args=t['wave_args'],
                                signif_qs = c,
-                               signif_method=t['signif_method'])
+                               signif_method=t['signif_method'],
+                               freq_method=t['freq_method'],
+                               freq_kwargs=t['freq_kwargs'],
+                               period_unit=t['period_unit'],
+                               time_label=t['time_label'])
     return scalogram
+
+
+def json_to_Coherence(filename):
+    '''
+    load a Coherence object from a JSON file. 
+
+    Parameters
+    ----------
+    filename : str
+        json file to unpack.
+
+    Returns
+    -------
+    coherence : pyleoclim.Coherence
+        A coherence object
+
+    '''
+    with open(filename,'r') as f:
+        t = json.load(f)
+    t = list_to_array(t)
+    temp1 = t['timeseries1']
+    ts1 = pyleo.Series(time=np.array(temp1['time']),
+                     value=np.array(temp1['value']),
+                     time_name=temp1['time_name'],
+                     time_unit=temp1['time_unit'],
+                     value_name=temp1['value_name'],
+                     value_unit=temp1['value_unit'],
+                     label=temp1['label'])
+    
+    temp2 = t['timeseries2']
+    ts2 = pyleo.Series(time=np.array(temp2['time']),
+                     value=np.array(temp2['value']),
+                     time_name=temp2['time_name'],
+                     time_unit=temp2['time_unit'],
+                     value_name=temp2['value_name'],
+                     value_unit=temp2['value_unit'],
+                     label=temp2['label'])
+    
+    c = None
+    
+    if type(t['signif_qs']) is dict:
+        c = Scalogram_to_MultipleScalogram(t['signif_qs']['scalogram_list'])
+    else:
+        c = t['signif_qs']
+                             
+    coherence = pyleo.Coherence(frequency=np.array(t['frequency']),time=np.array(t['time']),
+                               coherence=np.array(t['coherence']),coi=t['coi'], phase=t['phase'],
+                               timeseries1=ts1,timeseries2=ts2,
+                               freq_method = t['freq_method'],
+                               freq_kwargs=t['freq_kwargs'],
+                               period_unit=t['period_unit'],
+                               time_label=t['time_label'],
+                               signif_qs = c,
+                               signif_method=t['signif_method'])
+    return coherence
