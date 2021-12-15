@@ -1242,7 +1242,7 @@ class Series:
             the limitation of the psd axis
 
         n_signif_test=100 : int
-            Number of Monte-Carlo simulations to perform for significance testing. Used when psd=None or scalogram=None
+            Number of Monte-Carlo simulations to perform for significance testing. Used when psd=None or scalogram=None.
 
         time_label : str
             the label for the time axis
@@ -1427,7 +1427,10 @@ class Series:
                 else:
                     psd = self.spectral(**psd_kwargs)
             else:
-                psd = self.spectral(method='wwz', scalogram = scalogram)
+                if n_signif_test > 0:
+                    psd = self.spectral(method='wwz').signif_test(number=n_signif_test)
+                else:
+                    psd = self.spectral(method='wwz', scalogram = scalogram)
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, **psd_plot_kwargs)
         
