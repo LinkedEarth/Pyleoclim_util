@@ -1417,7 +1417,7 @@ class Series:
                 else:
                     psd = self.spectral(**psd_kwargs)
             else:
-                psd = self.spectral(method='wwz',scalogram = scalogram)
+                psd = self.spectral(scalogram = scalogram)
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, **psd_plot_kwargs)
         
