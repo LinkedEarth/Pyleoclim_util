@@ -1758,8 +1758,7 @@ class Series:
             # Detrending with default parameters (using EMD method with 1 mode)
             ts_emd1 = ts.detrend()
             ts_emd1.label = 'default detrending (EMD, last mode)' 
-            @savefig ts_emd1.png
-            
+            @savefig ts_emd1.png      
             fig, ax = ts_emd1.plot(title='Detrended with EMD method',mute=True)
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
@@ -1800,7 +1799,6 @@ class Series:
             ax.legend()
             pyleo.showfig(fig)
             pyleo.closefig(fig)
-
 
         '''
         new = self.copy()
