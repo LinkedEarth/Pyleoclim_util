@@ -3690,7 +3690,7 @@ class Coherence:
 
         cohs = []
         for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', total=number, disable=mute_pbar):
-            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i], tau=self.time, freq_method=self.freq_method, freq_kwargs=self.freq_kwargs)
+            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i], settings={'tau': self.time, 'freq': self.frequency})
             cohs.append(coh_tmp.coherence)
 
         cohs = np.array(cohs)
