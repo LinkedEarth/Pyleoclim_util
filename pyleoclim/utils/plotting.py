@@ -372,17 +372,19 @@ def showfig(fig, close=False):
     pyleoclim.utils.plotting.in_notebook: Functions to sense a notebook environment
 
     '''
-    if in_notebook:
-        try:
-            from IPython.display import display
-        except ImportError as error:
-            # Output expected ImportErrors.
-            print(f'{error.__class__.__name__}: {error.message}')
+    # if in_notebook:
+    #     try:
+    #         from IPython.display import display
+    #     except ImportError as error:
+    #         # Output expected ImportErrors.
+    #         print(f'{error.__class__.__name__}: {error.message}')
 
-        display(fig)
+    #     display(fig)
 
-    else:
-        plt.show()
+    # else:
+    #     plt.show()
+
+    plt.show()
 
     if close:
         closefig(fig)
