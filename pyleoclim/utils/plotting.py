@@ -13,6 +13,7 @@ __all__ = [
     'closefig',
 ]
 
+from tkinter import Variable
 import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
@@ -372,17 +373,19 @@ def showfig(fig, close=False):
     pyleoclim.utils.plotting.in_notebook: Functions to sense a notebook environment
 
     '''
-    if in_notebook:
-        try:
-            from IPython.display import display
-        except ImportError as error:
-            # Output expected ImportErrors.
-            print(f'{error.__class__.__name__}: {error.message}')
+    # if in_notebook:
+    #     try:
+    #         from IPython.display import display
+    #     except ImportError as error:
+    #         # Output expected ImportErrors.
+    #         print(f'{error.__class__.__name__}: {error.message}')
 
-        display(fig)
+    #     display(fig)
 
-    else:
-        plt.show()
+    # else:
+    #     plt.show()
+
+    plt.show()
 
     if close:
         closefig(fig)
@@ -453,7 +456,7 @@ def savefig(fig, path=None, settings={}, verbose=True):
         print(f'Figure saved at: "{str(path)}"')
 
 
-def set_style(style='journal', font_scale=1.0):
+def set_style(style='journal', font_scale=1.5):
     ''' Modify the visualization style
     
     This function is inspired by [Seaborn](https://github.com/mwaskom/seaborn).
@@ -475,8 +478,6 @@ def set_style(style='journal', font_scale=1.0):
         Default is 1. Corresponding to 12 Font Size. 
     
     '''
-    mpl.rcParams.update(mpl.rcParamsDefault)
-
     font_dict = {
         'font.size': 12,
         'axes.labelsize': 12,
@@ -555,11 +556,8 @@ def set_style(style='journal', font_scale=1.0):
             'xtick.minor.width': 0,
             'ytick.minor.width': 0,
         })
-    elif 'matplotlib' in style or 'default' in style:
-        mpl.rcParams.update(mpl.rcParamsDefault)
     else:
-        print(f'Style [{style}] not availabel! Setting to `matplotlib` ...')
-        mpl.rcParams.update(mpl.rcParamsDefault)
+        raise ValueError(f'Style [{style}] not availabel!')
 
     if '_spines' in style:
         style_dict.update({
