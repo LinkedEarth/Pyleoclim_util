@@ -557,7 +557,7 @@ class Series:
              linestyle=None, linewidth=None, xlim=None, ylim=None,
              label=None, xlabel=None, ylabel=None, title=None, zorder=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None, alpha=None,
-             savefig_settings=None, ax=None, mute=False, holdon=None, invert_xaxis=False):
+             savefig_settings=None, ax=None, mute=False, invert_xaxis=False):
         ''' Plot the timeseries
 
         Parameters
@@ -631,8 +631,6 @@ class Series:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
-        holdon : bool
-            alias of mute
 
         Returns
         -------
@@ -695,9 +693,6 @@ class Series:
                 fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'})
                 pyleo.savefig(fig,path='ts_plot3.png')
         '''
-        if holdon is not None:
-            mute = holdon
-
         # generate default axis labels
         time_label, value_label = self.make_labels()
 
@@ -742,7 +737,7 @@ class Series:
             title=title, savefig_settings=savefig_settings,
             ax=ax, legend=legend, xlim=xlim, ylim=ylim,
             plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
-            mute=mute, holdon=holdon, invert_xaxis=invert_xaxis,
+            mute=mute, invert_xaxis=invert_xaxis,
         )
 
         return res
@@ -850,7 +845,7 @@ class Series:
             :okexcept:    
 
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
-            fig, ax = ts.plot(title='ONI',holdon=True) # we mute the first call to only get the plot with 2 lines
+            fig, ax = ts.plot(title='ONI') # we mute the first call to only get the plot with 2 lines
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
             @savefig ssa_recon.png
@@ -983,7 +978,7 @@ class Series:
             ts1 = pyleo.Series(time=t, value=sig1)
             ts2 = pyleo.Series(time=t, value=sig2)
             ts = pyleo.Series(time=t, value=sig)
-            fig, ax = ts.plot(holdon=True, label='mix')
+            fig, ax = ts.plot(label='mix')
             ts1.plot(ax=ax, label='10 Hz')
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
@@ -997,7 +992,7 @@ class Series:
             :okwarning:
             :okexcept:    
 
-            fig, ax = ts.plot(holdon=True, label='mix')
+            fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=15).plot(ax=ax, label='After 15 Hz low-pass filter')
             ts1.plot(ax=ax, label='10 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
@@ -1011,7 +1006,7 @@ class Series:
             :okwarning:
             :okexcept:    
 
-            fig, ax = ts.plot(holdon=True, label='mix')
+            fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label='After 15-25 Hz band-pass filter')
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
@@ -1025,7 +1020,7 @@ class Series:
             :okwarning:
             :okexcept:    
 
-            fig, ax = ts.plot(holdon=True, label='mix')
+            fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
@@ -1039,7 +1034,7 @@ class Series:
             :okwarning:
             :okexcept:    
 
-            fig, ax = ts.plot(holdon=True, label='mix')
+            fig, ax = ts.plot(label='mix')
             ts_low  = ts.filter(cutoff_freq=15)
             ts_high = ts.copy()
             ts_high.value = ts.value - ts_low.value # subtract low-pass filtered series from original one
@@ -1109,7 +1104,7 @@ class Series:
 
 
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
-                 ax=None, ylabel='KDE', vertical=False, edgecolor='w',mute=False, holdon=None, **plot_kwargs):
+                 ax=None, ylabel='KDE', vertical=False, edgecolor='w',mute=False, **plot_kwargs):
         ''' Plot the distribution of the timeseries values
 
         Parameters
@@ -1144,9 +1139,6 @@ class Series:
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
 
-        holdon : bool
-            alias of mute
-
         plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
 
@@ -1180,9 +1172,6 @@ class Series:
             pyleo.closefig(fig)
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
@@ -1205,9 +1194,6 @@ class Series:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -1216,7 +1202,7 @@ class Series:
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
                     time_label=None, value_label=None, period_label=None, psd_label='PSD', 
                     wavelet_kwargs = None, psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None, 
-                    psd_plot_kwargs = None, trunc_series = None, preprocess = True, savefig_settings=None, mute=False, holdon=None):
+                    psd_plot_kwargs = None, trunc_series = None, preprocess = True, savefig_settings=None, mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
 
@@ -1304,9 +1290,6 @@ class Series:
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
 
-        holdon : bool
-            alias of mute
-
         See also
         --------
 
@@ -1368,10 +1351,6 @@ class Series:
         
 
         '''
-        if holdon is not None:
-            mute = holdon
-
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         fig = plt.figure(figsize=figsize)
         gs = gridspec.GridSpec(6, 12)
@@ -1493,9 +1472,9 @@ class Series:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, ax
 
     def copy(self):
@@ -1788,7 +1767,7 @@ class Series:
             ts_emd1 = ts.detrend()
             ts_emd1.label = 'default detrending (EMD, last mode)' 
             @savefig ts_emd1.png      
-            fig, ax = ts_emd1.plot(title='Detrended with EMD method',holdon=True)
+            fig, ax = ts_emd1.plot(title='Detrended with EMD method')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
             pyleo.showfig(fig)
@@ -1800,7 +1779,7 @@ class Series:
             ts_emd2 = ts.detrend(method='emd', n=2)
             ts_emd2.label = 'EMD detrending, last 2 modes' 
             @savefig ts_emd_n2.png
-            fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)',holdon=True)
+            fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
             pyleo.showfig(fig)
@@ -1810,7 +1789,7 @@ class Series:
             ts_sg = ts.detrend(method='savitzky-golay')
             ts_sg.label = 'savitzky-golay detrending, default parameters'
             @savefig ts_sg.png
-            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter',holdon=True)
+            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
             pyleo.showfig(fig)
@@ -1823,7 +1802,7 @@ class Series:
             ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201})
             ts_sg2.label = 'savitzky-golay detrending, window_length = 201'
             @savefig ts_sg2.png
-            fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter',holdon=True)
+            fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
             pyleo.showfig(fig)
@@ -1933,14 +1912,14 @@ class Series:
             psd_LS_LS = ts_std.spectral(method='lomb_scargle', freq_method='lomb_scargle')  # with frequency vector generated using REDFIT method
             fig, ax = psd_LS_n50.plot(
                 title='PSD using Lomb-Scargle method with 4 overlapping segments',
-                label='settings={"n50": 4}', holdon=True)
+                label='settings={"n50": 4}')
             psd_ls.plot(ax=ax, label='settings={"n50": 3}', marker='o')
             @savefig spec_ls_n50.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
             fig, ax = psd_LS_freq.plot(
-                title='PSD using Lomb-Scargle method with differnt frequency vectors', holdon=True,
+                title='PSD using Lomb-Scargle method with differnt frequency vectors',
                 label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
             psd_ls.plot(ax=ax, label='freq_method="log"', marker='o')
             @savefig spec_ls_freq.png
@@ -2593,7 +2572,7 @@ class Series:
 
     def outliers(self, auto=True, remove=True, fig_outliers=True,fig_knee=True,
                  plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],
-                 saveknee_settings=None,saveoutliers_settings=None, mute=False, holdon=None):
+                 saveknee_settings=None,saveoutliers_settings=None, mute=False):
         '''
         Detects outliers in a timeseries and removes if specified
 
@@ -2622,8 +2601,6 @@ class Series:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
-        holdon : bool
-            alias of mute
 
         Returns
         -------
@@ -2640,9 +2617,6 @@ class Series:
         pyleoclim.utils.plotting.plot_scatter_xy : Scatter plot on top of a line plot
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         new = self.copy()
 
         #outlier_indices,fig1,ax1,fig2,ax2 = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
@@ -2650,7 +2624,7 @@ class Series:
         outlier_indices = tsutils.detect_outliers(
             self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,
             figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,
-            plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs, mute=mute, holdon=holdon,
+            plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs, mute=mute
         )
         outlier_indices = np.asarray(outlier_indices)
         if remove == True:
@@ -2897,7 +2871,7 @@ class PSD:
 
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
-             xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False, holdon=None,
+             xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None, mute=False,
              legend=True, lgd_kwargs=None, xticks=None, yticks=None, alpha=None, zorder=None,
              plot_kwargs=None, signif_clr='red', signif_linestyles=['--', '-.', ':'], signif_linewidth=1,
              plot_beta=True, beta_kwargs=None):
@@ -2949,8 +2923,6 @@ class PSD:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
         legend : bool, optional
             whether to plot the legend. The default is True.
         lgd_kwargs : dict, optional
@@ -2986,9 +2958,6 @@ class PSD:
         pyleoclim.core.ui.Series.spectral : spectral analysis
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = self.plot_kwargs if plot_kwargs is None else plot_kwargs.copy()
         beta_kwargs = {} if beta_kwargs is None else beta_kwargs.copy()
@@ -3135,9 +3104,9 @@ class PSD:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -3213,7 +3182,7 @@ class Scalogram:
         return f'Dimension: {np.size(self.frequency)} x {np.size(self.time)}'
 
     def plot(self, in_period=True, xlabel=None, ylabel=None, title=None,
-             ylim=None, xlim=None, yticks=None, figsize=[10, 8], mute=False, holdon=None,
+             ylim=None, xlim=None, yticks=None, figsize=[10, 8], mute=False,
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              contourf_style={}, cbar_style={}, savefig_settings={}, ax=None):
         '''Plot the scalogram
@@ -3240,8 +3209,6 @@ class Scalogram:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
         signif_clr : str, optional
             Color of the singificance line. The default is 'white'.
         signif_linestyles : str, optional
@@ -3268,9 +3235,6 @@ class Scalogram:
 
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
 
@@ -3348,9 +3312,9 @@ class Scalogram:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -3463,7 +3427,7 @@ class Coherence:
         return deepcopy(self)
 
     def plot(self, xlabel=None, ylabel=None, title=None, figsize=[10, 8],
-             ylim=None, xlim=None, in_period=True, yticks=None, mute=False, holdon=None,
+             ylim=None, xlim=None, in_period=True, yticks=None, mute=False,
              contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, ax=None,
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              under_clr='ivory', over_clr='black', bad_clr='dimgray'):
@@ -3491,8 +3455,6 @@ class Coherence:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax The default is False. The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
         contourf_style : dict, optional
             Arguments for the contour plot. The default is {}.
         phase_style : dict, optional
@@ -3536,9 +3498,6 @@ class Coherence:
         matplotlib.pyplot.quiver
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
@@ -3666,9 +3625,9 @@ class Coherence:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -4761,7 +4720,7 @@ class MultipleSeries:
              linestyle=None, linewidth=None, colors=None, cmap='tab10', norm=None,
              xlabel=None, ylabel=None, title=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None,
-             savefig_settings=None, ax=None, mute=False, holdon=None, invert_xaxis=False):
+             savefig_settings=None, ax=None, mute=False, invert_xaxis=False):
         '''Plot multiple timeseries on the same axis
 
         Parameters
@@ -4809,8 +4768,6 @@ class MultipleSeries:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
-        holdon : bool
-            alias of mute
         invert_xaxis : bool, optional
             if True, the x-axis of the plot will be inverted
 
@@ -4819,9 +4776,6 @@ class MultipleSeries:
         fig, ax
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -4874,15 +4828,15 @@ class MultipleSeries:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
     def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None, mute=False, holdon=None):
+                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None, mute=False):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
@@ -4936,9 +4890,6 @@ class MultipleSeries:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
-        holdon : bool
-            alias of mute
-           
         
         Returns
         -------
@@ -5026,9 +4977,6 @@ class MultipleSeries:
             pyleo.closefig(fig)
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         current_style = deepcopy(mpl.rcParams)
         plotting.set_style('journal', font_scale=font_scale)
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -5159,9 +5107,9 @@ class MultipleSeries:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             # reset the plotting style
             mpl.rcParams.update(current_style)
             return fig, ax
@@ -5394,7 +5342,7 @@ class EnsembleSeries(MultipleSeries):
 
     def plot_traces(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, num_traces=10, seed=None,
              xlim=None, ylim=None, linestyle='-', savefig_settings=None, ax=None, plot_legend=True,
-             color=sns.xkcd_rgb['pale red'], lw=0.5, alpha=0.3, lgd_kwargs=None, mute=False, holdon=None):
+             color=sns.xkcd_rgb['pale red'], lw=0.5, alpha=0.3, lgd_kwargs=None, mute=False):
             '''Plot EnsembleSeries as a subset of traces.
 
             Parameters
@@ -5436,8 +5384,6 @@ class EnsembleSeries(MultipleSeries):
                 if True, the plot will not show;
                 recommend to turn on when more modifications are going to be made on ax. The default is False.
                 (going to be deprecated)
-            holdon : bool
-                alias of mute
             seed : int, optional
                 Set the seed for the random number generator. Useful for reproducibility. The default is None.
 
@@ -5469,9 +5415,6 @@ class EnsembleSeries(MultipleSeries):
                 pyleo.closefig(fig)
 
             '''
-            if holdon is not None:
-                mute = holdon
-
             savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
             lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
@@ -5510,9 +5453,9 @@ class EnsembleSeries(MultipleSeries):
             if 'fig' in locals():
                 if 'path' in savefig_settings:
                     plotting.savefig(fig, settings=savefig_settings)
-                else:
-                    if not mute:
-                        plotting.showfig(fig)
+                # else:
+                #     if not mute:
+                #         plotting.showfig(fig)
                 return fig, ax
             else:
                 return ax
@@ -5521,7 +5464,7 @@ class EnsembleSeries(MultipleSeries):
                       xlabel=None, ylabel=None, title=None,
                       xlim=None, ylim=None, savefig_settings=None, ax=None, plot_legend=True,
                       curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
-                      inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None, mute=False, holdon=None):
+                      inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None, mute=False):
         ''' Plot EnsembleSeries as an envelope.
 
         Parameters
@@ -5567,8 +5510,6 @@ class EnsembleSeries(MultipleSeries):
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
 
         Returns
         -------
@@ -5596,9 +5537,6 @@ class EnsembleSeries(MultipleSeries):
             pyleo.closefig(fig)
  
         '''
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
@@ -5651,16 +5589,16 @@ class EnsembleSeries(MultipleSeries):
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
 
     def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, mute=False, holdon=None):
+                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, mute=False):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
@@ -5704,16 +5642,11 @@ class EnsembleSeries(MultipleSeries):
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
              (going to be deprecated)
-        holdon : bool
-            alias of mute
 
         Returns
         -------
         fig, ax
         '''
-        if holdon is not None:
-            mute = holdon
-
         current_style = deepcopy(mpl.rcParams)
         plotting.set_style('journal', font_scale=font_scale)
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -5822,9 +5755,9 @@ class EnsembleSeries(MultipleSeries):
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             # reset the plotting style
             mpl.rcParams.update(current_style)
             return fig, ax
@@ -5835,7 +5768,7 @@ class EnsembleSeries(MultipleSeries):
 
     
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
-                 ax=None, ylabel='KDE', vertical=False, edgecolor='w',mute=False, holdon=None, **plot_kwargs):
+                 ax=None, ylabel='KDE', vertical=False, edgecolor='w',mute=False, **plot_kwargs):
         """
         Plots the distribution of the timeseries across ensembles
 
@@ -5863,8 +5796,6 @@ class EnsembleSeries(MultipleSeries):
            if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
         **plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html.
             
@@ -5874,10 +5805,6 @@ class EnsembleSeries(MultipleSeries):
         pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
 
         """
-        
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
@@ -5908,9 +5835,9 @@ class EnsembleSeries(MultipleSeries):
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax        
@@ -6031,7 +5958,7 @@ class MultiplePSD:
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, legend=True,
-             colors=None, cmap=None, norm=None, plot_kwargs=None, lgd_kwargs=None, mute=False, holdon=None):
+             colors=None, cmap=None, norm=None, plot_kwargs=None, lgd_kwargs=None, mute=False):
         '''Plot multiple PSD on the same plot
 
         Parameters
@@ -6084,17 +6011,12 @@ class MultiplePSD:
             recommend to turn on when more modifications are going to be made on ax
             The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
 
         Returns
         -------
         fig, ax
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -6161,9 +6083,9 @@ class MultiplePSD:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -6172,7 +6094,7 @@ class MultiplePSD:
              in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
              curve_clr=sns.xkcd_rgb['pale red'], curve_lw=3, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.3, shade_label=None,
-             lgd_kwargs=None, mute=False, holdon=None, members_plot_num=10, members_alpha=0.3, members_lw=1, seed=None):
+             lgd_kwargs=None, mute=False, members_plot_num=10, members_alpha=0.3, members_lw=1, seed=None):
 
         '''Plot mutiple PSD as an envelope.
 
@@ -6225,8 +6147,6 @@ class MultiplePSD:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
         members_plot_num : int, optional
             Number of individual members to plot. The default is 10.
         members_alpha : float, optional
@@ -6241,10 +6161,6 @@ class MultiplePSD:
         fig, ax
 
         '''
-
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
@@ -6297,9 +6213,9 @@ class MultiplePSD:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -6488,7 +6404,7 @@ class CorrEns:
 
     def plot(self, figsize=[4, 4], title=None, ax=None, savefig_settings=None, hist_kwargs=None, title_kwargs=None, xlim=None,
              clr_insignif=sns.xkcd_rgb['grey'], clr_signif=sns.xkcd_rgb['teal'], clr_signif_fdr=sns.xkcd_rgb['pale orange'],
-             clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None, mute=False, holdon=None):
+             clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None, mute=False):
         ''' Plot the correlation ensembles
 
         Parameters
@@ -6520,9 +6436,6 @@ class CorrEns:
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
 
-        holdon : bool
-            alias of mute
-
         xlim : list, optional
             x-axis limits. The default is None.
 
@@ -6531,9 +6444,6 @@ class CorrEns:
 
         matplotlib.pyplot.hist: https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.hist.html
         '''
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         hist_kwargs = {} if hist_kwargs is None else hist_kwargs.copy()
         if ax is None:
@@ -6582,9 +6492,9 @@ class CorrEns:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -6636,7 +6546,7 @@ class SpatialDecomp:
         self.neff       = neff
         
     def screeplot(self, figsize=[6, 4], uq='N82' ,title='scree plot', ax=None, savefig_settings=None, 
-                  title_kwargs=None, xlim=[0,10], clr_eig='C0',  mute=False, holdon=None):
+                  title_kwargs=None, xlim=[0,10], clr_eig='C0',  mute=False):
         ''' Plot the eigenvalue spectrum with uncertainties
 
         Parameters
@@ -6665,9 +6575,6 @@ class SpatialDecomp:
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
 
-        holdon : bool
-            alias of mute
-
         xlim : list, optional
             x-axis limits. The default is [0, 10] (first 10 eigenvalues)
             
@@ -6692,9 +6599,6 @@ class SpatialDecomp:
             1119–1152, doi:10.1002/joc.1499.
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         if ax is None:
@@ -6748,13 +6652,13 @@ class SpatialDecomp:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, ax
 
     def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None, 
-              title_kwargs=None, mute=False, holdon=None, spec_method = 'mtm'):
+              title_kwargs=None, mute=False, spec_method = 'mtm'):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
@@ -6787,9 +6691,6 @@ class SpatialDecomp:
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
 
-        holdon : bool
-            alias of mute
-        
         spec_method: str, optional
             The name of the spectral method to be applied on the PC. Default: MTM
             Note that the data are evenly-spaced, so any spectral method that
@@ -6797,9 +6698,6 @@ class SpatialDecomp:
             'wwz' is relevant if scaling exponents need to be estimated, but ill-advised otherwise, as it is very slow. 
       
         '''
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         if ax is None:
@@ -6835,9 +6733,9 @@ class SpatialDecomp:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, gs
 
 
@@ -6895,7 +6793,7 @@ class SsaRes:
 
     def screeplot(self, figsize=[6, 4], title='SSA scree plot', ax=None, savefig_settings=None, title_kwargs=None, xlim=None,
              clr_mcssa=sns.xkcd_rgb['red'], clr_signif=sns.xkcd_rgb['teal'],
-             clr_eig='black',  mute=False, holdon=None):
+             clr_eig='black',  mute=False):
         ''' Scree plot for SSA, visualizing the eigenvalue spectrum and indicating which modes were retained.  
 
         Parameters
@@ -6924,9 +6822,6 @@ class SsaRes:
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
 
-        holdon : bool
-            alias of mute
-
         xlim : list, optional
             x-axis limits. The default is None.
             
@@ -6942,9 +6837,6 @@ class SsaRes:
                default: teal 
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         if ax is None:
@@ -6976,13 +6868,13 @@ class SsaRes:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, ax
 
     def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None, 
-             title_kwargs=None, mute=False, holdon=None, spec_method = 'mtm', plot_original=False):
+             title_kwargs=None, mute=False, spec_method = 'mtm', plot_original=False):
         ''' Dashboard visualizing the properties of a given SSA mode, including:
             1. the analyzing function (T-EOF)
             2. the reconstructed component (RC)
@@ -7015,9 +6907,6 @@ class SsaRes:
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
 
-        holdon : bool
-            alias of mute
-        
         spec_method: str, optional
             The name of the spectral method to be applied on the PC. Default: MTM
             Note that the data are evenly-spaced, so any spectral method that
@@ -7025,9 +6914,6 @@ class SsaRes:
             'wwz' is relevant too if scaling exponents need to be estimated. 
       
         '''
-        if holdon is not None:
-            mute = holdon
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         if ax is None:
@@ -7060,9 +6946,9 @@ class SsaRes:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, ax
 
 
@@ -7325,7 +7211,7 @@ class Lipd:
            background = True,borders = False, rivers = False, lakes = False,
            figsize = None, ax = None, marker=None, color=None,
            markersize = None, scatter_kwargs=None,
-           legend=True, lgd_kwargs=None, savefig_settings=None, mute=False, holdon=None):
+           legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
 
         '''Map the records contained in LiPD files by archive type
 
@@ -7368,8 +7254,6 @@ class Lipd:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
 
         Returns
         -------
@@ -7412,9 +7296,6 @@ class Lipd:
 
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
 
 
@@ -7458,7 +7339,7 @@ class Lipd:
                               figsize = figsize, ax = ax,
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                              mute=mute, holdon=holdon)
+                              mute=mute)
 
         return res
 
@@ -7701,7 +7582,7 @@ class LipdSeries(Series):
            background = True,borders = False, rivers = False, lakes = False,
            figsize = None, ax = None, marker=None, color=None,
            markersize = None, scatter_kwargs=None,
-           legend=True, lgd_kwargs=None, savefig_settings=None, mute=False, holdon=None):
+           legend=True, lgd_kwargs=None, savefig_settings=None, mute=False):
         '''Map the location of the record
 
         Parameters
@@ -7743,8 +7624,6 @@ class LipdSeries(Series):
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
 
         Returns
         -------
@@ -7771,9 +7650,6 @@ class LipdSeries(Series):
             pyleo.closefig(fig)
 
         '''
-        if holdon is not None:
-            mute = holdon
-
         scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
         #get the information from the timeseries
         lat=[self.lipd_ts['geo_meanLat']]
@@ -7818,7 +7694,7 @@ class LipdSeries(Series):
                               figsize = figsize, ax = ax,
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                              mute=mute, holdon=holdon)
+                              mute=mute)
 
             except:
                 try:
@@ -7830,7 +7706,7 @@ class LipdSeries(Series):
                               figsize = figsize, ax = ax,
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                              mute=mute, holdon=holdon)
+                              mute=mute)
                 except:
                     res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
                               marker=marker, color =color,
@@ -7840,7 +7716,7 @@ class LipdSeries(Series):
                               figsize = figsize, ax = ax,
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                              mute=mute, holdon=holdon)
+                              mute=mute)
 
         else:
             res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
@@ -7851,7 +7727,7 @@ class LipdSeries(Series):
                               figsize = figsize, ax = ax,
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                              mute=mute, holdon=holdon)
+                              mute=mute)
         return res
 
     def getMetadata(self):
@@ -8013,7 +7889,7 @@ class LipdSeries(Series):
 
     def dashboard(self, figsize = [11,8], plt_kwargs=None, distplt_kwargs=None, spectral_kwargs=None,
                   spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None, metadata = True,
-                  savefig_settings=None, mute=False, holdon=None, ensemble = False, D=None):
+                  savefig_settings=None, mute=False, ensemble = False, D=None):
         '''
 
 
@@ -8045,8 +7921,6 @@ class LipdSeries(Series):
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
         ensemble : {True, False}, optional
             If True, will return the dashboard in ensemble modes if ensembles are available
         D : pyleoclim.Lipd
@@ -8102,9 +7976,6 @@ class LipdSeries(Series):
             pyleo.closefig(fig)
 
         '''
-        if holdon is not None:
-            mute = holdon
-        
         if ensemble == True and D is None:
             raise ValueError("When an ensemble dashboard is requested, the corresponsind Lipd object must be supplied")
             
@@ -8318,9 +8189,9 @@ class LipdSeries(Series):
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, ax
 
     def mapNearRecord(self, D, n=5, radius = None, sameArchive = False, 
@@ -8330,7 +8201,7 @@ class LipdSeries(Series):
                       marker_ref= None, color_ref=None, marker=None, color=None,
                       markersize_adjust=False, scale_factor = 100, scatter_kwargs=None,
                       legend = True, lgd_kwargs=None, savefig_settings=None, 
-                      mute=False, holdon=None):
+                      mute=False):
         """ Map records that are near the timeseries of interest
         
 
@@ -8387,8 +8258,6 @@ class LipdSeries(Series):
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
 
         See also
         --------
@@ -8407,9 +8276,6 @@ class LipdSeries(Series):
             contains fig and ax
 
         """
-        if holdon is not None:
-            mute = holdon
-        
         scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
         
         #get the information about the original timeseries
@@ -8562,7 +8428,7 @@ class LipdSeries(Series):
                       figsize = figsize, ax = ax,
                       scatter_kwargs=scatter_kwargs, legend=legend,
                       lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                      mute=mute, holdon=holdon)
+                      mute=mute)
             except:
                 try:
                     res = mapping.map_all(lat=lat_all, lon=lon_all, 
@@ -8574,7 +8440,7 @@ class LipdSeries(Series):
                       figsize = figsize, ax = ax,
                       scatter_kwargs=scatter_kwargs, legend=legend,
                       lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                      mute=mute, holdon=holdon)
+                      mute=mute)
                 except:
                     res = mapping.map_all(lat=lat_all, lon=lon_all, 
                       criteria=archiveType_all,
@@ -8585,7 +8451,7 @@ class LipdSeries(Series):
                       figsize = figsize, ax = ax,
                       scatter_kwargs=scatter_kwargs, legend=legend,
                       lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                      mute=mute, holdon=holdon)
+                      mute=mute)
         
         else:
             res = mapping.map_all(lat=lat_all, lon=lon_all, 
@@ -8597,13 +8463,13 @@ class LipdSeries(Series):
                       figsize = figsize, ax = ax,
                       scatter_kwargs=scatter_kwargs, legend=legend,
                       lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                      mute=mute, holdon=holdon)
+                      mute=mute)
         
         return res
 
         
     def plot_age_depth(self,figsize = [10,4], plt_kwargs=None,  
-                       savefig_settings=None, mute=False, holdon=None,
+                       savefig_settings=None, mute=False, 
                        ensemble = False, D=None, num_traces = 10, ensemble_kwargs=None,
                        envelope_kwargs = None, traces_kwargs = None):
         
@@ -8624,8 +8490,6 @@ class LipdSeries(Series):
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
             (going to be deprecated)
-        holdon : bool
-            alias of mute
         ensemble : {True,False}, optional
             Whether to use age model ensembles stored in the file for the plot. The default is False.
             If no ensemble can be found, will error out.
@@ -8674,9 +8538,6 @@ class LipdSeries(Series):
             pyleo.closefig(fig)
         
         '''
-        if holdon is not None:
-            mute = holdon
-        
         if ensemble == True and D is None:
             raise ValueError("When an ensemble is requested, the corresponsind Lipd object must be supplied")
         
@@ -8741,9 +8602,9 @@ class LipdSeries(Series):
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax

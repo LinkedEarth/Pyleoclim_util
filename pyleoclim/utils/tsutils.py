@@ -849,6 +849,7 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
        mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+            (going to be deprecated)
        plot_kwargs : dict
             keyword arguments for ax.plot()
 
@@ -911,9 +912,9 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
         if 'fig1' in locals():
             if 'path' in saveknee_settings:
                 savefig(fig1, settings=saveknee_settings)
-            else:
-                if not mute:
-                    showfig(fig1)
+            # else:
+            #     if not mute:
+            #         showfig(fig1)
 
         if plot_outliers==True:
             x2 = ts[outliers]
