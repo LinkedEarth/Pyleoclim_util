@@ -22,11 +22,6 @@ import pyleoclim as pyleo
 from urllib.request import urlopen
 import json
 
-def get_ts():
-    d=pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD98-2170.Stott.2004')
-    ts=d.to_LipdSeries(number=5)
-    return ts
-
 def importLiPD():
     url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/lipds.json'
     response = urlopen(url)
@@ -38,6 +33,12 @@ def importEnsLiPD():
     response = urlopen(url)
     d = json.loads(response.read())
     return d
+    
+def get_ts():
+    D = importLiPD()
+    d=pyleo.Lipd(lipd_dict=D)
+    ts=d.to_LipdSeries(number=3)
+    return ts
 
 class TestUiLipdSeriesMap():
     ''' test LipdSeries.map()

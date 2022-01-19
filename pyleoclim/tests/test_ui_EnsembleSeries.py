@@ -25,6 +25,7 @@ from pyleoclim.utils.tsmodel import (
     ar1_sim,
     colored_noise,
 )
+from pyleoclim.tests.examples import load_dataset
 
 # a collection of useful functions
 

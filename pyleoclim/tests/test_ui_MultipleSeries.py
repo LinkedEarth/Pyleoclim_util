@@ -19,6 +19,8 @@ from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
 
 import pytest
+from urllib.request import urlopen
+import json
 
 import pyleoclim as pyleo
 from pyleoclim.utils.tsmodel import (
@@ -42,6 +44,12 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
     t = np.arange(nt)
     v = colored_noise(alpha=alpha, t=t, f0=f0, m=m, seed=seed)
     return t, v
+    
+def importLiPD():
+    url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/lipds.json'
+    response = urlopen(url)
+    d = json.loads(response.read())
+    return d
 
 
 # Tests below
@@ -272,10 +280,10 @@ class TestMultipleSeriesPca:
         Test with real data, same time axis
     
         ''' 
-        url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-        data = pyleo.Lipd(usr_path = url)
-        tslist = data.to_LipdSeriesList()
-        tslist = tslist[2:] # drop the first two series which only concerns age and depth
+        D = importLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
+        tslist = d.to_LipdSeriesList()
+        tslist = [tslist[3],tslist[12]]
         ms = pyleo.MultipleSeries(tslist)
         msl = ms.common_time()  # put on common time
     
@@ -394,19 +402,21 @@ class TestMultipleSeriesStackPlot():
     @pytest.mark.parametrize('labels', [None, 'auto', ['sst','d18Osw']])
     def test_StackPlot_t0(self, labels):
     
-        d=pyleo.Lipd('https://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
-        sst = d.to_LipdSeries(number=5)
-        d18Osw = d.to_LipdSeries(number=3)
-        ms = pyleo.MultipleSeries([sst,d18Osw])
+        D = importLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
+        d18O_1 = d.to_LipdSeries(number=3)
+        d18O_2 = d.to_LipdSeries(number=12)
+        ms = pyleo.MultipleSeries([d18O_1,d18O_2])
         ms.stackplot(labels=labels, mute=True)
     
     @pytest.mark.parametrize('plot_kwargs', [{'marker':'o'},[{'marker':'o'},{'marker':'^'}]])
     def test_StackPlot_t1(self, plot_kwargs):
     
-        d=pyleo.Lipd('https://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
-        sst = d.to_LipdSeries(number=5)
-        d18Osw = d.to_LipdSeries(number=3)
-        ms = pyleo.MultipleSeries([sst,d18Osw])
+        D = importLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
+        d18O_1 = d.to_LipdSeries(number=3)
+        d18O_2 = d.to_LipdSeries(number=12)
+        ms = pyleo.MultipleSeries([d18O_1,d18O_2])
         ms.stackplot(plot_kwargs=plot_kwargs, mute=True)
         
         

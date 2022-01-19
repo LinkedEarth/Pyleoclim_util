@@ -26,9 +26,11 @@ import pyleoclim as pyleo
 from urllib.request import urlopen
 import json
 
+from pyleoclim.tests.examples import load_dataset
+
 # For some of the testing importa JSON file with a dictionary of possible LiDPs
 
-def  importLiPD():
+def importLiPD():
     url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/lipds.json'
     response = urlopen(url)
     d = json.loads(response.read())
@@ -38,8 +40,8 @@ class TestUiLipdTo_tso():
     ''' Test Lipd.to_tso()
     '''
     def test_to_tso_t0(self):
-        
-        d=pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD98-2170.Stott.2004')
+        D = importLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
         ts=d.to_tso()
         assert len(ts)>0
 
@@ -59,14 +61,16 @@ class TestUiLipdTo_LipdSeriesList():
     ''' Test Lipd.to_LipdSeriesList
     '''
     def test_to_LipdSeriesList_t0(self):
-        d=pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD98-2170.Stott.2004')
+        D = importLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
         ts=d.to_LipdSeriesList()
 
 class TestUiLipdTo_LipdSeries():
     ''' Test Lipd.to_LipdSeries
     '''
     def test_to_LipdSeries_t0(self):
-        d=pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD98-2170.Stott.2004')
+        D = importLiPD()
+        d=pyleo.Lipd(lipd_dict=D)
         ts=d.to_LipdSeries(number=5)
 
 class TestUiLipdMapAllArchive():
