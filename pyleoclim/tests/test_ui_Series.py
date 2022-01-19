@@ -135,7 +135,7 @@ class TestUiSeriesSpectral:
         t, v = gen_colored_noise(nt=1000, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method=spec_method)
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('freq_method', ['log', 'scale', 'nfft', 'lomb_scargle', 'welch'])
@@ -148,7 +148,7 @@ class TestUiSeriesSpectral:
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method=freq_method)
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('nfreq', [10, 20, 30])
@@ -161,7 +161,7 @@ class TestUiSeriesSpectral:
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method='log', freq_kwargs={'nfreq': nfreq})
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('nv', [10, 20, 30])
@@ -174,7 +174,7 @@ class TestUiSeriesSpectral:
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method='scale', freq_kwargs={'nv': nv})
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('dt, nf, ofac, hifac', [(None, 20, 1, 1), (None, None, 2, 0.5)])
@@ -187,7 +187,7 @@ class TestUiSeriesSpectral:
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method='lomb_scargle', freq_kwargs={'dt': dt, 'nf': nf, 'ofac': ofac, 'hifac': hifac})
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
     def test_spectral_t5(self, eps=0.6):
@@ -202,7 +202,7 @@ class TestUiSeriesSpectral:
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 100)
         psd = ts.spectral(method='wwz', settings={'freq': freq}, label='WWZ')
-        beta = psd.beta_est(fmin=1/200, fmax=1/10)['beta']
+        beta = psd.beta_est(fmin=1/200, fmax=1/10).beta_est_res['beta']
         assert_array_equal(psd.frequency, freq)
         assert np.abs(beta-alpha) < eps
 
@@ -222,7 +222,7 @@ class TestUiSeriesSpectral:
 
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
         psd = ts.spectral(method=spec_method)
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
 class TestUiSeriesBin:

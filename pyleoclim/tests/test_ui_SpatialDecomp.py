@@ -91,7 +91,7 @@ class TestUipatialDecompModeplot:
            mslist.append(pyleo.Series(time = t, value = X[:,i]))
        ms = pyleo.MultipleSeries(mslist)
        res = ms.pca()
-       fig, ax = res.modeplot(mode=2,mute=True)
+       fig, ax = res.modeplot(index=2,mute=True)
        
        
        # TODO: add test for maps, including different projections
