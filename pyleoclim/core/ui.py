@@ -3339,7 +3339,7 @@ class Scalogram:
             return ax
 
     def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95],
-                    settings=None):
+                    settings=None, export_scal = False):
         '''Significance test for wavelet analysis
 
         Parameters
@@ -3354,6 +3354,8 @@ class Scalogram:
             Significane level to consider. The default is [0.95].
         settings : dict, optional
             Parameters for the model. The default is None.
+        export_scal : bool
+            Whether or not to export the scalograms used in the noise realizations
 
         Raises
         ------
@@ -3385,6 +3387,9 @@ class Scalogram:
 
         new.signif_qs = surr_scal.quantiles(qs=qs)
         new.signif_method = method
+        
+        if export_scal == True:
+            new.signif_scals = surr_scal
 
         return new
 
