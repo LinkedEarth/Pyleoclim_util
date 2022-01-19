@@ -13,7 +13,7 @@ __all__ = [
     'closefig',
 ]
 
-from tkinter import Variable
+# from tkinter import Variable
 import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
@@ -61,6 +61,7 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
     mute : bool
         if True, the plot will not show;
          recommend to turn on when more modifications are going to be made on ax
+         (going to be deprecated)
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existed or non-existed path,
@@ -114,9 +115,9 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
     if 'fig' in locals():
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                showfig(fig)
+        # else:
+        #     if not mute:
+        #         showfig(fig)
         return fig, ax
     else:
         return ax
@@ -157,6 +158,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     mute : bool
         if True, the plot will not show;
         recommend to turn on when more modifications are going to be made on ax
+         (going to be deprecated)
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existed or non-existed path,
@@ -215,9 +217,9 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     if 'fig' in locals():
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                showfig(fig)
+        # else:
+        #     if not mute:
+        #         showfig(fig)
         return fig, ax
     else:
         return ax
@@ -225,7 +227,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, 
               xlim=None, ylim=None, title=None,
               savefig_settings=None, ax=None, style=None, 
-              plot_kwargs=None, mute=False,color=None):
+              plot_kwargs=None, mute=False, color=None):
     ''' Stack plot of timeseries
     
     Please not that this function uses a different default style than the Pyleoclim package.
@@ -258,6 +260,7 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
     mute : bool
         if True, the plot will not show;
           recommend to turn on when more modifications are going to be made on ax
+         (going to be deprecated)
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existed or non-existed path,
@@ -274,7 +277,6 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
     pyleoclim.utils.plotting.showfig : equivalent to plt.show(). Platform-dependent
     
       '''
-
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
     plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
        
@@ -328,9 +330,9 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
     if 'fig' in locals():
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                showfig(fig)
+        # else:
+        #     if not mute:
+        #         showfig(fig)
         return fig, ax
     else:
         return ax
@@ -456,7 +458,7 @@ def savefig(fig, path=None, settings={}, verbose=True):
         print(f'Figure saved at: "{str(path)}"')
 
 
-def set_style(style='journal', font_scale=1.5):
+def set_style(style='journal', font_scale=1.0):
     ''' Modify the visualization style
     
     This function is inspired by [Seaborn](https://github.com/mwaskom/seaborn).
