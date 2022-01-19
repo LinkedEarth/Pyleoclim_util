@@ -1207,8 +1207,8 @@ class Series:
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
-                    time_label=None, value_label=None, period_label=None, psd_label='PSD', 
-                    wavelet_kwargs = None, psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None, 
+                    time_label=None, value_label=None, period_label=None, psd_label='PSD', wavelet_method = 'wwz', 
+                    wavelet_kwargs = None, psd_method = 'wwz', psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None, 
                     psd_plot_kwargs = None, trunc_series = None, preprocess = True, savefig_settings=None, mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
@@ -1256,9 +1256,15 @@ class Series:
         psd_label : str
             the label for the amplitude axis of PDS
             
+        wavelet_method : str
+            the method for the calculation of the scalogram, see pyleoclim.core.ui.Series.wavelet for details
+            
         wavelet_kwargs : dict
             arguments to be passed to the wavelet function, see pyleoclim.core.ui.Series.wavelet for details
         
+        psd_method : str
+            the method for the calculation of the psd, see pyleoclim.core.ui.Series.spectral for details
+            
         psd_kwargs : dict
             arguments to be passed to the spectral function, see pyleoclim.core.ui.Series.spectral for details
             
@@ -1406,11 +1412,15 @@ class Series:
 
         ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
         
+        if 'method' in list(wavelet_kwargs.keys()):
+            del wavelet_kwargs['method']
+            print('Please pass method via exposed wavelet_method argument, exposed argument overrides key word argument')
+        
         if scalogram is None:
             if n_signif_test > 0:
-                scalogram = self.wavelet(**wavelet_kwargs).signif_test(number=n_signif_test)
+                scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs).signif_test(number=n_signif_test)
             else:
-                scalogram = self.wavelet(**wavelet_kwargs)
+                scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs)
         
         if 'cbar_style' not in wavelet_plot_kwargs:
             wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.1}})
@@ -1420,17 +1430,26 @@ class Series:
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
         
+        if psd_method==wavelet_method:
+            psd_scal = scalogram
+        else:
+            psd_scal = None
+            
+        if 'method' in list(psd_kwargs.keys()):
+            del psd_kwargs['method']
+            print('Please pass method via exposed psd_method argument, exposed argument overrides key word argument')
+            
         if psd is None:
             if psd_kwargs:
                 if n_signif_test > 0:
-                    psd = self.spectral(**psd_kwargs).signif_test(number=n_signif_test)
+                    psd = self.spectral(method=psd_method,scalogram=psd_scal,**psd_kwargs).signif_test(number=n_signif_test)
                 else:
-                    psd = self.spectral(**psd_kwargs)
+                    psd = self.spectral(method=psd_method,scalogram=psd_scal,**psd_kwargs)
             else:
                 if n_signif_test > 0:
-                    psd = self.spectral(method='wwz').signif_test(number=n_signif_test)
+                    psd = self.spectral(method=psd_method,scalogram=psd_scal).signif_test(number=n_signif_test)
                 else:
-                    psd = self.spectral(method='wwz', scalogram = scalogram)
+                    psd = self.spectral(method=psd_method,scalogram=psd_scal)
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, **psd_plot_kwargs)
         
