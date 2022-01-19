@@ -14,7 +14,7 @@ from .utils import *
 from .core import *
 
 from .utils import plotting
-plotting.set_style()
+plotting.set_style(style='journal', font_scale=1.4)
 
 # get the version
 from importlib.metadata import version
