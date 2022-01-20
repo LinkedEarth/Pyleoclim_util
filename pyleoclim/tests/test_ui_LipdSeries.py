@@ -34,9 +34,16 @@ def importEnsLiPD():
     d = json.loads(response.read())
     return d
     
+def load_data():
+    #Loads stott MD982176 record
+    try:
+        d = pyleo.Lipd(url='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
+    except:
+        d = pyleo.Lipd('../example_data/MD982176.Stott.2004.lpd')
+    return d
+    
 def get_ts():
-    D = importLiPD()
-    d=pyleo.Lipd(lipd_dict=D)
+    d=load_data()
     ts=d.to_LipdSeries(number=3)
     return ts
 
