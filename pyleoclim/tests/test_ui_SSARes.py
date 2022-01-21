@@ -69,5 +69,5 @@ class TestUiSSAResModeplot:
         cn = pyleo.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
 
         cn_ssa = cn.ssa()
-        fig, ax = cn_ssa.modeplot(mode=4,mute=True)   
+        fig, ax = cn_ssa.modeplot(index=4,mute=True)   
         
