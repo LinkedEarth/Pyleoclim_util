@@ -2052,6 +2052,11 @@ class Series:
         if label is None:
             label = self.label
 
+        if method == 'wwz' and scalogram is not None:
+            args['wwz'].pop('wwa')
+            args['wwz'].pop('wwz_Neffs')
+            args['wwz'].pop('wwz_freq')
+
         psd = PSD(
             frequency=spec_res.freq,
             amplitude=spec_res.psd,
