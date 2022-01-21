@@ -459,7 +459,7 @@ class TestUiSeriesSummaryPlot:
             psd = psd, scalogram=scal, figsize=[4, 5], title='Test',
             period_label=period_label, psd_label=psd_label,
             value_label=value_label, time_label=time_label,
-            mute=True,
+            n_signif_test = 1, mute=True,
         )
         
         assert ax['scal'].properties()['ylabel'] == period_label, 'Period label is not being passed properly'

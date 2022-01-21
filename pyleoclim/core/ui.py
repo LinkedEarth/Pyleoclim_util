@@ -1407,22 +1407,29 @@ class Series:
             del wavelet_kwargs['method']
             print('Please pass method via exposed wavelet_method argument, exposed argument overrides key word argument')
         
-        if scalogram is None:
-            if n_signif_test > 0:
+        
+        if n_signif_test > 0:
+            if scalogram is None:
                 scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs).signif_test(number=n_signif_test, export_scal=True)
             else:
+                scalogram = scalogram.signif_test(number=n_signif_test, export_scal=True)
+        else:
+            if scalogram is None:
                 scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs)
         
         if 'cbar_style' not in wavelet_plot_kwargs:
-            wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.1}})
+            wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.12}})
 
         ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
         ax['scal'].invert_yaxis()
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
         
-        if psd_method==wavelet_method:
+        if psd is None and psd_method==scalogram.wave_method:
             psd_scal = scalogram
+            if n_signif_test > 0:
+                psd_signif_scal = psd_scal.signif_scals
+        if psd and psd.spec_method==scalogram.wave_method:
             if n_signif_test > 0:
                 psd_signif_scal = scalogram.signif_scals
         else:
@@ -1433,17 +1440,14 @@ class Series:
             del psd_kwargs['method']
             print('Please pass method via exposed psd_method argument, exposed argument overrides key word argument')
             
-        if psd is None:
-            if psd_kwargs:
-                if n_signif_test > 0:
-                    psd = self.spectral(method=psd_method,scalogram=psd_scal,**psd_kwargs).signif_test(number=n_signif_test,signif_scals=psd_signif_scal)
-                else:
-                    psd = self.spectral(method=psd_method,scalogram=psd_scal,**psd_kwargs)
+        if n_signif_test > 0:
+            if psd is None:
+                psd = self.spectral(method=psd_method,scalogram=psd_scal,**psd_kwargs).signif_test(number=n_signif_test,signif_scals=psd_signif_scal)
             else:
-                if n_signif_test > 0:
-                    psd = self.spectral(method=psd_method,scalogram=psd_scal).signif_test(number=n_signif_test,signif_scals=psd_signif_scal)
-                else:
-                    psd = self.spectral(method=psd_method,scalogram=psd_scal)
+                psd = psd.signif_test(number=n_signif_test,signif_scals=psd_signif_scal)
+        else:
+            if psd is None:
+                psd = self.spectral(method=psd_method,scalogram=psd_scal,**psd_kwargs)
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, **psd_plot_kwargs)
         
