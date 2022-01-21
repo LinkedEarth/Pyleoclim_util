@@ -1409,7 +1409,7 @@ class Series:
         
         if scalogram is None:
             if n_signif_test > 0:
-                scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs).signif_test(number=n_signif_test)
+                scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs).signif_test(number=n_signif_test, export_scal=True)
             else:
                 scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs)
         
@@ -1423,8 +1423,11 @@ class Series:
         
         if psd_method==wavelet_method:
             psd_scal = scalogram
+            if n_signif_test > 0:
+                psd_signif_scal = scalogram.signif_scals
         else:
             psd_scal = None
+            psd_signif_scal = None
             
         if 'method' in list(psd_kwargs.keys()):
             del psd_kwargs['method']
@@ -1433,12 +1436,12 @@ class Series:
         if psd is None:
             if psd_kwargs:
                 if n_signif_test > 0:
-                    psd = self.spectral(method=psd_method,scalogram=psd_scal,**psd_kwargs).signif_test(number=n_signif_test)
+                    psd = self.spectral(method=psd_method,scalogram=psd_scal,**psd_kwargs).signif_test(number=n_signif_test,signif_scals=psd_signif_scal)
                 else:
                     psd = self.spectral(method=psd_method,scalogram=psd_scal,**psd_kwargs)
             else:
                 if n_signif_test > 0:
-                    psd = self.spectral(method=psd_method,scalogram=psd_scal).signif_test(number=n_signif_test)
+                    psd = self.spectral(method=psd_method,scalogram=psd_scal).signif_test(number=n_signif_test,signif_scals=psd_signif_scal)
                 else:
                     psd = self.spectral(method=psd_method,scalogram=psd_scal)
 
@@ -2822,22 +2825,25 @@ class PSD:
             number=number, seed=seed, method=method, settings=settings
         )
         
-        # if signif_scals and self.spec_method == 'wwz':
-        #     try:
-        #         signif_scals_len = len(signif_scals.scalogram_list)
-        #         print(signif_scals_len)
-        #     except:
-        #         print('Signif_scals does not appear to be a Multiple Scalogram object continuing without')
-        #         surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
-        #     if signif_scals_len == number:
-        #         surr_psd = surr.spectral(
-        #             method=self.spec_method, settings=self.spec_args, scalogram=signif_scals
-        #         )
-        #     else:
-        #         print('Number of significance tests does not match length of Multiple Scalogram, continuint without')
-        #         surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
-        # else:
-        surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
+        signif_scals_len = None
+        if signif_scals and self.spec_method == 'wwz':
+            try:
+                signif_scals_len = len(signif_scals.scalogram_list)
+                print(signif_scals_len)
+            except:
+                print('Signif_scals does not appear to be a Multiple Scalogram object, continuing without')
+                surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
+                
+        if signif_scals_len:
+            if signif_scals_len == number:
+                surr_psd = surr.spectral(
+                    method=self.spec_method, settings=self.spec_args, scalogram_list=signif_scals
+                )
+            else:
+                print('Number of significance tests does not match length of Multiple Scalogram, continuint without')
+                surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
+        else:
+            surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
         new.signif_qs = surr_psd.quantiles(qs=qs)
         new.signif_method = method
 
@@ -4637,7 +4643,7 @@ class MultipleSeries:
             ms.series_list[idx]=s
         return ms
 
-    def spectral(self, method='lomb_scargle', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False):
+    def spectral(self, method='lomb_scargle', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False, scalogram_list=None):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -4663,6 +4669,9 @@ class MultipleSeries:
 
         mute_pbar : {True, False}
             Mute the progress bar. Default is False.
+        
+        scalogram_list : pyleoclim.MultipleScalogram object, optional
+            Multiple scalogram object containing pre-computed scalograms to use when calculating spectra, only works with wwz
 
         Returns
         -------
@@ -4695,9 +4704,20 @@ class MultipleSeries:
         settings = {} if settings is None else settings.copy()
 
         psd_list = []
-        for s in tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar):
-            psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
-            psd_list.append(psd_tmp)
+        if method == 'wwz' and scalogram_list:
+            if len(scalogram_list.scalogram_list) == len(self.series_list):
+                for idx, s in enumerate(tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar)):
+                    psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
+                    psd_list.append(psd_tmp)
+            else:
+                print('Length of scalogram list does not match length of series list, continuing without')
+                for s in tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar):
+                    psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
+                    psd_list.append(psd_tmp)
+        else: 
+            for s in tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar):
+                psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
+                psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)
 

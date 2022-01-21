@@ -39,9 +39,9 @@ def importLiPD():
 def load_data():
     #Loads stott MD982176 record
     try:
-        d = pyleo.Lipd(url='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
+        d = pyleo.Lipd(usr_path='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
     except:
-        d = pyleo.Lipd('../example_data/MD982176.Stott.2004.lpd')
+        d = pyleo.Lipd('./example_data/MD982176.Stott.2004.lpd')
     return d
 
 class TestUiLipdTo_tso():

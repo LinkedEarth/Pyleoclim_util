@@ -224,6 +224,16 @@ class TestUiSeriesSpectral:
         psd = ts.spectral(method=spec_method)
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
+        
+    def test_spectral_t7(self):
+        '''Test the spectral significance testing with pre-generated scalogram objects
+        '''
+        
+        ts = pyleo.gen_ts(model='colored_noise')
+        scal = ts.wavelet()
+        signif = scal.signif_test(number=2,export_scal = True)
+        sig_psd = ts.spectral(method='wwz',scalogram=scal)
+        sig_psd.signif_test(number=2,signif_scals=signif.signif_scals).plot()
 
 class TestUiSeriesBin:
     ''' Tests for Series.bin()

@@ -48,9 +48,9 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
 def load_data():
     #Loads stott MD982176 record
     try:
-        d = pyleo.Lipd(url='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
+        d = pyleo.Lipd(usr_path='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
     except:
-        d = pyleo.Lipd('../example_data/MD982176.Stott.2004.lpd')
+        d = pyleo.Lipd('./example_data/MD982176.Stott.2004.lpd')
     return d
 
 # Tests below
@@ -417,6 +417,20 @@ class TestMultipleSeriesStackPlot():
         ms = pyleo.MultipleSeries([sst,d18Osw])
         ms.stackplot(plot_kwargs=plot_kwargs, mute=True)
         
+class TestMultipleSeriesSpectral():
+    ''' Test for MultipleSeries.spectral
+    '''
+    
+    def test_spectral_t0(self):
+        '''Test the spectral function with pre-generated scalogram objects
+        '''
+        
+        d=load_data()
+        sst = d.to_LipdSeries(number=5)
+        d18Osw = d.to_LipdSeries(number=3)
+        ms = pyleo.MultipleSeries([sst,d18Osw])
+        scals = ms.wavelet()
+        psds = ms.spectral(method='wwz',scalogram_list=scals)
         
         
         
