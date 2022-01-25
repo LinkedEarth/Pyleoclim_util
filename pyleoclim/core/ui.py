@@ -1482,9 +1482,6 @@ class Series:
             ax['ts'].set_ylabel(value_label)
             if 'ylabel' in ts_plot_kwargs:
                 print('Ylabel passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-        # else:
-        #     time_label, value_label = self.make_labels()
-        #     ax['ts'].set_ylabel(value_label, labelpad=11.0)
 
         if time_label is not None:
             #time_label, value_label = self.make_labels()
