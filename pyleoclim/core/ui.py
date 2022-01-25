@@ -1202,7 +1202,8 @@ class Series:
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
                     time_label=None, value_label=None, period_label=None, psd_label='PSD', wavelet_method = 'wwz', 
                     wavelet_kwargs = None, psd_method = 'wwz', psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None, 
-                    psd_plot_kwargs = None, trunc_series = None, preprocess = True, savefig_settings=None, mute=False):
+                    psd_plot_kwargs = None, trunc_series = None, preprocess = True, y_label_loc = -.15, savefig_settings=None, 
+                    mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
 
@@ -1274,6 +1275,9 @@ class Series:
                     - legend
                     - tick parameters
                 These will be overriden by summary plot to prevent formatting errors
+                
+        y_label_loc : float
+            Plot parameter to adjust horizontal location of y labels to avoid conflict with axis labels, default value is -0.15
                 
         trunc_series : list or tuple
             the limitation of the time axis. This will slice the actual time series into one contained within the 
@@ -1387,6 +1391,7 @@ class Series:
         ax['ts'] = plt.subplot(gs[0:1, :-3])
         ax['ts'] = self.plot(ax=ax['ts'], **ts_plot_kwargs)
         ax['ts'].xaxis.set_visible(False)
+        ax['ts'].get_yaxis().set_label_coords(y_label_loc,0.5)
         
         if preprocess:
             self = self.standardize().detrend()
@@ -1407,7 +1412,6 @@ class Series:
             del wavelet_kwargs['method']
             print('Please pass method via exposed wavelet_method argument, exposed argument overrides key word argument')
         
-        
         if n_signif_test > 0:
             if scalogram is None:
                 scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs).signif_test(number=n_signif_test, export_scal=True)
@@ -1422,6 +1426,7 @@ class Series:
 
         ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
         ax['scal'].invert_yaxis()
+        ax['scal'].get_yaxis().set_label_coords(y_label_loc,0.5)
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
         
@@ -1490,6 +1495,7 @@ class Series:
             ax['scal'].set_ylabel(period_label)
             if 'ylabel' in wavelet_plot_kwargs:
                 print('Ylabel passed to scalogram plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+                
 
         if psd_label is not None:
             ax['psd'].set_xlabel(psd_label)
