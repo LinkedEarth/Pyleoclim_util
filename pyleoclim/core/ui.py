@@ -2839,13 +2839,13 @@ class PSD:
         if signif_scals and self.spec_method == 'wwz':
             try:
                 signif_scals_len = len(signif_scals.scalogram_list)
-                print(signif_scals_len)
             except:
                 print('Signif_scals does not appear to be a Multiple Scalogram object, continuing without')
                 surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
                 
         if signif_scals_len:
             if signif_scals_len == number:
+                print('Scalogram list matches number of sig tests')
                 surr_psd = surr.spectral(
                     method=self.spec_method, settings=self.spec_args, scalogram_list=signif_scals
                 )
