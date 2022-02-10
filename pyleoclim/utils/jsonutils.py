@@ -267,7 +267,12 @@ def json_to_Scalogram(filename):
         c = Scalogram_to_MultipleScalogram(t['signif_qs']['scalogram_list'])
     else:
         c = t['signif_qs']
-                             
+    
+    if type(t['signif_scals']) is dict:
+       d = Scalogram_to_MultipleScalogram(t['signif_scals']['scalogram_list'])
+    else:
+       d = t['signif_scals']
+        
     scalogram = pyleo.Scalogram(frequency=np.array(t['frequency']),time=np.array(t['time']),
                                amplitude=np.array(t['amplitude']),coi=t['coi']
                                ,label=t['label'],timeseries=ts,
@@ -278,7 +283,10 @@ def json_to_Scalogram(filename):
                                freq_method=t['freq_method'],
                                freq_kwargs=t['freq_kwargs'],
                                period_unit=t['period_unit'],
-                               time_label=t['time_label'])
+                               time_label=t['time_label'],
+                               wwz_Neffs=t['wwz_Neffs'],
+                               signif_scals=d)
+    
     return scalogram
 
 
@@ -335,3 +343,8 @@ def json_to_Coherence(filename):
                                signif_qs = c,
                                signif_method=t['signif_method'])
     return coherence
+
+def json_to_MulitplePSD(filename):
+    with open(filename,'r') as f:
+        t = json.load(f)
+    t = list_to_array(t)
