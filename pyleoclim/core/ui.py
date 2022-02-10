@@ -3172,7 +3172,7 @@ class PSD:
 class Scalogram:
     def __init__(self, frequency, time, amplitude, coi=None, label=None, Neff=3, wwz_Neffs=None, timeseries=None,
                  wave_method=None, wave_args=None, signif_qs=None, signif_method=None, freq_method=None, freq_kwargs=None,
-                 period_unit=None, time_label=None):
+                 period_unit=None, time_label=None, signif_scals=None):
         '''
         Parameters
         ----------
@@ -3183,10 +3183,34 @@ class Scalogram:
             amplitude : array
                 the amplitude at each (frequency, time) point;
                 note the dimension is assumed to be (frequency, time)
+            coi : array
+                Cone of influence
+            label : str
+                Label for the Series
             Neff : int
                 the threshold of the number of effective samples
             wwz_Neffs : array
                 the matrix of effective number of points in the time-scale coordinates obtained from wwz
+            timeseries : pyleoclim.Series
+                A copy of the timeseries for which the scalogram was obtained
+            wave_method: str
+                The method used to obtain the scalogram
+            wave_args: dict
+                The parameters values of the wavelet method
+            signif_qs : dict
+                The significance limits
+            signif_method: str
+                The method used to obtain the significance level
+            freq_method: str
+                The method used to obtain the frequency vector
+            freq_kwargs: dict
+                Arguments for the frequency vector
+            period_unit: str
+                Units for the period axis
+            time_label: str
+                Label for the time axis
+            signif_scals: pyleoclim.MultipleScalogram
+                A list of the scalogram from the AR1 MC significance testing. Useful when obtaining a PSD. 
         '''
         self.frequency = np.array(frequency)
         self.time = np.array(time)
@@ -3203,8 +3227,9 @@ class Scalogram:
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
-        if wave_method == 'wwz':
-            self.wwz_Neffs = wwz_Neffs
+        self.signif_scals = signif_scals
+        #if wave_method == 'wwz':
+        self.wwz_Neffs = wwz_Neffs
 
         if period_unit is not None:
             self.period_unit = period_unit
