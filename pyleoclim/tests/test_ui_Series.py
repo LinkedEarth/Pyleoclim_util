@@ -233,7 +233,7 @@ class TestUiSeriesSpectral:
         scal = ts.wavelet()
         signif = scal.signif_test(number=2,export_scal = True)
         sig_psd = ts.spectral(method='wwz',scalogram=scal)
-        sig_psd.signif_test(number=2,signif_scals=signif.signif_scals).plot()
+        sig_psd.signif_test(number=2,scalogram=signif).plot()
 
 class TestUiSeriesBin:
     ''' Tests for Series.bin()

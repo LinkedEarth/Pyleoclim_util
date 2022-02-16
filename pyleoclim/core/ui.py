@@ -1201,7 +1201,7 @@ class Series:
             return ax
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None,
-                    time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
+                    time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=None,
                     time_label=None, value_label=None, period_label=None, psd_label='PSD', wavelet_method = 'wwz', 
                     wavelet_kwargs = None, psd_method = 'wwz', psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None, 
                     psd_plot_kwargs = None, trunc_series = None, preprocess = True, y_label_loc = -.15, savefig_settings=None, 
@@ -1237,8 +1237,8 @@ class Series:
         psd_lim : list or tuple
             the limitation of the psd axis
 
-        n_signif_test=100 : int
-            Number of Monte-Carlo simulations to perform for significance testing. Used when psd=None or scalogram=None.
+        n_signif_test=None : int
+            Number of Monte-Carlo simulations to perform for significance testing. Default is None. If a scalogram is passed it will be parsed for significance testing purposes.
 
         time_label : str
             the label for the time axis
@@ -1414,12 +1414,25 @@ class Series:
             del wavelet_kwargs['method']
             print('Please pass method via exposed wavelet_method argument, exposed argument overrides key word argument')
         
+        if n_signif_test is None:
+            #If significance testing isn't specified then we either use what we can find or don't do significance testing
+            if scalogram is not None:
+                if getattr(scalogram,'signif_scals',None) is not None:
+                    n_signif_test = len(scalogram.signif_scals.scalogram_list)
+                else:
+                    n_signif_test = 0
+            else:
+                n_signif_test = 0
+    
         if n_signif_test > 0:
+            #If a scalogram is not passed and significance tests are requested
             if scalogram is None:
                 scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs).signif_test(number=n_signif_test, export_scal=True)
-            else:
-                scalogram = scalogram.signif_test(number=n_signif_test, export_scal=True)
-        else:
+            #If a scalogram is passed, significance tests are requested, and the passed scalogram has some significance tests stored in it
+            elif scalogram is not None:
+                scalogram = scalogram.signif_test(number=n_signif_test, export_scal = True)
+        elif n_signif_test == 0:
+            #If specifically no significance tests are requested we just need to generate a scalogram (unless one has been passed)
             if scalogram is None:
                 scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs)
         
@@ -1434,9 +1447,7 @@ class Series:
         
         if psd is None and psd_method==scalogram.wave_method:
             psd_scal = scalogram
-            if n_signif_test > 0:
-                psd_signif_scal = psd_scal.signif_scals
-        if psd and psd.spec_method==scalogram.wave_method:
+        elif psd is not None and psd.spec_method==scalogram.wave_method:
             if n_signif_test > 0:
                 psd_signif_scal = scalogram.signif_scals
         else:
@@ -1446,15 +1457,26 @@ class Series:
         if 'method' in list(psd_kwargs.keys()):
             del psd_kwargs['method']
             print('Please pass method via exposed psd_method argument, exposed argument overrides key word argument')
-            
+        
+        #Doing effectively the same thing we did for scalogram but now for the psd object
         if n_signif_test > 0:
             if psd is None:
-                psd = self.spectral(method=psd_method,scalogram=psd_scal,**psd_kwargs).signif_test(number=n_signif_test,signif_scals=psd_signif_scal)
-            else:
-                psd = psd.signif_test(number=n_signif_test,signif_scals=psd_signif_scal)
-        else:
+                if psd_method == scalogram.wave_method:
+                    psd = self.spectral(method=psd_method,scalogram=scalogram,**psd_kwargs).signif_test(number=n_signif_test,scalogram=scalogram)
+                elif psd_method != scalogram.wave_method:
+                    psd = self.spectral(method=psd_method,**psd_kwargs).signif_test(number=n_signif_test)
+            elif psd is not None:
+                if psd_method == scalogram.wave_method:
+                    psd = psd.signif_test(number=n_signif_test,scalogram=scalogram)
+                elif psd_method != scalogram.wave_method:
+                    psd = psd.signif_test(number=n_signif_test)
+        #At this point n_signif_test will be set to zero or some positive number
+        elif n_signif_test == 0:
             if psd is None:
-                psd = self.spectral(method=psd_method,scalogram=psd_scal,**psd_kwargs)
+                if psd_method == scalogram.wave_method:
+                    psd = self.spectral(method=psd_method,scalogram=scalogram,**psd_kwargs)
+                elif psd_method != scalogram.wave_method:
+                    psd = self.spectral(method=psd_method,**psd_kwargs)
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, **psd_plot_kwargs)
         
@@ -3405,7 +3427,7 @@ class Scalogram:
         else:
             return ax
 
-    def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95],
+    def signif_test(self, number=None, method='ar1', seed=None, qs=[0.95],
                     settings=None, export_scal = False):
         '''Significance test for wavelet analysis
 
@@ -3440,14 +3462,43 @@ class Scalogram:
         pyleoclim.core.ui.Series.wavelet : wavelet analysis
 
         '''
-        if number == 0:
+
+        if hasattr(self,'signif_scals'):
+            signif_scals = self.signif_scals
+        
+        #Allow for a few different configurations of passed number of signif tests, default behavior is to set number = 200
+        if number is None and signif_scals is not None:
+            number = len(signif_scals.scalogram_list)
+        elif number is None and signif_scals is None:
+            number = 200
+        elif number == 0:
             return self
 
         new = self.copy()
-        surr = self.timeseries.surrogates(
+
+        if signif_scals:
+            scalogram_list = signif_scals.scalogram_list
+            #If signif_scals already in scalogram object are more than those requested for significance testing, use as many of them as required
+            if len(scalogram_list) > number:
+                surr_scal = MultipleScalogram(scalogram_list=scalogram_list[:number])
+            #If number is the same as the length of signif_scals, just use signif_scals
+            elif len(scalogram_list) == number:
+                surr_scal = signif_scals
+            #If the number is more than the length of signif_scals, reuse what is available and calculate the rest
+            elif len(scalogram_list) < number:
+                number -= len(scalogram_list)
+                surr_scal_tmp = []
+                surr_scal_tmp.extend(scalogram_list)
+                surr = self.timeseries.surrogates(
             number=number, seed=seed, method=method, settings=settings
         )
-        surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args)
+                surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, settings=self.wave_args,).scalogram_list)
+                surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
+        else:
+            surr = self.timeseries.surrogates(
+            number=number, seed=seed, method=method, settings=settings
+        )
+            surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args,)
 
         if len(qs) > 1:
             raise ValueError('qs should be a list with size 1!')
