@@ -423,7 +423,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     else:
         ts_seg.append(ts)
         ys_seg.append(ys)
-    
+
     if freq is None:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         if 'dt' not in freq_kwargs.keys():
@@ -435,9 +435,9 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
             #remove zero freq
     if freq[0]==0:
         freq=np.delete(freq,0)
-    
+
     freq_angular = 2 * np.pi * freq
-    
+
     psd_seg=[]
 
     for idx,item in enumerate(ys_seg):
@@ -616,7 +616,19 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             detrend=False, sg_kwargs=None, gaussianize=False,
             standardize=False, Neff=3, anti_alias=False, avgs=2,
             method='Kirchner_numba', wwa=None, wwz_Neffs=None, wwz_freq=None):
-    ''' Return the psd of a timeseries using wwz method.
+    ''' Returns the power spectral density (PSD) of a timeseries using the Weighted Wavelet Z-transform
+
+    The Weighted wavelet Z-transform (WWZ) is based on Morlet wavelet spectral estimation, using
+    least squares minimization to suppress the energy leakage caused by the data gaps.
+    WWZ does not rely on interpolation or detrending, and is appropriate for unevenly-spaced datasets.
+    In particular, we use the variant of Kirchner & Neal (2013), in which basis rotations mitigate the
+    numerical instability that occurs in pathological cases with the original algorithm (Foster, 1996).
+    The WWZ method has one adjustable parameter, a decay constant `c` that balances the time and frequency
+    resolutions of the analysis. The smaller this constant is, the sharper the peaks.
+     We choose the value 1e-3 to obtain smooth spectra that lend themselves to better scaling exponent estimation,
+     while still capturing the main periodicities.
+
+     Note that scalogram applications use the larger value (8π2)−1, justified elsewhere (Foster, 1996).
 
     Parameters
     ----------
@@ -711,8 +723,8 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     References
     ----------
     - Foster, G. (1996). Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112(4), 1709-1729.
-    - Kirchner, J. W. (2005). Aliasin in 1/f(alpha) noise spectra: origins, consequences, and remedies. Physical Review E covering statistical, nonlinear, biological, and soft matter physics, 71, 66110.
-
+    - Kirchner, J. W. (2005). Aliasin in 1/f^a noise spectra: origins, consequences, and remedies. Physical Review E covering statistical, nonlinear, biological, and soft matter physics, 71, 66110.
+    - Kirchner, J. W. and Neal, C. (2013). Universal fractal scaling in stream chemistry and its impli-cations for solute transport and water quality trend detection. Proc Natl Acad Sci USA 110:12213–12218.
     '''
     ys_cut, ts_cut, freq, tau = prepare_wwz(ys, ts, freq=freq,
                                             freq_method=freq_method,
