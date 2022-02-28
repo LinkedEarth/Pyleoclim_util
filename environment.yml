@@ -132,11 +132,11 @@ dependencies:
     - bagit==1.8.1
     - charset-normalizer==2.0.7
     - cython==0.29.24
-    - demjson==2.2.4
+    - demjson3==3.0.5
     - dill==0.3.4
     - idna==3.3
     - joblib==1.1.0
-    - lipd==0.2.8.7
+    - lipd==0.2.8.8
     - llvmlite==0.36.0
     - multiprocess==0.70.12.2
     - networkx==2.6.3
@@ -149,7 +149,7 @@ dependencies:
     - pox==0.3.0
     - ppft==1.6.6.4
     - pyhht==0.1.0
-    - pyleoclim==0.6.3b0
+    - pyleoclim==0.7.2b0
     - pytz==2021.3
     - requests==2.26.0
     - scikit-learn==1.0

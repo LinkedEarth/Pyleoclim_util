@@ -22,11 +22,9 @@ dependencies:
     - nitime>=0.9
     - tabulate>=0.8.9
     - Unidecode>=1.2.1
-    - LiPD==0.2.8.7
+    - LiPD==0.2.8.8
     - numpydoc>=1.1.0
     - nbsphinx
     - IPython
     - readthedocs-sphinx-search>=0.1.0
     - git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
-    - setuptools==56.0.0
-    - demjson
