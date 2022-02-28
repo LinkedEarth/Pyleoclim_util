@@ -3754,7 +3754,7 @@ class Coherence:
         cb = plt.colorbar(cont, **cbar_args)
 
         # plot cone of influence
-        ax.set_yscale('log', nonposy='clip')
+        ax.set_yscale('log')
         ax.plot(self.time, self.coi, 'k--')
 
         if ylim is None:
