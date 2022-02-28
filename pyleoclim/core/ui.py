@@ -1218,6 +1218,8 @@ class Series:
 
         scalogram : Scalogram
             the Scalogram object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
+            If the passed scalogram object contains stored signif_scals (see pyleo.Scalogram.signif_test() for details) these will
+            be flexibly reused as a function of the value of n_signif_test in the summary plot. 
 
         figsize : list
             a list of two integers indicating the figure size
@@ -1329,9 +1331,12 @@ class Series:
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             fig, ax = series.summary_plot(n_signif_test=1)
+
+            pyleo.showfig(fig)
+
             pyleo.closefig(fig)
             
-        Summary_plot with pre-generated psd and scalogram objects.
+        Summary_plot with pre-generated psd and scalogram objects. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
         
         .. ipython:: python
             :okwarning:
@@ -1344,9 +1349,12 @@ class Series:
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
+
+            pyleo.showfig(fig)
+
             pyleo.closefig(fig)
         
-        Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed.
+        Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
         
         .. ipython:: python
             :okwarning:
@@ -1359,8 +1367,10 @@ class Series:
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
+            
+            pyleo.showfig(fig)
+            
             pyleo.closefig(fig)
-        
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -1444,15 +1454,6 @@ class Series:
         ax['scal'].get_yaxis().set_label_coords(y_label_loc,0.5)
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
-        
-        if psd is None and psd_method==scalogram.wave_method:
-            psd_scal = scalogram
-        elif psd is not None and psd.spec_method==scalogram.wave_method:
-            if n_signif_test > 0:
-                psd_signif_scal = scalogram.signif_scals
-        else:
-            psd_scal = None
-            psd_signif_scal = None
             
         if 'method' in list(psd_kwargs.keys()):
             del psd_kwargs['method']
@@ -2851,6 +2852,33 @@ class PSD:
         new : pyleoclim.PSD
             New PSD object with appropriate significance test
 
+        Examples
+        --------
+
+        If significance tests from a comparable scalogram have been saved, they can be passed here to speed up the generation of noise realizations for significance testing
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+            
+            import pyleoclim as pyleo
+            import pandas as pd
+            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
+            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+
+            #Setting export_scal to True saves the noise realizations generated during significance testing for future use
+            scalogram = series.wavelet().signif_test(number=5,export_scal=True)
+
+            #The psd can be calculated by using the previously generated scalogram
+            psd = series.spectral(scalogram=scalogram)
+
+            #The same scalogram can then be passed to do significance testing. Pyleoclim will dig through the scalogram to find the saved noise realizations and reuse them flexibly.
+            fig, ax = psd.signif_test(scalogram=scalogram).plot()
+
+            pyleo.showfig(fig)
+
+            pyleo.closefig(fig)
+
         '''
         
         signif_scals = None
@@ -3444,7 +3472,8 @@ class Scalogram:
         settings : dict, optional
             Parameters for the model. The default is None.
         export_scal : bool
-            Whether or not to export the scalograms used in the noise realizations
+            Whether or not to export the scalograms used in the noise realizations. Note: The scalograms used for wavelet analysis are slightly different
+            than those used for spectral analysis (different decay constant). As such, this functionality should be used only to expedite exploratory analysis.
 
         Raises
         ------
@@ -3455,6 +3484,23 @@ class Scalogram:
         -------
         new : pyleoclim.Scalogram
             A new Scalogram object with the significance level
+
+        Examples
+        --------
+
+        Generating scalogram, running significance tests, and saving the output for future use in generating psd objects or in summary_plot()
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+            
+            import pyleoclim as pyleo
+            import pandas as pd
+            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
+            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+
+            #By setting export_scal to True, the noise realizations used to generate the significance test will be saved. These come in handy for generating summary plots and for running significance tests on spectral objects.
+            scalogram = series.wavelet().signif_test(export_scal=True)
 
         See also
         --------
@@ -3708,7 +3754,7 @@ class Coherence:
         cb = plt.colorbar(cont, **cbar_args)
 
         # plot cone of influence
-        ax.set_yscale('log', nonposy='clip')
+        ax.set_yscale('log')
         ax.plot(self.time, self.coi, 'k--')
 
         if ylim is None:

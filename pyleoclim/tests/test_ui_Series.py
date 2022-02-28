@@ -50,7 +50,15 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
     t = np.arange(nt)
     v = colored_noise(alpha=alpha, t=t, f0=f0, m=m, seed=seed)
     return t, v
-
+    
+def load_data():
+    try:
+        url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/scal_signif_benthic.json'
+        response = urlopen(url)
+        d = json.loads(response.read())
+    except:
+        d = pyleo.utils.jsonutils.json_to_Scalogram('./example_data/scal_signif_benthic.json')
+    return d
 
 # Tests below
 
@@ -441,16 +449,15 @@ class TestUiSeriesSummaryPlot:
     ''' Test Series.summary_plot()
     '''
     def test_summary_plot_t0(self):
-        ''' Generate a colored noise and run the summary_plot() function.
+        '''Testing that labels are being passed and that psd and scalogram objects dont fail when passed. 
+        Also testing that we can specify fewer significance tests than those stored in the scalogram object
         Note that we should avoid pyleo.showfig() in tests.
         
         Passing pre generated scalogram and psd.
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=100, alpha=alpha)
-        ts = pyleo.Series(time=t, value=v)
-        scal = ts.wavelet()
-        psd = ts.spectral()
+        scal = load_data()
+        ts = scal.timeseries
+        psd = ts.spectral(scalogram=scal)
         period_label='Period'
         psd_label='PSD'
         time_label='Time'
@@ -459,7 +466,7 @@ class TestUiSeriesSummaryPlot:
             psd = psd, scalogram=scal, figsize=[4, 5], title='Test',
             period_label=period_label, psd_label=psd_label,
             value_label=value_label, time_label=time_label,
-            n_signif_test = 1, mute=True,
+            n_signif_test = 1
         )
         
         assert ax['scal'].properties()['ylabel'] == period_label, 'Period label is not being passed properly'
@@ -468,32 +475,59 @@ class TestUiSeriesSummaryPlot:
         assert ax['ts'].properties()['ylabel'] == value_label, 'Value label is not being passed properly'
 
         plt.close(fig)
-        
+
     def test_summary_plot_t1(self):
-        ''' Generate a colored noise and run the summary_plot() function.
+        '''Testing that the bare function works
         Note that we should avoid pyleo.showfig() in tests.
     
         Passing just a pre generated psd.
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=100, alpha=alpha)
-        ts = pyleo.Series(time=t, value=v)
-        psd = ts.spectral()
-        period_label='Period'
-        psd_label='PSD'
-        time_label='Time'
-        value_label='Value'
+        scal = load_data()
+        ts = scal.timeseries
+        fig, ax = ts.summary_plot()
+    
+        plt.close(fig)  
+    
+    def test_summary_plot_t2(self):
+        '''Testing that we can pass just the scalogram object
+        Note that we should avoid pyleo.showfig() in tests.
+    
+        Passing just a pre generated psd.
+        '''
+        scal = load_data()
+        ts = scal.timeseries
         fig, ax = ts.summary_plot(
-            psd = psd, figsize=[4, 5], title='Test',
-            period_label=period_label, psd_label=psd_label,
-            value_label=value_label, time_label=time_label,
-            n_signif_test = 1, mute=True,
+            scalogram = scal
         )
     
-        assert ax['scal'].properties()['ylabel'] == period_label, 'Period label is not being passed properly'
-        assert ax['psd'].properties()['xlabel'] == psd_label, 'PSD label is not being passed properly'
-        assert ax['scal'].properties()['xlabel'] == time_label, 'Time label is not being passed properly'
-        assert ax['ts'].properties()['ylabel'] == value_label, 'Value label is not being passed properly'
+        plt.close(fig)
+
+    def test_summary_plot_t3(self):
+        '''Testing that we can generate pass just a psd object and no scalogram
+        Note that we should avoid pyleo.showfig() in tests.
+    
+        Passing just a pre generated psd.
+        '''
+        scal = load_data()
+        ts = scal.timeseries
+        psd = ts.spectral(scalogram=scal)
+        fig, ax = ts.summary_plot(
+            psd = psd
+        )
+
+        plt.close(fig)
+
+    def test_summary_plot_t4(self):
+        '''Testing that we can generate a psd object using a different method from that of the passed scalogram
+        Note that we should avoid pyleo.showfig() in tests.
+    
+        Passing just a pre generated psd.
+        '''
+        scal = load_data()
+        ts = scal.timeseries
+        fig, ax = ts.summary_plot(
+            scalogram = scal, psd_method='lomb_scargle'
+        )
     
         plt.close(fig)
 
