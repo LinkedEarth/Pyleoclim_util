@@ -27,7 +27,7 @@ setup(
     keywords=['Paleoclimate, Data Analysis, LiPD'],
     classifiers=[],
     install_requires=[
-        "LiPD==0.2.8.7",
+        "LiPD==0.2.8.8",
         "pandas>=1.3.0",
         "numpy>=1.21.1",
         "matplotlib>=3.4.2",
