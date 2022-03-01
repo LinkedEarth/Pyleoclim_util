@@ -2145,7 +2145,7 @@ class Series:
 
         pyleoclim.utils.wavelet.cwt : cwt function
 
-        pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
+        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
