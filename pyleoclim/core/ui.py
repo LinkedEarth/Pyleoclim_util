@@ -1348,7 +1348,7 @@ class Series:
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
-            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
+            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram,n_signif_test=2)
 
             pyleo.showfig(fig)
 
@@ -1366,7 +1366,7 @@ class Series:
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
-            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
+            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, n_signif_test=2, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
             
             pyleo.showfig(fig)
             
@@ -2867,7 +2867,7 @@ class PSD:
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
 
             #Setting export_scal to True saves the noise realizations generated during significance testing for future use
-            scalogram = series.wavelet().signif_test(number=5,export_scal=True)
+            scalogram = series.wavelet().signif_test(number=2,export_scal=True)
 
             #The psd can be calculated by using the previously generated scalogram
             psd = series.spectral(scalogram=scalogram)
@@ -3500,7 +3500,7 @@ class Scalogram:
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
 
             #By setting export_scal to True, the noise realizations used to generate the significance test will be saved. These come in handy for generating summary plots and for running significance tests on spectral objects.
-            scalogram = series.wavelet().signif_test(export_scal=True)
+            scalogram = series.wavelet().signif_test(number=2, export_scal=True)
 
         See also
         --------
