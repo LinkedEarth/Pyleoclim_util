@@ -2268,7 +2268,7 @@ class Series:
 
         pyleoclim.utils.wavelet.xwt : Cross-wavelet analysis based on WWZ method
 
-        pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
+        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
@@ -4826,7 +4826,7 @@ class MultipleSeries:
 
         pyleoclim.utils.spectral.wwz_psd : Spectral analysis using the Wavelet Weighted Z transform
 
-        pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
+        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
@@ -4906,7 +4906,7 @@ class MultipleSeries:
         --------
         pyleoclim.utils.wavelet.wwz : wwz function
 
-        pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
+        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
