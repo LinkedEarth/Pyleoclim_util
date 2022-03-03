@@ -464,7 +464,7 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     References
     ----------
 
-    1. Tapio Schneider's MATLAB code: http://www.clidyn.ethz.ch/imputation/standardize.m
+    1. Tapio Schneider's MATLAB code: https://github.com/tapios/RegEM/blob/master/standardize.m
     2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
 
     See also
@@ -496,6 +496,42 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
         z = (x - mu2) / sig2
 
     return z, mu, sig
+
+def center(y, axis=0):
+    """ Centers array y (i.e. removes the sample mean) 
+
+    Parameters
+    ----------
+
+    y : array
+        vector of (real) numbers as a time series, NaNs allowed
+    axis : int or None
+        axis along which to operate, if None, compute over the whole array
+        
+    Returns
+    -------
+
+    yc : array
+       The centered time series, yc = (y - ybar), NaNs allowed
+    ybar : real
+        The sampled mean of the original time series, y 
+
+    References
+    ----------
+    Tapio Schneider's MATLAB code: https://github.com/tapios/RegEM/blob/master/center.m
+
+    """
+    y = np.asanyarray(y)
+    assert y.ndim <= 2, 'The time series y should be a vector or 2-D array!'
+
+    ybar = np.nanmean(y, axis=axis)  # the mean of the original time series
+
+    if axis and ybar.ndim < y.ndim:
+        yc = y - np.expand_dims(ybar, axis=axis) 
+    else:
+        yc = y - ybar
+
+    return yc, ybar
 
 
 def ts2segments(ys, ts, factor=10):
@@ -658,11 +694,11 @@ def gaussianize_single(X_single):
     return Xn_single
 
 
-def detrend(y, x = None, method = "emd", sg_kwargs = None):
+def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     """Detrend a timeseries according to four methods
 
     Detrending methods include, "linear", "constant", using a low-pass
-        Savitzky-Golay filter, and using eigen mode decomposition (default).
+        Savitzky-Golay filter, and using Empirical Mode Decomposition (default).
 
     Parameters
     ----------
@@ -674,10 +710,12 @@ def detrend(y, x = None, method = "emd", sg_kwargs = None):
        the Savitzky-Golay filters method since the series should be evenly spaced.
     method : str
         The type of detrending:
-        - linear: the result of a linear least-squares fit to y is subtracted from y.
-        - constant: only the mean of data is subtrated.
+        - "linear": the result of a linear least-squares fit to y is subtracted from y.
+        - "constant": only the mean of data is subtracted.
         - "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
         - "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+    n : int
+        Works only if `method == 'emd'`. The number of smoothest modes to remove.
     sg_kwargs : dict
         The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
 
@@ -726,7 +764,9 @@ def detrend(y, x = None, method = "emd", sg_kwargs = None):
         if np.shape(imfs)[0] == 1:
             trend = np.zeros(np.size(y))
         else:
-            trend = imfs[-1]
+            # trend = imfs[-1]
+            trend = np.sum(imfs[-n:], axis=0)  # remove the n smoothest modes
+
         ys = y - trend
     else:
         raise KeyError('Not a valid detrending method')
@@ -809,6 +849,7 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
        mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+            (going to be deprecated)
        plot_kwargs : dict
             keyword arguments for ax.plot()
 
@@ -871,9 +912,9 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
         if 'fig1' in locals():
             if 'path' in saveknee_settings:
                 savefig(fig1, settings=saveknee_settings)
-            else:
-                if not mute:
-                    showfig(fig1)
+            # else:
+            #     if not mute:
+            #         showfig(fig1)
 
         if plot_outliers==True:
             x2 = ts[outliers]

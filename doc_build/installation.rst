@@ -60,7 +60,7 @@ First install Cartopy:
 
 .. code-block:: bash
 
-  conda install cartopy
+  conda install -c conda-forge cartopy
 
 Then install Pyleoclim through Pypi, which contains the most stable version of Pyleoclim:
 
@@ -74,35 +74,12 @@ To install the development version, which contains the most up-to-date features:
 
   pip install git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
 
-Note that Pyleoclim is currently affected by `this issue <https://github.com/dmeranda/demjson/issues/40>`_, so you
-need to use `pip list` to check that the version of `demjson` that was installed is 2.2.4. If it is not, type:
-
-.. code-block:: bash
-
-  pip install demjson --upgrade
-
-In some rare cases this may return an error. If so, you first need to downgrade `setuptools`:
-
-.. code-block:: bash
-
-  pip install setuptools==56.0.0
-
-Then upgrade `demjson` as above, and check that the version is 2.2.4 or above.  We hope this glitch gets resolved soon!
-
 If you would like to use Jupyter Notebooks or Spyder for code development, install these packages in your environment:
 
 .. code-block:: bash
 
-  pip install spyder
-  pip install jupyter
-
-.. warning::
-  The GUI framework used by the LiPD packages may cause a known conflict with the GUI framework for spyder. If this is the case it is safe to downgrade the conflicting packages.
-
-.. code-block:: bash
-
-  pip install 'pyqt5<5.13'
-  pip install 'pyqtwebengine<5.13'
+  conda install spyder
+  conda install jupyter
 
 Building from source for the f2py feature of WWZ
 """"""""""""""""""""""""""""""""""""""""""""""""

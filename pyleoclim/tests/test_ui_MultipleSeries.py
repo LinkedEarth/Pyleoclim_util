@@ -19,6 +19,8 @@ from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
 
 import pytest
+from urllib.request import urlopen
+import json
 
 import pyleoclim as pyleo
 from pyleoclim.utils.tsmodel import (
@@ -42,7 +44,14 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
     t = np.arange(nt)
     v = colored_noise(alpha=alpha, t=t, f0=f0, m=m, seed=seed)
     return t, v
-
+    
+def load_data():
+    #Loads stott MD982176 record
+    try:
+        d = pyleo.Lipd(usr_path='http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004')
+    except:
+        d = pyleo.Lipd('./example_data/MD982176.Stott.2004.lpd')
+    return d
 
 # Tests below
 class TestUIMultipleSeriesDetrend():
@@ -272,10 +281,9 @@ class TestMultipleSeriesPca:
         Test with real data, same time axis
     
         ''' 
-        url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-        data = pyleo.Lipd(usr_path = url)
-        tslist = data.to_LipdSeriesList()
-        tslist = tslist[2:] # drop the first two series which only concerns age and depth
+        d=load_data()
+        tslist = d.to_LipdSeriesList()
+        tslist = tslist[2:]
         ms = pyleo.MultipleSeries(tslist)
         msl = ms.common_time()  # put on common time
     
@@ -386,3 +394,44 @@ class TestMultipleSeriesCommonTime:
         ms1 = ms.common_time(method='interp', start=1910, stop=2010, step=1/12)
         
         assert (np.diff(ms1.series_list[0].time)[0] - 1/12) < 1e-3
+        
+class TestMultipleSeriesStackPlot():
+    ''' Test for MultipleSeries.Stackplot
+    '''
+    
+    @pytest.mark.parametrize('labels', [None, 'auto', ['sst','d18Osw']])
+    def test_StackPlot_t0(self, labels):
+    
+        d=load_data()
+        sst = d.to_LipdSeries(number=5)
+        d18Osw = d.to_LipdSeries(number=3)
+        ms = pyleo.MultipleSeries([sst,d18Osw])
+        ms.stackplot(labels=labels, mute=True)
+    
+    @pytest.mark.parametrize('plot_kwargs', [{'marker':'o'},[{'marker':'o'},{'marker':'^'}]])
+    def test_StackPlot_t1(self, plot_kwargs):
+    
+        d=load_data()
+        sst = d.to_LipdSeries(number=5)
+        d18Osw = d.to_LipdSeries(number=3)
+        ms = pyleo.MultipleSeries([sst,d18Osw])
+        ms.stackplot(plot_kwargs=plot_kwargs, mute=True)
+        
+class TestMultipleSeriesSpectral():
+    ''' Test for MultipleSeries.spectral
+    '''
+    
+    def test_spectral_t0(self):
+        '''Test the spectral function with pre-generated scalogram objects
+        '''
+        
+        d=load_data()
+        sst = d.to_LipdSeries(number=5)
+        d18Osw = d.to_LipdSeries(number=3)
+        ms = pyleo.MultipleSeries([sst,d18Osw])
+        scals = ms.wavelet()
+        psds = ms.spectral(method='wwz',scalogram_list=scals)
+        
+        
+        
+        

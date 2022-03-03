@@ -170,8 +170,8 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info = psd.beta_est(fmin=1/50, fmax=1/2)
-        print(beta_info['beta'])
+        psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(psd_beta.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn_t0.png
@@ -183,8 +183,8 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info = psd.beta_est(fmin=1/50, fmax=1/2)
-        print(beta_info['beta'])
+        psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(psd_beta.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn_t1.png
@@ -202,10 +202,10 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info_lf = psd.beta_est(fmin=1/50, fmax=1/20)
-        beta_info_hf = psd.beta_est(fmin=1/20, fmax=1/2)
-        print(beta_info_lf['beta'])
-        print(beta_info_hf['beta'])
+        psd_beta_lf = psd.beta_est(fmin=1/50, fmax=1/20)
+        psd_beta_hf = psd.beta_est(fmin=1/20, fmax=1/2)
+        print(psd_beta_lf.beta_est_res['beta'])
+        print(psd_beta_hf.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn2_t0.png
@@ -217,10 +217,10 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         psd = ts.spectral()
 
         # estimate the scaling slope
-        beta_info_lf = psd.beta_est(fmin=1/50, fmax=1/10)
-        beta_info_hf = psd.beta_est(fmin=1/10, fmax=1/2)
-        print(beta_info_lf['beta'])
-        print(beta_info_hf['beta'])
+        psd_beta_lf = psd.beta_est(fmin=1/50, fmax=1/10)
+        psd_beta_hf = psd.beta_est(fmin=1/10, fmax=1/2)
+        print(psd_beta_lf.beta_est_res['beta'])
+        print(psd_beta_hf.beta_est_res['beta'])
 
         # visualize
         @savefig gen_cn2_t1.png
@@ -328,6 +328,8 @@ class Series:
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
+        self.clean_ts=clean_ts
+        self.verbose=verbose
 
     def convert_time_unit(self, time_unit='years'):
         ''' Convert the time unit of the Series object
@@ -630,6 +632,7 @@ class Series:
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+            (going to be deprecated)
 
         Returns
         -------
@@ -692,9 +695,6 @@ class Series:
                 fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'})
                 pyleo.savefig(fig,path='ts_plot3.png')
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         # generate default axis labels
         time_label, value_label = self.make_labels()
 
@@ -847,7 +847,7 @@ class Series:
             :okexcept:    
 
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
-            fig, ax = ts.plot(title='ONI',mute=True) # we mute the first call to only get the plot with 2 lines
+            fig, ax = ts.plot(title='ONI') # we mute the first call to only get the plot with 2 lines
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
             @savefig ssa_recon.png
@@ -887,7 +887,7 @@ class Series:
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
         
                 
-        resc = SsaRes(name=self.value_name, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
+        resc = SsaRes(name=self.value_name, original=self.value, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
                         pctvar = res['pctvar'], PC = res['PC'], RCmat = res['RCmat'], 
                         RCseries=res['RCseries'], mode_idx=res['mode_idx'])
         if nMC >= 0:
@@ -980,7 +980,7 @@ class Series:
             ts1 = pyleo.Series(time=t, value=sig1)
             ts2 = pyleo.Series(time=t, value=sig2)
             ts = pyleo.Series(time=t, value=sig)
-            fig, ax = ts.plot(mute=True, label='mix')
+            fig, ax = ts.plot(label='mix')
             ts1.plot(ax=ax, label='10 Hz')
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
@@ -994,7 +994,7 @@ class Series:
             :okwarning:
             :okexcept:    
 
-            fig, ax = ts.plot(mute=True, label='mix')
+            fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=15).plot(ax=ax, label='After 15 Hz low-pass filter')
             ts1.plot(ax=ax, label='10 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
@@ -1008,7 +1008,7 @@ class Series:
             :okwarning:
             :okexcept:    
 
-            fig, ax = ts.plot(mute=True, label='mix')
+            fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label='After 15-25 Hz band-pass filter')
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
@@ -1022,7 +1022,7 @@ class Series:
             :okwarning:
             :okexcept:    
 
-            fig, ax = ts.plot(mute=True, label='mix')
+            fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
@@ -1036,7 +1036,7 @@ class Series:
             :okwarning:
             :okexcept:    
 
-            fig, ax = ts.plot(mute=True, label='mix')
+            fig, ax = ts.plot(label='mix')
             ts_low  = ts.filter(cutoff_freq=15)
             ts_high = ts.copy()
             ts_high.value = ts.value - ts_low.value # subtract low-pass filtered series from original one
@@ -1139,6 +1139,7 @@ class Series:
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+            (going to be deprecated)
 
         plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
@@ -1173,9 +1174,6 @@ class Series:
             pyleo.closefig(fig)
 
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
@@ -1198,18 +1196,16 @@ class Series:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None,
-                    time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=100,
-                    time_label=None, value_label=None, period_label=None, psd_label='PSD', 
-                    wavelet_kwargs = None, psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None, 
-                    psd_plot_kwargs = None, trunc_series = None, savefig_settings=None, mute=False):
+                    time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=None,
+                    time_label=None, value_label=None, period_label=None, psd_label='PSD', wavelet_method = 'wwz', 
+                    wavelet_kwargs = None, psd_method = 'wwz', psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None, 
+                    psd_plot_kwargs = None, trunc_series = None, preprocess = True, y_label_loc = -.15, savefig_settings=None, 
+                    mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
 
@@ -1217,10 +1213,13 @@ class Series:
         ----------
 
         psd : PSD
-            the PSD object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
+            the PSD object of a Series. If None, and psd_kwargs is empty, the PSD from the calculated Scalogram will be used. 
+            Otherwise it will be calculated based on specifications in psd_kwargs.
 
         scalogram : Scalogram
             the Scalogram object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
+            If the passed scalogram object contains stored signif_scals (see pyleo.Scalogram.signif_test() for details) these will
+            be flexibly reused as a function of the value of n_signif_test in the summary plot. 
 
         figsize : list
             a list of two integers indicating the figure size
@@ -1240,8 +1239,8 @@ class Series:
         psd_lim : list or tuple
             the limitation of the psd axis
 
-        n_signif_test=100 : int
-            Number of Monte-Carlo simulations to perform for significance testing. Used when psd=None or scalogram=None
+        n_signif_test=None : int
+            Number of Monte-Carlo simulations to perform for significance testing. Default is None. If a scalogram is passed it will be parsed for significance testing purposes.
 
         time_label : str
             the label for the time axis
@@ -1255,9 +1254,15 @@ class Series:
         psd_label : str
             the label for the amplitude axis of PDS
             
+        wavelet_method : str
+            the method for the calculation of the scalogram, see pyleoclim.core.ui.Series.wavelet for details
+            
         wavelet_kwargs : dict
             arguments to be passed to the wavelet function, see pyleoclim.core.ui.Series.wavelet for details
         
+        psd_method : str
+            the method for the calculation of the psd, see pyleoclim.core.ui.Series.spectral for details
+            
         psd_kwargs : dict
             arguments to be passed to the spectral function, see pyleoclim.core.ui.Series.spectral for details
             
@@ -1275,8 +1280,18 @@ class Series:
                     - tick parameters
                 These will be overriden by summary plot to prevent formatting errors
                 
+        y_label_loc : float
+            Plot parameter to adjust horizontal location of y labels to avoid conflict with axis labels, default value is -0.15
+                
         trunc_series : list or tuple
-            the limitation of the time axis. This will slice the actual time series into one contained within the passed boundaries and as such effect the resulting scalogram and psd objects (assuming said objects are to be generated by summary_plot).
+            the limitation of the time axis. This will slice the actual time series into one contained within the 
+            passed boundaries and as such effect the resulting scalogram and psd objects 
+            (assuming said objects are to be generated by summary_plot).
+        
+        preprocess : bool
+            if True, the series will be standardized and detrended using pyleoclim defaults 
+            prior to the calculation of the scalogram and psd. The unedited series will be used in the plot,
+            while the edited series will be used to calculate the psd and scalogram.
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
@@ -1284,9 +1299,10 @@ class Series:
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
 
-        mute : {True,False}
+        mute : bool
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+            (going to be deprecated)
 
         See also
         --------
@@ -1315,9 +1331,12 @@ class Series:
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             fig, ax = series.summary_plot(n_signif_test=1)
+
+            pyleo.showfig(fig)
+
             pyleo.closefig(fig)
             
-        Summary_plot with pre-generated psd and scalogram objects.
+        Summary_plot with pre-generated psd and scalogram objects. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
         
         .. ipython:: python
             :okwarning:
@@ -1329,10 +1348,13 @@ class Series:
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
-            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
+            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram,n_signif_test=2)
+
+            pyleo.showfig(fig)
+
             pyleo.closefig(fig)
         
-        Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed.
+        Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
         
         .. ipython:: python
             :okwarning:
@@ -1344,14 +1366,13 @@ class Series:
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
-            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
+            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, n_signif_test=2, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
+            
+            pyleo.showfig(fig)
+            
             pyleo.closefig(fig)
-        
 
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         fig = plt.figure(figsize=figsize)
         gs = gridspec.GridSpec(6, 12)
@@ -1382,6 +1403,10 @@ class Series:
         ax['ts'] = plt.subplot(gs[0:1, :-3])
         ax['ts'] = self.plot(ax=ax['ts'], **ts_plot_kwargs)
         ax['ts'].xaxis.set_visible(False)
+        ax['ts'].get_yaxis().set_label_coords(y_label_loc,0.5)
+        
+        if preprocess:
+            self = self.standardize().detrend()
         
         if time_lim is not None:
             ax['ts'].set_xlim(time_lim)
@@ -1395,25 +1420,64 @@ class Series:
 
         ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
         
-        if scalogram is None:
-            if n_signif_test > 0:
-                scalogram = self.wavelet(**wavelet_kwargs).signif_test(number=n_signif_test)
+        if 'method' in list(wavelet_kwargs.keys()):
+            del wavelet_kwargs['method']
+            print('Please pass method via exposed wavelet_method argument, exposed argument overrides key word argument')
+        
+        if n_signif_test is None:
+            #If significance testing isn't specified then we either use what we can find or don't do significance testing
+            if scalogram is not None:
+                if getattr(scalogram,'signif_scals',None) is not None:
+                    n_signif_test = len(scalogram.signif_scals.scalogram_list)
+                else:
+                    n_signif_test = 0
             else:
-                scalogram = self.wavelet(**wavelet_kwargs)
+                n_signif_test = 0
+    
+        if n_signif_test > 0:
+            #If a scalogram is not passed and significance tests are requested
+            if scalogram is None:
+                scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs).signif_test(number=n_signif_test, export_scal=True)
+            #If a scalogram is passed, significance tests are requested, and the passed scalogram has some significance tests stored in it
+            elif scalogram is not None:
+                scalogram = scalogram.signif_test(number=n_signif_test, export_scal = True)
+        elif n_signif_test == 0:
+            #If specifically no significance tests are requested we just need to generate a scalogram (unless one has been passed)
+            if scalogram is None:
+                scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs)
         
         if 'cbar_style' not in wavelet_plot_kwargs:
-            wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.1}})
+            wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.12}})
 
         ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
         ax['scal'].invert_yaxis()
+        ax['scal'].get_yaxis().set_label_coords(y_label_loc,0.5)
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
+            
+        if 'method' in list(psd_kwargs.keys()):
+            del psd_kwargs['method']
+            print('Please pass method via exposed psd_method argument, exposed argument overrides key word argument')
         
-        if psd is None:
-            if n_signif_test > 0:
-                psd = self.spectral(**psd_kwargs).signif_test(number=n_signif_test)
-            else:
-                psd = self.spectral(**psd_kwargs)
+        #Doing effectively the same thing we did for scalogram but now for the psd object
+        if n_signif_test > 0:
+            if psd is None:
+                if psd_method == scalogram.wave_method:
+                    psd = self.spectral(method=psd_method,scalogram=scalogram,**psd_kwargs).signif_test(number=n_signif_test,scalogram=scalogram)
+                elif psd_method != scalogram.wave_method:
+                    psd = self.spectral(method=psd_method,**psd_kwargs).signif_test(number=n_signif_test)
+            elif psd is not None:
+                if psd_method == scalogram.wave_method:
+                    psd = psd.signif_test(number=n_signif_test,scalogram=scalogram)
+                elif psd_method != scalogram.wave_method:
+                    psd = psd.signif_test(number=n_signif_test)
+        #At this point n_signif_test will be set to zero or some positive number
+        elif n_signif_test == 0:
+            if psd is None:
+                if psd_method == scalogram.wave_method:
+                    psd = self.spectral(method=psd_method,scalogram=scalogram,**psd_kwargs)
+                elif psd_method != scalogram.wave_method:
+                    psd = self.spectral(method=psd_method,**psd_kwargs)
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, **psd_plot_kwargs)
         
@@ -1456,6 +1520,7 @@ class Series:
             ax['scal'].set_ylabel(period_label)
             if 'ylabel' in wavelet_plot_kwargs:
                 print('Ylabel passed to scalogram plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+                
 
         if psd_label is not None:
             ax['psd'].set_xlabel(psd_label)
@@ -1464,9 +1529,9 @@ class Series:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, ax
 
     def copy(self):
@@ -1536,7 +1601,8 @@ class Series:
         return new
 
     def standardize(self):
-        '''Standardizes the time series
+        '''Standardizes the series ((i.e. renove its estimated mean and divides
+            by its estimated standard deviation)
 
         Returns
         -------
@@ -1549,28 +1615,31 @@ class Series:
         new.value = v_mod
         return new
 
-    def anomaly(self, timespan=None):
-        ''' Calculate the anomaly of the series
+    def center(self, timespan=None):
+        ''' Centers the series (i.e. renove its estimated mean)
 
         Parameters
         ----------
         timespan : tuple or list
-            The timespan of the mean as the reference for anomaly calculation.
-            It is in form of [a, b], where a, b are two time points.
+            The timespan over which the mean must be estimated.
+            In the form [a, b], where a, b are two points along the series' time axis.
 
         Returns
         -------
-        new : pyleoclim.Series
-            The standardized series object
+        tsc : pyleoclim.Series
+            The centered series object
+        ts_mean : estimated mean of the original series, in case it needs to be restored later   
 
         '''
-        new = self.copy()
+        tsc = self.copy()
         if timespan is not None:
-            v_mod = self.value - np.nanmean(self.slice(timespan).value)
+            ts_mean  = np.nanmean(self.slice(timespan).value)
+            vc = self.value - ts_mean
         else:
-            v_mod = self.value - np.nanmean(self.value)
-        new.value = v_mod
-        return new
+            ts_mean  = np.nanmean(self.value)
+            vc = self.value - ts_mean
+        tsc.value = vc
+        return tsc, ts_mean
 
     def segment(self, factor=10):
         """Gap detection
@@ -1698,8 +1767,8 @@ class Series:
         method : str, optional
             The method for detrending. The default is 'emd'.
             Options include:
-                * linear: the result of a linear least-squares fit to y is subtracted from y.
-                * constant: only the mean of data is subtrated.
+                * "linear": the result of a n ordinary least-squares stright line fit to y is subtracted.
+                * "constant": only the mean of data is subtracted.
                 * "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
                 * "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
         **kwargs : dict
@@ -1717,7 +1786,7 @@ class Series:
         Examples
         --------
 
-        We will generate a random signal and use the different detrending functions
+        We will generate a random signal with a nonlinear trend and use two  detrending options to recover the original signal.
 
         .. ipython:: python
             :okwarning:
@@ -1726,45 +1795,74 @@ class Series:
             import pyleoclim as pyleo
             import numpy as np
 
-            # Generate a mixed signal with known frequencies
+            # Generate a mixed harmonic signal with known frequencies
             freqs=[1/20,1/80]
             time=np.arange(2001)
             signals=[]
             for freq in freqs:
                 signals.append(np.cos(2*np.pi*freq*time))
             signal=sum(signals)
-
+            
             # Add a non-linear trend
-            slope = 1e-5
-            intercept = -1
+            slope = 1e-5;  intercept = -1
             nonlinear_trend = slope*time**2 + intercept
-            signal_trend = signal + nonlinear_trend
-
-            # Add white noise
+            
+            # Add a modicum of white noise
+            np.random.seed(2333)
             sig_var = np.var(signal)
             noise_var = sig_var / 2 #signal is twice the size of noise
             white_noise = np.random.normal(0, np.sqrt(noise_var), size=np.size(signal))
-            signal_noise = signal_trend + white_noise
-
-            # Create a series object
-            ts = pyleo.Series(time=time,value=signal_noise)
+            signal_noise = signal + white_noise
+            
+            # Place it all in a series object and plot it:
+            ts = pyleo.Series(time=time,value=signal_noise + nonlinear_trend)
             @savefig random_series.png
             fig, ax = ts.plot(title='Timeseries with nonlinear trend')
             pyleo.closefig(fig)
-
-            # kStandardize
-            ts_std = ts.standardize()
-
-            # Detrend using EMD
-            ts_emd = ts_std.detrend()
-            @savefig ts_emd.png
-            fig, ax = ts_emd.plot(title='Detrended with EMD method')
+            
+            # Detrending with default parameters (using EMD method with 1 mode)
+            ts_emd1 = ts.detrend()
+            ts_emd1.label = 'default detrending (EMD, last mode)' 
+            @savefig ts_emd1.png      
+            fig, ax = ts_emd1.plot(title='Detrended with EMD method')
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
             pyleo.closefig(fig)
-
-            # Detrend using Savitzky-Golay filter
-            ts_sg = ts_std.detrend(method='savitzky-golay')
+            
+            # We see that the default function call results in a "Hockey Stick" at the end, which is undesirable. 
+            # There is no automated way to do this, but with a little trial and error, we find that removing the 2 smoothest modes performs reasonably:
+                
+            ts_emd2 = ts.detrend(method='emd', n=2)
+            ts_emd2.label = 'EMD detrending, last 2 modes' 
+            @savefig ts_emd_n2.png
+            fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)')
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+            
+            # Another option for removing a nonlinear trend is a Savitzky-Golay filter:
+            ts_sg = ts.detrend(method='savitzky-golay')
+            ts_sg.label = 'savitzky-golay detrending, default parameters'
             @savefig ts_sg.png
             fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter')
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
+            pyleo.closefig(fig)
+            
+            # As we can see, the result is even worse than with EMD (default). Here it pays to look into the underlying method, which comes from SciPy.
+            # It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges. 
+            # By default, this value is close to the length of the series. Choosing a value 10x smaller fixes the problem here, though you will have to tinker with that parameter until you get the result you seek.
+            
+            ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201})
+            ts_sg2.label = 'savitzky-golay detrending, window_length = 201'
+            @savefig ts_sg2.png
+            fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter')
+            ax.plot(time,signal_noise,label='target signal')
+            ax.legend()
+            pyleo.showfig(fig)
             pyleo.closefig(fig)
 
         '''
@@ -1773,7 +1871,7 @@ class Series:
         new.value = v_mod
         return new
 
-    def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, verbose=False):
+    def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -1793,6 +1891,9 @@ class Series:
 
         label : str
             Label for the PSD object
+
+        scalogram : pyleoclim.core.ui.Series.Scalogram
+            The return of the wavelet analysis; effective only when the method is 'wwz'
 
         verbose : bool
             If True, will print warning messages if there is any
@@ -1868,14 +1969,14 @@ class Series:
             psd_LS_LS = ts_std.spectral(method='lomb_scargle', freq_method='lomb_scargle')  # with frequency vector generated using REDFIT method
             fig, ax = psd_LS_n50.plot(
                 title='PSD using Lomb-Scargle method with 4 overlapping segments',
-                label='settings={"n50": 4}', mute=True)
+                label='settings={"n50": 4}')
             psd_ls.plot(ax=ax, label='settings={"n50": 3}', marker='o')
             @savefig spec_ls_n50.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
 
             fig, ax = psd_LS_freq.plot(
-                title='PSD using Lomb-Scargle method with differnt frequency vectors', mute=True,
+                title='PSD using Lomb-Scargle method with differnt frequency vectors',
                 label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
             psd_ls.plot(ax=ax, label='freq_method="log"', marker='o')
             @savefig spec_ls_freq.png
@@ -1896,6 +1997,19 @@ class Series:
             psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger
             @savefig spec_wwz.png
             fig, ax = psd_wwz_signif.plot(title='PSD using WWZ method')
+            pyleo.closefig(fig)
+
+        We may take advantage of a pre-calculated scalogram using WWZ to accelerate the spectral analysis
+        (although note that the default parameters for spectral and wavelet analysis using WWZ are different):
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            scal_wwz = ts_std.wavelet(method='wwz')  # wwz is the default method
+            psd_wwz_fast = ts_std.spectral(method='wwz', scalogram=scal_wwz)
+            @savefig spec_wwz_fast.png
+            fig, ax = psd_wwz_fast.plot(title='PSD using WWZ method w/ pre-calculated scalogram')
             pyleo.closefig(fig)
 
         - Periodogram
@@ -1959,12 +2073,27 @@ class Series:
         args['welch'] = {}
         args['periodogram'] = {}
         args[method].update(settings)
+
+        if method == 'wwz' and scalogram is not None:
+            args['wwz'].update(
+                {
+                    'wwa': scalogram.amplitude,
+                    'wwz_Neffs': scalogram.wwz_Neffs,
+                    'wwz_freq': scalogram.frequency,
+                }
+            )
+
         spec_res = spec_func[method](self.value, self.time, **args[method])
         if type(spec_res) is dict:
             spec_res = dict2namedtuple(spec_res)
 
         if label is None:
             label = self.label
+
+        if method == 'wwz' and scalogram is not None:
+            args['wwz'].pop('wwa')
+            args['wwz'].pop('wwz_Neffs')
+            args['wwz'].pop('wwz_freq')
 
         psd = PSD(
             frequency=spec_res.freq,
@@ -2016,7 +2145,7 @@ class Series:
 
         pyleoclim.utils.wavelet.cwt : cwt function
 
-        pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
+        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
@@ -2077,6 +2206,11 @@ class Series:
 
         args[method].update(settings)
         wave_res = wave_func[method](self.value, self.time, **args[method])
+        if method == 'wwz':
+            wwz_Neffs = wave_res.Neffs
+        else:
+            wwz_Neffs = None
+
         scal = Scalogram(
             frequency=wave_res.freq,
             time=wave_res.time,
@@ -2088,6 +2222,7 @@ class Series:
             freq_method=freq_method,
             freq_kwargs=freq_kwargs,
             wave_args=args[method],
+            wwz_Neffs=wwz_Neffs,
         )
 
         return scal
@@ -2133,7 +2268,7 @@ class Series:
 
         pyleoclim.utils.wavelet.xwt : Cross-wavelet analysis based on WWZ method
 
-        pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
+        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
@@ -2527,6 +2662,7 @@ class Series:
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+            (going to be deprecated)
 
         Returns
         -------
@@ -2550,7 +2686,7 @@ class Series:
         outlier_indices = tsutils.detect_outliers(
             self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,
             figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,
-            plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs, mute=mute,
+            plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs, mute=mute
         )
         outlier_indices = np.asarray(outlier_indices)
         if remove == True:
@@ -2690,15 +2826,15 @@ class PSD:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.frequency)}'
 
-    def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95],
-                    settings=None):
+    def signif_test(self, number=None, method='ar1', seed=None, qs=[0.95],
+                    settings=None, scalogram = None):
         '''
 
 
         Parameters
         ----------
         number : int, optional
-            Number of surrogate series to generate for significance testing. The default is 200.
+            Number of surrogate series to generate for significance testing. The default is None.
         method : {ar1}, optional
             Method to generate surrogates. The default is 'ar1'.
         seed : int, optional
@@ -2707,21 +2843,70 @@ class PSD:
             Singificance levels to return. The default is [0.95].
         settings : dict, optional
             Parameters. The default is None.
+        scalogram : Pyleoclim Scalogram object, optional
+            Scalogram containing signif_scals exported during significance testing of scalogram. 
+            If number is None and signif_scals are present, will use length of scalogram list as number of significance tests
 
         Returns
         -------
         new : pyleoclim.PSD
             New PSD object with appropriate significance test
 
+        Examples
+        --------
+
+        If significance tests from a comparable scalogram have been saved, they can be passed here to speed up the generation of noise realizations for significance testing
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+            
+            import pyleoclim as pyleo
+            import pandas as pd
+            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
+            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+
+            #Setting export_scal to True saves the noise realizations generated during significance testing for future use
+            scalogram = series.wavelet().signif_test(number=2,export_scal=True)
+
+            #The psd can be calculated by using the previously generated scalogram
+            psd = series.spectral(scalogram=scalogram)
+
+            #The same scalogram can then be passed to do significance testing. Pyleoclim will dig through the scalogram to find the saved noise realizations and reuse them flexibly.
+            fig, ax = psd.signif_test(scalogram=scalogram).plot()
+
+            pyleo.showfig(fig)
+
+            pyleo.closefig(fig)
+
         '''
-        if number == 0:
+        
+        signif_scals = None
+        if scalogram:
+            try:
+                signif_scals = scalogram.signif_scals
+            except:
+                return ValueError('Could not find signif_scals in passed object, make sure this is a scalogram with signif_scals that were saved during significance testing')
+        
+
+        if number is None and signif_scals:
+            number = len(signif_scals.scalogram_list)
+        elif number is None and signif_scals is None:
+            number = 200
+        elif number == 0:
             return self
 
         new = self.copy()
         surr = self.timeseries.surrogates(
             number=number, seed=seed, method=method, settings=settings
         )
-        surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
+    
+        if signif_scals:
+            surr_psd = surr.spectral(
+                method=self.spec_method, settings=self.spec_args, scalogram_list=signif_scals
+            )
+        else:
+            surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
         new.signif_qs = surr_psd.quantiles(qs=qs)
         new.signif_method = method
 
@@ -2749,12 +2934,32 @@ class PSD:
         Returns
         -------
 
-        res_dict : dictionary
+        new : pyleoclim.PSD
+            New PSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
             - beta: the scaling factor
             - std_err: the one standard deviation error of the scaling factor
             - f_binned: the binned frequency series, used as X for linear regression
             - psd_binned: the binned PSD series, used as Y for linear regression
             - Y_reg: the predicted Y from linear regression, used with f_binned for the slope curve plotting
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            # generate colored noise with default scaling slope 'alpha' equals to 1
+            ts = pyleo.gen_ts(model='colored_noise')
+            ts.label = 'colored noise'
+            psd = ts.spectral()
+
+            # estimate the scaling slope
+            psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+
+            @savefig color_noise_beta.png
+            fig, ax = psd_beta.plot()
+            pyleo.closefig(fig)
 
         '''
         if fmin is None:
@@ -2828,6 +3033,7 @@ class PSD:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax The default is False.
+            (going to be deprecated)
         legend : bool, optional
             whether to plot the legend. The default is True.
         lgd_kwargs : dict, optional
@@ -2863,16 +3069,16 @@ class PSD:
         pyleoclim.core.ui.Series.spectral : spectral analysis
 
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = self.plot_kwargs if plot_kwargs is None else plot_kwargs.copy()
         beta_kwargs = {} if beta_kwargs is None else beta_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
         if label is None:
-            label = self.label
+            if plot_beta and self.beta_est_res is not None:
+                label = fr'{self.label} ($\beta=${self.beta_est_res["beta"]:.2f}$\pm${self.beta_est_res["std_err"]:.2f})'
+            else:
+                label = self.label
 
         if label is not None:
             plot_kwargs.update({'label': label})
@@ -2938,11 +3144,6 @@ class PSD:
 
         ax.plot(x_axis, y_axis, **plot_kwargs)
 
-        if xlim is not None:
-            ax.set_xlim(xlim)
-
-        if ylim is not None:
-            ax.set_ylim(ylim)
 
         # plot significance levels
         if self.signif_qs is not None:
@@ -2985,7 +3186,6 @@ class PSD:
 
         if plot_beta and self.beta_est_res is not None:
             plot_beta_kwargs = {
-                'label': fr'$\beta=${self.beta_est_res["beta"]:.2f}$\pm${self.beta_est_res["std_err"]:.2f}',
                 'linestyle': '--',
                 'color': 'k',
                 'linewidth': 1,
@@ -3005,21 +3205,27 @@ class PSD:
 
         if title is not None:
             ax.set_title(title)
+            
+        if xlim is not None:
+            ax.set_xlim(xlim)
+
+        if ylim is not None:
+            ax.set_ylim(ylim)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
 class Scalogram:
-    def __init__(self, frequency, time, amplitude, coi=None, label=None, Neff=3, timeseries=None,
+    def __init__(self, frequency, time, amplitude, coi=None, label=None, Neff=3, wwz_Neffs=None, timeseries=None,
                  wave_method=None, wave_args=None, signif_qs=None, signif_method=None, freq_method=None, freq_kwargs=None,
-                 period_unit=None, time_label=None):
+                 period_unit=None, time_label=None, signif_scals=None):
         '''
         Parameters
         ----------
@@ -3030,6 +3236,34 @@ class Scalogram:
             amplitude : array
                 the amplitude at each (frequency, time) point;
                 note the dimension is assumed to be (frequency, time)
+            coi : array
+                Cone of influence
+            label : str
+                Label for the Series
+            Neff : int
+                the threshold of the number of effective samples
+            wwz_Neffs : array
+                the matrix of effective number of points in the time-scale coordinates obtained from wwz
+            timeseries : pyleoclim.Series
+                A copy of the timeseries for which the scalogram was obtained
+            wave_method: str
+                The method used to obtain the scalogram
+            wave_args: dict
+                The parameters values of the wavelet method
+            signif_qs : dict
+                The significance limits
+            signif_method: str
+                The method used to obtain the significance level
+            freq_method: str
+                The method used to obtain the frequency vector
+            freq_kwargs: dict
+                Arguments for the frequency vector
+            period_unit: str
+                Units for the period axis
+            time_label: str
+                Label for the time axis
+            signif_scals: pyleoclim.MultipleScalogram
+                A list of the scalogram from the AR1 MC significance testing. Useful when obtaining a PSD. 
         '''
         self.frequency = np.array(frequency)
         self.time = np.array(time)
@@ -3046,6 +3280,9 @@ class Scalogram:
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
+        self.signif_scals = signif_scals
+        #if wave_method == 'wwz':
+        self.wwz_Neffs = wwz_Neffs
 
         if period_unit is not None:
             self.period_unit = period_unit
@@ -3107,6 +3344,7 @@ class Scalogram:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax The default is False.
+            (going to be deprecated)
         signif_clr : str, optional
             Color of the singificance line. The default is 'white'.
         signif_linestyles : str, optional
@@ -3133,9 +3371,6 @@ class Scalogram:
 
 
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
 
@@ -3213,15 +3448,15 @@ class Scalogram:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
-    def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95],
-                    settings=None):
+    def signif_test(self, number=None, method='ar1', seed=None, qs=[0.95],
+                    settings=None, export_scal = False):
         '''Significance test for wavelet analysis
 
         Parameters
@@ -3236,6 +3471,9 @@ class Scalogram:
             Significane level to consider. The default is [0.95].
         settings : dict, optional
             Parameters for the model. The default is None.
+        export_scal : bool
+            Whether or not to export the scalograms used in the noise realizations. Note: The scalograms used for wavelet analysis are slightly different
+            than those used for spectral analysis (different decay constant). As such, this functionality should be used only to expedite exploratory analysis.
 
         Raises
         ------
@@ -3247,26 +3485,75 @@ class Scalogram:
         new : pyleoclim.Scalogram
             A new Scalogram object with the significance level
 
+        Examples
+        --------
+
+        Generating scalogram, running significance tests, and saving the output for future use in generating psd objects or in summary_plot()
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+            
+            import pyleoclim as pyleo
+            import pandas as pd
+            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
+            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+
+            #By setting export_scal to True, the noise realizations used to generate the significance test will be saved. These come in handy for generating summary plots and for running significance tests on spectral objects.
+            scalogram = series.wavelet().signif_test(number=2, export_scal=True)
+
         See also
         --------
 
         pyleoclim.core.ui.Series.wavelet : wavelet analysis
 
         '''
-        if number == 0:
+
+        if hasattr(self,'signif_scals'):
+            signif_scals = self.signif_scals
+        
+        #Allow for a few different configurations of passed number of signif tests, default behavior is to set number = 200
+        if number is None and signif_scals is not None:
+            number = len(signif_scals.scalogram_list)
+        elif number is None and signif_scals is None:
+            number = 200
+        elif number == 0:
             return self
 
         new = self.copy()
-        surr = self.timeseries.surrogates(
+
+        if signif_scals:
+            scalogram_list = signif_scals.scalogram_list
+            #If signif_scals already in scalogram object are more than those requested for significance testing, use as many of them as required
+            if len(scalogram_list) > number:
+                surr_scal = MultipleScalogram(scalogram_list=scalogram_list[:number])
+            #If number is the same as the length of signif_scals, just use signif_scals
+            elif len(scalogram_list) == number:
+                surr_scal = signif_scals
+            #If the number is more than the length of signif_scals, reuse what is available and calculate the rest
+            elif len(scalogram_list) < number:
+                number -= len(scalogram_list)
+                surr_scal_tmp = []
+                surr_scal_tmp.extend(scalogram_list)
+                surr = self.timeseries.surrogates(
             number=number, seed=seed, method=method, settings=settings
         )
-        surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args)
+                surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, settings=self.wave_args,).scalogram_list)
+                surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
+        else:
+            surr = self.timeseries.surrogates(
+            number=number, seed=seed, method=method, settings=settings
+        )
+            surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args,)
 
         if len(qs) > 1:
             raise ValueError('qs should be a list with size 1!')
 
         new.signif_qs = surr_scal.quantiles(qs=qs)
         new.signif_method = method
+        
+        if export_scal == True:
+            new.signif_scals = surr_scal
 
         return new
 
@@ -3355,6 +3642,7 @@ class Coherence:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax The default is False. The default is False.
+            (going to be deprecated)
         contourf_style : dict, optional
             Arguments for the contour plot. The default is {}.
         phase_style : dict, optional
@@ -3398,9 +3686,6 @@ class Coherence:
         matplotlib.pyplot.quiver
 
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
@@ -3469,7 +3754,7 @@ class Coherence:
         cb = plt.colorbar(cont, **cbar_args)
 
         # plot cone of influence
-        ax.set_yscale('log', nonposy='clip')
+        ax.set_yscale('log')
         ax.plot(self.time, self.coi, 'k--')
 
         if ylim is None:
@@ -3528,9 +3813,9 @@ class Coherence:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -3577,7 +3862,7 @@ class Coherence:
 
         cohs = []
         for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', total=number, disable=mute_pbar):
-            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i], tau=self.time, freq_method=self.freq_method, freq_kwargs=self.freq_kwargs)
+            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i], settings={'tau': self.time, 'freq': self.frequency})
             cohs.append(coh_tmp.coherence)
 
         cohs = np.array(cohs)
@@ -4493,7 +4778,7 @@ class MultipleSeries:
             ms.series_list[idx]=s
         return ms
 
-    def spectral(self, method='lomb_scargle', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False):
+    def spectral(self, method='lomb_scargle', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False, scalogram_list=None):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -4519,6 +4804,9 @@ class MultipleSeries:
 
         mute_pbar : {True, False}
             Mute the progress bar. Default is False.
+        
+        scalogram_list : pyleoclim.MultipleScalogram object, optional
+            Multiple scalogram object containing pre-computed scalograms to use when calculating spectra, only works with wwz
 
         Returns
         -------
@@ -4538,7 +4826,7 @@ class MultipleSeries:
 
         pyleoclim.utils.spectral.wwz_psd : Spectral analysis using the Wavelet Weighted Z transform
 
-        pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
+        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
@@ -4551,9 +4839,29 @@ class MultipleSeries:
         settings = {} if settings is None else settings.copy()
 
         psd_list = []
-        for s in tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar):
-            psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
-            psd_list.append(psd_tmp)
+        if method == 'wwz' and scalogram_list:
+            scalogram_list_len = len(scalogram_list.scalogram_list)
+            series_len = len(self.series_list)
+
+            #In the case where the scalogram list and series list are the same we can re-use scalograms in a one to one fashion
+            #OR if the scalogram list is longer than the series list we use as many scalograms from the scalogram list as we need
+            if scalogram_list_len >= series_len:
+                for idx, s in enumerate(tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar)):
+                    psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
+                    psd_list.append(psd_tmp)
+            #If the scalogram list isn't as long as the series list, we re-use all the scalograms we can and then recalculate the rest
+            elif scalogram_list_len < series_len:
+                for idx, s in enumerate(tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar)):
+                    if idx < scalogram_list_len:
+                        psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
+                        psd_list.append(psd_tmp)
+                    else:
+                        psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
+                        psd_list.append(psd_tmp)
+        else: 
+            for s in tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar):
+                psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
+                psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)
 
@@ -4598,7 +4906,7 @@ class MultipleSeries:
         --------
         pyleoclim.utils.wavelet.wwz : wwz function
 
-        pyleoclim.utils.wavelet.make_freq : Functions to create the frequency vector
+        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
@@ -4670,6 +4978,7 @@ class MultipleSeries:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+            (going to be deprecated)
         invert_xaxis : bool, optional
             if True, the x-axis of the plot will be inverted
 
@@ -4678,9 +4987,6 @@ class MultipleSeries:
         fig, ax
 
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -4733,15 +5039,15 @@ class MultipleSeries:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
-    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
+    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
+                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None, mute=False):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
@@ -4760,6 +5066,11 @@ class MultipleSeries:
         norm : matplotlib.colors.Normalize like
             The nomorlization for the colormap.
             If None, a linear normalization will be used.
+        labels: None, 'auto' or list
+            If None, doesn't add labels to the subplots
+            If 'auto', uses the labels passed during the creation of pyleoclim.Series
+            If list, pass a list of strings for each labels. 
+            Default is 'auto'
         savefig_settings : dictionary
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -4782,7 +5093,15 @@ class MultipleSeries:
         v_shift_factor : float
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
-
+        plot_kwargs: dict or list of dict
+            Arguments to further customize the plot from matplotlib.pyplot.plot.
+            Dictionary: Arguments will be applied to all lines in the stackplots
+            List of dictionary: Allows to customize one line at a time. 
+        mute : {True,False}
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+            (going to be deprecated)
+        
         Returns
         -------
         fig, ax
@@ -4803,15 +5122,90 @@ class MultipleSeries:
             @savefig mts_stackplot.png
             fig, ax = ms.stackplot()
             pyleo.closefig(fig)
+        
+        Let's change the labels on the left
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_customlabels.png
+            fig, ax = ms.stackplot(labels=['sst','d18Osw'])
+            pyleo.closefig(fig)
+            
+        And let's remove them completely
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_nolabels.png
+            fig, ax = ms.stackplot(labels=None)
+            pyleo.closefig(fig)
+        
+        Now, let's add markers to the timeseries.
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_samemarkers.png
+            fig, ax = ms.stackplot(labels=None, plot_kwargs={'marker':'o'})
+            pyleo.closefig(fig)
+        
+        But I really want to use different markers
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:    
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            sst = d.to_LipdSeries(number=5)
+            d18Osw = d.to_LipdSeries(number=3)
+            ms = pyleo.MultipleSeries([sst,d18Osw])
+            @savefig mts_stackplot_differentmarkers.png
+            fig, ax = ms.stackplot(labels=None, plot_kwargs=[{'marker':'o'},{'marker':'^'}])
+            pyleo.closefig(fig)
 
         '''
-        plt.ioff()
         current_style = deepcopy(mpl.rcParams)
         plotting.set_style('journal', font_scale=font_scale)
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         n_ts = len(self.series_list)
-
+        
+        if type(labels)==list:
+            if len(labels) != n_ts:
+                raise ValueError("The length of the label list should match the number of timeseries to be plotted")
+        
+        # Deal with plotting arguments
+        if type(plot_kwargs)==dict:
+            plot_kwargs = [plot_kwargs]*n_ts
+        
+        if plot_kwargs is not None and len(plot_kwargs) != n_ts:
+            raise ValueError("When passing a list of dictionaries for kwargs arguments, the number of items should be the same as the number of timeseries")
+            
+                
         fig = plt.figure(figsize=figsize)
 
         if xlim is None:
@@ -4848,10 +5242,15 @@ class MultipleSeries:
                 clr = colors[idx%nc]
             else:
                 raise TypeError('"colors" should be a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)')
-
+            #deal with other plotting arguments
+            if plot_kwargs is None:
+                p_kwargs = {}
+            else:
+                p_kwargs = plot_kwargs[idx]
+            
             bottom -= height*v_shift_factor
             ax[idx] = fig.add_axes([left, bottom, width, height])
-            ax[idx].plot(ts.time, ts.value, color=clr, lw=linewidth)
+            ax[idx].plot(ts.time, ts.value, color=clr, lw=linewidth,**p_kwargs)
             ax[idx].patch.set_alpha(0)
             ax[idx].set_xlim(xlim)
             time_label, value_label = ts.make_labels()
@@ -4862,8 +5261,13 @@ class MultipleSeries:
             ylim = [mu-4*std, mu+4*std]
             ax[idx].fill_between(ts.time, ts.value, y2=mu, alpha=fill_between_alpha, color=clr)
             trans = transforms.blended_transform_factory(ax[idx].transAxes, ax[idx].transData)
-            if ts.label is not None:
-                ax[idx].text(label_x_loc, mu, ts.label, horizontalalignment='right', transform=trans, color=clr, weight='bold')
+            if labels == 'auto':
+                if ts.label is not None:
+                    ax[idx].text(label_x_loc, mu, ts.label, horizontalalignment='right', transform=trans, color=clr, weight='bold')
+            elif type(labels) ==list:
+                ax[idx].text(label_x_loc, mu, labels[idx], horizontalalignment='right', transform=trans, color=clr, weight='bold')
+            elif labels==None:
+                pass
             ax[idx].set_ylim(ylim)
             ax[idx].set_yticks(ylim)
             ax[idx].yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -4911,14 +5315,20 @@ class MultipleSeries:
         for x in xt:
             ax[n_ts].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
 
-        if 'path' in savefig_settings:
-            plotting.savefig(fig, settings=savefig_settings)
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
+            # reset the plotting style
+            mpl.rcParams.update(current_style)
+            return fig, ax
         else:
             plotting.showfig(fig)
-
-        # reset the plotting style
-        mpl.rcParams.update(current_style)
-        return fig, ax
+            # reset the plotting style
+            mpl.rcParams.update(current_style)
+            return ax
 
 
 class SurrogateSeries(MultipleSeries):
@@ -5184,6 +5594,7 @@ class EnsembleSeries(MultipleSeries):
             mute : bool, optional
                 if True, the plot will not show;
                 recommend to turn on when more modifications are going to be made on ax. The default is False.
+                (going to be deprecated)
             seed : int, optional
                 Set the seed for the random number generator. Useful for reproducibility. The default is None.
 
@@ -5215,9 +5626,6 @@ class EnsembleSeries(MultipleSeries):
                 pyleo.closefig(fig)
 
             '''
-            # Turn the interactive mode off.
-            plt.ioff()
-
             savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
             lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
@@ -5256,9 +5664,9 @@ class EnsembleSeries(MultipleSeries):
             if 'fig' in locals():
                 if 'path' in savefig_settings:
                     plotting.savefig(fig, settings=savefig_settings)
-                else:
-                    if not mute:
-                        plotting.showfig(fig)
+                # else:
+                #     if not mute:
+                #         plotting.showfig(fig)
                 return fig, ax
             else:
                 return ax
@@ -5312,6 +5720,7 @@ class EnsembleSeries(MultipleSeries):
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
+            (going to be deprecated)
 
         Returns
         -------
@@ -5339,9 +5748,6 @@ class EnsembleSeries(MultipleSeries):
             pyleo.closefig(fig)
  
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
@@ -5394,9 +5800,9 @@ class EnsembleSeries(MultipleSeries):
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -5443,12 +5849,15 @@ class EnsembleSeries(MultipleSeries):
         v_shift_factor : float
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
+        mute : bool
+            if True, the plot will not show;
+            recommend to turn on when more modifications are going to be made on ax
+             (going to be deprecated)
 
         Returns
         -------
         fig, ax
         '''
-        plt.ioff()
         current_style = deepcopy(mpl.rcParams)
         plotting.set_style('journal', font_scale=font_scale)
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -5557,9 +5966,9 @@ class EnsembleSeries(MultipleSeries):
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             # reset the plotting style
             mpl.rcParams.update(current_style)
             return fig, ax
@@ -5597,6 +6006,7 @@ class EnsembleSeries(MultipleSeries):
         mute : {True,False}, optional
            if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
+            (going to be deprecated)
         **plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html.
             
@@ -5606,11 +6016,6 @@ class EnsembleSeries(MultipleSeries):
         pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
 
         """
-        
-        
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
@@ -5641,9 +6046,9 @@ class EnsembleSeries(MultipleSeries):
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax        
@@ -5654,8 +6059,9 @@ class MultiplePSD:
 
     Used for significance level
     '''
-    def __init__(self, psd_list):
+    def __init__(self, psd_list, beta_est_res=None):
         self.psd_list = psd_list
+        self.beta_est_res = beta_est_res
 
     def copy(self):
         '''Copy object
@@ -5726,12 +6132,13 @@ class MultiplePSD:
         Returns
         -------
 
-        res_dict : dictionary
-            - beta: list of the scaling factors
-            - std_err: list of one standard deviation errors of the scaling factor
-            - f_binned: list of the binned frequency series, used as X for linear regression
-            - psd_binned: list of the binned PSD series, used as Y for linear regression
-            - Y_reg: list of the predicted Y from linear regression, used with f_binned for the slope curve plotting
+        new : pyleoclim.MultiplePSD
+            New MultiplePSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
+            - beta: the scaling factor
+            - std_err: the one standard deviation error of the scaling factor
+            - f_binned: the binned frequency series, used as X for linear regression
+            - psd_binned: the binned PSD series, used as Y for linear regression
+            - Y_reg: the predicted Y from linear regression, used with f_binned for the slope curve plotting
 
         See also
         --------
@@ -5746,12 +6153,18 @@ class MultiplePSD:
         res_dict['f_binned'] = []
         res_dict['psd_binned'] = []
         res_dict['Y_reg'] = []
+        psd_beta_list = []
         for psd_obj in self.psd_list:
-            res = psd_obj.beta_est(fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
+            psd_beta = psd_obj.beta_est(fmin=fmin, fmax=fmax, logf_binning_step=logf_binning_step, verbose=verbose)
+            psd_beta_list.append(psd_beta)
+            res = psd_beta.beta_est_res
             for k in res_dict.keys():
                 res_dict[k].append(res[k])
 
-        return res_dict
+        new = self.copy()
+        new.beta_est_res = res_dict
+        new.psd_list = psd_beta_list
+        return new
 
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
@@ -5808,15 +6221,13 @@ class MultiplePSD:
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
             The default is False.
+            (going to be deprecated)
 
         Returns
         -------
         fig, ax
 
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -5883,9 +6294,9 @@ class MultiplePSD:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -5946,6 +6357,7 @@ class MultiplePSD:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
+            (going to be deprecated)
         members_plot_num : int, optional
             Number of individual members to plot. The default is 10.
         members_alpha : float, optional
@@ -5960,13 +6372,6 @@ class MultiplePSD:
         fig, ax
 
         '''
-
-
-        # Turn the interactive mode off.
-        plt.ioff()
-
-
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
@@ -6019,9 +6424,9 @@ class MultiplePSD:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -6240,6 +6645,7 @@ class CorrEns:
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+            (going to be deprecated)
 
         xlim : list, optional
             x-axis limits. The default is None.
@@ -6249,9 +6655,6 @@ class CorrEns:
 
         matplotlib.pyplot.hist: https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.hist.html
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         hist_kwargs = {} if hist_kwargs is None else hist_kwargs.copy()
         if ax is None:
@@ -6300,9 +6703,9 @@ class CorrEns:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -6381,6 +6784,7 @@ class SpatialDecomp:
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+            (going to be deprecated)
 
         xlim : list, optional
             x-axis limits. The default is [0, 10] (first 10 eigenvalues)
@@ -6406,9 +6810,6 @@ class SpatialDecomp:
             1119–1152, doi:10.1002/joc.1499.
 
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         if ax is None:
@@ -6462,12 +6863,12 @@ class SpatialDecomp:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, ax
 
-    def modeplot(self, mode=1, figsize=[10, 5], ax=None, savefig_settings=None, 
+    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None, 
               title_kwargs=None, mute=False, spec_method = 'mtm'):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
@@ -6476,8 +6877,9 @@ class SpatialDecomp:
 
         Parameters
         ----------
-        mode : int
-            the (one-based) index of the mode to visualize
+        index : int
+            the (0-based) index of the mode to visualize. 
+            Default is 0, corresponding to the first mode. 
         
         figsize : list, optional
             The figure size. The default is [10, 5].
@@ -6498,38 +6900,36 @@ class SpatialDecomp:
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
-        
+            (going to be deprecated)
+
         spec_method: str, optional
             The name of the spectral method to be applied on the PC. Default: MTM
             Note that the data are evenly-spaced, so any spectral method that
             assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
-            'wwz' is relevant too if scaling exponents need to be estimated. 
+            'wwz' is relevant if scaling exponents need to be estimated, but ill-advised otherwise, as it is very slow. 
       
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
         
-        PC = self.pcs[:,mode-1]    
+        PC = self.pcs[:,index]    
         ts = Series(time=self.time, value=PC) # define timeseries object for the PC
 
         fig = plt.figure(tight_layout=True,figsize=figsize)
         gs = gridspec.GridSpec(2, 2) # define grid for subplots
         ax1 = fig.add_subplot(gs[0, :])
         ts.plot(ax=ax1)
-        ax1.set_ylabel('PC '+str(mode))
-        ax1.set_title('Mode '+str(mode)+', '+ '{:3.2f}'.format(self.pctvar[mode-1]) + '% variance explained',weight='bold')
+        ax1.set_ylabel('PC '+str(index+1))
+        ax1.set_title('Mode '+str(index+1)+', '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
         
         # plot spectrum
         ax2 = fig.add_subplot(gs[1, 0])
         psd_mtm_rc = ts.interp().spectral(method=spec_method)    
         _ = psd_mtm_rc.plot(ax=ax2)
         ax2.set_xlabel('Period')
-        ax2.set_title('Spectrum ('+spec_method+')',weight='bold')
+        ax2.set_title('Power spectrum ('+spec_method+')',weight='bold')
         
         # plot T-EOF
         ax3 = fig.add_subplot(gs[1, 1])
@@ -6544,9 +6944,9 @@ class SpatialDecomp:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, gs
 
 
@@ -6579,7 +6979,7 @@ class SsaRes:
         index of retained modes 
         
     RCseries : float (N, 1)
-        reconstructed series based on the RCs of mode_idx (scale and mean fit to original series)
+        reconstructed series based on the RCs of mode_idx (scaled to original series; mean must be added after the fact)
 
 
     See also
@@ -6587,8 +6987,9 @@ class SsaRes:
 
     pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis
     '''
-    def __init__(self, time, name, eigvals, eigvecs, pctvar, PC, RCmat, RCseries,mode_idx, eigvals_q=None):
+    def __init__(self, time, original, name, eigvals, eigvecs, pctvar, PC, RCmat, RCseries,mode_idx, eigvals_q=None):
         self.time       = time
+        self.original   = original
         self.name       = name
         self.eigvals    = eigvals
         self.eigvals_q  = eigvals_q
@@ -6630,6 +7031,7 @@ class SsaRes:
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
+            (going to be deprecated)
 
         xlim : list, optional
             x-axis limits. The default is None.
@@ -6646,9 +7048,6 @@ class SsaRes:
                default: teal 
 
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         if ax is None:
@@ -6680,13 +7079,13 @@ class SsaRes:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, ax
 
-    def modeplot(self, mode=1, figsize=[10, 5], ax=None, savefig_settings=None, 
-             title_kwargs=None, mute=False, spec_method = 'mtm'):
+    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None, 
+             title_kwargs=None, mute=False, spec_method = 'mtm', plot_original=False):
         ''' Dashboard visualizing the properties of a given SSA mode, including:
             1. the analyzing function (T-EOF)
             2. the reconstructed component (RC)
@@ -6694,8 +7093,9 @@ class SsaRes:
 
         Parameters
         ----------
-        mode : int
-            the (one-based) index of the mode to visualize
+        index : int
+            the (0-based) index of the mode to visualize. 
+            Default is 0, corresponding to the first mode. 
         
         figsize : list, optional
             The figure size. The default is [10, 5].
@@ -6716,7 +7116,8 @@ class SsaRes:
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
-        
+            (going to be deprecated)
+
         spec_method: str, optional
             The name of the spectral method to be applied on the PC. Default: MTM
             Note that the data are evenly-spaced, so any spectral method that
@@ -6724,26 +7125,27 @@ class SsaRes:
             'wwz' is relevant too if scaling exponents need to be estimated. 
       
         '''
-        # Turn the interactive mode off.
-        plt.ioff()
-
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
         
-        RC = self.RCmat[:,mode-1]    
+        RC = self.RCmat[:,index]    
         fig = plt.figure(tight_layout=True,figsize=figsize)
         gs = gridspec.GridSpec(2, 2)
         # plot RC
         ax = fig.add_subplot(gs[0, :])
-        ax.plot(self.time,RC)  
-        ax.set_xlabel('Time'),  ax.set_ylabel('RC [dimensionless]')
-        ax.set_title('Mode '+str(mode)+' RC, '+ '{:3.2f}'.format(self.pctvar[mode-1]) + '% variance explained',weight='bold')
+        
+        ax.plot(self.time,RC,label='mode '+str(index+1),zorder=99) 
+        if plot_original:
+            ax.plot(self.time,self.original,color='Silver',lw=1,label='original')
+            ax.legend()
+        ax.set_xlabel('Time'),  ax.set_ylabel('RC')
+        ax.set_title('SSA Mode '+str(index+1)+' RC, '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
         # plot T-EOF
         ax = fig.add_subplot(gs[1, 0])
-        ax.plot(self.eigvecs[:,mode-1])
-        ax.set_title('Analyzing function)')
+        ax.plot(self.eigvecs[:,index])
+        ax.set_title('Analyzing function')
         ax.set_xlabel('Time'), ax.set_ylabel('T-EOF')
         # plot spectrum
         ax = fig.add_subplot(gs[1, 1])
@@ -6755,9 +7157,9 @@ class SsaRes:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, ax
 
 
@@ -7062,6 +7464,7 @@ class Lipd:
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
+            (going to be deprecated)
 
         Returns
         -------
@@ -7104,7 +7507,6 @@ class Lipd:
 
 
         '''
-
         scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
 
 
@@ -7207,7 +7609,7 @@ class LipdSeries(Series):
 
 
     '''
-    def __init__(self, tso, clean_ts=True):
+    def __init__(self, tso, clean_ts=True, verbose=False):
         if type(tso) is list:
             self.lipd_ts=lipdutils.getTs(tso)
         else:
@@ -7228,6 +7630,7 @@ class LipdSeries(Series):
                 'peat' : ['#2F4F4F','*'],
                 'midden' : ['#824E2B','o'],
                 'other':['k','o']}
+        
         try:
             time, label= lipdutils.checkTimeAxis(self.lipd_ts)
             if label=='age':
@@ -7245,10 +7648,6 @@ class LipdSeries(Series):
             try:
                 if self.lipd_ts['mode'] == 'paleoData':
                     value=np.array(self.lipd_ts['paleoData_values'],dtype='float64')
-                    #Remove NaNs
-                    #ys_tmp=np.copy(value)
-                    #value=value[~np.isnan(ys_tmp)]
-                    #time=time[~np.isnan(ys_tmp)]
                     value_name=self.lipd_ts['paleoData_variableName']
                     if 'paleoData_units' in self.lipd_ts.keys():
                         value_unit=self.lipd_ts['paleoData_units']
@@ -7257,13 +7656,9 @@ class LipdSeries(Series):
                     label=self.lipd_ts['dataSetName']
                     super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
                          time_unit=time_unit,value_name=value_name,value_unit=value_unit,
-                         label=label,clean_ts=clean_ts)
+                         label=label,clean_ts=clean_ts,verbose=verbose)
                 elif self.lipd_ts['mode'] == 'chronData':
                     value=np.array(self.lipd_ts['chronData_values'],dtype='float64')
-                    #Remove NaNs
-                    #ys_tmp=np.copy(value)
-                    #value=value[~np.isnan(ys_tmp)]
-                    #time=time[~np.isnan(ys_tmp)]
                     value_name=self.lipd_ts['chronData_variableName']
                     if 'paleoData_units' in self.lipd_ts.keys():
                         value_unit=self.lipd_ts['chronData_units']
@@ -7272,7 +7667,7 @@ class LipdSeries(Series):
                     label=self.lipd_ts['dataSetName']
                     super(LipdSeries,self).__init__(time=time,value=value,time_name=time_name,
                          time_unit=time_unit,value_name=value_name,value_unit=value_unit,
-                         label=label,clean_ts=clean_ts)
+                         label=label,clean_ts=clean_ts,verbose=verbose)
             except:
                 raise ValueError("paleoData_values should contain floats")
         except:
@@ -7284,12 +7679,16 @@ class LipdSeries(Series):
         '''
         return deepcopy(self)
 
-    def chronEnsembleToPaleo(self,D,modelNumber=None,tableNumber=None):
+    def chronEnsembleToPaleo(self,D,number=None,chronNumber=None, modelNumber=None,tableNumber=None):
         '''Fetch chron ensembles from a lipd object and return the ensemble as MultipleSeries
 
         Parameters
         ----------
         D : a LiPD object
+        number: int, optional
+            The number of ensemble members to store. Default is None, which corresponds to all present
+        chronNumber: int, optional
+            The chron object number. The default is None. 
         modelNumber : int, optional
             Age model number. The default is None.
         tableNumber : int, optional
@@ -7298,7 +7697,6 @@ class LipdSeries(Series):
         Raises
         ------
         ValueError
-            DESCRIPTION.
 
         Returns
         -------
@@ -7324,13 +7722,14 @@ class LipdSeries(Series):
         if len(chron)==0:
             raise ValueError("No ChronMeasurementTables available")
         elif len(chron)>1:
-            if modelNumber==None or tableNumber==None:
+            if chronNumber==None or modelNumber==None or tableNumber==None:
                 csvName=lipdutils.whichEnsemble(chron)
             else:
+                str0='chron'+str(chronNumber)
                 str1='model'+str(modelNumber)
                 str2='ensemble'+str(tableNumber)
                 for item in chron:
-                    if str1 in item and str2 in item:
+                    if str0 in item and str1 in item and str2 in item:
                         csvName=item
             depth, ensembleValues =lipdutils.getEnsemble(csv_dict,csvName)
         else:
@@ -7339,6 +7738,14 @@ class LipdSeries(Series):
         sort_ind = np.argsort(depth)
         depth=list(np.array(depth)[sort_ind])
         ensembleValues=ensembleValues[sort_ind,:]
+        
+        if number is not None:
+            if number>np.shape(ensembleValues)[1]:
+                warnings.warn('Selected number of ensemble members is greater than number of members in the ensemble table; passing')
+                pass
+            else:
+                ensembleValues=ensembleValues[:,0:number]
+        
         #Map to paleovalues
         key=[]
         for item in self.lipd_ts.keys():
@@ -7420,6 +7827,7 @@ class LipdSeries(Series):
         mute : bool, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
+            (going to be deprecated)
 
         Returns
         -------
@@ -7716,6 +8124,7 @@ class LipdSeries(Series):
         mute : {True,False}, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
+            (going to be deprecated)
         ensemble : {True, False}, optional
             If True, will return the dashboard in ensemble modes if ensembles are available
         D : pyleoclim.Lipd
@@ -7771,7 +8180,6 @@ class LipdSeries(Series):
             pyleo.closefig(fig)
 
         '''
-        
         if ensemble == True and D is None:
             raise ValueError("When an ensemble dashboard is requested, the corresponsind Lipd object must be supplied")
             
@@ -7985,9 +8393,9 @@ class LipdSeries(Series):
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                plotting.showfig(fig)
+        # else:
+        #     if not mute:
+        #         plotting.showfig(fig)
         return fig, ax
 
     def mapNearRecord(self, D, n=5, radius = None, sameArchive = False, 
@@ -8053,6 +8461,7 @@ class LipdSeries(Series):
         mute : {True, False}, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
+            (going to be deprecated)
 
         See also
         --------
@@ -8071,7 +8480,6 @@ class LipdSeries(Series):
             contains fig and ax
 
         """
-        
         scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
         
         #get the information about the original timeseries
@@ -8285,6 +8693,7 @@ class LipdSeries(Series):
         mute : {True,False}, optional
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax. The default is False.
+            (going to be deprecated)
         ensemble : {True,False}, optional
             Whether to use age model ensembles stored in the file for the plot. The default is False.
             If no ensemble can be found, will error out.
@@ -8333,7 +8742,6 @@ class LipdSeries(Series):
             pyleo.closefig(fig)
         
         '''
-        
         if ensemble == True and D is None:
             raise ValueError("When an ensemble is requested, the corresponsind Lipd object must be supplied")
         
@@ -8398,9 +8806,9 @@ class LipdSeries(Series):
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            else:
-                if not mute:
-                    plotting.showfig(fig)
+            # else:
+            #     if not mute:
+            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax

@@ -20,6 +20,7 @@ from pandas.testing import assert_frame_equal
 
 import pytest
 import scipy.io as sio
+import sys
 import os
 import pathlib
 test_dirpath = pathlib.Path(__file__).parent.absolute()
@@ -49,7 +50,15 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
     t = np.arange(nt)
     v = colored_noise(alpha=alpha, t=t, f0=f0, m=m, seed=seed)
     return t, v
-
+    
+def load_data():
+    try:
+        url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/scal_signif_benthic.json'
+        response = urlopen(url)
+        d = json.loads(response.read())
+    except:
+        d = pyleo.utils.jsonutils.json_to_Scalogram('./example_data/scal_signif_benthic.json')
+    return d
 
 # Tests below
 
@@ -134,7 +143,7 @@ class TestUiSeriesSpectral:
         t, v = gen_colored_noise(nt=1000, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method=spec_method)
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('freq_method', ['log', 'scale', 'nfft', 'lomb_scargle', 'welch'])
@@ -147,7 +156,7 @@ class TestUiSeriesSpectral:
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method=freq_method)
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('nfreq', [10, 20, 30])
@@ -160,7 +169,7 @@ class TestUiSeriesSpectral:
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method='log', freq_kwargs={'nfreq': nfreq})
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('nv', [10, 20, 30])
@@ -173,7 +182,7 @@ class TestUiSeriesSpectral:
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method='scale', freq_kwargs={'nv': nv})
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
     @pytest.mark.parametrize('dt, nf, ofac, hifac', [(None, 20, 1, 1), (None, None, 2, 0.5)])
@@ -186,7 +195,7 @@ class TestUiSeriesSpectral:
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
         psd = ts.spectral(method='mtm', freq_method='lomb_scargle', freq_kwargs={'dt': dt, 'nf': nf, 'ofac': ofac, 'hifac': hifac})
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
     def test_spectral_t5(self, eps=0.6):
@@ -201,7 +210,7 @@ class TestUiSeriesSpectral:
         ts = pyleo.Series(time=t, value=v)
         freq = np.linspace(1/500, 1/2, 100)
         psd = ts.spectral(method='wwz', settings={'freq': freq}, label='WWZ')
-        beta = psd.beta_est(fmin=1/200, fmax=1/10)['beta']
+        beta = psd.beta_est(fmin=1/200, fmax=1/10).beta_est_res['beta']
         assert_array_equal(psd.frequency, freq)
         assert np.abs(beta-alpha) < eps
 
@@ -221,8 +230,18 @@ class TestUiSeriesSpectral:
 
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
         psd = ts.spectral(method=spec_method)
-        beta = psd.beta_est()['beta']
+        beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
+        
+    def test_spectral_t7(self):
+        '''Test the spectral significance testing with pre-generated scalogram objects
+        '''
+        
+        ts = pyleo.gen_ts(model='colored_noise')
+        scal = ts.wavelet()
+        signif = scal.signif_test(number=2,export_scal = True)
+        sig_psd = ts.spectral(method='wwz',scalogram=scal)
+        sig_psd.signif_test(number=2,scalogram=signif).plot()
 
 class TestUiSeriesBin:
     ''' Tests for Series.bin()
@@ -281,6 +300,23 @@ class TestUiSeriesStats:
         key = {'mean': 4.5,'median': 4.5,'min': 0.0,'max': 9.0,'std': np.std(t),'IQR': 4.5}
 
         assert stats == key
+        
+class TestUiSeriesCenter:
+    '''Test for Series.center()
+
+    Center removes the mean, so we'll simply test maximum and minimum values'''
+
+    def test_center(self):
+        #Generate sample data
+        t, v = gen_colored_noise()
+
+        #Create time series with sample data
+        ts = pyleo.Series(time = t, value = v)
+
+        #Call function to be tested
+        tsc, mu = ts.center()
+
+        assert np.abs(tsc.value.mean()) <= np.sqrt(sys.float_info.epsilon) 
 
 class TestUiSeriesStandardize:
     '''Test for Series.standardize()
@@ -413,23 +449,24 @@ class TestUiSeriesSummaryPlot:
     ''' Test Series.summary_plot()
     '''
     def test_summary_plot_t0(self):
-        ''' Generate a colored noise and run the summary_plot() function.
+        '''Testing that labels are being passed and that psd and scalogram objects dont fail when passed. 
+        Also testing that we can specify fewer significance tests than those stored in the scalogram object
         Note that we should avoid pyleo.showfig() in tests.
+        
+        Passing pre generated scalogram and psd.
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=100, alpha=alpha)
-        ts = pyleo.Series(time=t, value=v)
-        psd = ts.spectral()
-        scal = ts.wavelet()
+        scal = load_data()
+        ts = scal.timeseries
+        psd = ts.spectral(scalogram=scal)
         period_label='Period'
         psd_label='PSD'
         time_label='Time'
         value_label='Value'
         fig, ax = ts.summary_plot(
-            psd=psd, scalogram=scal, figsize=[4, 5], title='Test',
+            psd = psd, scalogram=scal, figsize=[4, 5], title='Test',
             period_label=period_label, psd_label=psd_label,
             value_label=value_label, time_label=time_label,
-            mute=True,
+            n_signif_test = 1
         )
         
         assert ax['scal'].properties()['ylabel'] == period_label, 'Period label is not being passed properly'
@@ -437,6 +474,61 @@ class TestUiSeriesSummaryPlot:
         assert ax['scal'].properties()['xlabel'] == time_label, 'Time label is not being passed properly'
         assert ax['ts'].properties()['ylabel'] == value_label, 'Value label is not being passed properly'
 
+        plt.close(fig)
+
+    def test_summary_plot_t1(self):
+        '''Testing that the bare function works
+        Note that we should avoid pyleo.showfig() in tests.
+    
+        Passing just a pre generated psd.
+        '''
+        scal = load_data()
+        ts = scal.timeseries
+        fig, ax = ts.summary_plot()
+    
+        plt.close(fig)  
+    
+    def test_summary_plot_t2(self):
+        '''Testing that we can pass just the scalogram object
+        Note that we should avoid pyleo.showfig() in tests.
+    
+        Passing just a pre generated psd.
+        '''
+        scal = load_data()
+        ts = scal.timeseries
+        fig, ax = ts.summary_plot(
+            scalogram = scal
+        )
+    
+        plt.close(fig)
+
+    def test_summary_plot_t3(self):
+        '''Testing that we can generate pass just a psd object and no scalogram
+        Note that we should avoid pyleo.showfig() in tests.
+    
+        Passing just a pre generated psd.
+        '''
+        scal = load_data()
+        ts = scal.timeseries
+        psd = ts.spectral(scalogram=scal)
+        fig, ax = ts.summary_plot(
+            psd = psd
+        )
+
+        plt.close(fig)
+
+    def test_summary_plot_t4(self):
+        '''Testing that we can generate a psd object using a different method from that of the passed scalogram
+        Note that we should avoid pyleo.showfig() in tests.
+    
+        Passing just a pre generated psd.
+        '''
+        scal = load_data()
+        ts = scal.timeseries
+        fig, ax = ts.summary_plot(
+            scalogram = scal, psd_method='lomb_scargle'
+        )
+    
         plt.close(fig)
 
 class TestUiSeriesCorrelation:
@@ -722,8 +814,7 @@ class TestUISeriesSsa():
     def test_ssa_t0(self):
         ''' Test Series.ssa() with available methods using default arguments
         '''
-        nt = 500
-        t  = np.arange(nt)
+        t  = np.arange(500)
         cn = pyleo.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
 
         res = cn.ssa()
@@ -733,19 +824,14 @@ class TestUISeriesSsa():
     def test_ssa_t1(self):
         '''Test Series.ssa() with var truncation
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=1.0)
-        ts = pyleo.Series(time=t, value=v)
-
+        ts = pyleo.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
         res = ts.ssa(trunc='var')
 
     def test_ssa_t2(self):
         '''Test Series.ssa() with Monte-Carlo truncation
         '''
 
-        alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=1.0)
-        ts = pyleo.Series(time=t, value=v)
+        ts = pyleo.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
 
         res = ts.ssa(M=60, nMC=10, trunc='mcssa')
         res.screeplot(mute=True)
@@ -753,9 +839,7 @@ class TestUISeriesSsa():
     def test_ssa_t3(self):
         '''Test Series.ssa() with Kaiser truncation
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=1.0)
-        ts  = pyleo.Series(time=t, value=v)
+        ts = pyleo.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
         res = ts.ssa(trunc='kaiser')
         
     def test_ssa_t4(self):

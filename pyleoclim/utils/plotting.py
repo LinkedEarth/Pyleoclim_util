@@ -13,6 +13,7 @@ __all__ = [
     'closefig',
 ]
 
+# from tkinter import Variable
 import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
@@ -60,6 +61,7 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
     mute : bool
         if True, the plot will not show;
          recommend to turn on when more modifications are going to be made on ax
+         (going to be deprecated)
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existed or non-existed path,
@@ -113,9 +115,9 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
     if 'fig' in locals():
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                showfig(fig)
+        # else:
+        #     if not mute:
+        #         showfig(fig)
         return fig, ax
     else:
         return ax
@@ -156,6 +158,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     mute : bool
         if True, the plot will not show;
         recommend to turn on when more modifications are going to be made on ax
+         (going to be deprecated)
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existed or non-existed path,
@@ -214,9 +217,9 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     if 'fig' in locals():
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                showfig(fig)
+        # else:
+        #     if not mute:
+        #         showfig(fig)
         return fig, ax
     else:
         return ax
@@ -224,7 +227,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 def stackplot(x, y, figsize=None, xlabel=None, ylabel=None, 
               xlim=None, ylim=None, title=None,
               savefig_settings=None, ax=None, style=None, 
-              plot_kwargs=None, mute=False,color=None):
+              plot_kwargs=None, mute=False, color=None):
     ''' Stack plot of timeseries
     
     Please not that this function uses a different default style than the Pyleoclim package.
@@ -257,6 +260,7 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
     mute : bool
         if True, the plot will not show;
           recommend to turn on when more modifications are going to be made on ax
+         (going to be deprecated)
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existed or non-existed path,
@@ -273,7 +277,6 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
     pyleoclim.utils.plotting.showfig : equivalent to plt.show(). Platform-dependent
     
       '''
-
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
     plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
        
@@ -327,9 +330,9 @@ def stackplot(x, y, figsize=None, xlabel=None, ylabel=None,
     if 'fig' in locals():
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                showfig(fig)
+        # else:
+        #     if not mute:
+        #         showfig(fig)
         return fig, ax
     else:
         return ax
@@ -372,17 +375,19 @@ def showfig(fig, close=False):
     pyleoclim.utils.plotting.in_notebook: Functions to sense a notebook environment
 
     '''
-    if in_notebook:
-        try:
-            from IPython.display import display
-        except ImportError as error:
-            # Output expected ImportErrors.
-            print(f'{error.__class__.__name__}: {error.message}')
+    # if in_notebook:
+    #     try:
+    #         from IPython.display import display
+    #     except ImportError as error:
+    #         # Output expected ImportErrors.
+    #         print(f'{error.__class__.__name__}: {error.message}')
 
-        display(fig)
+    #     display(fig)
 
-    else:
-        plt.show()
+    # else:
+    #     plt.show()
+
+    plt.show()
 
     if close:
         closefig(fig)
@@ -475,8 +480,6 @@ def set_style(style='journal', font_scale=1.0):
         Default is 1. Corresponding to 12 Font Size. 
     
     '''
-    mpl.rcParams.update(mpl.rcParamsDefault)
-
     font_dict = {
         'font.size': 12,
         'axes.labelsize': 12,
@@ -555,11 +558,8 @@ def set_style(style='journal', font_scale=1.0):
             'xtick.minor.width': 0,
             'ytick.minor.width': 0,
         })
-    elif 'matplotlib' in style or 'default' in style:
-        mpl.rcParams.update(mpl.rcParamsDefault)
     else:
-        print(f'Style [{style}] not availabel! Setting to `matplotlib` ...')
-        mpl.rcParams.update(mpl.rcParamsDefault)
+        raise ValueError(f'Style [{style}] not availabel!')
 
     if '_spines' in style:
         style_dict.update({

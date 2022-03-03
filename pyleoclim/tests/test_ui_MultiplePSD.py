@@ -60,7 +60,7 @@ class TestUiMultiplePsdBetaEst:
 
         ts_surrs = pyleo.MultipleSeries(series_list=series_list)
         psds = ts_surrs.spectral(method='mtm')
-        betas = psds.beta_est()['beta']
+        betas = psds.beta_est().beta_est_res['beta']
         for idx, beta in enumerate(betas):
             assert np.abs(beta-alphas[idx]) < eps
 

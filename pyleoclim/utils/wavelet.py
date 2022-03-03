@@ -48,10 +48,10 @@ warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 #----------------
 
 class AliasFilter(object):
-    '''Performing anti-alias filter on a psd 
-    
+    '''Performing anti-alias filter on a psd
+
     experimental: Use at your own risk
-    
+
     @author: fzhu
     '''
 
@@ -170,18 +170,18 @@ class AliasFilter(object):
         spectr = freq**(-alpha) / (1 + (freq/fc)**2)
 
         return spectr
-    
+
 # def cwt(ys,ts,scales,wavelet='morl',sampling_period=1.0,method='conv',axis=-1):
 #     '''Continous wavelet transform for evenly spaced data
-    
+
 #     pywavelet documentation: https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
-    
+
 #     Parameters
 #     ----------
 #     ys : array
 #         signal
 #     ts : array
-#         time 
+#         time
 #     scales : array (float)
 #         different wavelet scales to use
 #     wavelet : str
@@ -197,14 +197,14 @@ class AliasFilter(object):
 #     Returns
 #     -------
 #     res : dictionary
-#         'freq' - array(float) 
+#         'freq' - array(float)
 #             frequencies
 #         'time' - array(float)
 #         'amplitude' - array(float)
 #         'coi' - array(float)
 #             cone of inference
 
-#     '''    
+#     '''
 #     coeff,freq=pywt.cwt(data=ys,scales=scales,wavelet=wavelet,sampling_period=sampling_period,method=method,axis=axis)
 #     amplitude=abs(coeff).T
 #     if wavelet=='morl' or wavelet[:4]=='cmor':
@@ -217,12 +217,12 @@ class AliasFilter(object):
 
 def assertPositiveInt(*args):
     ''' Assert that the arguments are all positive integers.
-    
+
     Parameters
     ----------
-    
+
     args
-    
+
     '''
     for arg in args:
         assert isinstance(arg, int) and arg >= 1
@@ -231,7 +231,16 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
               gaussianize=False, standardize=False):
     ''' Return the weighted wavelet amplitude (WWA).
 
-    Original method from Foster. Not multiprocessing.
+    The Weighted wavelet Z-transform (WWZ) is based on Morlet wavelet estimation, using
+    least squares minimization to suppress the energy leakage caused by the data gaps.
+    WWZ does not rely on interpolation or detrending, and is appropriate for unevenly-spaced datasets.
+    In particular, we use the variant of Kirchner & Neal (2013), in which basis rotations mitigate the
+    numerical instability that occurs in pathological cases with the original algorithm (Foster, 1996).
+    The WWZ method has one adjustable parameter, a decay constant `c` that balances the time and frequency
+    resolutions of the analysis. This application uses the larger value (8π2)−1, justified elsewhere
+    (Witt & Schumann, 2005).
+
+    No multiprocessing is applied by Default.
 
     Parameters
     ----------
@@ -248,7 +257,7 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
-        the threshold of the number of effective degree of freedom
+        the threshold of the number of effective degrees of freedom
     nproc :int
         fake argument, just for convenience
     detrend : string
@@ -279,13 +288,14 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
     References
     ----------
 
-    Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
-    Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
+    - Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+    - Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
     Nonlinear Processes in Geophysics 12, 345–352 (2005).
+    - Kirchner, J. W. and Neal, C. (2013). Universal fractal scaling in stream chemistry and its implications for solute transport and water quality trend detection. Proc Natl Acad Sci USA 110:12213–12218.
 
     See also
     --------
-    
+
     pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
 
     pyleoclim.utils.wavelet.kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
@@ -294,7 +304,7 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
 
     pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     '''
@@ -355,11 +365,11 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=Fals
 
     return wwa, phase, Neffs, coeff
 
-def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=False, sg_kwargs=None,
+def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
               gaussianize=False, standardize=False):
     ''' Return the weighted wavelet amplitude (WWA).
 
-    Original method from Foster. Supports multiprocessing.
+    Original method from Foster (1996). Supports multiprocessing.
 
     Parameters
     ----------
@@ -376,7 +386,7 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=Fal
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
-        the threshold of the number of effective degree of freedom
+        the threshold of the number of effective degrees of freedom
     nproc : int
         the number of processes for multiprocessing
     detrend : string
@@ -403,10 +413,10 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=Fal
         the matrix of effective number of points in the time-scale coordinates
     coeff : array
         the wavelet transform coefficients (a0, a1, a2)
-        
+
     See also
     --------
-    
+
     pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
     pyleoclim.utils.wavelet.kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
@@ -415,7 +425,7 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8,  detrend=Fal
 
     pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
@@ -510,7 +520,7 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
-        the threshold of the number of effective degree of freedom
+        the threshold of the number of effective degrees of freedom
     nproc : int
         fake argument for convenience, for parameter consistency between functions, does not need to be specified
     detrend : string
@@ -541,13 +551,13 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
     References
     ----------
 
-    Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
-    Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
+    - Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+    - Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
     Nonlinear Processes in Geophysics 12, 345–352 (2005).
-    
+
     See also
     --------
-    
+
     pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
     pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
@@ -556,7 +566,7 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend
 
     pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
@@ -653,7 +663,7 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
-        the threshold of the number of effective degree of freedom
+        the threshold of the number of effective degrees of freedom
     nproc : int
         the number of processes for multiprocessing
     detrend : string
@@ -676,10 +686,10 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend
     phase (array): the weighted wavelet phase
     Neffs (array): the matrix of effective number of points in the time-scale coordinates
     coeff (array): the wavelet transform coefficients (a0, a1, a2)
-    
+
     See also
     --------
-    
+
     pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
     pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
@@ -688,7 +698,7 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend
 
     pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
@@ -798,7 +808,7 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, s
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
-        the threshold of the number of effective degree of freedom
+        the threshold of the number of effective degrees of freedom
     nproc : int
         fake argument, just for convenience
     detrend : string
@@ -832,10 +842,10 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, s
     Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
     Witt, A. & Schumann, A. Y. Holocene climate variability on millennial scales recorded in Greenland ice cores.
     Nonlinear Processes in Geophysics 12, 345–352 (2005).
-    
+
     See also
     --------
-    
+
     pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
     pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
@@ -844,7 +854,7 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, s
 
     pyleoclim.utils.wavelet.kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
 
-    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
@@ -950,7 +960,7 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
-        the threshold of the number of effective degree of freedom
+        the threshold of the number of effective degrees of freedom
     nproc : int
         fake argument, just for convenience
     detrend : string
@@ -977,10 +987,10 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=
         the matrix of effective number of points in the time-scale coordinates
     coeff : array
         the wavelet transform coefficients (a0, a1, a2)
-        
+
     See also
     --------
-    
+
     pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
     pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
@@ -1103,7 +1113,7 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
     ts : array
         the time points, should be pre-truncated so that the span is exactly what is used for wwz
     Neffs : array
-        the matrix of effective number of points in the time-scale coordinates obtained from wwz from wwz
+        the matrix of effective number of points in the time-scale coordinates obtained from wwz
     freq : array
         vector of frequency from wwz
     Neff : int
@@ -1245,10 +1255,10 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', freq_kwargs={
 
         coeff : array
             the wavelet transform coefficents
-    
+
     See also
     --------
-    
+
     pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
     pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
@@ -1259,10 +1269,10 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', freq_kwargs={
 
     pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
-    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.    
-    
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
 
     Examples
@@ -1409,10 +1419,10 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     res : dict
         contains the cross wavelet coherence, cross-wavelet phase,
         vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
-    
+
     See also
     --------
-    
+
     pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
     pyleoclim.utils.wavelet.wwz_nproc : Returns the weighted wavelet amplitude using the original method from Kirchner. Supports multiprocessing
@@ -1423,12 +1433,12 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
 
     pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler. 
+    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
-    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.    
-    
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
-    
+
     '''
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
@@ -1531,9 +1541,9 @@ def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
     ts : array
         time axis of the time series
     dt : float
-        The resolution of the data. If None, uses the median resolution. Defaults to None. 
+        The resolution of the data. If None, uses the median resolution. Defaults to None.
     nf : int
-        Number of frequency points. 
+        Number of frequency points.
         If None, calculated as the difference between the highest and lowest frequencies (set by hifac and ofac) divided by resolution. Defaults to None
     ofac : float
         Oversampling rate that influences the resolution of the frequency axis,
@@ -1557,19 +1567,19 @@ def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
 
     See also
     --------
-    
+
     pyleoclim.utils.wavelet.freq_vector_welch : Return the frequency vector based on the Welch's method.
 
     pyleoclim.utils.wavelet.freq_vector_nfft : Return the frequency vector based on NFFT
 
     pyleoclim.utils.wavelet.freq_vector_scale : Return the frequency vector based on scales
 
-    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace 
+    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace
 
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
     '''
     assert ofac >= 1 and hifac <= 1, "`ofac` should be >= 1, and `hifac` should be <= 1"
-    
+
     if dt is None:
         dt = np.median(np.diff(ts))
     flo = (1/(2*dt)) / (np.size(ts)*ofac)
@@ -1602,18 +1612,18 @@ def freq_vector_welch(ts):
     ----------
 
     https://github.com/scipy/scipy/blob/v0.14.0/scipy/signal/Spectral.py
-    
+
     See also
     --------
-    
-    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+
+    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT
         recommendation.
 
     pyleoclim.utils.wavelet.freq_vector_nfft : Return the frequency vector based on NFFT
 
     pyleoclim.utils.wavelet.freq_vector_scale : Return the frequency vector based on scales
 
-    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace 
+    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace
 
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
 
@@ -1644,18 +1654,18 @@ def freq_vector_nfft(ts):
 
     freq : array
         the frequency vector
-        
+
     See also
     --------
-    
-    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+
+    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT
         recommendation.
 
     pyleoclim.utils.wavelet.freq_vector_welch : Return the frequency vector based on the Welch's method.
 
     pyleoclim.utils.wavelet.freq_vector_scale : Return the frequency vector based on scales
 
-    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace 
+    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace
 
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
 
@@ -1686,18 +1696,18 @@ def freq_vector_scale(ts, nv=12, fourier_factor=1):
 
     freq : array
         the frequency vector
-        
+
     See also
     --------
-    
-    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+
+    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT
         recommendation.
 
     pyleoclim.utils.wavelet.freq_vector_welch : Return the frequency vector based on the Welch's method.
 
     pyleoclim.utils.wavelet.freq_vector_nfft : Return the frequency vector based on NFFT
 
-    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace 
+    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace
 
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
 
@@ -1728,11 +1738,11 @@ def freq_vector_log(ts, nfreq=None):
 
     freq : array
         the frequency vector
-    
+
     See also
     --------
-    
-    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+
+    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT
         recommendation.
 
     pyleoclim.utils.wavelet.freq_vector_welch : Return the frequency vector based on the Welch's method.
@@ -1786,11 +1796,11 @@ def make_freq_vector(ts, method='log', **kwargs):
 
     freq : array
         the frequency vector
-    
+
     See also
     --------
-    
-    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT 
+
+    pyleoclim.utils.wavelet.freq_vector_lomb_scargle : Return the frequency vector based on the REDFIT
         recommendation.
 
     pyleoclim.utils.wavelet.freq_vector_welch : Return the frequency vector based on the Welch's method.
@@ -1799,7 +1809,7 @@ def make_freq_vector(ts, method='log', **kwargs):
 
     pyleoclim.utils.wavelet.freq_vector_scale : Return the frequency vector based on scales
 
-    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace 
+    pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace
 
     '''
 
@@ -2456,22 +2466,22 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 # def cwt(ys,ts,mother='morlet',param=None,freq=None,freq_method='scale',
 #         freq_kwargs={},detrend=False, sg_kwargs={}, gaussianize=False,
 #         standardize=False,pad=False,pad_kwargs={}):
-    
+
 #     ys=np.array(ys)
 #     ts=np.array(ts)
-    
+
 #     ys, ts = clean_ts(ys, ts) #clean up time
-    
+
 #     #make sure that the time series is evenly-spaced
 #     if is_evenly_spaced(ts) == True:
 #         dt = np.mean(np.diff(ts))
 #     else:
 #         raise ValueError('Time series must be evenly spaced in time')
-       
-#     # prepare the time series 
-#     pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs, 
+
+#     # prepare the time series
+#     pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs,
 #                        gaussianize=gaussianize, standardize=standardize)
-    
+
 #     # Get the fourier factor
 #     if mother.lower() == 'morlet':
 #         if param is None:
@@ -2487,19 +2497,19 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 #         fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * param + 1))
 #     else:
 #         fourier_factor = 1
-    
+
 #     #get the frequency/scale information
-#     if freq is None: 
+#     if freq is None:
 #         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
 #         if freq_method == 'scale':
 #             freq_kwargs.update({'fourier_factor':fourier_factor})
 #         freq = make_freq_vector(ts, method=freq_method, **freq_kwargs)
 #     # Use scales
 #     scale = np.sort(1/(freq*fourier_factor))
-    
+
 #     #Normalize
 #     #n_ys = pd_ys-np.mean(pd_ys)
-    
+
 #     #pad if wanted
 #     if pad == True:
 #         pad_kwargs = {} if pad_kwargs is None else pad_kwargs.copy()
@@ -2507,10 +2517,10 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 #     else:
 #         yp=pd_ys
 #         tp=ts
-        
+
 #     # Wave calculation
 #     n = len(yp)
-    
+
 #     # construct wavenumber array used in transform [Eqn(5)]
 #     kplus = np.arange(1, int(n / 2) + 1)
 #     kplus = (kplus * 2 * np.pi / (n * dt))
@@ -2519,8 +2529,8 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 #     k = np.concatenate(([0.], kplus, kminus))
 
 #     # compute FFT of the (padded) time series
-#     f = np.fft.fft(yp) 
-    
+#     f = np.fft.fft(yp)
+
 #     # define the wavelet array
 #     wave = np.zeros(shape=(len(scale), n), dtype=complex)
 
@@ -2529,25 +2539,25 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 #         daughter, fourier_factor, coi, _ = \
 #             wave_bases(mother, k, scale[a1], param)
 #         wave[a1, :] = np.fft.ifft(f * daughter)  # wavelet transform[Eqn(4)]
-    
+
 #     #COI
 #     coi = coi * dt * np.concatenate((
 #         np.insert(np.arange(int((len(ys) + 1) / 2) - 1), [0], [1E-5]),
 #         np.insert(np.flipud(np.arange(0, int(len(ys) / 2) - 1)), [-1], [1E-5])))
-    
-#     #Remove the padding 
+
+#     #Remove the padding
 #     if pad == True:
 #         idx = np.in1d(tp,ts)
 #         wave = wave[:,idx]
-        
+
 #     res = {}
-    
+
 #     return res
-    
+
 
 # def wave_bases(mother, k, scale, param):
 #     '''
-    
+
 
 #     Parameters
 #     ----------
@@ -2577,7 +2587,7 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 #         DESCRIPTION.
 
 #     '''
-    
+
 #     n = len(k)
 #     kplus = np.array(k > 0., dtype=float)
 
@@ -2623,8 +2633,8 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 #         raise KeyError('Mother must be one of "morlet", "paul", "dog"')
 
 #     return daughter, fourier_factor, coi, dofmin
-        
-    
+
+
 # def chisquare_inv(P, V):
 
 #     if (1 - P) < 1E-4:
@@ -2647,7 +2657,7 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 
 #     X = X * V  # put back in the goofy V factor
 
-#     return X  
+#     return X
 
 # def chisquare_solve(XGUESS, P, V):
 
@@ -2660,4 +2670,3 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 #         PDIFF = XGUESS   # then just assign some big number like XGUESS
 
 #     return PDIFF
-
