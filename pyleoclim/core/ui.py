@@ -109,7 +109,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         the time axis
 
     nt : number of time points
-        only works if 't' is None, and it will use an evenly-spaced vector with nt points 
+        only works if 't' is None, and it will use an evenly-spaced vector with nt points
 
     kwargs : dict
         the keyward arguments for the specified timeseries model
@@ -134,7 +134,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
 
     .. ipython:: python
         :okwarning:
-        :okexcept:    
+        :okexcept:
 
         import pyleoclim as pyleo
 
@@ -163,7 +163,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
 
     .. ipython:: python
         :okwarning:
-        :okexcept:    
+        :okexcept:
 
         # default scaling slope 'alpha' is 1
         ts = pyleo.gen_ts(model='colored_noise')
@@ -298,7 +298,7 @@ class Series:
 
     .. ipython:: python
         :okwarning:
-        :okexcept:    
+        :okexcept:
 
         import pyleoclim as pyleo
         import pandas as pd
@@ -350,7 +350,7 @@ class Series:
         --------
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -535,7 +535,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -662,7 +662,7 @@ class Series:
 
             .. ipython:: python
                 :okwarning:
-                :okexcept:    
+                :okexcept:
 
                 import pyleoclim as pyleo
                 import pandas as pd
@@ -678,7 +678,7 @@ class Series:
 
             .. ipython:: python
                 :okwarning:
-                :okexcept:    
+                :okexcept:
 
                 @savefig ts_plot2.png
                 fig, ax = ts.plot(color='r')
@@ -690,7 +690,7 @@ class Series:
 
             .. ipython:: python
                 :okwarning:
-                :okexcept:    
+                :okexcept:
 
                 fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'})
                 pyleo.savefig(fig,path='ts_plot3.png')
@@ -746,7 +746,7 @@ class Series:
 
     def ssa(self, M=None, nMC=0, f=0.3, trunc = None, var_thresh=80):
         ''' Singular Spectrum Analysis
-        
+
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
         This implementation  uses the method of [1], with applications presented in [2].
         Optionally (MC>0), the significance of eigenvalues is assessed by Monte-Carlo simulations of an AR(1) model fit to X, using [3].
@@ -763,7 +763,7 @@ class Series:
         trunc : str
             if present, truncates the expansion to a level K < M owing to one of 3 criteria:
                 (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
-                (2) 'mc-ssa': Monte-Carlo SSA (use modes above the 95% threshold)
+                (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% threshold)
                 (3) 'var': first K modes that explain at least var_thresh % of the variance.
             Default is None, which bypasses truncation (K = M)
 
@@ -781,14 +781,14 @@ class Series:
         - PC : (N - M + 1, M) array of principal components (T-PCs)
 
         - RCmat : (N,  M) array of reconstructed components
-        
+
         - RCseries : (N,) reconstructed series, with mean and variance restored
 
         - pctvar: (M, ) array of the fraction of variance (%) associated with each mode
 
         - eigvals_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
-        
-            
+
+
         Examples
         --------
 
@@ -796,7 +796,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -816,11 +816,11 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
             var_pct = nino_ssa['pctvar'] # extract the fraction of variance attributable to each mode
 
             # plot eigenvalues
-           
+
             nino_ssa.screeplot()
             @savefig ts_eigen.png
             pyleo.showfig(fig)
@@ -836,7 +836,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             print(nino_ssa.pctvar[15:].sum()*100)
 
@@ -844,7 +844,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
             fig, ax = ts.plot(title='ONI') # we mute the first call to only get the plot with 2 lines
@@ -865,7 +865,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             nino_mcssa = ts.ssa(M = 60, nMC=1000)
 
@@ -873,7 +873,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             nino_mcssa.screeplot()
             @savefig scree_nmc.png
@@ -885,14 +885,14 @@ class Series:
         '''
 
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
-        
-                
+
+
         resc = SsaRes(name=self.value_name, original=self.value, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
-                        pctvar = res['pctvar'], PC = res['PC'], RCmat = res['RCmat'], 
+                        pctvar = res['pctvar'], PC = res['PC'], RCmat = res['RCmat'],
                         RCseries=res['RCseries'], mode_idx=res['mode_idx'])
         if nMC >= 0:
            resc.eigvals_q=res['eigvals_q'] # assign eigenvalue quantiles if Monte-Carlo SSA was called
-        
+
         return resc
 
     def is_evenly_spaced(self, tol=1e-3):
@@ -909,11 +909,11 @@ class Series:
 
     def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
         ''' Filtering methods for Series objects using four possible methods:
-            - `Butterworth <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.butter.html>`_ 
-            - `Lanczos <http://scitools.org.uk/iris/docs/v1.2/examples/graphics/SOI_filtering.html>`_  
-            - `Finite Impulse Response <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html>`_  
+            - `Butterworth <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.butter.html>`_
+            - `Lanczos <http://scitools.org.uk/iris/docs/v1.2/examples/graphics/SOI_filtering.html>`_
+            - `Finite Impulse Response <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html>`_
             - `Savitzky-Golay filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html>`_
-                
+
         By default, this method implements a lowpass filter, though it can easily be turned into a bandpass or high-pass filter (see examples below).
 
         Parameters
@@ -925,13 +925,13 @@ class Series:
             - 'butterworth': a Butterworth filter (default = 3rd order)
             - 'savitzky-golay': Savitzky-Golay filter
             - 'firwin': finite impulse response filter design using the window method, with default window as Hamming
-            - 'lanczos': Lanczos zero-phase filter 
+            - 'lanczos': Lanczos zero-phase filter
 
         cutoff_freq : float or list
             The cutoff frequency only works with the Butterworth method.
             If a float, it is interpreted as a low-frequency cutoff (lowpass).
-            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass). 
-            Note that only the Butterworth option (default) currently supports bandpass filtering. 
+            If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
+            Note that only the Butterworth option (default) currently supports bandpass filtering.
 
         cutoff_scale : float or list
             cutoff_freq = 1 / cutoff_scale
@@ -968,7 +968,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             import numpy as np
@@ -992,7 +992,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=15).plot(ax=ax, label='After 15 Hz low-pass filter')
@@ -1006,7 +1006,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label='After 15-25 Hz band-pass filter')
@@ -1017,10 +1017,10 @@ class Series:
             pyleo.closefig(fig)
 
         Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:
-            
+
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
@@ -1029,12 +1029,12 @@ class Series:
             @savefig ts_filter4.png
             pyleo.showfig(fig)
             pyleo.closefig(fig)
-            
+
         - Applying a high-pass filter
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             fig, ax = ts.plot(label='mix')
             ts_low  = ts.filter(cutoff_freq=15)
@@ -1051,10 +1051,10 @@ class Series:
             raise ValueError('This  method assumes evenly-spaced timeseries, while the input is not. Use the ".interp()", ".bin()" or ".gkernel()" methods prior to ".filter()".')
 
         new = self.copy()
-        
+
         mu = np.mean(self.value) # extract the mean
         y = self.value - mu
-        
+
         fs = 1/np.mean(np.diff(self.time))
 
         method_func = {
@@ -1081,17 +1081,17 @@ class Series:
                         raise ValueError('Lanczos filter requires a scalar input as cutoff scale/frequency')
                     else:
                         raise ValueError('Wrong cutoff_scale; should be either one float value (lowpass) or a list two float values (bandpass).')
-            # assign optional arguments            
+            # assign optional arguments
             args['butterworth'] = {'fc': cutoff_freq, 'fs': fs}
             args['firwin'] = {'fc': cutoff_freq, 'fs': fs}
             args['lanczos'] = {'fc': cutoff_freq, 'fs': fs}
-        
+
         else: # for Savitzky-Golay only
             if cutoff_scale and cutoff_freq is None:
                 raise ValueError('No cutoff_scale or cutoff_freq argument provided')
             elif cutoff_freq is not None:
                 cutoff_scale = 1 / cutoff_freq
-            
+
             window_length = int(cutoff_scale*fs)
             if window_length % 2 == 0:
                 window_length += 1   # window length needs to be an odd integer
@@ -1156,7 +1156,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -1202,9 +1202,9 @@ class Series:
 
     def summary_plot(self, psd=None, scalogram=None, figsize=[8, 10], title=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=None,
-                    time_label=None, value_label=None, period_label=None, psd_label='PSD', wavelet_method = 'wwz', 
-                    wavelet_kwargs = None, psd_method = 'wwz', psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None, 
-                    psd_plot_kwargs = None, trunc_series = None, preprocess = True, y_label_loc = -.15, savefig_settings=None, 
+                    time_label=None, value_label=None, period_label=None, psd_label='PSD', wavelet_method = 'wwz',
+                    wavelet_kwargs = None, psd_method = 'wwz', psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None,
+                    psd_plot_kwargs = None, trunc_series = None, preprocess = True, y_label_loc = -.15, savefig_settings=None,
                     mute=False):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
@@ -1213,13 +1213,13 @@ class Series:
         ----------
 
         psd : PSD
-            the PSD object of a Series. If None, and psd_kwargs is empty, the PSD from the calculated Scalogram will be used. 
+            the PSD object of a Series. If None, and psd_kwargs is empty, the PSD from the calculated Scalogram will be used.
             Otherwise it will be calculated based on specifications in psd_kwargs.
 
         scalogram : Scalogram
             the Scalogram object of a Series. If None, will be calculated. This process can be slow as it will be using the WWZ method.
             If the passed scalogram object contains stored signif_scals (see pyleo.Scalogram.signif_test() for details) these will
-            be flexibly reused as a function of the value of n_signif_test in the summary plot. 
+            be flexibly reused as a function of the value of n_signif_test in the summary plot.
 
         figsize : list
             a list of two integers indicating the figure size
@@ -1253,25 +1253,25 @@ class Series:
 
         psd_label : str
             the label for the amplitude axis of PDS
-            
+
         wavelet_method : str
             the method for the calculation of the scalogram, see pyleoclim.core.ui.Series.wavelet for details
-            
+
         wavelet_kwargs : dict
             arguments to be passed to the wavelet function, see pyleoclim.core.ui.Series.wavelet for details
-        
+
         psd_method : str
             the method for the calculation of the psd, see pyleoclim.core.ui.Series.spectral for details
-            
+
         psd_kwargs : dict
             arguments to be passed to the spectral function, see pyleoclim.core.ui.Series.spectral for details
-            
+
         ts_plot_kwargs : dict
             arguments to be passed to the timeseries subplot, see pyleoclim.core.ui.Series.plot for details
-        
+
         wavelet_plot_kwargs : dict
             arguments to be passed to the scalogram plot, see pyleoclim.core.ui.Scalogram.plot for details
-        
+
         psd_plot_kwargs : dict
             arguments to be passed to the psd plot, see pyleoclim.core.ui.PSD.plot for details
                 Certain psd plot settings are required by summary plot formatting. These include:
@@ -1279,17 +1279,17 @@ class Series:
                     - legend
                     - tick parameters
                 These will be overriden by summary plot to prevent formatting errors
-                
+
         y_label_loc : float
             Plot parameter to adjust horizontal location of y labels to avoid conflict with axis labels, default value is -0.15
-                
+
         trunc_series : list or tuple
-            the limitation of the time axis. This will slice the actual time series into one contained within the 
-            passed boundaries and as such effect the resulting scalogram and psd objects 
+            the limitation of the time axis. This will slice the actual time series into one contained within the
+            passed boundaries and as such effect the resulting scalogram and psd objects
             (assuming said objects are to be generated by summary_plot).
-        
+
         preprocess : bool
-            if True, the series will be standardized and detrended using pyleoclim defaults 
+            if True, the series will be standardized and detrended using pyleoclim defaults
             prior to the calculation of the scalogram and psd. The unedited series will be used in the plot,
             while the edited series will be used to calculate the psd and scalogram.
 
@@ -1316,7 +1316,7 @@ class Series:
         pyleoclim.core.ui.PSD : PSD object
 
         pyleoclim.core.ui.MultiplePSD : Multiple PSD object
-        
+
         Examples
         --------
 
@@ -1324,8 +1324,8 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
-            
+            :okexcept:
+
             import pyleoclim as pyleo
             import pandas as pd
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
@@ -1335,13 +1335,13 @@ class Series:
             pyleo.showfig(fig)
 
             pyleo.closefig(fig)
-            
+
         Summary_plot with pre-generated psd and scalogram objects. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
-        
+
         .. ipython:: python
             :okwarning:
-            :okexcept:    
-            
+            :okexcept:
+
             import pyleoclim as pyleo
             import pandas as pd
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
@@ -1353,13 +1353,13 @@ class Series:
             pyleo.showfig(fig)
 
             pyleo.closefig(fig)
-        
+
         Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
-        
+
         .. ipython:: python
             :okwarning:
-            :okexcept:    
-            
+            :okexcept:
+
             import pyleoclim as pyleo
             import pandas as pd
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
@@ -1367,9 +1367,9 @@ class Series:
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, n_signif_test=2, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
-            
+
             pyleo.showfig(fig)
-            
+
             pyleo.closefig(fig)
 
         '''
@@ -1383,7 +1383,7 @@ class Series:
         psd_kwargs={} if psd_kwargs is None else psd_kwargs.copy()
         psd_plot_kwargs={} if psd_plot_kwargs is None else psd_plot_kwargs.copy()
         ts_plot_kwargs={} if ts_plot_kwargs is None else ts_plot_kwargs.copy()
-        
+
         if trunc_series is not None:
             sub_time = []
             if trunc_series[0] <= self.time[0] and trunc_series[1] >= self.time[-1]:
@@ -1398,32 +1398,32 @@ class Series:
                     print('Number of time points in given truncation period is not even. Removing last time point and continuing.')
                     sub_time.pop(-1)
                     self = self.slice(sub_time)
-        
+
         ax = {}
         ax['ts'] = plt.subplot(gs[0:1, :-3])
         ax['ts'] = self.plot(ax=ax['ts'], **ts_plot_kwargs)
         ax['ts'].xaxis.set_visible(False)
         ax['ts'].get_yaxis().set_label_coords(y_label_loc,0.5)
-        
+
         if preprocess:
             self = self.standardize().detrend()
-        
+
         if time_lim is not None:
             ax['ts'].set_xlim(time_lim)
             if 'xlim' in ts_plot_kwargs:
                 print('Xlim passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-            
+
         if value_lim is not None:
             ax['ts'].set_ylim(value_lim)
             if 'ylim' in ts_plot_kwargs:
                 print('Ylim passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
         ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
-        
+
         if 'method' in list(wavelet_kwargs.keys()):
             del wavelet_kwargs['method']
             print('Please pass method via exposed wavelet_method argument, exposed argument overrides key word argument')
-        
+
         if n_signif_test is None:
             #If significance testing isn't specified then we either use what we can find or don't do significance testing
             if scalogram is not None:
@@ -1433,7 +1433,7 @@ class Series:
                     n_signif_test = 0
             else:
                 n_signif_test = 0
-    
+
         if n_signif_test > 0:
             #If a scalogram is not passed and significance tests are requested
             if scalogram is None:
@@ -1445,7 +1445,7 @@ class Series:
             #If specifically no significance tests are requested we just need to generate a scalogram (unless one has been passed)
             if scalogram is None:
                 scalogram = self.wavelet(method=wavelet_method, **wavelet_kwargs)
-        
+
         if 'cbar_style' not in wavelet_plot_kwargs:
             wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.12}})
 
@@ -1454,11 +1454,11 @@ class Series:
         ax['scal'].get_yaxis().set_label_coords(y_label_loc,0.5)
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
-            
+
         if 'method' in list(psd_kwargs.keys()):
             del psd_kwargs['method']
             print('Please pass method via exposed psd_method argument, exposed argument overrides key word argument')
-        
+
         #Doing effectively the same thing we did for scalogram but now for the psd object
         if n_signif_test > 0:
             if psd is None:
@@ -1480,12 +1480,12 @@ class Series:
                     psd = self.spectral(method=psd_method,**psd_kwargs)
 
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, **psd_plot_kwargs)
-        
+
         if period_lim is not None:
             ax['psd'].set_ylim(period_lim)
             if 'ylim' in psd_plot_kwargs:
                print('Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-        
+
         ax['psd'].yaxis.set_visible(False)
         ax['psd'].invert_yaxis()
         ax['psd'].set_ylabel(None)
@@ -1520,7 +1520,7 @@ class Series:
             ax['scal'].set_ylabel(period_label)
             if 'ylabel' in wavelet_plot_kwargs:
                 print('Ylabel passed to scalogram plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-                
+
 
         if psd_label is not None:
             ax['psd'].set_xlabel(psd_label)
@@ -1564,16 +1564,16 @@ class Series:
         new.time = t_mod
         new.value = v_mod
         return new
-    
+
     def sort(self, verbose=False):
         ''' Ensure timeseries is aligned to a prograde axis.
             If the time axis is prograde to begin with, no transformation is applied.
-            
+
         Parameters
         ----------
         verbose : bool
             If True, will print warning messages if there is any
-    
+
         Returns
         -------
         Series
@@ -1585,7 +1585,7 @@ class Series:
         new.time = t_mod
         new.value = v_mod
         return new
-    
+
     def gaussianize(self):
         ''' Gaussianizes the timeseries
 
@@ -1628,7 +1628,7 @@ class Series:
         -------
         tsc : pyleoclim.Series
             The centered series object
-        ts_mean : estimated mean of the original series, in case it needs to be restored later   
+        ts_mean : estimated mean of the original series, in case it needs to be restored later
 
         '''
         tsc = self.copy()
@@ -1790,7 +1790,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             import numpy as np
@@ -1802,46 +1802,46 @@ class Series:
             for freq in freqs:
                 signals.append(np.cos(2*np.pi*freq*time))
             signal=sum(signals)
-            
+
             # Add a non-linear trend
             slope = 1e-5;  intercept = -1
             nonlinear_trend = slope*time**2 + intercept
-            
+
             # Add a modicum of white noise
             np.random.seed(2333)
             sig_var = np.var(signal)
             noise_var = sig_var / 2 #signal is twice the size of noise
             white_noise = np.random.normal(0, np.sqrt(noise_var), size=np.size(signal))
             signal_noise = signal + white_noise
-            
+
             # Place it all in a series object and plot it:
             ts = pyleo.Series(time=time,value=signal_noise + nonlinear_trend)
             @savefig random_series.png
             fig, ax = ts.plot(title='Timeseries with nonlinear trend')
             pyleo.closefig(fig)
-            
+
             # Detrending with default parameters (using EMD method with 1 mode)
             ts_emd1 = ts.detrend()
-            ts_emd1.label = 'default detrending (EMD, last mode)' 
-            @savefig ts_emd1.png      
+            ts_emd1.label = 'default detrending (EMD, last mode)'
+            @savefig ts_emd1.png
             fig, ax = ts_emd1.plot(title='Detrended with EMD method')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
             pyleo.showfig(fig)
             pyleo.closefig(fig)
-            
-            # We see that the default function call results in a "Hockey Stick" at the end, which is undesirable. 
+
+            # We see that the default function call results in a "Hockey Stick" at the end, which is undesirable.
             # There is no automated way to do this, but with a little trial and error, we find that removing the 2 smoothest modes performs reasonably:
-                
+
             ts_emd2 = ts.detrend(method='emd', n=2)
-            ts_emd2.label = 'EMD detrending, last 2 modes' 
+            ts_emd2.label = 'EMD detrending, last 2 modes'
             @savefig ts_emd_n2.png
             fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
             pyleo.showfig(fig)
             pyleo.closefig(fig)
-            
+
             # Another option for removing a nonlinear trend is a Savitzky-Golay filter:
             ts_sg = ts.detrend(method='savitzky-golay')
             ts_sg.label = 'savitzky-golay detrending, default parameters'
@@ -1851,11 +1851,11 @@ class Series:
             ax.legend()
             pyleo.showfig(fig)
             pyleo.closefig(fig)
-            
+
             # As we can see, the result is even worse than with EMD (default). Here it pays to look into the underlying method, which comes from SciPy.
-            # It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges. 
+            # It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges.
             # By default, this value is close to the length of the series. Choosing a value 10x smaller fixes the problem here, though you will have to tinker with that parameter until you get the result you seek.
-            
+
             ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201})
             ts_sg2.label = 'savitzky-golay detrending, window_length = 201'
             @savefig ts_sg2.png
@@ -1932,7 +1932,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -1947,7 +1947,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             psd_ls = ts_std.spectral(method='lomb_scargle')
             psd_ls_signif = psd_ls.signif_test(number=20) #in practice, need more AR1 simulations
@@ -1961,7 +1961,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import numpy as np
             psd_LS_n50 = ts_std.spectral(method='lomb_scargle', settings={'n50': 4})  # c=1e-2 yields lower frequency resolution
@@ -1991,7 +1991,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             psd_wwz = ts_std.spectral(method='wwz')  # wwz is the default method
             psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger
@@ -2004,7 +2004,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             scal_wwz = ts_std.wavelet(method='wwz')  # wwz is the default method
             psd_wwz_fast = ts_std.spectral(method='wwz', scalogram=scal_wwz)
@@ -2016,7 +2016,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             ts_interp = ts_std.interp()
             psd_perio = ts_interp.spectral(method='periodogram')
@@ -2029,7 +2029,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             ts_interp = ts_std.interp()
             psd_welch = ts_interp.spectral(method='welch')
@@ -2042,7 +2042,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             ts_interp = ts_std.interp()
             psd_mtm = ts_interp.spectral(method='mtm')
@@ -2160,7 +2160,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2281,7 +2281,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:                   
+            :okexcept:
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2315,7 +2315,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             coh_tau = ts_air.wavelet_coherence(ts_nino, tau=np.arange(1880, 2001))
 
@@ -2434,7 +2434,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2492,7 +2492,7 @@ class Series:
 
     def causality(self, target_series, method='liang', settings=None):
         ''' Perform causality analysis with the target timeseries
-            The timeseries are first sorted in ascending order.         
+            The timeseries are first sorted in ascending order.
 
         Parameters
         ----------
@@ -2526,7 +2526,7 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -2555,18 +2555,18 @@ class Series:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             caus_res = ts_nino.causality(ts_air, method='granger')
             print(caus_res)
 
         '''
-        
-        # Sort both timeseries 
-    
-        sorted_self   = self.sort(verbose=True) 
-        sorted_target = target_series.sort(verbose=True)        
-        
+
+        # Sort both timeseries
+
+        sorted_self   = self.sort(verbose=True)
+        sorted_target = target_series.sort(verbose=True)
+
         settings = {} if settings is None else settings.copy()
         spec_func={
             'liang':causalutils.liang_causality,
@@ -2844,7 +2844,7 @@ class PSD:
         settings : dict, optional
             Parameters. The default is None.
         scalogram : Pyleoclim Scalogram object, optional
-            Scalogram containing signif_scals exported during significance testing of scalogram. 
+            Scalogram containing signif_scals exported during significance testing of scalogram.
             If number is None and signif_scals are present, will use length of scalogram list as number of significance tests
 
         Returns
@@ -2859,8 +2859,8 @@ class PSD:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
-            
+            :okexcept:
+
             import pyleoclim as pyleo
             import pandas as pd
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
@@ -2880,14 +2880,14 @@ class PSD:
             pyleo.closefig(fig)
 
         '''
-        
+
         signif_scals = None
         if scalogram:
             try:
                 signif_scals = scalogram.signif_scals
             except:
                 return ValueError('Could not find signif_scals in passed object, make sure this is a scalogram with signif_scals that were saved during significance testing')
-        
+
 
         if number is None and signif_scals:
             number = len(signif_scals.scalogram_list)
@@ -2900,7 +2900,7 @@ class PSD:
         surr = self.timeseries.surrogates(
             number=number, seed=seed, method=method, settings=settings
         )
-    
+
         if signif_scals:
             surr_psd = surr.spectral(
                 method=self.spec_method, settings=self.spec_args, scalogram_list=signif_scals
@@ -2947,7 +2947,7 @@ class PSD:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             # generate colored noise with default scaling slope 'alpha' equals to 1
             ts = pyleo.gen_ts(model='colored_noise')
@@ -3205,7 +3205,7 @@ class PSD:
 
         if title is not None:
             ax.set_title(title)
-            
+
         if xlim is not None:
             ax.set_xlim(xlim)
 
@@ -3263,7 +3263,7 @@ class Scalogram:
             time_label: str
                 Label for the time axis
             signif_scals: pyleoclim.MultipleScalogram
-                A list of the scalogram from the AR1 MC significance testing. Useful when obtaining a PSD. 
+                A list of the scalogram from the AR1 MC significance testing. Useful when obtaining a PSD.
         '''
         self.frequency = np.array(frequency)
         self.time = np.array(time)
@@ -3492,8 +3492,8 @@ class Scalogram:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
-            
+            :okexcept:
+
             import pyleoclim as pyleo
             import pandas as pd
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
@@ -3511,7 +3511,7 @@ class Scalogram:
 
         if hasattr(self,'signif_scals'):
             signif_scals = self.signif_scals
-        
+
         #Allow for a few different configurations of passed number of signif tests, default behavior is to set number = 200
         if number is None and signif_scals is not None:
             number = len(signif_scals.scalogram_list)
@@ -3551,7 +3551,7 @@ class Scalogram:
 
         new.signif_qs = surr_scal.quantiles(qs=qs)
         new.signif_method = method
-        
+
         if export_scal == True:
             new.signif_scals = surr_scal
 
@@ -3912,7 +3912,7 @@ class MultipleSeries:
     --------
     .. ipython:: python
         :okwarning:
-        :okexcept:    
+        :okexcept:
 
         import pyleoclim as pyleo
         import pandas as pd
@@ -3958,7 +3958,7 @@ class MultipleSeries:
         --------
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             import pandas as pd
@@ -4065,7 +4065,7 @@ class MultipleSeries:
         return deepcopy(self)
 
     def standardize(self):
-        '''Standardize each series object in a collection 
+        '''Standardize each series object in a collection
 
         Returns
         -------
@@ -4080,34 +4080,34 @@ class MultipleSeries:
             s.value=v_mod
             ms.series_list[idx]=s
         return ms
-    
+
     def grid_properties(self, step_style='median'):
         '''
-        Extract grid properties (start, stop, step) of all the Series objects in 
+        Extract grid properties (start, stop, step) of all the Series objects in
         a collection.
-        
+
         Parameters
         ----------
         step_style : str
             Method to obtain a representative step if x is not evenly spaced.
             Valid entries: 'median' [default], 'mean', 'mode' or 'max'
             The mode is the most frequent entry in a dataset, and may be a good choice if the timeseries
-            is nearly equally spaced but for a few gaps. 
-            
+            is nearly equally spaced but for a few gaps.
+
             Max is a conservative choice, appropriate for binning methods and Gaussian kernel coarse-graining
 
         Returns
         -------
-        
+
         grid_properties : numpy array
             n x 3 array, where n is the number of series
-            
+
         '''
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
         for idx,item in enumerate(self.series_list):
             item      = item.clean(verbose=idx==0)
             gp[idx,:] = tsutils.grid_properties(item.time, step_style=step_style)
-            
+
         return gp
 
     def common_time(self, method='interp', common_step = 'max', start=None, stop = None, step=None, step_style = None, **kwargs):
@@ -4168,7 +4168,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import numpy as np
             import pyleoclim as pyleo
@@ -4224,7 +4224,7 @@ class MultipleSeries:
             elif  method == 'interp':
                step_style = 'mean'
 
-        gp = self.grid_properties(step_style=step_style)        
+        gp = self.grid_properties(step_style=step_style)
 
         # define parameters for common time axis
         start = gp[:,0].max()
@@ -4327,7 +4327,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             from pyleoclim.utils.tsmodel import colored_noise
@@ -4418,54 +4418,54 @@ class MultipleSeries:
         flag = all (l==L for l in r)
 
         return flag, lengths
-    
+
     def pca(self,weights=None,missing='fill-em',tol_em=5e-03, max_em_iter=100,**pca_kwargs):
         '''Principal Component Analysis (Empirical Orthogonal Functions)
 
         Decomposition of dataset ys in terms of orthogonal basis functions.
-        Tolerant to missing values, infilled by an EM algorithm. 
+        Tolerant to missing values, infilled by an EM algorithm.
         Requires ncomp to be less than the number of missing values.
-        
+
         Do make sure the time axes are aligned, however! (e.g. use `common_time()`)
-        
+
         Algorithm from statsmodels: https://www.statsmodels.org/stable/generated/statsmodels.multivariate.pca.PCA.html
-        
-        
+
+
         Parameters
         ----------
 
-        
+
         weights : ndarray, optional
             Series weights to use after transforming data according to standardize
             or demean when computing the principal components.
-        
+
         missing : {str, None}
             Method for missing data.  Choices are:
-        
+
             * 'drop-row' - drop rows with missing values.
             * 'drop-col' - drop columns with missing values.
             * 'drop-min' - drop either rows or columns, choosing by data retention.
             * 'fill-em' - use EM algorithm to fill missing value.  ncomp should be
               set to the number of factors required.
             * `None` raises if data contains NaN values.
-        
+
         tol_em : float
             Tolerance to use when checking for convergence of the EM algorithm.
         max_em_iter : int
             Maximum iterations for the EM algorithm.
-        
+
         Attributes
         ----------
         res: pyleoclim.ui.SpatialDecomp
             the result object, see `pyleoclim.ui.SpatialDecomp`
-            
+
 
         Examples
         --------
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -4473,9 +4473,9 @@ class MultipleSeries:
             tslist = data.to_LipdSeriesList()
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
             ms = pyleo.MultipleSeries(tslist).common_time()
-        
+
             res = ms.pca() # carry out PCA
-            
+
             res.screeplot() # plot the eigenvalue spectrum
             res.modeplot() # plot the first mode
         '''
@@ -4489,28 +4489,28 @@ class MultipleSeries:
             ys = np.empty((n,p))
             for j in range(p):
                 ys[:,j] = self.series_list[j].value  # fill in data matrix
-        
+
         nc = min(ys.shape) # number of components to return
-        
+
         out  = PCA(ys,weights=weights,missing=missing,tol_em=tol_em, max_em_iter=max_em_iter,**pca_kwargs)
-        
+
         # compute effective sample size
         PC1  = out.factors[:,0]
-        neff = tsutils.eff_sample_size(PC1) 
-        
+        neff = tsutils.eff_sample_size(PC1)
+
         # compute percent variance
         pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
-        
+
         # assign result to SpatiamDecomp class
-        # Note: need to grab coordinates from Series or LiPDSeries        
+        # Note: need to grab coordinates from Series or LiPDSeries
         res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
                             pcs = out.scores, pctvar = pctvar,  locs = None,
                             eigvals = out.eigenvals, eigvecs = out.eigenvecs)
-        return res    
+        return res
 
     # def mcpca(self,nMC=200,**pca_kwargs):
     #     ''' Monte Carlo Principal Component Analysis
-        
+
     #     (UNDER REPAIR)
 
     #     Parameters
@@ -4576,7 +4576,7 @@ class MultipleSeries:
 
     def bin(self, **kwargs):
         '''Aligns the time axes of a MultipleSeries object, via binning.
-        
+
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
 
@@ -4611,7 +4611,7 @@ class MultipleSeries:
 
         Examples
         --------
-        
+
         .. ipython:: python
             :okwarning:
             :okexcept:
@@ -4670,7 +4670,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -4726,7 +4726,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -4804,7 +4804,7 @@ class MultipleSeries:
 
         mute_pbar : {True, False}
             Mute the progress bar. Default is False.
-        
+
         scalogram_list : pyleoclim.MultipleScalogram object, optional
             Multiple scalogram object containing pre-computed scalograms to use when calculating spectra, only works with wwz
 
@@ -4858,7 +4858,7 @@ class MultipleSeries:
                     else:
                         psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
                         psd_list.append(psd_tmp)
-        else: 
+        else:
             for s in tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar):
                 psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose)
                 psd_list.append(psd_tmp)
@@ -5069,7 +5069,7 @@ class MultipleSeries:
         labels: None, 'auto' or list
             If None, doesn't add labels to the subplots
             If 'auto', uses the labels passed during the creation of pyleoclim.Series
-            If list, pass a list of strings for each labels. 
+            If list, pass a list of strings for each labels.
             Default is 'auto'
         savefig_settings : dictionary
             the dictionary of arguments for plt.savefig(); some notes below:
@@ -5096,12 +5096,12 @@ class MultipleSeries:
         plot_kwargs: dict or list of dict
             Arguments to further customize the plot from matplotlib.pyplot.plot.
             Dictionary: Arguments will be applied to all lines in the stackplots
-            List of dictionary: Allows to customize one line at a time. 
+            List of dictionary: Allows to customize one line at a time.
         mute : {True,False}
             if True, the plot will not show;
             recommend to turn on when more modifications are going to be made on ax
             (going to be deprecated)
-        
+
         Returns
         -------
         fig, ax
@@ -5111,7 +5111,7 @@ class MultipleSeries:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -5122,12 +5122,12 @@ class MultipleSeries:
             @savefig mts_stackplot.png
             fig, ax = ms.stackplot()
             pyleo.closefig(fig)
-        
+
         Let's change the labels on the left
-        
+
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -5138,12 +5138,12 @@ class MultipleSeries:
             @savefig mts_stackplot_customlabels.png
             fig, ax = ms.stackplot(labels=['sst','d18Osw'])
             pyleo.closefig(fig)
-            
+
         And let's remove them completely
-        
+
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -5154,12 +5154,12 @@ class MultipleSeries:
             @savefig mts_stackplot_nolabels.png
             fig, ax = ms.stackplot(labels=None)
             pyleo.closefig(fig)
-        
+
         Now, let's add markers to the timeseries.
-        
+
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -5170,12 +5170,12 @@ class MultipleSeries:
             @savefig mts_stackplot_samemarkers.png
             fig, ax = ms.stackplot(labels=None, plot_kwargs={'marker':'o'})
             pyleo.closefig(fig)
-        
+
         But I really want to use different markers
-        
+
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -5193,19 +5193,19 @@ class MultipleSeries:
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         n_ts = len(self.series_list)
-        
+
         if type(labels)==list:
             if len(labels) != n_ts:
                 raise ValueError("The length of the label list should match the number of timeseries to be plotted")
-        
+
         # Deal with plotting arguments
         if type(plot_kwargs)==dict:
             plot_kwargs = [plot_kwargs]*n_ts
-        
+
         if plot_kwargs is not None and len(plot_kwargs) != n_ts:
             raise ValueError("When passing a list of dictionaries for kwargs arguments, the number of items should be the same as the number of timeseries")
-            
-                
+
+
         fig = plt.figure(figsize=figsize)
 
         if xlim is None:
@@ -5247,7 +5247,7 @@ class MultipleSeries:
                 p_kwargs = {}
             else:
                 p_kwargs = plot_kwargs[idx]
-            
+
             bottom -= height*v_shift_factor
             ax[idx] = fig.add_axes([left, bottom, width, height])
             ax[idx].plot(ts.time, ts.value, color=clr, lw=linewidth,**p_kwargs)
@@ -5601,28 +5601,28 @@ class EnsembleSeries(MultipleSeries):
             Returns
             -------
             fig, ax
-            
+
             Examples
             --------
 
             .. ipython:: python
                 :okwarning:
-                :okexcept:    
-                
+                :okexcept:
+
                 nn = 30 # number of noise realizations
                 nt = 500
                 series_list = []
-        
-                signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
+
+                signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
                 noise = np.random.randn(nt,nn)
-        
+
                 for idx in range(nn):  # noise
                     ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
                     series_list.append(ts)
-        
+
                 ts_ens = pyleo.EnsembleSeries(series_list)
-        
-                fig, ax = ts_ens.plot_traces(alpha=0.2,num_traces=8) 
+
+                fig, ax = ts_ens.plot_traces(alpha=0.2,num_traces=8)
                 pyleo.closefig(fig)
 
             '''
@@ -5725,28 +5725,28 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
         fig, ax
-        
+
         Examples
         --------
         .. ipython:: python
             :okwarning:
-            :okexcept:    
-            
+            :okexcept:
+
             nn = 30 # number of noise realizations
             nt = 500
             series_list = []
-    
-            signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
+
+            signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
             noise = np.random.randn(nt,nn)
-    
+
             for idx in range(nn):  # noise
                 ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
                 series_list.append(ts)
-    
-            ts_ens = pyleo.EnsembleSeries(series_list)  
-            fig, ax = ts_ens.plot_envelope(curve_lw=1.5) 
+
+            ts_ens = pyleo.EnsembleSeries(series_list)
+            fig, ax = ts_ens.plot_envelope(curve_lw=1.5)
             pyleo.closefig(fig)
- 
+
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -5977,7 +5977,7 @@ class EnsembleSeries(MultipleSeries):
             mpl.rcParams.update(current_style)
             return ax
 
-    
+
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                  ax=None, ylabel='KDE', vertical=False, edgecolor='w',mute=False, **plot_kwargs):
         """
@@ -5993,7 +5993,7 @@ class EnsembleSeries(MultipleSeries):
             the dictionary of arguments for plt.savefig(); some notes below:
               - "path" must be specified; it can be any existed or non-existed path,
                 with or without a suffix; if the suffix is not given in "path", it will follow "format"
-              - "format" can be one of {"pdf", "eps", "png", "ps"}. 
+              - "format" can be one of {"pdf", "eps", "png", "ps"}.
             The default is None.
         ax : matplotlib.axis, optional
             A matplotlib axis. The default is None.
@@ -6009,7 +6009,7 @@ class EnsembleSeries(MultipleSeries):
             (going to be deprecated)
         **plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html.
-            
+
         See also
         --------
 
@@ -6022,14 +6022,14 @@ class EnsembleSeries(MultipleSeries):
 
         #make the data into a dataframe so we can flip the figure
         time_label, value_label = self.make_labels()
-        
+
         #append all the values together for the plot
         for item in self.series_list:
             try:
                 val=np.append(val,item.value)
             except:
                 val=item.value
-        
+
         if vertical == True:
             data=pd.DataFrame({'value':val})
             ax = sns.histplot(data=data, y="value", ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
@@ -6051,8 +6051,8 @@ class EnsembleSeries(MultipleSeries):
             #         plotting.showfig(fig)
             return fig, ax
         else:
-            return ax        
-        
+            return ax
+
 
 class MultiplePSD:
     ''' Object for multiple PSD.
@@ -6248,7 +6248,7 @@ class MultiplePSD:
 
             if 'color' not in tmp_plot_kwargs and 'c' not in 'tmp_plot_kwargs':
                 use_clr = True
-            
+
             if 'color' in tmp_plot_kwargs and tmp_plot_kwargs['color'] is None:
                 use_clr = True
 
@@ -6492,7 +6492,7 @@ class MultipleScalogram:
         scals = MultipleScalogram(scalogram_list=scal_list)
         return scals
 
- 
+
 class Corr:
     ''' The object for correlation result in order to format the print message
 
@@ -6719,44 +6719,44 @@ class CorrEns:
 
 class SpatialDecomp:
     ''' Class to hold the results of spatial decompositions
-        applies to : `pca()`, `mcpca()`, `mssa()` 
-        
+        applies to : `pca()`, `mcpca()`, `mssa()`
+
         Attributes
         ----------
 
         time: float
             the common time axis
-            
+
         locs: float (p, 2)
             a p x 2 array of coordinates (latitude, longitude) for mapping the spatial patterns ("EOFs")
-            
+
         name: str
             name of the dataset/analysis to use in plots
-            
+
         eigvals: float
             vector of eigenvalues from the decomposition
-            
+
         eigvecs: float
-            array of eigenvectors from the decomposition  
-         
-        pctvar: float    
+            array of eigenvectors from the decomposition
+
+        pctvar: float
             array of pct variance accounted for by each mode
-            
+
         neff: float
             scalar representing the effective sample size of the leading mode
-    
+
     '''
     def __init__(self, time, locs, name, eigvals, eigvecs, pctvar, pcs, neff):
         self.time       = time
         self.name       = name
-        self.locs       = locs 
+        self.locs       = locs
         self.eigvals    = eigvals
         self.eigvecs    = eigvecs
         self.pctvar     = pctvar
         self.pcs        = pcs
         self.neff       = neff
-        
-    def screeplot(self, figsize=[6, 4], uq='N82' ,title='scree plot', ax=None, savefig_settings=None, 
+
+    def screeplot(self, figsize=[6, 4], uq='N82' ,title='scree plot', ax=None, savefig_settings=None,
                   title_kwargs=None, xlim=[0,10], clr_eig='C0',  mute=False):
         ''' Plot the eigenvalue spectrum with uncertainties
 
@@ -6788,25 +6788,25 @@ class SpatialDecomp:
 
         xlim : list, optional
             x-axis limits. The default is [0, 10] (first 10 eigenvalues)
-            
+
         uq : str, optional
             Method used for uncertainty quantification of the eigenvalues.
-            'N82' uses the North et al "rule of thumb" [1] with effective sample size 
-            computed as in [2]. 
+            'N82' uses the North et al "rule of thumb" [1] with effective sample size
+            computed as in [2].
             'MC' uses Monte-Carlo simulations (e.g. MC-EOF). Returns an error if no ensemble is found.
-            
+
         clr_eig : str, optional
             color to be used for plotting eigenvalues
-        
-            
+
+
         References
         ----------
-        [1] North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982), 
+        [1] North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982),
             Sampling errors in the estimation of empirical orthogonal functions,
             Mon. Weather Rev., 110, 699–706.
         [2] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical
-            orthogonal functions and related techniques in atmospheric science: 
-            A review, International Journal of Climatology, 27(9), 
+            orthogonal functions and related techniques in atmospheric science:
+            A review, International Journal of Climatology, 27(9),
             1119–1152, doi:10.1002/joc.1499.
 
         '''
@@ -6814,16 +6814,16 @@ class SpatialDecomp:
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
-            
-        
-        
+
+
+
         if self.neff < 2:
             self.neff = 2
-        
-        # compute 95% CI    
+
+        # compute 95% CI
         if uq == 'N82':
             eb_lbl =  r'95% CI ($n_\mathrm{eff} = $'+ '{:.1f}'.format(self.neff) +')' # declare method
-            Lc = self.eigvals # central estimate 
+            Lc = self.eigvals # central estimate
             Lerr  = np.tile(Lc,(2,1)) # declare array
             Lerr[0,:]  = Lc*np.sqrt(1-np.sqrt(2/self.neff))
             Lerr[1,:]  = Lc*np.sqrt(1+np.sqrt(2/self.neff))
@@ -6835,19 +6835,19 @@ class SpatialDecomp:
                 Lerr  = np.tile(Lc,(2,1)) # declare array
                 Lerr[0,:]  = Lq[0,:]
                 Lerr[1,:]  = Lq[2,:]
-        
+
             except ValueError:
-                print("Eigenvalue array must have more than 1 non-singleton dimension.")             
+                print("Eigenvalue array must have more than 1 non-singleton dimension.")
         else:
             raise NameError("unknown UQ method. No action taken")
-           
-            
+
+
         idx = np.arange(len(Lc)) + 1
-        
+
         ax.errorbar(x=idx,y=Lc,yerr = Lerr, color=clr_eig,marker='o',ls='',
                     alpha=1.0,label=eb_lbl)
-        
-        ax.set_title(title,fontweight='bold'); ax.legend(); 
+
+        ax.set_title(title,fontweight='bold'); ax.legend();
         ax.set_xlabel(r'Mode index $i$'); ax.set_ylabel(r'$\lambda_i$')
         ax.xaxis.set_major_locator(MaxNLocator(integer=True)) # enforce integer values
 
@@ -6868,7 +6868,7 @@ class SpatialDecomp:
         #         plotting.showfig(fig)
         return fig, ax
 
-    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None, 
+    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None,
               title_kwargs=None, mute=False, spec_method = 'mtm'):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
@@ -6878,12 +6878,12 @@ class SpatialDecomp:
         Parameters
         ----------
         index : int
-            the (0-based) index of the mode to visualize. 
-            Default is 0, corresponding to the first mode. 
-        
+            the (0-based) index of the mode to visualize.
+            Default is 0, corresponding to the first mode.
+
         figsize : list, optional
             The figure size. The default is [10, 5].
-        
+
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -6906,15 +6906,15 @@ class SpatialDecomp:
             The name of the spectral method to be applied on the PC. Default: MTM
             Note that the data are evenly-spaced, so any spectral method that
             assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
-            'wwz' is relevant if scaling exponents need to be estimated, but ill-advised otherwise, as it is very slow. 
-      
+            'wwz' is relevant if scaling exponents need to be estimated, but ill-advised otherwise, as it is very slow.
+
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
-        
-        PC = self.pcs[:,index]    
+
+        PC = self.pcs[:,index]
         ts = Series(time=self.time, value=PC) # define timeseries object for the PC
 
         fig = plt.figure(tight_layout=True,figsize=figsize)
@@ -6923,14 +6923,14 @@ class SpatialDecomp:
         ts.plot(ax=ax1)
         ax1.set_ylabel('PC '+str(index+1))
         ax1.set_title('Mode '+str(index+1)+', '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
-        
+
         # plot spectrum
         ax2 = fig.add_subplot(gs[1, 0])
-        psd_mtm_rc = ts.interp().spectral(method=spec_method)    
+        psd_mtm_rc = ts.interp().spectral(method=spec_method)
         _ = psd_mtm_rc.plot(ax=ax2)
         ax2.set_xlabel('Period')
         ax2.set_title('Power spectrum ('+spec_method+')',weight='bold')
-        
+
         # plot T-EOF
         ax3 = fig.add_subplot(gs[1, 1])
         #EOF = self.eigvecs[:,mode]
@@ -6959,25 +6959,25 @@ class SsaRes:
 
     eigvals: float (M, 1)
         a vector of real eigenvalues derived from the signal
-    
+
     pctvar: float (M, 1)
-        same vector, expressed in % variance accounted for by each mode. 
-    
+        same vector, expressed in % variance accounted for by each mode.
+
     eigvals_q: float (M, 2)
         array containing the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ assigned NaNs if unused ]
-        
+
     eigvecs : float (M, M)
         a matrix of the temporal eigenvectors (T-EOFs), i.e. the temporal patterns that explain most of the variations in the original series.
 
-    PC : float (N - M + 1, M) 
+    PC : float (N - M + 1, M)
         array of principal components, i.e. the loadings that, convolved with the T-EOFs, produce the reconstructed components, or RCs
 
-    RCmat : float (N,  M) 
+    RCmat : float (N,  M)
         array of reconstructed components, One can think of each RC as the contribution of each mode to the timeseries, weighted by their eigenvalue (loosely speaking, their "amplitude"). Summing over all columns of RC recovers the original series. (synthesis, the reciprocal operation of analysis).
 
-    mode_idx: list 
-        index of retained modes 
-        
+    mode_idx: list
+        index of retained modes
+
     RCseries : float (N, 1)
         reconstructed series based on the RCs of mode_idx (scaled to original series; mean must be added after the fact)
 
@@ -6999,13 +6999,13 @@ class SsaRes:
         self.RCseries   = RCseries
         self.RCmat      = RCmat
         self.mode_idx   = mode_idx
-        
-        
+
+
 
     def screeplot(self, figsize=[6, 4], title='SSA scree plot', ax=None, savefig_settings=None, title_kwargs=None, xlim=None,
              clr_mcssa=sns.xkcd_rgb['red'], clr_signif=sns.xkcd_rgb['teal'],
              clr_eig='black',  mute=False):
-        ''' Scree plot for SSA, visualizing the eigenvalue spectrum and indicating which modes were retained.  
+        ''' Scree plot for SSA, visualizing the eigenvalue spectrum and indicating which modes were retained.
 
         Parameters
         ----------
@@ -7035,36 +7035,36 @@ class SsaRes:
 
         xlim : list, optional
             x-axis limits. The default is None.
-            
+
         clr_mcssa : str, optional
             color of the Monte Carlo SSA AR(1) shading (if data are provided)
             default: red
-            
+
         clr_eig : str, optional
             color of the eigenvalues, default: black
-            
-        clr_signif: str, optional 
+
+        clr_signif: str, optional
             color of the highlights for significant eigenvalue.
-               default: teal 
+               default: teal
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
-            
+
         v = self.eigvals
         n = self.PC.shape[0] #sample size
-        dv = v*np.sqrt(2/(n-1)) 
-        idx = np.arange(len(v))+1 
+        dv = v*np.sqrt(2/(n-1))
+        idx = np.arange(len(v))+1
         if self.eigvals_q is not None:
-            plt.fill_between(idx,self.eigvals_q[:,0],self.eigvals_q[:,1], color=clr_mcssa, alpha = 0.3, label='AR(1) 5-95% quantiles') 
-            
+            plt.fill_between(idx,self.eigvals_q[:,0],self.eigvals_q[:,1], color=clr_mcssa, alpha = 0.3, label='AR(1) 5-95% quantiles')
+
         plt.errorbar(x=idx,y=v,yerr = dv, color=clr_eig,marker='o',ls='',alpha=1.0,label=self.name)
         plt.plot(idx[self.mode_idx],v[self.mode_idx],color=clr_signif,marker='o',ls='',
                  markersize=4, label='modes retained',zorder=10)
-        plt.title(title,fontweight='bold'); plt.legend() 
-        plt.xlabel(r'Mode index $i$'); plt.ylabel(r'$\lambda_i$')    
+        plt.title(title,fontweight='bold'); plt.legend()
+        plt.xlabel(r'Mode index $i$'); plt.ylabel(r'$\lambda_i$')
         ax.xaxis.set_major_locator(MaxNLocator(integer=True)) # enforce integer values
 
 
@@ -7084,7 +7084,7 @@ class SsaRes:
         #         plotting.showfig(fig)
         return fig, ax
 
-    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None, 
+    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None,
              title_kwargs=None, mute=False, spec_method = 'mtm', plot_original=False):
         ''' Dashboard visualizing the properties of a given SSA mode, including:
             1. the analyzing function (T-EOF)
@@ -7094,12 +7094,12 @@ class SsaRes:
         Parameters
         ----------
         index : int
-            the (0-based) index of the mode to visualize. 
-            Default is 0, corresponding to the first mode. 
-        
+            the (0-based) index of the mode to visualize.
+            Default is 0, corresponding to the first mode.
+
         figsize : list, optional
             The figure size. The default is [10, 5].
-        
+
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -7122,21 +7122,21 @@ class SsaRes:
             The name of the spectral method to be applied on the PC. Default: MTM
             Note that the data are evenly-spaced, so any spectral method that
             assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
-            'wwz' is relevant too if scaling exponents need to be estimated. 
-      
+            'wwz' is relevant too if scaling exponents need to be estimated.
+
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
-        
-        RC = self.RCmat[:,index]    
+
+        RC = self.RCmat[:,index]
         fig = plt.figure(tight_layout=True,figsize=figsize)
         gs = gridspec.GridSpec(2, 2)
         # plot RC
         ax = fig.add_subplot(gs[0, :])
-        
-        ax.plot(self.time,RC,label='mode '+str(index+1),zorder=99) 
+
+        ax.plot(self.time,RC,label='mode '+str(index+1),zorder=99)
         if plot_original:
             ax.plot(self.time,self.original,color='Silver',lw=1,label='original')
             ax.legend()
@@ -7373,7 +7373,7 @@ class Lipd:
                     txt = 'The timeseries from ' + str(idx) + ': ' +\
                             item['dataSetName'] + ': ' + \
                             item['chronData_variableName'] + \
-                            ' could not be coerced into a LipdSeries object, passing'  
+                            ' could not be coerced into a LipdSeries object, passing'
                 warnings.warn(txt)
                 pass
 
@@ -7483,7 +7483,7 @@ class Lipd:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -7496,7 +7496,7 @@ class Lipd:
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -7573,7 +7573,7 @@ class LipdSeries(Series):
     .. ipython:: python
         :okwarning:
         :okexcept:
-            
+
         import pyleoclim as pyleo
         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
         data = pyleo.Lipd(usr_path = url)
@@ -7589,7 +7589,7 @@ class LipdSeries(Series):
 
     .. ipython:: python
         :okwarning:
-        :okexcept:    
+        :okexcept:
 
         ts1 = data.to_LipdSeries(number=5)
 
@@ -7599,7 +7599,7 @@ class LipdSeries(Series):
 
     .. ipython:: python
         :okwarning:
-        :okexcept:    
+        :okexcept:
 
         ts_list = data.to_LipdSeriesList()
         # only keep the Mg/Ca and SST
@@ -7630,7 +7630,7 @@ class LipdSeries(Series):
                 'peat' : ['#2F4F4F','*'],
                 'midden' : ['#824E2B','o'],
                 'other':['k','o']}
-        
+
         try:
             time, label= lipdutils.checkTimeAxis(self.lipd_ts)
             if label=='age':
@@ -7688,7 +7688,7 @@ class LipdSeries(Series):
         number: int, optional
             The number of ensemble members to store. Default is None, which corresponds to all present
         chronNumber: int, optional
-            The chron object number. The default is None. 
+            The chron object number. The default is None.
         modelNumber : int, optional
             Age model number. The default is None.
         tableNumber : int, optional
@@ -7738,14 +7738,14 @@ class LipdSeries(Series):
         sort_ind = np.argsort(depth)
         depth=list(np.array(depth)[sort_ind])
         ensembleValues=ensembleValues[sort_ind,:]
-        
+
         if number is not None:
             if number>np.shape(ensembleValues)[1]:
                 warnings.warn('Selected number of ensemble members is greater than number of members in the ensemble table; passing')
                 pass
             else:
                 ensembleValues=ensembleValues[:,0:number]
-        
+
         #Map to paleovalues
         key=[]
         for item in self.lipd_ts.keys():
@@ -7770,8 +7770,8 @@ class LipdSeries(Series):
         s_list=[]
         for i, s in enumerate(ensembleValuestoPaleo.T):
             s_tmp = Series(time=s,value=ys,
-                           verbose=i==0, 
-                           clean_ts=False, 
+                           verbose=i==0,
+                           clean_ts=False,
                            value_name=self.value_name,
                            value_unit=self.value_unit,
                            time_name=self.time_name,
@@ -7843,7 +7843,7 @@ class LipdSeries(Series):
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -7858,7 +7858,7 @@ class LipdSeries(Series):
         #get the information from the timeseries
         lat=[self.lipd_ts['geo_meanLat']]
         lon=[self.lipd_ts['geo_meanLon']]
-        
+
         if 'archiveType' in self.lipd_ts.keys():
             archiveType=lipdutils.LipdToOntology(self.lipd_ts['archiveType']).lower().replace(" ","")
         else:
@@ -7988,7 +7988,7 @@ class LipdSeries(Series):
             DOI = self.lipd_ts["pub1_doi"]
         else:
             DOI = "NA"
-        
+
         if self.lipd_ts['mode'] == 'paleoData':
             prefix = 'paleo'
         else:
@@ -8141,21 +8141,21 @@ class LipdSeries(Series):
         --------
 
         pyleoclim.Series.plot : plot a timeseries
-        
+
         pyleoclim.EnsembleSeries.plot_envelope: Envelope plots for an ensemble
 
         pyleoclim.Series.distplot : plot a distribution of the timeseries
-        
+
         pyleoclim.EnsembleSeries.distplot : plot a distribution of the timeseries across ensembles
 
         pyleoclim.Series.spectral : spectral analysis method.
-        
+
         pyleoclim.MultipleSeries.spectral : spectral analysis method for multiple series.
 
         pyleoclim.PSD.signif_test : significance test for timeseries analysis
 
         pyleoclim.PSD.plot : plot power spectrum
-        
+
         pyleoclim.MulitplePSD.plot : plot envelope of power spectrum
 
         pyleoclim.LipdSeries.map : map location of dataset
@@ -8169,7 +8169,7 @@ class LipdSeries(Series):
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
+            :okexcept:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
@@ -8182,17 +8182,17 @@ class LipdSeries(Series):
         '''
         if ensemble == True and D is None:
             raise ValueError("When an ensemble dashboard is requested, the corresponsind Lipd object must be supplied")
-            
+
         if ensemble == True:
             warnings.warn('Some of the computation in ensemble mode can require a few minutes to complete.')
-            
+
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         res=self.getMetadata()
         # start plotting
         fig = plt.figure(figsize=figsize)
         gs = gridspec.GridSpec(2,5)
         gs.update(left=0,right=1.1)
-        
+
         if ensemble==True:
            ens = self.chronEnsembleToPaleo(D)
            ensc = ens.common_time()
@@ -8223,7 +8223,7 @@ class LipdSeries(Series):
         else:
             raise ValueError("Invalid argument value for ensemble")
         ymin, ymax = ax['ts'].get_ylim()
-            
+
 
         #plot the distplot
         distplt_kwargs={} if distplt_kwargs is None else distplt_kwargs.copy()
@@ -8234,7 +8234,7 @@ class LipdSeries(Series):
         if 'color' not in distplt_kwargs.keys():
             archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
             distplt_kwargs.update({'color':self.plot_default[archiveType][0]})
-        if ensemble == False:   
+        if ensemble == False:
             ax['dts'] = self.distplot(**distplt_kwargs)
         elif ensemble == True:
             ax['dts'] = ensc.distplot(**distplt_kwargs)
@@ -8339,11 +8339,11 @@ class LipdSeries(Series):
                 spectral_kwargs.update({'freq_method':'lomb_scargle'})
             elif ensemble == True:
                 pass
-        
+
         ax['spec'] = plt.subplot(gs[1,1:3])
         spectralfig_kwargs={} if spectralfig_kwargs is None else spectralfig_kwargs.copy()
         spectralfig_kwargs.update({'ax':ax['spec']})
-        
+
         if ensemble == False:
             ts_preprocess = self.detrend().standardize()
             psd = ts_preprocess.spectral(**spectral_kwargs)
@@ -8358,7 +8358,7 @@ class LipdSeries(Series):
             if 'signif_clr' not in spectralfig_kwargs.keys():
                 spectralfig_kwargs.update({'signif_clr':'grey'})
             ax['spec'] = psd_signif.plot(**spectralfig_kwargs)
-        
+
         elif ensemble == True:
             if 'curve_clr' not in spectralfig_kwargs.keys():
                 archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ","")
@@ -8371,7 +8371,7 @@ class LipdSeries(Series):
             ax['spec'] = psd.plot_envelope(**spectralfig_kwargs)
 
         #Make the plot
-        
+
 
         if metadata == True:
             # get metadata
@@ -8398,16 +8398,16 @@ class LipdSeries(Series):
         #         plotting.showfig(fig)
         return fig, ax
 
-    def mapNearRecord(self, D, n=5, radius = None, sameArchive = False, 
+    def mapNearRecord(self, D, n=5, radius = None, sameArchive = False,
                       projection='Orthographic',proj_default = True,
-                      background = True,borders = False, rivers = False, 
-                      lakes = False, figsize = None, ax = None, 
+                      background = True,borders = False, rivers = False,
+                      lakes = False, figsize = None, ax = None,
                       marker_ref= None, color_ref=None, marker=None, color=None,
                       markersize_adjust=False, scale_factor = 100, scatter_kwargs=None,
-                      legend = True, lgd_kwargs=None, savefig_settings=None, 
+                      legend = True, lgd_kwargs=None, savefig_settings=None,
                       mute=False):
         """ Map records that are near the timeseries of interest
-        
+
 
         Parameters
         ----------
@@ -8467,11 +8467,11 @@ class LipdSeries(Series):
         --------
 
         pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
-        
+
         pyleoclim.utils.mapping.dist_sphere: Calculate distance on a sphere
-        
+
         pyleoclim.utils.mapping.compute_dist: Compute the distance between a point and an array
-        
+
         pyleoclim.utils.mapping.within_distance: Returns point in an array within a certain distance
 
         Returns
@@ -8481,11 +8481,11 @@ class LipdSeries(Series):
 
         """
         scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
-        
+
         #get the information about the original timeseries
         lat_ref=[self.lipd_ts['geo_meanLat']]
         lon_ref=[self.lipd_ts['geo_meanLon']]
-        
+
         if 'archiveType' in self.lipd_ts.keys():
             archiveType_ref=lipdutils.LipdToOntology(self.lipd_ts['archiveType']).lower().replace(" ","")
         else:
@@ -8494,12 +8494,12 @@ class LipdSeries(Series):
         # make sure criteria is in the plot_default list
         if archiveType_ref not in self.plot_default.keys():
             archiveType_ref = 'other'
-        
+
         # get information about the other timeseries
         lat=[]
         lon=[]
         archiveType=[]
-        
+
         dataSetName_ref = self.lipd_ts['dataSetName']
 
         for idx, key in enumerate(D.lipd):
@@ -8516,10 +8516,10 @@ class LipdSeries(Series):
         for idx,val in enumerate(archiveType):
             if val not in self.plot_default.keys():
                 archiveType[idx] = 'other'
-        
+
         if len(lat)==0: #this should not happen unless the coordinates are not available in the LiPD file
             raise ValueError('no matching record found')
-        
+
         # Filter by the same type of archive if asked
         if sameArchive == True:
             idx_archive = [idx for idx,val in enumerate(archiveType) if val==archiveType_ref]
@@ -8529,11 +8529,11 @@ class LipdSeries(Series):
                 lat = [lat[idx] for idx in idx_archive]
                 lon = [lon[idx] for idx in idx_archive]
                 archiveType=[archiveType[idx] for idx in idx_archive]
-                       
+
         #compute the distance
         dist = mapping.compute_dist(lat_ref,lon_ref,lat,lon)
-        
-        if radius: 
+
+        if radius:
             idx_radius = mapping.within_distance(dist, radius)
             if len(idx_radius) == 0:
                 raise ValueError('No records withing matching radius distance. Widen your search criteria')
@@ -8542,35 +8542,35 @@ class LipdSeries(Series):
                 lon = [lon[idx] for idx in idx_radius]
                 archiveType = [archiveType[idx] for idx in idx_radius]
                 dist = [dist[idx] for idx in idx_radius]
-        
+
         #print a warning if plotting less than asked because of the filters
-        
+
         if n>len(dist):
             warnings.warn("Number of matching records is less"+\
               " than the number of neighbors chosen. Including all records "+\
               " in the analysis.")
             n=len(dist)
-        
+
         #Sort the distance array
         sort_idx = np.argsort(dist)
         dist = [dist[idx] for idx in sort_idx]
         lat = [lat[idx] for idx in sort_idx]
         lon = [lon[idx] for idx in sort_idx]
         archiveType = [archiveType[idx] for idx in sort_idx]
-        
+
         # Grab the right number of records
         dist = dist[0:n]
         lat = lat[0:n]
         lon = lon[0:n]
         archiveType = archiveType[0:n]
-         
+
         # Get plotting information
-        
+
         if marker_ref == None:
             marker_ref = self.plot_default[archiveType_ref][1]
         if color_ref == None:
-            color_ref = self.plot_default[archiveType_ref][0] 
-        
+            color_ref = self.plot_default[archiveType_ref][0]
+
         if marker == None:
             marker=[]
             for item in archiveType:
@@ -8590,40 +8590,40 @@ class LipdSeries(Series):
                 raise ValueError('When providing a list, it should be the same length as the number of records')
         elif type(color) == str:
             color = [color]*len(lon)
-        
+
         if 'edgecolors' not in scatter_kwargs.keys():
             edgecolors = []
             for item in marker:
                 edgecolors.append('w')
             edgecolors.append('k')
             scatter_kwargs.update({'edgecolors':edgecolors})
-        
+
         #Start plotting
         lat_all = lat + lat_ref
         lon_all = lon + lon_ref
         dist_all = dist + [0]
         archiveType_all = archiveType
-        archiveType_all.append(archiveType_ref) 
-        
+        archiveType_all.append(archiveType_ref)
+
         color_all = color
         color_all.append(color_ref)
         marker_all= marker
         marker_all.append(marker_ref)
-        
+
         if markersize_adjust == True:
             scale = dist_all[-1]/(scale_factor-30)
             s = list(np.array(dist_all)*1/(scale)+30)
             s.reverse()
             scatter_kwargs.update({'s':s})
-        
+
         proj1={'central_latitude':lat_ref[0],
        'central_longitude':lon_ref[0]}
         proj2={'central_latitude':lat_ref[0]}
         proj3={'central_longitude':lon_ref[0]}
-        
+
         if proj_default==True:
             try:
-                res = mapping.map_all(lat=lat_all, lon=lon_all, 
+                res = mapping.map_all(lat=lat_all, lon=lon_all,
                       criteria=archiveType_all,
                       marker=marker_all, color =color_all,
                       projection = projection, proj_default = proj1,
@@ -8635,7 +8635,7 @@ class LipdSeries(Series):
                       mute=mute)
             except:
                 try:
-                    res = mapping.map_all(lat=lat_all, lon=lon_all, 
+                    res = mapping.map_all(lat=lat_all, lon=lon_all,
                       criteria=archiveType_all,
                       marker=marker_all, color =color_all,
                       projection = projection, proj_default = proj2,
@@ -8646,7 +8646,7 @@ class LipdSeries(Series):
                       lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
                       mute=mute)
                 except:
-                    res = mapping.map_all(lat=lat_all, lon=lon_all, 
+                    res = mapping.map_all(lat=lat_all, lon=lon_all,
                       criteria=archiveType_all,
                       marker=marker_all, color =color_all,
                       projection = projection, proj_default = proj3,
@@ -8656,9 +8656,9 @@ class LipdSeries(Series):
                       scatter_kwargs=scatter_kwargs, legend=legend,
                       lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
                       mute=mute)
-        
+
         else:
-            res = mapping.map_all(lat=lat_all, lon=lon_all, 
+            res = mapping.map_all(lat=lat_all, lon=lon_all,
                       criteria=archiveType_all,
                       marker=marker_all, color =color_all,
                       projection = projection, proj_default = proj_default,
@@ -8668,15 +8668,15 @@ class LipdSeries(Series):
                       scatter_kwargs=scatter_kwargs, legend=legend,
                       lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
                       mute=mute)
-        
+
         return res
 
-        
-    def plot_age_depth(self,figsize = [10,4], plt_kwargs=None,  
-                       savefig_settings=None, mute=False, 
+
+    def plot_age_depth(self,figsize = [10,4], plt_kwargs=None,
+                       savefig_settings=None, mute=False,
                        ensemble = False, D=None, num_traces = 10, ensemble_kwargs=None,
                        envelope_kwargs = None, traces_kwargs = None):
-        
+
         '''
 
         Parameters
@@ -8711,7 +8711,7 @@ class LipdSeries(Series):
         Raises
         ------
         ValueError
-            In ensemble mode, make sure that the LiPD object is given 
+            In ensemble mode, make sure that the LiPD object is given
         KeyError
             Depth information needed.
 
@@ -8719,32 +8719,32 @@ class LipdSeries(Series):
         -------
         fig,ax
             The figure
-        
+
         See also
         --------
-        
+
         pyleoclim.core.ui.Lipd : Pyleoclim internal representation of a LiPD file
         pyleoclim.core.ui.Series.plot : Basic plotting in pyleoclim
-        pyleoclim.core.ui.LipdSeries.chronEnsembleToPaleo : Function to map the ensemble table to a paleo depth. 
+        pyleoclim.core.ui.LipdSeries.chronEnsembleToPaleo : Function to map the ensemble table to a paleo depth.
         pyleoclim.core.ui.EnsembleSeries.plot_envelope : Create an envelope plot from an ensemble
         pyleoclim.core.ui.EnsembleSeries.plot_traces : Create a trace plot from an ensemble
-        
+
         Examples
         --------
 
         .. ipython:: python
             :okwarning:
-            :okexcept:    
-                
+            :okexcept:
+
             D = pyleo.Lipd('http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=Crystal.McCabe-Glynn.2013')
             ts=D.to_LipdSeries(number=2)
             ts.plot_age_depth()
             pyleo.closefig(fig)
-        
+
         '''
         if ensemble == True and D is None:
             raise ValueError("When an ensemble is requested, the corresponsind Lipd object must be supplied")
-        
+
         meta=self.getMetadata()
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         plt_kwargs={} if plt_kwargs is None else plt_kwargs.copy()
@@ -8757,9 +8757,9 @@ class LipdSeries(Series):
                 units_depth = 'NA'
         except:
             raise KeyError('No depth available in this record')
-        
+
         # create a series for which time is actually depth
-        
+
         if ensemble  == False:
             ts = Series(time = self.time,value=value_depth,
                               time_name=self.time_name,time_unit=self.time_unit,
@@ -8771,7 +8771,7 @@ class LipdSeries(Series):
             if 'color' not in plt_kwargs.keys():
                 archiveType = lipdutils.LipdToOntology(meta['archiveType']).lower().replace(" ","")
                 plt_kwargs.update({'color':self.plot_default[archiveType][0]})
-            
+
             fig,ax = ts.plot(**plt_kwargs)
         elif ensemble == True:
             ensemble_kwargs = {} if ensemble_kwargs is None else ensemble_kwargs.copy()
@@ -8799,10 +8799,10 @@ class LipdSeries(Series):
                 if 'linestyle' not in traces_kwargs.keys():
                     traces_kwargs.update({'linestyle':'dashed'})
                 traces_kwargs.update({'ax':ax,'num_traces':num_traces})
-                ens2.plot_traces(**traces_kwargs) 
+                ens2.plot_traces(**traces_kwargs)
             else:
                 fig,ax=ens2.plot_envelope(**envelope_kwargs)
-            
+
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
@@ -8812,6 +8812,3 @@ class LipdSeries(Series):
             return fig, ax
         else:
             return ax
-        
-        
-            
