@@ -28,31 +28,31 @@ import copy
 #------
 
 def mcpca(ys, nMC=200, **pca_kwargs):
-    '''Monte-Carlo Principal Component Analysis 
-    
+    '''Monte-Carlo Principal Component Analysis
+
     Carries out Principal Component Analysis  (most unfortunately named EOF analysis in the meteorology
-    and climate literature) on a data matrix ys.  
-    
+    and climate literature) on a data matrix ys.
+
     The significance of eigenvalues is gauged against those of AR(1) surrogates fit to the data.
 
     TODO: enable for ensembles and generally debug
-              
+
     Parameters
     ----------
     ys : 2D numpy array (nt, nrec)
         nt   = number of time samples (assumed identical for all records)
         nrec = number of records (aka variables, channels, etc)
-        
-    nMC : int 
+
+    nMC : int
         the number of Monte-Carlo simulations
-    
-    pca_kwargs : tuple 
+
+    pca_kwargs : tuple
         keyword arguments for the PCA method
-    
+
     Returns
     -------
     res : dict containing:
-        
+
         - eigvals : eigenvalues (nrec,)
 
         - eigvals95 : eigenvalues of the AR(1) ensemble (nrec, nMC)
@@ -60,33 +60,33 @@ def mcpca(ys, nMC=200, **pca_kwargs):
         - pcs : PC series of all components (nt, rec)
 
         - eofs : EOFs of all components (nrec, nrec)
-    
+
     References:
-    ----------    
-    Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene 
-    European speleothem δ18O records linked to North Atlantic Ocean circulation. 
+    ----------
+    Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene
+    European speleothem δ18O records linked to North Atlantic Ocean circulation.
     Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8
 
     Written by Jun Hu (Rice University).
     Adapted for pyleoclim by Julien Emile-Geay (USC)
     '''
     nt, nrec = ys.shape
-    
+
     ncomp = min(nt,nrec)
-    
+
     pc_mc = np.zeros((nt,nrec)) # principal components
     eof_mc = np.zeros((nrec,nrec))  #eof (spatial loadings)
     #eigenvalue matrices
     eigvals = np.zeros((nrec))
     eig_ar1 = np.zeros((nrec,nMC))
 
-    # apply PCA algorithm to the data matrix     
-    pca_res = PCA(ys,ncomp=ncomp, **pca_kwargs) 
+    # apply PCA algorithm to the data matrix
+    pca_res = PCA(ys,ncomp=ncomp, **pca_kwargs)
     eigvals = pca_res.eigenvals
-    
+
     # generate surrogate matrix
     y_ar1 = np.full((nt,nrec,nMC), 0, dtype=np.double)
-    
+
     for i in range(nrec):
         yi = copy.deepcopy(ys[:,i])
         # generate nMC AR(1) surrogates
@@ -96,36 +96,36 @@ def mcpca(ys, nMC=200, **pca_kwargs):
             eof_mc[:,i]  = pc.loadings[:,i]
             pc_mc[:,i]   = pc.factors[:,i]
         else:   # flip sign (arbitrary)
-            eof_mc[:,i]  = -pc.loadings[:,i] 
+            eof_mc[:,i]  = -pc.loadings[:,i]
             pc_mc[:,i]   = -pc.factors[:,i]
         # estimate effective sample size
-        #PC1 = 
+        #PC1 =
         neff[i] = tsutils.eff_sample_size(PC1)
-            
-    # loop over Monte Carlo iterations     
-    for m in range(nMC):    
+
+    # loop over Monte Carlo iterations
+    for m in range(nMC):
         pc_ar1 = PCA(y_ar1[:,:,m],ncomp=nrec,**pca_kwargs)
         eig_ar1[:,m] = pc_ar1.eigenvals
- 
+
     eig95 = np.percentile(eig_ar1, 95, axis=1)
-    
-                
+
+
     # assign result
     #res = {'eigvals': eigvals, 'eigvals95': eig95, 'pcs': pc_mc, 'eofs': eof_mc}
-    
+
     # compute effective sample size
     PC1  = out.factors[:,0]
-    neff = tsutils.eff_sample_size(PC1) 
-    
+    neff = tsutils.eff_sample_size(PC1)
+
     # compute percent variance
     pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
-    
+
     # assign result to SpatiamDecomp class
-    # Note: need to grab coordinates from Series or LiPDSeries        
+    # Note: need to grab coordinates from Series or LiPDSeries
     res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
                         pcs = out.scores, pctvar = pctvar,  locs = None,
                         eigvals = out.eigenvals, eigvecs = out.eigenvecs)
-    
+
     return res
 
 
@@ -308,7 +308,7 @@ def mssa(ys, M=None, nMC=0, f=0.3):
         noise[irec, 0, :] = ys[0, irec]
     eigvals_R = np.zeros((nrec * M, nMC))
     # estimate coefficents of ar1 processes, and then generate ar1 time series (noise)
-    # TODO : update to use ar1_sim(), as in ssa() 
+    # TODO : update to use ar1_sim(), as in ssa()
     for irec in np.arange(nrec):
         Xs = ys[:, irec]
         coefs_est, var_est = alg.AR_est_YW(Xs[~np.isnan(Xs)], 1)
@@ -389,7 +389,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
             (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)
             (3) 'var': first K modes that explain at least var_thresh % of the variance.
         Default is None, which bypasses truncation (K = M)
-        
+
     var_thresh : float
         variance threshold for reconstruction (only impactful if trunc is set to 'var')
 
@@ -405,7 +405,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         - PC : (N - M + 1, M) array of principal components (T-PCs)
 
         - RCmat : (N,  M) array of reconstructed components
-        
+
         - RCseries : (N,) reconstructed series, with mean and variance restored
 
         - pctvar: (M, ) array of the fraction of variance (%) associated with each mode
@@ -444,7 +444,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         M=int(N/10)
     c = np.zeros(M)
 
-    for j in range(M): 
+    for j in range(M):
         prod = ys[0:N - j] * ys[j:N]
         c[j] = sum(prod[~np.isnan(prod)]) / (sum(~np.isnan(prod)) - 1)
 
@@ -478,7 +478,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         noise = ar1_sim(ys, nMC)  # generate MC AR(1) surrogates of y
         eigvals_R = np.zeros((M,nMC)) # define eigenvalue matrix
         lgs = np.arange(-N + 1, N)
-        
+
         for m in range(nMC):
             xn, _ , _ = standardize(noise[:, m]) # center and standardize
             Gn = np.correlate(xn, xn, "full")
@@ -489,41 +489,44 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         eigvals_q = np.empty((M,2))
         eigvals_q[:,0] = np.percentile(eigvals_R, 5, axis=1)
         eigvals_q[:,1] = np.percentile(eigvals_R, 95, axis=1)
-        mode_idx = np.where(eigvals>=eigvals_q[:,1])[0] 
+        mode_idx = np.where(eigvals>=eigvals_q[:,1])[0]
     else:
         eigvals_q = None
 
-    
+
     if trunc is None:
         mode_idx = np.arange(M)
     elif trunc == 'kaiser':
         mval     = np.median(eigvals) # median eigenvalues
         mode_idx = np.where(eigvals>=mval)[0]
     elif trunc == 'var':
-        mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0]+1)        
+        mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0]+1)
     if nMC == 0 and trunc == 'mcssa':
         raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
     elif nMC>0:
-       mode_idx = np.where(eigvals>=eigvals_q[:,1])[0] 
+       mode_idx = np.where(eigvals>=eigvals_q[:,1])[0]
+       
+    nmodes = len(mode_idx)
 
-      
     # compute reconstructed timeseries
     Np = N - M + 1
     RCmat = np.zeros((N, M))
-    
+
     for im in range(M):
         xdum = np.dot(np.expand_dims(PC[:, im], axis=1), np.expand_dims(eigvecs[0:M, im], axis=0))
         xdum = np.flipud(xdum)
 
         for n in np.arange(N):
             RCmat[n, im] = np.diagonal(xdum, offset=-(Np - 1 - n)).mean()
-        del xdum            
+        del xdum
 
     RCmat = scale*RCmat + np.tile(mu, reps=[N, M])  # restore the mean and variance
-    
+
     #RCseries = scale*RCmat[:,mode_idx].sum(axis=1) + mu
-    
+
     RCseries = RCmat[:,mode_idx].sum(axis=1)
+    if nmodes > 1:
+        RCseries -= mu*(nmodes-1)
 
     # export results
     res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'PC': PC, 'RCseries': RCseries, 'RCmat': RCmat, 'pctvar': pctvar, 'eigvals_q': eigvals_q, 'mode_idx': mode_idx}
