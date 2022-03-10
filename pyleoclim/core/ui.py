@@ -2329,7 +2329,7 @@ class Series:
 
         settings = {} if settings is None else settings.copy()
         xwc_func = {
-            'wwz': waveutils.xwc,
+            'wwz': waveutils.wavelet_coherence,
         }
 
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()

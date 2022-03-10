@@ -12,7 +12,9 @@ Functions concerning wavelet analysis
 __all__ = [
     #'cwt',
     'wwz',
-    'xwc',
+    'xwt',
+    'wtc',
+    'wavelet_coherence',
 ]
 
 import numpy as np
@@ -1361,7 +1363,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', freq_kwargs={
 
     return res
 
-def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
+def wavelet_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         tau=None, freq=None, freq_method='log', freq_kwargs=None,
         c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
         nMC=200,
@@ -1491,8 +1493,8 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     wt_coeff1 = res_wwz1.coeff[1] - res_wwz1.coeff[2]*1j
     wt_coeff2 = res_wwz2.coeff[1] - res_wwz2.coeff[2]*1j
 
-    xw_coherence, xw_phase = wavelet_coherence(wt_coeff1, wt_coeff2, freq, tau, smooth_factor=smooth_factor)
-    xwt, xw_amplitude, _ = cross_wt(wt_coeff1, wt_coeff2)
+    xw_coherence, xw_phase = wtc(wt_coeff1, wt_coeff2, freq, tau, smooth_factor=smooth_factor)
+    xw_t, xw_amplitude, _ = xwt(wt_coeff1, wt_coeff2)
 
     # Monte-Carlo simulations of AR1 process
     nt = np.size(tau)
@@ -1527,8 +1529,8 @@ def xwc(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         #  AR1_q = None
 
     coi = make_coi(tau, Neff=Neff)
-    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xwt', 'freq', 'time', 'AR1_q', 'coi'])
-    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase, xwt=xwt,
+    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xw_t', 'freq', 'time', 'AR1_q', 'coi'])
+    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase, xw_t=xw_t,
                   freq=freq, time=tau, AR1_q=AR1_q, coi=coi)
 
     return res
@@ -2249,7 +2251,7 @@ def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None
 
     return ys_cut, ts_cut, freq, tau
 
-def cross_wt(coeff1, coeff2):
+def xwt(coeff1, coeff2):
     ''' Return the cross wavelet transform.
 
     Parameters
@@ -2267,6 +2269,8 @@ def cross_wt(coeff1, coeff2):
     Returns
     -------
 
+    xw_t : array
+        the cross wavelet transform complex number
     xw_amplitude : array
         the cross wavelet amplitude
     xw_phase : array
@@ -2279,13 +2283,13 @@ def cross_wt(coeff1, coeff2):
     wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004).
 
     '''
-    xwt = coeff1 * np.conj(coeff2)
-    xw_amplitude = np.sqrt(xwt.real**2 + xwt.imag**2)
-    xw_phase = np.arctan2(xwt.imag, xwt.real)
+    xw_t = coeff1 * np.conj(coeff2)
+    xw_amplitude = np.sqrt(xw_t.real**2 + xw_t.imag**2)
+    xw_phase = np.arctan2(xw_t.imag, xw_t.real)
 
-    return xwt, xw_amplitude, xw_phase
+    return xw_t, xw_amplitude, xw_phase
 
-def wavelet_coherence(coeff1, coeff2, freq, tau, smooth_factor=0.25):
+def wtc(coeff1, coeff2, freq, tau, smooth_factor=0.25):
     ''' Return the cross wavelet coherence.
 
     Parameters
