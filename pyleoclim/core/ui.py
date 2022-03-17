@@ -2636,7 +2636,7 @@ class Series:
                  plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],
                  saveknee_settings=None,saveoutliers_settings=None, mute=False):
         '''
-        Detects outliers in a timeseries and removes if specified
+        Detects outliers in a timeseries and removes if specified. The method uses clustering to locate outliers. 
 
         Parameters
         ----------
@@ -2677,12 +2677,50 @@ class Series:
         pyleoclim.utils.plotting.plot_xy : basic x-y plot
 
         pyleoclim.utils.plotting.plot_scatter_xy : Scatter plot on top of a line plot
+        
+        Examples
+        --------
+
+        Let's create a "perfect" sinusoidal signal and add outliers
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import numpy as np
+            
+            # create the signal
+            freqs=[1/20,1/80]
+            time=np.arange(2001)
+            signals=[]
+            for freq in freqs:
+                signals.append(np.cos(2*np.pi*freq*time))
+            signal=sum(signals)
+            
+            #add outliers
+            outliers_start = np.mean(signal)+5*np.std(signal)
+            outliers_end = np.mean(signal)+7*np.std(signal)
+            outlier_values = np.arange(outliers_start,outliers_end,0.1)
+            index = np.random.randint(0,len(signal),6)
+            signal_out = signal
+            for i,ind in enumerate(index):
+                signal_out[ind] = outlier_values[i]
+            
+            #Make a Series object
+            ts = pyleo.Series(time=time,value=signal_out)
+            @savefig outliers.png
+            fig, ax = ts.plot()
+            pyleo.closefig(fig)
+            
+            #Detect and remove outliers
+            ts_new=ts.outliers()
+            @savefig outliers_remove.png
+            fig, ax = ts_new.plot()
+            pyleo.closefig(fig)           
 
         '''
         new = self.copy()
-
-        #outlier_indices,fig1,ax1,fig2,ax2 = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
-        #                                                   figsize=figsize,save_knee=save_knee,save_outliers=save_outliers,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
         outlier_indices = tsutils.detect_outliers(
             self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,
             figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,
