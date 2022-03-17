@@ -54,14 +54,11 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
     return t, v
     
 def load_data():
-    # note: JEG swapped the two choices on 03/07/2022 to get through PaleoHack 3. 
-    # Awaits fixing of jsonutils (issue 209)
     try:
-        d = pyleo.utils.jsonutils.json_to_Scalogram('../../example_data/scal_signif_benthic.json')
-    except:
         url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/scal_signif_benthic.json'
-        response = urlopen(url)
-        d = json.loads(response.read())
+        d = pyleo.utils.jsonutils.json_to_Scalogram(url)
+    except:
+        d = pyleo.utils.jsonutils.json_to_Scalogram('../../example_data/scal_signif_benthic.json')
     return d
 
 # Tests below
@@ -487,7 +484,7 @@ class TestUiSeriesSummaryPlot:
         Passing just a pre generated psd.
         '''
         scal = load_data()
-        ts = scal.__dict__['timeseries']
+        ts = scal.timeseries
         fig, ax = ts.summary_plot()
     
         plt.close(fig)  
@@ -499,7 +496,7 @@ class TestUiSeriesSummaryPlot:
         Passing just a pre generated psd.
         '''
         scal = load_data()
-        ts = scal.__dict__['timeseries']
+        ts = scal.timeseries
         fig, ax = ts.summary_plot(
             scalogram = scal
         )
@@ -513,7 +510,7 @@ class TestUiSeriesSummaryPlot:
         Passing just a pre generated psd.
         '''
         scal = load_data()
-        ts = scal.__dict__['timeseries']
+        ts = scal.timeseries
         psd = ts.spectral(scalogram=scal)
         fig, ax = ts.summary_plot(
             psd = psd
@@ -528,7 +525,7 @@ class TestUiSeriesSummaryPlot:
         Passing just a pre generated psd.
         '''
         scal = load_data()
-        ts = scal.__dict__['timeseries']
+        ts = scal.timeseries
         fig, ax = ts.summary_plot(
             scalogram = scal, psd_method='lomb_scargle'
         )
