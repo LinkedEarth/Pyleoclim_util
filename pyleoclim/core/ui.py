@@ -2115,7 +2115,7 @@ class Series:
         ----------
 
         method : {wwz, cwt}
-            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
+            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from Torrence and Compo)
 
         freq_method : str
             {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
@@ -2124,11 +2124,12 @@ class Series:
             Arguments for frequency vector
 
         ntau : int
-            The length of the time shift points that determins the temporal resolution of the result.
+            The length of the time shift points that determines the temporal resolution of the result.
             If None, it will be either the length of the input time axis, or at most 50.
+            Not relevant for cwt
 
         settings : dict
-            Arguments for the specific spectral method
+            Arguments for the specific wavelet method
 
         verbose : bool
             If True, will print warning messages if there is any
@@ -2181,14 +2182,9 @@ class Series:
 
         settings = {} if settings is None else settings.copy()
         wave_func = {
-            'wwz': waveutils.wwz
-            # 'cwt': waveutils.cwt,
+            'wwz': waveutils.wwz,
+            'cwt': waveutils.cwt
         }
-
-        if method == 'cwt' and 'freq' in settings.keys():
-            scales=1/np.array(settings['freq'])
-            settings.update({'scales':scales})
-            del settings['freq']
 
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
@@ -2201,8 +2197,7 @@ class Series:
         tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
 
         args['wwz'] = {'tau': tau, 'freq': freq}
-        args['cwt'] = {'wavelet' : 'morl', 'scales':1/freq}
-
+        args['cwt'] = {'freq':freq}
 
         args[method].update(settings)
         wave_res = wave_func[method](self.value, self.time, **args[method])
