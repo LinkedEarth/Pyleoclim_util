@@ -785,8 +785,7 @@ class TestUISeriesWavelet():
     ''' Test the wavelet functionalities
     '''
 
-    #@pytest.mark.parametrize('wave_method',['wwz','cwt'])
-    @pytest.mark.parametrize('wave_method',['wwz'])
+    @pytest.mark.parametrize('wave_method',['wwz','cwt'])
     def test_wave_t0(self, wave_method):
         ''' Test Series.wavelet() with available methods using default arguments
         '''
@@ -795,8 +794,7 @@ class TestUISeriesWavelet():
         ts = pyleo.Series(time=t, value=v)
         scal = ts.wavelet(method=wave_method)
 
-    #@pytest.mark.parametrize('wave_method',['wwz','cwt'])
-    @pytest.mark.parametrize('wave_method',['wwz'])
+    @pytest.mark.parametrize('wave_method',['wwz','cwt'])
     def test_wave_t1(self,wave_method):
         '''Test Series.spectral() with WWZ/cwt with specified frequency vector passed via `settings`
         '''

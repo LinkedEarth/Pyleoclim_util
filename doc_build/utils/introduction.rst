@@ -144,8 +144,14 @@ Functions for wavelet analysis. Includes some pre-processing and post-processing
 
    * - :ref:`wwz <utils_wwz>`
      - Weighted wavelet amplitude (WWA) for unevenly-spaced data
-   * - :ref:`xwc <utils_xwc>`
-     - Cross-wavelet analysis for unevenly-spaced data.
+   * - :ref:`wavelet_coherence <utils_wavelet_coherence>`
+     - Cross-wavelet coherence for unevenly-spaced data.
+   * - :ref:`xwt <utils_xwt`
+     - Cross-Wavelet transform for unevenly-spaced data.
+   * - :ref:`wtc <utils_wtc`
+     - Cross-Wavelet coherence for unevenly-spaced data.
+   * - :ref:`cwt <utils_cwt`
+     - Continuous wavelet transform after Torrence and Compo
 
 
 Tsutils
