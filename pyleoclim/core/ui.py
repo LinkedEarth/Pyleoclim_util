@@ -2109,8 +2109,6 @@ class Series:
     def wavelet(self, method='wwz', settings=None, freq_method='log', ntau=None, freq_kwargs=None, verbose=False):
         ''' Perform wavelet analysis on the timeseries
 
-        cwt wavelets documented on https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
-
         Parameters
         ----------
 
@@ -2153,6 +2151,12 @@ class Series:
         pyleoclim.core.ui.Scalogram : Scalogram object
 
         pyleoclim.core.ui.MultipleScalogram : Multiple Scalogram object
+
+        References
+        ----------
+        
+        Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+        Python routines available at http://paos.colorado.edu/research/wavelets/
 
         Examples
         --------
@@ -4906,7 +4910,7 @@ class MultipleSeries:
         Parameters
         ----------
         method : {wwz, cwt}
-            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
+            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from Torrence and Compo)
 
         settings : dict, optional
             Settings for the particular method. The default is {}.
@@ -4938,6 +4942,8 @@ class MultipleSeries:
         See also
         --------
         pyleoclim.utils.wavelet.wwz : wwz function
+        
+        pyleoclim.utils.wavelet.cwt : cwt function
 
         pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
@@ -4946,6 +4952,12 @@ class MultipleSeries:
         pyleoclim.core.ui.Series.wavelet : wavelet analysis on single object
 
         pyleoclim.core.ui.MultipleScalogram : Multiple Scalogram object
+
+        References
+        ----------
+        
+        Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+        Python routines available at http://paos.colorado.edu/research/wavelets/
 
         '''
         settings = {} if settings is None else settings.copy()

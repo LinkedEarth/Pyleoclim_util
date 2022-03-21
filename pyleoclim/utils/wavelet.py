@@ -10,7 +10,7 @@ Functions concerning wavelet analysis
 
 
 __all__ = [
-    #'cwt',
+    'cwt',
     'wwz',
     'xwt',
     'wtc',
