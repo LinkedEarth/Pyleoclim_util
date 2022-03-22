@@ -1372,13 +1372,13 @@ def wavelet_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     ----------
 
     ys1 : array
-        first of two time series
+        values of the 1st time series
     ys2 : array
-        second of the two time series
+        values of the 2nd time series
     ts1 : array
-        time axis of first time series
+        time axis of the 1st time series
     ts2 : array
-        time axis of the second time series
+        time axis of the 2nd time series
     tau : array
         the evenly-spaced time points
     freq : array
@@ -2329,15 +2329,15 @@ def xwt(coeff1, coeff2):
     return xw_t, xw_amplitude, xw_phase
 
 def wtc(coeff1, coeff2, freq, tau, smooth_factor=0.25):
-    ''' Return the cross wavelet coherence.
+    ''' Return the cross wavelet coherence from two sets of wavelet coefficients.
 
     Parameters
     ----------
 
     coeff1 : array
-        the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
+        the 1st set of wavelet transform coefficients **in the form of a1 + a2*1j**
     coeff2 : array
-        the second of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
+        the 2nd set of wavelet transform coefficients **in the form of a1 + a2*1j**
     freq : array
         vector of frequency
     tau : array'
