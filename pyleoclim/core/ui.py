@@ -2109,13 +2109,11 @@ class Series:
     def wavelet(self, method='wwz', settings=None, freq_method='log', ntau=None, freq_kwargs=None, verbose=False):
         ''' Perform wavelet analysis on the timeseries
 
-        cwt wavelets documented on https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
-
         Parameters
         ----------
 
         method : {wwz, cwt}
-            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
+            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from Torrence and Compo)
 
         freq_method : str
             {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
@@ -2124,11 +2122,12 @@ class Series:
             Arguments for frequency vector
 
         ntau : int
-            The length of the time shift points that determins the temporal resolution of the result.
+            The length of the time shift points that determines the temporal resolution of the result.
             If None, it will be either the length of the input time axis, or at most 50.
+            Not relevant for cwt
 
         settings : dict
-            Arguments for the specific spectral method
+            Arguments for the specific wavelet method
 
         verbose : bool
             If True, will print warning messages if there is any
@@ -2152,6 +2151,12 @@ class Series:
         pyleoclim.core.ui.Scalogram : Scalogram object
 
         pyleoclim.core.ui.MultipleScalogram : Multiple Scalogram object
+
+        References
+        ----------
+        
+        Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+        Python routines available at http://paos.colorado.edu/research/wavelets/
 
         Examples
         --------
@@ -2181,14 +2186,9 @@ class Series:
 
         settings = {} if settings is None else settings.copy()
         wave_func = {
-            'wwz': waveutils.wwz
-            # 'cwt': waveutils.cwt,
+            'wwz': waveutils.wwz,
+            'cwt': waveutils.cwt
         }
-
-        if method == 'cwt' and 'freq' in settings.keys():
-            scales=1/np.array(settings['freq'])
-            settings.update({'scales':scales})
-            del settings['freq']
 
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
@@ -2201,8 +2201,7 @@ class Series:
         tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
 
         args['wwz'] = {'tau': tau, 'freq': freq}
-        args['cwt'] = {'wavelet' : 'morl', 'scales':1/freq}
-
+        args['cwt'] = {'freq':freq}
 
         args[method].update(settings)
         wave_res = wave_func[method](self.value, self.time, **args[method])
@@ -2329,7 +2328,7 @@ class Series:
 
         settings = {} if settings is None else settings.copy()
         xwc_func = {
-            'wwz': waveutils.xwc,
+            'wwz': waveutils.wavelet_coherence,
         }
 
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
@@ -2636,7 +2635,7 @@ class Series:
                  plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],
                  saveknee_settings=None,saveoutliers_settings=None, mute=False):
         '''
-        Detects outliers in a timeseries and removes if specified
+        Detects outliers in a timeseries and removes if specified. The method uses clustering to locate outliers. 
 
         Parameters
         ----------
@@ -2677,12 +2676,50 @@ class Series:
         pyleoclim.utils.plotting.plot_xy : basic x-y plot
 
         pyleoclim.utils.plotting.plot_scatter_xy : Scatter plot on top of a line plot
+        
+        Examples
+        --------
+
+        Let's create a "perfect" sinusoidal signal and add outliers
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import numpy as np
+            
+            # create the signal
+            freqs=[1/20,1/80]
+            time=np.arange(2001)
+            signals=[]
+            for freq in freqs:
+                signals.append(np.cos(2*np.pi*freq*time))
+            signal=sum(signals)
+            
+            #add outliers
+            outliers_start = np.mean(signal)+5*np.std(signal)
+            outliers_end = np.mean(signal)+7*np.std(signal)
+            outlier_values = np.arange(outliers_start,outliers_end,0.1)
+            index = np.random.randint(0,len(signal),6)
+            signal_out = signal
+            for i,ind in enumerate(index):
+                signal_out[ind] = outlier_values[i]
+            
+            #Make a Series object
+            ts = pyleo.Series(time=time,value=signal_out)
+            @savefig outliers.png
+            fig, ax = ts.plot()
+            pyleo.closefig(fig)
+            
+            #Detect and remove outliers
+            ts_new=ts.outliers()
+            @savefig outliers_remove.png
+            fig, ax = ts_new.plot()
+            pyleo.closefig(fig)           
 
         '''
         new = self.copy()
-
-        #outlier_indices,fig1,ax1,fig2,ax2 = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
-        #                                                   figsize=figsize,save_knee=save_knee,save_outliers=save_outliers,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
         outlier_indices = tsutils.detect_outliers(
             self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,
             figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,
@@ -4873,7 +4910,7 @@ class MultipleSeries:
         Parameters
         ----------
         method : {wwz, cwt}
-            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
+            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from Torrence and Compo)
 
         settings : dict, optional
             Settings for the particular method. The default is {}.
@@ -4905,6 +4942,8 @@ class MultipleSeries:
         See also
         --------
         pyleoclim.utils.wavelet.wwz : wwz function
+        
+        pyleoclim.utils.wavelet.cwt : cwt function
 
         pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
@@ -4913,6 +4952,12 @@ class MultipleSeries:
         pyleoclim.core.ui.Series.wavelet : wavelet analysis on single object
 
         pyleoclim.core.ui.MultipleScalogram : Multiple Scalogram object
+
+        References
+        ----------
+        
+        Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+        Python routines available at http://paos.colorado.edu/research/wavelets/
 
         '''
         settings = {} if settings is None else settings.copy()
