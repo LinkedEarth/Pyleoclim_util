@@ -7085,7 +7085,7 @@ class SsaRes:
         return fig, ax
 
     def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None,
-             title_kwargs=None, mute=False, spec_method = 'mtm', plot_original=False):
+             title_kwargs=None, mute=False, spec_method = 'mtm', plot_original=True):
         ''' Dashboard visualizing the properties of a given SSA mode, including:
             1. the analyzing function (T-EOF)
             2. the reconstructed component (RC)
@@ -7135,7 +7135,6 @@ class SsaRes:
         gs = gridspec.GridSpec(2, 2)
         # plot RC
         ax = fig.add_subplot(gs[0, :])
-
         ax.plot(self.time,RC,label='mode '+str(index+1),zorder=99)
         if plot_original:
             ax.plot(self.time,self.original,color='Silver',lw=1,label='original')
