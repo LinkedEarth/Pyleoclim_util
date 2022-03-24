@@ -2245,11 +2245,11 @@ class Series:
             Arguments for frequency vector
 
         tau : array
-            The time shift points that determins the temporal resolution of the result.
+            The time shift points that determines the temporal resolution of the result.
             If None, it will be calculated using ntau.
 
         ntau : int
-            The length of the time shift points that determins the temporal resolution of the result.
+            The length of the time shift points that determines the temporal resolution of the result.
             If None, it will be either the length of the input time axis, or at most 50.
 
         settings : dict
