@@ -35,6 +35,7 @@ from .tsutils import preprocess
 from .tsbase import (
     clean_ts,
     is_evenly_spaced)
+from .tsmodel import(ar1_fit)
 
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
@@ -1372,13 +1373,13 @@ def wavelet_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     ----------
 
     ys1 : array
-        values of the 1st time series
+        first of two time series
     ys2 : array
-        values of the 2nd time series
+        second of the two time series
     ts1 : array
-        time axis of the 1st time series
+        time axis of first time series
     ts2 : array
-        time axis of the 2nd time series
+        time axis of the second time series
     tau : array
         the evenly-spaced time points
     freq : array
@@ -2329,15 +2330,15 @@ def xwt(coeff1, coeff2):
     return xw_t, xw_amplitude, xw_phase
 
 def wtc(coeff1, coeff2, freq, tau, smooth_factor=0.25):
-    ''' Return the cross wavelet coherence from two sets of wavelet coefficients.
+    ''' Return the cross wavelet coherence.
 
     Parameters
     ----------
 
     coeff1 : array
-        the 1st set of wavelet transform coefficients **in the form of a1 + a2*1j**
+        the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
     coeff2 : array
-        the 2nd set of wavelet transform coefficients **in the form of a1 + a2*1j**
+        the second of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
     freq : array
         vector of frequency
     tau : array'
@@ -2504,7 +2505,7 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 
 ############ Methods for Torrence and Compo#############
 
-def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={},detrend=False,sg_kwargs={},
+def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=False,sg_kwargs={},
         gaussianize=False, pad=False, mother='MORLET',param=None):
     '''
     Wrapper function to implement Torrence and Compo continuous wavelet transform
@@ -2522,6 +2523,8 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={},detrend=False,sg_kwargs
         Options are 'log' (default), 'nfft', 'lomb_scargle', 'welch', and 'scale'
     freq_kwargs : dict, optional
         Optional parameters for the choice of the frequency vector. See make_freq_vector and additional methods for details. The default is {}.
+    scale : numpy.array
+        Optional scale vector in place of a frequency vector. Default is None. If scale is not None, frequency method and attached arguments will be ignored. 
     detrend : bool, string, {'linear', 'constant', 'savitzy-golay', 'emd'}
         Whether to detrend and with which option. The default is False.
     sg_kwargs : dict, optional
@@ -2605,19 +2608,20 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={},detrend=False,sg_kwargs
         fourier_factor = np.nan
     
     #get the scale
-    if freq is None:
-        if freq_method == 'scale':
-            freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-            freq_kwargs.update({'mother':mother,'param':param})
-        freq = make_freq_vector(ts,method=freq_method,**freq_kwargs)
-    scale = 1. / (fourier_factor * freq)
+    if scale is None:
+        if freq is None:
+            if freq_method == 'scale':
+                freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
+                freq_kwargs.update({'mother':mother,'param':param})
+            freq = make_freq_vector(ts,method=freq_method,**freq_kwargs)
+        scale = 1. / (fourier_factor * freq)
         
     #calculate wavelet
     wave, coi = tc_wavelet(ys, dt, scale, mother, param, pad)
     amplitude=np.abs(wave)
     
-    Results = collections.namedtuple('Results', ['amplitude', 'coi', 'freq', 'time', 'scale', 'coeff'])
-    res = Results(amplitude=amplitude.T, coi=coi, freq=freq, time=ts, scale=scale, coeff=wave)
+    Results = collections.namedtuple('Results', ['amplitude', 'coi', 'freq', 'time', 'scale', 'coeff', 'mother','param'])
+    res = Results(amplitude=amplitude.T, coi=coi, freq=freq, time=ts, scale=scale, coeff=wave, mother=mother,param=param)
 
     return res
     
@@ -2794,47 +2798,46 @@ def tc_wave_bases(mother, k, scale, param):
 
     return daughter, fourier_factor, coi, dofmin
 
-def tc_wave_signif(Y, dt, scale, sigtest=0, lag1=0.0, siglvl=0.95,
-                dof=None, mother='MORLET', param=None, gws=None):
+def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95],
+                dof=None, gws=None):
     
-    n1 = len(np.atleast_1d(Y))
+    if mother.upper() not in ['MORLET','DOG','PAUL']:
+        raise ValueError('The mother wavelet should be either "MORLET","PAUL", or "DOG"')
+    
+    if sigtest not in ['chi-square','time-average','scale-average']:
+        raise ValueError("The type of significance test should be either 'chi-square','time-average','scale-average'")
+    
+    
     J1 = len(scale) - 1
     dj = np.log2(scale[1] / scale[0])
 
-    if n1 == 1:
-        variance = Y
-    else:
-        variance = np.std(Y) ** 2
+    variance = np.std(ys) ** 2
 
     # get the appropriate parameters [see Table(2)]
-    if mother == 'MORLET':  # ----------------------------------  Morlet
+    if mother.upper() == 'MORLET':  # ----------------------------------  Morlet
         empir = ([2., -1, -1, -1])
-        if param is None:
-            param = 6.
+        if param == 6:
             empir[1:] = ([0.776, 2.32, 0.60])
         k0 = param
         # Scale-->Fourier [Sec.3h]
         fourier_factor = (4 * np.pi) / (k0 + np.sqrt(2 + k0 ** 2))
         
-    elif mother == 'PAUL':
+    elif mother.upper() == 'PAUL':
         empir = ([2, -1, -1, -1])
-        if param is None:
-            param = 4
+        if param == 4:
             empir[1:] = ([1.132, 1.17, 1.5])
         m = param
         fourier_factor = (4 * np.pi) / (2 * m + 1)
         
-    elif mother == 'DOG':  # -------------------------------------Paul
+    elif mother.upper() == 'DOG':  # -------------------------------------Paul
         empir = ([1., -1, -1, -1])
-        if param is None:
-            param = 2.
+        if param ==2:
             empir[1:] = ([3.541, 1.43, 1.4])
         elif param == 6:  # --------------------------------------DOG
             empir[1:] = ([1.966, 1.37, 0.97])
         m = param
         fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * m + 1))
-    else:
-        print('Mother must be one of MORLET, PAUL, DOG')
+
 
     period = scale * fourier_factor
     dofmin = empir[0]  # Degrees of freedom with no smoothing
@@ -2842,12 +2845,14 @@ def tc_wave_signif(Y, dt, scale, sigtest=0, lag1=0.0, siglvl=0.95,
     gamma_fac = empir[2]  # time-decorrelation factor
     dj0 = empir[3]  # scale-decorrelation factor
 
-    freq = dt / period  # normalized frequency
+    dt = float(np.mean(np.diff(ts)))
+    freq =  dt / period  # normalized frequency
 
     if gws is not None:   # use global-wavelet as background spectrum
         fft_theor = gws
     else:
         # [Eqn(16)]
+        lag1 = ar1_fit(ys,ts)
         fft_theor = (1 - lag1 ** 2) / \
             (1 - 2 * lag1 * np.cos(freq * 2 * np.pi) + lag1 ** 2)
         fft_theor = variance * fft_theor  # include time-series variance
@@ -2856,51 +2861,79 @@ def tc_wave_signif(Y, dt, scale, sigtest=0, lag1=0.0, siglvl=0.95,
     if dof is None:
         dof = dofmin
 
-    if sigtest == 0:  # no smoothing, DOF=dofmin [Sec.4]
-        dof = dofmin
-        chisquare = chisquare_inv(siglvl, dof) / dof
-        signif = fft_theor * chisquare  # [Eqn(18)]
-    elif sigtest == 1:  # time-averaged significance
-        if len(np.atleast_1d(dof)) == 1:
-            dof = np.zeros(J1) + dof
-        dof[dof < 1] = 1
-        # [Eqn(23)]
-        dof = dofmin * np.sqrt(1 + (dof * dt / gamma_fac / scale) ** 2)
-        dof[dof < dofmin] = dofmin   # minimum DOF is dofmin
-        for a1 in range(0, J1 + 1):
-            chisquare = chisquare_inv(siglvl, dof[a1]) / dof[a1]
-            signif[a1] = fft_theor[a1] * chisquare
-    elif sigtest == 2:  # time-averaged significance
-        if len(dof) != 2:
-            print('ERROR: DOF must be set to [S1,S2],'
-                ' the range of scale-averages')
-        if Cdelta == -1:
-            print('ERROR: Cdelta & dj0 not defined'
-                  ' for ' + mother + ' with param = ' + str(param))
-
-        s1 = dof[0]
-        s2 = dof[1]
-        avg = np.logical_and(scale >= 2, scale < 8)  # scales between S1 & S2
-        navg = np.sum(np.array(np.logical_and(scale >= 2, scale < 8),
-            dtype=int))
-        if navg == 0:
-            print('ERROR: No valid scales between ' + s1 + ' and ' + s2)
-        Savg = 1. / np.sum(1. / scale[avg])  # [Eqn(25)]
-        Smid = np.exp((np.log(s1) + np.log(s2)) / 2.)  # power-of-two midpoint
-        dof = (dofmin * navg * Savg / Smid) * \
-            np.sqrt(1 + (navg * dj / dj0) ** 2)  # [Eqn(28)]
-        fft_theor = Savg * np.sum(fft_theor[avg] / scale[avg])  # [Eqn(27)]
-        chisquare = chisquare_inv(siglvl, dof) / dof
-        signif = (dj * dt / Cdelta / Savg) * fft_theor * chisquare  # [Eqn(26)]
-    else:
-        print('ERROR: sigtest must be either 0, 1, or 2')
-
-    return signif
+    signif_level = []
+    
+    for siglvl in qs:
+            
+        if sigtest == 'chi-square':  # no smoothing, DOF=dofmin [Sec.4]
+            dof = dofmin
+            chisquare = chisquare_inv(siglvl, dof) / dof
+            signif = fft_theor * chisquare  # [Eqn(18)]
+        elif sigtest == 'time-average':  # time-averaged significance
+            if len(np.atleast_1d(dof)) == 1:
+                dof = np.zeros(J1) + dof
+            dof[dof < 1] = 1
+            # [Eqn(23)]
+            dof = dofmin * np.sqrt(1 + (dof * dt / gamma_fac / scale) ** 2)
+            dof[dof < dofmin] = dofmin   # minimum DOF is dofmin
+            for a1 in range(0, J1 + 1):
+                chisquare = chisquare_inv(siglvl, dof[a1]) / dof[a1]
+                signif[a1] = fft_theor[a1] * chisquare
+        elif sigtest == 'scale-average':  # time-averaged significance
+            if len(dof) != 2:
+                raise ValueError('DOF must be set to [S1,S2],'
+                    ' the range of scale-averages')
+            if Cdelta == -1:
+                raise ValueError('Cdelta & dj0 not defined'
+                      ' for ' + mother + ' with param = ' + str(param))
+    
+            s1 = dof[0]
+            s2 = dof[1]
+            avg = np.logical_and(scale >= 2, scale < 8)  # scales between S1 & S2
+            navg = np.sum(np.array(np.logical_and(scale >= 2, scale < 8),
+                dtype=int))
+            if navg == 0:
+                raise ValueError('No valid scales between ' + s1 + ' and ' + s2)
+            Savg = 1. / np.sum(1. / scale[avg])  # [Eqn(25)]
+            Smid = np.exp((np.log(s1) + np.log(s2)) / 2.)  # power-of-two midpoint
+            dof = (dofmin * navg * Savg / Smid) * \
+                np.sqrt(1 + (navg * dj / dj0) ** 2)  # [Eqn(28)]
+            fft_theor = Savg * np.sum(fft_theor[avg] / scale[avg])  # [Eqn(27)]
+            chisquare = chisquare_inv(siglvl, dof) / dof
+            signif = (dj * dt / Cdelta / Savg) * fft_theor * chisquare  # [Eqn(26)]
+        #expand
+        sig = signif[:, np.newaxis].dot(np.ones(len(ys))[np.newaxis, :])
+        signif_level.append(np.sqrt(sig.T))
+    
+    return signif_level
 
 def chisquare_inv(P, V):
+    '''
+    Returns the inverse of chi-square CDF with V degrees of freedom at fraction P
+    
+
+    Parameters
+    ----------
+    P : float
+        fraction
+    V : float
+        degress of freedom
+
+    Returns
+    -------
+    X : float
+        Inverse chi-square
+    
+    References
+    ----------
+    
+    Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+    Python routines available at http://paos.colorado.edu/research/wavelets/
+
+    '''
     
     if (1 - P) < 1E-4:
-        print('P must be < 0.9999')
+        raise ValueError('P must be < 0.9999')
 
     if P == 0.95 and V == 2:  # this is a no-brainer
         X = 5.9915
@@ -2922,6 +2955,30 @@ def chisquare_inv(P, V):
     return X 
 
 def chisquare_solve(XGUESS, P, V):
+    '''
+    Given XGUESS, a percentile P, and degrees-of-freedom V, return the difference between calculated percentile and P.
+
+    Parameters
+    ----------
+    XGUESS : float
+        sig level
+    P : float
+        percentile
+    V : float
+        degrees of freedom
+
+    Returns
+    -------
+    PDIFF : float
+        difference between calculated percentile and P
+        
+    References
+    ----------
+    
+    Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+    Python routines available at http://paos.colorado.edu/research/wavelets/
+
+    '''
     
     PGUESS = gammainc(V / 2, V * XGUESS / 2)  # incomplete Gamma function
 

@@ -2207,8 +2207,9 @@ class Series:
         wave_res = wave_func[method](self.value, self.time, **args[method])
         if method == 'wwz':
             wwz_Neffs = wave_res.Neffs
-        else:
+        elif method=='cwt':
             wwz_Neffs = None
+            args[method].update({'scale':wave_res.scale,'mother':wave_res.mother,'param':wave_res.param})
 
         scal = Scalogram(
             frequency=wave_res.freq,
@@ -2577,13 +2578,13 @@ class Series:
         causal_res = spec_func[method](sorted_self.value, sorted_target.value, **args[method])
         return causal_res
 
-    def surrogates(self, method='ar1', number=1, length=None, seed=None, settings=None):
+    def surrogates(self, method='ar1sim', number=1, length=None, seed=None, settings=None):
         ''' Generate surrogates with increasing time axis
 
         Parameters
         ----------
 
-        method : {ar1}
+        method : {ar1sim}
             Uses an AR1 model to generate surrogates of the timeseries
 
         number : int
@@ -2609,10 +2610,10 @@ class Series:
         '''
         settings = {} if settings is None else settings.copy()
         surrogate_func = {
-            'ar1': tsmodel.ar1_sim,
+            'ar1sim': tsmodel.ar1_sim,
         }
         args = {}
-        args['ar1'] = {'t': self.time}
+        args['ar1sim'] = {'t': self.time}
         args[method].update(settings)
 
         if seed is not None:
@@ -3492,16 +3493,16 @@ class Scalogram:
         else:
             return ax
 
-    def signif_test(self, number=None, method='ar1', seed=None, qs=[0.95],
+    def signif_test(self, method=None, number=None, seed=None, qs=[0.95],
                     settings=None, export_scal = False):
         '''Significance test for wavelet analysis
 
         Parameters
         ----------
+        method : {'ar1asym', 'ar1sim'}, optional
+            Method to use to generate the surrogates. The default is None, which will result in the use of simulations if method is `wwz` and the asymptotic solution if method is `cwt`. The asymptotic solution is currently not available for `wwz`. 
         number : int, optional
-            Number of surrogates to generate for significance analysis. The default is 200.
-        method : {'ar1'}, optional
-            Method to use to generate the surrogates. The default is 'ar1'.
+            Number of surrogates to generate for significance analysis based on simulations. The default is 200.
         seed : int, optional
             Set the seed for the random number generator. Useful for reproducibility The default is None.
         qs : list, optional
@@ -3509,7 +3510,7 @@ class Scalogram:
         settings : dict, optional
             Parameters for the model. The default is None.
         export_scal : bool
-            Whether or not to export the scalograms used in the noise realizations. Note: The scalograms used for wavelet analysis are slightly different
+            Whether or not to export the scalograms used in the noise realizations. Note: For the wwz method, the scalograms used for wavelet analysis are slightly different
             than those used for spectral analysis (different decay constant). As such, this functionality should be used only to expedite exploratory analysis.
 
         Raises
@@ -3545,52 +3546,92 @@ class Scalogram:
         pyleoclim.core.ui.Series.wavelet : wavelet analysis
 
         '''
-
-        if hasattr(self,'signif_scals'):
-            signif_scals = self.signif_scals
-
-        #Allow for a few different configurations of passed number of signif tests, default behavior is to set number = 200
-        if number is None and signif_scals is not None:
-            number = len(signif_scals.scalogram_list)
-        elif number is None and signif_scals is None:
-            number = 200
-        elif number == 0:
-            return self
-
-        new = self.copy()
-
-        if signif_scals:
-            scalogram_list = signif_scals.scalogram_list
-            #If signif_scals already in scalogram object are more than those requested for significance testing, use as many of them as required
-            if len(scalogram_list) > number:
-                surr_scal = MultipleScalogram(scalogram_list=scalogram_list[:number])
-            #If number is the same as the length of signif_scals, just use signif_scals
-            elif len(scalogram_list) == number:
-                surr_scal = signif_scals
-            #If the number is more than the length of signif_scals, reuse what is available and calculate the rest
-            elif len(scalogram_list) < number:
-                number -= len(scalogram_list)
-                surr_scal_tmp = []
-                surr_scal_tmp.extend(scalogram_list)
-                surr = self.timeseries.surrogates(
-            number=number, seed=seed, method=method, settings=settings
-        )
-                surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, settings=self.wave_args,).scalogram_list)
-                surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
+        if self.wave_method == 'wwz' and method == 'ar1asym':
+            raise ValueError('Asymptotic solution is not supported for the wwz method')
+        
+        if method is None:
+            if self.wave_method == 'wwz':
+                method = 'ar1sim'
+            elif self.wave_method == 'cwt':
+                method = 'ar1asym'
         else:
-            surr = self.timeseries.surrogates(
-            number=number, seed=seed, method=method, settings=settings
-        )
-            surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args,)
-
-        if len(qs) > 1:
-            raise ValueError('qs should be a list with size 1!')
-
-        new.signif_qs = surr_scal.quantiles(qs=qs)
-        new.signif_method = method
-
-        if export_scal == True:
-            new.signif_scals = surr_scal
+            if method not in ['ar1sim', 'ar1asym']:
+                raise ValueError("The available methods are ar1sim'and 'ar1asym'")
+        
+        if method == 'ar1sim':
+        
+            if hasattr(self,'signif_scals'):
+                signif_scals = self.signif_scals
+    
+            #Allow for a few different configurations of passed number of signif tests, default behavior is to set number = 200
+            if number is None and signif_scals is not None:
+                number = len(signif_scals.scalogram_list)
+            elif number is None and signif_scals is None:
+                number = 200
+            elif number == 0:
+                return self
+    
+            new = self.copy()
+    
+            if signif_scals:
+                scalogram_list = signif_scals.scalogram_list
+                #If signif_scals already in scalogram object are more than those requested for significance testing, use as many of them as required
+                if len(scalogram_list) > number:
+                    surr_scal = MultipleScalogram(scalogram_list=scalogram_list[:number])
+                #If number is the same as the length of signif_scals, just use signif_scals
+                elif len(scalogram_list) == number:
+                    surr_scal = signif_scals
+                #If the number is more than the length of signif_scals, reuse what is available and calculate the rest
+                elif len(scalogram_list) < number:
+                    number -= len(scalogram_list)
+                    surr_scal_tmp = []
+                    surr_scal_tmp.extend(scalogram_list)
+                    surr = self.timeseries.surrogates(
+                number=number, seed=seed, method=method, settings=settings
+            )
+                    surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, settings=self.wave_args,).scalogram_list)
+                    surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
+            else:
+                surr = self.timeseries.surrogates(
+                number=number, seed=seed, method=method, settings=settings
+            )
+                surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args,)
+    
+            if type(qs) is not list:
+                raise TypeError('qs should be a list')
+    
+            new.signif_qs = surr_scal.quantiles(qs=qs)
+            new.signif_method = method
+    
+            if export_scal == True:
+                new.signif_scals = surr_scal
+        
+        elif method == 'ar1asym':
+            
+            new = self.copy()
+            
+            if type(qs) is not list:
+                raise TypeError('qs should be a list')
+            
+            settings = {} if settings is None else settings.copy()
+            
+            signif_levels=waveutils.tc_wave_signif(self.timeseries.value,
+                                                   self.timeseries.time,
+                                                   self.wave_args['scale'],
+                                                   self.wave_args['mother'],
+                                                   self.wave_args['param'],
+                                                   qs=qs, **settings)
+            
+            #Create a scalogram for each of the significance levels
+            ms_base =[]
+            for idx, item in enumerate(signif_levels):
+                label = str(int(qs[idx]*100))+'%'
+                s = Scalogram(frequency=self.frequency, time =self.time,
+                              amplitude = item, label=label)
+                ms_base.append(s)
+            
+            new.signif_qs = MultipleScalogram(ms_base)
+            new.signif_method = method
 
         return new
 
@@ -7130,7 +7171,7 @@ class SsaRes:
         return fig, ax
 
     def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None,
-             title_kwargs=None, mute=False, spec_method = 'mtm', plot_original=True):
+             title_kwargs=None, mute=False, spec_method = 'mtm', plot_original=False):
         ''' Dashboard visualizing the properties of a given SSA mode, including:
             1. the analyzing function (T-EOF)
             2. the reconstructed component (RC)
@@ -7180,6 +7221,7 @@ class SsaRes:
         gs = gridspec.GridSpec(2, 2)
         # plot RC
         ax = fig.add_subplot(gs[0, :])
+
         ax.plot(self.time,RC,label='mode '+str(index+1),zorder=99)
         if plot_original:
             ax.plot(self.time,self.original,color='Silver',lw=1,label='original')
