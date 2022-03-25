@@ -2800,6 +2800,51 @@ def tc_wave_bases(mother, k, scale, param):
 
 def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95],
                 dof=None, gws=None):
+    '''
+    Asymptotic singificance testing.
+
+    Parameters
+    ----------
+    ys : numpy.array
+        Values for the timeseries
+    ts : numpy.array
+        time vector.
+    scale : numpy.array
+        vector of scale
+    mother : str
+        Type of mother wavelet
+    param : int
+        mother wavelet parameter
+    sigtest : {'chi-square','time-average','scale-average'}, optional
+        Type of significance test to perform . The default is 'chi-square'.
+        - chi-square: a regular chi-square test Eq(18) from Torrence and Compo
+        - time-average: DOF should be set to NA, the number of local wavelet spectra that were averaged together.
+             For the Global Wavelet Spectrum, this would be NA=N, where N is the number of points in your time series. Eq23 in Torrence and Compo
+        -scale-average: In this case, DOF should be set to a two-element vector [S1,S2], which gives the scale range that was averaged together.
+             e.g. if one scale-averaged scales between 2 and 8, then DOF=[2,8].
+    qs : list, optional
+        Significance level. The default is [0.95].
+    dof : None, optional
+        Degrees of freedon for signif test. The default is None, which will automatically assign:
+            - chi-square: DOF = 2 (or 1 for MOTHER='DOG')
+            - time-average: DOF = NA, the number of times averaged together.
+            -scale-average: DOF = [S1,S2], the range of scales averaged.
+    gws : np.array, optional
+        Global wavelet spectrum. a vector of the same length as scale. If input then this is used as the theoretical background spectrum, rather than white or red noise. The default is None.
+
+    Returns
+    -------
+    signif_level : numpy.array
+        Array of values for significance level 
+    
+    References
+    ----------
+    
+    Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+    Python routines available at http://paos.colorado.edu/research/wavelets/
+
+
+    '''
     
     if mother.upper() not in ['MORLET','DOG','PAUL']:
         raise ValueError('The mother wavelet should be either "MORLET","PAUL", or "DOG"')
