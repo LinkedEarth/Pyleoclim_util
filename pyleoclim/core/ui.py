@@ -3544,6 +3544,8 @@ class Scalogram:
         --------
 
         pyleoclim.core.ui.Series.wavelet : wavelet analysis
+        
+        pyleoclim.utils.wavelet.tc_wave_signif : asymptotic significance calculation
 
         '''
         if self.wave_method == 'wwz' and method == 'ar1asym':

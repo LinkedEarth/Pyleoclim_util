@@ -2842,6 +2842,13 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
     
     Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
     Python routines available at http://paos.colorado.edu/research/wavelets/
+    
+    See also
+    --------
+    
+    pyleoclim.utils.wavelet.chisquare_inv : inverse of chi-square CDF
+    
+    pyleoclim.utils.wavelet.chisquare_solve : return the difference between calculated percentile and true P
 
 
     '''
