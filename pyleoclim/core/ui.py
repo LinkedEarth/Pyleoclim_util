@@ -3376,7 +3376,7 @@ class Scalogram:
         msg = print(tabulate(table, headers='keys'))
         return f'Dimension: {np.size(self.frequency)} x {np.size(self.time)}'
 
-    def plot(self, in_period=True, xlabel=None, ylabel=None, title=None,
+    def plot(self, variable = 'amplitude', in_period=True, xlabel=None, ylabel=None, title=None,
              ylim=None, xlim=None, yticks=None, figsize=[10, 8], mute=False,
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              contourf_style={}, cbar_style={}, savefig_settings={}, ax=None):
@@ -3384,6 +3384,8 @@ class Scalogram:
 
         Parameters
         ----------
+        variable : {'amplitude','power'}
+            Whether to plot the amplitude or power. Default is amplitude
         in_period : bool, optional
             Plot the in period instead of frequency space. The default is True.
         xlabel : str, optional
@@ -3450,7 +3452,12 @@ class Scalogram:
             if ylabel is None:
                 ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
 
-        cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
+        if variable == 'amplitude':
+            cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
+        elif variable=='power':
+            cont = ax.contourf(self.time, y_axis, self.amplitude.T**2, **contourf_args)
+        else:
+            raise ValueError('Variable should be either "amplitude" or "power"')
         ax.set_yscale('log')
 
         # plot colorbar
