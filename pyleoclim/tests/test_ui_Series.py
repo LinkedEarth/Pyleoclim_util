@@ -133,7 +133,7 @@ class TestUiSeriesSpectral:
     [parametrizing tests](https://docs.pytest.org/en/stable/example/parametrize.html).
     '''
 
-    @pytest.mark.parametrize('spec_method', ['wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram'])
+    @pytest.mark.parametrize('spec_method', ['wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram','cwt'])
     def test_spectral_t0(self, spec_method, eps=0.5):
         ''' Test Series.spectral() with available methods using default arguments
 
@@ -173,8 +173,8 @@ class TestUiSeriesSpectral:
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
-    @pytest.mark.parametrize('nv', [10, 20, 30])
-    def test_spectral_t3(self, nv, eps=0.3):
+    @pytest.mark.parametrize('dj', [0.25, 0.5, 1])
+    def test_spectral_t3(self, dj, eps=0.3):
         ''' Test Series.spectral() with MTM using `freq_method='scale'` with different values for its keyword argument `nv`
 
         We will estimate the scaling slope of an ideal colored noise to make sure the result is reasonable.
@@ -182,7 +182,7 @@ class TestUiSeriesSpectral:
         alpha = 1
         t, v = gen_colored_noise(nt=500, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
-        psd = ts.spectral(method='mtm', freq_method='scale', freq_kwargs={'nv': nv})
+        psd = ts.spectral(method='mtm', freq_method='scale', freq_kwargs={'dj': dj})
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
 
@@ -233,15 +233,16 @@ class TestUiSeriesSpectral:
         psd = ts.spectral(method=spec_method)
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
-        
-    def test_spectral_t7(self):
+    
+    @pytest.mark.parametrize('spec_method', ['wwz','cwt'])
+    def test_spectral_t7(self, spec_method,):
         '''Test the spectral significance testing with pre-generated scalogram objects
         '''
         
         ts = pyleo.gen_ts(model='colored_noise')
-        scal = ts.wavelet()
+        scal = ts.wavelet(method=spec_method)
         signif = scal.signif_test(number=2,export_scal = True)
-        sig_psd = ts.spectral(method='wwz',scalogram=scal)
+        sig_psd = ts.spectral(method=spec_method,scalogram=scal)
         sig_psd.signif_test(number=2,scalogram=signif).plot()
 
 class TestUiSeriesBin:

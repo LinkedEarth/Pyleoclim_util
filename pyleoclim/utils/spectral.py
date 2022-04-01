@@ -34,6 +34,7 @@ from .wavelet import (
     prepare_wwz,
     wwz,
     wwa2psd,
+    cwt,
 )
 #from .tsutils import clean_ts, interp, bin
 
@@ -741,38 +742,95 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         wwz_freq = res_wwz.freq
 
     psd = wwa2psd(wwa, ts_cut, wwz_Neffs, freq=wwz_freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
-    #  psd[1/freqs > np.max(coi)] = np.nan  # cut off the unreliable part out of the coi
-    #  psd = psd[1/freqs <= np.max(coi)] # cut off the unreliable part out of the coi
-    #  freqs = freqs[1/freqs <= np.max(coi)]
-
-    # Monte-Carlo simulations of AR1 process
-    #nf = np.size(freq)
-
-    #  psd_ar1 = np.ndarray(shape=(nMC, nf))
-
-    #  if nMC >= 1:
-        #  #  tauest = wa.tau_estimation(ys_cut, ts_cut, detrend=detrend)
-
-        #  for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
-            #  #  r = wa.ar1_model(ts_cut, tauest)
-            #  r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
-            #  res_red = wwz(r, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
-                                                                     #  detrend=detrend, params=params,
-                                                                     #  gaussianize=gaussianize, standardize=standardize,
-                                                                     #  method=method)
-            #  psd_ar1[i, :] = wa.wwa2psd(res_red.wwa, ts_cut, res_red.Neffs,
-                                       #  freq=res_red.freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
-            #  #  psd_ar1[i, 1/freqs_red > np.max(coi_red)] = np.nan  # cut off the unreliable part out of the coi
-            #  #  psd_ar1 = psd_ar1[1/freqs_red <= np.max(coi_red)] # cut off the unreliable part out of the coi
-
-        #  psd_ar1_q95 = mquantiles(psd_ar1, 0.95, axis=0)[0]
-
-    #  else:
-        #  psd_ar1_q95 = None
-
-    # Results = collections.namedtuple('Results', ['psd', 'freq', 'psd_ar1_q95', 'psd_ar1'])
-    # res = Results(psd=psd, freq=freq, psd_ar1_q95=psd_ar1_q95, psd_ar1=psd_ar1)
     Results = collections.namedtuple('Results', ['psd', 'freq'])
     res = Results(psd=psd, freq=freq)
+
+    return res
+
+def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None, 
+            detrend=False,sg_kwargs={}, gaussianize=False, standardize =False, pad=False, 
+            mother='MORLET',param=None, cwt_res=None):
+    '''
+    Wrapper function to implement Torrence and Compo continuous wavelet transform
+
+    Parameters
+    ----------
+    ys : numpy.array
+        the time series.
+    ts : numpy.array
+        the time axis.
+    freq : numpy.array, optional
+        The frequency vector. The default is None, which will prompt the use of one the underlying functions
+    freq_method : string, optional
+        The method by which to obtain the frequency vector. The default is 'log'.
+        Options are 'log' (default), 'nfft', 'lomb_scargle', 'welch', and 'scale'
+    freq_kwargs : dict, optional
+        Optional parameters for the choice of the frequency vector. See make_freq_vector and additional methods for details. The default is {}.
+    scale : numpy.array
+        Optional scale vector in place of a frequency vector. Default is None. If scale is not None, frequency method and attached arguments will be ignored. 
+    detrend : bool, string, {'linear', 'constant', 'savitzy-golay', 'emd'}
+        Whether to detrend and with which option. The default is False.
+    sg_kwargs : dict, optional
+        Additional parameters for the savitzy-golay method. The default is {}.
+    gaussianize : bool, optional
+        Whether to gaussianize. The default is False.
+    standardize : bool, optional
+        Whether to standardize. The default is False.     
+    pad : bool, optional
+        Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
+        This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
+        This will not eliminate all edge effects. The default is False.
+    mother : string, optional
+        the mother wavelet function. The default is 'MORLET'. Options are: 'MORLET', 'PAUL', or 'DOG'
+    param : flaot, optional
+        the mother wavelet parameter. The default is None since it varies for each mother
+            - For 'MORLET' this is k0 (wavenumber), default is 6.
+            - For 'PAUL' this is m (order), default is 4.
+            - For 'DOG' this is m (m-th derivative), default is 2.
+    cwt_res : dict
+        Results from pyleoclim.utils.wavelet.cwt
+
+    Returns
+    -------
+    res : dict
+        Dictionary containing:
+            - psd: the power density function
+            - freq: frequency vector
+            - scale: the scale vector
+            - mother: the mother wavelet
+            - param : the wavelet parameter
+            
+    See also
+    --------
+    
+    pyleoclim.utils.wavelet.make_freq_vector : make the frequency vector with various methods
+    
+    pyleoclim.utils.wavelet.cwt: Torrence and Compo implementation of the continuous wavelet transform 
+    
+    pyleoclim.utils.tsutils.detrend : detrending functionalities in Pyleoclim
+    
+    References
+    ----------
+    
+    Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+    Python routines available at http://paos.colorado.edu/research/wavelets/
+    
+    '''
+    
+    
+        #get the wavelet:
+    if cwt_res is None:
+        cwt_res = cwt(ys,ts,freq=freq, freq_method=freq_method, freq_kwargs=freq_kwargs,
+              scale = scale, detrend=detrend,sg_kwargs=sg_kwargs, gaussianize=gaussianize, 
+              standardize = standardize, pad=pad, mother=mother, param=param) 
+        n= len(ts)
+    else:
+        n=len(cwt_res.time)
+    
+    psd = np.sum(cwt_res.amplitude.T**2,axis=1)/n
+    
+    
+    Results = collections.namedtuple('Results', ['psd', 'freq','scale','mother','param'])
+    res = Results(psd=psd, freq=cwt_res.freq, scale=cwt_res.scale, mother=cwt_res.mother,param=cwt_res.param)
 
     return res
