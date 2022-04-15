@@ -2506,7 +2506,7 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 ############ Methods for Torrence and Compo#############
 
 def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=False,sg_kwargs={},
-        gaussianize=False, pad=False, mother='MORLET',param=None):
+        gaussianize=False, standardize=False, pad=False, mother='MORLET',param=None):
     '''
     Wrapper function to implement Torrence and Compo continuous wavelet transform
 
@@ -2531,6 +2531,8 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
         Additional parameters for the savitzy-golay method. The default is {}.
     gaussianize : bool, optional
         Whether to gaussianize. The default is False.
+    standardize : bool, optional
+        Whether to standardize. The default is False.
     pad : bool, optional
         Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
@@ -2553,6 +2555,8 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
             - coeff: the wavelet coefficients
             - scale: the scale vector
             - time: the time vector
+            - mother: the mother wavelet
+            - param : the wavelet parameter
             
     See also
     --------
@@ -2573,6 +2577,8 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     
     ts = np.array(ts)
     ys = np.array(ys)
+    
+    ys, ts = clean_ts(ys,ts)
 
     if len(ts) != len(ys):
         raise ValueError('Time and value axis should be the same length')
@@ -2585,11 +2591,11 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
         
     #preprocessing
     # remove NaNs
-    ys, ts = clean_ts(ys,ts)
+    
     dt = np.diff(ts).mean()
 
     ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs,
-               gaussianize=gaussianize, standardize=True) #TC seems to require standardization
+               gaussianize=gaussianize, standardize=standardize) #TC seems to require standardization
     
     # fourier factor determination
     if mother.upper() == 'MORLET':
@@ -2863,7 +2869,7 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
     J1 = len(scale) - 1
     dj = np.log2(scale[1] / scale[0])
 
-    variance = np.std(ys) ** 2
+    variance = np.std(ys,ddof=1) ** 2
 
     # get the appropriate parameters [see Table(2)]
     if mother.upper() == 'MORLET':  # ----------------------------------  Morlet
@@ -2910,6 +2916,7 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
         fft_theor = variance * fft_theor  # include time-series variance
 
     signif = fft_theor
+    
     if dof is None:
         dof = dofmin
 
@@ -2921,6 +2928,11 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
             dof = dofmin
             chisquare = chisquare_inv(siglvl, dof) / dof
             signif = fft_theor * chisquare  # [Eqn(18)]
+            
+        #expand
+            #signif = signif[:, np.newaxis].dot(np.ones(len(ys))[np.newaxis, :])
+            
+        
         elif sigtest == 'time-average':  # time-averaged significance
             if len(np.atleast_1d(dof)) == 1:
                 dof = np.zeros(J1) + dof
@@ -2931,6 +2943,7 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
             for a1 in range(0, J1 + 1):
                 chisquare = chisquare_inv(siglvl, dof[a1]) / dof[a1]
                 signif[a1] = fft_theor[a1] * chisquare
+        
         elif sigtest == 'scale-average':  # time-averaged significance
             if len(dof) != 2:
                 raise ValueError('DOF must be set to [S1,S2],'
@@ -2953,10 +2966,9 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
             fft_theor = Savg * np.sum(fft_theor[avg] / scale[avg])  # [Eqn(27)]
             chisquare = chisquare_inv(siglvl, dof) / dof
             signif = (dj * dt / Cdelta / Savg) * fft_theor * chisquare  # [Eqn(26)]
-        #expand
-        sig = signif[:, np.newaxis].dot(np.ones(len(ys))[np.newaxis, :])
-        signif_level.append(np.sqrt(sig.T))
-    
+        
+        signif_level.append(np.sqrt(signif.T))
+        
     return signif_level
 
 def chisquare_inv(P, V):

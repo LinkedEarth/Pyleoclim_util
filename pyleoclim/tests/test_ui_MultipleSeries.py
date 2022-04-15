@@ -420,17 +420,20 @@ class TestMultipleSeriesStackPlot():
 class TestMultipleSeriesSpectral():
     ''' Test for MultipleSeries.spectral
     '''
-    
-    def test_spectral_t0(self):
+    @pytest.mark.parametrize('spec_method',['wwz','cwt'])
+    def test_spectral_t0(self,spec_method):
         '''Test the spectral function with pre-generated scalogram objects
         '''
         
         d=load_data()
         sst = d.to_LipdSeries(number=5)
         d18Osw = d.to_LipdSeries(number=3)
+        if spec_method == 'cwt':
+            sst=sst.interp()
+            d18Osw=d18Osw.interp()
         ms = pyleo.MultipleSeries([sst,d18Osw])
-        scals = ms.wavelet()
-        psds = ms.spectral(method='wwz',scalogram_list=scals)
+        scals = ms.wavelet(method=spec_method)
+        psds = ms.spectral(method=spec_method,scalogram_list=scals)
         
         
         

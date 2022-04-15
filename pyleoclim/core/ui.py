@@ -2023,7 +2023,7 @@ class Series:
 
             ts_interp = ts_std.interp()
             psd_perio = ts_interp.spectral(method='periodogram')
-            psd_perio_signif = psd_perio.signif_test(number=20) #in practice, need more AR1 simulations
+            psd_perio_signif = psd_perio.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_perio.png
             fig, ax = psd_perio_signif.plot(title='PSD using Periodogram method')
             pyleo.closefig(fig)
@@ -2036,7 +2036,7 @@ class Series:
 
             ts_interp = ts_std.interp()
             psd_welch = ts_interp.spectral(method='welch')
-            psd_welch_signif = psd_welch.signif_test(number=20) #in practice, need more AR1 simulations
+            psd_welch_signif = psd_welch.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_welch.png
             fig, ax = psd_welch_signif.plot(title='PSD using Welch method')
             pyleo.closefig(fig)
@@ -2049,9 +2049,22 @@ class Series:
 
             ts_interp = ts_std.interp()
             psd_mtm = ts_interp.spectral(method='mtm')
-            psd_mtm_signif = psd_mtm.signif_test(number=20) #in practice, need more AR1 simulations
+            psd_mtm_signif = psd_mtm.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_mtm.png
             fig, ax = psd_mtm_signif.plot(title='PSD using MTM method')
+            pyleo.closefig(fig)
+        
+        - Continuous Wavelet Transform
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            ts_interp = ts_std.interp()
+            psd_cwt = ts_interp.spectral(method='cwt')
+            psd_cwt_signif = psd_cwt.signif_test() 
+            @savefig spec_cwt.png
+            fig, ax = psd_cwt_signif.plot(title='PSD using CWT method')
             pyleo.closefig(fig)
 
         '''
@@ -2200,6 +2213,8 @@ class Series:
             @savefig spec_mtm.png
             fig, ax = scal_signif.plot()
             pyleo.closefig(fig)
+        
+        See the Series.spectral() functionality as an example to change the wavelet method. 
 
         '''
         if not verbose:
@@ -2885,7 +2900,7 @@ class PSD:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.frequency)}'
 
-    def signif_test(self, number=None, method='ar1', seed=None, qs=[0.95],
+    def signif_test(self, method=None, number=None, seed=None, qs=[0.95],
                     settings=None, scalogram = None):
         '''
 
@@ -2894,14 +2909,14 @@ class PSD:
         ----------
         number : int, optional
             Number of surrogate series to generate for significance testing. The default is None.
-        method : {ar1}, optional
-            Method to generate surrogates. The default is 'ar1'.
+        method : {ar1asym,'ar1sim'}, optional
+            Method to generate surrogates. The default is None, which will result in the use of simulations if method is `wwz` or `Lomb-Sacrgle` and the asymptotic solution for other methods. The asymptotic solution is currently not available for methods aimed at unevenly-spaced timeseries.  
         seed : int, optional
             Option to set the seed for reproducibility. The default is None.
         qs : list, optional
             Singificance levels to return. The default is [0.95].
         settings : dict, optional
-            Parameters. The default is None.
+            Parameters for the specific significance test. The default is None. Note that the default value for the asymptotic solution is `time-average`
         scalogram : Pyleoclim Scalogram object, optional
             Scalogram containing signif_scals exported during significance testing of scalogram.
             If number is None and signif_scals are present, will use length of scalogram list as number of significance tests
@@ -2937,38 +2952,102 @@ class PSD:
             pyleo.showfig(fig)
 
             pyleo.closefig(fig)
+            
+        See also
+        --------
+
+        pyleoclim.utils.wavelet.tc_wave_signif : asymptotic significance calculation
 
         '''
-
-        signif_scals = None
-        if scalogram:
-            try:
-                signif_scals = scalogram.signif_scals
-            except:
-                return ValueError('Could not find signif_scals in passed object, make sure this is a scalogram with signif_scals that were saved during significance testing')
-
-
-        if number is None and signif_scals:
-            number = len(signif_scals.scalogram_list)
-        elif number is None and signif_scals is None:
-            number = 200
-        elif number == 0:
-            return self
-
-        new = self.copy()
-        surr = self.timeseries.surrogates(
-            number=number, seed=seed, method=method, settings=settings
-        )
-
-        if signif_scals:
-            surr_psd = surr.spectral(
-                method=self.spec_method, settings=self.spec_args, scalogram_list=signif_scals
-            )
+        
+        if self.spec_method == 'wwz' and method == 'ar1asym':
+            raise ValueError('Asymptotic solution is not supported for the wwz method')
+        
+        if self.spec_method == 'lomb_scargle' and method == 'ar1asym':
+            raise ValueError('Asymptotic solution is not supported for the Lomb-Scargle method')
+        
+        if method is None:
+            if self.spec_method == 'wwz' or self.spec_method == 'lomb_scargle':
+                method = 'ar1sim'
+            else:
+                method = 'ar1asym'
         else:
-            surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
-        new.signif_qs = surr_psd.quantiles(qs=qs)
-        new.signif_method = method
-
+            if method not in ['ar1sim', 'ar1asym']:
+                raise ValueError("The available methods are ar1sim'and 'ar1asym'")
+        
+        if method == 'ar1sim': 
+            signif_scals = None
+            if scalogram:
+                try:
+                    signif_scals = scalogram.signif_scals
+                except:
+                    return ValueError('Could not find signif_scals in passed object, make sure this is a scalogram with signif_scals that were saved during significance testing')
+    
+    
+            if number is None and signif_scals:
+                number = len(signif_scals.scalogram_list)
+            elif number is None and signif_scals is None:
+                number = 200
+            elif number == 0:
+                return self
+    
+            new = self.copy()
+            surr = self.timeseries.surrogates(
+                number=number, seed=seed, method=method, settings=settings
+            )
+    
+            if signif_scals:
+                surr_psd = surr.spectral(
+                    method=self.spec_method, settings=self.spec_args, scalogram_list=signif_scals
+                )
+            else:
+                surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
+            new.signif_qs = surr_psd.quantiles(qs=qs)
+            new.signif_method = method
+        
+        elif method == 'ar1asym':
+            new=self.copy()
+            
+            if type(qs) is not list:
+                raise TypeError('qs should be a list')
+            
+            settings = {'sigtest':'time-average'} if settings is None else settings.copy()
+                        
+            if self.spec_method=='cwt':
+                if 'dof' not in settings.keys():
+                    dof = len(self.timeseries.value) - self.spec_args['scale']
+                    settings.update({'dof':dof})
+                signif_levels=waveutils.tc_wave_signif(self.timeseries.value,
+                                                       self.timeseries.time,
+                                                       self.spec_args['scale'],
+                                                       self.spec_args['mother'],
+                                                       self.spec_args['param'],
+                                                       qs=qs, **settings)
+            else:
+                # hard code Mortlet values to obtain the spectrum
+                param = 6
+                fourier_factor = 4 * np.pi / (param + np.sqrt(2 + param**2))
+                scale = 1/(fourier_factor*self.frequency)
+                if 'dof' not in settings.keys():
+                    dof = len(self.timeseries.value) - scale
+                    settings.update({'dof':dof})
+                signif_levels=waveutils.tc_wave_signif(self.timeseries.value,
+                                                       self.timeseries.time,
+                                                       scale,
+                                                       'MORLET',
+                                                       param,
+                                                       qs=qs, **settings)
+        
+            # get it back into the object
+            new.signif_method = method
+                
+            ms_base = []
+            for idx, item in enumerate(signif_levels):
+                label = str(int(qs[idx]*100))+'%'
+                s = PSD(frequency=self.frequency, amplitude = item, label=label)
+                ms_base.append(s)
+                new.signif_qs = MultiplePSD(ms_base)
+        
         return new
 
     def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
@@ -3207,7 +3286,8 @@ class PSD:
         # plot significance levels
         if self.signif_qs is not None:
             signif_method_label = {
-                'ar1': 'AR(1)',
+                'ar1sim': 'AR(1) simulations',
+                'ar1asym': 'AR(1) asymptotic solution'
             }
             nqs = np.size(self.signif_qs.psd_list)
 
@@ -3656,8 +3736,10 @@ class Scalogram:
             ms_base =[]
             for idx, item in enumerate(signif_levels):
                 label = str(int(qs[idx]*100))+'%'
+                # expand
+                signif = item[:, np.newaxis].dot(np.ones(len(self.timeseries.value))[np.newaxis, :])
                 s = Scalogram(frequency=self.frequency, time =self.time,
-                              amplitude = item, label=label)
+                              amplitude = signif.T, label=label)
                 ms_base.append(s)
             
             new.signif_qs = MultipleScalogram(ms_base)
