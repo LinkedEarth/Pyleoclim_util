@@ -2900,7 +2900,7 @@ class PSD:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.frequency)}'
 
-    def signif_test(self, method=None, number=None, seed=None, qs=[0.95],
+    def signif_test(self, method='ar1sim', number=None, seed=None, qs=[0.95],
                     settings=None, scalogram = None):
         '''
 
@@ -2909,8 +2909,8 @@ class PSD:
         ----------
         number : int, optional
             Number of surrogate series to generate for significance testing. The default is None.
-        method : {ar1asym,'ar1sim'}, optional
-            Method to generate surrogates. The default is None, which will result in the use of simulations if method is `wwz` or `Lomb-Sacrgle` and the asymptotic solution for other methods. The asymptotic solution is currently not available for methods aimed at unevenly-spaced timeseries.
+        method : {ar1asym,'ar1sim'}
+            Method to generate surrogates. AR1sim uses simulated timeseries with similar persistence. AR1asymp represents the closed form solution. The default is AR1sim
         seed : int, optional
             Option to set the seed for reproducibility. The default is None.
         qs : list, optional
@@ -2966,13 +2966,7 @@ class PSD:
         if self.spec_method == 'lomb_scargle' and method == 'ar1asym':
             raise ValueError('Asymptotic solution is not supported for the Lomb-Scargle method')
 
-        if method is None:
-            if self.spec_method == 'wwz' or self.spec_method == 'lomb_scargle':
-                method = 'ar1sim'
-            else:
-                method = 'ar1asym'
-        else:
-            if method not in ['ar1sim', 'ar1asym']:
+        if method not in ['ar1sim', 'ar1asym']:
                 raise ValueError("The available methods are ar1sim'and 'ar1asym'")
 
         if method == 'ar1sim':
@@ -3601,15 +3595,14 @@ class Scalogram:
         else:
             return ax
 
-    def signif_test(self, method=None, number=None, seed=None, qs=[0.95],
+    def signif_test(self, method='ar1sim', number=None, seed=None, qs=[0.95],
                     settings=None, export_scal = False):
         '''Significance test for wavelet analysis
 
         Parameters
         ----------
-        method : {'ar1asym', 'ar1sim'}, optional
-            Method to use to generate the surrogates. The default is None, which will result in the use of simulations if method is `wwz` and the asymptotic solution if method is `cwt`. The asymptotic solution is currently not available for `wwz`.
-        number : int, optional
+        method : {'ar1asym', 'ar1sim'}
+            Method to use to generate the surrogates.  AR1sim uses simulated timeseries with similar persistence. AR1asymp represents the closed form solution.The default is AR1sim
             Number of surrogates to generate for significance analysis based on simulations. The default is 200.
         seed : int, optional
             Set the seed for the random number generator. Useful for reproducibility The default is None.
@@ -3659,13 +3652,7 @@ class Scalogram:
         if self.wave_method == 'wwz' and method == 'ar1asym':
             raise ValueError('Asymptotic solution is not supported for the wwz method')
 
-        if method is None:
-            if self.wave_method == 'wwz':
-                method = 'ar1sim'
-            elif self.wave_method == 'cwt':
-                method = 'ar1asym'
-        else:
-            if method not in ['ar1sim', 'ar1asym']:
+        if method not in ['ar1sim', 'ar1asym']:
                 raise ValueError("The available methods are ar1sim'and 'ar1asym'")
 
         if method == 'ar1sim':
