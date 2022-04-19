@@ -27,4 +27,4 @@ dependencies:
     - nbsphinx
     - IPython
     - readthedocs-sphinx-search>=0.1.0
-    - pyleoclim==0.7.2
+    - git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
