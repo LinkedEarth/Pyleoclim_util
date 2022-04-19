@@ -47,12 +47,23 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
 class TestUiScalogramSignifTest:
     ''' Tests for Scalogram.signif_test()
     '''
-
-    def test_signif_test_t0(self):
+    
+    @pytest.mark.parametrize('wave_method',['wwz','cwt'])
+    def test_signif_test_t0(self, wave_method):
         ''' Test scalogram.signif_test() with default parameters
         '''
         alpha = 1
         t, v = gen_colored_noise(nt=100, alpha=alpha)
         ts = pyleo.Series(time=t, value=v)
-        scal = ts.wavelet()
+        scal = ts.wavelet(method=wave_method)
         scal_signif = scal.signif_test(number=1)
+    
+    @pytest.mark.parametrize('ar1_method',['ar1asym', 'ar1sim'])
+    def test_signif_test_t1(self,ar1_method):
+        ''' Test scalogram.signif_test() with default parameters
+        '''
+        alpha = 1
+        t, v = gen_colored_noise(nt=100, alpha=alpha)
+        ts = pyleo.Series(time=t, value=v)
+        scal = ts.wavelet(method='cwt')
+        scal_signif = scal.signif_test(method=ar1_method,number=1)

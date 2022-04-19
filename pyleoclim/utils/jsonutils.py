@@ -8,11 +8,14 @@ Created on Mon Oct 19 14:09:03 2020
 Utilities to import/export Pyleoclim objects from JSON files
 """
 
-__all__ =['PyleoObj_to_json', 'json_to_Series','json_to_PSD','json_to_Scalogram']
+__all__ =['PyleoObj_to_json', 'json_to_Series', 'json_to_LipdSeries',
+          'json_to_PSD','json_to_Scalogram', 'json_to_Coherence', 'json_to_MultiplePSD']
 
 import numpy as np
 import json
 import pyleoclim as pyleo
+from urllib.request import urlopen
+import re
 
 def transform(obj_dict):
     '''
@@ -32,7 +35,7 @@ def transform(obj_dict):
     for k in obj_dict.keys():
         if isinstance(obj_dict[k],(np.ndarray)):
             obj_dict[k] = obj_dict[k].tolist()
-        elif isinstance(obj_dict[k],(pyleo.core.ui.Series,pyleo.core.ui.Scalogram)):
+        elif isinstance(obj_dict[k],(pyleo.core.ui.Series,pyleo.core.ui.Scalogram,pyleo.core.ui.PSD)):
             obj_dict[k]=PyleoObj_to_json(obj_dict[k],dict_return=True)
         elif isinstance(obj_dict[k],pyleo.core.ui.MultiplePSD):
             obj_dict[k]=PyleoObj_to_json(obj_dict[k],dict_return=True)
@@ -52,6 +55,11 @@ def transform(obj_dict):
             obj_dict[k]['scalogram_list']=c            
         elif isinstance(obj_dict[k],(dict)):
             obj_dict[k]=transform(obj_dict[k])
+        elif isinstance(obj_dict[k],(list)):
+             new_list = []
+             for item in obj_dict[k]:
+                 new_list.append(PyleoObj_to_json(item,dict_return=True))
+             obj_dict[k] = new_list
     return obj_dict
 
 def list_to_array(obj_dict):
@@ -77,6 +85,8 @@ def list_to_array(obj_dict):
         else:
             obj_dict[k]=obj_dict[k]
     return obj_dict
+
+ 
 
 def PyleoObj_to_json(PyleoObj,filename=None,dict_return=False):
     '''
@@ -116,16 +126,29 @@ def open_json(filename):
     Parameters
     ----------
     filename : str
-        Path to the json file
+        Path to the json file or URL
 
     Returns
     -------
     t : dict
-        A Python diciotanary from the json
+        A Python dictionary from the json
 
     '''
-    with open(filename,'r') as f:
-        t=json.load(f)
+    
+    regex = re.compile(
+        r'^(?:http|ftp)s?://' # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+        r'localhost|' #localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+        r'(?::\d+)?' # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    
+    if (re.match(regex, filename) is not None)==True:
+        response = urlopen(filename)
+        t = json.loads(response.read())
+    else:    
+        with open(filename,'r') as f:
+            t=json.load(f)
     return t
 
 def json_to_Series(filename):
@@ -135,7 +158,7 @@ def json_to_Series(filename):
     Parameters
     ----------
     filename : str
-        The name of the JSON file containing the Series information. 
+        The name of the JSON file/URL containing the Series information. 
 
     Returns
     -------
@@ -163,7 +186,7 @@ def json_to_LipdSeries(filename):
     Parameters
     ----------
     filename : str
-        The name of the JSON file containing the Series information
+        The name of the JSON file/URL containing the Series information
 
     Returns
     -------
@@ -171,6 +194,7 @@ def json_to_LipdSeries(filename):
         A pyleoclim.Series object
 
     '''
+        
     t = open_json(filename)
     ts = pyleo.LipdSeries(tso=t['lipd_ts'],clean_ts=t['clean_ts'],verbose=t['verbose']) 
     return ts
@@ -229,7 +253,7 @@ def json_to_PSD(filename):
     Parameters
     ----------
     filename : str
-        Name of the json file containing the necessary information
+        Name of the json file/URL containing the necessary information
 
     Returns
     -------
@@ -237,8 +261,7 @@ def json_to_PSD(filename):
         a pyleoclim PSD object
 
     '''
-    with  open(filename,'r') as f:
-        t = json.load(f)
+    t = open_json(filename)
     t = list_to_array(t)
     
     #Deal with significance testing 
@@ -312,7 +335,7 @@ def Scalogram_to_MultipleScalogram(series_list):
                                freq_kwargs=t['freq_kwargs'],
                                period_unit=t['period_unit'],
                                time_label=t['time_label'],
-                               wwz_Neffs=t['wwz_Neffs'],
+                               wwz_Neffs=np.array(t['wwz_Neffs']),
                                signif_scals=t['signif_scals'])
 
         d.append(scalogram_obj)
@@ -320,9 +343,21 @@ def Scalogram_to_MultipleScalogram(series_list):
     return mscalogram
 
 def json_to_Scalogram(filename):
-    with open(filename,'r') as f:
-        t = json.load(f)
-    t = list_to_array(t)
+    '''
+    Transform a Scalogram object stored in JSON format back to a Pyleoclim object
+
+    Parameters
+    ----------
+    filename : str
+        Path of the JSON file/URL
+
+    Returns
+    -------
+    scalogram : pyleoclim.Scalogram
+        A Pyleoclim Scalogram object.
+
+    '''
+    t = open_json(filename)
     temp = t['timeseries']
     ts = pyleo.Series(time=np.array(temp['time']),
                      value=np.array(temp['value']),
@@ -356,7 +391,7 @@ def json_to_Scalogram(filename):
                                freq_kwargs=t['freq_kwargs'],
                                period_unit=t['period_unit'],
                                time_label=t['time_label'],
-                               wwz_Neffs=t['wwz_Neffs'],
+                               wwz_Neffs=np.array(t['wwz_Neffs']),
                                signif_scals=d)
     
     return scalogram
@@ -369,7 +404,7 @@ def json_to_Coherence(filename):
     Parameters
     ----------
     filename : str
-        json file to unpack.
+        Path/URL to json file to unpack.
 
     Returns
     -------
@@ -377,8 +412,7 @@ def json_to_Coherence(filename):
         A coherence object
 
     '''
-    with open(filename,'r') as f:
-        t = json.load(f)
+    t = open_json(filename)
     t = list_to_array(t)
     temp1 = t['timeseries1']
     ts1 = pyleo.Series(time=np.array(temp1['time']),
@@ -419,3 +453,57 @@ def json_to_Coherence(filename):
                                signif_qs = c,
                                signif_method=t['signif_method'])
     return coherence
+
+def json_to_MultiplePSD(filename):
+    '''
+    Transform a MultiplePSD object stored in JSON format back to a Pyleoclim object
+
+    Parameters
+    ----------
+    filename : str
+        Filename or URL for the JSON file
+
+    Returns
+    -------
+    mpsd : pyleoclim.MultiplePSD
+        The MultiplePSD object
+
+    '''
+    
+    t = open_json(filename)
+    psd_list = []
+    for item in t['psd_list']:
+        item=list_to_array(item)
+        if type(item['signif_qs']) is dict:
+            c = PSD_to_MultiplePSD(item['signif_qs']['psd_list'])
+        else:
+            c = item['signif_qs']
+        psd = pyleo.PSD(frequency=np.array(item['frequency']),
+                        amplitude=np.array(item['amplitude']),
+                        label=item['label'],
+                        timeseries = pyleo.Series(time=np.array(item['timeseries']['time']),
+                                                 value=np.array(item['timeseries']['value']),
+                                                 time_name=item['timeseries']['time_name'],
+                                                 time_unit=item['timeseries']['time_unit'],
+                                                 value_name=item['timeseries']['value_name'],
+                                                 value_unit=item['timeseries']['value_unit'],
+                                                 label=item['timeseries']['label'],
+                                                 clean_ts=item['timeseries']['clean_ts'], 
+                                                 verbose=item['timeseries']['verbose']),
+                        spec_method = item['spec_method'],
+                        spec_args =  item['spec_args'],
+                        signif_qs = c,
+                        signif_method = item['signif_method'],
+                        plot_kwargs=item['plot_kwargs'],
+                        period_unit=item['period_unit'],
+                        beta_est_res=item['beta_est_res'])
+        psd_list.append(psd)
+    
+    if t['beta_est_res']==None:
+        pass
+    else:
+        t['beta_est_res']=np.array(t['beta_est_res'])
+    
+    mpsd=pyleo.MultiplePSD(psd_list=psd_list,beta_est_res=t['beta_est_res'])
+    
+    return mpsd

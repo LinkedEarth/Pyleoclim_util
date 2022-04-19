@@ -103,3 +103,13 @@ To do that, a Fortran compiler (e.g. :code:`gfortran` or :code:`ifort`) is requi
   print(pyleo)
 
 Again, unless you are planning to make heavy use of the WWZ functionality, we recommend using the default installation.
+
+Docker Container
+""""""""""""""""
+Docker containers with various versions of Pyleoclim are available at: `https://quay.io/repository/2i2c/paleohack-2021?tab=tags <https://quay.io/repository/2i2c/paleohack-2021?tab=tags>`_.
+
+To pull an image:
+
+.. code-block:: bash
+
+  docker pull quay.io/2i2c/paleohack-2021:latest
