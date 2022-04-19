@@ -316,13 +316,13 @@ class TestMultipleSeriesPca:
         assert abs(res.pctvar.sum() - 100)<0.001 
         
  
-class TestMultipleSeriesGridProperties:
-    '''Test for MultipleSeries.grid_properties()
+class TestMultipleSeriesIncrements:
+    '''Test for MultipleSeries.increments()
     
     '''
     @pytest.mark.parametrize('step_style', ['min', 'max', 'mean', 'median'])
-    def test_grid_properties(self, step_style):
-        p = 10; n = 100
+    def test_increments(self, step_style):
+        p = 2; n = 100
         signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
@@ -332,7 +332,7 @@ class TestMultipleSeriesGridProperties:
             mslist.append(pyleo.Series(time = t, value = X[:,i]))
         ms = pyleo.MultipleSeries(mslist)
         
-        gp = ms.grid_properties(step_style=step_style)
+        gp = ms.increments(step_style=step_style)
         
         assert (gp[0,:] == np.array((t.min(), t.max(), 1.))).all()
                

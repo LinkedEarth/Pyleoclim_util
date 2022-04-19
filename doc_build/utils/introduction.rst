@@ -168,19 +168,17 @@ This modules contain pre-processing functions for time series analysis.
    * - :ref:`bin <utils_bin>`
      - Bin the values into evenly-spaced bins
    * - :ref:`gkernel <utils_gkernel>`
-     - Coarsen time resolution using a Gaussian Kernel
-   * - :ref:`grid_properties <utils_grid_properties>`
-     - Establishes the grid properties of a numerical array
+     - Coarsens time resolution using a Gaussian Kernel
+   * - :ref:`increments <utils_increments>`
+     - Assesses the increments of a numerical array
    * - :ref:`interp <utils_interp>`
      - Interpolation function based on `scipy.interpolate.interp1d <https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html>_`
-   * - :ref:`on_common_axis <utils_on_common_axis>`
-     - Places two timeseries on a common time axis
    * - :ref:`standardize <utils_standardize>`
      - Standardizes a timeseries
    * - :ref:`ts2segments <utils_ts2segments>`
      - Chop a timeseries into several segments based on gap detection
    * - :ref:`annualize <utils_annualize>`
-     - Annualize a time series whose time resolution is finer than 1 year
+     - Annualizes a time series whose time resolution is finer than 1 year
    * - :ref:`gaussianize <utils_gaussianize>`
      - Maps a (proxy) timeseries to a Gaussian distribution
    * - :ref:`gaussianize_single <utils_gaussianize_single>`
@@ -188,9 +186,9 @@ This modules contain pre-processing functions for time series analysis.
    * - :ref:`detrend <utils_detrend>`
      - Applies linear, constant, low-pass filter, or decomposition-based detrending
    * - :ref:`detect_outliers <utils_detect_outliers>`
-     - Detect outliers in a timeseries
+     - Detects outliers in a timeseries
    * - :ref:`remove_outliers <utils_remove_outliers>`
-     - Remove outliers in a timeseries
+     - Removes outliers in a timeseries
 
 
 Tsbase
