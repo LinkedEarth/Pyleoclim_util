@@ -56,10 +56,11 @@ def transform(obj_dict):
         elif isinstance(obj_dict[k],(dict)):
             obj_dict[k]=transform(obj_dict[k])
         elif isinstance(obj_dict[k],(list)):
-             new_list = []
-             for item in obj_dict[k]:
-                 new_list.append(PyleoObj_to_json(item,dict_return=True))
-             obj_dict[k] = new_list
+            if type(obj_dict[k][0]) not in [float,int,str,list,dict]:
+                 new_list = []
+                 for item in obj_dict[k]:
+                     new_list.append(PyleoObj_to_json(item,dict_return=True))
+                 obj_dict[k] = new_list
     return obj_dict
 
 def list_to_array(obj_dict):
