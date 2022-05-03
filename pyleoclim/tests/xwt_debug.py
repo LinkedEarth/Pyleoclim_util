@@ -28,3 +28,9 @@ tau = np.linspace(np.min(ts_nino.time), np.max(ts_nino.time), ntau)
 coh = ts_air.wavelet_coherence(ts_nino,settings={'tau':tau})
 fig, ax = coh.plot()
 #settings = {'ntau':50,'tau':tau}
+
+
+import pyleoclim as pyleo
+
+ts = pyleo.gen_ts(model='colored_noise',nt=100)
+scal = ts.wavelet(method='cwt') 

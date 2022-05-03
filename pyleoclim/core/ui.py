@@ -2196,33 +2196,31 @@ class Series:
         wave_func = {'wwz': waveutils.wwz,
                      'cwt': waveutils.cwt
                      }
-
-        if method == 'cwt' and 'freq' in settings.keys():
-            scales=1/np.array(settings['freq'])
-            settings.update({'scales':scales})
-            del settings['freq']
-
-        
         # Process options
         settings = {} if settings is None else settings.copy()
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
         args = {}
-
-        # if ntau is None:
-        #     ntau = np.min([np.size(self.time), 50])
-
+        
         args['wwz'] = {'freq': freq}
-        args['cwt'] = {'wavelet' : 'morl', 'scales':1/freq}
+        args['cwt'] = {'freq': freq}
+        
+        # if method == 'cwt' and 'freq' in settings.keys():
+        #     scales=1/np.array(settings['freq'])
+        #     settings.update({'scales':scales})
+        #     del settings['freq'] # remove to avoid conflicts
 
-        # tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
-        #args['wwz'] = {'tau': tau, 'freq': freq}
-
-        args['wwz'] = {'freq':freq}
-        args['cwt'] = {'freq':freq}
+        if method == 'wwz':
+            if 'ntau' in settings.keys():
+                ntau = settings['ntau']
+            else:
+                ntau = np.min([np.size(self.time), 50])  
+                
+            tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
+            settings.update({'tau': tau})
+          
 
         args[method].update(settings)
-
 
         # Apply wavelet method
         wave_res = wave_func[method](self.value, self.time, **args[method])
@@ -2230,8 +2228,9 @@ class Series:
         # Export result
         if method == 'wwz':
             wwz_Neffs = wave_res.Neffs
-        else:
+        elif method=='cwt':
             wwz_Neffs = None
+            args[method].update({'scale':wave_res.scale,'mother':wave_res.mother,'param':wave_res.param})
 
         scal = Scalogram(
             frequency=wave_res.freq,

@@ -12,7 +12,6 @@ Functions concerning wavelet analysis
 __all__ = [
     'cwt',
     'wwz',
-    'xwc',
     'xwt',
     'wtc',
 ]
@@ -27,7 +26,6 @@ import warnings
 import collections
 import scipy.fftpack as fft
 from scipy import optimize
-from scipy.optimize import fminbound
 from scipy.special._ufuncs import gamma, gammainc
 
 #from .tsmodel import ar1_sim
