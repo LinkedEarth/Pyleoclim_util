@@ -34,16 +34,21 @@ fig, ax = coh.plot()
 
 
 import pyleoclim as pyleo
+import pandas as pd
+data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+time = data.iloc[:,1]
+value = data.iloc[:,2]
+ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+
+scal1 = ts.wavelet(method='cwt') 
+scal_signif = scal1.signif_test(number=200)  # for research-grade work, use number=200 or even larger
+scal_signif.plot(title='CWT scalogram')
+#@savefig scal_cwt.png
 
 
-ts = pyleo.gen_ts(model='colored_noise',nt=200)
-fig , ax = plt.subplots(3,1,sharex=True) 
-ax = ax.flatten()
-ts.plot(ax=ax[0])
-scal2 = ts.wavelet(method='cwt') 
-scal2.plot(ax=ax[1],title='CWT scalogram')
-scal1 = ts.wavelet(method='wwz') 
-scal1.plot(ax=ax[2],title='WWZ scalogram')
+# if you wanted to invoke the WWZ instead 
+scal2 = ts.wavelet(method='wwz')  
+scal2.plot(title='WWZ scalogram')
 
+# notice that the two scalograms have different units, which are arbitrary
 
-np.abs(scal2.amplitude-scal1.amplitude).max()

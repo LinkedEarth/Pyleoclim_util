@@ -2109,14 +2109,10 @@ class Series:
     def wavelet(self, method=None, settings=None, freq_method='log', freq_kwargs=None, verbose=False):
         ''' Perform wavelet analysis on the timeseries
 
-        cwt wavelets documented on https://pywavelets.readthedocs.io/en/latest/ref/cwt.html
-
         Parameters
         ----------
 
-        method : {wwz, cwt}
-            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt
-
+        method : str {wwz, cwt}
             Default is None, so the method is assigned based on whether the series
             are evenly-spaced (cwt, Torrence and Compo [1998]) or unevenly-spaced
             (wwz, Foster [1996]).
@@ -2125,7 +2121,7 @@ class Series:
             {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
 
         freq_kwargs : dict
-            Arguments for frequency vector
+            Arguments for the frequency vector
 
         settings : dict
             Arguments for the specific spectral method
@@ -2136,7 +2132,7 @@ class Series:
         Returns
         -------
 
-        scal : Series.Scalogram
+        scal : Scalogram object
 
         See also
         --------
@@ -2156,10 +2152,13 @@ class Series:
         References
         ----------
 
-        Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+        [1] Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. 
+            Bull. Amer. Meteor. Soc., 79, 61-78.
         Python routines available at http://paos.colorado.edu/research/wavelets/
 
-        Foster, G. Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal 112, 1709 (1996).
+        [2] Foster, G. Wavelets for period analysis of unevenly sampled time series. 
+            The Astronomical Journal 112, 1709 (1996).
+            
         Examples
         --------
 
@@ -2175,12 +2174,18 @@ class Series:
             time = data.iloc[:,1]
             value = data.iloc[:,2]
             ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
-            # WWZ
-            scal = ts.wavelet()
-            scal_signif = scal.signif_test(number=1)  # for research-grade work, use number=200 or even larger
-            @savefig spec_mtm.png
-            fig, ax = scal_signif.plot()
-            pyleo.closefig(fig)
+
+            scal1 = ts.wavelet() # method='cwt' will be applied since the series is evenly spaced
+            scal_signif = scal1.signif_test(number=200)  # for research-grade work, use number=200 or larger
+            scal_signif.plot(title='CWT scalogram')
+            @savefig scal_cwt.png
+
+            # if you wanted to invoke the WWZ instead 
+            scal2 = ts.wavelet(method='wwz') # no significance testing to lower computational cost 
+            scal2.plot(title='WWZ scalogram')
+            @savefig scal_wwz.png
+
+            # notice that the two scalograms have different units, which are arbitrary
 
         '''
         if not verbose:
@@ -2201,16 +2206,10 @@ class Series:
         settings = {} if settings is None else settings.copy()
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
-        args = {}
-        
+        args = {}   
         args['wwz'] = {'freq': freq}
         args['cwt'] = {'freq': freq}
         
-        # if method == 'cwt' and 'freq' in settings.keys():
-        #     scales=1/np.array(settings['freq'])
-        #     settings.update({'scales':scales})
-        #     del settings['freq'] # remove to avoid conflicts
-
         if method == 'wwz':
             if 'ntau' in settings.keys():
                 ntau = settings['ntau']
@@ -3705,16 +3704,16 @@ class Scalogram:
                 number -= len(scalogram_list)
                 surr_scal_tmp = []
                 surr_scal_tmp.extend(scalogram_list)
-                surr = self.timeseries.surrogates(
-            number=number, seed=seed, method=method, settings=settings
-        )
-                surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, settings=self.wave_args,).scalogram_list)
+                surr = self.timeseries.surrogates(number=number, 
+                                                  seed=seed, method=method, 
+                                                  settings=settings)
+                surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, 
+                                                  settings=self.wave_args,).scalogram_list)
                 surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
         else:
-            surr = self.timeseries.surrogates(
-            number=number, seed=seed, method=method, settings=settings
-        )
-            surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args,)
+            surr = self.timeseries.surrogates(number=number, seed=seed,
+                                              method=method, settings=settings)
+            surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args)
 
         if len(qs) > 1:
             raise ValueError('qs should be a list with size 1!')
@@ -5111,7 +5110,7 @@ class MultipleSeries:
 
         scal_list = []
         for s in tqdm(self.series_list, desc='Performing wavelet analysis on individual series', position=0, leave=True, disable=mute_pbar):
-            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose, ntau=ntau)
+            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose)
             scal_list.append(scal_tmp)
 
         scals = MultipleScalogram(scalogram_list=scal_list)
