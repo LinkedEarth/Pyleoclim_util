@@ -322,8 +322,8 @@ class Series:
         if clean_ts==True:
             value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
 
-        self.time = time
-        self.value = value
+        self.time = np.array(time)
+        self.value = np.array(value)
         self.time_name = time_name
         self.time_unit = time_unit
         self.value_name = value_name
@@ -2873,12 +2873,17 @@ class PSD:
         self.label = label
         self.timeseries = timeseries
         self.spec_method = spec_method
+        if spec_args is not None:
+            if 'freq' in spec_args.keys():
+                spec_args['freq'] = np.array(spec_args['freq'])
         self.spec_args = spec_args
         self.signif_qs = signif_qs
         self.signif_method = signif_method
         self.plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
-        self.beta_est_res = beta_est_res
-
+        if beta_est_res is None:
+            self.beta_est_res = beta_est_res
+        else: 
+            self.beta_est_res = np.array(beta_est_res)
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
@@ -3408,6 +3413,11 @@ class Scalogram:
         self.label = label
         self.timeseries = timeseries
         self.wave_method = wave_method
+        if wave_args is not None:
+            if 'freq' in wave_args.keys():
+                wave_args['freq'] = np.array(wave_args['freq'])
+            if 'tau' in wave_args.keys():
+                wave_args['tau'] = np.array(wave_args['tau'])
         self.wave_args = wave_args
         self.signif_qs = signif_qs
         self.signif_method = signif_method
@@ -3415,7 +3425,10 @@ class Scalogram:
         self.freq_kwargs = freq_kwargs
         self.signif_scals = signif_scals
         #if wave_method == 'wwz':
-        self.wwz_Neffs = wwz_Neffs
+        if wwz_Neffs is None:
+            self.wwz_Neffs = wwz_Neffs
+        else:
+            self.wwz_Neffs=np.array(wwz_Neffs)
 
         if period_unit is not None:
             self.period_unit = period_unit
@@ -6258,7 +6271,10 @@ class MultiplePSD:
     '''
     def __init__(self, psd_list, beta_est_res=None):
         self.psd_list = psd_list
-        self.beta_est_res = beta_est_res
+        if beta_est_res is None:
+            self.beta_est_res = beta_est_res
+        else:
+            self.beta_est_res = np.array(beta_est_res)
 
     def copy(self):
         '''Copy object
