@@ -793,7 +793,7 @@ class TestUISeriesWavelet():
         ''' Test Series.wavelet() with available methods using default arguments
         '''
         ts = pyleo.gen_ts(model='colored_noise',nt=100)
-        scal = ts.wavelet(method=wave_method)
+        _ = ts.wavelet(method=wave_method)
 
     @pytest.mark.parametrize('wave_method',['wwz','cwt'])
     def test_wave_t1(self,wave_method):
@@ -802,7 +802,14 @@ class TestUISeriesWavelet():
         n = 200
         ts = pyleo.gen_ts(model='colored_noise',nt=n)
         freq = np.linspace(1/n, 1/2, 20)
-        scal = ts.wavelet(method=wave_method, settings={'freq': freq})
+        _ = ts.wavelet(method=wave_method, settings={'freq': freq})
+        
+    def test_wave_t2(self):
+       ''' Test Series.wavelet() with available methods using default arguments
+       '''
+       ts = pyleo.gen_ts(model='colored_noise',nt=200)
+       _ = ts.wavelet(method='wwz',settings={'ntau':10})
+ 
 
 
 class TestUISeriesSsa():
