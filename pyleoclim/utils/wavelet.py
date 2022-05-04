@@ -2438,10 +2438,10 @@ def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
 #  This is the main function, which has been rewritten to work with functionalities in Pyleoclim
 
 def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=False,sg_kwargs={},
-        gaussianize=False, pad=False, mother='MORLET',param=None):
+        gaussianize=False, standardize=False, pad=False, mother='MORLET',param=None):
     '''
-    Wrapper function to implement Torrence and Compo continuous wavelet transform (cwt)
-    
+    Wrapper function to implement Torrence and Compo continuous wavelet transform
+
     Parameters
     ----------
     ys : numpy.array
@@ -2463,6 +2463,8 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
         Additional parameters for the savitzy-golay method. The default is {}.
     gaussianize : bool, optional
         Whether to gaussianize. The default is False.
+    standardize : bool, optional
+        Whether to standardize. The default is False.
     pad : bool, optional
         Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
@@ -2474,6 +2476,7 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
             - For 'MORLET' this is k0 (wavenumber), default is 6.
             - For 'PAUL' this is m (order), default is 4.
             - For 'DOG' this is m (m-th derivative), default is 2.
+
     Returns
     -------
     res : dict
@@ -2484,6 +2487,8 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
             - coeff: the wavelet coefficients
             - scale: the scale vector
             - time: the time vector
+            - mother: the mother wavelet
+            - param : the wavelet parameter
             
     See also
     --------
@@ -2499,10 +2504,13 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     
     Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
     Python routines available at http://paos.colorado.edu/research/wavelets/
+
     '''    
     
     ts = np.array(ts)
     ys = np.array(ys)
+    
+    ys, ts = clean_ts(ys,ts)
 
     if len(ts) != len(ys):
         raise ValueError('Time and value axis should be the same length')
@@ -2515,11 +2523,11 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
         
     #preprocessing
     # remove NaNs
-    ys, ts = clean_ts(ys,ts)
+    
     dt = np.diff(ts).mean()
 
     ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs,
-               gaussianize=gaussianize, standardize=True) #TC seems to require standardization
+               gaussianize=gaussianize, standardize=standardize) #TC seems to require standardization
     
     # fourier factor determination
     if mother.upper() == 'MORLET':
@@ -2555,7 +2563,6 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
 
     return res
     
-
 
     
 def cwt_coherence(ys1, ts1, ys2, ts2, freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=False,sg_kwargs={},
@@ -2769,118 +2776,427 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None,freq_method='log',freq_kwargs={}
 #     return res
 
 
-# def wave_bases(mother, k, scale, param):
-#     '''
+
+def tc_wavelet(Y, dt, scale, mother, param, pad=False):
+    '''
+    WAVELET  1D Wavelet transform. Adapted from Torrence and Compo to fit existing Pyleoclim functionalities
+    
+    Computes the wavelet transform of the vector Y (length N),
+    with sampling rate DT.
+
+    By default, the Morlet wavelet (k0=6) is used.
+    The wavelet basis is normalized to have total energy=1 at all scales.
+
+    Parameters
+    ----------
+    Y : numpy.array
+        the time series of length N.
+    dt : float
+        the sampling time
+    
+    mother : string, optional
+        the mother wavelet function. The default is 'MORLET'. Options are: 'MORLET', 'PAUL', or 'DOG'
+    param : flaot, optional
+        the mother wavelet parameter. The default is None since it varies for each mother
+            - For 'MORLET' this is k0 (wavenumber), default is 6.
+            - For 'PAUL' this is m (order), default is 4.
+            - For 'DOG' this is m (m-th derivative), default is 2.
+    pad : {True,False}, optional
+        Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
+        This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
+        This will not eliminate all edge effects. The default is False.
+
+    Returns
+    -------
+    wave : numpy.array
+        The wavelet coefficients
+    coi : numpy.array
+        The cone of influence. Periods greater than this are subject to edge effects.
+        
+    See also
+    --------
+    
+    pyleoclim.utils.wavelet.tc_wave_bases: 1D wavelet functions Morlet, Paul or Dog
+    
+    References
+    ----------
+    
+    Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+    Python routines available at http://paos.colorado.edu/research/wavelets/
+    
+    '''
+    
+    n1 = len(Y)
+
+    # construct time series to analyze, pad if necessary
+    x = Y - np.mean(Y)
+    if pad == True:
+        # power of 2 nearest to N
+        base2 = np.fix(np.log(n1) / np.log(2) + 0.4999)
+        nzeroes = (2 ** (base2 + 1) - n1).astype(np.int64)
+        x = np.concatenate((x, np.zeros(nzeroes)))
+
+    n = len(x)
+
+    # construct wavenumber array used in transform [Eqn(5)]
+    kplus = np.arange(1, int(n / 2) + 1)
+    kplus = (kplus * 2 * np.pi / (n * dt))
+    kminus = np.arange(1, int((n - 1) / 2) + 1)
+    kminus = np.sort((-kminus * 2 * np.pi / (n * dt)))
+    k = np.concatenate(([0.], kplus, kminus))
+
+    # compute FFT of the (padded) time series
+    f = np.fft.fft(x)  # [Eqn(3)]
+    
+    # define the wavelet array
+    wave = np.zeros(shape=(len(scale), n), dtype=complex)
+
+    # loop through all scales and compute transform
+    for a1 in range(0, len(scale)):
+        daughter, fourier_factor, coi, _ = \
+            tc_wave_bases(mother, k, scale[a1], param)
+        wave[a1, :] = np.fft.ifft(f * daughter)  # wavelet transform[Eqn(4)]
+
+    # COI [Sec.3g]
+    coi = coi * dt * np.concatenate((
+        np.insert(np.arange(int((n1 + 1) / 2) - 1), [0], [1E-5]),
+        np.insert(np.flipud(np.arange(0, int(n1 / 2) - 1)), [-1], [1E-5])))
+    wave = wave[:, :n1]  # get rid of padding before returning
+
+    return wave, coi
+
+def tc_wave_bases(mother, k, scale, param):
+    '''
+    WAVE_BASES  1D Wavelet functions Morlet, Paul, or DOG
+
+    Parameters
+    ----------
+    mother : string 
+        equal to 'MORLET' or 'PAUL' or 'DOG'
+    k : numpy.array
+        the Fourier frequencies at which to calculate the wavelet
+    scale : float
+        The wavelet scale
+    param : float
+        the nondimensional parameter for the wavelet function
+
+    Returns
+    -------
+    daughter : numpy.array
+        a vector, the wavelet function
+    fourier_factor : float
+        the ratio of Fourier period to scale
+    coi : float
+        the cone-of-influence size at the scale
+    dofmin : float
+        degrees of freedom for each point in the wavelet power
+             (either 2 for Morlet and Paul, or 1 for the DOG)
+    
+    References
+    ----------
+    
+    Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+    Python routines available at http://paos.colorado.edu/research/wavelets/
+
+    '''
+    
+    
+    n = len(k)
+    kplus = np.array(k > 0., dtype=float)
+
+    if mother == 'MORLET':  # -----------------------------------  Morlet
+
+        if param == -1:
+            param = 6.
+
+        k0 = np.copy(param)
+        # calc psi_0(s omega) from Table 1
+        expnt = -(scale * k - k0) ** 2 / 2. * kplus
+        norm = np.sqrt(scale * k[1]) * (np.pi ** (-0.25)) * np.sqrt(n)
+        daughter = norm * np.exp(expnt)
+        daughter = daughter * kplus  # Heaviside step function
+        # Scale-->Fourier [Sec.3h]
+        fourier_factor = (4 * np.pi) / (k0 + np.sqrt(2 + k0 ** 2))
+        coi = fourier_factor / np.sqrt(2)  # Cone-of-influence [Sec.3g]
+        dofmin = 2  # Degrees of freedom
+        
+    elif mother == 'PAUL':  # --------------------------------  Paul
+        if param == -1:
+            param = 4.
+        m = param
+        # calc psi_0(s omega) from Table 1
+        expnt = -scale * k * kplus
+        norm_bottom = np.sqrt(m * np.prod(np.arange(1, (2 * m))))
+        norm = np.sqrt(scale * k[1]) * (2 ** m / norm_bottom) * np.sqrt(n)
+        daughter = norm * ((scale * k) ** m) * np.exp(expnt) * kplus
+        fourier_factor = 4 * np.pi / (2 * m + 1)
+        coi = fourier_factor * np.sqrt(2)
+        dofmin = 2
+        
+    elif mother == 'DOG':  # --------------------------------  DOG
+        if param == -1:
+            param = 2.
+        m = param
+        # calc psi_0(s omega) from Table 1
+        expnt = -(scale * k) ** 2 / 2.0
+        norm = np.sqrt(scale * k[1] / gamma(m + 0.5)) * np.sqrt(n)
+        daughter = -norm * (1j ** m) * ((scale * k) ** m) * np.exp(expnt)
+        fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * m + 1))
+        coi = fourier_factor / np.sqrt(2)
+        dofmin = 1
+    else:
+        print('Mother must be one of MORLET, PAUL, DOG')
+
+    return daughter, fourier_factor, coi, dofmin
+
+def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95],
+                dof=None, gws=None):
+    '''
+    Asymptotic singificance testing.
+
+    Parameters
+    ----------
+    ys : numpy.array
+        Values for the timeseries
+    ts : numpy.array
+        time vector.
+    scale : numpy.array
+        vector of scale
+    mother : str
+        Type of mother wavelet
+    param : int
+        mother wavelet parameter
+    sigtest : {'chi-square','time-average','scale-average'}, optional
+        Type of significance test to perform . The default is 'chi-square'.
+        - chi-square: a regular chi-square test Eq(18) from Torrence and Compo
+        - time-average: DOF should be set to NA, the number of local wavelet spectra that were averaged together.
+             For the Global Wavelet Spectrum, this would be NA=N, where N is the number of points in your time series. Eq23 in Torrence and Compo
+        -scale-average: In this case, DOF should be set to a two-element vector [S1,S2], which gives the scale range that was averaged together.
+             e.g. if one scale-averaged scales between 2 and 8, then DOF=[2,8].
+    qs : list, optional
+        Significance level. The default is [0.95].
+    dof : None, optional
+        Degrees of freedon for signif test. The default is None, which will automatically assign:
+            - chi-square: DOF = 2 (or 1 for MOTHER='DOG')
+            - time-average: DOF = NA, the number of times averaged together.
+            -scale-average: DOF = [S1,S2], the range of scales averaged.
+    gws : np.array, optional
+        Global wavelet spectrum. a vector of the same length as scale. If input then this is used as the theoretical background spectrum, rather than white or red noise. The default is None.
+
+    Returns
+    -------
+    signif_level : numpy.array
+        Array of values for significance level 
+    
+    References
+    ----------
+    
+    Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+    Python routines available at http://paos.colorado.edu/research/wavelets/
+    
+    See also
+    --------
+    
+    pyleoclim.utils.wavelet.chisquare_inv : inverse of chi-square CDF
+    
+    pyleoclim.utils.wavelet.chisquare_solve : return the difference between calculated percentile and true P
 
 
-#     Parameters
-#     ----------
-#     mother : string, {}
-#         DESCRIPTION.
-#     k : TYPE
-#         DESCRIPTION.
-#     scale : TYPE
-#         DESCRIPTION.
-#     param : TYPE
-#         DESCRIPTION.
+    '''
+    
+    if mother.upper() not in ['MORLET','DOG','PAUL']:
+        raise ValueError('The mother wavelet should be either "MORLET","PAUL", or "DOG"')
+    
+    if sigtest not in ['chi-square','time-average','scale-average']:
+        raise ValueError("The type of significance test should be either 'chi-square','time-average','scale-average'")
+    
+    
+    J1 = len(scale) - 1
+    dj = np.log2(scale[1] / scale[0])
 
-#     Raises
-#     ------
-#     KeyError
-#         DESCRIPTION.
+    variance = np.std(ys,ddof=1) ** 2
 
-#     Returns
-#     -------
-#     daughter : TYPE
-#         DESCRIPTION.
-#     fourier_factor : TYPE
-#         DESCRIPTION.
-#     coi : TYPE
-#         DESCRIPTION.
-#     dofmin : TYPE
-#         DESCRIPTION.
-
-#     '''
-
-#     n = len(k)
-#     kplus = np.array(k > 0., dtype=float)
-
-#     if mother == 'morlet':  # -----------------------------------  Morlet
-
-#         if param == -1:
-#             param = 6.
-
-#         k0 = np.copy(param)
-#         # calc psi_0(s omega) from Table 1
-#         expnt = -(scale * k - k0) ** 2 / 2. * kplus
-#         norm = np.sqrt(scale * k[1]) * (np.pi ** (-0.25)) * np.sqrt(n)
-#         daughter = norm * np.exp(expnt)
-#         daughter = daughter * kplus  # Heaviside step function
-#         # Scale-->Fourier [Sec.3h]
-#         fourier_factor = (4 * np.pi) / (k0 + np.sqrt(2 + k0 ** 2))
-#         coi = fourier_factor / np.sqrt(2)  # Cone-of-influence [Sec.3g]
-#         dofmin = 2  # Degrees of freedom
-#     elif mother == 'paul':  # --------------------------------  Paul
-#         if param == -1:
-#             param = 4.
-#         m = param
-#         # calc psi_0(s omega) from Table 1
-#         expnt = -scale * k * kplus
-#         norm_bottom = np.sqrt(m * np.prod(np.arange(1, (2 * m))))
-#         norm = np.sqrt(scale * k[1]) * (2 ** m / norm_bottom) * np.sqrt(n)
-#         daughter = norm * ((scale * k) ** m) * np.exp(expnt) * kplus
-#         fourier_factor = 4 * np.pi / (2 * m + 1)
-#         coi = fourier_factor * np.sqrt(2)
-#         dofmin = 2
-#     elif mother == 'dog':  # --------------------------------  DOG
-#         if param == -1:
-#             param = 2.
-#         m = param
-#         # calc psi_0(s omega) from Table 1
-#         expnt = -(scale * k) ** 2 / 2.0
-#         norm = np.sqrt(scale * k[1] / gamma(m + 0.5)) * np.sqrt(n)
-#         daughter = -norm * (1j ** m) * ((scale * k) ** m) * np.exp(expnt)
-#         fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * m + 1))
-#         coi = fourier_factor / np.sqrt(2)
-#         dofmin = 1
-#     else:
-#         raise KeyError('Mother must be one of "morlet", "paul", "dog"')
-
-#     return daughter, fourier_factor, coi, dofmin
+    # get the appropriate parameters [see Table(2)]
+    if mother.upper() == 'MORLET':  # ----------------------------------  Morlet
+        empir = ([2., -1, -1, -1])
+        if param == 6:
+            empir[1:] = ([0.776, 2.32, 0.60])
+        k0 = param
+        # Scale-->Fourier [Sec.3h]
+        fourier_factor = (4 * np.pi) / (k0 + np.sqrt(2 + k0 ** 2))
+        
+    elif mother.upper() == 'PAUL':
+        empir = ([2, -1, -1, -1])
+        if param == 4:
+            empir[1:] = ([1.132, 1.17, 1.5])
+        m = param
+        fourier_factor = (4 * np.pi) / (2 * m + 1)
+        
+    elif mother.upper() == 'DOG':  # -------------------------------------Paul
+        empir = ([1., -1, -1, -1])
+        if param ==2:
+            empir[1:] = ([3.541, 1.43, 1.4])
+        elif param == 6:  # --------------------------------------DOG
+            empir[1:] = ([1.966, 1.37, 0.97])
+        m = param
+        fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * m + 1))
 
 
-# def chisquare_inv(P, V):
+    period = scale * fourier_factor
+    dofmin = empir[0]  # Degrees of freedom with no smoothing
+    Cdelta = empir[1]  # reconstruction factor
+    gamma_fac = empir[2]  # time-decorrelation factor
+    dj0 = empir[3]  # scale-decorrelation factor
 
-#     if (1 - P) < 1E-4:
-#         print('P must be < 0.9999')
+    dt = float(np.mean(np.diff(ts)))
+    freq =  dt / period  # normalized frequency
 
-#     if P == 0.95 and V == 2:  # this is a no-brainer
-#         X = 5.9915
-#         return X
+    if gws is not None:   # use global-wavelet as background spectrum
+        fft_theor = gws
+    else:
+        # [Eqn(16)]
+        lag1 = ar1_fit(ys,ts)
+        fft_theor = (1 - lag1 ** 2) / \
+            (1 - 2 * lag1 * np.cos(freq * 2 * np.pi) + lag1 ** 2)
+        fft_theor = variance * fft_theor  # include time-series variance
 
-#     MINN = 0.01  # hopefully this is small enough
-#     MAXX = 1  # actually starts at 10 (see while loop below)
-#     X = 1
-#     TOLERANCE = 1E-4  # this should be accurate enough
+    signif = fft_theor
+    
+    if dof is None:
+        dof = dofmin
 
-#     while (X + TOLERANCE) >= MAXX:  # should only need to loop thru once
-#         MAXX = MAXX * 10.
-#     # this calculates value for X, NORMALIZED by V
-#         X = fminbound(chisquare_solve, MINN, MAXX, args=(P, V), xtol=TOLERANCE)
-#         MINN = MAXX
+    signif_level = []
+    
+    for siglvl in qs:
+            
+        if sigtest == 'chi-square':  # no smoothing, DOF=dofmin [Sec.4]
+            dof = dofmin
+            chisquare = chisquare_inv(siglvl, dof) / dof
+            signif = fft_theor * chisquare  # [Eqn(18)]
+            
+        #expand
+            #signif = signif[:, np.newaxis].dot(np.ones(len(ys))[np.newaxis, :])
+            
+        
+        elif sigtest == 'time-average':  # time-averaged significance
+            if len(np.atleast_1d(dof)) == 1:
+                dof = np.zeros(J1) + dof
+            dof[dof < 1] = 1
+            # [Eqn(23)]
+            dof = dofmin * np.sqrt(1 + (dof * dt / gamma_fac / scale) ** 2)
+            dof[dof < dofmin] = dofmin   # minimum DOF is dofmin
+            for a1 in range(0, J1 + 1):
+                chisquare = chisquare_inv(siglvl, dof[a1]) / dof[a1]
+                signif[a1] = fft_theor[a1] * chisquare
+        
+        elif sigtest == 'scale-average':  # time-averaged significance
+            if len(dof) != 2:
+                raise ValueError('DOF must be set to [S1,S2],'
+                    ' the range of scale-averages')
+            if Cdelta == -1:
+                raise ValueError('Cdelta & dj0 not defined'
+                      ' for ' + mother + ' with param = ' + str(param))
+    
+            s1 = dof[0]
+            s2 = dof[1]
+            avg = np.logical_and(scale >= 2, scale < 8)  # scales between S1 & S2
+            navg = np.sum(np.array(np.logical_and(scale >= 2, scale < 8),
+                dtype=int))
+            if navg == 0:
+                raise ValueError('No valid scales between ' + s1 + ' and ' + s2)
+            Savg = 1. / np.sum(1. / scale[avg])  # [Eqn(25)]
+            Smid = np.exp((np.log(s1) + np.log(s2)) / 2.)  # power-of-two midpoint
+            dof = (dofmin * navg * Savg / Smid) * \
+                np.sqrt(1 + (navg * dj / dj0) ** 2)  # [Eqn(28)]
+            fft_theor = Savg * np.sum(fft_theor[avg] / scale[avg])  # [Eqn(27)]
+            chisquare = chisquare_inv(siglvl, dof) / dof
+            signif = (dj * dt / Cdelta / Savg) * fft_theor * chisquare  # [Eqn(26)]
+        
+        signif_level.append(np.sqrt(signif.T))
+        
+    return signif_level
 
-#     X = X * V  # put back in the goofy V factor
+def chisquare_inv(P, V):
+    '''
+    Returns the inverse of chi-square CDF with V degrees of freedom at fraction P
+    
 
-#     return X
+    Parameters
+    ----------
+    P : float
+        fraction
+    V : float
+        degress of freedom
 
-# def chisquare_solve(XGUESS, P, V):
+    Returns
+    -------
+    X : float
+        Inverse chi-square
+    
+    References
+    ----------
+    
+    Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+    Python routines available at http://paos.colorado.edu/research/wavelets/
 
-#     PGUESS = gammainc(V / 2, V * XGUESS / 2)  # incomplete Gamma function
+    '''
+    
+    if (1 - P) < 1E-4:
+        raise ValueError('P must be < 0.9999')
 
-#     PDIFF = np.abs(PGUESS - P)            # error in calculated P
+    if P == 0.95 and V == 2:  # this is a no-brainer
+        X = 5.9915
+        return X
 
-#     TOL = 1E-4
-#     if PGUESS >= 1 - TOL:  # if P is very close to 1 (i.e. a bad guess)
-#         PDIFF = XGUESS   # then just assign some big number like XGUESS
+    MINN = 0.01  # hopefully this is small enough
+    MAXX = 1  # actually starts at 10 (see while loop below)
+    X = 1
+    TOLERANCE = 1E-4  # this should be accurate enough
 
-#     return PDIFF
+    while (X + TOLERANCE) >= MAXX:  # should only need to loop thru once
+        MAXX = MAXX * 10.
+    # this calculates value for X, NORMALIZED by V
+        X = fminbound(chisquare_solve, MINN, MAXX, args=(P, V), xtol=TOLERANCE)
+        MINN = MAXX
+
+    X = X * V  # put back in the goofy V factor
+
+    return X 
+
+def chisquare_solve(XGUESS, P, V):
+    '''
+    Given XGUESS, a percentile P, and degrees-of-freedom V, return the difference between calculated percentile and P.
+
+    Parameters
+    ----------
+    XGUESS : float
+        sig level
+    P : float
+        percentile
+    V : float
+        degrees of freedom
+
+    Returns
+    -------
+    PDIFF : float
+        difference between calculated percentile and P
+        
+    References
+    ----------
+    
+    Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+    Python routines available at http://paos.colorado.edu/research/wavelets/
+
+    '''
+    
+    PGUESS = gammainc(V / 2, V * XGUESS / 2)  # incomplete Gamma function
+
+    PDIFF = np.abs(PGUESS - P)            # error in calculated P
+
+    TOL = 1E-4
+    if PGUESS >= 1 - TOL:  # if P is very close to 1 (i.e. a bad guess)
+        PDIFF = XGUESS   # then just assign some big number like XGUESS
+
+    return PDIFF
+
+

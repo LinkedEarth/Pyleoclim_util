@@ -799,9 +799,9 @@ class TestUISeriesWavelet():
     def test_wave_t1(self,wave_method):
         '''Test Series.spectral() with WWZ/cwt with specified frequency vector passed via `settings`
         '''
-
-        ts = pyleo.gen_ts(model='colored_noise',nt=100)
-        freq = np.linspace(1/500, 1/2, 20)
+        n = 200
+        ts = pyleo.gen_ts(model='colored_noise',nt=n)
+        freq = np.linspace(1/n, 1/2, 20)
         scal = ts.wavelet(method=wave_method, settings={'freq': freq})
 
 

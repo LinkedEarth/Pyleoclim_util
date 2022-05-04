@@ -8,6 +8,10 @@ Created on Mon Apr  4 14:49:05 2022
 
 import pyleoclim as pyleo
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+
 data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
 time = data['t'].values
 air = data['air'].values
@@ -22,7 +26,6 @@ fig, ax = coh.plot()
 
 
 # or it can be passed
-import numpy as np
 ntau=50
 tau = np.linspace(np.min(ts_nino.time), np.max(ts_nino.time), ntau)
 coh = ts_air.wavelet_coherence(ts_nino,settings={'tau':tau})
@@ -32,5 +35,15 @@ fig, ax = coh.plot()
 
 import pyleoclim as pyleo
 
-ts = pyleo.gen_ts(model='colored_noise',nt=100)
-scal = ts.wavelet(method='cwt') 
+
+ts = pyleo.gen_ts(model='colored_noise',nt=200)
+fig , ax = plt.subplots(3,1,sharex=True) 
+ax = ax.flatten()
+ts.plot(ax=ax[0])
+scal2 = ts.wavelet(method='cwt') 
+scal2.plot(ax=ax[1],title='CWT scalogram')
+scal1 = ts.wavelet(method='wwz') 
+scal1.plot(ax=ax[2],title='WWZ scalogram')
+
+
+np.abs(scal2.amplitude-scal1.amplitude).max()

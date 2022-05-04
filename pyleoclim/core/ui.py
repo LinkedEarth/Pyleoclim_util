@@ -2187,15 +2187,16 @@ class Series:
             warnings.simplefilter('ignore')
 
         # Assign method
-
-        if self.is_evenly_spaced():
-            method = 'cwt'
-        else:
-            method = 'wwz'
+        if method is None:
+            if self.is_evenly_spaced():
+                method = 'cwt'
+            else:
+                method = 'wwz'
 
         wave_func = {'wwz': waveutils.wwz,
                      'cwt': waveutils.cwt
                      }
+        ''
         # Process options
         settings = {} if settings is None else settings.copy()
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
@@ -2214,8 +2215,7 @@ class Series:
             if 'ntau' in settings.keys():
                 ntau = settings['ntau']
             else:
-                ntau = np.min([np.size(self.time), 50])  
-                
+                ntau = np.min([np.size(self.time), 50])              
             tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
             settings.update({'tau': tau})
           
