@@ -2313,7 +2313,7 @@ class Series:
             fig, ax = coh.plot()
             pyleo.closefig()
 
-        We may specify `ntau` to adjust the temporal resolution of the scalogram, which will affect the time consumption of calculation and the result itself:
+        We may specify `ntau` to adjust the temporal resolution of the WWZ scalogram, which will affect the time consumption of calculation and the result itself:
 
         .. ipython:: python
             :okwarning:
@@ -2365,13 +2365,7 @@ class Series:
         #overlap = np.arange(np.max([t1[0], t2[0]]), np.min([t1[-1], t2[-1]]), np.max([dt1, dt2]))
         args = {}
 
-        # # define WWZ-specific options
-        # if ntau is None:
-        #     ntau = np.min([np.size(overlap), 50])
-
-        # if tau is None:
-        #     tau = np.linspace(np.min(overlap), np.max(overlap), ntau)
-
+        
         #args['wwz'] = {'tau': tau, 'freq': freq, 'verbose': verbose}
         args['wwz'] = {'freq': freq, 'verbose': verbose}
         args[method].update(settings)
@@ -2392,10 +2386,23 @@ class Series:
             freq_method=freq_method,
             freq_kwargs=freq_kwargs,
         )
+        # Export result
+        xwave = CrossWavelet(
+            frequency=wtc_res.freq,
+            time=wtc_res.time,
+            xwt=wtc_res.xw_amplitude,
+            phase=wtc_res.xw_phase,
+            coi=wtc_res.coi,
+            timeseries1=self,
+            timeseries2=target_series,
+            freq_method=freq_method,
+            freq_kwargs=freq_kwargs,
+        )
 
-        return coh
 
-    # def cross_wavelet(self, target_series, method='wwz', settings=None, freq_method='log', ntau=None, tau=None, freq_kwargs=None, verbose=False):
+        return coh, xwave
+
+    # def cross_wavelet(self, target_series, method=None, settings=None, freq_method='log', freq_kwargs=None, verbose=False):
     #      ''' Perform cross-wavelet analysis (XWT) with the target timeseries
 
     #      Parameters
@@ -2411,14 +2418,6 @@ class Series:
 
     #      freq_kwargs : dict
     #          Arguments for frequency vector
-
-    #      tau : array
-    #          The time shift points that determines the temporal resolution of the result.
-    #          If None, it will be calculated using ntau.
-
-    #      ntau : int
-    #          The length of the time shift points that determines the temporal resolution of the result.
-    #          If None, it will be either the length of the input time axis, or 50, whichever is smaller.
 
     #      settings : dict
     #          Arguments for the specific spectral method
@@ -5058,7 +5057,7 @@ class MultipleSeries:
 
         return psds
 
-    def wavelet(self, method='wwz', settings={}, freq_method='log', ntau=None, freq_kwargs=None, verbose=False, mute_pbar=False):
+    def wavelet(self, method=None, settings={}, freq_method='log', freq_kwargs=None, verbose=False, mute_pbar=False):
         '''Wavelet analysis
 
         Parameters
@@ -5074,10 +5073,6 @@ class MultipleSeries:
 
         freq_kwargs : dict
             Arguments for frequency vector
-
-        ntau : int
-            The length of the time shift points that determins the temporal resolution of the result.
-            If None, it will be either the length of the input time axis, or at most 100.
 
         settings : dict
             Arguments for the specific spectral method
