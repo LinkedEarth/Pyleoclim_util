@@ -33,22 +33,11 @@ fig, ax = coh.plot()
 #settings = {'ntau':50,'tau':tau}
 
 
-import pyleoclim as pyleo
-import pandas as pd
-data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-time = data.iloc[:,1]
-value = data.iloc[:,2]
-ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+# ========== Coherence summary plot ======
 
-scal1 = ts.wavelet(method='cwt') 
-scal_signif = scal1.signif_test(number=200)  # for research-grade work, use number=200 or even larger
-scal_signif.plot(title='CWT scalogram')
-#@savefig scal_cwt.png
-
-
-# if you wanted to invoke the WWZ instead 
-scal2 = ts.wavelet(method='wwz')  
-scal2.plot(title='WWZ scalogram')
-
-# notice that the two scalograms have different units, which are arbitrary
-
+ # if ax is None:
+ #     if xwt is False:
+ #         fig, ax = plt.subplots(figsize=figsize)
+ #         ax = np.ndarray([ax]) # ensures that ax is iterable
+ #     else:
+ #         fig, ax = plt.subplots(2,1,figsize=(figsize[0],1.8*figsize[1]),sharex=True)

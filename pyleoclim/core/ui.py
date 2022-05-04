@@ -3566,7 +3566,7 @@ class Scalogram:
         cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
         cbar_args.update(cbar_style)
 
-        cb = plt.colorbar(cont, **cbar_args)
+        cb = plt.colorbar(cont, ax = ax, **cbar_args)
 
         # plot cone of influence
         if self.coi is not None:
@@ -3860,11 +3860,7 @@ class Coherence:
 
         '''
         if ax is None:
-            if xwt is False:
-                fig, ax = plt.subplots(figsize=figsize)
-                ax = np.ndarray([ax]) # ensures that ax is iterable
-            else:
-                fig, ax = plt.subplots(2,1,figsize=(figsize[0],1.8*figsize[1]),sharex=True)
+            fig, ax = plt.subplots(figsize=figsize)
 
         # handling NaNs
         mask_freq = []
@@ -3902,10 +3898,7 @@ class Coherence:
         cmap.set_bad(bad_clr)
         contourf_args['cmap'] = cmap
 
-        # TODO: loop over axes
-
-
-        wtc_cont = ax[0].contourf(self.time, y_axis, self.wtc[:, mask_freq].T, **contourf_args)
+        wtc_cont = ax.contourf(self.time, y_axis, self.wtc[:, mask_freq].T, **contourf_args)
 
         # plot significance levels
         if self.signif_qs is not None:
@@ -3914,12 +3907,10 @@ class Coherence:
             }
             signif_coh = self.signif_qs.scalogram_list[0]
             signif_boundary = self.wtc[:, mask_freq].T / signif_coh.amplitude[:, mask_freq].T
-            ax.contour(
-                self.time, y_axis, signif_boundary, [-99, 1],
-                colors=signif_clr,
-                linestyles=signif_linestyles,
-                linewidths=signif_linewidths,
-            )
+            cont = ax.contour(self.time, y_axis, signif_boundary, [-99, 1],
+                              colors=signif_clr,
+                              linestyles=signif_linestyles,
+                              linewidths=signif_linewidths)
 
         # plot colorbar
         cbar_args = {
@@ -3932,8 +3923,8 @@ class Coherence:
         }
         cbar_args.update(cbar_style)
 
-        # TODO : colorbar per axis : https://stackoverflow.com/questions/23876588/matplotlib-colorbar-in-each-subplot
-        cb = plt.colorbar(cont, **cbar_args)
+        # assign colorbar to axis (instead of fig) : https://matplotlib.org/stable/gallery/subplots_axes_and_figures/colorbar_placement.html
+        cb = plt.colorbar(cont, ax = ax, **cbar_args)
 
         # plot cone of influence
         ax.set_yscale('log')
