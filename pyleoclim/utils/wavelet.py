@@ -2380,58 +2380,58 @@ def wtc(coeff1, coeff2, freq, tau, smooth_factor=0.25):
 
     return xw_coherence, xw_phase
 
-def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
-    ''' Reconstruct the normalized time series from the wavelet coefficients.
+# def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
+#     ''' Reconstruct the normalized time series from the wavelet coefficients.
 
-    Parameters
-    ----------
+#     Parameters
+#     ----------
 
-    coeff : array
-        the coefficients of the corresponding basis functions (a0, a1, a2)
-    freq : array
-        vector of frequency of the basis functions
-    tau : array
-        the evenly-spaced time points of the basis functions
-    t : array
-        the specified evenly-spaced time points of the reconstructed time series
-    len_bd : int
-        the number of the ghost grids want to creat on each boundary
+#     coeff : array
+#         the coefficients of the corresponding basis functions (a0, a1, a2)
+#     freq : array
+#         vector of frequency of the basis functions
+#     tau : array
+#         the evenly-spaced time points of the basis functions
+#     t : array
+#         the specified evenly-spaced time points of the reconstructed time series
+#     len_bd : int
+#         the number of the ghost grids want to creat on each boundary
 
-    Returns
-    -------
+#     Returns
+#     -------
 
-    rec_ts : array
-        the reconstructed normalized time series
-    t : array
-        the evenly-spaced time points of the reconstructed time series
-    '''
-    omega = 2*np.pi*freq
-    nf = np.size(freq)
+#     rec_ts : array
+#         the reconstructed normalized time series
+#     t : array
+#         the evenly-spaced time points of the reconstructed time series
+#     '''
+#     omega = 2*np.pi*freq
+#     nf = np.size(freq)
 
-    dt = np.median(np.diff(t))
-    if len_bd > 0:
-        t_left_bd = np.linspace(t[0]-dt*len_bd, t[0]-dt, len_bd)
-        t_right_bd = np.linspace(t[-1]+dt, t[-1]+dt*len_bd, len_bd)
-        t = np.concatenate((t_left_bd, t, t_right_bd))
+#     dt = np.median(np.diff(t))
+#     if len_bd > 0:
+#         t_left_bd = np.linspace(t[0]-dt*len_bd, t[0]-dt, len_bd)
+#         t_right_bd = np.linspace(t[-1]+dt, t[-1]+dt*len_bd, len_bd)
+#         t = np.concatenate((t_left_bd, t, t_right_bd))
 
-    ntau = np.size(tau)
-    a_0, a_1, a_2 = coeff
+#     ntau = np.size(tau)
+#     a_0, a_1, a_2 = coeff
 
-    rec_ts = np.zeros(np.size(t))
-    for k in range(nf):
-        for j in range(ntau):
-            if np.isnan(a_0[j, k]) or np.isnan(a_1[j, k]) or np.isnan(a_1[j, k]):
-                continue
-            else:
-                dz = omega[k] * (t - tau[j])
-                phi_1 = np.cos(dz)
-                phi_2 = np.sin(dz)
+#     rec_ts = np.zeros(np.size(t))
+#     for k in range(nf):
+#         for j in range(ntau):
+#             if np.isnan(a_0[j, k]) or np.isnan(a_1[j, k]) or np.isnan(a_1[j, k]):
+#                 continue
+#             else:
+#                 dz = omega[k] * (t - tau[j])
+#                 phi_1 = np.cos(dz)
+#                 phi_2 = np.sin(dz)
 
-                rec_ts += (a_0[j, k] + a_1[j, k]*phi_1 + a_2[j, k]*phi_2)
+#                 rec_ts += (a_0[j, k] + a_1[j, k]*phi_1 + a_2[j, k]*phi_2)
 
-    rec_ts = preprocess(rec_ts, t, detrend=False, gaussianize=False, standardize=False)
+#     rec_ts = preprocess(rec_ts, t, detrend=False, gaussianize=False, standardize=False)
 
-    return rec_ts, t
+#     return rec_ts, t
 
 # ## Methods for Torrence and compo
 
