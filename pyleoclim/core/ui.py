@@ -2258,9 +2258,10 @@ class Series:
             A pyleoclim Series object on which to perform the coherence analysis
 
         method : str
-            Possible methods {'wwz','cwt'}. Default is None, so the method is
-            assigned based on whether the series are evenly-spaced (cwt) or
-            unevenly-spaced (wwz).
+            Possible methods {'wwz','cwt'}. Default is 'cwt', which only works
+            if the series share the same evenly-spaced time axis. If not, 
+            the series are put on  common time axis (using common_time_kwargs).
+            'wwz' is designed to unevenly-spaced data, but far slower.
 
         freq_method : str
             {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
@@ -2272,7 +2273,8 @@ class Series:
             Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
 
         settings : dict
-            Arguments for the specific wavelet method
+            Arguments for the specific wavelet method (e.g. decay constant for WWZ, mother wavelet for CWT)
+            and common properties like standardize, detrend, gaussianize, pad, etc.
 
         verbose : bool
             If True, will print warning messages, if any
@@ -2350,8 +2352,7 @@ class Series:
             'wwz': waveutils.wwz_coherence,
             'cwt': waveutils.cwt_coherence
         }
-
-        
+   
         # Process options
         settings = {} if settings is None else settings.copy()
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
@@ -2382,11 +2383,7 @@ class Series:
                 
             tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
             settings.update({'tau': tau})
-            
-            
-            
-          
-
+                   
         args[method].update(settings)
 
         # Apply WTC method
@@ -2395,6 +2392,7 @@ class Series:
         # Export result
         coh = Coherence(
             frequency=wtc_res.freq,
+            scales = wtc_res.scales,
             time=wtc_res.time,
             wtc=wtc_res.xw_coherence,
             xwt=wtc_res.xw_amplitude,
@@ -2405,19 +2403,8 @@ class Series:
             freq_method=freq_method,
             freq_kwargs=freq_kwargs,
         )
-        # Export result
-        xwave = CrossWavelet(
-            frequency=wtc_res.freq,
-            time=wtc_res.time,
-            xwt=wtc_res.xw_amplitude,
-            phase=wtc_res.xw_phase,
-            coi=wtc_res.coi,
-            timeseries1=self,
-            timeseries2=target_series,
-            freq_method=freq_method,
-            freq_kwargs=freq_kwargs,
-        )
-
+        
+        return coh
 
         return coh, xwave
 

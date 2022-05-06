@@ -1045,6 +1045,10 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
     --------
 
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    
+    pyleoclim.utils.gaussianize : map data to a standad Gaussian
+    
+    pyleoclim.utils.standardize : convert data to Z-scores (0 mean, unit standard deviation)
 
     '''
 

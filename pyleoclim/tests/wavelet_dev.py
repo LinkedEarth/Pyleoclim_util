@@ -9,10 +9,11 @@ Created on Mon Apr  4 14:49:05 2022
 import pyleoclim as pyleo
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 
-data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
+#data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
+data = pd.read_csv('/Users/julieneg/Documents/GitHub/Pyleoclim_util/example_data/wtc_test_data_nino_even.csv')
 time = data['t'].values
 air = data['air'].values
 nino = data['nino'].values
@@ -24,6 +25,8 @@ coh = ts_air.wavelet_coherence(ts_nino)
 fig, ax = coh.plot()
 #pyleo.closefig()
 
+cwt =  pyleo.utils.wavelet.cwt(nino, time)
+wwz =  pyleo.utils.wavelet.wwz(nino, time)
 
 # or it can be passed
 ntau=50

@@ -35,7 +35,7 @@ from .tsbase import (
     is_evenly_spaced,
 )
 
-from .filter import ts_pad
+#from .filter import ts_pad
 
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
@@ -1162,9 +1162,10 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
 
     return psd
 
-def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
-        nMC=200, nproc=8, detrend=False, sg_kwargs=None,
-        gaussianize=False, standardize=False, method='Kirchner_numba', len_bd=0,
+def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', 
+        freq_kwargs={}, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
+        nproc=8, detrend=False, sg_kwargs=None, method='Kirchner_numba',
+        gaussianize=False, standardize=False, len_bd=0,
         bc_mode='reflect', reflect_type='odd'):
     ''' Weighted wavelet Z transform (WWZ) for unevenly-spaced data
 
@@ -1196,8 +1197,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', freq_kwargs={
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff : int
         effective number of points
-    nMC : int
-        the number of Monte-Carlo simulations
+
     nproc : int
         the number of processes for multiprocessing
 
@@ -1280,7 +1280,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', freq_kwargs={
 
     We perform an ideal test below.
     We use a sine wave with a period of 50 yrs as the signal for test.
-    Then performing wavelet analysis should return an energy band around period of 50 yrs in the time-period scalogram domain.
+    Then performing wavelet analysis should return an energy band around period of 50 yrs in the scalogram.
 
     .. ipython:: python
         :okwarning:
@@ -1316,7 +1316,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', freq_kwargs={
         plt.show()
 
     '''
-    assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
+    #assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
 
     ys_cut, ts_cut, freq, tau = prepare_wwz(
         ys, ts, freq=freq, freq_method=freq_method, freq_kwargs=freq_kwargs,
@@ -1329,35 +1329,14 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', freq_kwargs={
                                         detrend=detrend, sg_kwargs=sg_kwargs,
                                         gaussianize=gaussianize, standardize=standardize)
 
-    # Monte-Carlo simulations of AR1 process
-    nt = np.size(tau)
-    nf = np.size(freq)
-
-    #  wwa_red = np.ndarray(shape=(nMC, nt, nf))
-    #  AR1_q = np.ndarray(shape=(nt, nf))
-
-    #  if nMC >= 1:
-        #  for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
-            #  r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
-            #  wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freq, tau, c=c, Neff=Neff, nproc=nproc,
-                                                 #  detrend=detrend, sg_kwargs=sg_kwargs,
-                                                 #  gaussianize=gaussianize, standardize=standardize)
-
-        #  for j in range(nt):
-            #  for k in range(nf):
-                #  AR1_q[j, k] = mquantiles(wwa_red[:, j, k], 0.95)
-
-    #  else:
-        #  AR1_q = None
-    # AR1_q = None
-
     # calculate the cone of influence
     coi = make_coi(tau, Neff=Neff_coi)
-
-    # Results = collections.namedtuple('Results', ['amplitude', 'phase', 'AR1_q', 'coi', 'freq', 'time', 'Neffs', 'coeff'])
-    # res = Results(amplitude=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
-    Results = collections.namedtuple('Results', ['amplitude', 'phase', 'coi', 'freq', 'time', 'Neffs', 'coeff'])
-    res = Results(amplitude=wwa, phase=phase, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
+    # define `scales` as the `Period` axis in the wavelet plot
+    scales = 1/freq  
+    
+    # export 
+    Results = collections.namedtuple('Results', ['amplitude', 'phase', 'coi', 'freq', 'time', 'Neffs', 'coeff', 'scales'])
+    res = Results(amplitude=wwa, phase=phase, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff, scales = scales)
 
     return res
 
@@ -1365,10 +1344,9 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', freq_kwargs={
 def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
                   tau=None, freq=None, freq_method='log', freq_kwargs=None,
                   c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
-                  nMC=200,
-                  gaussianize=False, standardize=False, method='Kirchner_numba',
-                  verbose=False):
-    ''' Returns the wavelet coherence of two time series.
+                  verbose=False,  method='Kirchner_numba',
+                  gaussianize=False, standardize=False):
+    ''' Returns the wavelet coherence of two time series (WWZ method).
 
     Parameters
     ----------
@@ -1392,8 +1370,6 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         effective number of points
     nproc : int
         the number of processes for multiprocessing
-    nMC : int
-        the number of Monte-Carlo simulations
     detrend : string
         - None: the original time series is assumed to have no trend;
         - 'linear': a linear least-squares fit to `ys` is subtracted;
@@ -1412,7 +1388,9 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         - 'Kirchner_f2py': the method Kirchner adapted from Foster with f2py
         - 'Kirchner_numba': Kirchner's algorithm with Numba support for acceleration (default)
     verbose : bool
-        If True, print warning messages
+        If True, print warning messages  
+    smooth_factor : float
+        smoothing factor for the WTC (default: 0.25)
 
     Returns
     -------
@@ -1441,7 +1419,6 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
 
     '''
-    assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
     # TODO: should this use common_time()?
     if tau is None:
@@ -1483,27 +1460,31 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     if freq[0] == 0:
         freq = freq[1:] # delete 0 frequency if present
 
-    res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
+    res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff,
                    nproc=nproc, detrend=detrend, sg_kwargs=sg_kwargs,
                    gaussianize=gaussianize, standardize=standardize, method=method)
-    res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
+    res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, 
                    nproc=nproc, detrend=detrend, sg_kwargs=sg_kwargs,
                    gaussianize=gaussianize, standardize=standardize, method=method)
 
     wt_coeff1 = res_wwz1.coeff[1] - res_wwz1.coeff[2]*1j
     wt_coeff2 = res_wwz2.coeff[1] - res_wwz2.coeff[2]*1j
 
-    xw_coherence, xw_phase = wtc(wt_coeff1, wt_coeff2, freq, tau, smooth_factor=smooth_factor)
+    xw_coherence, xw_phase = wtc(wt_coeff1, wt_coeff2, freq, tau, 
+                                 smooth_factor=smooth_factor)
     xw_product, xw_amplitude, _ = xwt(wt_coeff1, wt_coeff2)
 
     # export output    
-    coherence_red = None
-    AR1_q = None
 
     coi = make_coi(tau, Neff=Neff)
-    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xwt', 'freq', 'time', 'AR1_q', 'coi'])
-    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase, xwt=xw_product,
-                  freq=freq, time=tau, AR1_q=AR1_q, coi=coi)
+    scales = 1/freq  # `scales` here is the `Period` axis in the wavelet plot
+
+    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 
+                                                 'xw_phase', 'xwt', 'freq', 'time', 
+                                                 'AR1_q', 'coi', 'scales'])
+    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, 
+                  xw_phase=xw_phase, xwt=xw_product,
+                  freq=freq, time=tau, AR1_q=None, coi=coi, scales = scales)
 
     return res
 
@@ -2142,7 +2123,7 @@ def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None
         If the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so.
         If None, at most 50 tau points will be generated from the input time span.
     len_bd : int
-        the number of the ghost grids want to create on each boundary
+        the number of the ghost grids desired on each boundary
     bc_mode : string
         {'constant', 'edge', 'linear_ramp', 'maximum', 'mean', 'median', 'minimum', 'reflect' , 'symmetric', 'wrap'}
         For more details, see np.lib.pad()
@@ -2234,11 +2215,7 @@ def xwt(coeff1, coeff2):
         the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
     coeff2 : array
         the second of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
-    freq : array
-        vector of frequency
-    tau : array'
-        the evenly-spaced time points, namely the time shift for wavelet analysis
-
+    
     Returns
     -------
 
@@ -2261,7 +2238,7 @@ def xwt(coeff1, coeff2):
     return xwt, xw_amplitude, xw_phase
 
 def wtc(coeff1, coeff2, freq, tau, smooth_factor=0.25):
-    ''' Return the cross wavelet coherence.
+    ''' Return the wavelet transform coherency (WTC).
 
     Parameters
     ----------
@@ -2321,7 +2298,9 @@ def wtc(coeff1, coeff2, freq, tau, smooth_factor=0.25):
         snorm : array
             normalized scales
         dj : float
-            it satisfies the equation [ Sj = S0 * 2**(j*dj) ]
+            it satisfies the equation [ Sj = S0 * 2**(j*dj)      
+       smooth_factor : float
+           UNCLEAR (ask Feng)
 
         Returns
         -------
@@ -2467,7 +2446,7 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     standardize : bool, optional
         Whether to standardize. The default is False.
     pad : bool, optional
-        Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
+        Whether or not to pad the timeseries with zeroes to increase N to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
         This will not eliminate all edge effects. The default is False.
     mother : string, optional
@@ -2559,16 +2538,18 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     wave, coi = tc_wavelet(ys, dt, scale, mother, param, pad)
     amplitude=np.abs(wave)
     
-    Results = collections.namedtuple('Results', ['amplitude', 'coi', 'freq', 'time', 'scale', 'coeff', 'mother','param'])
-    res = Results(amplitude=amplitude.T, coi=coi, freq=freq, time=ts, scale=scale, coeff=wave, mother=mother,param=param)
+    Results = collections.namedtuple('Results', ['amplitude', 'coi', 'freq', 'time', 'scales', 'coeff', 'mother','param'])
+    res = Results(amplitude=amplitude.T, coi=coi, freq=freq, time=ts, scales=scale, coeff=wave, mother=mother,param=param)
 
     return res
     
 
     
-def cwt_coherence(ys1, ts1, ys2, ts2, tau= None, freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=False,sg_kwargs={},
-        gaussianize=False, pad=False, mother='MORLET',param=None, nMC=200):
-    ''' Returns the wavelet transform coherence of two time series using the CWT.
+def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={},
+                  scale = None, detrend=False,sg_kwargs={}, pad = False,
+                  standardize = False, gaussianize=False, tau = None, Neff=3,
+                  mother='MORLET',param=None, smooth_factor=0.25):
+    ''' Returns the wavelet transform coherency of two time series using the CWT.
 
     Parameters
     ----------
@@ -2580,31 +2561,50 @@ def cwt_coherence(ys1, ts1, ys2, ts2, tau= None, freq=None,freq_method='log',fre
     ts1 : array
         time axis of first time series
     ts2 : array
-        time axis of the second time series
+        time axis of the second time series (should be = ts1)
     tau : array
-        the evenly-spaced time axis common to both series
+        evenly-spaced time points at which to evaluate coherence 
+        Defaults to None, which uses ts1
     freq : array
         vector of frequency
-    nMC : int
-        the number of Monte-Carlo simulations
-    detrend : string
-        - None: the original time series is assumed to have no trend;
-        - 'linear': a linear least-squares fit to `ys` is subtracted;
-        - 'constant': the mean of `ys` is subtracted
-        - 'savitzy-golay': ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
-    sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
-    gaussianize : bool
-        If True, gaussianizes the timeseries
-   
+    freq_method : string, optional
+        The method by which to obtain the frequency vector. The default is 'log'.
+        Options are 'log' (default), 'nfft', 'lomb_scargle', 'welch', and 'scale'
+    freq_kwargs : dict, optional
+        Optional parameters for the choice of the frequency vector. See make_freq_vector and additional methods for details. The default is {}.
+    scale : numpy.array
+        Optional scale vector in place of a frequency vector. Default is None. If scale is not None, frequency method and attached arguments will be ignored. 
+    detrend : bool, string, {'linear', 'constant', 'savitzy-golay', 'emd'}
+        Whether to detrend and with which option. The default is False.
+    sg_kwargs : dict, optional
+        Additional parameters for the savitzy-golay method. The default is {}.
+    gaussianize : bool, optional
+        Whether to gaussianize. The default is False.
+    standardize : bool, optional
+        Whether to standardize. The default is False.
+    pad : bool, optional
+        Whether or not to pad the timeseries with zeroes to increase N to the next higher power of 2. 
+        This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT used to do the wavelet transform.
+        This will not eliminate all edge effects. The default is False.
+    mother : string, optional
+        the mother wavelet function. The default is 'MORLET'. Options are: 'MORLET', 'PAUL', or 'DOG'
+    param : flaot, optional
+        the mother wavelet parameter. The default is None since it varies for each mother
+            - For 'MORLET' this is k0 (wavenumber), default is 6.
+            - For 'PAUL' this is m (order), default is 4.
+            - For 'DOG' this is m (m-th derivative), default is 2.
+    smooth_factor : float
+        smoothing factor for the WTC (default: 0.25)
+    Neff : int
+        effective number of points (3 by default, see make_coi())
 
     Returns
     -------
 
     res : dict
-        contains the cross wavelet coherence, cross-wavelet phase,
-        vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
+        contains the cross wavelet coherence (WTC), cross-wavelet transform (XWT),
+        cross-wavelet phase, vector of frequency, evenly-spaced time points, 
+        nMC AR1 scalograms, cone of influence.
 
     See also
     --------
@@ -2616,173 +2616,50 @@ def cwt_coherence(ys1, ts1, ys2, ts2, tau= None, freq=None,freq_method='log',fre
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
 
     '''
-    assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
-
+    assert np.array_equal(ts1,ts2)  and len(ys1) == len(ys2) , "ts1 and ts2 should be the same. Suggest using common_time()"
+    
     if tau is None:
-        lb1, ub1 = np.min(ts1), np.max(ts1)
-        lb2, ub2 = np.min(ts2), np.max(ts2)
-        lb = np.max([lb1, lb2])
-        ub = np.min([ub1, ub2])   
-        inside = ts1[(ts1>=lb) & (ts1<=ub)]
-        tau = np.linspace(lb, ub, np.size(inside))
-        print(f'Setting tau={tau[:3]}...{tau[-3:]}, ntau={np.size(tau)}')
-        
+        tau = ts1
 
     if freq is None:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = make_freq_vector(ts1, method=freq_method, **freq_kwargs)
         print(f'Setting freq={freq[:3]}...{freq[-3:]}, nfreq={np.size(freq)}')
-
-    
-
-    if np.any(freq1 != freq2):
-        if verbose: print('inconsistent `freq`, recalculating...')
-        freq_min = np.min([np.min(freq1), np.min(freq2)])
-        freq_max = np.max([np.max(freq1), np.max(freq2)])
-        nfreq = np.max([np.size(freq1), np.size(freq2)])
-        freq = np.linspace(freq_min, freq_max, nfreq)
-    else:
-        freq = freq1
-
+  
     if freq[0] == 0:
         freq = freq[1:] # delete 0 frequency if present
 
-    #  TODO: CALLS to CWT    
-
-    res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
-                   nproc=nproc, detrend=detrend, sg_kwargs=sg_kwargs,
-                   gaussianize=gaussianize, standardize=standardize, method=method)
-    res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
-                   nproc=nproc, detrend=detrend, sg_kwargs=sg_kwargs,
-                   gaussianize=gaussianize, standardize=standardize, method=method)
-
-    wt_coeff1 = res_wwz1.coeff[1] - res_wwz1.coeff[2]*1j
-    wt_coeff2 = res_wwz2.coeff[1] - res_wwz2.coeff[2]*1j
-
-    xw_coherence, xw_phase = wtc(wt_coeff1, wt_coeff2, freq, tau, smooth_factor=smooth_factor)
+    #  Compute CWT for both series       
+    cwt1 = cwt(ys1,ts1,freq=freq,freq_method=freq_method,freq_kwargs=freq_kwargs,
+               scale = scale, detrend=detrend, sg_kwargs=sg_kwargs,
+               gaussianize=gaussianize, standardize=standardize, pad=pad,
+               mother=mother,param=param)
+    
+    cwt2 = cwt(ys2,ts2,freq=freq,freq_method=freq_method,freq_kwargs=freq_kwargs,
+               scale = scale, detrend=detrend, sg_kwargs=sg_kwargs,
+               gaussianize=gaussianize, standardize=standardize, pad=pad,
+               mother=mother,param=param)
+    
+    wt_coeff1 = cwt1.coeff # check if conjugate is needed
+    wt_coeff2 = cwt2.coeff 
+    
+    # compute XWT and CWT
+    xw_coherence, xw_phase = wtc(cwt1.coeff,cwt2.coeff, freq, tau, smooth_factor=smooth_factor)
     xw_t, xw_amplitude, _ = xwt(wt_coeff1, wt_coeff2)
 
-    # Monte-Carlo simulations of AR1 process
-    nt = np.size(tau)
-    nf = np.size(freq)
-
-    #  coherence_red = np.ndarray(shape=(nMC, nt, nf))
-    #  AR1_q = np.ndarray(shape=(nt, nf))
-    coherence_red = None
-    AR1_q = None
-
-    #  if nMC >= 1:
-
-        #  for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
-            #  r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
-            #  r2 = ar1_sim(ys2_cut, np.size(ts2_cut), 1, ts=ts2_cut)
-            #  res_wwz_r1 = wwz(r1, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
-                                                     #  detrend=detrend, sg_kwargs=sg_kwrags,
-                                                     #  gaussianize=gaussianize, standardize=standardize)
-            #  res_wwz_r2 = wwz(r2, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
-                                                     #  detrend=detrend, sg_kwargs=sg_kwargs,
-                                                     #  gaussianize=gaussianize, standardize=standardize)
-
-            #  wt_coeffr1 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
-            #  wt_coeffr2 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
-            #  coherence_red[i, :, :], phase_red = wwz_coherence(wt_coeffr1, wt_coeffr2, freq, tau, smooth_factor=smooth_factor)
-
-        #  for j in range(nt):
-            #  for k in range(nf):
-                #  AR1_q[j, k] = mquantiles(coherence_red[:, j, k], 0.95)
-
-    #  else:
-        #  AR1_q = None
-
+    # evaluate cone of influence
     coi = make_coi(tau, Neff=Neff)
-    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xw_t', 'freq', 'time', 'AR1_q', 'coi'])
-    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase, xw_t=xw_t,
-                  freq=freq, time=tau, AR1_q=AR1_q, coi=coi)
+    
+    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xw_t',
+                                                 'freq', 'scales', 'time', 'AR1_q', 'coi'])
+    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, 
+                  xw_phase=xw_phase, xw_t=xw_t, freq=freq, time=tau,
+                  AR1_q=None, coi=coi, scales = cwt1.scale)
 
     return res
 
 
-#     #make sure that the time series is evenly-spaced
-#     if is_evenly_spaced(ts) == True:
-#         dt = np.mean(np.diff(ts))
-#     else:
-#         raise ValueError('Time series must be evenly spaced in time')
 
-#     # prepare the time series
-#     pd_ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs,
-#                        gaussianize=gaussianize, standardize=standardize)
-
-#     # Get the fourier factor
-#     if mother.lower() == 'morlet':
-#         if param is None:
-#             param = 6.
-#         fourier_factor = 4 * np.pi / (param + np.sqrt(2 + param**2))
-#     elif mother.lower() == 'paul':
-#         if param is None:
-#             param = 4.
-#         fourier_factor = 4 * np.pi / (2 * param + 1)
-#     elif mother.lower() == 'dog':
-#         if param is None:
-#             param = 2.
-#         fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * param + 1))
-#     else:
-#         fourier_factor = 1
-
-#     #get the frequency/scale information
-#     if freq is None:
-#         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-#         if freq_method == 'scale':
-#             freq_kwargs.update({'fourier_factor':fourier_factor})
-#         freq = make_freq_vector(ts, method=freq_method, **freq_kwargs)
-#     # Use scales
-#     scale = np.sort(1/(freq*fourier_factor))
-
-#     #Normalize
-#     #n_ys = pd_ys-np.mean(pd_ys)
-
-#     #pad if wanted
-#     if pad == True:
-#         pad_kwargs = {} if pad_kwargs is None else pad_kwargs.copy()
-#         yp,tp = ts_pad(pd_ys,ts,**pad_kwargs)
-#     else:
-#         yp=pd_ys
-#         tp=ts
-
-#     # Wave calculation
-#     n = len(yp)
-
-#     # construct wavenumber array used in transform [Eqn(5)]
-#     kplus = np.arange(1, int(n / 2) + 1)
-#     kplus = (kplus * 2 * np.pi / (n * dt))
-#     kminus = np.arange(1, int((n - 1) / 2) + 1)
-#     kminus = np.sort((-kminus * 2 * np.pi / (n * dt)))
-#     k = np.concatenate(([0.], kplus, kminus))
-
-#     # compute FFT of the (padded) time series
-#     f = np.fft.fft(yp)
-
-#     # define the wavelet array
-#     wave = np.zeros(shape=(len(scale), n), dtype=complex)
-
-#     # loop through all scales and compute transform
-#     for a1 in range(0, len(scale)):
-#         daughter, fourier_factor, coi, _ = \
-#             wave_bases(mother, k, scale[a1], param)
-#         wave[a1, :] = np.fft.ifft(f * daughter)  # wavelet transform[Eqn(4)]
-
-#     #COI
-#     coi = coi * dt * np.concatenate((
-#         np.insert(np.arange(int((len(ys) + 1) / 2) - 1), [0], [1E-5]),
-#         np.insert(np.flipud(np.arange(0, int(len(ys) / 2) - 1)), [-1], [1E-5])))
-
-#     #Remove the padding
-#     if pad == True:
-#         idx = np.in1d(tp,ts)
-#         wave = wave[:,idx]
-
-#     res = {}
-
-#     return res
 
 
 
