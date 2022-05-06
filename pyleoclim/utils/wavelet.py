@@ -1443,6 +1443,7 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     '''
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
+    # TODO: should this use common_time()?
     if tau is None:
         lb1, ub1 = np.min(ts1), np.max(ts1)
         lb2, ub2 = np.min(ts2), np.max(ts2)
@@ -2565,7 +2566,7 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     
 
     
-def cwt_coherence(ys1, ts1, ys2, ts2, freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=False,sg_kwargs={},
+def cwt_coherence(ys1, ts1, ys2, ts2, tau= None, freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=False,sg_kwargs={},
         gaussianize=False, pad=False, mother='MORLET',param=None, nMC=200):
     ''' Returns the wavelet transform coherence of two time series using the CWT.
 
@@ -2581,7 +2582,7 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None,freq_method='log',freq_kwargs={}
     ts2 : array
         time axis of the second time series
     tau : array
-        the evenly-spaced time points
+        the evenly-spaced time axis common to both series
     freq : array
         vector of frequency
     nMC : int
@@ -2617,7 +2618,15 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None,freq_method='log',freq_kwargs={}
     '''
     assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
-    #  TODO: CHECK ts1 ts2 evenly spaced 
+    if tau is None:
+        lb1, ub1 = np.min(ts1), np.max(ts1)
+        lb2, ub2 = np.min(ts2), np.max(ts2)
+        lb = np.max([lb1, lb2])
+        ub = np.min([ub1, ub2])   
+        inside = ts1[(ts1>=lb) & (ts1<=ub)]
+        tau = np.linspace(lb, ub, np.size(inside))
+        print(f'Setting tau={tau[:3]}...{tau[-3:]}, ntau={np.size(tau)}')
+        
 
     if freq is None:
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
