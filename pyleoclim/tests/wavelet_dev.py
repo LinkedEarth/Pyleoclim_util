@@ -20,13 +20,39 @@ nino = data['nino'].values
 ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)',label='AIR (mm/month)')
 ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)',label='NINO3 (K)')
 
-# without any arguments, the `tau` will be determined automatically
-coh = ts_air.wavelet_coherence(ts_nino)
-fig, ax = coh.plot()
+coh_cwt = ts_air.wavelet_coherence(ts_nino) # by default, the method applied is CWT 
+coh_wwz = ts_air.wavelet_coherence(ts_nino, method = 'wwz') # it's also easy (but slow) to apply WWZ to an evenly-spaced series
+
+fig, ax = coh_cwt.plot()
 #pyleo.closefig()
 
-cwt =  pyleo.utils.wavelet.cwt(nino, time)
-wwz =  pyleo.utils.wavelet.wwz(nino, time)
+cwt1 =  pyleo.utils.wavelet.cwt(nino, time)
+cwt2 =  pyleo.utils.wavelet.cwt(air, time)
+
+wt_coeff1 = cwt1.coeff.T # transpose so that scale is second axis, as for wwz
+wt_coeff2 = cwt2.coeff.T 
+
+scale = cwt1.scale
+tau = time
+smooth_factor = 0.25
+
+# compute XWT and CWT
+xw_coherence, xw_phase = pyleo.utils.wavelet.wtc(wt_coeff1, wt_coeff2, scale, tau, smooth_factor=smooth_factor)
+xw_t, xw_amplitude, _ = pyleo.utils.wavelet.xwt(wt_coeff1, wt_coeff2)
+
+#  COMPARE TO WWZ
+
+res_wwz1 = pyleo.utils.wavelet.wwz(nino, time)
+res_wwz2 = pyleo.utils.wavelet.wwz(air, time)
+
+wt_coeff1 = res_wwz1.coeff[1] - res_wwz1.coeff[2]*1j
+wt_coeff2 = res_wwz2.coeff[1] - res_wwz2.coeff[2]*1j
+
+scale = 1/res_wwz1.freq  # `scales` here is the `Period` axis in the wavelet plot
+
+xw_coherence, xw_phase = pyleo.utils.wavelet.wtc(wt_coeff1, wt_coeff2, scale, tau, 
+                                                 smooth_factor=smooth_factor)
+
 
 # or it can be passed
 ntau=50
