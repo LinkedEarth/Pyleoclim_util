@@ -743,37 +743,41 @@ class TestUISeriesDetrend():
 class TestUISeriesWaveletCoherence():
     ''' Test the wavelet coherence
     '''
-    @pytest.mark.parametrize('xwave_method',['wwz'])
+    @pytest.mark.parametrize('xwave_method',['wwz','cwt'])
     def test_xwave_t0(self, xwave_method):
         ''' Test Series.wavelet_coherence() with available methods using default arguments
-        Note: this function will expand as more methods become available for testing
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=alpha)
-        t1, v1 = gen_colored_noise(nt=500, alpha=alpha)
-        ts = pyleo.Series(time=t, value=v)
-        ts1 = pyleo.Series(time=t1, value=v1)
-        scal = ts.wavelet_coherence(ts1,method=xwave_method)
+        nt = 200
+        ts1 = pyleo.gen_ts(model='colored_noise', nt=nt)
+        ts2 = pyleo.gen_ts(model='colored_noise', nt=nt)
+        _ = ts2.wavelet_coherence(ts1,method=xwave_method)
 
     def test_xwave_t1(self):
         ''' Test Series.wavelet_coherence() with WWZ with specified frequency vector passed via `settings`
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=alpha)
-        t1, v1 = gen_colored_noise(nt=500, alpha=alpha)
-        ts = pyleo.Series(time=t, value=v)
-        ts1 = pyleo.Series(time=t1, value=v1)
+        nt = 200
+        ts1 = pyleo.gen_ts(model='colored_noise', nt=nt)
+        ts2 = pyleo.gen_ts(model='colored_noise', nt=nt)
         freq = np.linspace(1/500, 1/2, 20)
-        scal = ts.wavelet_coherence(ts1,method='wwz',settings={'freq':freq})
+        _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'freq':freq})
+        
+    @pytest.mark.parametrize('mother',['MORLET', 'PAUL', 'DOG'])
+    def test_xwave_t2(self,mother):
+        ''' Test Series.wavelet_coherence() with CWT with mother wavelet specified  via `settings`
+        '''
+        nt = 500
+        ts1 = pyleo.gen_ts(model='colored_noise', nt=nt)
+        ts2 = pyleo.gen_ts(model='colored_noise', nt=nt)
+        _ = ts1.wavelet_coherence(ts2,method='cwt',settings={'mother':mother})
 
     def test_xwave_t3(self):
         ''' Test Series.wavelet_coherence() with WWZ on unevenly spaced data
         '''
         alpha = 1
-        t, v = gen_colored_noise(nt=550, alpha=alpha)
-        t1, v1 = gen_colored_noise(nt=550, alpha=alpha)
+        t, v = gen_colored_noise(nt=220, alpha=alpha)
+        t1, v1 = gen_colored_noise(nt=220, alpha=alpha)
         #remove points
-        n_del = 50
+        n_del = 20
         deleted_idx = np.random.choice(range(np.size(t)), n_del, replace=False)
         deleted_idx1 = np.random.choice(range(np.size(t1)), n_del, replace=False)
         t_unevenly =  np.delete(t, deleted_idx)
@@ -799,18 +803,23 @@ class TestUISeriesWavelet():
     def test_wave_t1(self,wave_method):
         '''Test Series.spectral() with WWZ/cwt with specified frequency vector passed via `settings`
         '''
-        n = 200
+        n = 100
         ts = pyleo.gen_ts(model='colored_noise',nt=n)
         freq = np.linspace(1/n, 1/2, 20)
         _ = ts.wavelet(method=wave_method, settings={'freq': freq})
         
     def test_wave_t2(self):
-       ''' Test Series.wavelet() with available methods using default arguments
+       ''' Test Series.wavelet() ntau option and plot functionality
        '''
        ts = pyleo.gen_ts(model='colored_noise',nt=200)
        _ = ts.wavelet(method='wwz',settings={'ntau':10})
  
-
+    @pytest.mark.parametrize('mother',['MORLET', 'PAUL', 'DOG'])
+    def test_wave_t3(self,mother):
+       ''' Test Series.wavelet() with different mother wavelets
+       '''
+       ts = pyleo.gen_ts(model='colored_noise',nt=200)
+       _ = ts.wavelet(method='cwt',settings={'mother':mother})
 
 class TestUISeriesSsa():
     ''' Test the SSA functionalities

@@ -1331,12 +1331,12 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
 
     # calculate the cone of influence
     coi = make_coi(tau, Neff_threshold=Neff_coi)
-    # define `scales` as the `Period` axis in the wavelet plot
-    scales = 1/freq  
+    # define `scale` as the `Period` axis for the scalogram
+    scale = 1/freq  
     
     # export 
-    Results = collections.namedtuple('Results', ['amplitude', 'phase', 'coi', 'freq', 'time', 'Neffs', 'coeff', 'scales'])
-    res = Results(amplitude=wwa, phase=phase, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff, scales = scales)
+    Results = collections.namedtuple('Results', ['amplitude', 'phase', 'coi', 'freq', 'time', 'Neffs', 'coeff', 'scale'])
+    res = Results(amplitude=wwa, phase=phase, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff, scale = scale)
 
     return res
 

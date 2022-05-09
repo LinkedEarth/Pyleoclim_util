@@ -21,26 +21,6 @@ from pandas.testing import assert_frame_equal
 import pytest
 
 import pyleoclim as pyleo
-from pyleoclim.utils.tsmodel import (
-    ar1_sim,
-    colored_noise,
-)
-
-# a collection of useful functions
-
-def gen_normal(loc=0, scale=1, nt=100):
-    ''' Generate random data with a Gaussian distribution
-    '''
-    t = np.arange(nt)
-    v = np.random.normal(loc=loc, scale=scale, size=nt)
-    return t, v
-
-def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
-    ''' Generate colored noise
-    '''
-    t = np.arange(nt)
-    v = colored_noise(alpha=alpha, t=t, f0=f0, m=m, seed=seed)
-    return t, v
 
 
 # Tests below
@@ -51,8 +31,15 @@ class TestUiScalogramSignifTest:
     def test_signif_test_t0(self):
         ''' Test scalogram.signif_test() with default parameters
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=100, alpha=alpha)
-        ts = pyleo.Series(time=t, value=v)
+        ts = pyleo.gen_ts(model='colored_noise',nt=500)
         scal = ts.wavelet()
-        scal_signif = scal.signif_test(number=1)
+        scal_signif = scal.signif_test(number=10)
+        scal_signif.plot(mute=True)
+        
+    def test_signif_test_t1(self):
+        ''' Test scalogram.signif_test() with default parameters
+        '''
+        ts = pyleo.gen_ts(model='colored_noise',nt=500)
+        scal = ts.wavelet()
+        scal_signif = scal.signif_test(number=10,qs = [0.8, 0.9, .95])
+        scal_signif.plot(mute=True,signif_thresh=0.99)
