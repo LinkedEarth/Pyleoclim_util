@@ -9,15 +9,15 @@ Created on Mon Apr  4 14:49:05 2022
 import pyleoclim as pyleo
 import pandas as pd
 import numpy as np
-
-
 #data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
 data = pd.read_csv('/Users/julieneg/Documents/GitHub/Pyleoclim_util/example_data/wtc_test_data_nino_even.csv')
 time = data['t'].values
 air = data['air'].values
 nino = data['nino'].values
-ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)', label='AIR (mm/month)')
-ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)',label='NINO3 (K)')
+ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)', 
+                      label='All India Rainfall', value_name='AIR (mm/month)')
+ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)',
+                       label='NINO3', value_name='NINO3 (K)')
 
 # by default, the method applied is CWT 
 coh_cwt = ts_air.wavelet_coherence(ts_nino)
@@ -57,15 +57,16 @@ fig, ax = coh_wwz.plot()
 ntau = 40
 tau = np.linspace(np.min(ts_nino.time), np.max(ts_nino.time), ntau)
 coh_wwz2 = ts_air.wavelet_coherence(ts_nino, method = 'wwz', settings={'tau':tau})
-fig, ax = coh_wwz2 .plot()
-
+@savefig coh_wwz2.png
+fig, ax = coh_wwz2.plot()
 
 # Significance 
-cwt_sig = coh_cwt.signif_test()
-cwt_sig.plot(signif_thresh = 0.97)
+cwt_sig = coh_cwt.signif_test(qs=[.9,.95,.99]) # specifiying 3 signifiance threhsolds does not take any more time.
+@savefig cwt_sig.png
+# by default, the plot function will look for the closest quantile to 0.95, but it is easy to adjust:
+cwt_sig.plot(signif_thresh = 0.99) 
 
-
-
+# summary plot
 
 
  
@@ -73,6 +74,8 @@ cwt_sig.plot(signif_thresh = 0.97)
 
 
 # ========== Coherence summary plot ======
+
+ms = pyleo.MultipleSeries([ts_nino,ts_air])
 
  # if ax is None:
  #     if xwt is False:

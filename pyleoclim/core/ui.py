@@ -4030,6 +4030,71 @@ class Coherence:
             return fig, ax
         else:
             return ax
+    
+
+    def dashboard(self, title=None, figsize=[7, 18], mute=False, ax=None,
+                  savefig_settings={}, ts_plot_kwargs = None):
+         ''' Cross-wavelet dashboard, including the two series, WTC and XWT
+    
+         Parameters
+         ----------
+         
+
+         title : str, optional
+             Title of the plot. The default is None.
+         figsize : list, optional
+             Figure size. The default is [10, 8].
+        
+         mute : bool, optional
+             if True, the plot will not show;
+             recommend to turn on when more modifications are going to be made on ax The default is False. The default is False.
+             (going to be deprecated)
+         
+         savefig_settings : dict, optional
+             The default is {}.
+             the dictionary of arguments for plt.savefig(); some notes below:
+             - "path" must be specified; it can be any existed or non-existed path,
+               with or without a suffix; if the suffix is not given in "path", it will follow "format"
+             - "format" can be one of {"pdf", "eps", "png", "ps"}
+         ax : ax, optional
+             Matplotlib axis on which to return the figure. The default is None.
+        
+         ts_plot_kwargs : dict
+              arguments to be passed to the timeseries subplot, see pyleoclim.core.ui.MultipleSeries.stackplot for details
+    
+    
+         Returns
+         -------
+         fig, ax
+    
+         See also
+         --------
+    
+         pyleoclim.core.ui.Series.wavelet_coherence
+         matplotlib.pyplot.quiver
+    
+         '''
+         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+         fig = plt.figure(figsize=figsize)
+         gs = gridspec.GridSpec(6, 12)
+         gs.update(wspace=0, hspace=0)
+         ax = {}
+
+         #if ax is None:
+          #   fig, ax = plt.subplots(3,1,figsize=figsize)
+         
+         
+         # first plot timeseries
+         ts_plot_kwargs={} if ts_plot_kwargs is None else ts_plot_kwargs.copy()
+    
+
+         ms = MultipleSeries(self.timeseries1, self.timeseries2)
+         ax['ts'] = plt.subplot(gs[0:1, :-3])
+         ax['ts'] = ms.stackplot(ax=ax['ts'], **ts_plot_kwargs, plot_kwargs={'ylabel':None})
+         ax['ts'].xaxis.set_visible(False)
+         #ax['ts'].get_yaxis().set_label_coords(y_label_loc,0.5)
+         
+         return fig, ax
 
     def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95], settings=None, mute_pbar=False):
         '''Significance testing
@@ -5288,8 +5353,11 @@ class MultipleSeries:
         else:
             return ax
 
-    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None, mute=False):
+    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, 
+                  fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, 
+                  labels='auto', ylabels='auto', spine_lw=1.5, grid_lw=0.5, 
+                  font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4,
+                  linewidth=1.5, plot_kwargs=None, mute=False):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
@@ -5306,13 +5374,19 @@ class MultipleSeries:
         cmap : str
             The colormap to use when "colors" is None.
         norm : matplotlib.colors.Normalize like
-            The nomorlization for the colormap.
+            The normalization for the colormap.
             If None, a linear normalization will be used.
         labels: None, 'auto' or list
             If None, doesn't add labels to the subplots
             If 'auto', uses the labels passed during the creation of pyleoclim.Series
-            If list, pass a list of strings for each labels.
+            If list, passes a list of strings for each label.
             Default is 'auto'
+        labels: None, 'auto' or list
+            If None, doesn't add ylabels to the subplots
+            If 'auto', uses the value_name property of each series
+            If list, passes a list of strings for each label.
+            Default is 'auto'    
+            
         savefig_settings : dictionary
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -5413,7 +5487,7 @@ class MultipleSeries:
             fig, ax = ms.stackplot(labels=None, plot_kwargs={'marker':'o'})
             pyleo.closefig(fig)
 
-        But I really want to use different markers
+        If you want to use different markers:
 
         .. ipython:: python
             :okwarning:
@@ -5496,7 +5570,14 @@ class MultipleSeries:
             ax[idx].patch.set_alpha(0)
             ax[idx].set_xlim(xlim)
             time_label, value_label = ts.make_labels()
-            ax[idx].set_ylabel(value_label, weight='bold')
+
+            if ylabels == 'auto':
+                ax[idx].set_ylabel(value_label)
+            elif type(ylabels) ==list:
+                ax[idx].set_ylabel(ylabels[idx], color=clr)
+            elif ylabels==None:
+                pass
+                
 
             mu = np.mean(ts.value)
             std = np.std(ts.value)
