@@ -3803,7 +3803,7 @@ class Coherence:
         '''
         return deepcopy(self)
 
-    def plot(self, xlabel=None, ylabel=None, title=None, figsize=[10, 8],
+    def plot(self, var='wtc', xlabel=None, ylabel=None, title='auto', figsize=[10, 8],
              ylim=None, xlim=None, in_scale=True, yticks=None, mute=False,
              contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, ax=None,
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
@@ -3812,13 +3812,16 @@ class Coherence:
 
         Parameters
         ----------
-        
+        var : str {'wtc', 'xwt'}
+            variable to be plotted as color field. Default: 'wtc', the wavelet transform coherency.
+            'xwt' plots the cross-wavelet transform instead.
         xlabel : str, optional
             x-axis label. The default is None.
         ylabel : str, optional
             y-axis label. The default is None.
         title : str, optional
-            Title of the plot. The default is None.
+            Title of the plot. The default is 'auto', where it is made from object metadata.
+            To mute, pass title = None.
         figsize : list, optional
             Figure size. The default is [10, 8].
         ylim : list, optional
@@ -3842,6 +3845,7 @@ class Coherence:
             - 'skip_y':  the number of points to skip between phase arrows along the y-axis
             - 'scale': number of data units per arrow length unit (see matplotlib.pyplot.quiver)
             - 'width': shaft width in arrow units (see matplotlib.pyplot.quiver)
+            - 'color': arrow color (see matplotlib.pyplot.quiver)
         cbar_style : dict, optional
             Arguments for the color bar. The default is {}.
         savefig_settings : dict, optional
@@ -3908,11 +3912,10 @@ class Coherence:
         if signif_thresh > 1 or signif_thresh < 0:
             raise ValueError("The significance threshold must be in [0, 1] ")
 
-        # plot WTC
+        # plot color field for WTC or XWT
         contourf_args = {
             'cmap': 'magma',
             'origin': 'lower',
-            'levels': np.linspace(0, 1, 11),
         }
         contourf_args.update(contourf_style)
 
@@ -3922,8 +3925,16 @@ class Coherence:
         cmap.set_bad(bad_clr)
         contourf_args['cmap'] = cmap
 
-        cont = ax.contourf(self.time, y_axis, self.wtc[:, mask_freq].T, **contourf_args)
-
+        if var == 'wtc':
+            lev = np.linspace(0, 1, 11)
+            cont = ax.contourf(self.time, y_axis, self.wtc[:, mask_freq].T, 
+                               levels = lev, **contourf_args)
+        elif var == 'xwt':
+            cont = ax.contourf(self.time, y_axis, self.xwt[:, mask_freq].T,
+                               levels = 11, **contourf_args) # just pass number of contours
+        else:
+            raise ValueError("Unknown variable; please choose either 'wtc' or 'xwt'")
+            
         # plot significance levels
         if self.signif_qs is not None:
             signif_method_label = {
@@ -3934,23 +3945,29 @@ class Coherence:
                 print("Significance threshold {:3.2f} not found in qs. Picking the closest, which is {:3.2f}".format(signif_thresh,self.qs[isig]))
             else:
                 isig = self.qs.index(signif_thresh)
-            signif_coh = self.signif_qs[0].scalogram_list[isig] # extract WTC significance threshold
             
-            signif_boundary = self.wtc[:, mask_freq].T / signif_coh.amplitude[:, mask_freq].T
+            if var == 'wtc':    
+                signif_coh = self.signif_qs[0].scalogram_list[isig] # extract WTC significance threshold
+                signif_boundary = self.wtc[:, mask_freq].T / signif_coh.amplitude[:, mask_freq].T
+            elif var == 'xwt':
+                signif_coh = self.signif_qs[1].scalogram_list[isig] # extract XWT significance threshold
+                signif_boundary = self.xwt[:, mask_freq].T / signif_coh.amplitude[:, mask_freq].T
+
             ax.contour(self.time, y_axis, signif_boundary, [-99, 1],
                        colors=signif_clr,
                        linestyles=signif_linestyles,
                        linewidths=signif_linewidths)
-            ax.set_title("Lines:" + str(round(self.qs[isig]*100))+"% threshold")
+            if title is not None:
+                ax.set_title("Lines:" + str(round(self.qs[isig]*100))+"% threshold")
 
         # plot colorbar
         cbar_args = {
-            #'label': 'WTC',
+            'label': var.upper(),
             'drawedges': False,
             'orientation': 'vertical',
             'fraction': 0.15,
             'pad': 0.05,
-            'ticks': np.linspace(0, 1, 11)
+            'ticks': cont.levels
         }
         cbar_args.update(cbar_style)
 
@@ -3983,7 +4000,9 @@ class Coherence:
         # plot phase
         skip_x = np.max([int(np.size(self.time)//20), 1])
         skip_y = np.max([int(np.size(y_axis)//20), 1])
-        phase_args = {'pt': 0.5, 'skip_x': skip_x, 'skip_y': skip_y, 'scale': 30, 'width': 0.004}
+        
+        phase_args = {'pt': 0.5, 'skip_x': skip_x, 'skip_y': skip_y, 
+                      'scale': 30, 'width': 0.004}
         phase_args.update(phase_style)
 
         pt = phase_args['pt']
@@ -3991,6 +4010,11 @@ class Coherence:
         skip_y = phase_args['skip_y']
         scale = phase_args['scale']
         width = phase_args['width']
+        
+        if 'color' in phase_style:
+            color = phase_style['color']
+        else:
+            color = 'black'
 
         phase = np.copy(self.phase)[:, mask_freq]
 
@@ -4004,26 +4028,25 @@ class Coherence:
 
         ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
                   U[::skip_y, ::skip_x], V[::skip_y, ::skip_x],
-                  scale=scale, width=width, zorder=99)
+                  scale=scale, width=width, zorder=99, color=color)
 
         ax.set_ylim(ylim)
 
         if xlim is not None:
-            ax.set_xlim(xlim)
-
-        if title is not None:
-            fig.suptitle(title)
+            ax.set_xlim(xlim)        
 
         lbl1 = self.timeseries1.label
         lbl2 = self.timeseries2.label
 
-        if title is None and lbl1 is not None and lbl1 is not None:
-            title = 'Wavelet transform coherency between '+ lbl1 + ' and ' + lbl2
-            fig.suptitle(title)
             
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
+            if title is not None and  title != 'auto':
+                fig.suptitle(title)
+            elif title == 'auto' and lbl1 is not None and lbl1 is not None:
+                title = 'Wavelet coherency ('+var.upper() +') between '+ lbl1 + ' and ' + lbl2
+                fig.suptitle(title)
             # else:
             #     if not mute:
             #         plotting.showfig(fig)
@@ -4032,18 +4055,20 @@ class Coherence:
             return ax
     
 
-    def dashboard(self, title=None, figsize=[7, 18], mute=False, ax=None,
-                  savefig_settings={}, ts_plot_kwargs = None):
-         ''' Cross-wavelet dashboard, including the two series, WTC and XWT
+    def dashboard(self, title=None, figsize=[9,12], mute=False, phase_style = {},
+                  savefig_settings={}, ts_plot_kwargs = None, wavelet_plot_kwargs= None):
+         ''' Cross-wavelet dashboard, including the two series, WTC and XWT.
     
+             Note: this design balances many considerations, and is not easily customizable.   
+             
          Parameters
          ----------
-         
 
          title : str, optional
              Title of the plot. The default is None.
+             
          figsize : list, optional
-             Figure size. The default is [10, 8].
+             Figure size. The default is [9, 12], as this is an information-rich figure.
         
          mute : bool, optional
              if True, the plot will not show;
@@ -4056,12 +4081,13 @@ class Coherence:
              - "path" must be specified; it can be any existed or non-existed path,
                with or without a suffix; if the suffix is not given in "path", it will follow "format"
              - "format" can be one of {"pdf", "eps", "png", "ps"}
-         ax : ax, optional
-             Matplotlib axis on which to return the figure. The default is None.
         
          ts_plot_kwargs : dict
-              arguments to be passed to the timeseries subplot, see pyleoclim.core.ui.MultipleSeries.stackplot for details
-    
+              arguments to be passed to the timeseries subplot, see pyleoclim.core.ui.Series.plot for details
+         
+         wavelet_plot_kwargs : dict
+              arguments to be passed to the contour subplots (XWT and WTC), see pyleoclim.core.ui.Scalogram.plot for details
+     
     
          Returns
          -------
@@ -4074,25 +4100,56 @@ class Coherence:
          matplotlib.pyplot.quiver
     
          '''
+         # prepare options dictionaries
          savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-         fig = plt.figure(figsize=figsize)
-         gs = gridspec.GridSpec(6, 12)
-         gs.update(wspace=0, hspace=0)
-         ax = {}
-
-         #if ax is None:
-          #   fig, ax = plt.subplots(3,1,figsize=figsize)
-         
-         
-         # first plot timeseries
+         wavelet_plot_kwargs={} if wavelet_plot_kwargs is None else wavelet_plot_kwargs.copy()
          ts_plot_kwargs={} if ts_plot_kwargs is None else ts_plot_kwargs.copy()
-    
 
-         ms = MultipleSeries(self.timeseries1, self.timeseries2)
-         ax['ts'] = plt.subplot(gs[0:1, :-3])
-         ax['ts'] = ms.stackplot(ax=ax['ts'], **ts_plot_kwargs, plot_kwargs={'ylabel':None})
-         ax['ts'].xaxis.set_visible(False)
-         #ax['ts'].get_yaxis().set_label_coords(y_label_loc,0.5)
+
+         # create figure
+         fig = plt.figure(figsize=figsize)
+         gs = gridspec.GridSpec(8, 1)
+         gs.update(wspace=0, hspace=0.3) # add some breathing room
+         ax = {}
+        
+         # 1) plot timeseries
+    
+         ax['ts'] = plt.subplot(gs[0:2, 0])
+         self.timeseries1.plot(ax=ax['ts'], color='C0', label='', **ts_plot_kwargs)
+         ax['ts'].yaxis.label.set_color('C0') 
+         ax['ts'].tick_params(axis='y', colors='C0')  
+         ax['ts'].spines['left'].set_color('C0')
+         ax['ts'].spines['bottom'].set_visible(False)
+         ax['ts'].grid(False)
+
+         axts2 = ax['ts'].twinx()
+         self.timeseries2.plot(ax=axts2, color='C1', label='',  **ts_plot_kwargs)
+         axts2.yaxis.label.set_color('C1') 
+         axts2.tick_params(axis='y', colors='C1')
+         axts2.spines['right'].set_color('C1')
+         axts2.spines['right'].set_visible(True)
+         axts2.spines['left'].set_visible(False)
+         axts2.grid(False)
+
+         # 2) plot WTC
+         ax['wtc'] = plt.subplot(gs[2:5, 0])
+         if 'cbar_style' not in wavelet_plot_kwargs:
+             wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal',
+                                                       'pad': 0.09, 'aspect': 50}})
+         self.plot(var='wtc',ax=ax['wtc'], title= None, **wavelet_plot_kwargs)
+         #ax['wtc'].xaxis.set_visible(False)  # hide x axis
+         ax['wtc'].set_xlabel('')
+
+        # 3) plot XWT
+         ax['xwt'] = plt.subplot(gs[5:8, 0])
+         if 'phase_style' not in wavelet_plot_kwargs:    
+             wavelet_plot_kwargs.update({'phase_style':{'color': 'lightgray'}})
+         self.plot(var='xwt',ax=ax['xwt'], title= None,
+                   contourf_style={'cmap': 'viridis'},
+                   cbar_style={'orientation': 'horizontal','pad': 0.15, 'aspect': 50},
+                   phase_style=wavelet_plot_kwargs['phase_style'])
+         
+         #fig.tight_layout() # this does nothing
          
          return fig, ax
 
@@ -5578,7 +5635,6 @@ class MultipleSeries:
             elif ylabels==None:
                 pass
                 
-
             mu = np.mean(ts.value)
             std = np.std(ts.value)
             ylim = [mu-4*std, mu+4*std]

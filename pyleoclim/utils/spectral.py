@@ -614,7 +614,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
 def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             tau=None, c=1e-3, nproc=8,
             detrend=False, sg_kwargs=None, gaussianize=False,
-            standardize=False, Neff=3, anti_alias=False, avgs=2,
+            standardize=False, Neff_threshold=3, anti_alias=False, avgs=2,
             method='Kirchner_numba', wwa=None, wwz_Neffs=None, wwz_freq=None):
     ''' Returns the power spectral density (PSD) of a timeseries using the Weighted Wavelet Z-transform
 
@@ -682,8 +682,8 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         - 'Kirchner_f2py':  the method Kirchner adapted from Foster, implemented with f2py for acceleration;
         - 'Kirchner_numba':  the method Kirchner adapted from Foster, implemented with Numba for acceleration (default);
 
-    Neff : int
-        effective number of points
+    Neff_threshold : int
+       threshold for effective number of points
     anti_alias : bool
         If True, uses anti-aliasing
     avgs : int
@@ -740,7 +740,7 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         wwz_Neffs = res_wwz.Neffs
         wwz_freq = res_wwz.freq
 
-    psd = wwa2psd(wwa, ts_cut, wwz_Neffs, freq=wwz_freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+    psd = wwa2psd(wwa, ts_cut, wwz_Neffs, freq=wwz_freq, Neff_threshold=Neff_threshold, anti_alias=anti_alias, avgs=avgs)
     #  psd[1/freqs > np.max(coi)] = np.nan  # cut off the unreliable part out of the coi
     #  psd = psd[1/freqs <= np.max(coi)] # cut off the unreliable part out of the coi
     #  freqs = freqs[1/freqs <= np.max(coi)]
