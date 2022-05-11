@@ -4019,11 +4019,16 @@ class Coherence:
         phase = np.copy(self.phase)[:, mask_freq]
 
         if self.signif_qs is None:
-            phase[self.wtc[:, mask_freq] < pt] = np.nan
+            if var == 'wtc':
+                phase[self.wtc[:, mask_freq] < pt] = np.nan
+            else:
+                field = self.xwt[:, mask_freq]
+                phase[field < pt*field.max()] = np.nan
         else:
             phase[signif_boundary.T < 1] = np.nan
 
-        X, Y = np.meshgrid(self.time, 1/self.frequency[mask_freq])
+        
+        X, Y = np.meshgrid(self.time, y_axis)
         U, V = np.cos(phase).T, np.sin(phase).T
 
         ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
