@@ -1864,7 +1864,7 @@ class Series:
         v_mod = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
         new.value = v_mod
         return new
-
+    
     def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
@@ -1872,7 +1872,7 @@ class Series:
         ----------
 
         method : str
-            {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram'}
+            {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram', 'cwt'}
 
         freq_method : str
             {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
@@ -1887,7 +1887,7 @@ class Series:
             Label for the PSD object
 
         scalogram : pyleoclim.core.ui.Series.Scalogram
-            The return of the wavelet analysis; effective only when the method is 'wwz'
+            The return of the wavelet analysis; effective only when the method is 'wwz' or 'cwt'
 
         verbose : bool
             If True, will print warning messages if there is any
@@ -1909,6 +1909,8 @@ class Series:
         pyleoclim.utils.spectral.periodogram: Spectral anaysis using the basic Fourier transform
 
         pyleoclim.utils.spectral.wwz_psd : Spectral analysis using the Wavelet Weighted Z transform
+
+        pyleoclim.utils.spectral.cwt_psd : Spectral analysis using the continuous Wavelet Transform as implemented by Torrence and Compo
 
         pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
@@ -2014,7 +2016,7 @@ class Series:
 
             ts_interp = ts_std.interp()
             psd_perio = ts_interp.spectral(method='periodogram')
-            psd_perio_signif = psd_perio.signif_test(number=20) #in practice, need more AR1 simulations
+            psd_perio_signif = psd_perio.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_perio.png
             fig, ax = psd_perio_signif.plot(title='PSD using Periodogram method')
             pyleo.closefig(fig)
@@ -2027,7 +2029,7 @@ class Series:
 
             ts_interp = ts_std.interp()
             psd_welch = ts_interp.spectral(method='welch')
-            psd_welch_signif = psd_welch.signif_test(number=20) #in practice, need more AR1 simulations
+            psd_welch_signif = psd_welch.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_welch.png
             fig, ax = psd_welch_signif.plot(title='PSD using Welch method')
             pyleo.closefig(fig)
@@ -2040,9 +2042,22 @@ class Series:
 
             ts_interp = ts_std.interp()
             psd_mtm = ts_interp.spectral(method='mtm')
-            psd_mtm_signif = psd_mtm.signif_test(number=20) #in practice, need more AR1 simulations
+            psd_mtm_signif = psd_mtm.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_mtm.png
             fig, ax = psd_mtm_signif.plot(title='PSD using MTM method')
+            pyleo.closefig(fig)
+
+        - Continuous Wavelet Transform
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            ts_interp = ts_std.interp()
+            psd_cwt = ts_interp.spectral(method='cwt')
+            psd_cwt_signif = psd_cwt.signif_test()
+            @savefig spec_cwt.png
+            fig, ax = psd_cwt_signif.plot(title='PSD using CWT method')
             pyleo.closefig(fig)
 
         '''
@@ -2055,13 +2070,15 @@ class Series:
             'mtm': specutils.mtm,
             'lomb_scargle': specutils.lomb_scargle,
             'welch': specutils.welch,
-            'periodogram': specutils.periodogram
+            'periodogram': specutils.periodogram,
+            'cwt': specutils.cwt_psd
         }
         args = {}
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
 
         args['wwz'] = {'freq': freq}
+        args['cwt'] = {'freq': freq}
         args['mtm'] = {}
         args['lomb_scargle'] = {'freq': freq}
         args['welch'] = {}
@@ -2077,6 +2094,16 @@ class Series:
                 }
             )
 
+        if method == 'cwt' and scalogram is not None:
+            Results = collections.namedtuple('Results', ['amplitude', 'coi', 'freq', 'time', 'scale', 'mother','param'])
+            res = Results(amplitude=scalogram.amplitude, coi=scalogram.coi,
+                          freq=scalogram.frequency, time=scalogram.time,
+                          scale=scalogram.wave_args['scale'],
+                          mother=scalogram.wave_args['mother'],
+                          param=scalogram.wave_args['param'])
+            args['cwt'].update({'cwt_res':res})
+
+
         spec_res = spec_func[method](self.value, self.time, **args[method])
         if type(spec_res) is dict:
             spec_res = dict2namedtuple(spec_res)
@@ -2088,6 +2115,12 @@ class Series:
             args['wwz'].pop('wwa')
             args['wwz'].pop('wwz_Neffs')
             args['wwz'].pop('wwz_freq')
+
+        if method == 'cwt':
+            args['cwt'].update({'scale':spec_res.scale,'mother':spec_res.mother,'param':spec_res.param})
+            if scalogram is not None:
+                args['cwt'].pop('cwt_res')
+
 
         psd = PSD(
             frequency=spec_res.freq,
