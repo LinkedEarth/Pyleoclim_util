@@ -2107,9 +2107,11 @@ class Series:
         ----------
 
         method : str {wwz, cwt}
-            Default is None, so the method is assigned based on whether the series
-            are evenly-spaced (cwt, Torrence and Compo [1998]) or unevenly-spaced
-            (wwz, Foster [1996]).
+            cwt - the continuous wavelet transform (as per Torrence and Compo [1998])
+                is appropriate for evenly-spaced series.
+            wwz - the weighted wavelet Z-trasnform (as per Foster [1996])
+                is appropriate for unevenly-spaced series.
+            Default is cwt, returning an error if the Series is unevenly-spaced.
 
         freq_method : str
             {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
@@ -2118,7 +2120,7 @@ class Series:
             Arguments for the frequency vector
 
         settings : dict
-            Arguments for the specific spectral method
+            Arguments for the specific wavelet method
 
         verbose : bool
             If True, will print warning messages if there is any
@@ -2189,7 +2191,6 @@ class Series:
         if method == 'cwt' and not(self.is_evenly_spaced()):
            raise ValueError("The chosen method is cwt but the series is unevenly spaced. You can either interpolate/bin or use 'wwz'.")     
             
-
         wave_func = {'wwz': waveutils.wwz,
                      'cwt': waveutils.cwt
                      }
@@ -2210,8 +2211,7 @@ class Series:
             tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
             settings.update({'tau': tau})
           
-
-        args[method].update(settings)
+        args[method].update(settings)  # BUG if settings ={}
 
         # Apply wavelet method
         wave_res = wave_func[method](self.value, self.time, **args[method])
@@ -2221,7 +2221,7 @@ class Series:
             wwz_Neffs = wave_res.Neffs
         elif method=='cwt':
             wwz_Neffs = None
-            args[method].update({'scale':wave_res.scale,'mother':wave_res.mother,'param':wave_res.param})
+            args[method].update({'scale':wave_res.scale,'mother':wave_res.mother,'param':wave_res.param}) 
 
         scal = Scalogram(
             frequency=wave_res.freq,
@@ -5240,14 +5240,18 @@ class MultipleSeries:
 
         return psds
 
-    def wavelet(self, method=None, settings={}, freq_method='log', freq_kwargs=None, verbose=False, mute_pbar=False):
+    def wavelet(self, method='cwt', settings={}, freq_method='log', freq_kwargs=None, verbose=False, mute_pbar=False):
         '''Wavelet analysis
 
         Parameters
         ----------
-        method : {wwz, cwt}
-            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from pywavelets)
-
+        method : str {wwz, cwt}
+            cwt - the continuous wavelet transform (as per Torrence and Compo [1998])
+                is appropriate for evenly-spaced series.
+            wwz - the weighted wavelet Z-trasnform (as per Foster [1996])
+                is appropriate for unevenly-spaced series.
+            Default is cwt, returning an error if the Series is unevenly-spaced.
+            
         settings : dict, optional
             Settings for the particular method. The default is {}.
 
@@ -5262,7 +5266,6 @@ class MultipleSeries:
 
         verbose : bool
             If True, will print warning messages if there is any
-
 
         mute_pbar : bool, optional
             Whether to mute the progress bar. The default is False.

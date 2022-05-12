@@ -730,10 +730,9 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
                                             freq_method=freq_method,
                                             freq_kwargs=freq_kwargs,tau=tau)
 
-    # get wwa but AR1_q is not needed here so set nMC=0
-    #  wwa, _, _, coi, freq, _, Neffs, _ = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
+   
     if wwa is None or wwz_Neffs is None or wwz_freq is None:
-        res_wwz = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
+        res_wwz = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc,
                   detrend=detrend, sg_kwargs=sg_kwargs,
                   gaussianize=gaussianize, standardize=standardize, method=method)
         wwa = res_wwz.amplitude
