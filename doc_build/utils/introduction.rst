@@ -144,8 +144,14 @@ Functions for wavelet analysis. Includes some pre-processing and post-processing
 
    * - :ref:`wwz <utils_wwz>`
      - Weighted wavelet amplitude (WWA) for unevenly-spaced data
-   * - :ref:`xwc <utils_xwc>`
-     - Cross-wavelet analysis for unevenly-spaced data.
+   * - :ref:`wavelet_coherence <utils_wavelet_coherence>`
+     - Cross-wavelet coherence for unevenly-spaced data.
+   * - :ref:`xwt <utils_xwt`
+     - Cross-Wavelet transform for unevenly-spaced data.
+   * - :ref:`wtc <utils_wtc`
+     - Cross-Wavelet coherence for unevenly-spaced data.
+   * - :ref:`cwt <utils_cwt`
+     - Continuous wavelet transform after Torrence and Compo
 
 
 Tsutils
@@ -162,19 +168,17 @@ This modules contain pre-processing functions for time series analysis.
    * - :ref:`bin <utils_bin>`
      - Bin the values into evenly-spaced bins
    * - :ref:`gkernel <utils_gkernel>`
-     - Coarsen time resolution using a Gaussian Kernel
-   * - :ref:`grid_properties <utils_grid_properties>`
-     - Establishes the grid properties of a numerical array
+     - Coarsens time resolution using a Gaussian Kernel
+   * - :ref:`increments <utils_increments>`
+     - Assesses the increments of a numerical array
    * - :ref:`interp <utils_interp>`
      - Interpolation function based on `scipy.interpolate.interp1d <https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html>_`
-   * - :ref:`on_common_axis <utils_on_common_axis>`
-     - Places two timeseries on a common time axis
    * - :ref:`standardize <utils_standardize>`
      - Standardizes a timeseries
    * - :ref:`ts2segments <utils_ts2segments>`
      - Chop a timeseries into several segments based on gap detection
    * - :ref:`annualize <utils_annualize>`
-     - Annualize a time series whose time resolution is finer than 1 year
+     - Annualizes a time series whose time resolution is finer than 1 year
    * - :ref:`gaussianize <utils_gaussianize>`
      - Maps a (proxy) timeseries to a Gaussian distribution
    * - :ref:`gaussianize_single <utils_gaussianize_single>`
@@ -182,9 +186,9 @@ This modules contain pre-processing functions for time series analysis.
    * - :ref:`detrend <utils_detrend>`
      - Applies linear, constant, low-pass filter, or decomposition-based detrending
    * - :ref:`detect_outliers <utils_detect_outliers>`
-     - Detect outliers in a timeseries
+     - Detects outliers in a timeseries
    * - :ref:`remove_outliers <utils_remove_outliers>`
-     - Remove outliers in a timeseries
+     - Removes outliers in a timeseries
 
 
 Tsbase
@@ -233,17 +237,7 @@ The most relevant functions concern querying the LinkedEarth wiki. The first 5 f
 jsonutils
 """""""""
 
-This module converts Pyleoclim objects to and from JSON files. Useful for obtaining a human-readable output and keeping the results of an analysis.
+This module converts Pyleoclim objects to and from JSON files. Useful for obtaining a human-readable output and keeping the results of an analysis. The JSON file can also be used to swap analysis results between programming language. Please note that this utilities are maintained on a as-needed basis and that not all objects are currently available.
 
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`PyleoObj_to_json <utils_PyleoObj_to_json>`
-     - Saves a Pyleoclim Object (e.g., Series, PSD, Scalogram) to a json file
-   * - :ref:`json_to_Series <utils_json_to_Series>`
-     - Load a pyleoclim Series object from a JSON file
-   * - :ref:`json_to_PSD <utils_json_to_PSD>`
-     - Load a pyleoclim PSD object from a JSON file
-   * - :ref:`json_to_Scalogram <utils_json_to_Scalogram>`
-     - Load a pyleoclim Scalogram object from a JSON file
+.. automodule:: pyleoclim.utils.jsonutils
+  :members: PyleoObj_to_json, json_to_PyleoObj

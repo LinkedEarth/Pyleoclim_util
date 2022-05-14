@@ -14,6 +14,7 @@ from scipy import optimize
 
 __all__ = [
     'ar1_sim',
+    'ar1_fit',
     'colored_noise',
     'colored_noise_2regimes',
     'gen_ar1_evenly',

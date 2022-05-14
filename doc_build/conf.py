@@ -71,7 +71,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Pyleoclim'
-copyright = '2017-2021, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James'
+copyright = '2017-2022, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James'
 author = 'Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James, Pratheek Athreya, Myron Kwan, Daniel Garijo, Jun Hu'
 
 # The version info for the project you're documenting, acts as replacement for

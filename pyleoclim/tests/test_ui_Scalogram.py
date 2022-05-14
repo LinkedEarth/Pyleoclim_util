@@ -19,27 +19,26 @@ from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
 
 import pytest
-
 import pyleoclim as pyleo
-
 
 # Tests below
 class TestUiScalogramSignifTest:
     ''' Tests for Scalogram.signif_test()
     '''
 
-    def test_signif_test_t0(self):
+    @pytest.mark.parametrize('wave_method',['wwz','cwt'])
+    def test_signif_test_t0(self, wave_method):
         ''' Test scalogram.signif_test() with default parameters
         '''
         ts = pyleo.gen_ts(model='colored_noise',nt=500)
-        scal = ts.wavelet()
-        scal_signif = scal.signif_test(number=10)
-        scal_signif.plot(mute=True)
-        
-    def test_signif_test_t1(self):
-        ''' Test scalogram.signif_test() with default parameters
-        '''
-        ts = pyleo.gen_ts(model='colored_noise',nt=500)
-        scal = ts.wavelet()
-        scal_signif = scal.signif_test(number=10,qs = [0.8, 0.9, .95])
+        scal = ts.wavelet(method=wave_method)
+        scal_signif = scal.signif_test(number=10, qs = [0.8, 0.9, .95])
         scal_signif.plot(mute=True,signif_thresh=0.99)
+
+    @pytest.mark.parametrize('ar1_method',['ar1asym', 'ar1sim'])
+    def test_signif_test_t1(self,ar1_method):
+        ''' Test scalogram.signif_test() with default parameters
+        '''
+        ts = pyleo.gen_ts(model='colored_noise',nt=500)
+        scal = ts.wavelet(method='cwt')
+        scal_signif = scal.signif_test(method=ar1_method,number=1)

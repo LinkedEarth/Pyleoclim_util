@@ -32,7 +32,6 @@ import matplotlib as mpl
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 
-
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
 from scipy import stats
@@ -41,6 +40,8 @@ import warnings
 import os
 
 import lipd as lpd
+
+import collections
 
 def pval_format(p, threshold=0.01, style='exp'):
     ''' Print p-value with proper format when p is close to 0
@@ -321,8 +322,8 @@ class Series:
         if clean_ts==True:
             value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
 
-        self.time = time
-        self.value = value
+        self.time = np.array(time)
+        self.value = np.array(value)
         self.time_name = time_name
         self.time_unit = time_unit
         self.value_name = value_name
@@ -872,7 +873,7 @@ class Series:
 
             nino_mcssa.screeplot()
             @savefig scree_nmc.png
-            
+
 
         This suggests that modes 1-5 fall above the red noise benchmark.
 
@@ -1864,7 +1865,7 @@ class Series:
         v_mod = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
         new.value = v_mod
         return new
-    
+
     def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
         ''' Perform spectral analysis on the timeseries
 
@@ -2181,13 +2182,13 @@ class Series:
         References
         ----------
 
-        [1] Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. 
+        [1] Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis.
             Bull. Amer. Meteor. Soc., 79, 61-78.
         Python routines available at http://paos.colorado.edu/research/wavelets/
 
-        [2] Foster, G. Wavelets for period analysis of unevenly sampled time series. 
+        [2] Foster, G. Wavelets for period analysis of unevenly sampled time series.
             The Astronomical Journal 112, 1709 (1996).
-            
+
         Examples
         --------
 
@@ -2209,12 +2210,14 @@ class Series:
             scal_signif.plot(title='CWT scalogram')
             @savefig scal_cwt.png
 
-            # if you wanted to invoke the WWZ instead 
-            scal2 = ts.wavelet(method='wwz') # no significance testing to lower computational cost 
+            # if you wanted to invoke the WWZ instead
+            scal2 = ts.wavelet(method='wwz') # no significance testing to lower computational cost
             scal2.plot(title='WWZ scalogram')
             @savefig scal_wwz.png
 
             # notice that the two scalograms have different units, which are arbitrary
+
+        See the Series.spectral() functionality as an example to change the wavelet method.
 
         '''
         if not verbose:
@@ -2222,28 +2225,28 @@ class Series:
 
         # Assign method
         if method == 'cwt' and not(self.is_evenly_spaced()):
-           raise ValueError("The chosen method is cwt but the series is unevenly spaced. You can either interpolate/bin or use 'wwz'.")     
-            
+           raise ValueError("The chosen method is cwt but the series is unevenly spaced. You can either interpolate/bin or use 'wwz'.")
+
         wave_func = {'wwz': waveutils.wwz,
                      'cwt': waveutils.cwt
                      }
-        
+
         # Process options
         settings = {} if settings is None else settings.copy()
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
-        args = {}   
+        args = {}
         args['wwz'] = {'freq': freq}
         args['cwt'] = {'freq': freq}
-        
+
         if method == 'wwz':
             if 'ntau' in settings.keys():
                 ntau = settings['ntau']
             else:
-                ntau = np.min([np.size(self.time), 50])              
+                ntau = np.min([np.size(self.time), 50])
             tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
             settings.update({'tau': tau})
-          
+
         args[method].update(settings)
 
         # Apply wavelet method
@@ -2254,7 +2257,7 @@ class Series:
             wwz_Neffs = wave_res.Neffs
         elif method=='cwt':
             wwz_Neffs = None
-            args[method].update({'scale':wave_res.scale,'mother':wave_res.mother,'param':wave_res.param}) 
+            args[method].update({'scale':wave_res.scale,'mother':wave_res.mother,'param':wave_res.param})
 
         scal = Scalogram(
             frequency=wave_res.freq,
@@ -2287,7 +2290,7 @@ class Series:
 
         method : str
             Possible methods {'wwz','cwt'}. Default is 'cwt', which only works
-            if the series share the same evenly-spaced time axis. 
+            if the series share the same evenly-spaced time axis.
             'wwz' is designed for unevenly-spaced data, but is far slower.
 
         freq_method : str
@@ -2295,7 +2298,7 @@ class Series:
 
         freq_kwargs : dict
             Arguments for frequency vector
-        
+
         common_time_kwargs : dict
             Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
 
@@ -2374,20 +2377,20 @@ class Series:
             warnings.simplefilter('ignore')
 
         settings = {} if settings is None else settings.copy()
-        
+
         wtc_func = {
             'wwz': waveutils.wwz_coherence,
             'cwt': waveutils.cwt_coherence
         }
-   
+
         # Process options
         settings = {} if settings is None else settings.copy()
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
         freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
-        args = {}   
+        args = {}
         args['wwz'] = {'freq': freq}
         args['cwt'] = {'freq': freq}
-        
+
         # put on same time axes if necessary
         if method == 'cwt' and not np.array_equal(self.time, target_series.time):
             warnings.warn("Series have different time axes. Applying common_time().")
@@ -2401,16 +2404,16 @@ class Series:
         else:
             ts1 = self
             ts2 = target_series
-        
+
         if method == 'wwz':
             if 'ntau' in settings.keys():
                 ntau = settings['ntau']
             else:
-                ntau = np.min([np.size(ts1.time), np.size(ts2.time), 50])   
-                
+                ntau = np.min([np.size(ts1.time), np.size(ts2.time), 50])
+
             tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
             settings.update({'tau': tau})
-                   
+
         args[method].update(settings)
 
         # Apply WTC method
@@ -2432,140 +2435,10 @@ class Series:
             freq_method=freq_method,
             freq_kwargs=freq_kwargs,
         )
-        
+
         return coh
 
-    # def cross_wavelet(self, target_series, method=None, settings=None, freq_method='log', freq_kwargs=None, verbose=False):
-    #      ''' Perform cross-wavelet analysis (XWT) with the target timeseries
 
-    #      Parameters
-    #      ----------
-
-    #      target_series : pyleoclim.Series
-    #          The pyleoclim Series object with whom XWT is sought
-
-    #      method : {'wwz'}
-
-    #      freq_method : str
-    #          {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
-
-    #      freq_kwargs : dict
-    #          Arguments for frequency vector
-
-    #      settings : dict
-    #          Arguments for the specific spectral method
-
-    #      verbose : bool
-    #          If True, will print warning messages if there is any
-
-    #      Returns
-    #      -------
-
-    #      xwt : pyleoclim.CrossWavelet
-
-    #      See also
-    #      --------
-
-    #      pyleoclim.utils.wavelet.xwt : Cross-wavelet analysis
-
-    #      pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
-
-    #      pyleoclim.utils.tsutils.detrend : Detrending function
-
-    #      pyleoclim.core.ui.Coherence : Coherence object
-
-    #      Examples
-    #      --------
-
-    #      Wavelet coherence with the default arguments:
-
-    #      .. ipython:: python
-    #          :okwarning:
-    #          :okexcept:
-
-    #          import pyleoclim as pyleo
-    #          import pandas as pd
-    #          data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
-    #          time = data['t'].values
-    #          air = data['air'].values
-    #          nino = data['nino'].values
-    #          ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)')
-    #          ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)')
-
-    #          # without any arguments, the `tau` will be determined automatically
-    #          coh = ts_air.wavelet_coherence(ts_nino)
-
-    #          @savefig coh.png
-    #          fig, ax = coh.plot()
-    #          pyleo.closefig()
-
-    #      We may specify `ntau` to adjust the temporal resolution of the scalogram, which will affect the time consumption of calculation and the result itself:
-
-    #      .. ipython:: python
-    #          :okwarning:
-    #          :okexcept:
-
-    #          coh_ntau = ts_air.wavelet_coherence(ts_nino, ntau=30)
-
-    #          @savefig coh_ntau.png
-    #          fig, ax = coh_ntau.plot()
-    #          pyleo.closefig()
-
-    #      We may also specify the `tau` vector explicitly:
-
-    #      .. ipython:: python
-    #          :okwarning:
-    #          :okexcept:
-
-    #          coh_tau = ts_air.wavelet_coherence(ts_nino, tau=np.arange(1880, 2001))
-
-    #          @savefig coh_tau.png
-    #          fig, ax = coh_tau.plot()
-    #          pyleo.closefig()
-
-    #      '''
-    #      if not verbose:
-    #          warnings.simplefilter('ignore')
-
-    #      settings = {} if settings is None else settings.copy()
-    #      xwt_func = {
-    #          'wwz': waveutils.wavelet_coherence,
-    #          'cwt':
-    #      }
-
-    #      freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-    #      freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
-
-    #      t1 = np.copy(self.time)
-    #      t2 = np.copy(target_series.time)
-    #      dt1 = np.median(np.diff(t1))
-    #      dt2 = np.median(np.diff(t2))
-    #      overlap = np.arange(np.max([t1[0], t2[0]]), np.min([t1[-1], t2[-1]]), np.max([dt1, dt2]))
-
-    #      if ntau is None:
-    #          ntau = np.min([np.size(overlap), 50])
-
-    #      if tau is None:
-    #          tau = np.linspace(np.min(overlap), np.max(overlap), ntau)
-
-    #      args = {}
-    #      args['wwz'] = {'tau': tau, 'freq': freq, 'verbose': verbose}
-    #      args[method].update(settings)
-    #      wtc_res = wtc_func[method](self.value, self.time, target_series.value, target_series.time, **args[method])
-
-    #      xwt = CrossWavelet(
-    #          frequency=wtc_res.freq,
-    #          time=xwc_res.time,
-    #          coherence=xwc_res.xw_coherence,
-    #          phase=xwc_res.xw_phase,
-    #          coi=xwc_res.coi,
-    #          timeseries1=self,
-    #          timeseries2=target_series,
-    #          freq_method=freq_method,
-    #          freq_kwargs=freq_kwargs,
-    #      )
-
-    #      return xwt
 
     def correlation(self, target_series, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None, seed=None):
         ''' Estimates the Pearson's correlation and associated significance between two non IID time series
@@ -2779,13 +2652,13 @@ class Series:
         causal_res = spec_func[method](sorted_self.value, sorted_target.value, **args[method])
         return causal_res
 
-    def surrogates(self, method='ar1', number=1, length=None, seed=None, settings=None):
+    def surrogates(self, method='ar1sim', number=1, length=None, seed=None, settings=None):
         ''' Generate surrogates with increasing time axis
 
         Parameters
         ----------
 
-        method : {ar1}
+        method : {ar1sim}
             Uses an AR1 model to generate surrogates of the timeseries
 
         number : int
@@ -2811,10 +2684,10 @@ class Series:
         '''
         settings = {} if settings is None else settings.copy()
         surrogate_func = {
-            'ar1': tsmodel.ar1_sim,
+            'ar1sim': tsmodel.ar1_sim,
         }
         args = {}
-        args['ar1'] = {'t': self.time}
+        args['ar1sim'] = {'t': self.time}
         args[method].update(settings)
 
         if seed is not None:
@@ -2837,7 +2710,7 @@ class Series:
                  plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],
                  saveknee_settings=None,saveoutliers_settings=None, mute=False):
         '''
-        Detects outliers in a timeseries and removes if specified
+        Detects outliers in a timeseries and removes if specified. The method uses clustering to locate outliers.
 
         Parameters
         ----------
@@ -2879,11 +2752,49 @@ class Series:
 
         pyleoclim.utils.plotting.plot_scatter_xy : Scatter plot on top of a line plot
 
+        Examples
+        --------
+
+        Let's create a "perfect" sinusoidal signal and add outliers
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import numpy as np
+
+            # create the signal
+            freqs=[1/20,1/80]
+            time=np.arange(2001)
+            signals=[]
+            for freq in freqs:
+                signals.append(np.cos(2*np.pi*freq*time))
+            signal=sum(signals)
+
+            #add outliers
+            outliers_start = np.mean(signal)+5*np.std(signal)
+            outliers_end = np.mean(signal)+7*np.std(signal)
+            outlier_values = np.arange(outliers_start,outliers_end,0.1)
+            index = np.random.randint(0,len(signal),6)
+            signal_out = signal
+            for i,ind in enumerate(index):
+                signal_out[ind] = outlier_values[i]
+
+            #Make a Series object
+            ts = pyleo.Series(time=time,value=signal_out)
+            @savefig outliers.png
+            fig, ax = ts.plot()
+            pyleo.closefig(fig)
+
+            #Detect and remove outliers
+            ts_new=ts.outliers()
+            @savefig outliers_remove.png
+            fig, ax = ts_new.plot()
+            pyleo.closefig(fig)
+
         '''
         new = self.copy()
-
-        #outlier_indices,fig1,ax1,fig2,ax2 = tsutils.detect_outliers(self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,\
-        #                                                   figsize=figsize,save_knee=save_knee,save_outliers=save_outliers,plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
         outlier_indices = tsutils.detect_outliers(
             self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,
             figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,
@@ -3000,12 +2911,17 @@ class PSD:
         self.label = label
         self.timeseries = timeseries
         self.spec_method = spec_method
+        if spec_args is not None:
+            if 'freq' in spec_args.keys():
+                spec_args['freq'] = np.array(spec_args['freq'])
         self.spec_args = spec_args
         self.signif_qs = signif_qs
         self.signif_method = signif_method
         self.plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
-        self.beta_est_res = beta_est_res
-
+        if beta_est_res is None:
+            self.beta_est_res = beta_est_res
+        else:
+            self.beta_est_res = np.array(beta_est_res)
         if period_unit is not None:
             self.period_unit = period_unit
         elif timeseries is not None:
@@ -3027,7 +2943,7 @@ class PSD:
         msg = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.frequency)}'
 
-    def signif_test(self, number=None, method='ar1', seed=None, qs=[0.95],
+    def signif_test(self, method='ar1sim', number=None, seed=None, qs=[0.95],
                     settings=None, scalogram = None):
         '''
 
@@ -3036,14 +2952,14 @@ class PSD:
         ----------
         number : int, optional
             Number of surrogate series to generate for significance testing. The default is None.
-        method : {ar1}, optional
-            Method to generate surrogates. The default is 'ar1'.
+        method : {ar1asym,'ar1sim'}
+            Method to generate surrogates. AR1sim uses simulated timeseries with similar persistence. AR1asymp represents the closed form solution. The default is AR1sim
         seed : int, optional
             Option to set the seed for reproducibility. The default is None.
         qs : list, optional
             Singificance levels to return. The default is [0.95].
         settings : dict, optional
-            Parameters. The default is None.
+            Parameters for the specific significance test. The default is None. Note that the default value for the asymptotic solution is `time-average`
         scalogram : Pyleoclim Scalogram object, optional
             Scalogram containing signif_scals exported during significance testing of scalogram.
             If number is None and signif_scals are present, will use length of scalogram list as number of significance tests
@@ -3080,36 +2996,94 @@ class PSD:
 
             pyleo.closefig(fig)
 
+        See also
+        --------
+
+        pyleoclim.utils.wavelet.tc_wave_signif : asymptotic significance calculation
+
         '''
 
-        signif_scals = None
-        if scalogram:
-            try:
-                signif_scals = scalogram.signif_scals
-            except:
-                return ValueError('Could not find signif_scals in passed object, make sure this is a scalogram with signif_scals that were saved during significance testing')
+        if self.spec_method == 'wwz' and method == 'ar1asym':
+            raise ValueError('Asymptotic solution is not supported for the wwz method')
+
+        if self.spec_method == 'lomb_scargle' and method == 'ar1asym':
+            raise ValueError('Asymptotic solution is not supported for the Lomb-Scargle method')
+
+        if method not in ['ar1sim', 'ar1asym']:
+                raise ValueError("The available methods are ar1sim'and 'ar1asym'")
+
+        if method == 'ar1sim':
+            signif_scals = None
+            if scalogram:
+                try:
+                    signif_scals = scalogram.signif_scals
+                except:
+                    return ValueError('Could not find signif_scals in passed object, make sure this is a scalogram with signif_scals that were saved during significance testing')
 
 
-        if number is None and signif_scals:
-            number = len(signif_scals.scalogram_list)
-        elif number is None and signif_scals is None:
-            number = 200
-        elif number == 0:
-            return self
+            if number is None and signif_scals:
+                number = len(signif_scals.scalogram_list)
+            elif number is None and signif_scals is None:
+                number = 200
+            elif number == 0:
+                return self
 
-        new = self.copy()
-        surr = self.timeseries.surrogates(
-            number=number, seed=seed, method=method, settings=settings
-        )
-
-        if signif_scals:
-            surr_psd = surr.spectral(
-                method=self.spec_method, settings=self.spec_args, scalogram_list=signif_scals
+            new = self.copy()
+            surr = self.timeseries.surrogates(
+                number=number, seed=seed, method=method, settings=settings
             )
-        else:
-            surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
-        new.signif_qs = surr_psd.quantiles(qs=qs)
-        new.signif_method = method
+
+            if signif_scals:
+                surr_psd = surr.spectral(
+                    method=self.spec_method, settings=self.spec_args, scalogram_list=signif_scals
+                )
+            else:
+                surr_psd = surr.spectral(method=self.spec_method, settings=self.spec_args)
+            new.signif_qs = surr_psd.quantiles(qs=qs)
+            new.signif_method = method
+
+        elif method == 'ar1asym':
+            new=self.copy()
+
+            if type(qs) is not list:
+                raise TypeError('qs should be a list')
+
+            settings = {'sigtest':'time-average'} if settings is None else settings.copy()
+
+            if self.spec_method=='cwt':
+                if 'dof' not in settings.keys():
+                    dof = len(self.timeseries.value) - self.spec_args['scale']
+                    settings.update({'dof':dof})
+                signif_levels=waveutils.tc_wave_signif(self.timeseries.value,
+                                                       self.timeseries.time,
+                                                       self.spec_args['scale'],
+                                                       self.spec_args['mother'],
+                                                       self.spec_args['param'],
+                                                       qs=qs, **settings)
+            else:
+                # hard code Mortlet values to obtain the spectrum
+                param = 6
+                fourier_factor = 4 * np.pi / (param + np.sqrt(2 + param**2))
+                scale = 1/(fourier_factor*self.frequency)
+                if 'dof' not in settings.keys():
+                    dof = len(self.timeseries.value) - scale
+                    settings.update({'dof':dof})
+                signif_levels=waveutils.tc_wave_signif(self.timeseries.value,
+                                                       self.timeseries.time,
+                                                       scale,
+                                                       'MORLET',
+                                                       param,
+                                                       qs=qs, **settings)
+
+            # get it back into the object
+            new.signif_method = method
+
+            ms_base = []
+            for idx, item in enumerate(signif_levels):
+                label = str(int(qs[idx]*100))+'%'
+                s = PSD(frequency=self.frequency, amplitude = item, label=label)
+                ms_base.append(s)
+                new.signif_qs = MultiplePSD(ms_base)
 
         return new
 
@@ -3349,7 +3323,8 @@ class PSD:
         # plot significance levels
         if self.signif_qs is not None:
             signif_method_label = {
-                'ar1': 'AR(1)',
+                'ar1sim': 'AR(1) simulations',
+                'ar1asym': 'AR(1) asymptotic solution'
             }
             nqs = np.size(self.signif_qs.psd_list)
 
@@ -3479,6 +3454,11 @@ class Scalogram:
         self.label = label
         self.timeseries = timeseries
         self.wave_method = wave_method
+        if wave_args is not None:
+            if 'freq' in wave_args.keys():
+                wave_args['freq'] = np.array(wave_args['freq'])
+            if 'tau' in wave_args.keys():
+                wave_args['tau'] = np.array(wave_args['tau'])
         self.wave_args = wave_args
         self.signif_qs = signif_qs
         self.signif_method = signif_method
@@ -3486,7 +3466,10 @@ class Scalogram:
         self.freq_kwargs = freq_kwargs
         self.signif_scals = signif_scals
         #if wave_method == 'wwz':
-        self.wwz_Neffs = wwz_Neffs
+        if wwz_Neffs is None:
+            self.wwz_Neffs = wwz_Neffs
+        else:
+            self.wwz_Neffs=np.array(wwz_Neffs)
 
         if scale_unit is not None:
             self.scale_unit = scale_unit
@@ -3521,7 +3504,7 @@ class Scalogram:
         msg = print(tabulate(table, headers='keys'))
         return f'Dimension: {np.size(self.frequency)} x {np.size(self.time)}'
 
-    def plot(self, in_scale=True, xlabel=None, ylabel=None, title=None,
+    def plot(self, variable = 'amplitude', in_scale=True, xlabel=None, ylabel=None, title=None,
              ylim=None, xlim=None, yticks=None, figsize=[10, 8], mute=False,
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              contourf_style={}, cbar_style={}, savefig_settings={}, ax=None,
@@ -3532,6 +3515,8 @@ class Scalogram:
         ----------
         in_scale : bool, optional
             Plot the in scale instead of frequency space. The default is True.
+        variable : {'amplitude','power'}
+            Whether to plot the amplitude or power. Default is amplitude
         xlabel : str, optional
             Label for the x-axis. The default is None.
         ylabel : str, optional
@@ -3552,10 +3537,10 @@ class Scalogram:
             (going to be deprecated)
         signif_clr : str, optional
             Color of the singificance line. The default is 'white'.
-        signif_thresh: float in [0, 1] 
+        signif_thresh: float in [0, 1]
             Significance threshold. Default is 0.95. If this quantile is not
-            found in the qs field of the Coherence object, the closest quantile 
-            will be picked.     
+            found in the qs field of the Coherence object, the closest quantile
+            will be picked.
         signif_linestyles : str, optional
             Linestyle of the significance line. The default is '-'.
         signif_linewidths : float, optional
@@ -3600,7 +3585,12 @@ class Scalogram:
             if ylabel is None:
                 ylabel = f'Frequency [1/{self.scale_unit}]' if self.scale_unit is not None else 'Frequency'
 
-        cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
+        if variable == 'amplitude':
+            cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
+        elif variable=='power':
+            cont = ax.contourf(self.time, y_axis, self.amplitude.T**2, **contourf_args)
+        else:
+            raise ValueError('Variable should be either "amplitude" or "power"')
         ax.set_yscale('log')
 
         # plot colorbar
@@ -3631,7 +3621,7 @@ class Scalogram:
             signif_method_label = {
                 'ar1': 'AR(1)',
             }
-            if signif_thresh not in self.qs: 
+            if signif_thresh not in self.qs:
                 isig = np.abs(np.array(self.qs) - signif_thresh).argmin()
                 print("Significance threshold {:3.2f} not found in qs. Picking the closest, which is {:3.2f}".format(signif_thresh,self.qs[isig]))
             else:
@@ -3644,7 +3634,7 @@ class Scalogram:
                 linestyles=signif_linestyles,
                 linewidths=signif_linewidths,
             )
-            if title is None: 
+            if title is None:
                 if self.label is not None:
                     ax.set_title(self.label + " scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
                 else:
@@ -3674,16 +3664,15 @@ class Scalogram:
         else:
             return ax
 
-    def signif_test(self, number=None, method='ar1', seed=None, qs=[0.95],
+    def signif_test(self, method='ar1sim', number=None, seed=None, qs=[0.95],
                     settings=None, export_scal = False):
         '''Significance test for wavelet analysis
 
         Parameters
         ----------
-        number : int, optional
-            Number of surrogates to generate for significance analysis. The default is 200.
-        method : {'ar1'}, optional
-            Method to use to generate the surrogates. The default is 'ar1'.
+        method : {'ar1asym', 'ar1sim'}
+            Method to use to generate the surrogates.  AR1sim uses simulated timeseries with similar persistence. AR1asymp represents the closed form solution.The default is AR1sim
+            Number of surrogates to generate for significance analysis based on simulations. The default is 200.
         seed : int, optional
             Set the seed for the random number generator. Useful for reproducibility The default is None.
         qs : list, optional
@@ -3691,7 +3680,7 @@ class Scalogram:
         settings : dict, optional
             Parameters for the model. The default is None.
         export_scal : bool
-            Whether or not to export the scalograms used in the noise realizations. Note: The scalograms used for wavelet analysis are slightly different
+            Whether or not to export the scalograms used in the noise realizations. Note: For the wwz method, the scalograms used for wavelet analysis are slightly different
             than those used for spectral analysis (different decay constant). As such, this functionality should be used only to expedite exploratory analysis.
 
         Raises
@@ -3726,20 +3715,19 @@ class Scalogram:
 
         pyleoclim.core.ui.Series.wavelet : wavelet analysis
 
+        pyleoclim.utils.wavelet.tc_wave_signif : asymptotic significance calculation
+
         '''
+        if self.wave_method == 'wwz' and method == 'ar1asym':
+            raise ValueError('Asymptotic solution is not supported for the wwz method')
 
-        if hasattr(self,'signif_scals'):
-            signif_scals = self.signif_scals
+        if method not in ['ar1sim', 'ar1asym']:
+                raise ValueError("The available methods are ar1sim'and 'ar1asym'")
 
-        #Allow for a few different configurations of passed number of signif tests, default behavior is to set number = 200
-        if number is None and signif_scals is not None:
-            number = len(signif_scals.scalogram_list)
-        elif number is None and signif_scals is None:
-            number = 200
-        elif number == 0:
-            return self
+        if method == 'ar1sim':
 
-        new = self.copy()
+            if hasattr(self,'signif_scals'):
+                signif_scals = self.signif_scals
 
         if signif_scals:
             scalogram_list = signif_scals.scalogram_list
@@ -3754,10 +3742,10 @@ class Scalogram:
                 number -= len(scalogram_list)
                 surr_scal_tmp = []
                 surr_scal_tmp.extend(scalogram_list)
-                surr = self.timeseries.surrogates(number=number, 
-                                                  seed=seed, method=method, 
+                surr = self.timeseries.surrogates(number=number,
+                                                  seed=seed, method=method,
                                                   settings=settings)
-                surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, 
+                surr_scal_tmp.extend(surr.wavelet(method=self.wave_method,
                                                   settings=self.wave_args,).scalogram_list)
                 surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
         else:
@@ -3767,13 +3755,42 @@ class Scalogram:
 
         #if len(qs) > 1:
         #    raise ValueError('qs should be a list with size 1!')
-        
+
         new.signif_qs = surr_scal.quantiles(qs=qs)
         new.signif_method = method
         new.qs = qs
 
-        if export_scal == True:
-            new.signif_scals = surr_scal
+            if export_scal == True:
+                new.signif_scals = surr_scal
+
+        elif method == 'ar1asym':
+
+            new = self.copy()
+
+            if type(qs) is not list:
+                raise TypeError('qs should be a list')
+
+            settings = {} if settings is None else settings.copy()
+
+            signif_levels=waveutils.tc_wave_signif(self.timeseries.value,
+                                                   self.timeseries.time,
+                                                   self.wave_args['scale'],
+                                                   self.wave_args['mother'],
+                                                   self.wave_args['param'],
+                                                   qs=qs, **settings)
+
+            #Create a scalogram for each of the significance levels
+            ms_base =[]
+            for idx, item in enumerate(signif_levels):
+                label = str(int(qs[idx]*100))+'%'
+                # expand
+                signif = item[:, np.newaxis].dot(np.ones(len(self.timeseries.value))[np.newaxis, :])
+                s = Scalogram(frequency=self.frequency, time =self.time,
+                              amplitude = signif.T, label=label)
+                ms_base.append(s)
+
+            new.signif_qs = MultipleScalogram(ms_base)
+            new.signif_method = method
 
         return new
 
@@ -3787,7 +3804,7 @@ class Coherence:
     pyleoclim.core.ui.Series.wavelet_coherence : Wavelet coherence method
 
     '''
-    def __init__(self, frequency, scale, time, wtc, xwt, phase, coi=None, 
+    def __init__(self, frequency, scale, time, wtc, xwt, phase, coi=None,
                  wave_method=None, wave_args=None,
                  timeseries1=None, timeseries2=None, signif_qs=None, signif_method=None,
                  freq_method=None, freq_kwargs=None, Neff_threshold=3, scale_unit=None, time_label=None):
@@ -3892,10 +3909,10 @@ class Coherence:
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         ax : ax, optional
             Matplotlib axis on which to return the figure. The default is None.
-        signif_thresh: float in [0, 1] 
+        signif_thresh: float in [0, 1]
             Significance threshold. Default is 0.95. If this quantile is not
-            found in the qs field of the Coherence object, the closest quantile 
-            will be picked. 
+            found in the qs field of the Coherence object, the closest quantile
+            will be picked.
         signif_clr : str, optional
             Color of the significance line. The default is 'white'.
         signif_linestyles : str, optional
@@ -3944,7 +3961,7 @@ class Coherence:
             y_axis = self.frequency[mask_freq]
             if ylabel is None:
                 ylabel = f'Frequency [1/{self.scale_unit}]' if self.scale_unit is not None else 'Frequency'
-        
+
         if signif_thresh > 1 or signif_thresh < 0:
             raise ValueError("The significance threshold must be in [0, 1] ")
 
@@ -3963,26 +3980,26 @@ class Coherence:
 
         if var == 'wtc':
             lev = np.linspace(0, 1, 11)
-            cont = ax.contourf(self.time, y_axis, self.wtc[:, mask_freq].T, 
+            cont = ax.contourf(self.time, y_axis, self.wtc[:, mask_freq].T,
                                levels = lev, **contourf_args)
         elif var == 'xwt':
             cont = ax.contourf(self.time, y_axis, self.xwt[:, mask_freq].T,
                                levels = 11, **contourf_args) # just pass number of contours
         else:
             raise ValueError("Unknown variable; please choose either 'wtc' or 'xwt'")
-            
+
         # plot significance levels
         if self.signif_qs is not None:
             signif_method_label = {
                 'ar1': 'AR(1)',
             }
-            if signif_thresh not in self.qs: 
+            if signif_thresh not in self.qs:
                 isig = np.abs(np.array(self.qs) - signif_thresh).argmin()
                 print("Significance threshold {:3.2f} not found in qs. Picking the closest, which is {:3.2f}".format(signif_thresh,self.qs[isig]))
             else:
                 isig = self.qs.index(signif_thresh)
-            
-            if var == 'wtc':    
+
+            if var == 'wtc':
                 signif_coh = self.signif_qs[0].scalogram_list[isig] # extract WTC significance threshold
                 signif_boundary = self.wtc[:, mask_freq].T / signif_coh.amplitude[:, mask_freq].T
             elif var == 'xwt':
@@ -4036,8 +4053,8 @@ class Coherence:
         # plot phase
         skip_x = np.max([int(np.size(self.time)//20), 1])
         skip_y = np.max([int(np.size(y_axis)//20), 1])
-        
-        phase_args = {'pt': 0.5, 'skip_x': skip_x, 'skip_y': skip_y, 
+
+        phase_args = {'pt': 0.5, 'skip_x': skip_x, 'skip_y': skip_y,
                       'scale': 30, 'width': 0.004}
         phase_args.update(phase_style)
 
@@ -4046,7 +4063,7 @@ class Coherence:
         skip_y = phase_args['skip_y']
         scale = phase_args['scale']
         width = phase_args['width']
-        
+
         if 'color' in phase_style:
             color = phase_style['color']
         else:
@@ -4063,7 +4080,7 @@ class Coherence:
         else:
             phase[signif_boundary.T < 1] = np.nan
 
-        
+
         X, Y = np.meshgrid(self.time, y_axis)
         U, V = np.cos(phase).T, np.sin(phase).T
 
@@ -4074,12 +4091,12 @@ class Coherence:
         ax.set_ylim(ylim)
 
         if xlim is not None:
-            ax.set_xlim(xlim)        
+            ax.set_xlim(xlim)
 
         lbl1 = self.timeseries1.label
         lbl2 = self.timeseries2.label
 
-            
+
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
@@ -4094,52 +4111,52 @@ class Coherence:
             return fig, ax
         else:
             return ax
-    
+
 
     def dashboard(self, title=None, figsize=[9,12], mute=False, phase_style = {},
                   savefig_settings={}, ts_plot_kwargs = None, wavelet_plot_kwargs= None):
          ''' Cross-wavelet dashboard, including the two series, WTC and XWT.
-    
-             Note: this design balances many considerations, and is not easily customizable.   
-             
+
+             Note: this design balances many considerations, and is not easily customizable.
+
          Parameters
          ----------
 
          title : str, optional
              Title of the plot. The default is None.
-             
+
          figsize : list, optional
              Figure size. The default is [9, 12], as this is an information-rich figure.
-        
+
          mute : bool, optional
              if True, the plot will not show;
              recommend to turn on when more modifications are going to be made on ax The default is False. The default is False.
              (going to be deprecated)
-         
+
          savefig_settings : dict, optional
              The default is {}.
              the dictionary of arguments for plt.savefig(); some notes below:
              - "path" must be specified; it can be any existed or non-existed path,
                with or without a suffix; if the suffix is not given in "path", it will follow "format"
              - "format" can be one of {"pdf", "eps", "png", "ps"}
-        
+
          ts_plot_kwargs : dict
               arguments to be passed to the timeseries subplot, see pyleoclim.core.ui.Series.plot for details
-         
+
          wavelet_plot_kwargs : dict
               arguments to be passed to the contour subplots (XWT and WTC), see pyleoclim.core.ui.Scalogram.plot for details
-     
-    
+
+
          Returns
          -------
          fig, ax
-    
+
          See also
          --------
-    
+
          pyleoclim.core.ui.Series.wavelet_coherence
          matplotlib.pyplot.quiver
-    
+
          '''
          # prepare options dictionaries
          savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -4152,20 +4169,20 @@ class Coherence:
          gs = gridspec.GridSpec(8, 1)
          gs.update(wspace=0, hspace=0.3) # add some breathing room
          ax = {}
-        
+
          # 1) plot timeseries
-    
+
          ax['ts'] = plt.subplot(gs[0:2, 0])
          self.timeseries1.plot(ax=ax['ts'], color='C0', label='', **ts_plot_kwargs)
-         ax['ts'].yaxis.label.set_color('C0') 
-         ax['ts'].tick_params(axis='y', colors='C0')  
+         ax['ts'].yaxis.label.set_color('C0')
+         ax['ts'].tick_params(axis='y', colors='C0')
          ax['ts'].spines['left'].set_color('C0')
          ax['ts'].spines['bottom'].set_visible(False)
          ax['ts'].grid(False)
 
          axts2 = ax['ts'].twinx()
          self.timeseries2.plot(ax=axts2, color='C1', label='',  **ts_plot_kwargs)
-         axts2.yaxis.label.set_color('C1') 
+         axts2.yaxis.label.set_color('C1')
          axts2.tick_params(axis='y', colors='C1')
          axts2.spines['right'].set_color('C1')
          axts2.spines['right'].set_visible(True)
@@ -4183,15 +4200,15 @@ class Coherence:
 
         # 3) plot XWT
          ax['xwt'] = plt.subplot(gs[5:8, 0])
-         if 'phase_style' not in wavelet_plot_kwargs:    
+         if 'phase_style' not in wavelet_plot_kwargs:
              wavelet_plot_kwargs.update({'phase_style':{'color': 'lightgray'}})
          self.plot(var='xwt',ax=ax['xwt'], title= None,
                    contourf_style={'cmap': 'viridis'},
                    cbar_style={'orientation': 'horizontal','pad': 0.15, 'aspect': 50},
                    phase_style=wavelet_plot_kwargs['phase_style'])
-         
+
          #fig.tight_layout() # this does nothing
-         
+
          return fig, ax
 
     def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95], settings=None, mute_pbar=False):
@@ -4216,7 +4233,7 @@ class Coherence:
         -------
         new : pyleoclim.Coherence
             Coherence with significance level signif_qs, a list with the following NumPy ndarrays:
-                0: 
+                0:
 
         See also
         --------
@@ -4236,24 +4253,24 @@ class Coherence:
         )
 
         wtcs, xwts = [], []
-        
+
         for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', total=number, disable=mute_pbar):
             coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i],
-                                                             method  = self.wave_method, 
+                                                             method  = self.wave_method,
                                                              settings = self.wave_args)
             wtcs.append(coh_tmp.wtc)
             xwts.append(coh_tmp.xwt)
-            
+
         wtcs = np.array(wtcs)
         xwts = np.array(xwts)
-        
-        
+
+
         ne, nf, nt = np.shape(wtcs)
-        
+
         # reshape because mquantiles only accepts inputs of at most 2D
         wtcs_r = np.reshape(wtcs, (ne, nf*nt))
         xwts_r = np.reshape(xwts, (ne, nf*nt))
-        
+
         # define nd-arrays
         nq = len(qs)
         wtc_qs = np.ndarray(shape=(nq, nf, nt))
@@ -4285,10 +4302,10 @@ class Coherence:
                     coi=self.coi, scale = self.scale,
                     freq_method=self.freq_method, freq_kwargs=self.freq_kwargs, label=f'{qs[i]*100:g}%',
                 )
-            
+
             xwt_list.append(xwt_tmp)
 
-        new.signif_qs = [] 
+        new.signif_qs = []
         new.signif_qs.append(MultipleScalogram(scalogram_list=wtc_list)) # Export WTC quantiles
         new.signif_qs.append(MultipleScalogram(scalogram_list=xwt_list)) # Export XWT quantiles
         new.signif_method = method
@@ -4490,7 +4507,7 @@ class MultipleSeries:
             ms.series_list[idx]=s
         return ms
 
-    def grid_properties(self, step_style='median'):
+    def increments(self, step_style='median'):
         '''
         Extract grid properties (start, stop, step) of all the Series objects in
         a collection.
@@ -4508,18 +4525,21 @@ class MultipleSeries:
         Returns
         -------
 
-        grid_properties : numpy array
-            n x 3 array, where n is the number of series
+        increments : numpy array
+            n x 3 array, where n is the number of series,
+            index 0 is the earliest time
+            index 1 is the latest time
+            index 2 is the step chosen according to step_style
 
         '''
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
         for idx,item in enumerate(self.series_list):
             item      = item.clean(verbose=idx==0)
-            gp[idx,:] = tsutils.grid_properties(item.time, step_style=step_style)
+            gp[idx,:] = tsutils.increments(item.time, step_style=step_style)
 
         return gp
 
-    def common_time(self, method='interp', common_step = 'max', start=None, stop = None, step=None, step_style = None, **kwargs):
+    def common_time(self, method='interp', step = None, start = None, stop = None, step_style = None, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via binning
         interpolation., or Gaussian kernel. Alignmentis critical for workflows
         that need to assume a common time axis for the group of series under consideration.
@@ -4531,32 +4551,30 @@ class MultipleSeries:
         stop  : the earliest stop date of the bunch (minimum of the maxima)
         step  : The representative spacing between consecutive values
 
-        Optional arguments for binning or interpolation are those of the underling functions.
+        Optional arguments for binning, Gaussian kernel (gkernel) interpolation are those of the underling functions.
 
-        If the time axis are retrograde, this step makes them prograde.
+        If any of the time axes are retrograde, this step makes them prograde.
 
         Parameters
         ----------
         method :  string
             either 'bin', 'interp' [default] or 'gkernel'
-        common_step : string
-            Method to obtain a representative step among all Series
-            Valid entries: 'median' [default], 'mean', 'mode' or 'max'
+        step : float
+            common step for all time axes  [default = None]
         start : float
             starting point of the common time axis [default = None]
         stop : float
             end point of the common time axis [default = None]
-        step : float
-            increment the common time axis  [default = None]
 
-        if not provided, `pyleoclim` will use `grid_properties()` to determine these parameters
-
-        step_style : 'string'
-            step style to be applied from `grid_properties` [default = None]
-
+        step_style : string
+            Method to obtain a representative step among all Series
+            (using tsutils.increments)
+            Valid entries: 'median', 'mean', 'mode' or 'max'
+            Default value is None, so that it will be chosen according
+            to the method: 'max' for bin and gkernel, 'mean' for interp.
 
         kwargs: dict
-            keyword arguments (dictionary) of the various methods
+            keyword arguments (dictionary) of the (bin, gkernel or interp) methods
 
         Returns
         -------
@@ -4570,7 +4588,7 @@ class MultipleSeries:
         pyleoclim.utils.tsutils.bin : put timeseries values into bins of equal size (possibly leaving NaNs in).
         pyleoclim.utils.tsutils.gkernel : coarse-graining using a Gaussian kernel
         pyleoclim.utils.tsutils.interp : interpolation onto a regular grid (default = linear interpolation)
-        pyleoclim.utils.tsutils.grid_properties : infer grid properties
+        pyleoclim.utils.tsutils.increments : infer grid properties
 
         Examples
         --------
@@ -4601,7 +4619,7 @@ class MultipleSeries:
             # create MS object from the list
             ms = pyleo.MultipleSeries(serieslist)
 
-            fig, ax = plt.subplots(2,2)
+            fig, ax = plt.subplots(2,2,sharex=True,sharey=True)
             ax = ax.flatten()
             # apply common_time with default parameters
             msc = ms.common_time()
@@ -4626,37 +4644,46 @@ class MultipleSeries:
             pyleo.closefig(fig)
 
         '''
-
-        if step_style == None:
+        # specify stepping style
+        if step_style == None: # if step style isn't specified, pick a robust choice according to method
             if method == 'bin' or method == 'gkernel':
                step_style = 'max'
             elif  method == 'interp':
                step_style = 'mean'
 
-        gp = self.grid_properties(step_style=step_style)
+        # obtain grid properties with given step_style
+        gp = self.increments(step_style=step_style)
 
-        # define parameters for common time axis
-        start = gp[:,0].max()
-        stop  = gp[:,1].min()
+        # define grid step
+        if step is not None and step > 0:
+            common_step = step
+        else:
+            if step_style == 'mean':
+                common_step = gp[:,2].mean()
+            elif step_style == 'max':
+                common_step = gp[:,2].max()
+            elif step_style == 'mode':
+                common_step = stats.mode(gp[:,2])[0][0]
+            else:
+                common_step = np.median(gp[:,2])
+
+        # define start and stop
+        if start is None:
+            start = gp[:,0].max() # pick the latest of the start times
+
+        if stop is None:
+            stop  = gp[:,1].min() # pick the earliest of the stop times
+
         if start > stop:
             raise ValueError('At least one series has no common time interval with others. Please check the time axis of the series.')
 
-        if step is None:
-            if common_step == 'mean':
-                step = gp[:,2].mean()
-            elif common_step == 'max':
-                step = gp[:,2].max()
-            elif common_step == 'mode':
-                step = stats.mode(gp[:,2])[0][0]
-            else:
-                step = np.median(gp[:,2])
-
         ms = self.copy()
 
+        # apply each method
         if method == 'bin':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                d = tsutils.bin(ts.time, ts.value, bin_size=step, start=start, stop=stop, evenly_spaced = False, **kwargs)
+                d = tsutils.bin(ts.time, ts.value, bin_size=common_step, start=start, stop=stop, evenly_spaced = False, **kwargs)
                 ts.time  = d['bins']
                 ts.value = d['binned_values']
                 ms.series_list[idx] = ts
@@ -4664,7 +4691,7 @@ class MultipleSeries:
         elif method == 'interp':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.interp(ts.time, ts.value, step=step, start=start, stop=stop,**kwargs)
+                ti, vi = tsutils.interp(ts.time, ts.value, step=common_step, start=start, stop=stop,**kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
@@ -4672,7 +4699,7 @@ class MultipleSeries:
         elif method == 'gkernel':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.gkernel(ts.time,ts.value,step=step, start=start, stop=stop, **kwargs)
+                ti, vi = tsutils.gkernel(ts.time,ts.value,step=common_step, start=start, stop=stop, **kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
@@ -5194,7 +5221,7 @@ class MultipleSeries:
         ----------
 
         method : str
-            {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram'}
+            {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram', 'cwt'}
 
         freq_method : str
             {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
@@ -5215,7 +5242,7 @@ class MultipleSeries:
             Mute the progress bar. Default is False.
 
         scalogram_list : pyleoclim.MultipleScalogram object, optional
-            Multiple scalogram object containing pre-computed scalograms to use when calculating spectra, only works with wwz
+            Multiple scalogram object containing pre-computed scalograms to use when calculating spectra, only works with wwz or cwt
 
         Returns
         -------
@@ -5235,6 +5262,8 @@ class MultipleSeries:
 
         pyleoclim.utils.spectral.wwz_psd : Spectral analysis using the Wavelet Weighted Z transform
 
+        pyleoclim.utils.spectral.cwt_psd : Spectral analysis using the continuous Wavelet Transform as implemented by Torrence and Compo
+
         pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
@@ -5248,7 +5277,7 @@ class MultipleSeries:
         settings = {} if settings is None else settings.copy()
 
         psd_list = []
-        if method == 'wwz' and scalogram_list:
+        if method in ['wwz','cwt'] and scalogram_list:
             scalogram_list_len = len(scalogram_list.scalogram_list)
             series_len = len(self.series_list)
 
@@ -5287,7 +5316,7 @@ class MultipleSeries:
             wwz - the weighted wavelet Z-trasnform (as per Foster [1996])
                 is appropriate for unevenly-spaced series.
             Default is cwt, returning an error if the Series is unevenly-spaced.
-            
+
         settings : dict, optional
             Settings for the particular method. The default is {}.
 
@@ -5314,6 +5343,8 @@ class MultipleSeries:
         --------
         pyleoclim.utils.wavelet.wwz : wwz function
 
+        pyleoclim.utils.wavelet.cwt : cwt function
+
         pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
@@ -5321,6 +5352,12 @@ class MultipleSeries:
         pyleoclim.core.ui.Series.wavelet : wavelet analysis on single object
 
         pyleoclim.core.ui.MultipleScalogram : Multiple Scalogram object
+
+        References
+        ----------
+
+        Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+        Python routines available at http://paos.colorado.edu/research/wavelets/
 
         '''
         settings = {} if settings is None else settings.copy()
@@ -5454,9 +5491,9 @@ class MultipleSeries:
         else:
             return ax
 
-    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, 
-                  fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, 
-                  labels='auto', ylabels='auto', spine_lw=1.5, grid_lw=0.5, 
+    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None,
+                  fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
+                  labels='auto', ylabels='auto', spine_lw=1.5, grid_lw=0.5,
                   font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4,
                   linewidth=1.5, plot_kwargs=None, mute=False):
         ''' Stack plot of multiple series
@@ -5486,8 +5523,8 @@ class MultipleSeries:
             If None, doesn't add ylabels to the subplots
             If 'auto', uses the value_name property of each series
             If list, passes a list of strings for each label.
-            Default is 'auto'    
-            
+            Default is 'auto'
+
         savefig_settings : dictionary
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -5678,7 +5715,7 @@ class MultipleSeries:
                 ax[idx].set_ylabel(ylabels[idx], color=clr)
             elif ylabels==None:
                 pass
-                
+
             mu = np.mean(ts.value)
             std = np.std(ts.value)
             ylim = [mu-4*std, mu+4*std]
@@ -6484,7 +6521,10 @@ class MultiplePSD:
     '''
     def __init__(self, psd_list, beta_est_res=None):
         self.psd_list = psd_list
-        self.beta_est_res = beta_est_res
+        if beta_est_res is None:
+            self.beta_est_res = beta_est_res
+        else:
+            self.beta_est_res = np.array(beta_est_res)
 
     def copy(self):
         '''Copy object
@@ -6911,7 +6951,7 @@ class MultipleScalogram:
 
         scal_list = []
         for i, amp in enumerate(amp_qs):
-            scal_tmp = Scalogram(frequency=freq, time=time, amplitude=amp, 
+            scal_tmp = Scalogram(frequency=freq, time=time, amplitude=amp,
                                  scale = scale, coi=coi, label=f'{qs[i]*100:g}%')
             scal_list.append(scal_tmp)
 
