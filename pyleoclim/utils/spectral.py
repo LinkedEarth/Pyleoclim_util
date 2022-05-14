@@ -35,6 +35,7 @@ from .wavelet import (
     prepare_wwz,
     wwz,
     wwa2psd,
+    cwt,
 )
 #from .tsutils import clean_ts, interp, bin
 

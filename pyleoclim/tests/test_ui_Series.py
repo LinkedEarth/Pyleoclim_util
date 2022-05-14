@@ -136,7 +136,7 @@ class TestUiSeriesSpectral:
     [parametrizing tests](https://docs.pytest.org/en/stable/example/parametrize.html).
     '''
 
-    @pytest.mark.parametrize('spec_method', ['wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram'])
+    @pytest.mark.parametrize('spec_method', ['wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram','cwt'])
     def test_spectral_t0(self, spec_method, eps=0.5):
         ''' Test Series.spectral() with available methods using default arguments
 

@@ -2244,7 +2244,7 @@ class Series:
             tau = np.linspace(np.min(self.time), np.max(self.time), ntau)
             settings.update({'tau': tau})
           
-        args[method].update(settings)  # BUG if settings ={}
+        args[method].update(settings)
 
         # Apply wavelet method
         wave_res = wave_func[method](self.value, self.time, **args[method])
@@ -3645,7 +3645,10 @@ class Scalogram:
                 linewidths=signif_linewidths,
             )
             if title is None: 
-                ax.set_title(self.label + " scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
+                if self.label is not None:
+                    ax.set_title(self.label + " scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
+                else:
+                    ax.set_title("Scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
 
         if xlabel is None:
             xlabel = self.time_label
@@ -3762,9 +3765,9 @@ class Scalogram:
                                               method=method, settings=settings)
             surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args)
 
-        if len(qs) > 1:
-            raise ValueError('qs should be a list with size 1!')
-
+        #if len(qs) > 1:
+        #    raise ValueError('qs should be a list with size 1!')
+        
         new.signif_qs = surr_scal.quantiles(qs=qs)
         new.signif_method = method
         new.qs = qs
