@@ -16,6 +16,7 @@ import warnings
 
 __all__ = [
     'wwz_psd',
+    'cwt_psd',
     'mtm',
     'lomb_scargle',
     'welch',
@@ -615,7 +616,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
 def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             tau=None, c=1e-3, nproc=8,
             detrend=False, sg_kwargs=None, gaussianize=False,
-            standardize=False, Neff=3, anti_alias=False, avgs=2,
+            standardize=False, Neff_threshold=3, anti_alias=False, avgs=2,
             method='Kirchner_numba', wwa=None, wwz_Neffs=None, wwz_freq=None):
     ''' Returns the power spectral density (PSD) of a timeseries using the Weighted Wavelet Z-transform
 
@@ -683,8 +684,8 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         - 'Kirchner_f2py':  the method Kirchner adapted from Foster, implemented with f2py for acceleration;
         - 'Kirchner_numba':  the method Kirchner adapted from Foster, implemented with Numba for acceleration (default);
 
-    Neff : int
-        effective number of points
+    Neff_threshold : int
+       threshold for effective number of points
     anti_alias : bool
         If True, uses anti-aliasing
     avgs : int
@@ -731,10 +732,9 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
                                             freq_method=freq_method,
                                             freq_kwargs=freq_kwargs,tau=tau)
 
-    # get wwa but AR1_q is not needed here so set nMC=0
-    #  wwa, _, _, coi, freq, _, Neffs, _ = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
+
     if wwa is None or wwz_Neffs is None or wwz_freq is None:
-        res_wwz = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
+        res_wwz = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc,
                   detrend=detrend, sg_kwargs=sg_kwargs,
                   gaussianize=gaussianize, standardize=standardize, method=method)
         wwa = res_wwz.amplitude
@@ -747,8 +747,8 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
 
     return res
 
-def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None, 
-            detrend=False,sg_kwargs={}, gaussianize=False, standardize =False, pad=False, 
+def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
+            detrend=False,sg_kwargs={}, gaussianize=False, standardize =False, pad=False,
             mother='MORLET',param=None, cwt_res=None):
     '''
     Wrapper function to implement Torrence and Compo continuous wavelet transform
@@ -767,7 +767,7 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
     freq_kwargs : dict, optional
         Optional parameters for the choice of the frequency vector. See make_freq_vector and additional methods for details. The default is {}.
     scale : numpy.array
-        Optional scale vector in place of a frequency vector. Default is None. If scale is not None, frequency method and attached arguments will be ignored. 
+        Optional scale vector in place of a frequency vector. Default is None. If scale is not None, frequency method and attached arguments will be ignored.
     detrend : bool, string, {'linear', 'constant', 'savitzy-golay', 'emd'}
         Whether to detrend and with which option. The default is False.
     sg_kwargs : dict, optional
@@ -775,9 +775,9 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
     gaussianize : bool, optional
         Whether to gaussianize. The default is False.
     standardize : bool, optional
-        Whether to standardize. The default is False.     
+        Whether to standardize. The default is False.
     pad : bool, optional
-        Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
+        Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2.
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
         This will not eliminate all edge effects. The default is False.
     mother : string, optional
@@ -799,37 +799,37 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
             - scale: the scale vector
             - mother: the mother wavelet
             - param : the wavelet parameter
-            
+
     See also
     --------
-    
+
     pyleoclim.utils.wavelet.make_freq_vector : make the frequency vector with various methods
-    
-    pyleoclim.utils.wavelet.cwt: Torrence and Compo implementation of the continuous wavelet transform 
-    
+
+    pyleoclim.utils.wavelet.cwt: Torrence and Compo implementation of the continuous wavelet transform
+
     pyleoclim.utils.tsutils.detrend : detrending functionalities in Pyleoclim
-    
+
     References
     ----------
-    
+
     Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
     Python routines available at http://paos.colorado.edu/research/wavelets/
-    
+
     '''
-    
-    
+
+
         #get the wavelet:
     if cwt_res is None:
         cwt_res = cwt(ys,ts,freq=freq, freq_method=freq_method, freq_kwargs=freq_kwargs,
-              scale = scale, detrend=detrend,sg_kwargs=sg_kwargs, gaussianize=gaussianize, 
-              standardize = standardize, pad=pad, mother=mother, param=param) 
+              scale = scale, detrend=detrend,sg_kwargs=sg_kwargs, gaussianize=gaussianize,
+              standardize = standardize, pad=pad, mother=mother, param=param)
         n= len(ts)
     else:
         n=len(cwt_res.time)
-    
+
     psd = np.sum(cwt_res.amplitude.T**2,axis=1)/n
-    
-    
+
+
     Results = collections.namedtuple('Results', ['psd', 'freq','scale','mother','param'])
     res = Results(psd=psd, freq=cwt_res.freq, scale=cwt_res.scale, mother=cwt_res.mother,param=cwt_res.param)
 

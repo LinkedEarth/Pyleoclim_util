@@ -44,7 +44,7 @@ def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
     t = np.arange(nt)
     v = colored_noise(alpha=alpha, t=t, f0=f0, m=m, seed=seed)
     return t, v
-    
+
 def load_data():
     #Loads stott MD982176 record
     try:
@@ -194,7 +194,7 @@ class TestMultipleSeriesInterp:
         x_axis_1 = ts_M_interp.series_list[1].__dict__['time']
 
         assert_array_equal(x_axis_0, x_axis_1)
-    
+
 class TestMultipleSeriesGkernel:
     '''Test for MultipleSeries.gkernel()
 
@@ -217,12 +217,12 @@ class TestMultipleSeriesGkernel:
         x_axis_0 = ts_M_gkernel.series_list[0].__dict__['time']
         x_axis_1 = ts_M_gkernel.series_list[1].__dict__['time']
 
-        assert_array_equal(x_axis_0, x_axis_1)    
+        assert_array_equal(x_axis_0, x_axis_1)
 
 class TestMultipleSeriesPca:
     '''Tests for MultipleSeries.pca()
 
-    Testing the PCA function 
+    Testing the PCA function
     '''
 
     def test_pca_t0(self):
@@ -235,63 +235,63 @@ class TestMultipleSeriesPca:
 
         '''
         p = 10; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize()
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
-    
+
         mslist = []
         for i in range(p):
             mslist.append(pyleo.Series(time = t, value = X[:,i]))
         ms = pyleo.MultipleSeries(mslist)
 
         res = ms.pca()
-        
+
         # check that all variance was recovered
-        assert abs(res.pctvar.sum() - 100)<0.1 
-        
-    
+        assert abs(res.pctvar.sum() - 100)<0.1
+
+
     def test_pca_t1(self):
         '''
         Test with synthetic data, with missing values
 
         '''
         p = 10; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize()
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
-        
+
         # poke some holes at random in the array
         Xflat = X.flatten()
         Xflat[np.random.randint(n*p, size=p-1)]=np.nan  # note: at most ncomp missing vals
         X = np.reshape(Xflat, (n,p))
-    
+
         #X[-1,0] = np.nan
-    
+
         mslist = []
         for i in range(p):
             mslist.append(pyleo.Series(time = t, value = X[:,i],clean_ts=False))
         ms = pyleo.MultipleSeries(mslist)
 
-        res = ms.pca(ncomp=4,gls=True)  
-                
-        fig, ax = res.screeplot(mute=True) 
-        
+        res = ms.pca(ncomp=4,gls=True)
+
+        fig, ax = res.screeplot(mute=True)
+
     def test_pca_t2(self):
         '''
         Test with real data, same time axis
-    
-        ''' 
+
+        '''
         d=load_data()
         tslist = d.to_LipdSeriesList()
         tslist = tslist[2:]
         ms = pyleo.MultipleSeries(tslist)
         msl = ms.common_time()  # put on common time
-    
+
         res = msl.pca()
-        
+
         res.screeplot(mute=True)
         res.modeplot(mute=True)
-        
+
     def test_pca_t3(self):
         '''
         Test with synthetic data, no missing values, kwargs
@@ -305,7 +305,7 @@ class TestMultipleSeriesPca:
         signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0)
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
-    
+
         mslist = []
         for i in range(p):
             mslist.append(pyleo.Series(time = t, value = X[:,i]))
@@ -313,48 +313,48 @@ class TestMultipleSeriesPca:
 
         res = ms.pca(method='eig',standardize=True,demean=False,normalize=True)
         # check that all variance was recovered
-        assert abs(res.pctvar.sum() - 100)<0.001 
-        
- 
+        assert abs(res.pctvar.sum() - 100)<0.001
+
+
 class TestMultipleSeriesIncrements:
     '''Test for MultipleSeries.increments()
-    
+
     '''
     @pytest.mark.parametrize('step_style', ['min', 'max', 'mean', 'median'])
     def test_increments(self, step_style):
         p = 2; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize()
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
-    
+
         mslist = []
         for i in range(p):
             mslist.append(pyleo.Series(time = t, value = X[:,i]))
         ms = pyleo.MultipleSeries(mslist)
-        
+
         gp = ms.increments(step_style=step_style)
-        
+
         assert (gp[0,:] == np.array((t.min(), t.max(), 1.))).all()
-               
+
 # class TestMultipleSeriesMcPca:
 #     '''Test for MultipleSeries.mcpca()
 
-#     Testing the MC-PCA function 
-#     '''    
+#     Testing the MC-PCA function
+#     '''
 #     def test_mcpca_t0(self):
 #         url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
 #         data = pyleo.Lipd(usr_path = url)
 #         tslist = data.to_LipdSeriesList()
 #         tslist = tslist[2:] # drop the first two series which only concerns age and depth
 #         ms = pyleo.MultipleSeries(tslist)
-    
-#         # TO DO !!!!
-    
-#         # msc = ms.common_time()
-    
-#         # res = msc.pca(nMC=20)   
 
-    
+#         # TO DO !!!!
+
+#         # msc = ms.common_time()
+
+#         # res = msc.pca(nMC=20)
+
+
 class TestMultipleSeriesCommonTime:
     '''Test for MultipleSeries.common_time()
     '''
@@ -376,7 +376,7 @@ class TestMultipleSeriesCommonTime:
         x_axis_1 = ts_M_ct.series_list[1].time
 
         assert_array_equal(x_axis_0, x_axis_1)
-        
+
     def test_common_time_t1(self):
         time = np.arange(1900, 2020, step=1/12)
         ndel = 200
@@ -388,35 +388,35 @@ class TestMultipleSeriesCommonTime:
             vu =  np.delete(v.value, deleted_idx)
             ts = pyleo.Series(time=tu, value=vu,  value_name='Series_'+str(j+1))
             seriesList.append(ts)
-    
+
         ms = pyleo.MultipleSeries(seriesList)
 
         ms1 = ms.common_time(method='interp', start=1910, stop=2010, step=1/12)
-        
+
         assert (np.diff(ms1.series_list[0].time)[0] - 1/12) < 1e-3
-        
+
 class TestMultipleSeriesStackPlot():
     ''' Test for MultipleSeries.Stackplot
     '''
-    
+
     @pytest.mark.parametrize('labels', [None, 'auto', ['sst','d18Osw']])
     def test_StackPlot_t0(self, labels):
-    
+
         d=load_data()
         sst = d.to_LipdSeries(number=5)
         d18Osw = d.to_LipdSeries(number=3)
         ms = pyleo.MultipleSeries([sst,d18Osw])
         ms.stackplot(labels=labels, mute=True)
-    
+
     @pytest.mark.parametrize('plot_kwargs', [{'marker':'o'},[{'marker':'o'},{'marker':'^'}]])
     def test_StackPlot_t1(self, plot_kwargs):
-    
+
         d=load_data()
         sst = d.to_LipdSeries(number=5)
         d18Osw = d.to_LipdSeries(number=3)
         ms = pyleo.MultipleSeries([sst,d18Osw])
         ms.stackplot(plot_kwargs=plot_kwargs, mute=True)
-        
+
 class TestMultipleSeriesSpectral():
     ''' Test for MultipleSeries.spectral
     '''
@@ -424,7 +424,7 @@ class TestMultipleSeriesSpectral():
     def test_spectral_t0(self,spec_method):
         '''Test the spectral function with pre-generated scalogram objects
         '''
-        
+
         d=load_data()
         sst = d.to_LipdSeries(number=5)
         d18Osw = d.to_LipdSeries(number=3)
@@ -434,7 +434,3 @@ class TestMultipleSeriesSpectral():
         ms = pyleo.MultipleSeries([sst,d18Osw])
         scals = ms.wavelet(method=spec_method)
         psds = ms.spectral(method=spec_method,scalogram_list=scals)
-        
-        
-        
-        
