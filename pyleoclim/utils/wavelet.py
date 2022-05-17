@@ -27,6 +27,7 @@ import warnings
 import collections
 import scipy.fftpack as fft
 from scipy import optimize
+from scipy.optimize import fminbound
 from scipy.special._ufuncs import gamma, gammainc
 
 #from .tsmodel import ar1_sim
@@ -226,7 +227,7 @@ def assertPositiveInt(*args):
     for arg in args:
         assert isinstance(arg, int) and arg >= 1
 
-def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, detrend=False, sg_kwargs=None,
+def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, sg_kwargs=None,
               gaussianize=False, standardize=False):
     ''' Return the weighted wavelet amplitude (WWA).
 
@@ -255,7 +256,7 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
     c : float
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
-    Neff_threshold : int
+    Neff : int
         the threshold of the number of effective degrees of freedom
     nproc :int
         fake argument, just for convenience
@@ -308,7 +309,7 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
-    assertPositiveInt(Neff_threshold)
+    assertPositiveInt(Neff)
 
     nt = np.size(tau)
     nf = np.size(freq)
@@ -332,8 +333,8 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
             sum_w = np.sum(weights)
             Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
 
-            if Neffs[j, k] <= Neff_threshold:
-                ywave_1[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff_threshold
+            if Neffs[j, k] <= Neff:
+                ywave_1[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
                 ywave_2[j, k] = np.nan
                 ywave_3[j, k] = np.nan
             else:
@@ -364,7 +365,7 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
 
     return wwa, phase, Neffs, coeff
 
-def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, detrend=False, sg_kwargs=None,
+def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
               gaussianize=False, standardize=False):
     ''' Return the weighted wavelet amplitude (WWA).
 
@@ -384,7 +385,7 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, de
     c : float
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
-    Neff_threshold : int
+    Neff : int
         the threshold of the number of effective degrees of freedom
     nproc : int
         the number of processes for multiprocessing
@@ -453,7 +454,7 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, de
 
         S = np.zeros(shape=(3, 3))
 
-        if Neff_loc <= Neff_threshold:
+        if Neff_loc <= Neff:
             ywave_2_1g = np.nan
             ywave_3_1g = np.nan
         else:
@@ -498,7 +499,7 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, de
 
     return wwa, phase, Neffs, coeff
 
-def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, detrend=False, sg_kwargs=None,
+def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=1, detrend=False, sg_kwargs=None,
                    gaussianize=False, standardize=False):
     ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -518,7 +519,7 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
     c : float
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
-    Neff_threshold : int
+    Neff : int
         the threshold of the number of effective degrees of freedom
     nproc : int
         fake argument for convenience, for parameter consistency between functions, does not need to be specified
@@ -571,7 +572,7 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
 
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
-    assertPositiveInt(Neff_threshold)
+    assertPositiveInt(Neff)
 
     nt = np.size(tau)
     nts = np.size(ts)
@@ -594,8 +595,8 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
             sum_w = np.sum(weights)
             Neffs[j, k] = sum_w**2 / np.sum(weights**2)  # local number of effective dof
 
-            if Neffs[j, k] <= Neff_threshold:
-                a0[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff_threshold
+            if Neffs[j, k] <= Neff:
+                a0[j, k] = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
                 a1[j, k] = np.nan
                 a2[j, k] = np.nan
             else:
@@ -641,7 +642,7 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
 
     return wwa, phase, Neffs, coeff
 
-def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, detrend=False, sg_kwargs=None,
+def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
                    gaussianize=False, standardize=False):
     ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -661,7 +662,7 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
     c : float
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
-    Neff_threshold : int
+    Neff : int
         the threshold of the number of effective degrees of freedom
     nproc : int
         the number of processes for multiprocessing
@@ -703,7 +704,7 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
 
     '''
     assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
-    assertPositiveInt(Neff_threshold)
+    assertPositiveInt(Neff)
 
     nt = np.size(tau)
     nts = np.size(ts)
@@ -725,9 +726,9 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
         sum_w = np.sum(weights)
         Neff_loc = sum_w**2 / np.sum(weights**2)
 
-        if Neff_loc <= Neff_threshold:
-            a0_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff_threshold
-            a1_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff_threshold
+        if Neff_loc <= Neff:
+            a0_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+            a1_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
             a2_1g = np.nan
         else:
             def w_prod(xs, ys):
@@ -786,7 +787,7 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
 
     return wwa, phase, Neffs, coeff
 
-def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detrend=False, sg_kwargs=None,
+def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, detrend=False, sg_kwargs=None,
                    gaussianize=False, standardize=False, nproc=1):
     ''' Return the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -806,7 +807,7 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detren
     c : float
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
-    Neff_threshold : int
+    Neff : int
         the threshold of the number of effective degrees of freedom
     nproc : int
         fake argument, just for convenience
@@ -858,7 +859,7 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detren
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
-    assertPositiveInt(Neff_threshold)
+    assertPositiveInt(Neff)
     nt = np.size(tau)
     nts = np.size(ts)
     nf = np.size(freq)
@@ -881,9 +882,9 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detren
             sum_w = np.sum(weights)
             Neff_loc = sum_w**2 / np.sum(weights**2)
 
-            if Neff_loc <= Neff_threshold:
-                a0_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff_threshold
-                a1_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff_threshold
+            if Neff_loc <= Neff:
+                a0_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
+                a1_1g = np.nan  # the coefficients cannot be estimated reliably when Neff_loc <= Neff
                 a2_1g = np.nan
             else:
                 def w_prod(xs, ys):
@@ -938,7 +939,7 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detren
 
     return wwa, phase, Neffs, coeff
 
-def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, detrend=False, sg_kwargs=None,
+def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
                   gaussianize=False, standardize=False):
     ''' Returns the weighted wavelet amplitude (WWA) modified by Kirchner.
 
@@ -958,7 +959,7 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8
     c : float
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
-    Neff_threshold : int
+    Neff : int
         the threshold of the number of effective degrees of freedom
     nproc : int
         fake argument, just for convenience
@@ -1004,7 +1005,7 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8
 
     '''
     from . import f2py_wwz as f2py
-    assertPositiveInt(Neff_threshold, nproc)
+    assertPositiveInt(Neff, nproc)
 
     nt = np.size(tau)
     nts = np.size(ts)
@@ -1014,7 +1015,7 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8
 
     omega = make_omega(ts, freq)
 
-    Neffs, a0, a1, a2 = f2py.f2py_wwz.wwa(tau, omega, c, Neff_threshold, ts, pd_ys, nproc, nts, nt, nf)
+    Neffs, a0, a1, a2 = f2py.f2py_wwz.wwa(tau, omega, c, Neff, ts, pd_ys, nproc, nts, nt, nf)
 
     undef = -99999.
     a0[a0 == undef] = np.nan
@@ -1028,7 +1029,7 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8
 
     return wwa, phase, Neffs, coeff
 
-def make_coi(tau, Neff_threshold=3):
+def make_coi(tau, Neff=3):
     ''' Return the cone of influence.
 
     Parameters
@@ -1036,7 +1037,7 @@ def make_coi(tau, Neff_threshold=3):
 
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
-    Neff_threshold : int
+    Neff : int
         the threshold of the number of effective samples
 
     Returns
@@ -1051,10 +1052,10 @@ def make_coi(tau, Neff_threshold=3):
     wave_signif() in http://paos.colorado.edu/research/wavelets/wave_python/waveletFunctions.py
 
     '''
-    assert isinstance(Neff_threshold, int) and Neff_threshold >= 1
+    assert isinstance(Neff, int) and Neff >= 1
     nt = np.size(tau)
 
-    fourier_factor = 4*np.pi / (Neff_threshold+np.sqrt(2+Neff_threshold**2))
+    fourier_factor = 4*np.pi / (Neff+np.sqrt(2+Neff**2))
     coi_const = fourier_factor / np.sqrt(2)
 
     dt = np.median(np.diff(tau))
@@ -1101,7 +1102,7 @@ def make_omega(ts, freq):
 
     return omega
 
-def wwa2psd(wwa, ts, Neffs, freq=None, Neff_threshold=3, anti_alias=False, avgs=2):
+def wwa2psd(wwa, ts, Neffs, freq=None, Neff=3, anti_alias=False, avgs=2):
     """ Return the power spectral density (PSD) using the weighted wavelet amplitude (WWA).
 
     Parameters
@@ -1115,7 +1116,7 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff_threshold=3, anti_alias=False, avgs=
         the matrix of effective number of points in the time-scale coordinates obtained from wwz
     freq : array
         vector of frequency from wwz
-    Neff_threshold : int
+    Neff : int
         the threshold of the number of effective samples
     anti_alias : bool
         whether to apply anti-alias filter
@@ -1139,7 +1140,7 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff_threshold=3, anti_alias=False, avgs=
     # weighted psd calculation start
     power = wwa**2 * 0.5 * (np.max(ts)-np.min(ts))/np.size(ts) * Neffs
 
-    Neff_diff = Neffs - Neff_threshold
+    Neff_diff = Neffs - Neff
     Neff_diff[Neff_diff < 0] = 0
 
     sum_power = np.nansum(power * Neff_diff, axis=0)
@@ -1161,12 +1162,11 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff_threshold=3, anti_alias=False, avgs=
 
     return psd
 
-def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
-        freq_kwargs={}, c=1/(8*np.pi**2), Neff_threshold=3, Neff_coi=3,
-        nproc=8, detrend=False, sg_kwargs=None, method='Kirchner_numba',
-        gaussianize=False, standardize=False, len_bd=0,
+def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', freq_kwargs={}, c=1/(8*np.pi**2), Neff=3, Neff_coi=3,
+        nMC=200, nproc=8, detrend=False, sg_kwargs=None,
+        gaussianize=False, standardize=False, method='Kirchner_numba', len_bd=0,
         bc_mode='reflect', reflect_type='odd'):
-    ''' Weighted wavelet Z transform (WWZ) for unevenly-spaced data
+    ''' Weighted wavelet amplitude (WWA) for unevenly-spaced data
 
     Parameters
     ----------
@@ -1194,9 +1194,10 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
     c : float
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
-    Neff_threshold : int
-        threshold for the effective number of points
-
+    Neff : int
+        effective number of points
+    nMC : int
+        the number of Monte-Carlo simulations
     nproc : int
         the number of processes for multiprocessing
 
@@ -1253,7 +1254,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
             the matrix of effective number of points in the time-scale coordinates
 
         coeff : array
-            the wavelet transform coefficients
+            the wavelet transform coefficents
 
     See also
     --------
@@ -1279,7 +1280,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
 
     We perform an ideal test below.
     We use a sine wave with a period of 50 yrs as the signal for test.
-    Then performing wavelet analysis should return an energy band around period of 50 yrs in the scalogram.
+    Then performing wavelet analysis should return an energy band around period of 50 yrs in the time-period scalogram domain.
 
     .. ipython:: python
         :okwarning:
@@ -1315,7 +1316,7 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
         plt.show()
 
     '''
-    #assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
+    assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
 
     ys_cut, ts_cut, freq, tau = prepare_wwz(
         ys, ts, freq=freq, freq_method=freq_method, freq_kwargs=freq_kwargs,
@@ -1324,28 +1325,49 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
     )
 
     wwz_func = get_wwz_func(nproc, method)
-    wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freq, tau, Neff_threshold=Neff_threshold, c=c, nproc=nproc,
+    wwa, phase, Neffs, coeff = wwz_func(ys_cut, ts_cut, freq, tau, Neff=Neff, c=c, nproc=nproc,
                                         detrend=detrend, sg_kwargs=sg_kwargs,
                                         gaussianize=gaussianize, standardize=standardize)
 
-    # calculate the cone of influence
-    coi = make_coi(tau, Neff_threshold=Neff_coi)
-    # define `scale` as the `Period` axis for the scalogram
-    scale = 1/freq
+    # Monte-Carlo simulations of AR1 process
+    nt = np.size(tau)
+    nf = np.size(freq)
 
-    # export
-    Results = collections.namedtuple('Results', ['amplitude', 'phase', 'coi', 'freq', 'time', 'Neffs', 'coeff', 'scale'])
-    res = Results(amplitude=wwa, phase=phase, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff, scale = scale)
+    #  wwa_red = np.ndarray(shape=(nMC, nt, nf))
+    #  AR1_q = np.ndarray(shape=(nt, nf))
+
+    #  if nMC >= 1:
+        #  for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
+            #  r = ar1_sim(ys_cut, np.size(ts_cut), 1, ts=ts_cut)
+            #  wwa_red[i, :, :], _, _, _ = wwz_func(r, ts_cut, freq, tau, c=c, Neff=Neff, nproc=nproc,
+                                                 #  detrend=detrend, sg_kwargs=sg_kwargs,
+                                                 #  gaussianize=gaussianize, standardize=standardize)
+
+        #  for j in range(nt):
+            #  for k in range(nf):
+                #  AR1_q[j, k] = mquantiles(wwa_red[:, j, k], 0.95)
+
+    #  else:
+        #  AR1_q = None
+    # AR1_q = None
+
+    # calculate the cone of influence
+    coi = make_coi(tau, Neff=Neff_coi)
+
+    # Results = collections.namedtuple('Results', ['amplitude', 'phase', 'AR1_q', 'coi', 'freq', 'time', 'Neffs', 'coeff'])
+    # res = Results(amplitude=wwa, phase=phase, AR1_q=AR1_q, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
+    Results = collections.namedtuple('Results', ['amplitude', 'phase', 'coi', 'freq', 'time', 'Neffs', 'coeff'])
+    res = Results(amplitude=wwa, phase=phase, coi=coi, freq=freq, time=tau, Neffs=Neffs, coeff=coeff)
 
     return res
 
-
-def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
-                  tau=None, freq=None, freq_method='log', freq_kwargs=None,
-                  c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, detrend=False, sg_kwargs=None,
-                  verbose=False,  method='Kirchner_numba',
-                  gaussianize=False, standardize=False):
-    ''' Returns the wavelet coherence of two time series (WWZ method).
+def wavelet_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
+        tau=None, freq=None, freq_method='log', freq_kwargs=None,
+        c=1/(8*np.pi**2), Neff=3, nproc=8, detrend=False, sg_kwargs=None,
+        nMC=200,
+        gaussianize=False, standardize=False, method='Kirchner_numba',
+        verbose=False):
+    ''' Return the cross-wavelet coherence of two time series.
 
     Parameters
     ----------
@@ -1365,10 +1387,12 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     c : float
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
-    Neff_threshold : int
-        threshold for the effective number of points
+    Neff : int
+        effective number of points
     nproc : int
         the number of processes for multiprocessing
+    nMC : int
+        the number of Monte-Carlo simulations
     detrend : string
         - None: the original time series is assumed to have no trend;
         - 'linear': a linear least-squares fit to `ys` is subtracted;
@@ -1388,8 +1412,6 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         - 'Kirchner_numba': Kirchner's algorithm with Numba support for acceleration (default)
     verbose : bool
         If True, print warning messages
-    smooth_factor : float
-        smoothing factor for the WTC (default: 0.25)
 
     Returns
     -------
@@ -1418,8 +1440,8 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
 
     '''
+    assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or eaqual to 0."
 
-    # TODO: should this use common_time()?
     if tau is None:
         lb1, ub1 = np.min(ts1), np.max(ts1)
         lb2, ub2 = np.min(ts2), np.max(ts2)
@@ -1459,35 +1481,57 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     if freq[0] == 0:
         freq = freq[1:] # delete 0 frequency if present
 
-    res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freq=freq, c=c, Neff_threshold=Neff_threshold,
+    res_wwz1 = wwz(ys1_cut, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
                    nproc=nproc, detrend=detrend, sg_kwargs=sg_kwargs,
                    gaussianize=gaussianize, standardize=standardize, method=method)
-    res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freq=freq, c=c, Neff_threshold=Neff_threshold,
+    res_wwz2 = wwz(ys2_cut, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0,
                    nproc=nproc, detrend=detrend, sg_kwargs=sg_kwargs,
                    gaussianize=gaussianize, standardize=standardize, method=method)
 
     wt_coeff1 = res_wwz1.coeff[1] - res_wwz1.coeff[2]*1j
     wt_coeff2 = res_wwz2.coeff[1] - res_wwz2.coeff[2]*1j
 
-    scale = 1/freq  # `scales` here is the `Period` axis in the wavelet plot
+    xw_coherence, xw_phase = wtc(wt_coeff1, wt_coeff2, freq, tau, smooth_factor=smooth_factor)
+    xw_t, xw_amplitude, _ = xwt(wt_coeff1, wt_coeff2)
 
-    xw_coherence, xw_phase = wtc(wt_coeff1, wt_coeff2, scale, tau,
-                                 smooth_factor=smooth_factor)
-    xw_product, xw_amplitude, _ = xwt(wt_coeff1, wt_coeff2)
+    # Monte-Carlo simulations of AR1 process
+    nt = np.size(tau)
+    nf = np.size(freq)
 
-    # export output
+    #  coherence_red = np.ndarray(shape=(nMC, nt, nf))
+    #  AR1_q = np.ndarray(shape=(nt, nf))
+    coherence_red = None
+    AR1_q = None
 
-    coi = make_coi(tau, Neff_threshold=Neff_threshold)
+    #  if nMC >= 1:
 
-    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude',
-                                                 'xw_phase', 'xwt', 'freq', 'time',
-                                                 'AR1_q', 'coi', 'scale'])
-    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude,
-                  xw_phase=xw_phase, xwt=xw_product, scale = scale,
-                  freq=freq, time=tau, AR1_q=None, coi=coi)
+        #  for i in tqdm(range(nMC), desc='Monte-Carlo simulations'):
+            #  r1 = ar1_sim(ys1_cut, np.size(ts1_cut), 1, ts=ts1_cut)
+            #  r2 = ar1_sim(ys2_cut, np.size(ts2_cut), 1, ts=ts2_cut)
+            #  res_wwz_r1 = wwz(r1, ts1_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
+                                                     #  detrend=detrend, sg_kwargs=sg_kwrags,
+                                                     #  gaussianize=gaussianize, standardize=standardize)
+            #  res_wwz_r2 = wwz(r2, ts2_cut, tau=tau, freq=freq, c=c, Neff=Neff, nMC=0, nproc=nproc,
+                                                     #  detrend=detrend, sg_kwargs=sg_kwargs,
+                                                     #  gaussianize=gaussianize, standardize=standardize)
+
+            #  wt_coeffr1 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
+            #  wt_coeffr2 = res_wwz_r1.coeff[1] - res_wwz_r2.coeff[2]*1j
+            #  coherence_red[i, :, :], phase_red = wavelet_coherence(wt_coeffr1, wt_coeffr2, freq, tau, smooth_factor=smooth_factor)
+
+        #  for j in range(nt):
+            #  for k in range(nf):
+                #  AR1_q[j, k] = mquantiles(coherence_red[:, j, k], 0.95)
+
+    #  else:
+        #  AR1_q = None
+
+    coi = make_coi(tau, Neff=Neff)
+    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xw_t', 'freq', 'time', 'AR1_q', 'coi'])
+    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude, xw_phase=xw_phase, xw_t=xw_t,
+                  freq=freq, time=tau, AR1_q=AR1_q, coi=coi)
 
     return res
-
 def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
     ''' Return the frequency vector based on the REDFIT recommendation.
 
@@ -1636,14 +1680,14 @@ def freq_vector_nfft(ts):
     return freq
 
 def freq_vector_scale(ts, dj=0.25, s0=None,j1=None, mother='MORLET',param=None):
-    ''' Return the frequency vector based on scales for wavelet analysis.
+    ''' Return the frequency vector based on scales for wavelet analysis. 
     This function is adapted from Torrence and Compo
 
     Parameters
     ----------
 
     ts: numpy.array
-        The time axis for the timeseries
+        The time axis for the timeseries    
     dj : float, optional
         The spacing between discrete scales. The default is 0.25. A smaller number will give better scale resolution, but be slower to plot.
     s0 : float, optional
@@ -1678,25 +1722,25 @@ def freq_vector_scale(ts, dj=0.25, s0=None,j1=None, mother='MORLET',param=None):
     pyleoclim.utils.wavelet.freq_vector_log : Return the frequency vector based on logspace
 
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
-
+    
     References
     ----------
-
+    
     Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
     Python routines available at http://paos.colorado.edu/research/wavelets/
     '''
-
+    
     if mother.upper() not in ['MORLET','DOG','PAUL']:
         raise ValueError('The mother wavelet should be either "MORLET","PAUL", or "DOG"')
-
+    
     dt = np.diff(ts).mean()
     n1=len(ts)
-
+    
     if s0 is None:
         s0 = 2 * dt
     if j1 is None:
         j1 = np.fix((np.log(n1 * dt / s0) / np.log(2)) / dj)
-
+    
     # construct SCALE array & empty PERIOD & WAVE arrays
     if mother.upper() == 'MORLET':
         if param == None:
@@ -1715,7 +1759,7 @@ def freq_vector_scale(ts, dj=0.25, s0=None,j1=None, mother='MORLET',param=None):
 
     j = np.arange(0, j1 + 1)
     scale = s0 * 2. ** (j * dj)
-    freq = 1. / (fourier_factor * scale)
+    freq = 1. / (fourier_factor * scale)       
 
     return freq
 
@@ -2165,7 +2209,7 @@ def prepare_wwz(ys, ts, freq=None, freq_method='log', freq_kwargs=None, tau=None
         If the boundaries of tau are not exactly on two of the time axis points, then tau will be adjusted to be so.
         If None, at most 50 tau points will be generated from the input time span.
     len_bd : int
-        the number of the ghost grids desired on each boundary
+        the number of the ghost grids want to create on each boundary
     bc_mode : string
         {'constant', 'edge', 'linear_ramp', 'maximum', 'mean', 'median', 'minimum', 'reflect' , 'symmetric', 'wrap'}
         For more details, see np.lib.pad()
@@ -2257,6 +2301,10 @@ def xwt(coeff1, coeff2):
         the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
     coeff2 : array
         the second of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
+    freq : array
+        vector of frequency
+    tau : array'
+        the evenly-spaced time points, namely the time shift for wavelet analysis
 
     Returns
     -------
@@ -2281,8 +2329,8 @@ def xwt(coeff1, coeff2):
 
     return xw_t, xw_amplitude, xw_phase
 
-def wtc(coeff1, coeff2, scales, tau, smooth_factor=0.25):
-    ''' Return the wavelet transform coherency (WTC).
+def wtc(coeff1, coeff2, freq, tau, smooth_factor=0.25):
+    ''' Return the cross wavelet coherence.
 
     Parameters
     ----------
@@ -2291,8 +2339,8 @@ def wtc(coeff1, coeff2, scales, tau, smooth_factor=0.25):
         the first of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
     coeff2 : array
         the second of two sets of wavelet transform coefficients **in the form of a1 + a2*1j**
-    scales : array
-        vector of scales (=period for WWZ; more complicated dependence for CWT)
+    freq : array
+        vector of frequency
     tau : array'
         the evenly-spaced time points, namely the time shift for wavelet analysis
 
@@ -2342,9 +2390,7 @@ def wtc(coeff1, coeff2, scales, tau, smooth_factor=0.25):
         snorm : array
             normalized scales
         dj : float
-            it satisfies the equation [ Sj = S0 * 2**(j*dj)
-       smooth_factor : float
-           UNCLEAR (ask Feng)
+            it satisfies the equation [ Sj = S0 * 2**(j*dj) ]
 
         Returns
         -------
@@ -2385,6 +2431,7 @@ def wtc(coeff1, coeff2, scales, tau, smooth_factor=0.25):
     power1 = np.abs(coeff1)**2
     power2 = np.abs(coeff2)**2
 
+    scales = 1/freq  # `scales` here is the `Period` axis in the wavelet plot
     dt = np.median(np.diff(tau))
     snorm = scales / dt  # normalized scales
 
@@ -2403,63 +2450,60 @@ def wtc(coeff1, coeff2, scales, tau, smooth_factor=0.25):
 
     return xw_coherence, xw_phase
 
-# def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
-#     ''' Reconstruct the normalized time series from the wavelet coefficients.
-#
-#     NB: plagued by edge effects. Try again when darts prediction has been enabled
-#     Parameters
-#     ----------
+def reconstruct_ts(coeff, freq, tau, t, len_bd=0):
+    ''' Reconstruct the normalized time series from the wavelet coefficients.
 
-#     coeff : array
-#         the coefficients of the corresponding basis functions (a0, a1, a2)
-#     freq : array
-#         vector of frequency of the basis functions
-#     tau : array
-#         the evenly-spaced time points of the basis functions
-#     t : array
-#         the specified evenly-spaced time points of the reconstructed time series
-#     len_bd : int
-#         the number of the ghost grids want to creat on each boundary
+    Parameters
+    ----------
 
-#     Returns
-#     -------
+    coeff : array
+        the coefficients of the corresponding basis functions (a0, a1, a2)
+    freq : array
+        vector of frequency of the basis functions
+    tau : array
+        the evenly-spaced time points of the basis functions
+    t : array
+        the specified evenly-spaced time points of the reconstructed time series
+    len_bd : int
+        the number of the ghost grids want to creat on each boundary
 
-#     rec_ts : array
-#         the reconstructed normalized time series
-#     t : array
-#         the evenly-spaced time points of the reconstructed time series
-#     '''
-#     omega = 2*np.pi*freq
-#     nf = np.size(freq)
+    Returns
+    -------
 
-#     dt = np.median(np.diff(t))
-#     if len_bd > 0:
-#         t_left_bd = np.linspace(t[0]-dt*len_bd, t[0]-dt, len_bd)
-#         t_right_bd = np.linspace(t[-1]+dt, t[-1]+dt*len_bd, len_bd)
-#         t = np.concatenate((t_left_bd, t, t_right_bd))
+    rec_ts : array
+        the reconstructed normalized time series
+    t : array
+        the evenly-spaced time points of the reconstructed time series
+    '''
+    omega = 2*np.pi*freq
+    nf = np.size(freq)
 
-#     ntau = np.size(tau)
-#     a_0, a_1, a_2 = coeff
+    dt = np.median(np.diff(t))
+    if len_bd > 0:
+        t_left_bd = np.linspace(t[0]-dt*len_bd, t[0]-dt, len_bd)
+        t_right_bd = np.linspace(t[-1]+dt, t[-1]+dt*len_bd, len_bd)
+        t = np.concatenate((t_left_bd, t, t_right_bd))
 
-#     rec_ts = np.zeros(np.size(t))
-#     for k in range(nf):
-#         for j in range(ntau):
-#             if np.isnan(a_0[j, k]) or np.isnan(a_1[j, k]) or np.isnan(a_1[j, k]):
-#                 continue
-#             else:
-#                 dz = omega[k] * (t - tau[j])
-#                 phi_1 = np.cos(dz)
-#                 phi_2 = np.sin(dz)
+    ntau = np.size(tau)
+    a_0, a_1, a_2 = coeff
 
-#                 rec_ts += (a_0[j, k] + a_1[j, k]*phi_1 + a_2[j, k]*phi_2)
+    rec_ts = np.zeros(np.size(t))
+    for k in range(nf):
+        for j in range(ntau):
+            if np.isnan(a_0[j, k]) or np.isnan(a_1[j, k]) or np.isnan(a_1[j, k]):
+                continue
+            else:
+                dz = omega[k] * (t - tau[j])
+                phi_1 = np.cos(dz)
+                phi_2 = np.sin(dz)
 
-#     rec_ts = preprocess(rec_ts, t, detrend=False, gaussianize=False, standardize=False)
+                rec_ts += (a_0[j, k] + a_1[j, k]*phi_1 + a_2[j, k]*phi_2)
 
-#     return rec_ts, t
+    rec_ts = preprocess(rec_ts, t, detrend=False, gaussianize=False, standardize=False)
 
-# ## Methods for Torrence and compo
+    return rec_ts, t
 
-#  This is the main function, which has been rewritten to work with functionalities in Pyleoclim
+############ Methods for Torrence and Compo#############
 
 def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=False,sg_kwargs={},
         gaussianize=False, standardize=False, pad=False, mother='MORLET',param=None):
@@ -2480,7 +2524,7 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     freq_kwargs : dict, optional
         Optional parameters for the choice of the frequency vector. See make_freq_vector and additional methods for details. The default is {}.
     scale : numpy.array
-        Optional scale vector in place of a frequency vector. Default is None. If scale is not None, frequency method and attached arguments will be ignored.
+        Optional scale vector in place of a frequency vector. Default is None. If scale is not None, frequency method and attached arguments will be ignored. 
     detrend : bool, string, {'linear', 'constant', 'savitzy-golay', 'emd'}
         Whether to detrend and with which option. The default is False.
     sg_kwargs : dict, optional
@@ -2490,7 +2534,7 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     standardize : bool, optional
         Whether to standardize. The default is False.
     pad : bool, optional
-        Whether or not to pad the timeseries with zeroes to increase N to the next higher power of 2.
+        Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
         This will not eliminate all edge effects. The default is False.
     mother : string, optional
@@ -2513,46 +2557,46 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
             - time: the time vector
             - mother: the mother wavelet
             - param : the wavelet parameter
-
+            
     See also
     --------
-
+    
     pyleoclim.utils.wavelet.make_freq_vector : make the frequency vector with various methods
-
+    
     pyleoclim.utils.wavelet.tc_wavelet: the underlying wavelet function by Torrence and Compo
-
+    
     pyleoclim.utils.tsutils.detrend : detrending functionalities in Pyleoclim
-
+    
     References
     ----------
-
+    
     Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
     Python routines available at http://paos.colorado.edu/research/wavelets/
 
-    '''
-
+    '''    
+    
     ts = np.array(ts)
     ys = np.array(ys)
-
+    
     ys, ts = clean_ts(ys,ts)
 
     if len(ts) != len(ys):
         raise ValueError('Time and value axis should be the same length')
-
+    
     if is_evenly_spaced(ts) == False:
         raise ValueError('Time vector should be evenly spaced for this method. Interpolate or use WWZ.')
-
+    
     if mother.upper() not in ['MORLET','DOG','PAUL']:
         raise ValueError('The mother wavelet should be either "MORLET","PAUL", or "DOG"')
-
+        
     #preprocessing
     # remove NaNs
-
+    
     dt = np.diff(ts).mean()
 
     ys = preprocess(ys, ts, detrend=detrend, sg_kwargs=sg_kwargs,
                gaussianize=gaussianize, standardize=standardize) #TC seems to require standardization
-
+    
     # fourier factor determination
     if mother.upper() == 'MORLET':
         if param == None:
@@ -2568,7 +2612,7 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
         fourier_factor = 2 * np.pi * np.sqrt(2. / (2 * param + 1))
     else:
         fourier_factor = np.nan
-
+    
     #get the scale
     if scale is None:
         if freq is None:
@@ -2577,137 +2621,21 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
                 freq_kwargs.update({'mother':mother,'param':param})
             freq = make_freq_vector(ts,method=freq_method,**freq_kwargs)
         scale = 1. / (fourier_factor * freq)
-
+        
     #calculate wavelet
     wave, coi = tc_wavelet(ys, dt, scale, mother, param, pad)
     amplitude=np.abs(wave)
-
+    
     Results = collections.namedtuple('Results', ['amplitude', 'coi', 'freq', 'time', 'scale', 'coeff', 'mother','param'])
     res = Results(amplitude=amplitude.T, coi=coi, freq=freq, time=ts, scale=scale, coeff=wave, mother=mother,param=param)
 
     return res
-
-
-
-def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={},
-                  scale = None, detrend=False,sg_kwargs={}, pad = False,
-                  standardize = False, gaussianize=False, tau = None, Neff_threshold=3,
-                  mother='MORLET',param=None, smooth_factor=0.25):
-    ''' Returns the wavelet transform coherency of two time series using the CWT.
-
-    Parameters
-    ----------
-
-    ys1 : array
-        first of two time series
-    ys2 : array
-        second of the two time series
-    ts1 : array
-        time axis of first time series
-    ts2 : array
-        time axis of the second time series (should be = ts1)
-    tau : array
-        evenly-spaced time points at which to evaluate coherence
-        Defaults to None, which uses ts1
-    freq : array
-        vector of frequency
-    freq_method : string, optional
-        The method by which to obtain the frequency vector. The default is 'log'.
-        Options are 'log' (default), 'nfft', 'lomb_scargle', 'welch', and 'scale'
-    freq_kwargs : dict, optional
-        Optional parameters for the choice of the frequency vector. See make_freq_vector and additional methods for details. The default is {}.
-    scale : numpy.array
-        Optional scale vector in place of a frequency vector. Default is None. If scale is not None, frequency method and attached arguments will be ignored.
-    detrend : bool, string, {'linear', 'constant', 'savitzy-golay', 'emd'}
-        Whether to detrend and with which option. The default is False.
-    sg_kwargs : dict, optional
-        Additional parameters for the savitzy-golay method. The default is {}.
-    gaussianize : bool, optional
-        Whether to gaussianize. The default is False.
-    standardize : bool, optional
-        Whether to standardize. The default is False.
-    pad : bool, optional
-        Whether or not to pad the timeseries with zeroes to increase N to the next higher power of 2.
-        This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT used to do the wavelet transform.
-        This will not eliminate all edge effects. The default is False.
-    mother : string, optional
-        the mother wavelet function. The default is 'MORLET'. Options are: 'MORLET', 'PAUL', or 'DOG'
-    param : flaot, optional
-        the mother wavelet parameter. The default is None since it varies for each mother
-            - For 'MORLET' this is k0 (wavenumber), default is 6.
-            - For 'PAUL' this is m (order), default is 4.
-            - For 'DOG' this is m (m-th derivative), default is 2.
-    smooth_factor : float
-        smoothing factor for the WTC (default: 0.25)
-    Neff_threshold : int
-        threshold for the effective number of points (3 by default, see make_coi())
-
-    Returns
-    -------
-
-    res : dict
-        contains the cross wavelet coherence (WTC), cross-wavelet transform (XWT),
-        cross-wavelet phase, vector of frequency, evenly-spaced time points,
-        nMC AR1 scalograms, cone of influence.
-
-    See also
-    --------
-
-    pyleoclim.utils.wavelet.cwt : Continuous Wavelet Transform (Torrence & Compo 1998)
-
-    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
-
-    pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
-
-    '''
-    assert np.array_equal(ts1,ts2)  and len(ys1) == len(ys2) , "time axes should be the same. Suggest using common_time()"
-
-    if tau is None:
-        tau = ts1
-
-    if freq is None:
-        freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        freq = make_freq_vector(ts1, method=freq_method, **freq_kwargs)
-        print(f'Setting freq={freq[:3]}...{freq[-3:]}, nfreq={np.size(freq)}')
-
-    if freq[0] == 0:
-        freq = freq[1:] # delete 0 frequency if present
-
-    #  Compute CWT for both series
-    cwt1 = cwt(ys1,ts1,freq=freq,freq_method=freq_method,freq_kwargs=freq_kwargs,
-               scale = scale, detrend=detrend, sg_kwargs=sg_kwargs,
-               gaussianize=gaussianize, standardize=standardize, pad=pad,
-               mother=mother,param=param)
-
-    cwt2 = cwt(ys2,ts2,freq=freq,freq_method=freq_method,freq_kwargs=freq_kwargs,
-               scale = scale, detrend=detrend, sg_kwargs=sg_kwargs,
-               gaussianize=gaussianize, standardize=standardize, pad=pad,
-               mother=mother,param=param)
-
-    wt_coeff1 = cwt1.coeff.T # transpose so that scale is second axis, as for wwz
-    wt_coeff2 = cwt2.coeff.T
-
-    scale = cwt1.scale
-
-    # compute XWT and CWT
-    xw_coherence, xw_phase = wtc(wt_coeff1, wt_coeff2, scale, tau, smooth_factor=smooth_factor)
-    xw_t, xw_amplitude, _ = xwt(wt_coeff1, wt_coeff2)
-
-    # evaluate cone of influence
-    coi = make_coi(tau, Neff_threshold=Neff_threshold)
-
-    Results = collections.namedtuple('Results', ['xw_coherence', 'xw_amplitude', 'xw_phase', 'xw_t',
-                                                 'freq', 'scale', 'time', 'AR1_q', 'coi'])
-    res = Results(xw_coherence=xw_coherence, xw_amplitude=xw_amplitude,
-                  xw_phase=xw_phase, xw_t=xw_t, freq=freq, time=tau,
-                  AR1_q=None, coi=coi, scale = scale)
-
-    return res
+    
 
 def tc_wavelet(Y, dt, scale, mother, param, pad=False):
     '''
     WAVELET  1D Wavelet transform. Adapted from Torrence and Compo to fit existing Pyleoclim functionalities
-
+    
     Computes the wavelet transform of the vector Y (length N),
     with sampling rate DT.
 
@@ -2720,7 +2648,7 @@ def tc_wavelet(Y, dt, scale, mother, param, pad=False):
         the time series of length N.
     dt : float
         the sampling time
-
+    
     mother : string, optional
         the mother wavelet function. The default is 'MORLET'. Options are: 'MORLET', 'PAUL', or 'DOG'
     param : flaot, optional
@@ -2729,7 +2657,7 @@ def tc_wavelet(Y, dt, scale, mother, param, pad=False):
             - For 'PAUL' this is m (order), default is 4.
             - For 'DOG' this is m (m-th derivative), default is 2.
     pad : {True,False}, optional
-        Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2.
+        Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
         This will not eliminate all edge effects. The default is False.
 
@@ -2739,20 +2667,20 @@ def tc_wavelet(Y, dt, scale, mother, param, pad=False):
         The wavelet coefficients
     coi : numpy.array
         The cone of influence. Periods greater than this are subject to edge effects.
-
+        
     See also
     --------
-
+    
     pyleoclim.utils.wavelet.tc_wave_bases: 1D wavelet functions Morlet, Paul or Dog
-
+    
     References
     ----------
-
+    
     Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
     Python routines available at http://paos.colorado.edu/research/wavelets/
-
+    
     '''
-
+    
     n1 = len(Y)
 
     # construct time series to analyze, pad if necessary
@@ -2774,7 +2702,7 @@ def tc_wavelet(Y, dt, scale, mother, param, pad=False):
 
     # compute FFT of the (padded) time series
     f = np.fft.fft(x)  # [Eqn(3)]
-
+    
     # define the wavelet array
     wave = np.zeros(shape=(len(scale), n), dtype=complex)
 
@@ -2798,7 +2726,7 @@ def tc_wave_bases(mother, k, scale, param):
 
     Parameters
     ----------
-    mother : string
+    mother : string 
         equal to 'MORLET' or 'PAUL' or 'DOG'
     k : numpy.array
         the Fourier frequencies at which to calculate the wavelet
@@ -2818,16 +2746,16 @@ def tc_wave_bases(mother, k, scale, param):
     dofmin : float
         degrees of freedom for each point in the wavelet power
              (either 2 for Morlet and Paul, or 1 for the DOG)
-
+    
     References
     ----------
-
+    
     Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
     Python routines available at http://paos.colorado.edu/research/wavelets/
 
     '''
-
-
+    
+    
     n = len(k)
     kplus = np.array(k > 0., dtype=float)
 
@@ -2846,7 +2774,7 @@ def tc_wave_bases(mother, k, scale, param):
         fourier_factor = (4 * np.pi) / (k0 + np.sqrt(2 + k0 ** 2))
         coi = fourier_factor / np.sqrt(2)  # Cone-of-influence [Sec.3g]
         dofmin = 2  # Degrees of freedom
-
+        
     elif mother == 'PAUL':  # --------------------------------  Paul
         if param == -1:
             param = 4.
@@ -2859,7 +2787,7 @@ def tc_wave_bases(mother, k, scale, param):
         fourier_factor = 4 * np.pi / (2 * m + 1)
         coi = fourier_factor * np.sqrt(2)
         dofmin = 2
-
+        
     elif mother == 'DOG':  # --------------------------------  DOG
         if param == -1:
             param = 2.
@@ -2913,31 +2841,31 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
     Returns
     -------
     signif_level : numpy.array
-        Array of values for significance level
-
+        Array of values for significance level 
+    
     References
     ----------
-
+    
     Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
     Python routines available at http://paos.colorado.edu/research/wavelets/
-
+    
     See also
     --------
-
+    
     pyleoclim.utils.wavelet.chisquare_inv : inverse of chi-square CDF
-
+    
     pyleoclim.utils.wavelet.chisquare_solve : return the difference between calculated percentile and true P
 
 
     '''
-
+    
     if mother.upper() not in ['MORLET','DOG','PAUL']:
         raise ValueError('The mother wavelet should be either "MORLET","PAUL", or "DOG"')
-
+    
     if sigtest not in ['chi-square','time-average','scale-average']:
         raise ValueError("The type of significance test should be either 'chi-square','time-average','scale-average'")
-
-
+    
+    
     J1 = len(scale) - 1
     dj = np.log2(scale[1] / scale[0])
 
@@ -2951,14 +2879,14 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
         k0 = param
         # Scale-->Fourier [Sec.3h]
         fourier_factor = (4 * np.pi) / (k0 + np.sqrt(2 + k0 ** 2))
-
+        
     elif mother.upper() == 'PAUL':
         empir = ([2, -1, -1, -1])
         if param == 4:
             empir[1:] = ([1.132, 1.17, 1.5])
         m = param
         fourier_factor = (4 * np.pi) / (2 * m + 1)
-
+        
     elif mother.upper() == 'DOG':  # -------------------------------------Paul
         empir = ([1., -1, -1, -1])
         if param ==2:
@@ -2988,23 +2916,23 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
         fft_theor = variance * fft_theor  # include time-series variance
 
     signif = fft_theor
-
+    
     if dof is None:
         dof = dofmin
 
     signif_level = []
-
+    
     for siglvl in qs:
-
+            
         if sigtest == 'chi-square':  # no smoothing, DOF=dofmin [Sec.4]
             dof = dofmin
             chisquare = chisquare_inv(siglvl, dof) / dof
             signif = fft_theor * chisquare  # [Eqn(18)]
-
+            
         #expand
             #signif = signif[:, np.newaxis].dot(np.ones(len(ys))[np.newaxis, :])
-
-
+            
+        
         elif sigtest == 'time-average':  # time-averaged significance
             if len(np.atleast_1d(dof)) == 1:
                 dof = np.zeros(J1) + dof
@@ -3015,7 +2943,7 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
             for a1 in range(0, J1 + 1):
                 chisquare = chisquare_inv(siglvl, dof[a1]) / dof[a1]
                 signif[a1] = fft_theor[a1] * chisquare
-
+        
         elif sigtest == 'scale-average':  # time-averaged significance
             if len(dof) != 2:
                 raise ValueError('DOF must be set to [S1,S2],'
@@ -3023,7 +2951,7 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
             if Cdelta == -1:
                 raise ValueError('Cdelta & dj0 not defined'
                       ' for ' + mother + ' with param = ' + str(param))
-
+    
             s1 = dof[0]
             s2 = dof[1]
             avg = np.logical_and(scale >= 2, scale < 8)  # scales between S1 & S2
@@ -3038,15 +2966,15 @@ def tc_wave_signif(ys, ts, scale, mother, param, sigtest='chi-square', qs=[0.95]
             fft_theor = Savg * np.sum(fft_theor[avg] / scale[avg])  # [Eqn(27)]
             chisquare = chisquare_inv(siglvl, dof) / dof
             signif = (dj * dt / Cdelta / Savg) * fft_theor * chisquare  # [Eqn(26)]
-
+        
         signif_level.append(np.sqrt(signif.T))
-
+        
     return signif_level
 
 def chisquare_inv(P, V):
     '''
     Returns the inverse of chi-square CDF with V degrees of freedom at fraction P
-
+    
 
     Parameters
     ----------
@@ -3059,15 +2987,15 @@ def chisquare_inv(P, V):
     -------
     X : float
         Inverse chi-square
-
+    
     References
     ----------
-
+    
     Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
     Python routines available at http://paos.colorado.edu/research/wavelets/
 
     '''
-
+    
     if (1 - P) < 1E-4:
         raise ValueError('P must be < 0.9999')
 
@@ -3088,7 +3016,7 @@ def chisquare_inv(P, V):
 
     X = X * V  # put back in the goofy V factor
 
-    return X
+    return X 
 
 def chisquare_solve(XGUESS, P, V):
     '''
@@ -3107,15 +3035,15 @@ def chisquare_solve(XGUESS, P, V):
     -------
     PDIFF : float
         difference between calculated percentile and P
-
+        
     References
     ----------
-
+    
     Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
     Python routines available at http://paos.colorado.edu/research/wavelets/
 
     '''
-
+    
     PGUESS = gammainc(V / 2, V * XGUESS / 2)  # incomplete Gamma function
 
     PDIFF = np.abs(PGUESS - P)            # error in calculated P
