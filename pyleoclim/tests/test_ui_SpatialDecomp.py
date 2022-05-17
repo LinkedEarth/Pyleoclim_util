@@ -48,7 +48,7 @@ class TestUiSpatialDecompScreeplot:
 class TestUipatialDecompModeplot:
     ''' Tests for SSARes.modeplot()
     '''
-    @pytest.mark.parametrize('spec_method', ['mtm', 'welch', 'periodogram','cwt', 'wwz'])
+    @pytest.mark.parametrize('spec_method', ['mtm', 'welch', 'periodogram','wwz'])
     def test_plot_t0(self,spec_method):
        '''
        Test with synthetic data, non missing values, all allowable spectral methods

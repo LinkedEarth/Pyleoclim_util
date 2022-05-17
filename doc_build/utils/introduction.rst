@@ -239,5 +239,21 @@ jsonutils
 
 This module converts Pyleoclim objects to and from JSON files. Useful for obtaining a human-readable output and keeping the results of an analysis. The JSON file can also be used to swap analysis results between programming language. Please note that this utilities are maintained on a as-needed basis and that not all objects are currently available.
 
-.. automodule:: pyleoclim.utils.jsonutils
-  :members: PyleoObj_to_json, json_to_PyleoObj
+.. list-table::
+   :widths: 30 70
+   :header-rows: 0
+
+   * - :ref:`PyleoObj_to_json <utils_PyleoObj_to_json>`
+     - Saves a Pyleoclim Object (e.g., Series, PSD, Scalogram) to a json file
+   * - :ref:`json_to_Series <utils_json_to_Series>`
+     - Load a pyleoclim Series object from a JSON file
+   * - :ref:`json_to_LipdSeries <utils_json_to_LipdSeries>`
+     - Load a pyleoclim LipdSeries object from a JSON file
+   * - :ref:`json_to_PSD <utils_json_to_PSD>`
+     - Load a pyleoclim PSD object from a JSON file
+   * - :ref:`json_to_Scalogram <utils_json_to_Scalogram>`
+     - Load a pyleoclim Scalogram object from a JSON file
+   * - :ref:`json_to_Coherence <utils_json_to_Coherence>`
+     - Load a pyleoclim Coherence object from a JSON file
+   * - :ref:`json_to_MultiplePSD <utils_json_to_MultiplePSD>`
+     - Load a pyleoclim Multiple object from a JSON file
