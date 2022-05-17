@@ -14,7 +14,8 @@ __all__ = [
     'wwz',
     'xwt',
     'wtc',
-    'wavelet_coherence',
+    'wwz_coherence',
+    'cwt_coherence'
 ]
 
 import numpy as np

@@ -3728,38 +3728,49 @@ class Scalogram:
 
             if hasattr(self,'signif_scals'):
                 signif_scals = self.signif_scals
+            
+            #Allow for a few different configurations of passed number of signif tests, default behavior is to set number = 200
+            if number is None and signif_scals is not None:
+                number = len(signif_scals.scalogram_list)
+            elif number is None and signif_scals is None:
+                number = 200
+            elif number == 0:
+                return self
 
-        if signif_scals:
-            scalogram_list = signif_scals.scalogram_list
-            #If signif_scals already in scalogram object are more than those requested for significance testing, use as many of them as required
-            if len(scalogram_list) > number:
-                surr_scal = MultipleScalogram(scalogram_list=scalogram_list[:number])
-            #If number is the same as the length of signif_scals, just use signif_scals
-            elif len(scalogram_list) == number:
-                surr_scal = signif_scals
-            #If the number is more than the length of signif_scals, reuse what is available and calculate the rest
-            elif len(scalogram_list) < number:
-                number -= len(scalogram_list)
-                surr_scal_tmp = []
-                surr_scal_tmp.extend(scalogram_list)
-                surr = self.timeseries.surrogates(number=number,
-                                                  seed=seed, method=method,
-                                                  settings=settings)
-                surr_scal_tmp.extend(surr.wavelet(method=self.wave_method,
-                                                  settings=self.wave_args,).scalogram_list)
-                surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
-        else:
-            surr = self.timeseries.surrogates(number=number, seed=seed,
-                                              method=method, settings=settings)
-            surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args)
+            new = self.copy()
 
-        #if len(qs) > 1:
-        #    raise ValueError('qs should be a list with size 1!')
 
-        new.signif_qs = surr_scal.quantiles(qs=qs)
-        new.signif_method = method
-        new.qs = qs
-
+            if signif_scals:
+                scalogram_list = signif_scals.scalogram_list
+                #If signif_scals already in scalogram object are more than those requested for significance testing, use as many of them as required
+                if len(scalogram_list) > number:
+                    surr_scal = MultipleScalogram(scalogram_list=scalogram_list[:number])
+                #If number is the same as the length of signif_scals, just use signif_scals
+                elif len(scalogram_list) == number:
+                    surr_scal = signif_scals
+                #If the number is more than the length of signif_scals, reuse what is available and calculate the rest
+                elif len(scalogram_list) < number:
+                    number -= len(scalogram_list)
+                    surr_scal_tmp = []
+                    surr_scal_tmp.extend(scalogram_list)
+                    surr = self.timeseries.surrogates(number=number,
+                                                      seed=seed, method=method,
+                                                      settings=settings)
+                    surr_scal_tmp.extend(surr.wavelet(method=self.wave_method,
+                                                      settings=self.wave_args,).scalogram_list)
+                    surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
+            else:
+                surr = self.timeseries.surrogates(number=number, seed=seed,
+                                                  method=method, settings=settings)
+                surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args)
+    
+            #if len(qs) > 1:
+            #    raise ValueError('qs should be a list with size 1!')
+    
+            new.signif_qs = surr_scal.quantiles(qs=qs)
+            new.signif_method = method
+            new.qs = qs
+    
             if export_scal == True:
                 new.signif_scals = surr_scal
 
@@ -4211,14 +4222,14 @@ class Coherence:
 
          return fig, ax
 
-    def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95], settings=None, mute_pbar=False):
+    def signif_test(self, number=200, method='ar1sim', seed=None, qs=[0.95], settings=None, mute_pbar=False):
         '''Significance testing
 
         Parameters
         ----------
         number : int, optional
             Number of surrogate series to create for significance testing. The default is 200.
-        method : {'ar1'}, optional
+        method : {'ar1sim'}, optional
             Method through which to generate the surrogate series. The default is 'ar1'.
         seed : int, optional
             Fixes the seed for the random number generator. Useful for reproducibility. The default is None.
