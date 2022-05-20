@@ -3749,24 +3749,27 @@ class Scalogram:
 
 
 class Coherence:
-    '''Coherence object
+    '''Coherence object, meant to receive the WTC part of Series.wavelet_coherence()
 
     See also
     --------
 
-    pyleoclim.core.ui.Series.wavelet_coherence : Wavelet coherence
+    pyleoclim.core.ui.Series.wavelet_coherence : Wavelet coherence method
 
     '''
-    def __init__(self, frequency, time, coherence, phase, coi=None,
+    def __init__(self, frequency, scale, time, wtc, xwt, phase, coi=None,
+                 wave_method=None, wave_args=None,
                  timeseries1=None, timeseries2=None, signif_qs=None, signif_method=None,
-                 freq_method=None, freq_kwargs=None, Neff=3, period_unit=None, time_label=None):
+                 freq_method=None, freq_kwargs=None, Neff_threshold=3, scale_unit=None, time_label=None):
         self.frequency = np.array(frequency)
         self.time = np.array(time)
-        self.coherence = np.array(coherence)
+        self.scale = np.array(scale)
+        self.wtc = np.array(wtc)
+        self.xwt = np.array(xwt)
         if coi is not None:
             self.coi = np.array(coi)
         else:
-            self.coi = waveutils.make_coi(self.time, Neff=Neff)
+            self.coi = waveutils.make_coi(self.time, Neff_threshold=Neff_threshold)
         self.phase = np.array(phase)
         self.timeseries1 = timeseries1
         self.timeseries2 = timeseries2
@@ -3774,15 +3777,17 @@ class Coherence:
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
+        self.wave_method = wave_method
+        self.wave_args = wave_args
 
-        if period_unit is not None:
-            self.period_unit = period_unit
+        if scale_unit is not None:
+            self.scale_unit = scale_unit
         elif timeseries1 is not None:
-            self.period_unit = infer_period_unit_from_time_unit(timeseries1.time_unit)
+            self.scale_unit = infer_period_unit_from_time_unit(timeseries1.time_unit)
         elif timeseries2 is not None:
-            self.period_unit = infer_period_unit_from_time_unit(timeseries2.time_unit)
+            self.scale_unit = infer_period_unit_from_time_unit(timeseries2.time_unit)
         else:
-            self.period_unit = None
+            self.scale_unit = None
 
         if time_label is not None:
             self.time_label = time_label
@@ -3804,29 +3809,33 @@ class Coherence:
         '''
         return deepcopy(self)
 
-    def plot(self, xlabel=None, ylabel=None, title=None, figsize=[10, 8],
-             ylim=None, xlim=None, in_period=True, yticks=None, mute=False,
+    def plot(self, var='wtc', xlabel=None, ylabel=None, title='auto', figsize=[10, 8],
+             ylim=None, xlim=None, in_scale=True, yticks=None, mute=False,
              contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, ax=None,
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
-             under_clr='ivory', over_clr='black', bad_clr='dimgray'):
+             signif_thresh = 0.95, under_clr='ivory', over_clr='black', bad_clr='dimgray'):
         '''Plot the cross-wavelet results
 
         Parameters
         ----------
+        var : str {'wtc', 'xwt'}
+            variable to be plotted as color field. Default: 'wtc', the wavelet transform coherency.
+            'xwt' plots the cross-wavelet transform instead.
         xlabel : str, optional
             x-axis label. The default is None.
         ylabel : str, optional
             y-axis label. The default is None.
         title : str, optional
-            Title of the plot. The default is None.
+            Title of the plot. The default is 'auto', where it is made from object metadata.
+            To mute, pass title = None.
         figsize : list, optional
             Figure size. The default is [10, 8].
         ylim : list, optional
             y-axis limits. The default is None.
         xlim : list, optional
             x-axis limits. The default is None.
-        in_period : bool, optional
-            Plots periods instead of frequencies The default is True.
+        in_scale : bool, optional
+            Plots scales instead of frequencies The default is True.
         yticks : list, optional
             y-ticks label. The default is None.
         mute : bool, optional
@@ -3842,6 +3851,7 @@ class Coherence:
             - 'skip_y':  the number of points to skip between phase arrows along the y-axis
             - 'scale': number of data units per arrow length unit (see matplotlib.pyplot.quiver)
             - 'width': shaft width in arrow units (see matplotlib.pyplot.quiver)
+            - 'color': arrow color (see matplotlib.pyplot.quiver)
         cbar_style : dict, optional
             Arguments for the color bar. The default is {}.
         savefig_settings : dict, optional
@@ -3852,8 +3862,12 @@ class Coherence:
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         ax : ax, optional
             Matplotlib axis on which to return the figure. The default is None.
+        signif_thresh: float in [0, 1]
+            Significance threshold. Default is 0.95. If this quantile is not
+            found in the qs field of the Coherence object, the closest quantile
+            will be picked.
         signif_clr : str, optional
-            Color of the singificance line. The default is 'white'.
+            Color of the significance line. The default is 'white'.
         signif_linestyles : str, optional
             Style of the significance line. The default is '-'.
         signif_linewidths : float, optional
@@ -3882,15 +3896,15 @@ class Coherence:
         # handling NaNs
         mask_freq = []
         for i in range(np.size(self.frequency)):
-            if all(np.isnan(self.coherence[:, i])):
+            if all(np.isnan(self.wtc[:, i])):
                 mask_freq.append(False)
             else:
                 mask_freq.append(True)
 
-        if in_period:
-            y_axis = 1/self.frequency[mask_freq]
+        if in_scale:
+            y_axis = self.scale[mask_freq]
             if ylabel is None:
-                ylabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
+                ylabel = f'Scale [{self.scale_unit}]' if self.scale_unit is not None else 'Scale'
 
             if yticks is None:
                 yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 1e4, 2e4, 5e4, 1e5, 2e5, 5e5, 1e6])
@@ -3899,13 +3913,15 @@ class Coherence:
         else:
             y_axis = self.frequency[mask_freq]
             if ylabel is None:
-                ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
+                ylabel = f'Frequency [1/{self.scale_unit}]' if self.scale_unit is not None else 'Frequency'
 
-        # plot coherence amplitude
+        if signif_thresh > 1 or signif_thresh < 0:
+            raise ValueError("The significance threshold must be in [0, 1] ")
+
+        # plot color field for WTC or XWT
         contourf_args = {
             'cmap': 'magma',
             'origin': 'lower',
-            'levels': np.linspace(0, 1, 11),
         }
         contourf_args.update(contourf_style)
 
@@ -3915,33 +3931,54 @@ class Coherence:
         cmap.set_bad(bad_clr)
         contourf_args['cmap'] = cmap
 
-        cont = ax.contourf(self.time, y_axis, self.coherence[:, mask_freq].T, **contourf_args)
+        if var == 'wtc':
+            lev = np.linspace(0, 1, 11)
+            cont = ax.contourf(self.time, y_axis, self.wtc[:, mask_freq].T,
+                               levels = lev, **contourf_args)
+        elif var == 'xwt':
+            cont = ax.contourf(self.time, y_axis, self.xwt[:, mask_freq].T,
+                               levels = 11, **contourf_args) # just pass number of contours
+        else:
+            raise ValueError("Unknown variable; please choose either 'wtc' or 'xwt'")
 
         # plot significance levels
         if self.signif_qs is not None:
             signif_method_label = {
                 'ar1': 'AR(1)',
             }
-            signif_coh = self.signif_qs.scalogram_list[0]
-            signif_boundary = self.coherence[:, mask_freq].T / signif_coh.amplitude[:, mask_freq].T
-            ax.contour(
-                self.time, y_axis, signif_boundary, [-99, 1],
-                colors=signif_clr,
-                linestyles=signif_linestyles,
-                linewidths=signif_linewidths,
-            )
+            if signif_thresh not in self.qs:
+                isig = np.abs(np.array(self.qs) - signif_thresh).argmin()
+                print("Significance threshold {:3.2f} not found in qs. Picking the closest, which is {:3.2f}".format(signif_thresh,self.qs[isig]))
+            else:
+                isig = self.qs.index(signif_thresh)
+
+            if var == 'wtc':
+                signif_coh = self.signif_qs[0].scalogram_list[isig] # extract WTC significance threshold
+                signif_boundary = self.wtc[:, mask_freq].T / signif_coh.amplitude[:, mask_freq].T
+            elif var == 'xwt':
+                signif_coh = self.signif_qs[1].scalogram_list[isig] # extract XWT significance threshold
+                signif_boundary = self.xwt[:, mask_freq].T / signif_coh.amplitude[:, mask_freq].T
+
+            ax.contour(self.time, y_axis, signif_boundary, [-99, 1],
+                       colors=signif_clr,
+                       linestyles=signif_linestyles,
+                       linewidths=signif_linewidths)
+            if title is not None:
+                ax.set_title("Lines:" + str(round(self.qs[isig]*100))+"% threshold")
 
         # plot colorbar
         cbar_args = {
+            'label': var.upper(),
             'drawedges': False,
             'orientation': 'vertical',
             'fraction': 0.15,
             'pad': 0.05,
-            'ticks': np.linspace(0, 1, 11)
+            'ticks': cont.levels
         }
         cbar_args.update(cbar_style)
 
-        cb = plt.colorbar(cont, **cbar_args)
+        # assign colorbar to axis (instead of fig) : https://matplotlib.org/stable/gallery/subplots_axes_and_figures/colorbar_placement.html
+        cb = plt.colorbar(cont, ax = ax, **cbar_args)
 
         # plot cone of influence
         ax.set_yscale('log')
@@ -3969,7 +4006,9 @@ class Coherence:
         # plot phase
         skip_x = np.max([int(np.size(self.time)//20), 1])
         skip_y = np.max([int(np.size(y_axis)//20), 1])
-        phase_args = {'pt': 0.5, 'skip_x': skip_x, 'skip_y': skip_y, 'scale': 30, 'width': 0.004}
+
+        phase_args = {'pt': 0.5, 'skip_x': skip_x, 'skip_y': skip_y,
+                      'scale': 30, 'width': 0.004}
         phase_args.update(phase_style)
 
         pt = phase_args['pt']
@@ -3978,37 +4017,152 @@ class Coherence:
         scale = phase_args['scale']
         width = phase_args['width']
 
+        if 'color' in phase_style:
+            color = phase_style['color']
+        else:
+            color = 'black'
+
         phase = np.copy(self.phase)[:, mask_freq]
 
         if self.signif_qs is None:
-            phase[self.coherence[:, mask_freq] < pt] = np.nan
+            if var == 'wtc':
+                phase[self.wtc[:, mask_freq] < pt] = np.nan
+            else:
+                field = self.xwt[:, mask_freq]
+                phase[field < pt*field.max()] = np.nan
         else:
             phase[signif_boundary.T < 1] = np.nan
 
-        X, Y = np.meshgrid(self.time, 1/self.frequency[mask_freq])
+
+        X, Y = np.meshgrid(self.time, y_axis)
         U, V = np.cos(phase).T, np.sin(phase).T
 
         ax.quiver(X[::skip_y, ::skip_x], Y[::skip_y, ::skip_x],
                   U[::skip_y, ::skip_x], V[::skip_y, ::skip_x],
-                  scale=scale, width=width, zorder=99)
+                  scale=scale, width=width, zorder=99, color=color)
 
         ax.set_ylim(ylim)
 
         if xlim is not None:
             ax.set_xlim(xlim)
 
-        if title is not None:
-            ax.set_title(title)
+        lbl1 = self.timeseries1.label
+        lbl2 = self.timeseries2.label
+
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
+            if title is not None and  title != 'auto':
+                fig.suptitle(title)
+            elif title == 'auto' and lbl1 is not None and lbl1 is not None:
+                title = 'Wavelet coherency ('+var.upper() +') between '+ lbl1 + ' and ' + lbl2
+                fig.suptitle(title)
             # else:
             #     if not mute:
             #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
+
+
+    def dashboard(self, title=None, figsize=[9,12], mute=False, phase_style = {},
+                  savefig_settings={}, ts_plot_kwargs = None, wavelet_plot_kwargs= None):
+         ''' Cross-wavelet dashboard, including the two series, WTC and XWT.
+
+             Note: this design balances many considerations, and is not easily customizable.
+
+         Parameters
+         ----------
+
+         title : str, optional
+             Title of the plot. The default is None.
+
+         figsize : list, optional
+             Figure size. The default is [9, 12], as this is an information-rich figure.
+
+         mute : bool, optional
+             if True, the plot will not show;
+             recommend to turn on when more modifications are going to be made on ax The default is False. The default is False.
+             (going to be deprecated)
+
+         savefig_settings : dict, optional
+             The default is {}.
+             the dictionary of arguments for plt.savefig(); some notes below:
+             - "path" must be specified; it can be any existed or non-existed path,
+               with or without a suffix; if the suffix is not given in "path", it will follow "format"
+             - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+         ts_plot_kwargs : dict
+              arguments to be passed to the timeseries subplot, see pyleoclim.core.ui.Series.plot for details
+
+         wavelet_plot_kwargs : dict
+              arguments to be passed to the contour subplots (XWT and WTC), see pyleoclim.core.ui.Scalogram.plot for details
+
+
+         Returns
+         -------
+         fig, ax
+
+         See also
+         --------
+
+         pyleoclim.core.ui.Series.wavelet_coherence
+         matplotlib.pyplot.quiver
+
+         '''
+         # prepare options dictionaries
+         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+         wavelet_plot_kwargs={} if wavelet_plot_kwargs is None else wavelet_plot_kwargs.copy()
+         ts_plot_kwargs={} if ts_plot_kwargs is None else ts_plot_kwargs.copy()
+
+
+         # create figure
+         fig = plt.figure(figsize=figsize)
+         gs = gridspec.GridSpec(8, 1)
+         gs.update(wspace=0, hspace=0.3) # add some breathing room
+         ax = {}
+
+         # 1) plot timeseries
+
+         ax['ts'] = plt.subplot(gs[0:2, 0])
+         self.timeseries1.plot(ax=ax['ts'], color='C0', label='', **ts_plot_kwargs)
+         ax['ts'].yaxis.label.set_color('C0')
+         ax['ts'].tick_params(axis='y', colors='C0')
+         ax['ts'].spines['left'].set_color('C0')
+         ax['ts'].spines['bottom'].set_visible(False)
+         ax['ts'].grid(False)
+
+         axts2 = ax['ts'].twinx()
+         self.timeseries2.plot(ax=axts2, color='C1', label='',  **ts_plot_kwargs)
+         axts2.yaxis.label.set_color('C1')
+         axts2.tick_params(axis='y', colors='C1')
+         axts2.spines['right'].set_color('C1')
+         axts2.spines['right'].set_visible(True)
+         axts2.spines['left'].set_visible(False)
+         axts2.grid(False)
+
+         # 2) plot WTC
+         ax['wtc'] = plt.subplot(gs[2:5, 0])
+         if 'cbar_style' not in wavelet_plot_kwargs:
+             wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal',
+                                                       'pad': 0.09, 'aspect': 50}})
+         self.plot(var='wtc',ax=ax['wtc'], title= None, **wavelet_plot_kwargs)
+         #ax['wtc'].xaxis.set_visible(False)  # hide x axis
+         ax['wtc'].set_xlabel('')
+
+        # 3) plot XWT
+         ax['xwt'] = plt.subplot(gs[5:8, 0])
+         if 'phase_style' not in wavelet_plot_kwargs:
+             wavelet_plot_kwargs.update({'phase_style':{'color': 'lightgray'}})
+         self.plot(var='xwt',ax=ax['xwt'], title= None,
+                   contourf_style={'cmap': 'viridis'},
+                   cbar_style={'orientation': 'horizontal','pad': 0.15, 'aspect': 50},
+                   phase_style=wavelet_plot_kwargs['phase_style'])
+
+         #fig.tight_layout() # this does nothing
+
+         return fig, ax
 
     def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95], settings=None, mute_pbar=False):
         '''Significance testing
@@ -4022,7 +4176,7 @@ class Coherence:
         seed : int, optional
             Fixes the seed for the random number generator. Useful for reproducibility. The default is None.
         qs : list, optional
-            Significanc level to return. The default is [0.95].
+            Significance level to return. The default is [0.95].
         settings : dict, optional
             Parameters for surrogate model. The default is None.
         mute_pbar : bool, optional
@@ -4031,7 +4185,8 @@ class Coherence:
         Returns
         -------
         new : pyleoclim.Coherence
-            Coherence with significance level
+            Coherence with significance level signif_qs, a list with the following NumPy ndarrays:
+                0:
 
         See also
         --------
@@ -4050,30 +4205,64 @@ class Coherence:
             number=number, seed=seed, method=method, settings=settings
         )
 
-        cohs = []
+        wtcs, xwts = [], []
+
         for i in tqdm(range(number), desc='Performing wavelet coherence on surrogate pairs', total=number, disable=mute_pbar):
-            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i], settings={'tau': self.time, 'freq': self.frequency})
-            cohs.append(coh_tmp.coherence)
+            coh_tmp = surr1.series_list[i].wavelet_coherence(surr2.series_list[i],
+                                                             method  = self.wave_method,
+                                                             settings = self.wave_args)
+            wtcs.append(coh_tmp.wtc)
+            xwts.append(coh_tmp.xwt)
 
-        cohs = np.array(cohs)
+        wtcs = np.array(wtcs)
+        xwts = np.array(xwts)
 
-        ne, nf, nt = np.shape(cohs)
 
-        coh_qs = np.ndarray(shape=(np.size(qs), nf, nt))
-        for i in range(nf):
-            for j in range(nt):
-                coh_qs[:,i,j] = mquantiles(cohs[:,i,j], qs)
+        ne, nf, nt = np.shape(wtcs)
 
-        scal_list = []
-        for i, amp in enumerate(coh_qs):
-            scal_tmp = Scalogram(
-                    frequency=self.frequency, time=self.time, amplitude=amp, coi=self.coi,
+        # reshape because mquantiles only accepts inputs of at most 2D
+        wtcs_r = np.reshape(wtcs, (ne, nf*nt))
+        xwts_r = np.reshape(xwts, (ne, nf*nt))
+
+        # define nd-arrays
+        nq = len(qs)
+        wtc_qs = np.ndarray(shape=(nq, nf, nt))
+        xwt_qs = np.empty_like(wtc_qs)
+
+        # for i in range(nf):
+        #     for j in range(nt):
+        #         wtc_qs[:,i,j] = mquantiles(wtcs[:,i,j], qs)
+        #         xwt_qs[:,i,j] = mquantiles(xwts[:,i,j], qs)
+
+        # extract quantiles and reshape
+        wtc_qs = mquantiles(wtcs_r, qs, axis=0)
+        wtc_qs = np.reshape(wtc_qs, (nq, nf, nt))
+        xwt_qs = mquantiles(xwts_r, qs, axis=0)
+        xwt_qs = np.reshape(xwt_qs, (nq, nf, nt))
+
+        # put in Scalogram objects for export
+        wtc_list, xwt_list = [],[]
+
+        for i in range(nq):
+            wtc_tmp = Scalogram(
+                    frequency=self.frequency, time=self.time, amplitude=wtc_qs[i,:,:],
+                    coi=self.coi, scale = self.scale,
                     freq_method=self.freq_method, freq_kwargs=self.freq_kwargs, label=f'{qs[i]*100:g}%',
                 )
-            scal_list.append(scal_tmp)
+            wtc_list.append(wtc_tmp)
+            xwt_tmp = Scalogram(
+                    frequency=self.frequency, time=self.time, amplitude=xwt_qs[i,:,:],
+                    coi=self.coi, scale = self.scale,
+                    freq_method=self.freq_method, freq_kwargs=self.freq_kwargs, label=f'{qs[i]*100:g}%',
+                )
 
-        new.signif_qs = MultipleScalogram(scalogram_list=scal_list)
+            xwt_list.append(xwt_tmp)
+
+        new.signif_qs = []
+        new.signif_qs.append(MultipleScalogram(scalogram_list=wtc_list)) # Export WTC quantiles
+        new.signif_qs.append(MultipleScalogram(scalogram_list=xwt_list)) # Export XWT quantiles
         new.signif_method = method
+        new.qs = qs
 
         return new
 
