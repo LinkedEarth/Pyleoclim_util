@@ -16,6 +16,7 @@ import warnings
 
 __all__ = [
     'wwz_psd',
+    'cwt_psd',
     'mtm',
     'lomb_scargle',
     'welch',
@@ -615,7 +616,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
 def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             tau=None, c=1e-3, nproc=8,
             detrend=False, sg_kwargs=None, gaussianize=False,
-            standardize=False, Neff=3, anti_alias=False, avgs=2,
+            standardize=False, Neff_threshold=3, anti_alias=False, avgs=2,
             method='Kirchner_numba', wwa=None, wwz_Neffs=None, wwz_freq=None):
     ''' Returns the power spectral density (PSD) of a timeseries using the Weighted Wavelet Z-transform
 
@@ -683,8 +684,8 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
         - 'Kirchner_f2py':  the method Kirchner adapted from Foster, implemented with f2py for acceleration;
         - 'Kirchner_numba':  the method Kirchner adapted from Foster, implemented with Numba for acceleration (default);
 
-    Neff : int
-        effective number of points
+    Neff_threshold : int
+        threshold for the effective number of points
     anti_alias : bool
         If True, uses anti-aliasing
     avgs : int
@@ -734,14 +735,14 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     # get wwa but AR1_q is not needed here so set nMC=0
     #  wwa, _, _, coi, freq, _, Neffs, _ = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
     if wwa is None or wwz_Neffs is None or wwz_freq is None:
-        res_wwz = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc, nMC=0,
+        res_wwz = wwz(ys_cut, ts_cut, freq=freq, tau=tau, c=c, nproc=nproc,
                   detrend=detrend, sg_kwargs=sg_kwargs,
                   gaussianize=gaussianize, standardize=standardize, method=method)
         wwa = res_wwz.amplitude
         wwz_Neffs = res_wwz.Neffs
         wwz_freq = res_wwz.freq
-
-    psd = wwa2psd(wwa, ts_cut, wwz_Neffs, freq=wwz_freq, Neff=Neff, anti_alias=anti_alias, avgs=avgs)
+        
+    psd = wwa2psd(wwa, ts_cut, wwz_Neffs, freq=wwz_freq, Neff_threshold=Neff_threshold, anti_alias=anti_alias, avgs=avgs)
     Results = collections.namedtuple('Results', ['psd', 'freq'])
     res = Results(psd=psd, freq=freq)
 
