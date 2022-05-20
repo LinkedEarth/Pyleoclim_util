@@ -43,7 +43,7 @@ import statsmodels.tsa.stattools as sms
 
 import math
 from sys import exit
-from .plotting import plot_scatter_xy,plot_xy,savefig,showfig
+from .plotting import plot_scatter_xy, plot_xy, savefig
 from .filter import savitzky_golay
 
 from .tsbase import (
@@ -352,86 +352,7 @@ def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style
     return xi, yi
 
 
-# def on_common_axis(x1, y1, x2, y2, method = 'interpolation', step=None, start=None, stop=None):
-#     """Places two timeseries on a common axis
 
-#     Note this function assumes that the time representation and units are the same (e.g., BP vs CE)
-
-#     Parameters
-#     ----------
-#     x1 : array
-#         x-axis values of the first timeseries
-#     y1 : array
-#         y-axis values of the first timeseries
-#     x2 : array
-#         x-axis values of the second timeseries
-#     y2 : array
-#         y-axis values of the second timeseries
-#     method : str
-#         Which method to use to get the timeseries on the same x axis.
-#         Valid entries: 'interpolation' (default, linear interpolation),
-#         'bin', 'None'. 'None' only cuts the timeseries to the common
-#         period but does not attempt to generate a common time axis
-#     step : float
-#         The interpolation step. Default is mean resolution
-#         of lowest resolution series
-#     start : float
-#         where/when to start. Default is the maximum of the minima of
-#         the two timeseries
-#     stop : float
-#         Where/when to stop. Default is the minimum of the maxima of
-#         the two timeseries
-
-#     Returns
-#     -------
-
-#     xi1, xi2 : array
-#         The interpolated x-axis
-#     interp_values1, interp_values2 : array
-#         the interpolated y-values
-#     """
-#     # make sure that x1, y1, x2, y2 are numpy arrays
-#     x1 = np.array(x1, dtype='float64')
-#     y1 = np.array(y1, dtype='float64')
-#     x2 = np.array(x2, dtype='float64')
-#     y2 = np.array(y2, dtype='float64')
-
-#     # Find the mean/max x-axis is not provided
-#     if start is None:
-#         start = np.nanmax([np.nanmin(x1), np.nanmin(x2)])
-#     if stop is None:
-#         stop = np.nanmin([np.nanmax(x1), np.nanmax(x2)])
-
-#     # Get the interp_step
-#     if step is None:
-#         step = np.nanmin([np.nanmean(np.diff(x1)), np.nanmean(np.diff(x2))])
-
-#     if method == 'interpolation':
-#     # perform the interpolation
-#         xi1, interp_values1 = interp(x1, y1, step=step, start=start,
-#                                 stop=stop)
-#         xi2, interp_values2 = interp(x2, y2, step=step, start=start,
-#                                 stop=stop)
-#     elif method == 'bin':
-#         xi1, interp_values1, _ , _ = bin(x1, y1, bin_size=step, start=start,
-#                                 stop=stop)
-#         xi2, interp_values2, _ , _ = bin(x2, y2, bin_size=step, start=start,
-#                                 stop=stop)
-#     elif method == None:
-#         min_idx1 = np.where(x1>=start)[0][0]
-#         min_idx2 = np.where(x2>=start)[0][0]
-#         max_idx1 = np.where(x1<=stop)[0][-1]
-#         max_idx2 = np.where(x2<=stop)[0][-1]
-
-#         xi1 = x1[min_idx1:max_idx1+1]
-#         xi2 = x2[min_idx2:max_idx2+1]
-#         interp_values1 = y1[min_idx1:max_idx1+1]
-#         interp_values2 = y2[min_idx2:max_idx2+1]
-
-#     else:
-#         raise KeyError('Not a valid interpolation method')
-
-#     return xi1, xi2, interp_values1, interp_values2
 
 
 def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
