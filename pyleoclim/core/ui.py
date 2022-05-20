@@ -824,8 +824,7 @@ class Series:
 
             nino_ssa.screeplot()
             @savefig ts_eigen.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
+            
 
         This highlights a few common phenomena with SSA:
             * the eigenvalues are in descending order
@@ -852,8 +851,7 @@ class Series:
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
             @savefig ssa_recon.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
+        
 
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
             * there was not much rhyme or reason for picking 15 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
@@ -878,8 +876,6 @@ class Series:
 
             nino_mcssa.screeplot()
             @savefig scree_nmc.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
         This suggests that modes 1-5 fall above the red noise benchmark.
 
@@ -986,8 +982,6 @@ class Series:
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
             @savefig ts_filter1.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
         - Applying a low-pass filter
 
@@ -1000,8 +994,6 @@ class Series:
             ts1.plot(ax=ax, label='10 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
             @savefig ts_filter2.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
         - Applying a band-pass filter
 
@@ -1014,8 +1006,6 @@ class Series:
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
             @savefig ts_filter3.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
         Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:
 
@@ -1028,8 +1018,6 @@ class Series:
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
             @savefig ts_filter4.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
         - Applying a high-pass filter
 
@@ -1044,8 +1032,6 @@ class Series:
             ts_high.plot(label='High-pass filter @ 15Hz',ax=ax)
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
             @savefig ts_filter5.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
         '''
         if not self.is_evenly_spaced():
@@ -1333,9 +1319,6 @@ class Series:
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             fig, ax = series.summary_plot(n_signif_test=1)
 
-            pyleo.showfig(fig)
-
-            pyleo.closefig(fig)
 
         Summary_plot with pre-generated psd and scalogram objects. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
 
@@ -1351,10 +1334,6 @@ class Series:
             scalogram = series.wavelet(freq_method = 'welch')
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram,n_signif_test=2)
 
-            pyleo.showfig(fig)
-
-            pyleo.closefig(fig)
-
         Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
 
         .. ipython:: python
@@ -1368,10 +1347,6 @@ class Series:
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, n_signif_test=2, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
-
-            pyleo.showfig(fig)
-
-            pyleo.closefig(fig)
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -1819,7 +1794,6 @@ class Series:
             ts = pyleo.Series(time=time,value=signal_noise + nonlinear_trend)
             @savefig random_series.png
             fig, ax = ts.plot(title='Timeseries with nonlinear trend')
-            pyleo.closefig(fig)
 
             # Detrending with default parameters (using EMD method with 1 mode)
             ts_emd1 = ts.detrend()
@@ -1828,8 +1802,6 @@ class Series:
             fig, ax = ts_emd1.plot(title='Detrended with EMD method')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
             # We see that the default function call results in a "Hockey Stick" at the end, which is undesirable.
             # There is no automated way to do this, but with a little trial and error, we find that removing the 2 smoothest modes performs reasonably:
@@ -1840,8 +1812,6 @@ class Series:
             fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
             # Another option for removing a nonlinear trend is a Savitzky-Golay filter:
             ts_sg = ts.detrend(method='savitzky-golay')
@@ -1850,8 +1820,6 @@ class Series:
             fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
             # As we can see, the result is even worse than with EMD (default). Here it pays to look into the underlying method, which comes from SciPy.
             # It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges.
@@ -1863,8 +1831,6 @@ class Series:
             fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
         '''
         new = self.copy()
@@ -1956,7 +1922,6 @@ class Series:
             psd_ls_signif = psd_ls.signif_test(number=20) #in practice, need more AR1 simulations
             @savefig spec_ls.png
             fig, ax = psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
-            pyleo.closefig(fig)
 
         We may pass in method-specific arguments via "settings", which is a dictionary.
         For instance, to adjust the number of overlapping segment for Lomb-Scargle, we may specify the method-specific argument "n50";
@@ -1975,16 +1940,12 @@ class Series:
                 label='settings={"n50": 4}')
             psd_ls.plot(ax=ax, label='settings={"n50": 3}', marker='o')
             @savefig spec_ls_n50.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
             fig, ax = psd_LS_freq.plot(
                 title='PSD using Lomb-Scargle method with differnt frequency vectors',
                 label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
             psd_ls.plot(ax=ax, label='freq_method="log"', marker='o')
             @savefig spec_ls_freq.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
 
         You may notice the differences in the PSD curves regarding smoothness and the locations of the analyzed period points.
 
@@ -2000,7 +1961,6 @@ class Series:
             psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger
             @savefig spec_wwz.png
             fig, ax = psd_wwz_signif.plot(title='PSD using WWZ method')
-            pyleo.closefig(fig)
 
         We may take advantage of a pre-calculated scalogram using WWZ to accelerate the spectral analysis
         (although note that the default parameters for spectral and wavelet analysis using WWZ are different):
@@ -2013,7 +1973,6 @@ class Series:
             psd_wwz_fast = ts_std.spectral(method='wwz', scalogram=scal_wwz)
             @savefig spec_wwz_fast.png
             fig, ax = psd_wwz_fast.plot(title='PSD using WWZ method w/ pre-calculated scalogram')
-            pyleo.closefig(fig)
 
         - Periodogram
 
@@ -2026,7 +1985,6 @@ class Series:
             psd_perio_signif = psd_perio.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_perio.png
             fig, ax = psd_perio_signif.plot(title='PSD using Periodogram method')
-            pyleo.closefig(fig)
 
         - Welch
 
@@ -2039,7 +1997,6 @@ class Series:
             psd_welch_signif = psd_welch.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_welch.png
             fig, ax = psd_welch_signif.plot(title='PSD using Welch method')
-            pyleo.closefig(fig)
 
         - MTM
 
@@ -2052,7 +2009,6 @@ class Series:
             psd_mtm_signif = psd_mtm.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_mtm.png
             fig, ax = psd_mtm_signif.plot(title='PSD using MTM method')
-            pyleo.closefig(fig)
 
         - Continuous Wavelet Transform
 
@@ -2065,7 +2021,6 @@ class Series:
             psd_cwt_signif = psd_cwt.signif_test()
             @savefig spec_cwt.png
             fig, ax = psd_cwt_signif.plot(title='PSD using CWT method')
-            pyleo.closefig(fig)
 
         '''
         if not verbose:
@@ -2078,7 +2033,7 @@ class Series:
             'lomb_scargle': specutils.lomb_scargle,
             'welch': specutils.welch,
             'periodogram': specutils.periodogram,
-            'cwt':specutils.cwt_psd
+            'cwt': specutils.cwt_psd
         }
         args = {}
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
@@ -2995,9 +2950,6 @@ class PSD:
             #The same scalogram can then be passed to do significance testing. Pyleoclim will dig through the scalogram to find the saved noise realizations and reuse them flexibly.
             fig, ax = psd.signif_test(scalogram=scalogram).plot()
 
-            pyleo.showfig(fig)
-
-            pyleo.closefig(fig)
 
         See also
         --------
@@ -3402,14 +3354,16 @@ class PSD:
             return ax
 
 class Scalogram:
-    def __init__(self, frequency, time, amplitude, coi=None, label=None, Neff=3, wwz_Neffs=None, timeseries=None,
+    def __init__(self, frequency, scale, time, amplitude, coi=None, label=None, Neff_threshold=3, wwz_Neffs=None, timeseries=None,
                  wave_method=None, wave_args=None, signif_qs=None, signif_method=None, freq_method=None, freq_kwargs=None,
-                 period_unit=None, time_label=None, signif_scals=None):
+                 scale_unit=None, time_label=None, signif_scals=None):
         '''
         Parameters
         ----------
             frequency : array
                 the frequency axis
+            scale : array
+                the scale axis
             time : array
                 the time axis
             amplitude : array
@@ -3419,7 +3373,7 @@ class Scalogram:
                 Cone of influence
             label : str
                 Label for the Series
-            Neff : int
+            Neff_threshold : int
                 the threshold of the number of effective samples
             wwz_Neffs : array
                 the matrix of effective number of points in the time-scale coordinates obtained from wwz
@@ -3437,20 +3391,21 @@ class Scalogram:
                 The method used to obtain the frequency vector
             freq_kwargs: dict
                 Arguments for the frequency vector
-            period_unit: str
-                Units for the period axis
+            scale_unit: str
+                Units for the scale axis
             time_label: str
                 Label for the time axis
             signif_scals: pyleoclim.MultipleScalogram
                 A list of the scalogram from the AR1 MC significance testing. Useful when obtaining a PSD.
         '''
         self.frequency = np.array(frequency)
+        self.scale = np.array(scale)
         self.time = np.array(time)
         self.amplitude = np.array(amplitude)
         if coi is not None:
             self.coi = np.array(coi)
         else:
-            self.coi = waveutils.make_coi(self.time, Neff=Neff)
+            self.coi = waveutils.make_coi(self.time, Neff_threshold=Neff_threshold)
         self.label = label
         self.timeseries = timeseries
         self.wave_method = wave_method
@@ -3471,12 +3426,12 @@ class Scalogram:
         else:
             self.wwz_Neffs=np.array(wwz_Neffs)
 
-        if period_unit is not None:
-            self.period_unit = period_unit
+        if scale_unit is not None:
+            self.scale_unit = scale_unit
         elif timeseries is not None:
-            self.period_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
+            self.scale_unit = infer_period_unit_from_time_unit(timeseries.time_unit)
         else:
-            self.period_unit = None
+            self.scale_unit = None
 
         if time_label is not None:
             self.time_label = time_label
@@ -3504,18 +3459,19 @@ class Scalogram:
         msg = print(tabulate(table, headers='keys'))
         return f'Dimension: {np.size(self.frequency)} x {np.size(self.time)}'
 
-    def plot(self, variable = 'amplitude', in_period=True, xlabel=None, ylabel=None, title=None,
+    def plot(self, variable = 'amplitude', in_scale=True, xlabel=None, ylabel=None, title=None,
              ylim=None, xlim=None, yticks=None, figsize=[10, 8], mute=False,
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
-             contourf_style={}, cbar_style={}, savefig_settings={}, ax=None):
+             contourf_style={}, cbar_style={}, savefig_settings={}, ax=None,
+             signif_thresh = 0.95):
         '''Plot the scalogram
 
         Parameters
         ----------
+        in_scale : bool, optional
+            Plot the in scale instead of frequency space. The default is True.
         variable : {'amplitude','power'}
             Whether to plot the amplitude or power. Default is amplitude
-        in_period : bool, optional
-            Plot the in period instead of frequency space. The default is True.
         xlabel : str, optional
             Label for the x-axis. The default is None.
         ylabel : str, optional
@@ -3536,6 +3492,10 @@ class Scalogram:
             (going to be deprecated)
         signif_clr : str, optional
             Color of the singificance line. The default is 'white'.
+        signif_thresh: float in [0, 1]
+            Significance threshold. Default is 0.95. If this quantile is not
+            found in the qs field of the Coherence object, the closest quantile
+            will be picked.
         signif_linestyles : str, optional
             Linestyle of the significance line. The default is '-'.
         signif_linewidths : float, optional
@@ -3566,10 +3526,10 @@ class Scalogram:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
-        if in_period:
+        if in_scale:
             y_axis = 1/self.frequency
             if ylabel is None:
-                ylabel = f'Period [{self.period_unit}]' if self.period_unit is not None else 'Period'
+                ylabel = f'Scale [{self.scale_unit}]' if self.scale_unit is not None else 'Scale'
 
             if yticks is None:
                 yticks_default = np.array([0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 1e4, 2e4, 5e4, 1e5, 2e5, 5e5, 1e6])
@@ -3578,7 +3538,7 @@ class Scalogram:
         else:
             y_axis = self.frequency
             if ylabel is None:
-                ylabel = f'Frequency [1/{self.period_unit}]' if self.period_unit is not None else 'Frequency'
+                ylabel = f'Frequency [1/{self.scale_unit}]' if self.scale_unit is not None else 'Frequency'
 
         if variable == 'amplitude':
             cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
@@ -3592,7 +3552,7 @@ class Scalogram:
         cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
         cbar_args.update(cbar_style)
 
-        cb = plt.colorbar(cont, **cbar_args)
+        cb = plt.colorbar(cont, ax = ax, **cbar_args)
 
         # plot cone of influence
         if self.coi is not None:
@@ -3616,7 +3576,12 @@ class Scalogram:
             signif_method_label = {
                 'ar1': 'AR(1)',
             }
-            signif_scal = self.signif_qs.scalogram_list[0]
+            if signif_thresh not in self.qs:
+                isig = np.abs(np.array(self.qs) - signif_thresh).argmin()
+                print("Significance threshold {:3.2f} not found in qs. Picking the closest, which is {:3.2f}".format(signif_thresh,self.qs[isig]))
+            else:
+                isig = self.qs.index(signif_thresh)
+            signif_scal = self.signif_qs.scalogram_list[isig]
             signif_boundary = self.amplitude.T / signif_scal.amplitude.T
             ax.contour(
                 self.time, y_axis, signif_boundary, [-99, 1],
@@ -3624,6 +3589,11 @@ class Scalogram:
                 linestyles=signif_linestyles,
                 linewidths=signif_linewidths,
             )
+            if title is None:
+                if self.label is not None:
+                    ax.set_title(self.label + " scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
+                else:
+                    ax.set_title("Scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
 
         if xlabel is None:
             xlabel = self.time_label
@@ -4634,8 +4604,7 @@ class MultipleSeries:
             # display, save and close figure
             fig.tight_layout()
             @savefig ms_ct.png
-            pyleo.showfig(fig)
-            pyleo.closefig(fig)
+            
 
         '''
         # specify stepping style
@@ -5299,13 +5268,17 @@ class MultipleSeries:
 
         return psds
 
-    def wavelet(self, method='wwz', settings={}, freq_method='log', ntau=None, freq_kwargs=None, verbose=False, mute_pbar=False):
+    def wavelet(self, method='cwt', settings={}, freq_method='log', freq_kwargs=None, verbose=False, mute_pbar=False):
         '''Wavelet analysis
 
         Parameters
         ----------
-        method : {wwz, cwt}
-            Whether to use the wwz method for unevenly spaced timeseries or traditional cwt (from Torrence and Compo)
+        method : str {wwz, cwt}
+            cwt - the continuous wavelet transform (as per Torrence and Compo [1998])
+                is appropriate for evenly-spaced series.
+            wwz - the weighted wavelet Z-transform (as per Foster [1996])
+                is appropriate for unevenly-spaced series.
+            Default is cwt, returning an error if the Series is unevenly-spaced.
 
         settings : dict, optional
             Settings for the particular method. The default is {}.
@@ -5316,16 +5289,11 @@ class MultipleSeries:
         freq_kwargs : dict
             Arguments for frequency vector
 
-        ntau : int
-            The length of the time shift points that determins the temporal resolution of the result.
-            If None, it will be either the length of the input time axis, or at most 100.
-
         settings : dict
             Arguments for the specific spectral method
 
         verbose : bool
             If True, will print warning messages if there is any
-
 
         mute_pbar : bool, optional
             Whether to mute the progress bar. The default is False.
@@ -5359,7 +5327,7 @@ class MultipleSeries:
 
         scal_list = []
         for s in tqdm(self.series_list, desc='Performing wavelet analysis on individual series', position=0, leave=True, disable=mute_pbar):
-            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose, ntau=ntau)
+            scal_tmp = s.wavelet(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, verbose=verbose)
             scal_list.append(scal_tmp)
 
         scals = MultipleScalogram(scalogram_list=scal_list)
@@ -5390,7 +5358,7 @@ class MultipleSeries:
         cmap : str
             The colormap to use when "colors" is None.
         norm : matplotlib.colors.Normalize like
-            The nomorlization for the colormap.
+            The normalization for the colormap.
             If None, a linear normalization will be used.
         linestyle : str, optional
             Line style. The default is None.
@@ -6907,6 +6875,7 @@ class MultipleScalogram:
         scals : pyleoclim.MultipleScalogram
         '''
         freq = np.copy(self.scalogram_list[0].frequency)
+        scale = np.copy(self.scalogram_list[0].scale)
         time = np.copy(self.scalogram_list[0].time)
         coi = np.copy(self.scalogram_list[0].coi)
         amps = []
@@ -6929,7 +6898,8 @@ class MultipleScalogram:
 
         scal_list = []
         for i, amp in enumerate(amp_qs):
-            scal_tmp = Scalogram(frequency=freq, time=time, amplitude=amp, coi=coi, label=f'{qs[i]*100:g}%')
+            scal_tmp = Scalogram(frequency=freq, time=time, amplitude=amp,
+                                 scale = scale, coi=coi, label=f'{qs[i]*100:g}%')
             scal_list.append(scal_tmp)
 
         scals = MultipleScalogram(scalogram_list=scal_list)
