@@ -3356,7 +3356,7 @@ class PSD:
 class Scalogram:
     def __init__(self, frequency, scale, time, amplitude, coi=None, label=None, Neff_threshold=3, wwz_Neffs=None, timeseries=None,
                  wave_method=None, wave_args=None, signif_qs=None, signif_method=None, freq_method=None, freq_kwargs=None,
-                 scale_unit=None, time_label=None, signif_scals=None):
+                 scale_unit=None, time_label=None, signif_scals=None, qs = None):
         '''
         Parameters
         ----------
@@ -3383,8 +3383,10 @@ class Scalogram:
                 The method used to obtain the scalogram
             wave_args: dict
                 The parameters values of the wavelet method
+            qs : list
+                quantiles at which significance levels were evaluated & exported
             signif_qs : dict
-                The significance limits
+                MultipleScalogram object containing the quantiles qs of the surrogate scalogram distribution
             signif_method: str
                 The method used to obtain the significance level
             freq_method: str
@@ -3416,6 +3418,7 @@ class Scalogram:
                 wave_args['tau'] = np.array(wave_args['tau'])
         self.wave_args = wave_args
         self.signif_qs = signif_qs
+        self.qs        = qs
         self.signif_method = signif_method
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
@@ -3707,23 +3710,21 @@ class Scalogram:
                     number -= len(scalogram_list)
                     surr_scal_tmp = []
                     surr_scal_tmp.extend(scalogram_list)
-                    surr = self.timeseries.surrogates(
-                number=number, seed=seed, method=method, settings=settings
-            )
-                    surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, settings=self.wave_args,).scalogram_list)
+                    surr = self.timeseries.surrogates(number=number, seed=seed, 
+                                                      method=method, settings=settings)
+    
+                    surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, settings=self.wave_args).scalogram_list)
                     surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
             else:
-                surr = self.timeseries.surrogates(
-                number=number, seed=seed, method=method, settings=settings
-            )
-                surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args,)
+                surr = self.timeseries.surrogates(number=number, seed=seed,
+                                                  method=method, settings=settings)
+                surr_scal = surr.wavelet(method=self.wave_method, settings=self.wave_args)
 
             if type(qs) is not list:
                 raise TypeError('qs should be a list')
 
             new.signif_qs = surr_scal.quantiles(qs=qs)
-            new.signif_method = method
-
+           
             if export_scal == True:
                 new.signif_scals = surr_scal
 
@@ -3749,12 +3750,15 @@ class Scalogram:
                 label = str(int(qs[idx]*100))+'%'
                 # expand
                 signif = item[:, np.newaxis].dot(np.ones(len(self.timeseries.value))[np.newaxis, :])
-                s = Scalogram(frequency=self.frequency, time =self.time,
+                s = Scalogram(frequency=self.frequency, time =self.time, scale = self.scale,
                               amplitude = signif.T, label=label)
                 ms_base.append(s)
 
             new.signif_qs = MultipleScalogram(ms_base)
-            new.signif_method = method
+            
+        
+        new.signif_method = method
+        new.qs = qs
 
         return new
 
@@ -4175,7 +4179,7 @@ class Coherence:
 
          return fig, ax
 
-    def signif_test(self, number=200, method='ar1', seed=None, qs=[0.95], settings=None, mute_pbar=False):
+    def signif_test(self, number=200, method='ar1sim', seed=None, qs=[0.95], settings=None, mute_pbar=False):
         '''Significance testing
 
         Parameters
@@ -6153,8 +6157,6 @@ class EnsembleSeries(MultipleSeries):
 
             ts_ens = pyleo.EnsembleSeries(series_list)
             fig, ax = ts_ens.plot_envelope(curve_lw=1.5)
-            pyleo.closefig(fig)
-
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
