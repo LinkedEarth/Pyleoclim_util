@@ -7,7 +7,7 @@ Created on Tue Feb 25 05:46:36 2020
 
 Contains all relevant mapping functions
 """
-__all__=['map_all', 'compute_dist']
+__all__=['map', 'compute_dist']
 
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
@@ -33,7 +33,7 @@ def set_proj(projection='Robinson', proj_default = True):
         'Geostationary','NearsidePerspective','EckertI','EckertII',
         'EckertIII','EckertIV','EckertV','EckertVI','EqualEarth','Gnomonic',
         'LambertAzimuthalEqualArea','NorthPolarStereo','OSNI','SouthPolarStereo'
-    proj_default : bool
+    proj_default : bool; {True,False}
         If True, uses the standard projection attributes from Cartopy.
         Enter new attributes in a dictionary to change them. Lists of attributes
         can be found in the Cartopy documentation: 
@@ -45,7 +45,7 @@ def set_proj(projection='Robinson', proj_default = True):
         
     See Also
     --------
-    pyleoclim.utils.mapping.map_all : mapping function making use of the projection
+    pyleoclim.utils.mapping.map : mapping function making use of the projection
     
     """
     if proj_default is not True and type(proj_default) is not dict:
@@ -202,7 +202,7 @@ def map(lat, lon, criteria, marker=None, color =None,
             projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
            figsize = None, ax = None, scatter_kwargs=None, legend=True,
-           lgd_kwargs=None,savefig_settings=None, mute=False):
+           lgd_kwargs=None,savefig_settings=None):
     """ Map the location of all lat/lon according to some criteria
     
     Map the location of all lat/lon according to some criteria. Based on functions defined in the Cartopy package. 
@@ -278,10 +278,6 @@ def map(lat, lon, criteria, marker=None, color =None,
         - "path" must be specified; it can be any existed or non-existed path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
-    
-    mute : bool
-        if True, the plot will not show;
-        recommend to set to true when more modifications are going to be made on ax
     
     Returns
     -------
