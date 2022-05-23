@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Oct 19 14:09:03 2020
+This module converts Pyleoclim objects to and from JSON files. 
 
-@author: deborahkhider
+Useful for obtaining a human-readable output and keeping the results of an analysis. The JSON file can also be used to swap analysis results between programming language. 
 
-Utilities to import/export Pyleoclim objects from JSON files
+Please note that these utilities are maintained on a as-needed basis and that not all objects are currently available.
 """
 
 __all__ =['PyleoObj_to_json', 'json_to_PyleoObj', 'isPyleoclim']
@@ -39,7 +39,9 @@ def isPyleoclim(obj):
     return type(obj) in class_names
 
 def PyleoObj_to_dict(obj):
-    '''Transform a pyleoclim object into a dictionary that is valid for JSON encoding. i.e. all numpy arrays have been converted to lists.
+    '''Transform a pyleoclim object into a dictionary. 
+    
+    The transformation ensures that all the objects are JSON serializable (i.e. all numpy arrays have been converted to lists.)
     
 
     Parameters
@@ -81,19 +83,19 @@ def PyleoObj_to_dict(obj):
     return s
 
 def PyleoObj_to_json(obj, filename):
-    '''
-    Serializes a Pyleoclim object into a JSON file
+    '''Serializes a Pyleoclim object into a JSON file
 
     Parameters
     ----------
     obj : pyleoclim.core.ui
         A Pyleoclim object from the UI module
+        
     filename : str
         Filename or path to save the JSON to.
 
     Returns
     -------
-    None.
+    None 
     
     See also
     --------
@@ -108,8 +110,7 @@ def PyleoObj_to_json(obj, filename):
     
 
 def open_json(filename):
-    '''
-    Open a json file.
+    '''Open a json file.
 
     Parameters
     ----------
@@ -140,8 +141,7 @@ def open_json(filename):
     return t
 
 def objname_to_obj(objname):
-    '''
-    Returns the correct obj type for the name of a Pyleoclim UI object
+    '''Returns the correct obj type for the name of a Pyleoclim UI object
 
     Parameters
     ----------
@@ -185,8 +185,7 @@ def objname_to_obj(objname):
     return obj
 
 def json_to_PyleoObj(filename,objname):
-    '''
-    Reads a JSON serialized Pyleoclim object
+    '''Reads a JSON serialized file into a Pyleoclim object
 
     Parameters
     ----------
