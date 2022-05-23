@@ -386,39 +386,39 @@ def sm_ar1_sim(n, p, g, sig):
 
     return red
 
-def red_noise(N, M, g):
-    ''' Produce M realizations of an AR1 process of length N with lag-1 autocorrelation g
+# def red_noise(N, M, g):
+#     ''' Produce M realizations of an AR1 process of length N with lag-1 autocorrelation g
 
-    Parameters
-    ----------
+#     Parameters
+#     ----------
 
-    N : int
-        row dimensions
+#     N : int
+#         row dimensions
         
-    M : int
-        column dimensions
+#     M : int
+#         column dimensions
         
-    g : float
-        lag-1 autocorrelation coefficient
+#     g : float
+#         lag-1 autocorrelation coefficient
 
-    Returns
-    -------
+#     Returns
+#     -------
 
-    red : numpy array
-        N rows by M columns matrix of an AR1 process
+#     red : numpy array
+#         N rows by M columns matrix of an AR1 process
 
-    Notes
-    -----
+#     Notes
+#     -----
 
-    (Some Rights Reserved) Hepta Technologies, 2008
-    J.E.G., GaTech, Oct 20th 2008
-    '''
-    red = np.zeros(shape=(N, M))
-    red[0, :] = np.random.randn(1, M)
-    for i in np.arange(1, N):
-        red[i, :] = g * red[i-1, :] + np.random.randn(1, M)
+#     (Some Rights Reserved) Hepta Technologies, 2008
+#     J.E.G., GaTech, Oct 20th 2008
+#     '''
+#     red = np.zeros(shape=(N, M))
+#     red[0, :] = np.random.randn(1, M)
+#     for i in np.arange(1, N):
+#         red[i, :] = g * red[i-1, :] + np.random.randn(1, M)
 
-    return red
+#     return red
 
 def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
     ''' Estimates the significance of the correlation using phase randomization

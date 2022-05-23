@@ -8,7 +8,7 @@ Created on Mon Oct 19 14:09:03 2020
 Utilities to import/export Pyleoclim objects from JSON files
 """
 
-__all__ =['PyleoObj_to_json', 'json_to_PyleoObj']
+__all__ =['PyleoObj_to_json', 'json_to_PyleoObj', 'isPyleoclim']
 
 import pyleoclim as pyleo
 import numpy as np
@@ -24,7 +24,7 @@ def isPyleoclim(obj):
     Parameters
     ----------
     obj : pyleoclim.core.ui
-        Ovject from the Pyleoclim UI module
+        Object from the Pyleoclim UI module
 
     Returns
     -------

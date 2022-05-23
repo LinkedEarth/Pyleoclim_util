@@ -7,7 +7,7 @@ Created on Tue Feb 25 05:46:36 2020
 
 Contains all relevant mapping functions
 """
-__all__=['map_all']
+__all__=['map_all', 'compute_dist']
 
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from .plotting import savefig, showfig 
+from .plotting import savefig
 
 def set_proj(projection='Robinson', proj_default = True): 
     """ Set the projection for Cartopy.
@@ -189,7 +189,7 @@ def set_proj(projection='Robinson', proj_default = True):
         if proj_default is True:
             proj = ccrs.OSNI() 
         else: proj = ccrs.OSNI(**proj_default)
-    elif projection == 'OSNI':
+    elif projection == 'SouthPolarStereo':
         if proj_default is True:
             proj = ccrs.SouthPolarStereo() 
         else: proj = ccrs.SouthPolarStereo(**proj_default)
@@ -198,7 +198,7 @@ def set_proj(projection='Robinson', proj_default = True):
     
     return proj
 
-def map_all(lat, lon, criteria, marker=None, color =None,
+def map(lat, lon, criteria, marker=None, color =None,
             projection = 'Robinson', proj_default = True,
            background = True,borders = False, rivers = False, lakes = False,
            figsize = None, ax = None, scatter_kwargs=None, legend=True,
@@ -394,9 +394,6 @@ def map_all(lat, lon, criteria, marker=None, color =None,
     if 'fig' in locals():
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
-        else:
-            if not mute:
-                showfig(fig)
         return fig, ax
     else:
         return ax

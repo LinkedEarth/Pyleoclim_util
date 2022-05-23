@@ -13,16 +13,13 @@ __all__ = [
     'bin',
     'interp',
     'gkernel',
-    'increments',
     'standardize',
     'ts2segments',
     'annualize',
     'gaussianize',
     'gaussianize_single',
     'detrend',
-    'detect_outliers',
-    'remove_outliers',
-    'eff_sample_size'
+    'remove_outliers'
 ]
 
 

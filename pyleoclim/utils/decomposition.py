@@ -9,9 +9,7 @@ Principal Component Analysis, Singular Spectrum Analysis, Multi-channel SSA
 """
 
 __all__ = [
-    'mcpca',
-    'ssa',
-    'mssa',
+    'ssa'
 ]
 
 import numpy as np
@@ -27,337 +25,234 @@ import copy
 # Main functions
 #------
 
-def mcpca(ys, nMC=200, **pca_kwargs):
-    '''Monte-Carlo Principal Component Analysis
+# def mcpca(ys, nMC=200, **pca_kwargs):
+#     '''Monte-Carlo Principal Component Analysis
 
-    Carries out Principal Component Analysis  (most unfortunately named EOF analysis in the meteorology
-    and climate literature) on a data matrix ys.
+#     Carries out Principal Component Analysis  (most unfortunately named EOF analysis in the meteorology
+#     and climate literature) on a data matrix ys.
 
-    The significance of eigenvalues is gauged against those of AR(1) surrogates fit to the data.
+#     The significance of eigenvalues is gauged against those of AR(1) surrogates fit to the data.
 
-    TODO: enable for ensembles and generally debug
+#     TODO: enable for ensembles and generally debug
 
-    Parameters
-    ----------
-    ys : 2D numpy array (nt, nrec)
-        nt   = number of time samples (assumed identical for all records)
-        nrec = number of records (aka variables, channels, etc)
+#     Parameters
+#     ----------
+#     ys : 2D numpy array (nt, nrec)
+#         nt   = number of time samples (assumed identical for all records)
+#         nrec = number of records (aka variables, channels, etc)
 
-    nMC : int
-        the number of Monte-Carlo simulations
+#     nMC : int
+#         the number of Monte-Carlo simulations
 
-    pca_kwargs : tuple
-        keyword arguments for the PCA method
+#     pca_kwargs : tuple
+#         keyword arguments for the PCA method
 
-    Returns
-    -------
-    res : dict containing:
+#     Returns
+#     -------
+#     res : dict containing:
 
-        - eigvals : eigenvalues (nrec,)
+#         - eigvals : eigenvalues (nrec,)
 
-        - eigvals95 : eigenvalues of the AR(1) ensemble (nrec, nMC)
+#         - eigvals95 : eigenvalues of the AR(1) ensemble (nrec, nMC)
 
-        - pcs : PC series of all components (nt, rec)
+#         - pcs : PC series of all components (nt, rec)
 
-        - eofs : EOFs of all components (nrec, nrec)
+#         - eofs : EOFs of all components (nrec, nrec)
 
-    References:
-    ----------
-    Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene
-    European speleothem δ18O records linked to North Atlantic Ocean circulation.
-    Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8
+#     References:
+#     ----------
+#     Deininger, M., McDermott, F., Mudelsee, M. et al. (2017): Coherency of late Holocene
+#     European speleothem δ18O records linked to North Atlantic Ocean circulation.
+#     Climate Dynamics, 49, 595–618. https://doi.org/10.1007/s00382-016-3360-8
 
-    Written by Jun Hu (Rice University).
-    Adapted for pyleoclim by Julien Emile-Geay (USC)
-    '''
-    nt, nrec = ys.shape
+#     Written by Jun Hu (Rice University).
+#     Adapted for pyleoclim by Julien Emile-Geay (USC)
+#     '''
+#     nt, nrec = ys.shape
 
-    ncomp = min(nt,nrec)
+#     ncomp = min(nt,nrec)
 
-    pc_mc = np.zeros((nt,nrec)) # principal components
-    eof_mc = np.zeros((nrec,nrec))  #eof (spatial loadings)
-    #eigenvalue matrices
-    eigvals = np.zeros((nrec))
-    eig_ar1 = np.zeros((nrec,nMC))
+#     pc_mc = np.zeros((nt,nrec)) # principal components
+#     eof_mc = np.zeros((nrec,nrec))  #eof (spatial loadings)
+#     #eigenvalue matrices
+#     eigvals = np.zeros((nrec))
+#     eig_ar1 = np.zeros((nrec,nMC))
 
-    # apply PCA algorithm to the data matrix
-    pca_res = PCA(ys,ncomp=ncomp, **pca_kwargs)
-    eigvals = pca_res.eigenvals
+#     # apply PCA algorithm to the data matrix
+#     pca_res = PCA(ys,ncomp=ncomp, **pca_kwargs)
+#     eigvals = pca_res.eigenvals
 
-    # generate surrogate matrix
-    y_ar1 = np.full((nt,nrec,nMC), 0, dtype=np.double)
+#     # generate surrogate matrix
+#     y_ar1 = np.full((nt,nrec,nMC), 0, dtype=np.double)
 
-    for i in range(nrec):
-        yi = copy.deepcopy(ys[:,i])
-        # generate nMC AR(1) surrogates
-        y_ar1[:,i,:] = ar1_sim(yi, nMC)
-        # assign PC and EOF matrices
-        if pc.loadings[:,i][0]>0:
-            eof_mc[:,i]  = pc.loadings[:,i]
-            pc_mc[:,i]   = pc.factors[:,i]
-        else:   # flip sign (arbitrary)
-            eof_mc[:,i]  = -pc.loadings[:,i]
-            pc_mc[:,i]   = -pc.factors[:,i]
-        # estimate effective sample size
-        #PC1 =
-        neff[i] = tsutils.eff_sample_size(PC1)
+#     for i in range(nrec):
+#         yi = copy.deepcopy(ys[:,i])
+#         # generate nMC AR(1) surrogates
+#         y_ar1[:,i,:] = ar1_sim(yi, nMC)
+#         # assign PC and EOF matrices
+#         if pc.loadings[:,i][0]>0:
+#             eof_mc[:,i]  = pc.loadings[:,i]
+#             pc_mc[:,i]   = pc.factors[:,i]
+#         else:   # flip sign (arbitrary)
+#             eof_mc[:,i]  = -pc.loadings[:,i]
+#             pc_mc[:,i]   = -pc.factors[:,i]
+#         # estimate effective sample size
+#         #PC1 =
+#         neff[i] = tsutils.eff_sample_size(PC1)
 
-    # loop over Monte Carlo iterations
-    for m in range(nMC):
-        pc_ar1 = PCA(y_ar1[:,:,m],ncomp=nrec,**pca_kwargs)
-        eig_ar1[:,m] = pc_ar1.eigenvals
+#     # loop over Monte Carlo iterations
+#     for m in range(nMC):
+#         pc_ar1 = PCA(y_ar1[:,:,m],ncomp=nrec,**pca_kwargs)
+#         eig_ar1[:,m] = pc_ar1.eigenvals
 
-    eig95 = np.percentile(eig_ar1, 95, axis=1)
+#     eig95 = np.percentile(eig_ar1, 95, axis=1)
 
 
-    # assign result
-    #res = {'eigvals': eigvals, 'eigvals95': eig95, 'pcs': pc_mc, 'eofs': eof_mc}
+#     # assign result
+#     #res = {'eigvals': eigvals, 'eigvals95': eig95, 'pcs': pc_mc, 'eofs': eof_mc}
 
-    # compute effective sample size
-    PC1  = out.factors[:,0]
-    neff = tsutils.eff_sample_size(PC1)
+#     # compute effective sample size
+#     PC1  = out.factors[:,0]
+#     neff = tsutils.eff_sample_size(PC1)
 
-    # compute percent variance
-    pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
+#     # compute percent variance
+#     pctvar = out.eigenvals**2/np.sum(out.eigenvals**2)*100
 
-    # assign result to SpatiamDecomp class
-    # Note: need to grab coordinates from Series or LiPDSeries
-    res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
-                        pcs = out.scores, pctvar = pctvar,  locs = None,
-                        eigvals = out.eigenvals, eigvecs = out.eigenvecs)
+#     # assign result to SpatiamDecomp class
+#     # Note: need to grab coordinates from Series or LiPDSeries
+#     res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+#                         pcs = out.scores, pctvar = pctvar,  locs = None,
+#                         eigvals = out.eigenvals, eigvecs = out.eigenvecs)
 
-    return res
+#     return res
 
 
+# def mssa(ys, M=None, nMC=0, f=0.3):
+#     '''Multi-channel singular spectrum analysis analysis
 
+#     Multivariate generalization of SSA [2], using the original algorithm of [1].
+#     Each variable is called a channel, hence the name.
 
-def pca_sklearn(ys,n_components=None,copy=True,whiten=False, svd_solver='auto',tol=0.0,iterated_power='auto',random_state=None):
-    '''Principal Component Analysis (Empirical Orthogonal Functions)
+#     Parameters
+#     ----------
 
-    Decomposition of a signal or data set in terms of orthogonal basis functions.
+#     ys : array
+#           multiple time series (dimension: length of time series x total number of time series)
 
-    From scikit-learn: https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
+#     M : int
+#        window size (embedding dimension, default: 10% of the length of the series)
 
-    Parameters
-    ----------
+#     nMC : int
+#        Number of iteration in the Monte-Carlo process [default=0, no Monte Carlo process]
 
-    ys : array
-        timeseries
+#     f : float
+#        fraction (0<f<=1) of good data points for identifying significant PCs [f = 0.3]
 
-    n_components : int,None,or str
-         [default: None]
-        Number of components to keep. if n_components is not set all components are kept:
-        If n_components == 'mle' and svd_solver == 'full', Minka’s MLE is used to guess the dimension. Use of n_components == 'mle' will interpret svd_solver == 'auto' as svd_solver == 'full'.
-        If 0 < n_components < 1 and svd_solver == 'full', select the number of components such that the amount of variance that needs to be explained is greater than the percentage specified by n_components.
-        If svd_solver == 'arpack', the number of components must be strictly less than the minimum of n_features and n_samples.
+#     Returns
+#     -------
+#     res : dict
+#         Containing:
 
-    copy : bool,optional
-        [default: True]
-        If False, data passed to fit are overwritten and running fit(X).transform(X) will not yield the expected results, use fit_transform(X) instead.
+#         - eigvals : array of eigenvalue spectrum
 
-    whiten : bool,optional
-        [default: False]
-        When True (False by default) the components_ vectors are multiplied by the square root of n_samples and then divided by the singular values to ensure uncorrelated outputs with unit component-wise variances.
+#         - eigvals05 : The 5% percentile of eigenvalues
 
-    svd_solver : str {‘auto’, ‘full’, ‘arpack’, ‘randomized’}
-        If auto :
-            The solver is selected by a default policy based on X.shape and n_components: if the input data is larger than 500x500 and the number of components to extract is lower than 80% of the smallest dimension of the data, then the more efficient ‘randomized’ method is enabled.
-            Otherwise the exact full SVD is computed and optionally truncated afterwards.
+#         - eigvals95 : The 95% percentile of eigenvalues
 
-        If full :
-            run exact full SVD calling the standard LAPACK solver via scipy.linalg.svd and select the components by postprocessing
+#         - PC : matrix of principal components (2D array)
 
-        If arpack :
-            run SVD truncated to n_components calling ARPACK solver via scipy.sparse.linalg.svds. It requires strictly 0 < n_components < min(X.shape)
+#         - RC : matrix of RCs (nrec,N,nrec*M) (2D array)
 
-        If randomized :
-            run randomized SVD by the method of Halko et al.
+#     References
+#     ----------
+#     [1]_ Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
+#     dynamics, with applications to paleoclimatic time series, Physica D, 35,
+#     395–424.
 
-    tol : float >= 0 ,optional
-        [default: 0]
-        Tolerance for singular values computed by svd_solver == ‘arpack’.
+#     [2]_ Jiang, N., J. D. Neelin, and M. Ghil (1995), Quasi-quadrennial and
+#     quasi-biennial variability in the equatorial Pacific, Clim. Dyn., 12, 101-112.
 
-    iterated_power : int >= 0, or string {'auto'}
-        [default: 'auto']
-        Number of iterations for the power method computed by svd_solver == ‘randomized’.
+#     See Also
+#     --------
 
-    random_state : int, RandomState instance, or None, optional
-        [default: None]
-        If int, random_state is the seed used by the random number generator; If RandomState instance, random_state is the random number generator;
-        If None, the random number generator is the RandomState instance used by np.random.
-        Used when svd_solver == ‘arpack’ or ‘randomized’.
+#     pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis (single channel)
 
-    Returns
-    -------
+#     '''
+#     N = len(ys[:, 0])
+#     nrec = len(ys[0, :])
+#     if M == None:
+#         M=int(N/10)
+#     Y = np.zeros((N - M + 1, nrec * M))
+#     for irec in np.arange(nrec):
+#         for m in np.arange(0, M):
+#             Y[:, m + irec * M] = ys[m:N - M + 1 + m, irec]
 
-    dict
-        Sklearn PCA object dictionary of all attributes and values.
+#     C = np.dot(np.nan_to_num(np.transpose(Y)), np.nan_to_num(Y)) / (N - M + 1)
+#     D, eigvecs = eigh(C)
 
-        -components_array, shape (n_components, n_features)
-            Principal axes in feature space, representing the directions of maximum variance in the data. The components are sorted by explained_variance_.
+#     sort_tmp = np.sort(D)
+#     eigvals = sort_tmp[::-1]
+#     sortarg = np.argsort(-D)
 
-        -explained_variance_array, shape (n_components,)
-            The amount of variance explained by each of the selected components.
-            Equal to n_components largest eigenvalues of the covariance matrix of X.
-            New in version 0.18.
+#     eigvecs = eigvecs[:, sortarg]
 
-        -explained_variance_ratio_array, shape (n_components,)
-            Percentage of variance explained by each of the selected components.
-            If n_components is not set then all components are stored and the sum of the ratios is equal to 1.0.
+#     # test the signifiance using Monte-Carlo
+#     Ym = np.zeros((N - M + 1, nrec * M))
+#     noise = np.zeros((nrec, N, nMC))
+#     for irec in np.arange(nrec):
+#         noise[irec, 0, :] = ys[0, irec]
+#     eigvals_R = np.zeros((nrec * M, nMC))
+#     # estimate coefficents of ar1 processes, and then generate ar1 time series (noise)
+#     # TODO : update to use ar1_sim(), as in ssa()
+#     for irec in np.arange(nrec):
+#         Xs = ys[:, irec]
+#         coefs_est, var_est = alg.AR_est_YW(Xs[~np.isnan(Xs)], 1)
+#         sigma_est = np.sqrt(var_est)
 
-        -singular_values_array, shape (n_components,)
-            The singular values corresponding to each of the selected components. The singular values are equal to the 2-norms of the n_components variables in the lower-dimensional space.
-            New in version 0.19.
+#         for jt in range(1, N):
+#             noise[irec, jt, :] = coefs_est * noise[irec, jt - 1, :] + sigma_est * np.random.randn(1, nMC)
 
-        -mean_array, shape (n_features,)
-            Per-feature empirical mean, estimated from the training set.
-            Equal to X.mean(axis=0).
+#     for m in range(nMC):
+#         for irec in np.arange(nrec):
+#             noise[irec, :, m] = (noise[irec, :, m] - np.mean(noise[irec, :, m])) / (
+#                 np.std(noise[irec, :, m], ddof=1))
+#             for im in np.arange(0, M):
+#                 Ym[:, im + irec * M] = noise[irec, im:N - M + 1 + im, m]
+#         Cn = np.dot(np.nan_to_num(np.transpose(Ym)), np.nan_to_num(Ym)) / (N - M + 1)
+#         # eigvals_R[:,m] = np.diag(np.dot(np.dot(eigvecs,Cn),np.transpose(eigvecs)))
+#         eigvals_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eigvecs), Cn), eigvecs))
 
-        -n_components_int
-            The estimated number of components. When n_components is set to ‘mle’ or a number between 0 and 1 (with svd_solver == ‘full’) this number is estimated from input data. Otherwise it equals the parameter n_components, or the lesser value of n_features and n_samples if n_components is None.
+#     eigvals95 = np.percentile(eigvals_R, 95, axis=1)
+#     eigvals05 = np.percentile(eigvals_R, 5, axis=1)
 
-        -n_features_int
-            Number of features in the training data.
 
-        -n_samples_int
-            Number of samples in the training data.
+#     # determine principal component time series
+#     PC = np.zeros((N - M + 1, nrec * M))
+#     PC[:, :] = np.nan
+#     for k in np.arange(nrec * M):
+#         for i in np.arange(0, N - M + 1):
+#             #   modify for nan
+#             prod = Y[i, :] * eigvecs[:, k]
+#             ngood = sum(~np.isnan(prod))
+#             #   must have at least m*f good points
+#             if ngood >= M * f:
+#                 PC[i, k] = sum(prod[~np.isnan(prod)])  # the columns of this matrix are Ak(t), k=1 to M (T-PCs)
 
-        -noise_variance_float
-            The estimated noise covariance following the Probabilistic PCA model from Tipping and Bishop 1999. See “Pattern Recognition and Machine Learning” by C. Bishop, 12.2.1 p. 574 or http://www.miketipping.com/papers/met-mppca.pdf. It is required to compute the estimated data covariance and score samples.
-            Equal to the average of (min(n_features, n_samples) - n_components) smallest eigenvalues of the covariance matrix of X.
-    '''
-    if np.any(np.isnan(ys)):
-        raise ValueError('data may not contain missing values.')
-    pca=PCA(n_components=n_components,copy=copy,whiten=whiten,svd_solver=svd_solver,tol=tol,iterated_power=iterated_power,random_state=random_state)
-    return pca.fit(ys).__dict__
+#     # compute reconstructed timeseries
+#     Np = N - M + 1
 
+#     RC = np.zeros((nrec, N, nrec * M))
 
-def mssa(ys, M=None, nMC=0, f=0.3):
-    '''Multi-channel singular spectrum analysis analysis
+#     for k in np.arange(nrec):
+#         for im in np.arange(M):
+#             x2 = np.dot(np.expand_dims(PC[:, im], axis=1), np.expand_dims(eigvecs[0 + k * M:M + k * M, im], axis=0))
+#             x2 = np.flipud(x2)
 
-    Multivariate generalization of SSA [2], using the original algorithm of [1].
-    Each variable is called a channel, hence the name.
+#             for n in np.arange(N):
+#                 RC[k, n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
+#     res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'q05': eigvals05, 'q95': eigvals95, 'PC': PC, 'RC': RC}
 
-    Parameters
-    ----------
-
-    ys : array
-          multiple time series (dimension: length of time series x total number of time series)
-
-    M : int
-       window size (embedding dimension, default: 10% of the length of the series)
-
-    nMC : int
-       Number of iteration in the Monte-Carlo process [default=0, no Monte Carlo process]
-
-    f : float
-       fraction (0<f<=1) of good data points for identifying significant PCs [f = 0.3]
-
-    Returns
-    -------
-    res : dict
-        Containing:
-
-        - eigvals : array of eigenvalue spectrum
-
-        - eigvals05 : The 5% percentile of eigenvalues
-
-        - eigvals95 : The 95% percentile of eigenvalues
-
-        - PC : matrix of principal components (2D array)
-
-        - RC : matrix of RCs (nrec,N,nrec*M) (2D array)
-
-    References
-    ----------
-    [1]_ Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
-    dynamics, with applications to paleoclimatic time series, Physica D, 35,
-    395–424.
-
-    [2]_ Jiang, N., J. D. Neelin, and M. Ghil (1995), Quasi-quadrennial and
-    quasi-biennial variability in the equatorial Pacific, Clim. Dyn., 12, 101-112.
-
-    See Also
-    --------
-
-    pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis (single channel)
-
-    '''
-    N = len(ys[:, 0])
-    nrec = len(ys[0, :])
-    if M == None:
-        M=int(N/10)
-    Y = np.zeros((N - M + 1, nrec * M))
-    for irec in np.arange(nrec):
-        for m in np.arange(0, M):
-            Y[:, m + irec * M] = ys[m:N - M + 1 + m, irec]
-
-    C = np.dot(np.nan_to_num(np.transpose(Y)), np.nan_to_num(Y)) / (N - M + 1)
-    D, eigvecs = eigh(C)
-
-    sort_tmp = np.sort(D)
-    eigvals = sort_tmp[::-1]
-    sortarg = np.argsort(-D)
-
-    eigvecs = eigvecs[:, sortarg]
-
-    # test the signifiance using Monte-Carlo
-    Ym = np.zeros((N - M + 1, nrec * M))
-    noise = np.zeros((nrec, N, nMC))
-    for irec in np.arange(nrec):
-        noise[irec, 0, :] = ys[0, irec]
-    eigvals_R = np.zeros((nrec * M, nMC))
-    # estimate coefficents of ar1 processes, and then generate ar1 time series (noise)
-    # TODO : update to use ar1_sim(), as in ssa()
-    for irec in np.arange(nrec):
-        Xs = ys[:, irec]
-        coefs_est, var_est = alg.AR_est_YW(Xs[~np.isnan(Xs)], 1)
-        sigma_est = np.sqrt(var_est)
-
-        for jt in range(1, N):
-            noise[irec, jt, :] = coefs_est * noise[irec, jt - 1, :] + sigma_est * np.random.randn(1, nMC)
-
-    for m in range(nMC):
-        for irec in np.arange(nrec):
-            noise[irec, :, m] = (noise[irec, :, m] - np.mean(noise[irec, :, m])) / (
-                np.std(noise[irec, :, m], ddof=1))
-            for im in np.arange(0, M):
-                Ym[:, im + irec * M] = noise[irec, im:N - M + 1 + im, m]
-        Cn = np.dot(np.nan_to_num(np.transpose(Ym)), np.nan_to_num(Ym)) / (N - M + 1)
-        # eigvals_R[:,m] = np.diag(np.dot(np.dot(eigvecs,Cn),np.transpose(eigvecs)))
-        eigvals_R[:, m] = np.diag(np.dot(np.dot(np.transpose(eigvecs), Cn), eigvecs))
-
-    eigvals95 = np.percentile(eigvals_R, 95, axis=1)
-    eigvals05 = np.percentile(eigvals_R, 5, axis=1)
-
-
-    # determine principal component time series
-    PC = np.zeros((N - M + 1, nrec * M))
-    PC[:, :] = np.nan
-    for k in np.arange(nrec * M):
-        for i in np.arange(0, N - M + 1):
-            #   modify for nan
-            prod = Y[i, :] * eigvecs[:, k]
-            ngood = sum(~np.isnan(prod))
-            #   must have at least m*f good points
-            if ngood >= M * f:
-                PC[i, k] = sum(prod[~np.isnan(prod)])  # the columns of this matrix are Ak(t), k=1 to M (T-PCs)
-
-    # compute reconstructed timeseries
-    Np = N - M + 1
-
-    RC = np.zeros((nrec, N, nrec * M))
-
-    for k in np.arange(nrec):
-        for im in np.arange(M):
-            x2 = np.dot(np.expand_dims(PC[:, im], axis=1), np.expand_dims(eigvecs[0 + k * M:M + k * M, im], axis=0))
-            x2 = np.flipud(x2)
-
-            for n in np.arange(N):
-                RC[k, n, im] = np.diagonal(x2, offset=-(Np - 1 - n)).mean()
-    res = {'eigvals': eigvals, 'eigvecs': eigvecs, 'q05': eigvals05, 'q95': eigvals95, 'PC': PC, 'RC': RC}
-
-    return res
+#     return res
 
 def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     '''Singular spectrum analysis

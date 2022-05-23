@@ -11,13 +11,6 @@ Also handles integration with the LinkedEarth wiki and the LinkedEarth Ontology
 
 """
 
-__all__=['whatArchives',
-        'whatProxyObservations',
-        'whatProxySensors',
-        'whatInferredVariables',
-        'whatInterpretations',
-        'queryLinkedEarth']
-
 import lipd as lpd
 import numpy as np
 import os
