@@ -10,11 +10,11 @@ https://github.com/LinkedEarth/Pyleoclim_util/blob/master/license
 """
 #Import pyleoclim modules
 
-from .utils import *
+import pyleoclim.utils as utils
 from .core import *
 
-from .utils import plotting
-plotting.set_style(style='journal', font_scale=1.4)
+from .utils.plotting import *
+set_style(style='journal', font_scale=1.4)
 
 # get the version
 from importlib.metadata import version
