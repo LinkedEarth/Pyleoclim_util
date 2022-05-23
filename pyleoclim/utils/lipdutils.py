@@ -1,13 +1,8 @@
  # -*- coding: utf-8 -*-
 """
-Created on Mon Nov 21 13:07:07 2016
+This module contains functions to manipulate LiPD files and automate data transformation whenever possible. These functions are used throughout Pyleoclim but are not meant for direct interaction
 
-@author: deborahkhider
-
-LiPD file manipulations. Except for maps, most manipulations are done on the timeseries objects.
-See the LiPD documentation for more information on timeseries objects (TSO)
-
-Also handles integration with the LinkedEarth wiki and the LinkedEarth Ontology
+This module also handles integration with the LinkedEarth wiki and the LinkedEarth Ontology
 
 """
 
@@ -468,6 +463,13 @@ def getTs(timeseries_list, option = None):
     timeseries : single timeseries object or list of timeseries
         A single timeseries object if not optional filter selected or a filtered
         list if optional arguments given
+        
+    See also
+    --------
+    
+    pyleoclim.utils.lipdutils.enumerateTs : Enumerate the available time series objects
+
+    pyleoclim.utils.lipdutils.promptForVariable : Prompt for a specific variable
 
     """
     if not option:
