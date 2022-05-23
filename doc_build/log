@@ -98,7 +98,7 @@ reading sources... [ 67%] utils/tsutils/detrend
 reading sources... [ 68%] utils/tsutils/distance_neighbors
 reading sources... [ 69%] utils/tsutils/find_knee
 reading sources... [ 70%] utils/tsutils/gaussianize
-reading sources... [ 70%] utils/tsutils/gaussianize_single
+reading sources... [ 70%] utils/tsutils/gaussianize_1d
 reading sources... [ 71%] utils/tsutils/interp
 reading sources... [ 72%] utils/tsutils/is_evenly_spaced
 reading sources... [ 73%] utils/tsutils/on_common_axis
@@ -280,7 +280,7 @@ invalid option block.
    tsutils/clean_ts.rst
    tsutils/annualize.rst
    tsutils/gaussianize.rst
-   tsutils/gaussianize_single.rst
+   tsutils/gaussianize_1d.rst
    tsutils/detrend.rst
    tsutils/detect_outliers.rst
    tsutils/remove_outliers.rst
@@ -524,7 +524,7 @@ checking consistency... /Users/fzhu/Github/Pyleoclim_util/doc_build/anaconda_ins
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/distance_neighbors.rst: WARNING: document isn't included in any toctree
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/find_knee.rst: WARNING: document isn't included in any toctree
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/gaussianize.rst: WARNING: document isn't included in any toctree
-/Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/gaussianize_single.rst: WARNING: document isn't included in any toctree
+/Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/gaussianize_1d.rst: WARNING: document isn't included in any toctree
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/interp.rst: WARNING: document isn't included in any toctree
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/is_evenly_spaced.rst: WARNING: document isn't included in any toctree
 /Users/fzhu/Github/Pyleoclim_util/doc_build/utils/tsutils/on_common_axis.rst: WARNING: document isn't included in any toctree
@@ -660,7 +660,7 @@ writing output... [ 67%] utils/tsutils/detrend
 writing output... [ 68%] utils/tsutils/distance_neighbors
 writing output... [ 69%] utils/tsutils/find_knee
 writing output... [ 70%] utils/tsutils/gaussianize
-writing output... [ 70%] utils/tsutils/gaussianize_single
+writing output... [ 70%] utils/tsutils/gaussianize_1d
 writing output... [ 71%] utils/tsutils/interp
 writing output... [ 72%] utils/tsutils/is_evenly_spaced
 writing output... [ 73%] utils/tsutils/on_common_axis
