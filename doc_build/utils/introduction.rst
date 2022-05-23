@@ -181,7 +181,7 @@ This modules contain pre-processing functions for time series analysis.
      - Annualizes a time series whose time resolution is finer than 1 year
    * - :ref:`gaussianize <utils_gaussianize>`
      - Maps a (proxy) timeseries to a Gaussian distribution
-   * - :ref:`gaussianize_single <utils_gaussianize_single>`
+   * - :ref:`gaussianize_1d <utils_gaussianize_1d>`
      - Transforms a single (proxy) timeseries to a Gaussian distribution
    * - :ref:`detrend <utils_detrend>`
      - Applies linear, constant, low-pass filter, or decomposition-based detrending

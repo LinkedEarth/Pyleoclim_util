@@ -1,6 +1,6 @@
-.. _utils_gaussianize_single:
+.. _utils_gaussianize_1d:
 
-gaussianize_single (pyleoclim.utils.tsutils.gaussianize_single)
+gaussianize_1d (pyleoclim.utils.tsutils.gaussianize_1d)
 =======================================================
 
-.. autofunction:: pyleoclim.utils.tsutils.gaussianize_single
+.. autofunction:: pyleoclim.utils.tsutils.gaussianize_1d

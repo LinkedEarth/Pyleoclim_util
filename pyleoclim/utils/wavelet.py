@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 25 08:14:31 2020
+Functions to perform wavelet analysis, including Weighted Wavelet Z-transform
+ (WWZ) and Continuous Wavelet Transform (CWT) à la Torrence & Compo 1998.
 
-@author: deborahkhider
-
-Functions concerning wavelet analysis
+Includes multiple options for WWZ (Fortran, numba, multiprocessing) and enables
+cross-wavelet transform. 
 """
 
 
@@ -215,7 +215,7 @@ class AliasFilter(object):
 #     return res
 
 def assertPositiveInt(*args):
-    ''' Assert that the arguments are all positive integers.
+    ''' Assert that the arguments are all integers larger than unity
 
     Parameters
     ----------
@@ -231,12 +231,12 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
     ''' Return the weighted wavelet amplitude (WWA).
 
     The Weighted wavelet Z-transform (WWZ) is based on Morlet wavelet estimation, using
-    least squares minimization to suppress the energy leakage caused by the data gaps.
+    least squares minimization to suppress the energy leakage caused by data gaps.
     WWZ does not rely on interpolation or detrending, and is appropriate for unevenly-spaced datasets.
     In particular, we use the variant of Kirchner & Neal (2013), in which basis rotations mitigate the
     numerical instability that occurs in pathological cases with the original algorithm (Foster, 1996).
     The WWZ method has one adjustable parameter, a decay constant `c` that balances the time and frequency
-    resolutions of the analysis. This application uses the larger value (8π2)−1, justified elsewhere
+    resolutions of the analysis. This application uses the larger value 1/(8π^2), justified elsewhere
     (Witt & Schumann, 2005).
 
     No multiprocessing is applied by Default.
@@ -260,13 +260,14 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
     nproc :int
         fake argument, just for convenience
     detrend : string
-        None - the original time series is assumed to have no trend;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+        None - the original time series is assumed to have no trend (default);
+        Types of detrending:
+        - "linear" : the result of a linear least-squares fit to y is subtracted from y.
+        - "constant" : only the mean of data is subtracted.
+        - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
+        - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+        The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -306,6 +307,9 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
     pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
+
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
     assertPositiveInt(Neff_threshold)
@@ -385,17 +389,18 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, de
         the decay constant that determines the analytical resolution of frequency for analysis, the smaller the higher resolution;
         the default value 1/(8*np.pi**2) is good for most of the wavelet analysis cases
     Neff_threshold : int
-        the threshold of the number of effective degrees of freedom
+        the threshold of the number of effective degrees of freedom [default = 3]
     nproc : int
-        the number of processes for multiprocessing
+        the number of processes for multiprocessing [default = 8]
     detrend : string
-        None - the original time series is assumed to have no trend;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+       False - the original time series is assumed to have no trend; 
+       Types of detrending:
+       - "linear" : the result of a linear least-squares fit to y is subtracted from y.
+       - "constant" : only the mean of data is subtracted.
+       - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
+       - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+        The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -416,16 +421,18 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, de
     See also
     --------
 
-    pyleoclim.utils.wavelet.wwz_basic : Returns the weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.wwz_basic : weighted wavelet amplitude using the original method from Kirchner. No multiprocessing
 
-    pyleoclim.utils.wavelet.kirchner_basic : Return the weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
+    pyleoclim.utils.wavelet.kirchner_basic : weighted wavelet amplitude (WWA) modified by Kirchner. No multiprocessing
 
-    pyleoclim.utils.wavelet.kirchner_nproc : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
+    pyleoclim.utils.wavelet.kirchner_nproc : weighted wavelet amplitude (WWA) modified by Kirchner. Supports multiprocessing
 
-    pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
+    pyleoclim.utils.wavelet.kirchner_numba : weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
-    pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
+    pyleoclim.utils.wavelet.kirchner_f2py : weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
+    
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     '''
@@ -524,12 +531,13 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
         fake argument for convenience, for parameter consistency between functions, does not need to be specified
     detrend : string
         None - the original time series is assumed to have no trend;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+        Types of detrending:
+        - "linear" : the result of a linear least-squares fit to y is subtracted from y.
+        - "constant" : only the mean of data is subtracted.
+        - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
+        - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+        The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -568,6 +576,8 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
     pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
 
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
@@ -666,13 +676,13 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
     nproc : int
         the number of processes for multiprocessing
     detrend : string
-        None - the original time series is assumed to have no trend;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+        Types of detrending:
+        - "linear" : the result of a linear least-squares fit to y is subtracted from y.
+        - "constant" : only the mean of data is subtracted.
+        - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
+        - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+        The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -700,6 +710,8 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
     pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
 
     '''
     assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -812,12 +824,13 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detren
         fake argument, just for convenience
     detrend : string
         None - the original time series is assumed to have no trend;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+        Types of detrending:
+        - "linear" : the result of a linear least-squares fit to y is subtracted from y.
+        - "constant" : only the mean of data is subtracted.
+        - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
+        - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+        The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -856,6 +869,8 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detren
     pyleoclim.utils.wavelet.kirchner_f2py : Returns the weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
 
     '''
     assertPositiveInt(Neff_threshold)
@@ -964,12 +979,13 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8
         fake argument, just for convenience
     detrend : string
         None - the original time series is assumed to have no trend;
-        'linear' - a linear least-squares fit to `ys` is subtracted;
-        'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-        Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
-    sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+        Types of detrending:
+        - "linear" : the result of a linear least-squares fit to y is subtracted from y.
+        - "constant" : only the mean of data is subtracted.
+        - "savitzky-golay" : y is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
+        - "emd" : Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+    sg_kwargs : dict 
+        The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -1001,6 +1017,8 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8
     pyleoclim.utils.wavelet.kirchner_numba : Return the weighted wavelet amplitude (WWA) modified by Kirchner using Numba package.
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
 
     '''
     from . import f2py_wwz as f2py
@@ -1037,7 +1055,7 @@ def make_coi(tau, Neff_threshold=3):
     tau : array
         the evenly-spaced time points, namely the time shift for wavelet analysis
     Neff_threshold : int
-        the threshold of the number of effective samples
+        the threshold of the number of effective samples (default: 3)
 
     Returns
     -------
@@ -1131,7 +1149,7 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff_threshold=3, anti_alias=False, avgs=
     References
     ----------
 
-    Kirchner's C code for weighted psd calculation
+    Kirchner's C code for weighted psd calculation (see https://www.pnas.org/doi/full/10.1073/pnas.1304328110#supplementary-materials)
 
     """
     af = AliasFilter()
@@ -1206,11 +1224,11 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
         - None: the original time series is assumed to have no trend;
         - 'linear': a linear least-squares fit to `ys` is subtracted;
         - 'constant': the mean of `ys` is subtracted
-        - 'savitzy-golay': ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        - 'savitzy-golay': ys is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
         Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
 
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. See :func:`pyleoclim.utils.filter.savitzky_golay()` for details.
+        The parameters for the Savitzky-Golay filter. See :func:`pyleoclim.utils.filter.savitzky_golay()` for details.
 
     method : string, {'Foster', 'Kirchner', 'Kirchner_f2py', 'Kirchner_numba'}
         available specific implementation of WWZ, including
@@ -1373,10 +1391,10 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         - None: the original time series is assumed to have no trend;
         - 'linear': a linear least-squares fit to `ys` is subtracted;
         - 'constant': the mean of `ys` is subtracted
-        - 'savitzy-golay': ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        - 'savitzy-golay': ys is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted from y.
         Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+        The parameters for the Savitzky-Golay filter. see pyleoclim.utils.filter.savitzy_golay for details.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -1397,6 +1415,13 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     res : dict
         contains the cross wavelet coherence, cross-wavelet phase,
         vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
+        
+    Reference
+    ---------
+    
+    Grinsted, A., J. C. Moore, and S. Jevrejeva (2004), Application of the cross
+    wavelet transform and wavelet coherence to geophysical time series, 
+    Nonlinear Processes in Geophysics, 11, 561–566.
 
     See also
     --------
@@ -1550,7 +1575,7 @@ def freq_vector_lomb_scargle(ts, dt= None, nf=None, ofac=4, hifac=1):
     return freq
 
 def freq_vector_welch(ts):
-    ''' Return the frequency vector based on the Welch's method.
+    ''' Return the frequency vector based on Welch's method.
 
     Parameters
     ----------
@@ -1827,224 +1852,6 @@ def make_freq_vector(ts, method='log', **kwargs):
 
     return freq
 
-def beta_estimation(psd, freq, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
-    ''' Estimate the power slope of a 1/f^beta process.
-
-    Parameters
-    ----------
-
-    psd : array
-        the power spectral density
-    freq : array
-        the frequency vector
-    fmin : float
-        the min of frequency range for beta estimation
-    fmax : float
-        the max of frequency range for beta estimation
-    verbose : bool
-         if True, will print out debug information
-
-    Returns
-    -------
-
-    beta : float
-        the estimated slope
-    f_binned : array
-        binned frequency vector
-    psd_binned : array
-        binned power spectral density
-    Y_reg : array
-        prediction based on linear regression
-
-    '''
-    # drop the PSD at frequency zero
-    if freq[0] == 0:
-        psd = psd[1:]
-        freq = freq[1:]
-
-    if fmin is None or fmin == 0:
-        fmin = np.min(freq)
-
-    if fmax is None:
-        fmax = np.max(freq)
-
-    Results = collections.namedtuple('Results', ['beta', 'f_binned', 'psd_binned', 'Y_reg', 'std_err'])
-    if np.max(freq) < fmax or np.min(freq) > fmin:
-        if verbose:
-            print(fmin, fmax)
-            print(np.min(freq), np.max(freq))
-            print('WRONG')
-        res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
-        return res
-
-    # frequency binning start
-    fminindx = np.where(freq >= fmin)[0][0]
-    fmaxindx = np.where(freq <= fmax)[0][-1]
-
-    if fminindx >= fmaxindx:
-        res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
-        return res
-
-    logf = np.log(freq)
-    if logf_binning_step == 'max':
-        logf_step = np.max(np.diff(logf))
-    elif logf_binning_step == 'first':
-        logf_step = logf[fminindx+1] - logf[fminindx]
-    else:
-        raise ValueError('the option for logf_binning_step is unknown')
-
-    logf_start = logf[fminindx]
-    logf_end = logf[fmaxindx]
-    logf_binedges = np.arange(logf_start, logf_end+logf_step, logf_step)
-
-    n_intervals = np.size(logf_binedges)-1
-    logpsd_binned = np.empty(n_intervals)
-    logf_binned = np.empty(n_intervals)
-
-    logpsd = np.log(psd)
-
-    for i in range(n_intervals):
-        lb = logf_binedges[i]
-        ub = logf_binedges[i+1]
-        q = np.where((logf > lb) & (logf <= ub))
-
-        logpsd_binned[i] = np.nanmean(logpsd[q])
-        logf_binned[i] = (ub + lb) / 2
-
-    f_binned = np.exp(logf_binned)
-    psd_binned = np.exp(logpsd_binned)
-    # frequency binning end
-
-    # linear regression below
-    Y = np.log10(psd_binned)
-    X = np.log10(f_binned)
-    X_ex = sm.add_constant(X)
-
-    # note below: 'drop' is used for missing, so NaNs will be removed, and we need to put it back in the end
-    model = sm.OLS(Y, X_ex, missing='drop')
-    results = model.fit()
-
-    if np.size(results.params) < 2:
-        beta = np.nan
-        Y_reg = np.nan
-        std_err = np.nan
-    else:
-        beta = -results.params[1]  # the slope we want
-        Y_reg_raw = 10**model.predict(results.params)  # prediction based on linear regression
-        # handeling potential NaNs in psd_binned
-        Y_reg = []
-        i = 0
-        for psd in psd_binned:
-            if np.isnan(psd):
-                Y_reg.append(np.nan)
-            else:
-                Y_reg.append(Y_reg_raw[i])
-                i += 1
-
-        Y_reg = np.array(Y_reg)
-
-        std_err = results.bse[1]
-
-    res = Results(beta=beta, f_binned=f_binned, psd_binned=psd_binned, Y_reg=Y_reg, std_err=std_err)
-
-    return res
-
-def beta2HurstIndex(beta):
-    ''' Translate psd slope to Hurst index
-
-    Parameters
-    ----------
-
-    beta : float
-        the estimated slope of a power spectral density curve
-
-    Returns
-    -------
-
-    H : float
-        Hurst index, should be in (0, 1)
-
-    References
-    ----------
-
-    Equation 2 in http://www.bearcave.com/misl/misl_tech/wavelets/hurst/
-
-    '''
-    H = (beta-1)/2
-
-    return H
-
-def psd_ar(var_noise, freq, ar_params, f_sampling):
-    ''' Return the theoretical power spectral density (PSD) of an autoregressive model
-
-    Parameters
-    ----------
-
-    var_noise : float
-        the variance of the noise of the AR process
-    freq : array
-        vector of frequency
-    ar_params : array
-        autoregressive coefficients, not including zero-lag
-    f_sampling : float
-        sampling frequency
-
-    Returns
-    -------
-
-    psd : array
-        power spectral density
-
-    '''
-    p = np.size(ar_params)
-
-    tmp = np.ndarray(shape=(p, np.size(freq)), dtype=complex)
-    for k in range(p):
-        tmp[k, :] = np.exp(-1j*2*np.pi*(k+1)*freq/f_sampling)
-
-    psd = var_noise / np.absolute(1-np.sum(ar_params*tmp, axis=0))**2
-
-    return psd
-
-
-
-def psd_fBM(freq, ts, H):
-    ''' Return the theoretical psd of a fBM
-
-    Parameters
-    ----------
-
-    freq : array
-        vector of frequency
-    ts : array
-        the time axis of the time series
-    H : float
-        Hurst index, should be in (0, 1)
-
-    Returns
-    --------
-
-    psd : array
-        power spectral density
-
-    References
-    ----------
-
-    Flandrin, P. On the spectrum of fractional Brownian motions.
-    IEEE Transactions on Information Theory 35, 197–199 (1989).
-
-    '''
-    nf = np.size(freq)
-    psd = np.ndarray(shape=(nf))
-    T = np.max(ts) - np.min(ts)
-
-    omega = 2 * np.pi * freq
-
-    for k in range(nf):
-        tmp = 2 * omega[k] * T
-        psd[k] = (1 - 2**(1 - 2*H)*np.sin(tmp)/tmp) / np.abs(omega[k])**(1 + 2*H)
-
-    return psd
 
 def get_wwz_func(nproc, method):
     ''' Return the wwz function to use.
@@ -2468,7 +2275,11 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     
     pyleoclim.utils.wavelet.tc_wavelet: the underlying wavelet function by Torrence and Compo
     
-    pyleoclim.utils.tsutils.detrend : detrending functionalities in Pyleoclim
+    pyleoclim.utils.tsutils.detrend : detrending functionalities 
+    
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    
+    pyleoclim.utils.tsutils.preprocess: pre-processes a times series using standardization and detrending.
     
     References
     ----------
@@ -2594,6 +2405,13 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={
         contains the cross wavelet coherence (WTC), cross-wavelet transform (XWT),
         cross-wavelet phase, vector of frequency, evenly-spaced time points, 
         nMC AR1 scalograms, cone of influence.
+        
+    Reference
+    ---------
+    
+    Grinsted, A., J. C. Moore, and S. Jevrejeva (2004), Application of the cross
+    wavelet transform and wavelet coherence to geophysical time series, 
+    Nonlinear Processes in Geophysics, 11, 561–566.
 
     See also
     --------
@@ -2602,7 +2420,13 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
-    pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
+    pyleoclim.utils.wavelet.make_freq_vector : Makes frequency vector
+    
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    
+    pyleoclim.utils.tsutils.detrend : detrending functionalities 
+    
+    pyleoclim.utils.tsutils.preprocess: pre-processes a times series using standardization and detrending.
 
     '''
     assert np.array_equal(ts1,ts2)  and len(ys1) == len(ys2) , "ts1 and ts2 should be the same. Suggest using common_time()"

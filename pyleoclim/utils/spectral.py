@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 25 09:23:29 2020
+Spectral analysis functions, including WWZ, CWT, Lomb-Scargle, MTM, and Welch
 
-@author: deborahkhider
-
-Sectral analysis functions
 """
 
 import numpy as np
@@ -835,3 +832,223 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
     res = Results(psd=psd, freq=cwt_res.freq, scale=cwt_res.scale, mother=cwt_res.mother,param=cwt_res.param)
 
     return res
+
+def beta_estimation(psd, freq, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
+    ''' Estimate the power slope of a 1/f^beta process.
+
+    Parameters
+    ----------
+
+    psd : array
+        the power spectral density
+    freq : array
+        the frequency vector
+    fmin : float
+        the min of frequency range for beta estimation
+    fmax : float
+        the max of frequency range for beta estimation
+    verbose : bool
+         if True, will print out debug information
+
+    Returns
+    -------
+
+    beta : float
+        the estimated slope
+    f_binned : array
+        binned frequency vector
+    psd_binned : array
+        binned power spectral density
+    Y_reg : array
+        prediction based on linear regression
+
+    '''
+    # drop the PSD at frequency zero
+    if freq[0] == 0:
+        psd = psd[1:]
+        freq = freq[1:]
+
+    if fmin is None or fmin == 0:
+        fmin = np.min(freq)
+
+    if fmax is None:
+        fmax = np.max(freq)
+
+    Results = collections.namedtuple('Results', ['beta', 'f_binned', 'psd_binned', 'Y_reg', 'std_err'])
+    if np.max(freq) < fmax or np.min(freq) > fmin:
+        if verbose:
+            print(fmin, fmax)
+            print(np.min(freq), np.max(freq))
+            print('WRONG')
+        res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
+        return res
+
+    # frequency binning start
+    fminindx = np.where(freq >= fmin)[0][0]
+    fmaxindx = np.where(freq <= fmax)[0][-1]
+
+    if fminindx >= fmaxindx:
+        res = Results(beta=np.nan, f_binned=np.nan, psd_binned=np.nan, Y_reg=np.nan, std_err=np.nan)
+        return res
+
+    logf = np.log(freq)
+    if logf_binning_step == 'max':
+        logf_step = np.max(np.diff(logf))
+    elif logf_binning_step == 'first':
+        logf_step = logf[fminindx+1] - logf[fminindx]
+    else:
+        raise ValueError('the option for logf_binning_step is unknown')
+
+    logf_start = logf[fminindx]
+    logf_end = logf[fmaxindx]
+    logf_binedges = np.arange(logf_start, logf_end+logf_step, logf_step)
+
+    n_intervals = np.size(logf_binedges)-1
+    logpsd_binned = np.empty(n_intervals)
+    logf_binned = np.empty(n_intervals)
+
+    logpsd = np.log(psd)
+
+    for i in range(n_intervals):
+        lb = logf_binedges[i]
+        ub = logf_binedges[i+1]
+        q = np.where((logf > lb) & (logf <= ub))
+
+        logpsd_binned[i] = np.nanmean(logpsd[q])
+        logf_binned[i] = (ub + lb) / 2
+
+    f_binned = np.exp(logf_binned)
+    psd_binned = np.exp(logpsd_binned)
+    # frequency binning end
+
+    # linear regression below
+    Y = np.log10(psd_binned)
+    X = np.log10(f_binned)
+    X_ex = sm.add_constant(X)
+
+    # note below: 'drop' is used for missing, so NaNs will be removed, and we need to put it back in the end
+    model = sm.OLS(Y, X_ex, missing='drop')
+    results = model.fit()
+
+    if np.size(results.params) < 2:
+        beta = np.nan
+        Y_reg = np.nan
+        std_err = np.nan
+    else:
+        beta = -results.params[1]  # the slope we want
+        Y_reg_raw = 10**model.predict(results.params)  # prediction based on linear regression
+        # handeling potential NaNs in psd_binned
+        Y_reg = []
+        i = 0
+        for psd in psd_binned:
+            if np.isnan(psd):
+                Y_reg.append(np.nan)
+            else:
+                Y_reg.append(Y_reg_raw[i])
+                i += 1
+
+        Y_reg = np.array(Y_reg)
+
+        std_err = results.bse[1]
+
+    res = Results(beta=beta, f_binned=f_binned, psd_binned=psd_binned, Y_reg=Y_reg, std_err=std_err)
+
+    return res
+
+def beta2HurstIndex(beta):
+    ''' Translates spectral slope to Hurst exponent
+
+    Parameters
+    ----------
+
+    beta : float
+        the estimated slope of a power spectral density curve
+
+    Returns
+    -------
+
+    H : float
+        Hurst index, should be in (0, 1)
+
+    References
+    ----------
+
+    Equation 2 in http://www.bearcave.com/misl/misl_tech/wavelets/hurst/
+
+    '''
+    H = (beta-1)/2
+    #
+
+    return H
+
+def psd_ar(var_noise, freq, ar_params, f_sampling):
+    ''' Theoretical power spectral density (PSD) of an autoregressive model
+
+    Parameters
+    ----------
+
+    var_noise : float
+        the variance of the noise of the AR process
+    freq : array
+        vector of frequency
+    ar_params : array
+        autoregressive coefficients, not including zero-lag
+    f_sampling : float
+        sampling frequency
+
+    Returns
+    -------
+
+    psd : array
+        power spectral density
+
+    '''
+    p = np.size(ar_params)
+
+    tmp = np.ndarray(shape=(p, np.size(freq)), dtype=complex)
+    for k in range(p):
+        tmp[k, :] = np.exp(-1j*2*np.pi*(k+1)*freq/f_sampling)
+
+    psd = var_noise / np.absolute(1-np.sum(ar_params*tmp, axis=0))**2
+
+    return psd
+
+
+
+def psd_fBM(freq, ts, H):
+    ''' Theoretical power spectral density of a fractional Brownian motion
+
+    Parameters
+    ----------
+
+    freq : array
+        vector of frequency
+    ts : array
+        the time axis of the time series
+    H : float
+        Hurst index, should be in (0, 1)
+
+    Returns
+    --------
+
+    psd : array
+        power spectral density
+
+    References
+    ----------
+
+    Flandrin, P. On the spectrum of fractional Brownian motions.
+    IEEE Transactions on Information Theory 35, 197–199 (1989).
+
+    '''
+    nf = np.size(freq)
+    psd = np.ndarray(shape=(nf))
+    T = np.max(ts) - np.min(ts)
+
+    omega = 2 * np.pi * freq
+
+    for k in range(nf):
+        tmp = 2 * omega[k] * T
+        psd[k] = (1 - 2**(1 - 2*H)*np.sin(tmp)/tmp) / np.abs(omega[k])**(1 + 2*H)
+
+    return psd

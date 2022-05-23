@@ -17,7 +17,7 @@ __all__ = [
     'ts2segments',
     'annualize',
     'gaussianize',
-    'gaussianize_single',
+    'gaussianize_1d',
     'detrend',
     'remove_outliers'
 ]
@@ -544,21 +544,26 @@ def annualize(ys, ts):
 
 
 def gaussianize(X):
-    """ Transforms a (proxy) timeseries to a Gaussian distribution.
-
-    Originator: Michael Erb, Univ. of Southern California - April 2017
+    """ Quantile maps a matrix to a Gaussian distribution
 
     Parameters
     ----------
 
     X : array
-        Values for the timeseries.
+        Timeseries arrayed by column
 
     Returns
     -------
 
     Xn : array
-        Gaussianized timseries
+        Gaussianized array
+        
+    References
+    ----------
+    van Albada, S., and P. Robinson (2007), Transformation of arbitrary 
+        distributions to the normal distribution with application to EEG 
+        test–retest reliability, Journal of Neu- roscience Methods, 161(2), 
+        205 – 211, doi:10.1016/j.jneumeth.2006.11.004.    
 
     """
 
@@ -570,46 +575,44 @@ def gaussianize(X):
     Xn[:] = np.NAN
 
     if len(X.shape) == 1:
-        Xn = gaussianize_single(X)
+        Xn = gaussianize_1d(X)
     else:
         for i in range(X.shape[1]):
-            Xn[:, i] = gaussianize_single(X[:, i])
+            Xn[:, i] = gaussianize_1d(X[:, i])
 
     return Xn
 
 
-def gaussianize_single(X_single):
-    """ Transforms a single (proxy) timeseries to Gaussian distribution.
-
-    Originator: Michael Erb, Univ. of Southern California - April 2017
+def gaussianize_1d(ys):
+    """ Quantile maps a 1D array to a Gaussian distribution
 
     Parameters
     ----------
 
-    X_single : 1D Array
+    ys : 1D Array
         A single timeseries
 
     Returns
     -------
 
-    Xn_single : Gaussianized values for a single timeseries.
+    yg : Gaussianized values for a single timeseries.
 
     """
     # Count only elements with data.
 
-    n = X_single[~np.isnan(X_single)].shape[0]
+    n = ys[~np.isnan(ys)].shape[0]
 
     # Create a blank copy of the array.
-    Xn_single = copy.deepcopy(X_single)
-    Xn_single[:] = np.NAN
+    yg = copy.deepcopy(ys)
+    yg[:] = np.NAN
 
-    nz = np.logical_not(np.isnan(X_single))
-    index = np.argsort(X_single[nz])
+    nz = np.logical_not(np.isnan(ys))
+    index = np.argsort(ys[nz])
     rank = np.argsort(index)
     CDF = 1.*(rank+1)/(1.*n) - 1./(2*n)
-    Xn_single[nz] = np.sqrt(2)*special.erfinv(2*CDF - 1)
+    yg[nz] = np.sqrt(2)*special.erfinv(2*CDF - 1)
 
-    return Xn_single
+    return yg
 
 
 def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
