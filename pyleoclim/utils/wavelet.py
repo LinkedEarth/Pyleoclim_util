@@ -2006,61 +2006,7 @@ def psd_ar(var_noise, freq, ar_params, f_sampling):
 
     return psd
 
-def fBMsim(N=128, H=0.25):
-    '''Simple method to generate fractional Brownian Motion
 
-    Parameters
-    ----------
-
-    N : int
-        the length of the simulated time series
-    H : float
-        Hurst index, should be in (0, 1). The relationship between H and the scaling exponent beta is
-        H = (beta-1) / 2
-
-    Returns
-    -------
-
-    xfBm : array
-        the simulated fractional Brownian Motion time series
-
-    References
-    ----------
-
-    1. http://cours-physique.lps.ens.fr/index.php/TD11_Correlated_Noise_2011
-    2. https://www.wikiwand.com/en/Fractional_Brownian_motion
-
-    @authors: jeg, fzhu
-    '''
-    assert isinstance(N, int) and N >= 1
-    assert H > 0 and H < 1, "H should be in (0, 1)!"
-
-    HH = 2 * H
-
-    ns = N-1  # number of steps
-    covariance = np.ones((ns, ns))
-
-    for i in range(ns):
-        for j in range(i, ns):
-            x = np.abs(i-j)
-            covariance[i, j] = covariance[j, i] = (np.abs(x-1)**HH + (x+1)**HH - 2*x**HH) / 2.
-
-    w, v = np.linalg.eig(covariance)
-
-    A = np.zeros((ns, ns))
-    for i in range(ns):
-        for j in range(i, ns):
-            A[i, j] = A[j, i] = np.sum(np.sqrt(w) * v[i, :] * v[j, :])
-
-    xi = np.random.randn((ns))
-    eta = np.dot(A, xi)
-
-    xfBm = np.zeros(N)
-    xfBm[0] = 0
-    for i in range(1, N):
-        xfBm[i] = xfBm[i-1] + eta[i-1]
-
-    return xfBm
 
 def psd_fBM(freq, ts, H):
     ''' Return the theoretical psd of a fBM
