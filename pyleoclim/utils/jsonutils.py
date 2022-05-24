@@ -214,13 +214,13 @@ def json_to_PyleoObj(filename,objname):
         if k == 'timeseries':
             a[k]=pyleo.Series(**a[k])
         if k == 'signif_qs' and a[k] is not None:
-            if obj==pyleo.core.ui.PSD:
+            if obj==pyleo.core.PSD.PSD:
                 for idx,item in enumerate(a[k]['psd_list']):
                     if item['timeseries'] is not None:
                         item['timeseries'] = pyleo.Series(**item['timeseries'])
                     a[k]['psd_list'][idx]=pyleo.PSD(**a[k]['psd_list'][idx])
                 a[k] = pyleo.MultiplePSD(**a[k])
-            elif obj == pyleo.core.ui.Scalogram or obj == pyleo.core.ui.Coherence:
+            elif obj == pyleo.core.Scalogram.Scalogram or obj == pyleo.core.Coherence.Coherence:
                 for idx,item in enumerate(a[k]['scalogram_list']):
                     if item['timeseries'] is not None:
                         item['timeseries'] = pyleo.Series(**item['timeseries'])
