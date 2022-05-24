@@ -18,6 +18,7 @@ __all__ = [
     'colored_noise',
     'colored_noise_2regimes',
     'gen_ar1_evenly',
+    'gen_ts'
 ]
 
 def ar1_model(t, tau, output_sigma=1):
