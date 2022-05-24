@@ -371,7 +371,7 @@ class Series:
               linestyle=None, linewidth=None, xlim=None, ylim=None,
               label=None, xlabel=None, ylabel=None, title=None, zorder=None,
               legend=True, plot_kwargs=None, lgd_kwargs=None, alpha=None,
-              savefig_settings=None, ax=None, mute=False, invert_xaxis=False):
+              savefig_settings=None, ax=None, invert_xaxis=False):
         ''' Plot the timeseries
 
         Parameters
@@ -441,10 +441,6 @@ class Series:
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
 
-        mute : {True,False}
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            (going to be deprecated)
 
         Returns
         -------
@@ -551,7 +547,7 @@ class Series:
             title=title, savefig_settings=savefig_settings,
             ax=ax, legend=legend, xlim=xlim, ylim=ylim,
             plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
-            mute=mute, invert_xaxis=invert_xaxis,
+            invert_xaxis=invert_xaxis,
         )
 
         return res
@@ -658,7 +654,7 @@ class Series:
             :okexcept:
 
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
-            fig, ax = ts.plot(title='ONI') # we mute the first call to only get the plot with 2 lines
+            fig, ax = ts.plot(title='ONI') 
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
             @savefig ssa_recon.png
@@ -904,7 +900,7 @@ class Series:
 
 
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
-                  ax=None, ylabel='KDE', vertical=False, edgecolor='w',mute=False, **plot_kwargs):
+                  ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
         ''' Plot the distribution of the timeseries values
 
         Parameters
@@ -934,10 +930,6 @@ class Series:
         edgecolor : matplotlib.color
             The color of the edges of the bar
 
-        mute : {True,False}
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            (going to be deprecated)
 
         plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
@@ -1002,8 +994,7 @@ class Series:
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None, n_signif_test=None,
                     time_label=None, value_label=None, period_label=None, psd_label='PSD', wavelet_method = 'wwz',
                     wavelet_kwargs = None, psd_method = 'wwz', psd_kwargs = None, ts_plot_kwargs = None, wavelet_plot_kwargs = None,
-                    psd_plot_kwargs = None, trunc_series = None, preprocess = True, y_label_loc = -.15, savefig_settings=None,
-                    mute=False):
+                    psd_plot_kwargs = None, trunc_series = None, preprocess = True, y_label_loc = -.15, savefig_settings=None):
         ''' Generate a plot of the timeseries and its frequency content through spectral and wavelet analyses.
 
 
@@ -1096,11 +1087,6 @@ class Series:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
-
-        mute : bool
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            (going to be deprecated)
 
         See also
         --------
@@ -1316,9 +1302,6 @@ class Series:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        # else:
-        #     if not mute:
-        #         plotting.showfig(fig)
         return fig, ax
 
     def copy(self):
@@ -2477,7 +2460,7 @@ class Series:
 
     def outliers(self, auto=True, remove=True, fig_outliers=True,fig_knee=True,
                   plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],
-                  saveknee_settings=None,saveoutliers_settings=None, mute=False):
+                  saveknee_settings=None,saveoutliers_settings=None):
         '''
         Detects outliers in a timeseries and removes if specified. The method uses clustering to locate outliers.
 
@@ -2502,11 +2485,7 @@ class Series:
             arguments for the outliers plot
         figsize : list
             by default [10,4]
-        mute : {True,False}
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            (going to be deprecated)
-
+    
         Returns
         -------
         new : Series
@@ -2567,8 +2546,7 @@ class Series:
         outlier_indices = tsutils.detect_outliers(
             self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,
             figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,
-            plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs, mute=mute
-        )
+            plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
         outlier_indices = np.asarray(outlier_indices)
         if remove == True:
             new = self.copy()

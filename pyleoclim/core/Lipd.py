@@ -344,11 +344,7 @@ class Lipd:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
-        mute : bool, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax. The default is False.
-            (going to be deprecated)
-
+        
         Returns
         -------
         res : figure
