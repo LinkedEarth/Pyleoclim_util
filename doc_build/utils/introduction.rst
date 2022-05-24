@@ -7,237 +7,83 @@ Pyleoclim makes extensive use of functions from `numpy <https://numpy.org>`_, `P
 
 Causality
 """""""""
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`granger_causality <utils_granger>`
-     - Estimate Granger causality
-   * - :ref:`liang_causality <utils_liang>`
-     - Estimate Liang causality
+.. automodule::pyleoclim.utils.causality
+   :members: liang_causality, granger_causality
 
 Correlation
 """""""""""
 
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`corr_sig <utils_corr_sig>`
-     - Estimates the Pearson's correlation and associated significance between two time series, applicable to cases where the standard assumption of independence breaks down. Three methods are currently implemented: t test with a heuristic correction for the degrees of freedom, Monte Carlo simulations based on an AR(1) model (`isopersist`), and phase randomization (`isospectral`).
-   * - :ref:`fdr <utils_fdr>`
-     - False Discovery Rate, as per the method of Benjamini and Hochberg [1995]
-
+.. automodule::pyleoclim.utils.correlation
+   :members: fdr, corr_sig
 
 Decomposition
 """""""""""""
 
-Methods used for decomposing timeseries into orthogonal components.
-
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`mpca <utils_mpca>`
-     - Monte-Carlo Principal Component Analysis (PCA, sometimes known as EOF analysis)
-   * - :ref:`ssa <utils_ssa>`
-     - Singular Spectrum Analysis
-   * - :ref:`MSSA <utils_mssa>`
-     - Multi Channel Singular Spectrum Analysis.
+.. automodule::pyleoclim.utils.decomposition
+   :members: ssa
 
 Filter
 """"""
 
-Filtering functions
-
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`Savitzky-Golay filter <utils_savitzky_golay>`
-     - Smooth (and optionally differentiate) data with a Savitzky-Golay filter
-   * - :ref:`Butterworth filter <utils_butterworth>`
-     - Applies a Butterworth filter with frequency fc, with optional padding
-   * - :ref:`firwin filter <utils_firwin>`
-     - Applies a Finite Impulse Response filter design with window method and frequency fc, with padding
-   * - :ref:`lanczos filter <utils_lanczos>`
-     - Applies a Lanczos (lowpass) filter with frequency fc, with optional padding
+.. automodule::pyleoclim.utils.filter
+   :members: butterworth, savitzky_golay, firwin, lanczos
 
 Mapping
 """""""
 
-This module contains mapping function based on `cartopy <https://scitools.org.uk/cartopy/docs/latest/>_`
-
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`map_all <utils_mapall>`
-     - Maps records according to some criteria (e.g, proxy type, interpretation)
+.. automodule::pyleoclim.utils.mapping
+   :members: map, compute_distance
 
 Plotting
 """"""""
 
-The functions contained in this module rely heavily on `matplotlib <https://matplotlib.org>_`. See :ref:`here <plotting_private>` for details. If considering plotting without making use of the functions in the ui module, we recommend using matplotlib directly.
-
-However, the following functions can be used to manipulate the default style and save settings.
-
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`showfig <utils_showfig>`
-     - Shows the figure
-   * - :ref:`savefig <utils_savefig>`
-     - Saves the figure to a user specified path
-   * - :ref:`closefig <utils_closefig>`
-     - Closes the figure
-   * - :ref:`set_style <utils_set_style>`
-     - Modifies the visualization style
+.. automodule::pyleoclim.utils.plotting
+   :members: set_style, closefig, savefig
 
 Spectral
 """"""""
 
-This modules contains several spectral methods applicable to paleoclimate data
-
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`welch <utils_welch>`
-     - Estimate power spectral density using Welch's method
-   * - :ref:`periodogram <utils_periodogram>`
-     - Estimate power spectral density using periodogram method
-   * - :ref:`mtm <utils_mtm>`
-     - Estimate power spectral density using multi-taper method
-   * - :ref:`lomb_scargle <utils_lombscargle>`
-     - Estimate power spectral density using the Lomb-Scargle method
-   * - :ref:`wwz_psd <utils_wwzpsd>`
-     - Estimate power spectral density using the Weighted Z-Transform wavelet method
+.. automodule::pyleoclim.utils.spectral
+   :members: wwz_psd, cwt_psd, mtm, lomb_scargle, welch, periodogram
 
 Tsmodel
 """""""
 
-This module generates simulated time series that can be used for significance testing.
+.. automodule::pyleoclim.utils.tsmodel
+   :members: ar1_sim, ar1_fit, colored_noise, colored_noise_2regimes, gen_ar1_evenly
 
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`ar1_sim <utils_ar1_sim>`
-     - Produces p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from `y` and (if provided) `t`
-   * - :ref:`colored_noise <utils_colored_noise>`
-     - Generate a colored noise with given scaling factor `alpha`
-   * - :ref:`colored_noise_2regimes <utils_colored_noise_2regimes>`
-     - Generate a colored noise with two regimes given scaling factors `alpha1` and `alpha2`
-   * - :ref:`gen_ar1_evenly <utils_gen_ar1_evenly>`
-     - Generate AR(1) series samples
 
 Wavelet
 """""""
 
-Functions for wavelet analysis. Includes some pre-processing and post-processing functions for spectral and wavelet analysis described :ref:`here <wavelet_private>`.
-
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`wwz <utils_wwz>`
-     - Weighted wavelet amplitude (WWA) for unevenly-spaced data
-   * - :ref:`wavelet_coherence <utils_wavelet_coherence>`
-     - Cross-wavelet coherence for unevenly-spaced data.
-   * - :ref:`xwt <utils_xwt`
-     - Cross-Wavelet transform for unevenly-spaced data.
-   * - :ref:`wtc <utils_wtc`
-     - Cross-Wavelet coherence for unevenly-spaced data.
-   * - :ref:`cwt <utils_cwt`
-     - Continuous wavelet transform after Torrence and Compo
+.. automodule::pyleoclim.utils.wavelet
+   :members: cwt, cwt_coherence, wwz, wwz_coherence
 
 
 Tsutils
 """""""
 
-This modules contain pre-processing functions for time series analysis.
-
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`simple_stats <utils_simple_stats>`
-     - Computes the mean, median, min, max, standard deviation and interquartile range of a timeseries
-   * - :ref:`bin <utils_bin>`
-     - Bin the values into evenly-spaced bins
-   * - :ref:`gkernel <utils_gkernel>`
-     - Coarsens time resolution using a Gaussian Kernel
-   * - :ref:`increments <utils_increments>`
-     - Assesses the increments of a numerical array
-   * - :ref:`interp <utils_interp>`
-     - Interpolation function based on `scipy.interpolate.interp1d <https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html>_`
-   * - :ref:`standardize <utils_standardize>`
-     - Standardizes a timeseries
-   * - :ref:`ts2segments <utils_ts2segments>`
-     - Chop a timeseries into several segments based on gap detection
-   * - :ref:`annualize <utils_annualize>`
-     - Annualizes a time series whose time resolution is finer than 1 year
-   * - :ref:`gaussianize <utils_gaussianize>`
-     - Maps a (proxy) timeseries to a Gaussian distribution
-   * - :ref:`gaussianize_1d <utils_gaussianize_1d>`
-     - Transforms a single (proxy) timeseries to a Gaussian distribution
-   * - :ref:`detrend <utils_detrend>`
-     - Applies linear, constant, low-pass filter, or decomposition-based detrending
-   * - :ref:`detect_outliers <utils_detect_outliers>`
-     - Detects outliers in a timeseries
-   * - :ref:`remove_outliers <utils_remove_outliers>`
-     - Removes outliers in a timeseries
+.. automodule::pyleoclim.utils.tsutils
+   :members: simple_stats, bin, interp, gkernel, standardize, ts2segments, annualize, gaussianize, gaussianize_1d, detrend, remove_outliers
 
 
 Tsbase
 """"""
 
-This module contains simple cleaning routines.
+.. automodule::pyleoclim.utils.tsbase
+   :members: clean_ts, dropna, sort_ts, is_evenly_spaced, reduce_duplicated_timestampsers
 
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`clean_ts <utils_clean_ts>`
-     - Remove NaNs in the time series and sort it in ascending time order
-   * - :ref:`dropna <utils_dropna>`
-     - Remove NaNs
-   * - :ref:`sort_ts <utils_sort_ts>`
-     - Sort time values in ascending order
-   * - :ref:`reduce_duplicated_timestamps <utils_reduce_duplicated_timestamps>`
-     - Reduce duplicated timestamps in a timeseries by averaging the values
-   * - :ref:`is_evenly_spaced <utils_is_evenly_spaced>`
-     - Detect whether a timeseries is evenly spaced in time
 
 Lipdutils
 """""""""
-This module contains functions to manipulate LiPD files and automate data transformation whenever possible. These functions are used throughout Pyleoclim but are not meant for direct interactions. A list of these functions can be found :ref:`here <lipdutils_private>`.
 
-The most relevant functions concern querying the LinkedEarth wiki. The first 5 functions can be used to get relevant query terms.
+Utilities to manipulate LiPD files and automate data transformation whenever possible. 
+These functions are used throughout Pyleoclim but are not meant for direct interaction by users.
+Also handles integration with the LinkedEarth wiki and the LinkedEarth Ontology.
 
-.. list-table::
-   :widths: 30 70
-   :header-rows: 0
-
-   * - :ref:`whatArchives <utils_whatArchives>`
-     - Query the names of all ArchiveTypes from the LinkedEarth Ontology
-   * - :ref:`whatProxyObservations <utils_whatProxyObservations>`
-     - Query the names of all ProxyObservations from the LinkedEarth Ontology
-   * - :ref:`whatProxySensors <utils_whatProxySensors>`
-     - Query the names of all ProxySensors from the LinkedEarth Ontology
-   * - :ref:`whatInferredVariables <utils_whatInferredVariables>`
-     - Query the names of all InferredVariables from the LinkedEarth Ontology
-   * - :ref:`whatInterpretations <utils_whatInterpretations>`
-     - Query the names of all Interpretations from the LinkedEarth Ontology.
-   * - :ref:`queryLinkedEarth <utils_queryLinkedEarth>`
-     - Query the LinkedEarth wiki for datasets.
 
 jsonutils
 """""""""
 
-This module converts Pyleoclim objects to and from JSON files. Useful for obtaining a human-readable output and keeping the results of an analysis. The JSON file can also be used to swap analysis results between programming language. Please note that this utilities are maintained on a as-needed basis and that not all objects are currently available.
-
 .. automodule:: pyleoclim.utils.jsonutils
-  :members: PyleoObj_to_json, json_to_PyleoObj
+  :members: PyleoObj_to_json, json_to_PyleoObj, isPyleoclim
