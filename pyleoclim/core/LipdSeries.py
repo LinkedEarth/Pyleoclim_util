@@ -319,10 +319,6 @@ class LipdSeries(Series):
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
-        mute : bool, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax. The default is False.
-            (going to be deprecated)
 
         Returns
         -------
@@ -331,7 +327,7 @@ class LipdSeries(Series):
         See also
         --------
 
-        pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
+        pyleoclim.utils.mapping.map : Underlying mapping function for Pyleoclim
 
         Examples
         --------
@@ -378,7 +374,7 @@ class LipdSeries(Series):
             proj2={'central_latitude':lat[0]}
             proj3={'central_longitude':lon[0]}
 
-        archiveType=[archiveType] #list so it will work with map_all
+        archiveType=[archiveType] #list so it will work with map
         marker=[marker]
         color=[color]
 
@@ -415,7 +411,7 @@ class LipdSeries(Series):
                               lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings)
 
         else:
-            res = mapping.map_all(lat=lat, lon=lon, criteria=archiveType,
+            res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
                               marker=marker, color =color,
                               projection = projection, proj_default = proj_default,
                               background = background,borders = borders,
@@ -584,7 +580,7 @@ class LipdSeries(Series):
 
     def dashboard(self, figsize = [11,8], plt_kwargs=None, distplt_kwargs=None, spectral_kwargs=None,
                   spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None, metadata = True,
-                  savefig_settings=None, mute=False, ensemble = False, D=None):
+                  savefig_settings=None, ensemble = False, D=None):
         '''
 
 
@@ -612,10 +608,6 @@ class LipdSeries(Series):
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}.
             The default is None.
-        mute : {True,False}, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax. The default is False.
-            (going to be deprecated)
         ensemble : {True, False}, optional
             If True, will return the dashboard in ensemble modes if ensembles are available
         D : pyleoclim.Lipd
@@ -653,7 +645,7 @@ class LipdSeries(Series):
 
         pyleolim.LipdSeries.getMetadata : get relevant metadata from the timeseries object
 
-        pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
+        pyleoclim.utils.mapping.map : Underlying mapping function for Pyleoclim
 
         Examples
         --------
@@ -884,9 +876,7 @@ class LipdSeries(Series):
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        # else:
-        #     if not mute:
-        #         plotting.showfig(fig)
+
         return fig, ax
 
     def mapNearRecord(self, D, n=5, radius = None, sameArchive = False,
@@ -895,8 +885,7 @@ class LipdSeries(Series):
                       lakes = False, figsize = None, ax = None,
                       marker_ref= None, color_ref=None, marker=None, color=None,
                       markersize_adjust=False, scale_factor = 100, scatter_kwargs=None,
-                      legend = True, lgd_kwargs=None, savefig_settings=None,
-                      mute=False):
+                      legend = True, lgd_kwargs=None, savefig_settings=None):
         """ Map records that are near the timeseries of interest
 
 
@@ -949,15 +938,11 @@ class LipdSeries(Series):
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
-        mute : {True, False}, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax. The default is False.
-            (going to be deprecated)
 
         See also
         --------
 
-        pyleoclim.utils.mapping.map_all : Underlying mapping function for Pyleoclim
+        pyleoclim.utils.mapping.map: Underlying mapping function for Pyleoclim
 
         pyleoclim.utils.mapping.dist_sphere: Calculate distance on a sphere
 
@@ -1114,7 +1099,7 @@ class LipdSeries(Series):
 
         if proj_default==True:
             try:
-                res = mapping.map_all(lat=lat_all, lon=lon_all,
+                res = mapping.map(lat=lat_all, lon=lon_all,
                       criteria=archiveType_all,
                       marker=marker_all, color =color_all,
                       projection = projection, proj_default = proj1,
@@ -1122,11 +1107,10 @@ class LipdSeries(Series):
                       rivers = rivers, lakes = lakes,
                       figsize = figsize, ax = ax,
                       scatter_kwargs=scatter_kwargs, legend=legend,
-                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                      mute=mute)
+                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings)
             except:
                 try:
-                    res = mapping.map_all(lat=lat_all, lon=lon_all,
+                    res = mapping.map(lat=lat_all, lon=lon_all,
                       criteria=archiveType_all,
                       marker=marker_all, color =color_all,
                       projection = projection, proj_default = proj2,
@@ -1134,10 +1118,9 @@ class LipdSeries(Series):
                       rivers = rivers, lakes = lakes,
                       figsize = figsize, ax = ax,
                       scatter_kwargs=scatter_kwargs, legend=legend,
-                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                      mute=mute)
+                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings)
                 except:
-                    res = mapping.map_all(lat=lat_all, lon=lon_all,
+                    res = mapping.map(lat=lat_all, lon=lon_all,
                       criteria=archiveType_all,
                       marker=marker_all, color =color_all,
                       projection = projection, proj_default = proj3,
@@ -1145,11 +1128,10 @@ class LipdSeries(Series):
                       rivers = rivers, lakes = lakes,
                       figsize = figsize, ax = ax,
                       scatter_kwargs=scatter_kwargs, legend=legend,
-                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                      mute=mute)
+                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings)
 
         else:
-            res = mapping.map_all(lat=lat_all, lon=lon_all,
+            res = mapping.map(lat=lat_all, lon=lon_all,
                       criteria=archiveType_all,
                       marker=marker_all, color =color_all,
                       projection = projection, proj_default = proj_default,
@@ -1157,14 +1139,13 @@ class LipdSeries(Series):
                       rivers = rivers, lakes = lakes,
                       figsize = figsize, ax = ax,
                       scatter_kwargs=scatter_kwargs, legend=legend,
-                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings,
-                      mute=mute)
+                      lgd_kwargs=lgd_kwargs,savefig_settings=savefig_settings)
 
         return res
 
 
     def plot_age_depth(self,figsize = [10,4], plt_kwargs=None,
-                       savefig_settings=None, mute=False,
+                       savefig_settings=None,
                        ensemble = False, D=None, num_traces = 10, ensemble_kwargs=None,
                        envelope_kwargs = None, traces_kwargs = None):
 
@@ -1181,10 +1162,6 @@ class LipdSeries(Series):
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
-        mute : {True,False}, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax. The default is False.
-            (going to be deprecated)
         ensemble : {True,False}, optional
             Whether to use age model ensembles stored in the file for the plot. The default is False.
             If no ensemble can be found, will error out.
@@ -1281,7 +1258,7 @@ class LipdSeries(Series):
                 envelope_kwargs.update({'shade_clr':self.plot_default[archiveType][0]})
             ens2=ens.common_time()
             if num_traces > 0:
-                envelope_kwargs.update({'mute':True})
+                #envelope_kwargs.update({'mute':True})
                 fig,ax = ens2.plot_envelope(**envelope_kwargs)
                 traces_kwargs={} if traces_kwargs is None else traces_kwargs.copy()
                 if 'color' not in traces_kwargs.keys():
