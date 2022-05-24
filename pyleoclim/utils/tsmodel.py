@@ -21,22 +21,23 @@ __all__ = [
 ]
 
 def ar1_model(t, tau, output_sigma=1):
-    ''' Simulate a (possibly irregularly-sampled) AR(1) process with given decay
-        constant tau, à la REDFIT.
+    ''' Simulate AR(1) process with REDFIT
+    
+    Simulate a (possibly irregularly-sampled) AR(1) process with given decay constant tau, à la REDFIT.
 
     Parameters
     ----------
 
     t :  array
-        time axis of the time series
+        Time axis of the time series
     tau : float
-        the averaged persistence
+        The averaged persistence
 
     Returns
     -------
 
     y : array
-        the AR(1) time series
+        The AR(1) time series
 
     References
     ----------
@@ -59,22 +60,32 @@ def ar1_model(t, tau, output_sigma=1):
 
 
 def ar1_fit(y, t=None):
-    ''' Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
+    ''' Return lag-1 autocorrelation
+    
+    Returns the lag-1 autocorrelation from AR(1) fit OR persistence from tauest.
 
     Parameters
     ----------
 
     y : array
-        the time series
+        The time series
     t : array
-        the time axis of that series
+        The time axis of that series
 
     Returns
     -------
 
     g : float
-        lag-1 autocorrelation coefficient (for evenly-spaced time series)
+        Lag-1 autocorrelation coefficient (for evenly-spaced time series)
         OR estimated persistence (for unevenly-spaced time series)
+
+    See also
+    --------
+
+    pyleoclim.utils.tsbase.is_evenly_spaced : Check if a time axis is evenly spaced, within a given tolerance
+
+    pyleoclim.utils.tsmodel.tau_estimation : Estimates the  temporal decay scale of an (un)evenly spaced time series.
+
     '''
 
     if is_evenly_spaced(t):
@@ -86,7 +97,9 @@ def ar1_fit(y, t=None):
     return g
 
 def ar1_sim(y, p, t=None):
-    ''' Produce p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from `y` and (if provided) `t`
+    '''Simulate AR(1) process(es) with sample autocorrelation value
+
+    Produce p realizations of an AR(1) process of length n with lag-1 autocorrelation g calculated from `y` and (if provided) `t`
 
     Parameters
     ----------
@@ -104,7 +117,7 @@ def ar1_sim(y, p, t=None):
     ysim : array
         n by p matrix of simulated AR(1) vector
 
-    See Also
+    See also
     --------
 
     pyleoclim.utils.tsmodel.ar1_model : Simulates a (possibly irregularly-sampled) AR(1) process with given decay constant tau, à la REDFIT.
@@ -149,6 +162,9 @@ def ar1_sim(y, p, t=None):
 def gen_ar1_evenly(t, g, scale=1, burnin=50):
     ''' Generate AR(1) series samples
 
+    Wrapper for the function [statsmodels.tsa.arima_process.arma_generate_sample](https://www.statsmodels.org/stable/generated/statsmodels.tsa.arima_process.arma_generate_sample.html)
+    used to generate an ARMA
+
     Parameters
     ----------
 
@@ -169,11 +185,6 @@ def gen_ar1_evenly(t, g, scale=1, burnin=50):
     y : array
         the generated AR(1) series
 
-
-    See also
-    --------
-    statsmodels.tsa.arima_process.arma_generate_sample: Simulate data from an ARMA. (https://www.statsmodels.org/stable/generated/statsmodels.tsa.arima_process.arma_generate_sample.html)
-
     '''
     ar = np.r_[1, -g]  # AR model parameter
     ma = np.r_[1, 0.0]  # MA model parameters
@@ -184,15 +195,18 @@ def gen_ar1_evenly(t, g, scale=1, burnin=50):
 def ar1_fit_evenly(y):
     ''' Returns the lag-1 autocorrelation from AR(1) fit.
 
+    Uses [statsmodels.tsa.arima.model.ARIMA](https://www.statsmodels.org/devel/generated/statsmodels.tsa.arima.model.ARIMA.html) to
+    calculate lag-1 autocorrelation
+
     Parameters
     ----------
     y : array
-        vector of (float) numbers as a time series
+        Vector of (float) numbers as a time series
 
     Returns
     -------
     g : float
-        lag-1 autocorrelation coefficient
+        Lag-1 autocorrelation coefficient
 
     '''
     # syntax compatible with statsmodels v0.11.1
@@ -212,19 +226,22 @@ def tau_estimation(y, t):
 #  def tau_estimation(y, t, detrend=False, params=["default", 4, 0, 1], gaussianize=False, standardize=True):
     ''' Estimates the  temporal decay scale of an (un)evenly spaced time series.
 
+    Esimtates the temporal decay scale of an (un)evenly spaced time series. 
+    Uses [scipy.optimize.minimize_scalar](https://docs.scipy.org/doc/scipy/reference/optimize.minimize_scalar-bounded.html)
+
     Parameters
     ----------
 
     y : array
-        a time series
+        A time series
     t : array
-        time axis of the time series
+        Time axis of the time series
 
     Returns
     -------
 
     tau_est : float
-        the estimated persistence
+        The estimated persistence
 
     References
     ----------
@@ -361,58 +378,58 @@ def colored_noise_2regimes(alpha1, alpha2, f_break, t, f0=None, m=None, seed=Non
 
     return y
 
-def fBMsim(N=128, H=0.25):
-    '''Simple method to generate fractional Brownian Motion
+# def fBMsim(N=128, H=0.25):
+#     '''Simple method to generate fractional Brownian Motion
 
-    Parameters
-    ----------
+#     Parameters
+#     ----------
 
-    N : int
-        the length of the simulated time series
-    H : float
-        Hurst index, should be in (0, 1). The relationship between H and the scaling exponent beta is
-        H = (beta-1) / 2
+#     N : int
+#         the length of the simulated time series
+#     H : float
+#         Hurst index, should be in (0, 1). The relationship between H and the scaling exponent beta is
+#         H = (beta-1) / 2
 
-    Returns
-    -------
+#     Returns
+#     -------
 
-    xfBm : array
-        the simulated fractional Brownian Motion time series
+#     xfBm : array
+#         the simulated fractional Brownian Motion time series
 
-    References
-    ----------
+#     References
+#     ----------
 
-    1. http://cours-physique.lps.ens.fr/index.php/TD11_Correlated_Noise_2011
-    2. https://www.wikiwand.com/en/Fractional_Brownian_motion
+#     1. http://cours-physique.lps.ens.fr/index.php/TD11_Correlated_Noise_2011
+#     2. https://www.wikiwand.com/en/Fractional_Brownian_motion
 
-    @authors: jeg, fzhu
-    '''
-    assert isinstance(N, int) and N >= 1
-    assert H > 0 and H < 1, "H should be in (0, 1)!"
+#     @authors: jeg, fzhu
+#     '''
+#     assert isinstance(N, int) and N >= 1
+#     assert H > 0 and H < 1, "H should be in (0, 1)!"
 
-    HH = 2 * H
+#     HH = 2 * H
 
-    ns = N-1  # number of steps
-    covariance = np.ones((ns, ns))
+#     ns = N-1  # number of steps
+#     covariance = np.ones((ns, ns))
 
-    for i in range(ns):
-        for j in range(i, ns):
-            x = np.abs(i-j)
-            covariance[i, j] = covariance[j, i] = (np.abs(x-1)**HH + (x+1)**HH - 2*x**HH) / 2.
+#     for i in range(ns):
+#         for j in range(i, ns):
+#             x = np.abs(i-j)
+#             covariance[i, j] = covariance[j, i] = (np.abs(x-1)**HH + (x+1)**HH - 2*x**HH) / 2.
 
-    w, v = np.linalg.eig(covariance)
+#     w, v = np.linalg.eig(covariance)
 
-    A = np.zeros((ns, ns))
-    for i in range(ns):
-        for j in range(i, ns):
-            A[i, j] = A[j, i] = np.sum(np.sqrt(w) * v[i, :] * v[j, :])
+#     A = np.zeros((ns, ns))
+#     for i in range(ns):
+#         for j in range(i, ns):
+#             A[i, j] = A[j, i] = np.sum(np.sqrt(w) * v[i, :] * v[j, :])
 
-    xi = np.random.randn((ns))
-    eta = np.dot(A, xi)
+#     xi = np.random.randn((ns))
+#     eta = np.dot(A, xi)
 
-    xfBm = np.zeros(N)
-    xfBm[0] = 0
-    for i in range(1, N):
-        xfBm[i] = xfBm[i-1] + eta[i-1]
+#     xfBm = np.zeros(N)
+#     xfBm[0] = 0
+#     for i in range(1, N):
+#         xfBm[i] = xfBm[i-1] + eta[i-1]
 
-    return xfBm
+#     return xfBm

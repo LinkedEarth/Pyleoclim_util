@@ -12,6 +12,7 @@ import numpy as np
 from typing import OrderedDict
 
 #APIs
+
 __all__ = [
     'clean_ts',
     'dropna',
@@ -33,6 +34,8 @@ def clean_ts(ys, ts, verbose=False):
         A time series, NaNs allowed
     ts : array
         The time axis of the time series, NaNs allowed
+    verbose : bool
+        If True, will print a warning message
 
     Returns
     -------
@@ -40,6 +43,15 @@ def clean_ts(ys, ts, verbose=False):
         The time series without nans
     ts : array
         The time axis of the time series without nans
+
+    See also
+    --------
+
+    pyleoclim.utils.tsbase.dropna : Drop NaN values
+
+    pyleoclim.utils.tsbase.sort_ts : Sort timeseries
+
+    pyleoclim.utils.tsbase.reduce_duplicated_timestamps : Consolidate duplicated timestamps
 
     '''
     ys, ts = dropna(ys, ts, verbose=verbose)
@@ -50,7 +62,9 @@ def clean_ts(ys, ts, verbose=False):
 
 
 def dropna(ys, ts, verbose=False):
-    ''' Remove entries of ys or ts that bear NaNs
+    '''Drop NaN values
+    
+    Remove entries of ys or ts that bear NaNs
 
     Parameters
     ----------
@@ -86,7 +100,9 @@ def dropna(ys, ts, verbose=False):
     return ys, ts
 
 def sort_ts(ys, ts, verbose=False):
-    ''' Sort ts values in ascending order
+    ''' Sort timeseries
+    
+    Sort ts values in ascending order
 
     Parameters
     ----------
@@ -121,7 +137,9 @@ def sort_ts(ys, ts, verbose=False):
     return ys, ts
 
 def reduce_duplicated_timestamps(ys, ts, verbose=False):
-    ''' Reduce duplicated timestamps in a timeseries by averaging the values
+    ''' Consolidate duplicated timestamps
+    
+    Reduce duplicated timestamps in a timeseries by averaging the values
 
     Parameters
     ----------
@@ -172,10 +190,10 @@ def is_evenly_spaced(ts, tol=1e-4):
     ----------
 
     ts : array
-        the time axis of a time series
+        The time axis of a time series
         
     tol : float64
-        numerical tolerance for the relative difference
+        Numerical tolerance for the relative difference
 
     Returns
     -------
