@@ -599,7 +599,7 @@ def gaussianize(X):
 
     van Albada, S., and P. Robinson (2007), Transformation of arbitrary 
         distributions to the normal distribution with application to EEG 
-        test-retest reliability, Journal of Neu- roscience Methods, 161(2), 
+        test-retest reliability, Journal of Neuroscience Methods, 161(2), 
         205 - 211, doi:10.1016/j.jneumeth.2006.11.004.    
 
     See also
@@ -645,7 +645,7 @@ def gaussianize_1d(ys):
     
     van Albada, S., and P. Robinson (2007), Transformation of arbitrary 
         distributions to the normal distribution with application to EEG 
-        test-retest reliability, Journal of Neu- roscience Methods, 161(2), 
+        test-retest reliability, Journal of Neuroscience Methods, 161(2), 
         205 - 211, doi:10.1016/j.jneumeth.2006.11.004.   
 
     See also
@@ -674,7 +674,7 @@ def gaussianize_1d(ys):
 def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     """Detrend a timeseries according to four methods
 
-    Detrending methods include, "linear", "constant", using a low-pass Savitzky-Golay filter, and using Empirical Mode Decomposition (default).
+    Detrending methods include: "linear", "constant", using a low-pass Savitzky-Golay filter, and Empirical Mode Decomposition (default).
     Linear and constant methods use [scipy.signal.detrend](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.detrend.html),
     EMD uses [pyhht.emd.EMD](https://pyhht.readthedocs.io/en/stable/apiref/pyhht.html)
 
@@ -684,8 +684,8 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     y : array
        The series to be detrended.
     x : array
-       The time axis for the timeseries. Necessary for use with
-       the Savitzky-Golay filters method since the series should be evenly spaced.
+       Abscissa for array y. Necessary for use with the Savitzky-Golay 
+       method, since the series should be evenly spaced.
     method : str
         The type of detrending:
         - "linear": the result of a linear least-squares fit to y is subtracted from y.
@@ -723,7 +723,7 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     elif method == "savitzky-golay":
         # Check that the timeseries is uneven and interpolate if needed
         if x is None:
-            raise ValueError("A time axis is needed for use with the Savitzky-Golay filter method")
+            raise ValueError("An independent variable is needed for the Savitzky-Golay filter method")
         # Check whether the timeseries is unvenly-spaced and interpolate if needed
         if len(np.unique(np.diff(x)))>1:
             warnings.warn("Timeseries is not evenly-spaced, interpolating...")
@@ -967,19 +967,18 @@ def eff_sample_size(y, detrend_flag=False):
     y : float 
        1d array 
        
-    detrend : boolean
+    detrend_flag : boolean
         if True (default), detrends y before estimation.         
 
     Returns
     -------
     neff : float
         The effective sample size
-        
-        
+    
     Reference
     ---------
 
-    Thiébaux HJ, Zwiers FW. 1984. The interpretation and estimation of
+    Thiébaux HJ and Zwiers FW, 1984: The interpretation and estimation of
     effective sample sizes. Journal of Climate and Applied Meteorology 23: 800–811.
 
     '''
@@ -1023,9 +1022,9 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
         'emd' - the last mode is assumed to be the trend and removed from the series
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted.
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters.
+        The parameters for the Savitzky-Golay filter.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -1042,9 +1041,9 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
 
     pyleoclim.utils.tsutils.detrend : Detrend a timeseries according to four methods
 
-    pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay method
 
-    pyleoclim.utils.tsutils.standardize : Centers and normalizes a given time series.
+    pyleoclim.utils.tsutils.standardize : Centers and normalizes a given time series
 
     pyleoclim.utils.tsutils.gaussianize : Quantile maps a matrix to a Gaussian distribution
 
