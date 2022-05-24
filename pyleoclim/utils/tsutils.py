@@ -386,7 +386,7 @@ def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style
 
 
 def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
-    """ Centers and normalizes a given time series. Constant or nearly constant time series not rescaled.
+    """Centers and normalizes a time series. Constant or nearly constant time series not rescaled.
 
     Parameters
     ----------
@@ -417,7 +417,7 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
 
     Tapio Schneider's MATLAB code: https://github.com/tapios/RegEM/blob/master/standardize.m
 
-    The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
+    The zscore function in SciPy: https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.zscore.html
 
     See also
     --------
@@ -627,7 +627,10 @@ def annualize(ys, ts):
 def gaussianize(ys):
     """ Maps a 1D array to a Gaussian distribution using the inverse Rosenblatt transform
     
-
+    The resulting array is mapped to a standard normal distribution, and therefore
+    has zero mean and unit standard deviation. Using `gaussianize()` obviates the 
+    need for `standardize()`. 
+    
     Parameters
     ----------
 
@@ -651,7 +654,7 @@ def gaussianize(ys):
     See also
     --------
 
-    pyleoclim.utils.tsutils.gaussianize : Quantile maps a matrix to a Gaussian distribution
+    pyleoclim.utils.tsutils.standardize : Centers and normalizes a time series
 
     """
     # Count only elements with data.
