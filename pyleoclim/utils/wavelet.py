@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Functions to perform wavelet analysis, including Weighted Wavelet Z-transform
- (WWZ) and Continuous Wavelet Transform (CWT) à la Torrence & Compo 1998.
+Utilities for wavelet analysis, including Weighted Wavelet Z-transform (WWZ) 
+and Continuous Wavelet Transform (CWT) à la Torrence & Compo 1998.
 
-Includes multiple options for WWZ (Fortran, numba, multiprocessing) and enables
-cross-wavelet transform. 
+Includes multiple options for WWZ (Fortran via f2py, numba, multiprocessing) 
+and enables cross-wavelet transform with either WWZ or CWT. 
+
+Designed for NumPy arrays, either evenly spaced or not (method-dependent)
 """
-
 
 __all__ = [
     'cwt',
@@ -17,7 +18,6 @@ __all__ = [
 ]
 
 import numpy as np
-import statsmodels.api as sm
 from scipy import signal
 from pathos.multiprocessing import ProcessingPool as Pool
 import numba as nb
@@ -29,7 +29,6 @@ from scipy import optimize
 from scipy.optimize import fminbound
 from scipy.special._ufuncs import gamma, gammainc
 
-#from .tsmodel import ar1_sim
 from .tsutils import preprocess
 from .tsbase import (
     clean_ts,
@@ -308,8 +307,14 @@ def wwz_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=1, de
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     
-    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
-
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using Gaussianization and detrending.
+    
+    pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods
+    
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    
+    pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
+    
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
     assertPositiveInt(Neff_threshold)
@@ -431,9 +436,13 @@ def wwz_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, de
 
     pyleoclim.utils.wavelet.kirchner_f2py : weighted wavelet amplitude (WWA) modified by Kirchner. Uses Fortran. Fastest method but requires a compiler.
 
-    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using Gaussianization and detrending.
     
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    
+    pyleoclim.utils.tsutils.detrend : detrending functionalities 
+    
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
 
     '''
     assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -577,7 +586,11 @@ def kirchner_basic(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     
-    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using Gaussianization and detrending.
+    
+    pyleoclim.utils.tsutils.detrend : detrending functionalities 
+    
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
 
     '''
     assert nproc == 1, "wwz_basic() only supports nproc=1"
@@ -711,7 +724,11 @@ def kirchner_nproc(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     
-    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using Gaussianization and detrending.
+    
+    pyleoclim.utils.tsutils.detrend : detrending functionalities 
+    
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
 
     '''
     assert nproc >= 2, "wwz_nproc() should use nproc >= 2, if want serial run, please use wwz_basic()"
@@ -870,7 +887,11 @@ def kirchner_numba(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, detren
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     
-    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using Gaussianization and detrending.
+    
+    pyleoclim.utils.tsutils.detrend : detrending functionalities 
+    
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
 
     '''
     assertPositiveInt(Neff_threshold)
@@ -1018,7 +1039,11 @@ def kirchner_f2py(ys, ts, freq, tau, c=1/(8*np.pi**2), Neff_threshold=3, nproc=8
 
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     
-    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.tsutils.preprocess :  pre-processes a times series using Gaussianization and detrending.
+    
+    pyleoclim.utils.tsutils.detrend : detrending functionalities 
+    
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
 
     '''
     from . import f2py_wwz as f2py
@@ -1291,6 +1316,12 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
+    
+    pyleoclim.utils.tsutils.detrend : detrending functionalities 
+    
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    
+    pyleoclim.utils.tsutils.preprocess: pre-processes a times series using Gaussianization and detrending.
 
     Examples
     --------
@@ -1441,6 +1472,12 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
 
     pyleoclim.utils.wavelet.make_freq_vector : Make frequency vector
+    
+    pyleoclim.utils.tsutils.detrend : detrending functionalities 
+    
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    
+    pyleoclim.utils.tsutils.preprocess: pre-processes a times series using Gaussianization and detrending.
 
     '''
 
@@ -2279,7 +2316,7 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     
     pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
     
-    pyleoclim.utils.tsutils.preprocess: pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.tsutils.preprocess: pre-processes a times series using Gaussianization and detrending.
     
     References
     ----------
@@ -2426,7 +2463,7 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={
     
     pyleoclim.utils.tsutils.detrend : detrending functionalities 
     
-    pyleoclim.utils.tsutils.preprocess: pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.tsutils.preprocess: pre-processes a times series using Gaussianization and detrending.
 
     '''
     assert np.array_equal(ts1,ts2)  and len(ys1) == len(ys2) , "ts1 and ts2 should be the same. Suggest using common_time()"

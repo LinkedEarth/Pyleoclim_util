@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Spectral analysis functions, including WWZ, CWT, Lomb-Scargle, MTM, and Welch
+Utilities for spectral analysis, including WWZ, CWT, Lomb-Scargle, MTM, and Welch.
+Designed for NumPy arrays, either evenly spaced or not (method-dependent).
 
+All spectral methods must return a dictionary containing one vector for the 
+frequency axis and the power spectral density (PSD).
+
+Additional utilities help compute an optimal frequency vector or estimate scaling exponents.
 """
 
 import numpy as np
 from scipy import signal
 import nitime.algorithms as nialg
+import statsmodels.api as sm
 import collections
 import warnings
 
@@ -34,7 +40,6 @@ from .wavelet import (
     wwa2psd,
     cwt,
 )
-#from .tsutils import clean_ts, interp, bin
 
 #-----------
 #Wrapper
@@ -49,12 +54,15 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
            return_onesided=True, detrend = None, sg_kwargs = None,
            gaussianize=False, standardize=False,
            scaling='density', average='mean'):
-    '''Estimate power spectral density using Welch's method
+    '''Estimate power spectral density using Welch's periodogram
 
     Wrapper for the function implemented in scipy.signal.welch
     See https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.welch.html for details.
 
-    Welch's method is an approach for spectral density estimation. It computes an estimate of the power spectral density by dividing the data into overlapping segments, computing a modified periodogram for each segment and averaging the periodograms.
+    Welch's method is an approach for spectral density estimation. It computes 
+    an estimate of the power spectral density by dividing the data into overlapping
+    segments, computing a modified periodogram for each segment and averaging 
+    the periodograms to lower the estimator's variance.
 
     Parameters
     ----------
@@ -112,7 +120,7 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
       scaling : {"density,"spectrum}
           Selects between computing the power spectral density (‘density’) where Pxx has units of V**2/Hz and computing the power spectrum (‘spectrum’) where Pxx has units of V**2, if x is measured in V and fs is measured in Hz. Defaults to ‘density'
       average : {'mean','median'}
-          Method to use when averaging periodograms. Defaults to ‘mean’.
+          Method to use when combining periodograms. Defaults to ‘mean’.
 
     Returns
     -------
@@ -124,16 +132,21 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
 
     See also
     --------
-    pyleoclim.utils.spectral.periodogram : Estimate power spectral density using a periodogram
-    pyleoclim.utils.spectral.mtm : Retuns spectral density using a multi-taper method
-    pyleoclim.utils.spectral.lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
-    pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
+    pyleoclim.utils.spectral.periodogram : Spectral density estimation using a Blackman-Tukey periodogram
+    pyleoclim.utils.spectral.mtm : Spectral density estimation using the multi-taper method
+    pyleoclim.utils.spectral.lomb_scargle : Lomb-scargle priodogram
+    pyleoclim.utils.spectral.wwz_psd : Spectral estimation using the Weighted Wavelet Z-transform
+    pyleoclim.utils.spectral.cwt_psd : Spectral estimation using the Continuous Wavelet Transform
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
-    pyleoclim.utils.tsutils.detrend : Detrending method
+    pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     References
     ----------
-    P. Welch, “The use of the fast Fourier transform for the estimation of power spectra: A method based on time averaging over short, modified periodograms”, IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.
+    P. Welch, “The use of the fast Fourier transform for the estimation of power spectra: 
+        A method based on time averaging over short, modified periodograms”, 
+        IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.
 
     '''
 
@@ -182,10 +195,10 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
 def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
            gaussianize=False, standardize=False, adaptive=False, jackknife=True,
            low_bias=True, sides='default', nfft=None):
-    ''' Retuns spectral density using a multi-taper method.
+    ''' Spectral density using the multi-taper method.
 
 
-    Based on the function in the time series analysis for neuroscience toolbox: http://nipy.org/nitime/api/generated/nitime.algorithms.spectral.html
+    Based on the nitime package: http://nipy.org/nitime/api/generated/nitime.algorithms.spectral.html
 
     Parameters
     ----------
@@ -239,12 +252,15 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
 
     See Also
     --------
-    pyleoclim.utils.spectral.periodogram : Estimate power spectral density using a periodogram
-    pyleoclim.utils.spectral.welch : Retuns spectral density using the welch method
-    pyleoclim.utils.spectral.lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
-    pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
+    pyleoclim.utils.spectral.periodogram : Spectral density estimation using a Blackman-Tukey periodogram
+    pyleoclim.utils.spectral.welch : spectral estimation using Welch's periodogram
+    pyleoclim.utils.spectral.lomb_scargle : Lomb-scargle priodogram
+    pyleoclim.utils.spectral.wwz_psd : Spectral estimation using the Weighted Wavelet Z-transform
+    pyleoclim.utils.spectral.cwt_psd : Spectral estimation using the Continuous Wavelet Transform
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
-    pyleoclim.utils.tsutils.detrend : Detrending method
+    pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     '''
     # preprocessing
@@ -293,9 +309,10 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
                  gaussianize=False,
                  standardize=False,
                  average='mean'):
-    """ Return the computed periodogram using lomb-scargle algorithm
+    """ Lomb-scargle priodogram
 
-    Uses the lombscargle implementation from scipy.signal: https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle
+    Appropriate for unevenly-spaced arrays.
+    Uses the lomb-scargle implementation from scipy.signal: https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle
 
     Parameters
     ----------
@@ -371,12 +388,16 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
     See Also
     --------
+    
     pyleoclim.utils.spectral.periodogram : Estimate power spectral density using a periodogram
     pyleoclim.utils.spectral.mtm : Retuns spectral density using a multi-taper method
     pyleoclim.utils.spectral.welch : Returns power spectral density using the Welch method
-    pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
+    pyleoclim.utils.spectral.wwz_psd : Spectral estimation using the Weighted Wavelet Z-transform
+    pyleoclim.utils.spectral.cwt_psd : Spectral estimation using the Continuous Wavelet Transform
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
-    pyleoclim.utils.tsutils.detrend : Detrending method
+    pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     References
     ----------
@@ -498,7 +519,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
            return_onesided=True, detrend = None, sg_kwargs=None,
            gaussianize=False, standardize=False,
            scaling='density'):
-    ''' Estimate power spectral density using a periodogram
+    ''' Spectral density estimation using a Blackman-Tukey periodogram
 
     Based on the function from scipy: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.periodogram.html
 
@@ -567,9 +588,12 @@ def periodogram(ys, ts, window='hann', nfft=None,
     pyleoclim.utils.spectral.welch : Estimate power spectral density using the welch method
     pyleoclim.utils.spectral.mtm : Retuns spectral density using a multi-taper method
     pyleoclim.utils.spectral.lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
-    pyleoclim.utils.spectral.wwz_psd : Return the psd of a timeseries using wwz method.
+    pyleoclim.utils.spectral.wwz_psd : Spectral estimation using the Weighted Wavelet Z-transform
+    pyleoclim.utils.spectral.cwt_psd : Spectral estimation using the Continuous Wavelet Transform
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
-    pyleoclim.utils.tsutils.detrend : Detrending method
+    pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     '''
     ts = np.array(ts)
@@ -615,17 +639,17 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             detrend=False, sg_kwargs=None, gaussianize=False,
             standardize=False, Neff_threshold=3, anti_alias=False, avgs=2,
             method='Kirchner_numba', wwa=None, wwz_Neffs=None, wwz_freq=None):
-    ''' Returns the power spectral density (PSD) of a timeseries using the Weighted Wavelet Z-transform
-
+    ''' Spectral estimation using the Weighted Wavelet Z-transform
+    
     The Weighted wavelet Z-transform (WWZ) is based on Morlet wavelet spectral estimation, using
-    least squares minimization to suppress the energy leakage caused by the data gaps.
+    least squares minimization to suppress the energy leakage caused by data gaps.
     WWZ does not rely on interpolation or detrending, and is appropriate for unevenly-spaced datasets.
     In particular, we use the variant of Kirchner & Neal (2013), in which basis rotations mitigate the
     numerical instability that occurs in pathological cases with the original algorithm (Foster, 1996).
     The WWZ method has one adjustable parameter, a decay constant `c` that balances the time and frequency
     resolutions of the analysis. The smaller this constant is, the sharper the peaks.
-     We choose the value 1e-3 to obtain smooth spectra that lend themselves to better scaling exponent estimation,
-     while still capturing the main periodicities.
+    The default value is 1e-3 to obtain smooth spectra that lend themselves to better scaling exponent
+    estimation, while still capturing the main periodicities. 
 
      Note that scalogram applications use the larger value (8π2)−1, justified elsewhere (Foster, 1996).
 
@@ -716,8 +740,11 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     pyleoclim.utils.spectral.mtm : Retuns spectral density using a multi-taper method
     pyleoclim.utils.spectral.lomb_scargle : Return the computed periodogram using lomb-scargle algorithm
     pyleoclim.utils.spectral.welch : Estimate power spectral density using the Welch method
+    pyleoclim.utils.spectral.cwt_psd : Spectral estimation using the Continuous Wavelet Transform
     pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
-    pyleoclim.utils.tsutils.detrend : Detrending method
+    pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     References
     ----------
@@ -748,8 +775,8 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
 def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None, 
             detrend=False,sg_kwargs={}, gaussianize=False, standardize =False, pad=False, 
             mother='MORLET',param=None, cwt_res=None):
-    '''
-    Wrapper function to implement Torrence and Compo continuous wavelet transform
+    ''' Spectral estimation using the continuous wavelet transform
+    Uses the Torrence and Compo [1998] continuous wavelet transform implementation
 
     Parameters
     ----------
@@ -801,11 +828,16 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
     See also
     --------
     
-    pyleoclim.utils.wavelet.make_freq_vector : make the frequency vector with various methods
-    
+    pyleoclim.utils.wavelet.make_freq_vector : make the frequency vector with various methods    
     pyleoclim.utils.wavelet.cwt: Torrence and Compo implementation of the continuous wavelet transform 
-    
-    pyleoclim.utils.tsutils.detrend : detrending functionalities in Pyleoclim
+    pyleoclim.utils.spectral.periodogram : Spectral estimation using Blackman-Tukey's periodogram
+    pyleoclim.utils.spectral.mtm : Spectral estimation using the multi-taper method
+    pyleoclim.utils.spectral.lomb_scargle : Spectral estimation using the lomb-scargle periodogram
+    pyleoclim.utils.spectral.welch : Spectral estimation using Welch's periodogram
+    pyleoclim.utils.spectral.wwz_psd : Spectral estimation using the Weighted Wavelet Z-transform
+    pyleoclim.utils.tsutils.detrend : detrending functionalities using 4 possible methods  
+    pyleoclim.utils.tsutils.gaussianize_1d: Quantile maps a 1D array to a Gaussian distribution 
+    pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
     
     References
     ----------
@@ -834,8 +866,14 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
     return res
 
 def beta_estimation(psd, freq, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
-    ''' Estimate the power slope of a 1/f^beta process.
+    ''' Estimate the scaling exponent of a power spectral density.
+    
+    Models the spectrum as S(f)  = 1/f^{\beta}. For instance:
+    - \beta = 0 corresponds to white noise
+    - \beta = 1 corresponds to pink noise
+    - \beta = 2 corresponds to red noise (Brownian motion)
 
+    
     Parameters
     ----------
 
@@ -962,7 +1000,7 @@ def beta2HurstIndex(beta):
     ----------
 
     beta : float
-        the estimated slope of a power spectral density curve
+        the estimated slope of a power spectral density
 
     Returns
     -------
@@ -974,10 +1012,13 @@ def beta2HurstIndex(beta):
     ----------
 
     Equation 2 in http://www.bearcave.com/misl/misl_tech/wavelets/hurst/
-
+    
+    See also
+    --------
+    pyleoclim.utils.spectral.beta_estimation: Estimate the scaling exponent of a power spectral density.
+    
     '''
     H = (beta-1)/2
-    #
 
     return H
 
@@ -1026,7 +1067,7 @@ def psd_fBM(freq, ts, H):
     ts : array
         the time axis of the time series
     H : float
-        Hurst index, should be in (0, 1)
+        Hurst exponent, should be in (0, 1)
 
     Returns
     --------
