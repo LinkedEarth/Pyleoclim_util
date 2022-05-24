@@ -35,9 +35,8 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
         This is a parametric test as well (series follow an AR(1) model) but 
         solves the issue by direct simulation. 
     3) 'isospectral': phase randomization of original inputs. (default)
-        This is a non-parametric method, assuming only wide-sense stationarity.
+        This is a non-parametric method, assuming only wide-sense stationarity
         
-    
     For 2 and 3, computational requirements scale with nsim.
     When possible, nsim should be at least 1000. 
 
@@ -53,7 +52,7 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     nsim : int
         the number of simulations [default: 1000]
         
-    method : {'ttest','isopersistent','isospectral' (default)}
+    method : str; {'ttest','isopersistent','isospectral' (default)}
         method for significance testing
         
     alpha : float
@@ -72,14 +71,13 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
             true if significant; false otherwise
             Note that signif = True if and only if p <= alpha.
          
-    See Also
+    See also
     --------
 
-    pyleoclim.utils.correlation.corr_ttest : Estimates the significance of correlations between 2 time series using the classical T-test adjusted for effective sample size.
-    
-    pyleoclim.utils.correlation.corr_isopersist : Computes correlation between two timeseries, and their significance using Ar(1) modeling.
-    
+    pyleoclim.utils.correlation.corr_ttest : Estimates the significance of correlations between 2 time series using the classical T-test adjusted for effective sample size
+    pyleoclim.utils.correlation.corr_isopersist : Computes correlation between two timeseries, and their significance using Ar(1) modeling
     pyleoclim.utils.correlation.corr_isospec : Estimates the significance of the correlation using phase randomization
+    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
      
     """
     y1 = np.array(y1, dtype=float)
@@ -99,7 +97,7 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     return res
 
 def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
-    ''' Determine significance based on the FDR approach
+    ''' Determine significance based on the false discovery rate
     
     The false discovery rate is a method of conceptualizing the rate of type I errors in null hypothesis testing when conducting multiple comparisons. 
     Translated from fdr.R by Dr. Chris Paciorek 
@@ -134,6 +132,12 @@ def fdr(pvals, qlevel=0.05, method='original', adj_method=None, adj_args={}):
 
     fdr_res : array or None
         A vector of the indices of the significant tests; None if no significant tests
+
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    
 
     References
     ----------
@@ -204,13 +208,14 @@ def corr_ttest(y1, y2, alpha=0.05):
     pval : float
         test p-value (the probability of the test statistic exceeding the observed one by chance alone)
         
-    See Also
+    See also
     --------
-    
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     pyleoclim.utils.correlation.corr_isopersist : Estimate Pearson's correlation and associated significance using AR(1)
-    
     pyleoclim.utils.correlation.corr_isospec : Estimate Pearson's correlation and associated significance using phase randomization
-    
+    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+
     """
     r = pearsonr(y1, y2)[0]
 
@@ -278,13 +283,14 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
     (Some Rights Reserved) Hepta Technologies, 2009
     v1.0 USC, Aug 10 2012, based on corr_signif.
     
-    See Also
+    See also
     --------
-    
-    pyleoclim.utils.correlation.corr_ttest: Estimates Pearson's correlation and associated significance using a t-test.
-    
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    pyleoclim.utils.correlation.corr_ttest: Estimates Pearson's correlation and associated significance using a t-test
     pyleoclim.utils.correlation.corr_isospec : Estimates Pearson's correlation and associated significance using 
-    
+    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+
     '''
 
     r = pearsonr(y1, y2)[0]
@@ -333,6 +339,12 @@ def isopersistent_rn(X, p):
         n rows by p columns matrix of an AR1 process, where n is the size of X
     g :float
         lag-1 autocorrelation coefficient
+    
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
 
     Notes
     -----
@@ -372,6 +384,13 @@ def sm_ar1_sim(n, p, g, sig):
 
     red : numpy matrix
         n rows by p columns matrix of an AR1 process
+
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+
     '''
     # specify model parameters (statsmodel wants lag0 coefficents as unity)
     ar = np.r_[1, -g]  # AR model parameter
@@ -455,6 +474,14 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
     F : float
         Fraction of time series with higher correlation coefficents than observed (approximates the p-value).
 
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    pyleoclim.utils.correlation.corr_ttest : Estimates Pearson's correlation and associated significance using a t-test
+    pyleoclim.utils.correlation.corr_isopersist : Estimates Pearson's correlation and associated significance using AR(1) simulations
+    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+    
     References
     ---------
 
@@ -466,14 +493,6 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
     with Several Simultaneously Measured Variables (1994)
     Physical Review Letters, Vol 73, Number 7
     (Some Rights Reserved) USC Climate Dynamics Lab, 2012.
-    
-    See Also
-    --------
-    
-    pyleoclim.utils.correlation.corr_ttest : Estimates Pearson's correlation and associated significance using a t-test
-    
-    pyleoclim.utils.correlation.corr_isopersist : Estimates Pearson's correlation and associated significance using AR(1) simulations
-    
     '''
     r = pearsonr(y1, y2)[0]
 
@@ -525,6 +544,12 @@ def phaseran(recblk, nsurr):
 
     surrblk : numpy array
         3D multidimensional array image block with the surrogate datasets along the third dimension
+
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
 
     References
     ----------
@@ -588,10 +613,16 @@ def fdr_basic(pvals,qlevel=0.05):
     fdr_res : array or None
         A vector of the indices of the significant tests; None if no significant tests
 
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+
     References
     ----------
     
-    - Benjamini, Yoav; Hochberg, Yosef (1995). "Controlling the false discovery rate: a practical and powerful approach to multiple testing". Journal of the Royal Statistical Society, Series B. 57 (1): 289–300. MR 1325392
+    Benjamini, Yoav; Hochberg, Yosef (1995). "Controlling the false discovery rate: a practical and powerful approach to multiple testing". Journal of the Royal Statistical Society, Series B. 57 (1): 289–300. MR 1325392
     
 
     '''
@@ -634,6 +665,12 @@ def fdr_master(pvals, qlevel=0.05, method='original'):
     fdr_res : array or None
         A vector of the indices of the significant tests; None if no significant tests
 
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+
     References
     ----------
     
@@ -666,7 +703,13 @@ def storey(edf_quantile, pvals):
 
     a : int
         estimate of a, the number of alternative hypotheses
-        
+
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+
     References
     ----------
     
@@ -691,7 +734,7 @@ def prop_alt(pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 
         A vector of p-values on which to estimate a
 
 
-    adj_method: {'mean', 'storey', 'two-stage'}
+    adj_method: str; {'mean', 'storey', 'two-stage'}
         Method for increasing the power of the procedure by estimating the proportion of alternative p-values.
         - 'mean', the modified Storey estimator that we suggest in Ventura et al. (2004)
         - 'storey', the method of Storey (2002)
@@ -711,14 +754,18 @@ def prop_alt(pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 
 
     a : int
         estimate of a, the number of alternative hypotheses
-    
+
+    See also
+    --------
+
+    pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
+    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+
     References
     ----------
     
     - Storey, J.D. (2002). A direct approach to False Discovery Rates. Journal of the Royal Statistical Society, Series B, 64, 3, 479-498
-    
     - Benjamini, Yoav; Yekutieli, Daniel (2001). "The control of the false discovery rate in multiple testing under dependency". Annals of Statistics. 29 (4): 1165–1188. doi:10.1214/aos/1013699998 
-    
     - Ventura, V., Paciorek, C., Risbey, J.S. (2004). Controlling the proportion of falsely rejected hypotheses when conducting multiple tests with climatological data. Journal of climate, 17, 4343-4356
 
     '''
