@@ -237,7 +237,5 @@ The most relevant functions concern querying the LinkedEarth wiki. The first 5 f
 jsonutils
 """""""""
 
-This module converts Pyleoclim objects to and from JSON files. Useful for obtaining a human-readable output and keeping the results of an analysis. The JSON file can also be used to swap analysis results between programming language. Please note that this utilities are maintained on a as-needed basis and that not all objects are currently available.
-
 .. automodule:: pyleoclim.utils.jsonutils
   :members: PyleoObj_to_json, json_to_PyleoObj
