@@ -185,6 +185,11 @@ def gen_ar1_evenly(t, g, scale=1, burnin=50):
     y : array
         the generated AR(1) series
 
+    See also
+    --------
+
+    pyleoclim.utils.tsmodel.gen_ts : Generate pyleoclim.Series with timeseries models
+
     '''
     ar = np.r_[1, -g]  # AR model parameter
     ma = np.r_[1, 0.0]  # MA model parameters
@@ -289,11 +294,17 @@ def colored_noise(alpha, t, f0=None, m=None, seed=None):
     y : array
         the generated 1/f^alpha noise
 
+    See also
+    --------
+
+    pyleoclim.utils.tsmodel.gen_ts : Generate pyleoclim.Series with timeseries models
+
     References
     ----------
 
     Eq. (15) in Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
         Phys Rev E Stat Nonlin Soft Matter Phys 71, 066110 (2005).
+
     '''
     n = np.size(t)  # number of time points
     y = np.zeros(n)
@@ -341,6 +352,11 @@ def colored_noise_2regimes(alpha1, alpha2, f_break, t, f0=None, m=None, seed=Non
     y : array
         the generated 1/f^alpha noise
 
+    See also
+    --------
+
+    pyleoclim.utils.tsmodel.gen_ts : Generate pyleoclim.Series with timeseries models
+
     References
     ----------
 
@@ -377,6 +393,165 @@ def colored_noise_2regimes(alpha1, alpha2, f_break, t, f0=None, m=None, seed=Non
         y[j] = np.sum(coeff*sin_func)
 
     return y
+
+def gen_ts(model, t=None, nt=1000, **kwargs):
+    ''' Generate pyleoclim.Series with timeseries models
+
+    Parameters
+    ----------
+
+    model : str, {'colored_noise', 'colored_noise_2regimes', 'ar1'}
+        the timeseries model to use
+        - colored_noise : colored noise with one scaling slope
+        - colored_noise_2regimes : colored noise with two regimes of two different scaling slopes
+        - ar1 : AR(1) series
+
+    t : array
+        the time axis
+
+    nt : number of time points
+        only works if 't' is None, and it will use an evenly-spaced vector with nt points
+
+    kwargs : dict
+        the keyward arguments for the specified timeseries model
+
+    Returns
+    -------
+
+    ts : pyleoclim.Series
+        Generated Series object
+
+    See also
+    --------
+
+    pyleoclim.utils.tsmodel.colored_noise : generate a colored noise timeseries
+
+    pyleoclim.utils.tsmodel.colored_noise_2regimes : generate a colored noise timeseries with two regimes
+
+    pyleoclim.utils.tsmodel.gen_ar1_evenly : generate an AR(1) series
+
+
+    Examples
+    --------
+
+    - AR(1) series
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        import pyleoclim as pyleo
+
+        # default length nt=1000; default persistence parameter g=0.5
+        ts = pyleo.gen_ts(model='ar1')
+        g = pyleo.utils.tsmodel.ar1_fit(ts.value)
+        @savefig gen_ar1_t0.png
+        fig, ax = ts.plot(label=f'g={g:.2f}')
+        pyleo.closefig(fig)
+
+        # use 'nt' to modify the data length
+        ts = pyleo.gen_ts(model='ar1', nt=100)
+        g = pyleo.utils.tsmodel.ar1_fit(ts.value)
+        @savefig gen_ar1_t1.png
+        fig, ax = ts.plot(label=f'g={g:.2f}')
+        pyleo.closefig(fig)
+
+        # use 'settings' to modify the persistence parameter 'g'
+        ts = pyleo.gen_ts(model='ar1', g=0.9)
+        g = pyleo.utils.tsmodel.ar1_fit(ts.value)
+        @savefig gen_ar1_t2.png
+        fig, ax = ts.plot(label=f'g={g:.2f}')
+        pyleo.closefig(fig)
+
+    - Colored noise with 1 regime
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        # default scaling slope 'alpha' is 1
+        ts = pyleo.gen_ts(model='colored_noise')
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(psd_beta.beta_est_res['beta'])
+
+        # visualize
+        @savefig gen_cn_t0.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
+
+        # modify 'alpha' with 'settings'
+        ts = pyleo.gen_ts(model='colored_noise', alpha=2)
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+        print(psd_beta.beta_est_res['beta'])
+
+        # visualize
+        @savefig gen_cn_t1.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
+
+    - Colored noise with 2 regimes
+
+    .. ipython:: python
+        :okwarning
+        :okexcept:
+
+        # default scaling slopes 'alpha1' is 0.5 and 'alpha2' is 2, with break at 1/20
+        ts = pyleo.gen_ts(model='colored_noise_2regimes')
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        psd_beta_lf = psd.beta_est(fmin=1/50, fmax=1/20)
+        psd_beta_hf = psd.beta_est(fmin=1/20, fmax=1/2)
+        print(psd_beta_lf.beta_est_res['beta'])
+        print(psd_beta_hf.beta_est_res['beta'])
+
+        # visualize
+        @savefig gen_cn2_t0.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
+
+        # modify the scaling slopes and scaling break with 'settings'
+        ts = pyleo.gen_ts(model='colored_noise_2regimes', alpha1=2, alpha2=1, f_break=1/10)
+        psd = ts.spectral()
+
+        # estimate the scaling slope
+        psd_beta_lf = psd.beta_est(fmin=1/50, fmax=1/10)
+        psd_beta_hf = psd.beta_est(fmin=1/10, fmax=1/2)
+        print(psd_beta_lf.beta_est_res['beta'])
+        print(psd_beta_hf.beta_est_res['beta'])
+
+        # visualize
+        @savefig gen_cn2_t1.png
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
+
+    '''
+
+    if t is None:
+        t = np.arange(nt)
+
+    tsm = {
+        'colored_noise': colored_noise,
+        'colored_noise_2regimes': colored_noise_2regimes,
+        'ar1': gen_ar1_evenly,
+    }
+
+    tsm_args = {}
+    tsm_args['colored_noise'] = {'alpha': 1}
+    tsm_args['colored_noise_2regimes'] = {'alpha1': 1/2, 'alpha2': 2, 'f_break': 1/20}
+    tsm_args['ar1'] = {'g': 0.5}
+    tsm_args[model].update(kwargs)
+
+    v = tsm[model](t=t, **tsm_args[model])
+    ts = Series(time=t, value=v)
+
+    return ts
 
 # def fBMsim(N=128, H=0.25):
 #     '''Simple method to generate fractional Brownian Motion
