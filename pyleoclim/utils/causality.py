@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 25 05:47:03 2020
-
-@author: deborahkhider
-
-Contains all relevant functions for causality analysis
+Utilities for Liang and Granger causality analysis
 """
 
 __all__ = [
@@ -24,10 +20,9 @@ from scipy.stats.mstats import mquantiles
 #Main functions
 #--------
 def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
-    '''
-    statsmodels granger causality tests
-
-    Four tests for granger non causality of 2 time series.
+    '''Granger causality tests
+    
+    Four tests for the Granger non-causality of 2 time series.
 
     All four tests give similar results. params_ftest and ssr_ftest are equivalent based on F test which is identical to lmtest:grangertest in R.
     
@@ -91,9 +86,10 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
 
 def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
                     qs=[0.005, 0.025, 0.05, 0.95, 0.975, 0.995]):
-    '''
+    '''Liang-Kleeman information flow
+    
     Estimate the Liang information transfer from series y2 to series y1 with 
-    significance estimates using either an AR(1) test with series with the same
+    significance estimates using either an AR(1) tests with series with the same
     persistence or surrogates with randomized phases.
 
     Parameters
@@ -258,10 +254,10 @@ def liang(y1, y2, npt=1):
     ----------
 
     y1, y2 : array
-        vectors of (real) numbers with identical length, no NaNs allowed
+        Vectors of (real) numbers with identical length, no NaNs allowed
 
     npt : int  >=1
-        time advance in performing Euler forward differencing,
+        Time advance in performing Euler forward differencing,
         e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
         npt=1 should be used
 
@@ -389,10 +385,13 @@ def signif_isopersist(y1, y2, method,
 
     y1, y2 : array
         vectors of (real) numbers with identical length, no NaNs allowed
+
     method : str; {'liang'}
         estimates for the Liang method
+
     nsim : int
         the number of AR(1) surrogates for significance test
+
     qs : list
         the quantiles for significance test
 
@@ -454,13 +453,15 @@ def signif_isospec(y1, y2, method,
     ----------
 
     y1, y2 : array
-            vectors of (real) numbers with identical length, no NaNs allowed
+        vectors of (real) numbers with identical length, no NaNs allowed
     method : str; {'liang'}
-            estimates for the Liang method
+        estimates for the Liang method
     nsim : int
-            the number of surrogates for significance test
+        the number of surrogates for significance test
     qs : list
-            the quantiles for significance test
+        the quantiles for significance test
+    kwargs : dict
+        keyword arguments for the causality method (e.g. npt for Liang-Kleeman)
 
     Returns
     -------

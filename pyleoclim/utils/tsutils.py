@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 25 06:43:14 2020
-
-@author: deborahkhider, fzhu, jeg
-
-Utilities to manipulate timeseries
+Utilities to manipulate timeseries - useful for preprocessing prior to analysis
 """
 
 __all__ = [
@@ -50,8 +46,7 @@ from .tsbase import (
 def simple_stats(y, axis=None):
     """ Computes simple statistics
 
-    Computes the mean, median, min, max, standard deviation, and interquartile
-    range of a numpy array y, ignoring NaNs.
+    Computes the mean, median, min, max, standard deviation, and interquartile range of a numpy array y, ignoring NaNs.
 
     Parameters
     ----------
@@ -59,7 +54,7 @@ def simple_stats(y, axis=None):
     y: array
         A Numpy array
     axis : int, tuple of ints
-        Optional. Axis or Axes along which the means
+        Axis or Axes along which the means
         are computed, the default is to compute the mean of the flattened
         array. If a tuple of ints, performed over multiple axes
 
@@ -78,6 +73,7 @@ def simple_stats(y, axis=None):
         standard deviation of y, ignoring NaNs
     IQR : float
         Interquartile range of y along specified axis, ignoring NaNs
+        
     """
     # make sure that y is an array
     y = np.array(y, dtype='float64')
@@ -120,9 +116,16 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True):
     bins : array
         The bins (centered on the median, i.e., the 100-200 bin is 150)
     n : array
-        number of data points in each bin
+        Number of data points in each bin
     error : array
-        the standard error on the mean in each bin
+        The standard error on the mean in each bin
+
+    See also
+    --------
+
+    pyleoclim.utils.tsutils.gkernel : Coarsen time resolution using a Gaussian kernel
+
+    pyleoclim.utils.tsutils.interp : Interpolate y onto a new x-axis
 
     """
 
@@ -175,8 +178,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True):
 
 
 def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
-    '''
-    Coarsen time resolution using a Gaussian kernel
+    '''Coarsen time resolution using a Gaussian kernel
 
     Parameters
     ----------
@@ -185,20 +187,21 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
     
     y  : 1d array
         values on the original time axis
+        
+    h  : float 
+        kernel e-folding scale
     
     step : float
         The interpolation step. Default is max spacing between consecutive points.
-   
-    step_style : 'string'
-            step style to be applied from `increments` [default = 'max']
-    
-    start : float
+
+        start : float
         where/when to start the interpolation. Default is min(t).
         
     stop : float
         where/when to stop the interpolation. Default is max(t).
-    
-    h  : scalar;  kernel e-folding scale
+   
+    step_style : str
+            step style to be applied from 'increments' [default = 'max']
 
     Returns
     -------
@@ -214,6 +217,16 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
     Rehfeld, K., Marwan, N., Heitzig, J., and Kurths, J.: Comparison of correlation analysis
     techniques for irregularly sampled time series, Nonlin. Processes Geophys.,
     18, 389–404, https://doi.org/10.5194/npg-18-389-2011, 2011.
+
+    See also
+    --------
+
+    pyleoclim.utils.tsutils.increments : Establishes the increments of a numerical array
+
+    pyleoclim.utils.tsutils.bin : Bin the values
+
+    pyleoclim.utils.tsutils.interp : Interpolate y onto a new x-axis
+
     '''
 
     if len(t) != len(y):
@@ -252,8 +265,7 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
 
 
 def increments(x,step_style='median'):
-    ''' Establishes the increments of a numerical array:
-        start, stop, and representative step.
+    ''' Establishes the increments of a numerical array: start, stop, and representative step.
 
     Parameters
     ----------
@@ -275,7 +287,16 @@ def increments(x,step_style='median'):
         max(x)
     step : float
         The representative spacing between consecutive values, computed as above
+
+    See also
+    --------
+
+    pyleoclim.utils.tsutils.bin : Bin the values
+
+    pyleoclim.utils.tsutils.gkernel : Coarsen time resolution using a Gaussian kernel
+
     '''
+
     start = np.nanmin(x)
     stop = np.nanmax(x)
 
@@ -295,6 +316,8 @@ def increments(x,step_style='median'):
 def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style= 'mean',**kwargs):
     """ Interpolate y onto a new x-axis
 
+    Largely a wrapper for [scipy.interpolate.interp1d](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html)
+
     Parameters
     ----------
 
@@ -302,8 +325,11 @@ def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style
        The x-axis
     y : array
        The y-axis
-    interp_type : {‘linear’, ‘nearest’, ‘zero’, ‘slinear’, ‘quadratic’, ‘cubic’, ‘previous’, ‘next’}
-        where ‘zero’, ‘slinear’, ‘quadratic’ and ‘cubic’ refer to a spline interpolation of zeroth, first, second or third order; ‘previous’ and ‘next’ simply return the previous or next value of the point) or as an integer specifying the order of the spline interpolator to use. Default is ‘linear’.
+    interp_type : str
+        Options include: 'linear', 'nearest', 'zero', 'slinear', 'quadratic', 'cubic', 'previous', 'next'
+        where 'zero', 'slinear', 'quadratic' and 'cubic' refer to a spline interpolation of zeroth, first, second or third order; 
+        'previous' and 'next' simply return the previous or next value of the point) or as an integer specifying the order of the spline interpolator to use. 
+        Default is 'linear'.
     step : float
             The interpolation step. Default is mean spacing between consecutive points.
     start : float
@@ -311,8 +337,9 @@ def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style
     stop : float
          where/when to stop the interpolation. Default is max.
     kwargs :  kwargs
-        Aguments specific to interpolate.interp1D. See scipy for details https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html
+        Aguments specific to interpolate.interp1D.
         If getting an error about extrapolation, you can use the arguments `bound_errors=False` and `fill_value="extrapolate"` to allow for extrapolation. 
+
     Returns
     -------
 
@@ -320,6 +347,16 @@ def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style
         The interpolated x-axis
     yi : array
         The interpolated y values
+
+    See Also
+    --------
+
+    pyleoclim.utils.tsutils.increment : Establishes the increments of a numerical array
+
+    pyleoclim.utils.tsutils.bin : Bin the values
+
+    pyleoclim.utils.tsutils.gkernel : Coarsen time resolution using a Gaussian kernel
+
     """
 
         #Make sure x and y are numpy arrays
@@ -347,9 +384,6 @@ def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style
     yi = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**kwargs)(xi)
 
     return xi, yi
-
-
-
 
 
 def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
@@ -382,8 +416,9 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     References
     ----------
 
-    1. Tapio Schneider's MATLAB code: https://github.com/tapios/RegEM/blob/master/standardize.m
-    2. The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
+    Tapio Schneider's MATLAB code: https://github.com/tapios/RegEM/blob/master/standardize.m
+
+    The zscore function in SciPy: https://github.com/scipy/scipy/blob/master/scipy/stats/stats.py
 
     See also
     --------
@@ -422,9 +457,9 @@ def center(y, axis=0):
     ----------
 
     y : array
-        vector of (real) numbers as a time series, NaNs allowed
+        Vector of (real) numbers as a time series, NaNs allowed
     axis : int or None
-        axis along which to operate, if None, compute over the whole array
+        Axis along which to operate, if None, compute over the whole array
         
     Returns
     -------
@@ -436,6 +471,7 @@ def center(y, axis=0):
 
     References
     ----------
+
     Tapio Schneider's MATLAB code: https://github.com/tapios/RegEM/blob/master/center.m
 
     """
@@ -468,17 +504,17 @@ def ts2segments(ys, ts, factor=10):
     ts : array
         The time points
     factor : float
-        the factor that adjusts the threshold for gap detection
+        The factor that adjusts the threshold for gap detection
 
     Returns
     -------
 
     seg_ys : list
-        a list of several segments with potentially different lengths
+        A list of several segments with potentially different lengths
     seg_ts : list
-        a list of the time axis of the several segments
+        A list of the time axis of the several segments
     n_segs : int
-        the number of segments
+        The number of segments
     '''
 
     ys, ts = clean_ts(ys, ts)
@@ -560,10 +596,16 @@ def gaussianize(X):
         
     References
     ----------
+
     van Albada, S., and P. Robinson (2007), Transformation of arbitrary 
         distributions to the normal distribution with application to EEG 
-        test–retest reliability, Journal of Neu- roscience Methods, 161(2), 
-        205 – 211, doi:10.1016/j.jneumeth.2006.11.004.    
+        test-retest reliability, Journal of Neuroscience Methods, 161(2), 
+        205 - 211, doi:10.1016/j.jneumeth.2006.11.004.    
+
+    See also
+    --------
+
+    pyleoclim.utils.tsutils.gaussianize_1d : Quantile maps a 1D array to a Gaussian distribution
 
     """
 
@@ -595,7 +637,21 @@ def gaussianize_1d(ys):
     Returns
     -------
 
-    yg : Gaussianized values for a single timeseries.
+    yg : 1D Array
+        Gaussianized values for a single timeseries.
+
+    References
+    ----------
+    
+    van Albada, S., and P. Robinson (2007), Transformation of arbitrary 
+        distributions to the normal distribution with application to EEG 
+        test-retest reliability, Journal of Neuroscience Methods, 161(2), 
+        205 - 211, doi:10.1016/j.jneumeth.2006.11.004.   
+
+    See also
+    --------
+
+    pyleoclim.utils.tsutils.gaussianize : Quantile maps a matrix to a Gaussian distribution
 
     """
     # Count only elements with data.
@@ -618,8 +674,9 @@ def gaussianize_1d(ys):
 def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     """Detrend a timeseries according to four methods
 
-    Detrending methods include, "linear", "constant", using a low-pass
-        Savitzky-Golay filter, and using Empirical Mode Decomposition (default).
+    Detrending methods include: "linear", "constant", using a low-pass Savitzky-Golay filter, and Empirical Mode Decomposition (default).
+    Linear and constant methods use [scipy.signal.detrend](https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.detrend.html),
+    EMD uses [pyhht.emd.EMD](https://pyhht.readthedocs.io/en/stable/apiref/pyhht.html)
 
     Parameters
     ----------
@@ -627,8 +684,8 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     y : array
        The series to be detrended.
     x : array
-       The time axis for the timeseries. Necessary for use with
-       the Savitzky-Golay filters method since the series should be evenly spaced.
+       Abscissa for array y. Necessary for use with the Savitzky-Golay 
+       method, since the series should be evenly spaced.
     method : str
         The type of detrending:
         - "linear": the result of a linear least-squares fit to y is subtracted from y.
@@ -638,7 +695,7 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     n : int
         Works only if `method == 'emd'`. The number of smoothest modes to remove.
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+        The parameters for the Savitzky-Golay filters.
 
     Returns
     -------
@@ -649,9 +706,9 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     See also
     --------
 
-    pylecolim.utils.filter.savitzky_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.filter.savitzky_golay : Filtering using Savitzy-Golay
 
-    pylecolim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending.
+    pyleoclim.utils.tsutils.preprocess : pre-processes a times series using standardization and detrending.
 
     """
     y = np.array(y)
@@ -666,7 +723,7 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     elif method == "savitzky-golay":
         # Check that the timeseries is uneven and interpolate if needed
         if x is None:
-            raise ValueError("A time axis is needed for use with the Savitzky-Golay filter method")
+            raise ValueError("An independent variable is needed for the Savitzky-Golay filter method")
         # Check whether the timeseries is unvenly-spaced and interpolate if needed
         if len(np.unique(np.diff(x)))>1:
             warnings.warn("Timeseries is not evenly-spaced, interpolating...")
@@ -698,16 +755,20 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
 def distance_neighbors(signal):
     '''Finds Distance of each point in the timeseries from its 4 nearest neighbors
 
-       Parameters
-       ----------
+    Wrapper around [sklearn.neighbors.NearestNeighbors](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestNeighbors.html)
 
-       signal : array
-           The timeseries
+    Parameters
+    ----------
 
-       Returns
-       -------
-       distances : array
-           Distance of each point from its nearest neighbors in decreasing order
+    signal : array
+        The timeseries
+
+    Returns
+    -------
+
+    distances : array
+        Distance of each point from its nearest neighbors in decreasing order
+
     '''
     nn = NearestNeighbors(n_neighbors=4) # 4 nearest neighbors
     nbrs =nn.fit(signal.reshape(-1,1))
@@ -718,17 +779,18 @@ def distance_neighbors(signal):
 def find_knee(distances):
     '''Finds knee point automatically in a given array sorted in decreasing order
 
-       Parameters
-       ----------
+    Parameters
+    ----------
 
-       distances : array
-                  Distance of each point in the timeseries from it's nearest neighbors in decreasing order
+    distances : array
+        Distance of each point in the timeseries from it's nearest neighbors in decreasing order
 
-       Returns
-       -------
+    Returns
+    -------
 
-      knee : float
-            knee point in the array
+    knee : float
+        Knee point in the array
+
     '''
     nPoints = len(distances)
     allCoord = np.vstack((range(nPoints), distances)).T
@@ -750,46 +812,61 @@ def find_knee(distances):
 def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
                     plot_outliers_kwargs=None,plot_knee_kwargs=None,
                     figsize=[10,4],saveknee_settings=None,
-                    saveoutliers_settings=None,mute=False):
+                    saveoutliers_settings=None):
     ''' Function to detect outliers in the given timeseries
 
-       for more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
+    For more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
 
+    Parameters
+    ----------
 
-       Parameters
-       ----------
+    ts : array
+        Time axis of time series
+    ys : array
+        y values of time series
+    auto : boolean
+        True by default, if false the user manually selects the knee point
+    plot_knee : boolean
+        True by default, plots the knee
+    plot_outliers : boolean
+        True by default, plots the outliers using a scatter plot
+    plot_outliers_kwargs : dict
+        Keyword arguments for plot_scatter_xy for outliers plot
+    plot_knee_kwargs : dict
+        Keyword arguments for plot_xy for knee plot
+    figsize : tuple, list
+        Tuple or list of figure size
+    saveknee_settings : dict
+        the dictionary of arguments for plt.savefig() for knee plot; some notes below:
+        - "path" must be specified; it can be any existed or non-existed path,
+          with or without a suffix; if the suffix is not given in "path", it will follow "format"
+        - "format" can be one of {"pdf", "eps", "png", "ps"}
+    saveoutliers_settings : dict
+        the dictionary of arguments for plt.savefig() for outliers plot; some notes below:
+        - "path" must be specified; it can be any existed or non-existed path,
+          with or without a suffix; if the suffix is not given in "path", it will follow "format"
+        - "format" can be one of {"pdf", "eps", "png", "ps"}
 
-       ts : array
-            time axis of time series
-       ys : array
-            y values of time series
-       plot : boolean
-             true by default, plots the outliers using a scatter plot
-       auto : boolean
-             true by default, if false the user manually selects the knee point
-       mute : bool, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            (going to be deprecated)
-       plot_kwargs : dict
-            keyword arguments for ax.plot()
+    Returns
+    -------
 
-       Returns
-       -------
+    outliers : array
+        a list of values consisting of outlier indices
 
-       outliers : array
-                   a list of values consisting of outlier indices
+    See also
+    --------
 
-       See also
-       --------
+    pyleoclim.utils.tsutils.distance_neighbors : Finds Distance of each point in the timeseries from its 4 nearest neighbors
 
-       pylecolim.utils.tsutils.distance_neighbors : Finds Distance of each point in the timeseries from its 4 nearest neighbors
+    pyleoclim.utils.tsutils.find_knee : Finds knee point automatically in a given array sorted in decreasing order
 
-       pylecolim.utils.tsustils.find_knee : Finds knee point automatically in a given array sorted in decreasing order
+    pyleoclim.utils.tsutils.remove_outliers : Removes outliers from a timeseries
 
-       pylecolim.utils.tsutils.remove_outliers : Removes outliers from a timeseries
+    pyleoclim.utils.plotting.plot_xy : Plot a timeseries
 
-       '''
+    pyleoclim.utils.plotting.plot_scatter_xy : Plot a scatter on top of a line plot.
+
+    '''
     #Take care of arguments for the knee plot
     saveknee_settings = {} if saveknee_settings is None else saveknee_settings.copy()
 
@@ -833,14 +910,11 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
         if 'fig1' in locals():
             if 'path' in saveknee_settings:
                 savefig(fig1, settings=saveknee_settings)
-            # else:
-            #     if not mute:
-            #         showfig(fig1)
 
         if plot_outliers==True:
             x2 = ts[outliers]
             y2 = ys[outliers]
-            plot_scatter_xy(ts,ys,x2,y2,figsize=figsize,xlabel='time',ylabel='value',savefig_settings=saveoutliers_settings,plot_kwargs=plot_outliers_kwargs, mute=mute)
+            plot_scatter_xy(ts,ys,x2,y2,figsize=figsize,xlabel='time',ylabel='value',savefig_settings=saveoutliers_settings,plot_kwargs=plot_outliers_kwargs)
 
         return outliers
 
@@ -862,9 +936,9 @@ def remove_outliers(ts,ys,outlier_points):
     ts : array
          x axis of timeseries
     ys : array
-        y axis of timeseries
-   outlier_points : array
-                   indices of outlier points
+        y axis of timeseries 
+    outlier_points : array
+        indices of outlier points
 
     Returns
     -------
@@ -876,7 +950,8 @@ def remove_outliers(ts,ys,outlier_points):
     See also
     --------
 
-    pylecolim.utils.tsutils.detect_outliers : Function to detect outliers in the given timeseries
+    pyleoclim.utils.tsutils.detect_outliers : Function to detect outliers in the given timeseries
+
     '''
 
     ys = np.delete(ys,outlier_points)
@@ -885,26 +960,25 @@ def remove_outliers(ts,ys,outlier_points):
     return ys,ts
 
 def eff_sample_size(y, detrend_flag=False):
-    '''
-    Effective Sample Size of timeseries y
+    '''Effective Sample Size of timeseries y
 
     Parameters
     ----------
     y : float 
        1d array 
        
-    detrend : boolean
+    detrend_flag : boolean
         if True (default), detrends y before estimation.         
 
     Returns
     -------
     neff : float
         The effective sample size
-        
-        
+    
     Reference
     ---------
-    Thiébaux HJ, Zwiers FW. 1984. The interpretation and estimation of
+
+    Thiébaux HJ and Zwiers FW, 1984: The interpretation and estimation of
     effective sample sizes. Journal of Climate and Applied Meteorology 23: 800–811.
 
     '''
@@ -927,7 +1001,6 @@ def eff_sample_size(y, detrend_flag=False):
     
     return neff
 
-
 # alias
 std = standardize
 gauss = gaussianize
@@ -946,11 +1019,12 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
         the Savitzky-Golay filters method since the series should be evenly spaced.
     detrend : string
         'none'/False/None - no detrending will be applied;
+        'emd' - the last mode is assumed to be the trend and removed from the series
         'linear' - a linear least-squares fit to `ys` is subtracted;
         'constant' - the mean of `ys` is subtracted
-        'savitzy-golay' - ys is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+        'savitzy-golay' - ys is filtered using the Savitzky-Golay filter and the resulting filtered series is subtracted.
     sg_kwargs : dict
-        The parameters for the Savitzky-Golay filters. see pyleoclim.utils.filter.savitzy_golay for details.
+        The parameters for the Savitzky-Golay filter.
     gaussianize : bool
         If True, gaussianizes the timeseries
     standardize : bool
@@ -965,7 +1039,13 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
     See also
     --------
 
-    pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay
+    pyleoclim.utils.tsutils.detrend : Detrend a timeseries according to four methods
+
+    pyleoclim.utils.filter.savitzy_golay : Filtering using Savitzy-Golay method
+
+    pyleoclim.utils.tsutils.standardize : Centers and normalizes a given time series
+
+    pyleoclim.utils.tsutils.gaussianize : Quantile maps a matrix to a Gaussian distribution
 
     '''
 

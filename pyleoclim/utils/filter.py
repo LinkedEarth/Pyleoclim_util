@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 25 06:15:52 2020
-
-@author: deborahkhider
-
-Handles filtering
+Utilities to filter arrayed timeseries data, leveraging SciPy
 """
 
 __all__ = [
@@ -23,9 +19,9 @@ from .tsbase import (
     is_evenly_spaced
 )
 
-# ----
+#----
 # Main functions
-# ----
+#----
 
 def savitzky_golay(ys, window_length=None, polyorder=2, deriv=0, delta=1,
                    axis=-1, mode='mirror', cval=0):

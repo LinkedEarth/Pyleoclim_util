@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 25 06:01:55 2020
-
-@author: deborahkhider
-
-Contains all relevant functions for correlation analysis
+Relevant functions for correlation analysis
 """
 
 __all__ = [

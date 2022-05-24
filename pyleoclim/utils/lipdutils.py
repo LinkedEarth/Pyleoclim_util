@@ -1,9 +1,8 @@
  # -*- coding: utf-8 -*-
 """
-This module contains functions to manipulate LiPD files and automate data transformation whenever possible. These functions are used throughout Pyleoclim but are not meant for direct interaction
-
-This module also handles integration with the LinkedEarth wiki and the LinkedEarth Ontology
-
+Utilities to manipulate LiPD files and automate data transformation whenever possible. 
+These functions are used throughout Pyleoclim but are not meant for direct interaction by users.
+Also handles integration with the LinkedEarth wiki and the LinkedEarth Ontology.
 """
 
 import lipd as lpd

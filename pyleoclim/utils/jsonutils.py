@@ -3,9 +3,9 @@
 """
 This module converts Pyleoclim objects to and from JSON files. 
 
-Useful for obtaining a human-readable output and keeping the results of an analysis. The JSON file can also be used to swap analysis results between programming language. 
+Useful for obtaining a human-readable output and keeping the results of an analysis. The JSON file can also be used to swap analysis results between programming languages. 
 
-Please note that these utilities are maintained on a as-needed basis and that not all objects are currently available.
+These utilities are maintained on an as-needed basis and that not all objects are currently available.
 """
 
 __all__ =['PyleoObj_to_json', 'json_to_PyleoObj', 'isPyleoclim']
