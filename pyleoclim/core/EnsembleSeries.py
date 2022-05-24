@@ -262,7 +262,7 @@ class EnsembleSeries(MultipleSeries):
 
     def plot_traces(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, num_traces=10, seed=None,
              xlim=None, ylim=None, linestyle='-', savefig_settings=None, ax=None, plot_legend=True,
-             color=sns.xkcd_rgb['pale red'], lw=0.5, alpha=0.3, lgd_kwargs=None, mute=False):
+             color=sns.xkcd_rgb['pale red'], lw=0.5, alpha=0.3, lgd_kwargs=None):
             '''Plot EnsembleSeries as a subset of traces.
 
             Parameters
@@ -300,10 +300,6 @@ class EnsembleSeries(MultipleSeries):
                 Whether to plot the legend. The default is True.
             lgd_kwargs : dict, optional
                 Parameters for the legend. The default is None.
-            mute : bool, optional
-                if True, the plot will not show;
-                recommend to turn on when more modifications are going to be made on ax. The default is False.
-                (going to be deprecated)
             seed : int, optional
                 Set the seed for the random number generator. Useful for reproducibility. The default is None.
 
@@ -373,9 +369,6 @@ class EnsembleSeries(MultipleSeries):
             if 'fig' in locals():
                 if 'path' in savefig_settings:
                     plotting.savefig(fig, settings=savefig_settings)
-                # else:
-                #     if not mute:
-                #         plotting.showfig(fig)
                 return fig, ax
             else:
                 return ax
@@ -384,7 +377,7 @@ class EnsembleSeries(MultipleSeries):
                       xlabel=None, ylabel=None, title=None,
                       xlim=None, ylim=None, savefig_settings=None, ax=None, plot_legend=True,
                       curve_clr=sns.xkcd_rgb['pale red'], curve_lw=2, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.2,
-                      inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None, mute=False):
+                      inner_shade_label='IQR', outer_shade_label='95% CI', lgd_kwargs=None):
         ''' Plot EnsembleSeries as an envelope.
 
         Parameters
@@ -426,10 +419,6 @@ class EnsembleSeries(MultipleSeries):
             Label for the envelope. The default is '95\% CI'.
         lgd_kwargs : dict, optional
             Parameters for the legend. The default is None.
-        mute : bool, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax. The default is False.
-            (going to be deprecated)
 
         Returns
         -------
@@ -507,16 +496,13 @@ class EnsembleSeries(MultipleSeries):
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            # else:
-            #     if not mute:
-            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
 
     def stackplot(self, figsize=[5, 15], savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None,
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, mute=False):
+                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
@@ -556,10 +542,6 @@ class EnsembleSeries(MultipleSeries):
         v_shift_factor : float
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
-        mute : bool
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-             (going to be deprecated)
 
         Returns
         -------
@@ -673,10 +655,6 @@ class EnsembleSeries(MultipleSeries):
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            # else:
-            #     if not mute:
-            #         plotting.showfig(fig)
-            # reset the plotting style
             mpl.rcParams.update(current_style)
             return fig, ax
         else:
@@ -686,7 +664,7 @@ class EnsembleSeries(MultipleSeries):
 
 
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
-                 ax=None, ylabel='KDE', vertical=False, edgecolor='w',mute=False, **plot_kwargs):
+                 ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
         """
         Plots the distribution of the timeseries across ensembles
 
@@ -710,10 +688,6 @@ class EnsembleSeries(MultipleSeries):
             Whether to flip the plot vertically. The default is False.
         edgecolor : matplotlib.color, optional
             The color of the edges of the bar. The default is 'w'.
-        mute : {True,False}, optional
-           if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax. The default is False.
-            (going to be deprecated)
         **plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html.
 
@@ -753,9 +727,6 @@ class EnsembleSeries(MultipleSeries):
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            # else:
-            #     if not mute:
-            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax

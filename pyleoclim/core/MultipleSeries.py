@@ -1112,7 +1112,7 @@ class MultipleSeries:
              linestyle=None, linewidth=None, colors=None, cmap='tab10', norm=None,
              xlabel=None, ylabel=None, title=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None,
-             savefig_settings=None, ax=None, mute=False, invert_xaxis=False):
+             savefig_settings=None, ax=None, invert_xaxis=False):
         '''Plot multiple timeseries on the same axis
 
         Parameters
@@ -1156,10 +1156,6 @@ class MultipleSeries:
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
         ax : matplotlib.ax, optional
             The matplotlib axis onto which to return the figure. The default is None.
-        mute : bool, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            (going to be deprecated)
         invert_xaxis : bool, optional
             if True, the x-axis of the plot will be inverted
 
@@ -1220,15 +1216,12 @@ class MultipleSeries:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            # else:
-            #     if not mute:
-            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
     def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None, mute=False):
+                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
@@ -1278,10 +1271,6 @@ class MultipleSeries:
             Arguments to further customize the plot from matplotlib.pyplot.plot.
             Dictionary: Arguments will be applied to all lines in the stackplots
             List of dictionary: Allows to customize one line at a time.
-        mute : {True,False}
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            (going to be deprecated)
 
         Returns
         -------
@@ -1499,10 +1488,6 @@ class MultipleSeries:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            # else:
-            #     if not mute:
-            #         plotting.showfig(fig)
-            # reset the plotting style
             mpl.rcParams.update(current_style)
             return fig, ax
         else:

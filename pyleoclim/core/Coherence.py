@@ -131,8 +131,8 @@ class Coherence:
         return deepcopy(self)
 
     def plot(self, var='wtc', xlabel=None, ylabel=None, title='auto', figsize=[10, 8],
-             ylim=None, xlim=None, in_scale=True, yticks=None, mute=False,
-             contourf_style={}, phase_style={}, cbar_style={}, savefig_settings={}, ax=None,
+             ylim=None, xlim=None, in_scale=True, yticks=None, contourf_style={},
+             phase_style={}, cbar_style={}, savefig_settings={}, ax=None,
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              signif_thresh = 0.95, under_clr='ivory', over_clr='black', bad_clr='dimgray'):
         '''Plot the cross-wavelet results
@@ -159,10 +159,6 @@ class Coherence:
             Plots scales instead of frequencies The default is True.
         yticks : list, optional
             y-ticks label. The default is None.
-        mute : bool, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax The default is False. The default is False.
-            (going to be deprecated)
         contourf_style : dict, optional
             Arguments for the contour plot. The default is {}.
         phase_style : dict, optional
@@ -379,15 +375,12 @@ class Coherence:
             elif title == 'auto' and lbl1 is not None and lbl1 is not None:
                 title = 'Wavelet coherency ('+var.upper() +') between '+ lbl1 + ' and ' + lbl2
                 fig.suptitle(title)
-            # else:
-            #     if not mute:
-            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
 
-    def dashboard(self, title=None, figsize=[9,12], mute=False, phase_style = {},
+    def dashboard(self, title=None, figsize=[9,12], phase_style = {},
                   savefig_settings={}, ts_plot_kwargs = None, wavelet_plot_kwargs= None):
          ''' Cross-wavelet dashboard, including the two series, WTC and XWT.
 
@@ -401,11 +394,6 @@ class Coherence:
 
          figsize : list, optional
              Figure size. The default is [9, 12], as this is an information-rich figure.
-
-         mute : bool, optional
-             if True, the plot will not show;
-             recommend to turn on when more modifications are going to be made on ax The default is False. The default is False.
-             (going to be deprecated)
 
          savefig_settings : dict, optional
              The default is {}.
