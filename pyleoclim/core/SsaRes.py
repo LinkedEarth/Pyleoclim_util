@@ -130,9 +130,7 @@ class SsaRes:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        # else:
-        #     if not mute:
-        #         plotting.showfig(fig)
+
         return fig, ax
 
     def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None,
@@ -203,7 +201,5 @@ class SsaRes:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        # else:
-        #     if not mute:
-        #         plotting.showfig(fig)
+
         return fig, ax

@@ -79,7 +79,7 @@ class CorrEns:
              xlim=None,
              clr_insignif=sns.xkcd_rgb['grey'], clr_signif=sns.xkcd_rgb['teal'],
              clr_signif_fdr=sns.xkcd_rgb['pale orange'],
-             clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None, mute=False):
+             clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None):
         ''' Plot the correlation ensembles
 
         Parameters
@@ -105,11 +105,6 @@ class CorrEns:
         ax : matplotlib.axis, optional
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
-
-        mute : {True,False}
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            (going to be deprecated)
 
         xlim : list, optional
             x-axis limits. The default is None.
@@ -169,16 +164,7 @@ class CorrEns:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            # else:
-            #     if not mute:
-            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
-        # if 'path' in savefig_settings:
-        #     plotting.savefig(fig, settings=savefig_settings)
-        # else:
-        #     if not mute:
-        #         plotting.showfig(fig)
-        # return fig, ax
