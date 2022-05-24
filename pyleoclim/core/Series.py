@@ -7,10 +7,9 @@ The Series class describes the most basic objects in Pyleoclim. A Series is a si
 - optionally, some metadata about both axes, like units, labels and the like.
 
 How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
-
 """
 
-from ..utils import tsutils, plotting, mapping, lipdutils, tsmodel, tsbase
+from ..utils import tsutils, plotting, tsmodel, tsbase
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
@@ -18,13 +17,13 @@ from ..utils import causality as causalutils
 from ..utils import decomposition
 from ..utils import filter as filterutils
 
-from ..core import PSD
-from ..core import SsaRes
-from ..core import MultipleSeries
-from ..core import Scalogram
-from ..core import Coherence
-from ..core import Corr
-from ..core import SurrogateSeries
+from ..core.PSD import PSD
+from ..core.SsaRes import SsaRes
+from ..core.MultipleSeries import MultipleSeries
+from ..core.Scalogram import Scalogram
+from ..core.Coherence import Coherence
+from ..core.Corr import Corr
+from ..core.SurrogateSeries import SurrogateSeries
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -34,24 +33,8 @@ from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
 
-#from matplotlib.ticker import ScalarFormatter, FormatStrFormatter, MaxNLocator
-#import matplotlib.transforms as transforms
-#from matplotlib import cm
 from matplotlib import gridspec
-#import matplotlib as mpl
-
-#import cartopy.crs as ccrs
-#import cartopy.feature as cfeature
-
-#from tqdm import tqdm
-#from scipy.stats.mstats import mquantiles
-#from scipy import stats
-#from statsmodels.multivariate.pca import PCA
 import warnings
-#import os
-
-#import lipd as lpd
-
 import collections
 
 def dict2namedtuple(d):

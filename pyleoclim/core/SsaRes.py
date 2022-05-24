@@ -3,7 +3,7 @@ import seaborn as sns
 from matplotlib import pyplot as plt, gridspec
 from matplotlib.ticker import MaxNLocator
 
-from ..core import Series
+from ..core.Series import Series
 from ..utils import plotting
 
 

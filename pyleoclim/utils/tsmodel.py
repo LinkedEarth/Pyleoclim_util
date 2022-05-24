@@ -419,8 +419,8 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
     Returns
     -------
 
-    ts : pyleoclim.Series
-        Generated Series object
+    t, v : NumPy arrays
+        time axis and values
 
     See also
     --------
@@ -550,9 +550,9 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
     tsm_args[model].update(kwargs)
 
     v = tsm[model](t=t, **tsm_args[model])
-    ts = Series(time=t, value=v)
+    #ts = Series(time=t, value=v)
 
-    return ts
+    return t, v
 
 # def fBMsim(N=128, H=0.25):
 #     '''Simple method to generate fractional Brownian Motion

@@ -6,49 +6,22 @@ Compared to a MultipleSeries object, an EnsembleSeries object has the following 
 """
 
 from ..utils import plotting
-#from ..utils import wavelet as waveutils
-#from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
-#from ..utils import causality as causalutils
-#from ..utils import decomposition
-#from ..utils import filter as filterutils
-
-#from textwrap import dedent
-
-from ..core import Series
-from ..core import CorrEns
-from ..core import MultipleSeries
-#from ..core import MultipleScalogram
-#from ..core import MultiplePSD
-#from ..core import SpatialDecomp
-
+from ..core.Series import Series
+from ..core.CorrEns import CorrEns
+from ..core.MultipleSeries import MultipleSeries
 
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-#from tabulate import tabulate
-#from collections import namedtuple
 from copy import deepcopy
 
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.transforms as transforms
-#from matplotlib import cm
-#from matplotlib import gridspec
 import matplotlib as mpl
-#from matplotlib.colors import BoundaryNorm, Normalize
-
-#import cartopy.crs as ccrs
-#import cartopy.feature as cfeature
-
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
-#from scipy import stats
-#from statsmodels.multivariate.pca import PCA
-#import warnings
-#import os
-#import lipd as lpd
-#import collections
 
 class EnsembleSeries(MultipleSeries):
     ''' EnsembleSeries object

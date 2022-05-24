@@ -9,7 +9,6 @@ Core concerns objects. The pyleoclim defaults (if different from original base
 function should be set in these files)
 """
 
-#from .ui import *
 from .Series import *
 from .PSD import *
 from .MultipleSeries import *
@@ -21,22 +20,7 @@ from .MultiplePSD import *
 from .MultipleScalogram import *
 from .Corr import *
 from .CorrEns import *
-from .SpatialDecomposition import *
+from .SpatialDecomp import *
 from .SsaRes import *
 from .Lipd import *
 from .LipdSeries import *
-
-#__all__=[
-#    'gen_ts',
-#    #'Series',
-#    'PSD',
-#    'Scalogram',
-#    'Coherence',
-#    'MultiplePSD',
-#    'Lipd',
-    #'LipdSeries',
-    #'MultipleSeries',
-    #'SurrogateSeries',
-    #'EnsembleSeries',
-    #'MultipleScalogram',
-#]
