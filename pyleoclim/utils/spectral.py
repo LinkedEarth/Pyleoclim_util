@@ -868,10 +868,10 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
 def beta_estimation(psd, freq, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
     ''' Estimate the scaling exponent of a power spectral density.
     
-    Models the spectrum as S(f)  = 1/f^{\beta}. For instance:
-    - \beta = 0 corresponds to white noise
-    - \beta = 1 corresponds to pink noise
-    - \beta = 2 corresponds to red noise (Brownian motion)
+    Models the spectrum as :math: `S(f) \propto 1/f^{\beta}`. For instance:
+    - :math: `\beta = 0` corresponds to white noise
+    - :math: `\beta = 1` corresponds to pink noise
+    - :math: `\beta = 2` corresponds to red noise (Brownian motion)
 
     
     Parameters
@@ -993,15 +993,15 @@ def beta_estimation(psd, freq, fmin=None, fmax=None, logf_binning_step='max', ve
 
     return res
 
-def beta2HurstIndex(beta):
+def beta2Hurst(beta):
     ''' Translates spectral slope to Hurst exponent
 
     Parameters
     ----------
 
     beta : float
-        the estimated slope of a power spectral density
-
+        the estimated slope of a power spectral density :math: `S(f) \propto 1/f^{\beta}`
+        
     Returns
     -------
 
