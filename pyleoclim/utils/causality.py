@@ -55,7 +55,8 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
         
     Notes
     ------
-    The Null hypothesis for grangercausalitytests is that the time series in the second column, x2, does NOT Granger cause the time series in the first column, x1. Grange causality means that past values of x2 have a statistically significant effect on the current value of x1, taking past values of x1 into account as regressors. We reject the null hypothesis that x2 does not Granger cause x1 if the pvalues are below a desired size of the test.
+
+    The null hypothesis for grangercausalitytests is that the time series in the second column, x2, does NOT Granger cause the time series in the first column, x1. Grange causality means that past values of x2 have a statistically significant effect on the current value of x1, taking past values of x1 into account as regressors. We reject the null hypothesis that x2 does not Granger cause x1 if the pvalues are below a desired size of the test.
 
     The null hypothesis for all four test is that the coefficients corresponding to past values of the second time series are zero.
 
@@ -63,12 +64,16 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
 
     ‘ssr_chi2test’, ‘lrtest’ are based on chi-square distribution
     
-    See Also
+    See also
     --------
+
     pyleoclim.utils.causality.liang_causality : information flow estimated using the Liang algorithm
+    pyleoclim.utils.causality.signif_isopersist : significance test with AR(1) with same persistence
+    pyleoclim.utils.causality.signif_isospec : significance test with surrogates with randomized phases
     
     References
     ----------
+
     Granger, C. W. J. (1969). Investigating causal relations by econometric models and cross-spectral methods. Econometrica, 37(3), 424-438. 
     
     Granger, C. W. J. (1980). Testing for causality: A personal viewpoont. Journal of Economic Dynamics and Control, 2, 329-352. 
@@ -97,12 +102,12 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
     y1, y2 : array
         vectors of (real) numbers with identical length, no NaNs allowed
 
-    npt : int  >=1
+    npt : int >=1
         time advance in performing Euler forward differencing,
         e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
         npt=1 should be used
     
-    signif_test : {'isopersist', 'isospec'}
+    signif_test : str; {'isopersist', 'isospec'}
         the method for significance test
         see signif_isospec and signif_isopersist for details. 
         
@@ -114,6 +119,7 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
 
     Returns
     -------
+
     res : dict
         A dictionary of results including:
             T21 : float
@@ -122,13 +128,20 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
                 the standardized information flow from y2 to y1
             Z : float
                 the total information flow from y2 to y1
-            T21_noise_qs : list
+            dH1_star : float
+                dH*/dt (Liang, 2016)
+            dH1_noise : float
+            signif_qs : 
+                the quantiles for significance test
+            T21_noise : list
                 the quantiles of the information flow from noise2 to noise1 for significance testing
-            tau21_noise_qs : list
+            tau21_noise : list
                 the quantiles of the standardized information flow from noise2 to noise1 for significance testing
     
-    See Also
+    See also
     --------
+
+    pyleoclim.utils.causality.liang : information flow estimated using the Liang algorithm
     pyleoclim.utils.causality.granger_causality : information flow estimated using the Granger algorithm
     pyleoclim.utils.causality.signif_isopersist : significance test with AR(1) with same persistence
     pyleoclim.utils.causality.causality.signif_isospec : significance test with surrogates with randomized phases
@@ -149,6 +162,7 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
         Physical review, E 94, 052201
 
     '''
+
     dt=1
     nm = np.size(y1)
 
@@ -253,6 +267,7 @@ def liang(y1, y2, npt=1):
 
     Returns
     -------
+
     res : dict
         A dictionary of results including:
             T21 : float
@@ -261,10 +276,15 @@ def liang(y1, y2, npt=1):
                 the standardized information flow from y2 to y1
             Z : float
                 the total information flow from y2 to y1
+            dH1_star : float
+                dH*/dt (Liang, 2016)
+            dH1_noise : float
             
-    See Also
+    See also
     --------
-    pyleoclim.utils.causality.liang_causality : information flow estimated using the Granger algorithm
+
+    pyleoclim.utils.causality.liang_causality : information flow estimated using the Liang algorithm
+    pyleoclim.utils.causality.granger_causality : information flow estimated using the Granger algorithm    
     pyleoclim.utils.causality.signif_isopersist : significance test with AR(1) with same persistence
     pyleoclim.utils.causality.signif_isospec : significance test with surrogates with randomized phases
     
@@ -364,17 +384,13 @@ def signif_isopersist(y1, y2, method,
                       **kwargs):
     ''' significance test with AR(1) with same persistence
 
-    parameters
+    Parameters
     ----------
 
     y1, y2 : array
         vectors of (real) numbers with identical length, no NaNs allowed
-    method : {'liang'}
+    method : str; {'liang'}
         estimates for the Liang method
-    npt : int>=1
-        time advance in performing Euler forward differencing,
-        e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
-        npt=1 should be used.
     nsim : int
         the number of AR(1) surrogates for significance test
     qs : list
@@ -390,6 +406,13 @@ def signif_isopersist(y1, y2, method,
           tau21_noise_qs : list
             the quantiles of the standardized information flow from noise2 to noise1 for significance testing
 
+    See also
+    --------
+
+    pyleoclim.utils.causality.liang_causality : information flow estimated using the Liang algorithm
+    pyleoclim.utils.causality.granger_causality : information flow estimated using the Granger algorithm    
+    pyleoclim.utils.causality.signif_isospec : significance test with surrogates with randomized phases
+    
     '''
     g1 = ar1_fit_evenly(y1)
     g2 = ar1_fit_evenly(y2)
@@ -432,16 +455,12 @@ def signif_isospec(y1, y2, method,
 
     y1, y2 : array
             vectors of (real) numbers with identical length, no NaNs allowed
-    method : {'liang'}
+    method : str; {'liang'}
             estimates for the Liang method
-    npt : int>=1
-         time advance in performing Euler forward differencing,
-         e.g., 1, 2. Unless the series are generated with a highly chaotic deterministic system,
-         npt=1 should be used.
     nsim : int
-          the number of surrogates for significance test
+            the number of surrogates for significance test
     qs : list
-        the quantiles for significance test
+            the quantiles for significance test
 
     Returns
     -------
@@ -452,6 +471,14 @@ def signif_isospec(y1, y2, method,
                         the quantiles of the information flow from noise2 to noise1 for significance testing
           tau21_noise_qs : list
                           the quantiles of the standardized information flow from noise2 to noise1 for significance testing
+    
+    See also
+    --------
+
+    pyleoclim.utils.causality.liang_causality : information flow estimated using the Liang algorithm
+    pyleoclim.utils.causality.granger_causality : information flow estimated using the Granger algorithm    
+    pyleoclim.utils.causality.signif_isopersist : significance test with AR(1) with same persistence
+    
     '''
     
     noise1 = phaseran(y1, nsim)
