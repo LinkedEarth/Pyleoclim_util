@@ -7,7 +7,8 @@ import numpy as np
 from tabulate import tabulate
 from copy import deepcopy
 
-from matplotlib.ticker import ScalarFormatter, FormatStrFormatter #, MaxNLocator
+from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
+
 from ..core.MultiplePSD import MultiplePSD
 
 def infer_period_unit_from_time_unit(time_unit):
