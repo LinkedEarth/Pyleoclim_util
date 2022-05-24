@@ -1,6 +1,29 @@
-from ..core import pval_format
 from tabulate import tabulate
 
+
+def pval_format(p, threshold=0.01, style='exp'):
+    ''' Print p-value with proper format when p is close to 0
+    '''
+    if p < threshold:
+        if p == 0:
+            if style == 'float':
+                s = '< 0.000001'
+            elif style == 'exp':
+                s = '< 1e-6'
+            else:
+                raise ValueError('Wrong style.')
+        else:
+            n = int(np.ceil(np.log10(p)))
+            if style == 'float':
+                s = f'< {10**n}'
+            elif style == 'exp':
+                s = f'< 1e{n}'
+            else:
+                raise ValueError('Wrong style.')
+    else:
+        s = f'{p:.2f}'
+
+    return s
 
 class Corr:
     ''' The object for correlation result in order to format the print message

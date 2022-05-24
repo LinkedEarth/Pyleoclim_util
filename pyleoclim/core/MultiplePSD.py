@@ -157,7 +157,7 @@ class MultiplePSD:
 
     def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, legend=True,
-             colors=None, cmap=None, norm=None, plot_kwargs=None, lgd_kwargs=None, mute=False):
+             colors=None, cmap=None, norm=None, plot_kwargs=None, lgd_kwargs=None):
         '''Plot multiple PSD on the same plot
 
         Parameters
@@ -205,11 +205,6 @@ class MultiplePSD:
             Parameters for plot function. The default is None.
         lgd_kwargs : dictionary, optional
             Parameters for legend. The default is None.
-        mute : bool, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            The default is False.
-            (going to be deprecated)
 
         Returns
         -------
@@ -282,9 +277,6 @@ class MultiplePSD:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            # else:
-            #     if not mute:
-            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
@@ -293,7 +285,7 @@ class MultiplePSD:
              in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
              curve_clr=sns.xkcd_rgb['pale red'], curve_lw=3, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.3, shade_label=None,
-             lgd_kwargs=None, mute=False, members_plot_num=10, members_alpha=0.3, members_lw=1, seed=None):
+             lgd_kwargs=None, members_plot_num=10, members_alpha=0.3, members_lw=1, seed=None):
 
         '''Plot mutiple PSD as an envelope.
 
@@ -342,10 +334,6 @@ class MultiplePSD:
             Label for the envelope. The default is None.
         lgd_kwargs : dict, optional
             Parameters for the legend. The default is None.
-        mute : bool, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax. The default is False.
-            (going to be deprecated)
         members_plot_num : int, optional
             Number of individual members to plot. The default is 10.
         members_alpha : float, optional
@@ -412,9 +400,6 @@ class MultiplePSD:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            # else:
-            #     if not mute:
-            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax

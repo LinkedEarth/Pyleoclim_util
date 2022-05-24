@@ -47,7 +47,7 @@ class SpatialDecomp:
         self.neff = neff
 
     def screeplot(self, figsize=[6, 4], uq='N82', title='scree plot', ax=None, savefig_settings=None,
-                  title_kwargs=None, xlim=[0, 10], clr_eig='C0', mute=False):
+                  title_kwargs=None, xlim=[0, 10], clr_eig='C0'):
         ''' Plot the eigenvalue spectrum with uncertainties
 
         Parameters
@@ -70,11 +70,6 @@ class SpatialDecomp:
         ax : matplotlib.axis, optional
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
-
-        mute : {True,False}
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            (going to be deprecated)s
 
         xlim : list, optional
             x-axis limits. The default is [0, 10] (first 10 eigenvalues)
@@ -151,13 +146,11 @@ class SpatialDecomp:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        # else:
-        #     if not mute:
-        #         plotting.showfig(fig)
+
         return fig, ax
 
     def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None,
-                 title_kwargs=None, mute=False, spec_method='mtm'):
+                 title_kwargs=None, spec_method='mtm'):
         ''' Dashboard visualizing the properties of a given mode, including:
             1. The temporal coefficient (PC or similar)
             2. its spectrum
@@ -184,11 +177,6 @@ class SpatialDecomp:
         gs : matplotlib.gridspec object, optional
             the axis object from matplotlib
             See [matplotlib.gridspec.GridSpec](https://matplotlib.org/stable/tutorials/intermediate/gridspec.html) for details.
-
-        mute : {True,False}
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            (going to be deprecated)
 
         spec_method: str, optional
             The name of the spectral method to be applied on the PC. Default: MTM
@@ -233,7 +221,5 @@ class SpatialDecomp:
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
-        # else:
-        #     if not mute:
-        #         plotting.showfig(fig)
+
         return fig, gs

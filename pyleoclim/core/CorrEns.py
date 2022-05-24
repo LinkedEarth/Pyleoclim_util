@@ -4,10 +4,31 @@ from matplotlib import pyplot as plt, transforms as transforms
 from matplotlib.ticker import MaxNLocator
 from tabulate import tabulate
 
-from ..core import pval_format
-from ..core import Series
 from ..utils import plotting
 
+def pval_format(p, threshold=0.01, style='exp'):
+    ''' Print p-value with proper format when p is close to 0
+    '''
+    if p < threshold:
+        if p == 0:
+            if style == 'float':
+                s = '< 0.000001'
+            elif style == 'exp':
+                s = '< 1e-6'
+            else:
+                raise ValueError('Wrong style.')
+        else:
+            n = int(np.ceil(np.log10(p)))
+            if style == 'float':
+                s = f'< {10**n}'
+            elif style == 'exp':
+                s = f'< 1e{n}'
+            else:
+                raise ValueError('Wrong style.')
+    else:
+        s = f'{p:.2f}'
+
+    return s
 
 class CorrEns:
     ''' Correlation Ensemble
@@ -79,7 +100,7 @@ class CorrEns:
              xlim=None,
              clr_insignif=sns.xkcd_rgb['grey'], clr_signif=sns.xkcd_rgb['teal'],
              clr_signif_fdr=sns.xkcd_rgb['pale orange'],
-             clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None, mute=False):
+             clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None):
         ''' Plot the correlation ensembles
 
         Parameters
@@ -105,11 +126,6 @@ class CorrEns:
         ax : matplotlib.axis, optional
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
-
-        mute : {True,False}
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax
-            (going to be deprecated)
 
         xlim : list, optional
             x-axis limits. The default is None.
@@ -169,16 +185,7 @@ class CorrEns:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            # else:
-            #     if not mute:
-            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
 
-        # if 'path' in savefig_settings:
-        #     plotting.savefig(fig, settings=savefig_settings)
-        # else:
-        #     if not mute:
-        #         plotting.showfig(fig)
-        # return fig, ax
