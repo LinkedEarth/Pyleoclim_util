@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 25 06:29:36 2020
-
-@author: deborahkhider
-Contains eigendecomposition methods:
-Principal Component Analysis, Singular Spectrum Analysis, Multi-channel SSA
+Eigendecomposition methods:
+Singular Spectrum Analysis (SSA). 
+soon: Monte-Carlo Principal Component Analysis, Multi-Channel SSA
 """
 
 __all__ = [
@@ -14,12 +12,12 @@ __all__ = [
 
 import numpy as np
 #from sklearn.decomposition import PCA
-from statsmodels.multivariate.pca import PCA
+#from statsmodels.multivariate.pca import PCA
 from .tsutils import standardize
 from .tsmodel import ar1_sim
 from scipy.linalg import eigh, toeplitz
-from nitime import algorithms as alg
-import copy
+#from nitime import algorithms as alg
+#import copy
 
 #------
 # Main functions

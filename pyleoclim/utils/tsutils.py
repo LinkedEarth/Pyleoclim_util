@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue Feb 25 06:43:14 2020
-
-@author: deborahkhider, fzhu, jeg
-
-Utilities to manipulate timeseries
+Utilities to manipulate timeseries - useful for preprocessing prior to analysis
 """
 
 __all__ = [

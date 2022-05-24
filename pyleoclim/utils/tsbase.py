@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Sep  8 09:52:10 2021
-
-@author: deborahkhider
-
-Basic functionalities to clean timeseries data. 
+Basic functionalities to clean timeseries data prior to analysis
 """
 
 import numpy as np
