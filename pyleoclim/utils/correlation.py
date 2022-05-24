@@ -77,7 +77,7 @@ def corr_sig(y1, y2, nsim=1000, method='isospectral', alpha=0.05):
     pyleoclim.utils.correlation.corr_ttest : Estimates the significance of correlations between 2 time series using the classical T-test adjusted for effective sample size
     pyleoclim.utils.correlation.corr_isopersist : Computes correlation between two timeseries, and their significance using Ar(1) modeling
     pyleoclim.utils.correlation.corr_isospec : Estimates the significance of the correlation using phase randomization
-    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
      
     """
     y1 = np.array(y1, dtype=float)
@@ -214,7 +214,7 @@ def corr_ttest(y1, y2, alpha=0.05):
     pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     pyleoclim.utils.correlation.corr_isopersist : Estimate Pearson's correlation and associated significance using AR(1)
     pyleoclim.utils.correlation.corr_isospec : Estimate Pearson's correlation and associated significance using phase randomization
-    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 
     """
     r = pearsonr(y1, y2)[0]
@@ -289,7 +289,7 @@ def corr_isopersist(y1, y2, alpha=0.05, nsim=1000):
     pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     pyleoclim.utils.correlation.corr_ttest: Estimates Pearson's correlation and associated significance using a t-test
     pyleoclim.utils.correlation.corr_isospec : Estimates Pearson's correlation and associated significance using 
-    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 
     '''
 
@@ -344,7 +344,7 @@ def isopersistent_rn(X, p):
     --------
 
     pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 
     Notes
     -----
@@ -389,7 +389,7 @@ def sm_ar1_sim(n, p, g, sig):
     --------
 
     pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
-    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
 
     '''
     # specify model parameters (statsmodel wants lag0 coefficents as unity)
@@ -480,7 +480,7 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
     pyleoclim.utils.correlation.corr_sig : Estimates the Pearson's correlation and associated significance between two non IID time series
     pyleoclim.utils.correlation.corr_ttest : Estimates Pearson's correlation and associated significance using a t-test
     pyleoclim.utils.correlation.corr_isopersist : Estimates Pearson's correlation and associated significance using AR(1) simulations
-    pyleoclim.utils.correlation.fdf : Determine significance based on the false discovery rate
+    pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
     
     References
     ---------
