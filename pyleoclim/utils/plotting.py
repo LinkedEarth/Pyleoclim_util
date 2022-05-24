@@ -8,14 +8,13 @@ Contains all relevant plotting functions
 
 __all__ = ['set_style','closefig', 'savefig']
 
-# from tkinter import Variable
+
 import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
 
 
-
-def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
+def plot_scatter_xy(x1,y1,x2,y2, figsize=None, xlabel=None,
                     ylabel=None, title=None, xlim=None, ylim=None,
                     savefig_settings=None, ax=None, legend=True, 
                     plot_kwargs=None, lgd_kwargs=None):
@@ -53,10 +52,6 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
         the keyword arguments for ax.legend()
     plot_kwargs : dict
         the keyword arguments for ax.plot()
-    mute : bool
-        if True, the plot will not show;
-         recommend to turn on when more modifications are going to be made on ax
-         (going to be deprecated)
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified; it can be any existed or non-existed path,
@@ -68,12 +63,11 @@ def plot_scatter_xy(x1, y1,x2,y2, figsize=None, xlabel=None,
     
     ax : the pyplot.axis object
     
-    See Also
+    See also
     -------- 
     
     pyleoclim.utils.plotting.set_style : set different styles for the figures. Should be set before invoking the plotting functions
     pyleoclim.utils.plotting.savefig : save figures
-    pyleoclim.utils.plotting.showfig : equivalent to plt.show(). Platform-dependent
     
     '''
     # handle dict defaults
@@ -156,7 +150,6 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
         - "path" must be specified; it can be any existed or non-existed path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
-
     invert_xaxis : bool, optional
         if True, the x-axis of the plot will be inverted
         
@@ -169,9 +162,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     --------
     
     pyleoclim.utils.plotting.set_style : set different styles for the figures. Should be set before invoking the plotting functions
-    pyleoclim.utils.plotting.savefig : save figures
-    pyleoclim.utils.plotting.showfig : equivalent to plt.show(). Platform-dependent
-        
+    pyleoclim.utils.plotting.savefig : save figures        
     '''
     # handle dict defaults
     savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -243,6 +234,8 @@ def savefig(fig, path=None, settings={}, verbose=True):
           it can be any existed or non-existed path, with or without a suffix;
           if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
+    verbose : bool, {True,False}
+        If True, print the path of the saved file.
         
     '''
     if path is None and 'path' not in settings:
@@ -275,7 +268,7 @@ def set_style(style='journal', font_scale=1.0):
     ''' Modify the visualization style
     
     This function is inspired by [Seaborn](https://github.com/mwaskom/seaborn).
-    See a demo in the example_notebooks folder on GitHub to look at the different styles
+   
     
     Parameters
     ----------
