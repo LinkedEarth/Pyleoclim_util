@@ -290,7 +290,6 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
 
     Returns
     -------
-
     res : dict containing:
 
         - eigvals : (M, ) array of eigenvalues
@@ -305,7 +304,9 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
 
         - pctvar: (M, ) array of the fraction of variance (%) associated with each mode
 
-        - eigvals_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
+        - eigvals_q : (M, 2) array containting the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
+
+        - mode_idx : array of indices of eigenvalues >=eigvals_q
 
     References
     ----------
@@ -324,10 +325,8 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     [4]_ Schoellhamer, D. H. (2001), Singular spectrum analysis for time series with
     missing data, Geophysical Research Letters, 28(16), 3187–3190, doi:10.1029/2000GL012698.
 
-    See Also
+    See also
     --------
-
-    pyleoclim.utils.decomposition.mssa : Multi-channel SSA
 
     '''
 
