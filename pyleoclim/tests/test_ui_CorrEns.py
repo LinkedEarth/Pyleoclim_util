@@ -33,7 +33,7 @@ class TestUiCorrEns():
         nn = 20 # number of noise realizations
         nt = 200
         
-        signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
+        signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
         noise = np.random.randn(nt,nn)
 
         list1 = []

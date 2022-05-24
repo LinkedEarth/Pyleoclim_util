@@ -322,7 +322,7 @@ class EnsembleSeries(MultipleSeries):
                 nt = 500
                 series_list = []
 
-                signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
+                signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
                 noise = np.random.randn(nt,nn)
 
                 for idx in range(nn):  # noise
@@ -445,7 +445,7 @@ class EnsembleSeries(MultipleSeries):
             nt = 500
             series_list = []
 
-            signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
+            signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
             noise = np.random.randn(nt,nn)
 
             for idx in range(nn):  # noise

@@ -13,7 +13,6 @@ from ..utils import lipdutils
  #from ..utils import decomposition
  #from ..utils import filter as filterutils
 
- #from textwrap import dedent
 #from ..core import Series
 #from ..core import CorrEns
 from ..core import Scalogram

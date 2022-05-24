@@ -235,7 +235,7 @@ class TestMultipleSeriesPca:
 
         '''
         p = 10; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        signal = pyleo.utils.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
     
@@ -256,7 +256,7 @@ class TestMultipleSeriesPca:
 
         '''
         p = 10; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        signal = pyleo.utils.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
         
@@ -302,7 +302,7 @@ class TestMultipleSeriesPca:
 
         '''
         p = 10; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0)
+        signal = pyleo.utils.gen_ts(model='colored_noise',nt=n,alpha=1.0)
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
     
@@ -323,7 +323,7 @@ class TestMultipleSeriesIncrements:
     @pytest.mark.parametrize('step_style', ['min', 'max', 'mean', 'median'])
     def test_increments(self, step_style):
         p = 2; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        signal = pyleo.utils.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
     
@@ -382,7 +382,7 @@ class TestMultipleSeriesCommonTime:
         ndel = 200
         seriesList = []
         for j in range(4):
-            v = pyleo.gen_ts(model='colored_noise',alpha=1, t=time)
+            v = pyleo.utils.gen_ts(model='colored_noise',alpha=1, t=time)
             deleted_idx = np.random.choice(range(np.size(time)), ndel, replace=False)
             tu =  np.delete(time.copy(), deleted_idx)
             vu =  np.delete(v.value, deleted_idx)
