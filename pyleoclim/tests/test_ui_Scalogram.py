@@ -30,7 +30,7 @@ class TestUiScalogramSignifTest:
     def test_signif_test_t0(self, wave_method):
         ''' Test scalogram.signif_test() with default parameters
         '''
-        ts = pyleo.gen_ts(model='colored_noise',nt=500)
+        ts = pyleo.utils.gen_ts(model='colored_noise',nt=500)
         scal = ts.wavelet(method=wave_method)
         scal_signif = scal.signif_test(number=5, qs = [0.8, 0.9, .95])
         scal_signif.plot(mute=True,signif_thresh=0.99)
@@ -39,6 +39,6 @@ class TestUiScalogramSignifTest:
     def test_signif_test_t1(self,ar1_method):
         ''' Test scalogram.signif_test() with default parameters
         '''
-        ts = pyleo.gen_ts(model='colored_noise',nt=500)
+        ts = pyleo.utils.gen_ts(model='colored_noise',nt=500)
         scal = ts.wavelet(method='cwt')
         scal_signif = scal.signif_test(method=ar1_method,number=1)

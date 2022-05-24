@@ -239,7 +239,7 @@ class TestUiSeriesSpectral:
         '''Test the spectral significance testing with pre-generated scalogram objects
         '''
         
-        ts = pyleo.gen_ts(model='colored_noise')
+        ts = pyleo.utils.gen_ts(model='colored_noise')
         scal = ts.wavelet(method=spec_method)
         signif = scal.signif_test(number=2,export_scal = True)
         sig_psd = ts.spectral(method=spec_method,scalogram=scal)
@@ -746,16 +746,16 @@ class TestUISeriesWaveletCoherence():
         ''' Test Series.wavelet_coherence() with available methods using default arguments
         '''
         nt = 200
-        ts1 = pyleo.gen_ts(model='colored_noise', nt=nt)
-        ts2 = pyleo.gen_ts(model='colored_noise', nt=nt)
+        ts1 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
+        ts2 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
         _ = ts2.wavelet_coherence(ts1,method=xwave_method)
 
     def test_xwave_t1(self):
         ''' Test Series.wavelet_coherence() with WWZ with specified frequency vector passed via `settings`
         '''
         nt = 200
-        ts1 = pyleo.gen_ts(model='colored_noise', nt=nt)
-        ts2 = pyleo.gen_ts(model='colored_noise', nt=nt)
+        ts1 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
+        ts2 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
         freq = np.linspace(1/500, 1/2, 20)
         _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'freq':freq})
         
@@ -764,8 +764,8 @@ class TestUISeriesWaveletCoherence():
         ''' Test Series.wavelet_coherence() with CWT with mother wavelet specified  via `settings`
         '''
         nt = 500
-        ts1 = pyleo.gen_ts(model='colored_noise', nt=nt)
-        ts2 = pyleo.gen_ts(model='colored_noise', nt=nt)
+        ts1 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
+        ts2 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
         _ = ts1.wavelet_coherence(ts2,method='cwt',settings={'mother':mother})
 
     def test_xwave_t3(self):
@@ -794,7 +794,7 @@ class TestUISeriesWavelet():
     def test_wave_t0(self, wave_method):
         ''' Test Series.wavelet() with available methods using default arguments
         '''
-        ts = pyleo.gen_ts(model='colored_noise',nt=100)
+        ts = pyleo.utils.gen_ts(model='colored_noise',nt=100)
         _ = ts.wavelet(method=wave_method)
 
     @pytest.mark.parametrize('wave_method',['wwz','cwt'])
@@ -802,21 +802,21 @@ class TestUISeriesWavelet():
         '''Test Series.spectral() with WWZ/cwt with specified frequency vector passed via `settings`
         '''
         n = 100
-        ts = pyleo.gen_ts(model='colored_noise',nt=n)
+        ts = pyleo.utils.gen_ts(model='colored_noise',nt=n)
         freq = np.linspace(1/n, 1/2, 20)
         _ = ts.wavelet(method=wave_method, settings={'freq': freq})
         
     def test_wave_t2(self):
        ''' Test Series.wavelet() ntau option and plot functionality
        '''
-       ts = pyleo.gen_ts(model='colored_noise',nt=200)
+       ts = pyleo.utils.gen_ts(model='colored_noise',nt=200)
        _ = ts.wavelet(method='wwz',settings={'ntau':10})
  
     @pytest.mark.parametrize('mother',['MORLET', 'PAUL', 'DOG'])
     def test_wave_t3(self,mother):
        ''' Test Series.wavelet() with different mother wavelets
        '''
-       ts = pyleo.gen_ts(model='colored_noise',nt=200)
+       ts = pyleo.utils.gen_ts(model='colored_noise',nt=200)
        _ = ts.wavelet(method='cwt',settings={'mother':mother})
 
 class TestUISeriesSsa():
@@ -827,7 +827,7 @@ class TestUISeriesSsa():
         ''' Test Series.ssa() with available methods using default arguments
         '''
         t  = np.arange(500)
-        cn = pyleo.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
+        cn = pyleo.utils.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
 
         res = cn.ssa()
         assert abs(res.pctvar.sum() - 100.0)<0.01
@@ -836,14 +836,14 @@ class TestUISeriesSsa():
     def test_ssa_t1(self):
         '''Test Series.ssa() with var truncation
         '''
-        ts = pyleo.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
+        ts = pyleo.utils.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
         res = ts.ssa(trunc='var')
 
     def test_ssa_t2(self):
         '''Test Series.ssa() with Monte-Carlo truncation
         '''
 
-        ts = pyleo.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
+        ts = pyleo.utils.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
 
         res = ts.ssa(M=60, nMC=10, trunc='mcssa')
         res.screeplot(mute=True)
@@ -851,7 +851,7 @@ class TestUISeriesSsa():
     def test_ssa_t3(self):
         '''Test Series.ssa() with Kaiser truncation
         '''
-        ts = pyleo.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
+        ts = pyleo.utils.gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
         res = ts.ssa(trunc='kaiser')
         
     def test_ssa_t4(self):

@@ -443,21 +443,21 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         import pyleoclim as pyleo
 
         # default length nt=1000; default persistence parameter g=0.5
-        ts = pyleo.gen_ts(model='ar1')
+        ts = pyleo.utils.gen_ts(model='ar1')
         g = pyleo.utils.tsmodel.ar1_fit(ts.value)
         @savefig gen_ar1_t0.png
         fig, ax = ts.plot(label=f'g={g:.2f}')
         pyleo.closefig(fig)
 
         # use 'nt' to modify the data length
-        ts = pyleo.gen_ts(model='ar1', nt=100)
+        ts = pyleo.utils.gen_ts(model='ar1', nt=100)
         g = pyleo.utils.tsmodel.ar1_fit(ts.value)
         @savefig gen_ar1_t1.png
         fig, ax = ts.plot(label=f'g={g:.2f}')
         pyleo.closefig(fig)
 
         # use 'settings' to modify the persistence parameter 'g'
-        ts = pyleo.gen_ts(model='ar1', g=0.9)
+        ts = pyleo.utils.gen_ts(model='ar1', g=0.9)
         g = pyleo.utils.tsmodel.ar1_fit(ts.value)
         @savefig gen_ar1_t2.png
         fig, ax = ts.plot(label=f'g={g:.2f}')
@@ -470,7 +470,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         :okexcept:
 
         # default scaling slope 'alpha' is 1
-        ts = pyleo.gen_ts(model='colored_noise')
+        ts = pyleo.utils.gen_ts(model='colored_noise')
         psd = ts.spectral()
 
         # estimate the scaling slope
@@ -483,7 +483,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         pyleo.closefig(fig)
 
         # modify 'alpha' with 'settings'
-        ts = pyleo.gen_ts(model='colored_noise', alpha=2)
+        ts = pyleo.utils.gen_ts(model='colored_noise', alpha=2)
         psd = ts.spectral()
 
         # estimate the scaling slope
@@ -502,7 +502,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         :okexcept:
 
         # default scaling slopes 'alpha1' is 0.5 and 'alpha2' is 2, with break at 1/20
-        ts = pyleo.gen_ts(model='colored_noise_2regimes')
+        ts = pyleo.utils.gen_ts(model='colored_noise_2regimes')
         psd = ts.spectral()
 
         # estimate the scaling slope
@@ -517,7 +517,7 @@ def gen_ts(model, t=None, nt=1000, **kwargs):
         pyleo.closefig(fig)
 
         # modify the scaling slopes and scaling break with 'settings'
-        ts = pyleo.gen_ts(model='colored_noise_2regimes', alpha1=2, alpha2=1, f_break=1/10)
+        ts = pyleo.utils.gen_ts(model='colored_noise_2regimes', alpha1=2, alpha2=1, f_break=1/10)
         psd = ts.spectral()
 
         # estimate the scaling slope
