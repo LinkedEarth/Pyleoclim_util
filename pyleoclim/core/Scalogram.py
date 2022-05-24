@@ -170,7 +170,7 @@ class Scalogram:
         return f'Dimension: {np.size(self.frequency)} x {np.size(self.time)}'
 
     def plot(self, variable = 'amplitude', in_scale=True, xlabel=None, ylabel=None, title=None,
-             ylim=None, xlim=None, yticks=None, figsize=[10, 8], mute=False,
+             ylim=None, xlim=None, yticks=None, figsize=[10, 8],
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              contourf_style={}, cbar_style={}, savefig_settings={}, ax=None,
              signif_thresh = 0.95):
@@ -196,10 +196,6 @@ class Scalogram:
             yticks label. The default is None.
         figsize : list, optional
             Figure size The default is [10, 8].
-        mute : bool, optional
-            if True, the plot will not show;
-            recommend to turn on when more modifications are going to be made on ax The default is False.
-            (going to be deprecated)
         signif_clr : str, optional
             Color of the singificance line. The default is 'white'.
         signif_thresh: float in [0, 1]
@@ -322,9 +318,6 @@ class Scalogram:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            # else:
-            #     if not mute:
-            #         plotting.showfig(fig)
             return fig, ax
         else:
             return ax
