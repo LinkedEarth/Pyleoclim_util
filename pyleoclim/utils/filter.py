@@ -84,6 +84,13 @@ def savitzky_golay(ys, window_length=None, polyorder=2, deriv=0, delta=1,
     yf : array
         ndarray of shape (N), the smoothed signal (or it's n-th derivative).
 
+    See also
+    --------
+    
+    pyleoclim.utils.filter.butterworth : Applies a Butterworth filter with frequency fc, with padding
+    pyleoclim.utils.filter.lanczos : Applies a Lanczos filter with frequency fc, with padding
+    pyleoclim.utils.filter.firwin : Applies a Finite Impulse Response filter with frequency fc, with padding
+
     References
     ----------
 
@@ -141,13 +148,13 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
         Evenly-spaced timeseries
     ts : numpy array
         Time axis
-    method : string
-        The method to use to pad the series
+    method : str
+        the method to use to pad the series
         - ARIMA: uses a fitted ARIMA model
         - reflect (default): Reflects the time series around either end.
-    params : tuple ARIMA model order parameters (p,d,q), Default corresponds to an AR(1) model
-    reflect_type : string
-         {‘even’, ‘odd’}, optional
+    params : tuple 
+        the ARIMA model order parameters (p,d,q), Default corresponds to an AR(1) model
+    reflect_type : str; {‘even’, ‘odd’}, optional
          Used in ‘reflect’, and ‘symmetric’. The ‘even’ style is the default with an unaltered reflection around the edge value.
          For the ‘odd’ style, the extented part of the array is created by subtracting the reflected values from two times the edge value.
          For more details, see np.lib.pad()
@@ -161,6 +168,14 @@ def ts_pad(ys,ts,method = 'reflect', params=(1,0,0), reflect_type = 'odd',padFra
         padded timeseries
     tp : array
         augmented time axis
+
+    See also
+    --------
+    
+    pyleoclim.utils.filter.butterworth : Applies a Butterworth filter with frequency fc, with padding
+    pyleoclim.utils.filter.lanczos : Applies a Lanczos filter with frequency fc, with padding
+    pyleoclim.utils.filter.firwin : Applies a Finite Impulse Response filter with frequency fc, with padding
+    
     """
     padLength =  np.round(len(ts)*padFrac).astype(np.int64)
 
@@ -213,7 +228,7 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
         sampling frequency
     filter_order : int
         order n of Butterworth filter
-    pad : string
+    pad : str
         Indicates if padding is needed.
         - 'reflect': Reflects the timeseries
         - 'ARIMA': Uses an ARIMA model for the padding
@@ -233,6 +248,9 @@ def butterworth(ys,fc,fs=1,filter_order=3,pad='reflect',
     --------
     
     pyleoclim.utils.filter.ts_pad : Pad a timeseries based on timeseries model predictions
+    pyleoclim.utils.filter.firwin : Applies a Finite Impulse Response filter with frequency fc, with padding
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter
+    pyleoclim.utils.filter.lanczos : Applies a Lanczos filter with frequency fc, with padding
     
     '''
     nyq = 0.5 * fs
@@ -272,17 +290,16 @@ def lanczos(ys,fc,fs=1,pad='reflect',
     ys : numpy array
         Timeseries
     fc : float
-        cutoff frequency. 
+        cutoff frequency 
     fs : float
         sampling frequency
-    
-    pad : string
-        Indicates if padding is needed.
+    pad : str
+        Indicates if padding is needed
         - 'reflect': Reflects the timeseries
         - 'ARIMA': Uses an ARIMA model for the padding
-        - None: No padding.
+        - None: No padding
     params : tuple
-        model parameters for ARIMA model (if pad = 'ARIMA'). May require fiddling.
+        model parameters for ARIMA model (if pad = 'ARIMA'). May require fiddling
     padFrac : float
         fraction of the series to be padded
 
@@ -291,16 +308,19 @@ def lanczos(ys,fc,fs=1,pad='reflect',
 
     yf : array
         filtered array
-        
-    References
-    ----------
-    Filter design from http://scitools.org.uk/iris/docs/v1.2/examples/graphics/SOI_filtering.html
     
     See also
     --------
     
     pyleoclim.utils.filter.ts_pad : Pad a timeseries based on timeseries model predictions
-    
+    pyleoclim.utils.filter.butterworth : Applies a Butterworth filter with frequency fc, with padding
+    pyleoclim.utils.filter.firwin : Applies a Finite Impulse Response filter with frequency fc, with padding
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter
+        
+    References
+    ----------
+    Filter design from http://scitools.org.uk/iris/docs/v1.2/examples/graphics/SOI_filtering.html
+
     '''
     ts = np.arange(len(ys)) # define "time" axis
 
@@ -352,7 +372,7 @@ def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_
         sampling frequency
     window : str or tuple of string and parameter values, optional
         Desired window to use. See scipy.signal.get_window for a list of windows and required parameters.
-    pad : string
+    pad : str
         Indicates if padding is needed.
         - 'reflect': Reflects the timeseries
         - 'ARIMA': Uses an ARIMA model for the padding
@@ -374,6 +394,10 @@ def firwin(ys, fc, numtaps=None, fs=1, pad='reflect', window='hamming', reflect_
     --------
     
     scipy.signal.firwin : FIR filter design using the window method
+    pyleoclim.utils.filter.ts_pad : Pad a timeseries based on timeseries model predictions
+    pyleoclim.utils.filter.butterworth : Applies a Butterworth filter with frequency fc, with padding
+    pyleoclim.utils.filter.lanczos : Applies a Lanczos filter with frequency fc, with padding
+    pyleoclim.utils.filter.savitzky_golay : Smooth (and optionally differentiate) data with a Savitzky-Golay filter
     
     '''
     # taps = signal.firwin(numtaps, fc, window=window, fs=fs, **kwargs)
