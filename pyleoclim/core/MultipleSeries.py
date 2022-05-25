@@ -136,8 +136,8 @@ class MultipleSeries:
         Parameters
         ----------
 
-        method : str, {'savitzky-golay', 'butterworth', 'firwin'}
-            the filtering method
+        method : str, {'savitzky-golay', 'butterworth', 'firwin', 'lanczos'}
+            The filtering method
             - 'butterworth': the Butterworth method (default)
             - 'savitzky-golay': the Savitzky-Golay method
             - 'firwin': FIR filter design using the window method, with default window as Hamming
@@ -155,27 +155,50 @@ class MultipleSeries:
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
 
         kwargs : dict
-            a dictionary of the keyword arguments for the filtering method,
-            see `pyleoclim.utils.filter.savitzky_golay`, `pyleoclim.utils.filter.butterworth`, and `pyleoclim.utils.filter.firwin` for the details
+            A dictionary of the keyword arguments for the filtering method,
+            See pyleoclim.utils.filter.savitzky_golay, pyleoclim.utils.filter.butterworth, pyleoclim.utils.filter.firwin, and pyleoclim.utils.filter.lanczos for the details
 
         Returns
         -------
 
-        ms : pyleoclim.MultipleSeries
+        ms : pyleoclim.core.MultipleSeries.MultipleSeries
 
         See also
         --------
 
         pyleoclim.utils.filter.butterworth : Butterworth method
+
         pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
+
         pyleoclim.utils.filter.firwin : FIR filter design using the window method
+
         pyleoclim.utils.filter.lanczos : lowpass filter via Lanczos resampling
 
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
+            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
+            ms = pyleo.MultipleSeries([ts1, ts2], name = 'SOI x2')
+            ms_filter = ms.filter(method='lanczos',cutoff_scale=20)
         '''
 
         ms = self.copy()
 
         new_tslist = []
+
         for ts in self.series_list:
             new_tslist.append(ts.filter(cutoff_freq=cutoff_freq, cutoff_scale=cutoff_scale, method=method, **kwargs))
 
@@ -183,16 +206,45 @@ class MultipleSeries:
 
         return ms
 
-
-
     def append(self,ts):
         '''Append timeseries ts to MultipleSeries object
 
+        Parameters
+        ----------
+
+        ts : pyleoclim.Series
+            The pyleoclim Series object to be appended to the MultipleSeries object
+
         Returns
         -------
+
         ms : pyleoclim.MultipleSeries
             The augmented object, comprising the old one plus `ts`
 
+        See also
+        --------
+
+        pyleoclim.core.Series.Series
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
+            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
+            ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
+            ms.append(ts2)
         '''
         ms = self.copy()
         ts_list = deepcopy(ms.series_list)
@@ -202,6 +254,32 @@ class MultipleSeries:
 
     def copy(self):
         '''Copy the object
+
+        Returns
+        -------
+
+        ms : pyleoclim.MultipleSeries
+            The copied version of the pyleoclim.MultipleSeries object
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
+            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
+            ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
+            ms_copy = ms.copy()
         '''
         return deepcopy(self)
 
@@ -210,9 +288,29 @@ class MultipleSeries:
 
         Returns
         -------
-        ms : pyleoclim.MultipleSeries
-            The standardized Series
 
+        ms : pyleoclim.MultipleSeries
+            The standardized pyleoclim.MultipleSeries object
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
+            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
+            ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
+            ms_std = ms.standardize()
         '''
         ms=self.copy()
         for idx,item in enumerate(ms.series_list):
@@ -224,8 +322,7 @@ class MultipleSeries:
 
     def increments(self, step_style='median'):
         '''
-        Extract grid properties (start, stop, step) of all the Series objects in
-        a collection.
+        Extract grid properties (start, stop, step) of all the Series objects in a collection.
 
         Parameters
         ----------
@@ -245,6 +342,8 @@ class MultipleSeries:
             index 0 is the earliest time
             index 1 is the latest time
             index 2 is the step chosen according to step_style
+
+        
 
         '''
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
@@ -301,8 +400,11 @@ class MultipleSeries:
         --------
 
         pyleoclim.utils.tsutils.bin : put timeseries values into bins of equal size (possibly leaving NaNs in).
+
         pyleoclim.utils.tsutils.gkernel : coarse-graining using a Gaussian kernel
+
         pyleoclim.utils.tsutils.interp : interpolation onto a regular grid (default = linear interpolation)
+
         pyleoclim.utils.tsutils.increments : infer grid properties
 
         Examples
@@ -321,7 +423,6 @@ class MultipleSeries:
             ns = 2 ; nt = 200; n_del = 20
             serieslist = []
 
-
             for j in range(ns):
                 t = np.arange(nt)
                 v = colored_noise(alpha=1, t=t)
@@ -334,11 +435,13 @@ class MultipleSeries:
             # create MS object from the list
             ms = pyleo.MultipleSeries(serieslist)
 
+            @savefig ms_ct.png
             fig, ax = plt.subplots(2,2,sharex=True,sharey=True)
+            fig.tight_layout()
             ax = ax.flatten()
             # apply common_time with default parameters
             msc = ms.common_time()
-            msc.plot(title='linear interpolation',ax=ax[0])
+            msc.plot(title='linear interpolation',ax=ax[0], legend=False)
 
             # apply common_time with binning
             msc = ms.common_time(method='bin')
@@ -352,12 +455,10 @@ class MultipleSeries:
             msc = ms.common_time(method='gkernel', h=11)
             msc.plot(title=r'Gaussian kernel ($h=11$)',ax=ax[3],legend=False)
 
-            # display, save and close figure
-            fig.tight_layout()
-            @savefig ms_ct.png
-            
-
+            # Optional close fig after plotting
+            pyleo.closefig(fig)
         '''
+        
         # specify stepping style
         if step_style == None: # if step style isn't specified, pick a robust choice according to method
             if method == 'bin' or method == 'gkernel':
@@ -423,7 +524,8 @@ class MultipleSeries:
 
         return ms
 
-    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
+    def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, 
+                    fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
 
         If the target Series is not specified, then the 1st member of MultipleSeries will be the target
@@ -439,9 +541,6 @@ class MultipleSeries:
         alpha : float
             The significance level (0.05 by default)
 
-        fdr_kwargs : dict
-            Parameters for the FDR function
-
         settings : dict
             Parameters for the correlation function, including:
 
@@ -450,27 +549,32 @@ class MultipleSeries:
             method : str, {'ttest','isopersistent','isospectral' (default)}
                 method for significance testing
 
+        fdr_kwargs : dict
+            Parameters for the FDR function
+
         common_time_kwargs : dict
             Parameters for the method MultipleSeries.common_time()
 
-        seed : float or int
-            random seed for isopersistent and isospectral methods
-
         mute_pbar : bool
             If True, the progressbar will be muted. Default is False.
+        
+        seed : float or int
+            random seed for isopersistent and isospectral methods
 
         Returns
         -------
 
-        corr : pyleoclim.ui.CorrEns
-            the result object, see `pyleoclim.ui.CorrEns`
+        corr : pyleoclim.CorrEns.CorrEns
+            the result object, see `pyleoclim.CorrEns.CorrEns`
 
         See also
         --------
 
         pyleoclim.utils.correlation.corr_sig : Correlation function
+
         pyleoclim.utils.correlation.fdr : FDR function
-        pyleoclim.ui.CorrEns : the correlation ensemble object
+        
+        pyleoclim.CorrEns.CorrEns : the correlation ensemble object
 
         Examples
         --------
@@ -551,12 +655,17 @@ class MultipleSeries:
 
         Parameters
         ----------
+
         None
 
         Returns
         -------
-        flag : boolean
-        lengths : list containing the lengths of the series in object
+
+        flag : bool
+            Whether or not the Series in the pyleo.MultipleSeries object are of equal length
+
+        lengths : list 
+            List of the lengths of the series in object
         '''
 
         lengths = []
@@ -580,10 +689,8 @@ class MultipleSeries:
 
         Algorithm from statsmodels: https://www.statsmodels.org/stable/generated/statsmodels.multivariate.pca.PCA.html
 
-
         Parameters
         ----------
-
 
         weights : ndarray, optional
             Series weights to use after transforming data according to standardize
@@ -604,11 +711,11 @@ class MultipleSeries:
         max_em_iter : int
             Maximum iterations for the EM algorithm.
 
-        Attributes
-        ----------
-        res: pyleoclim.ui.SpatialDecomp
-            the result object, see `pyleoclim.ui.SpatialDecomp`
+        Returns
+        -------
 
+        res: pyleoclim.SpatialDecomp.SpatialDecomp
+            the result object, see `pyleoclim.SpatialDecomp.SpatialDecomp`
 
         Examples
         --------
@@ -626,8 +733,13 @@ class MultipleSeries:
 
             res = ms.pca() # carry out PCA
 
-            res.screeplot() # plot the eigenvalue spectrum
-            res.modeplot() # plot the first mode
+            @savefig ms_pca1.png
+            fig1, ax1 = res.screeplot() # plot the eigenvalue spectrum
+            pyleo.closefig(fig1)    # Optional close fig after plotting
+
+            @savefig ms_pca2.png
+            fig2, ax2 = res.modeplot() # plot the first mode
+            pyleo.closefig(fig2)    # Optional close fig after plotting
         '''
         flag, lengths = self.equal_lengths()
 
@@ -730,7 +842,6 @@ class MultipleSeries:
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
 
-
         The common time axis is characterized by the following parameters:
 
         start : the latest start date of the bunch (maximin of the minima)
@@ -747,17 +858,18 @@ class MultipleSeries:
 
         Returns
         -------
+
         ms : pyleoclim.MultipleSeries
             The MultipleSeries objects with all series aligned to the same time axis.
 
         See also
         --------
 
-        pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
+        pyleoclim.core.Series.MultipleSeries.common_time: Base function on which this operates
 
         pyleoclim.utils.tsutils.bin: Underlying binning function
 
-        pyleoclim.core.ui.Series.bin: Bin function for Series object
+        pyleoclim.core.Series.Series.bin: Bin function for Series object
 
         Examples
         --------
@@ -773,7 +885,6 @@ class MultipleSeries:
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
             ms = pyleo.MultipleSeries(tslist)
             msbin = ms.bin()
-
         '''
 
         ms = self.copy()
@@ -786,7 +897,6 @@ class MultipleSeries:
         ''' Aligns the time axes of a MultipleSeries object, via Gaussian kernel.
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
-
 
         The common time axis is characterized by the following parameters:
 
@@ -810,10 +920,9 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
+        pyleoclim.core.MultipleSeries.MultipleSeries.common_time: Base function on which this operates
 
         pyleoclim.utils.tsutils.gkernel: Underlying kernel module
-
 
         Examples
         --------
@@ -865,11 +974,11 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.core.ui.MultipleSeries.common_time: Base function on which this operates
+        pyleoclim.core.MultipleSeries.MultipleSeries.common_time: Base function on which this operates
 
         pyleoclim.utils.tsutils.interp: Underlying interpolation function
 
-        pyleoclim.core.ui.Series.interp: Interpolation function for Series object
+        pyleoclim.core.Series.Series.interp: Interpolation function for Series object
 
         Examples
         --------
@@ -916,9 +1025,9 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.core.ui.Series.detrend : Detrending for a single series
-        pyleoclim.utils.tsutils.detrend : Detrending function
+        pyleoclim.core.Series.Series.detrend : Detrending for a single series
 
+        pyleoclim.utils.tsutils.detrend : Detrending function
         '''
         ms=self.copy()
         for idx,item in enumerate(ms.series_list):
@@ -928,7 +1037,8 @@ class MultipleSeries:
             ms.series_list[idx]=s
         return ms
 
-    def spectral(self, method='lomb_scargle', settings=None, mute_pbar=False, freq_method='log', freq_kwargs=None, label=None, verbose=False, scalogram_list=None):
+    def spectral(self, method='lomb_scargle', settings=None, mute_pbar=False, freq_method='log', 
+                freq_kwargs=None, label=None, verbose=False, scalogram_list=None):
         ''' Perform spectral analysis on the timeseries
 
         Parameters
@@ -952,10 +1062,10 @@ class MultipleSeries:
         verbose : bool
             If True, will print warning messages if there is any
 
-        mute_pbar : {True, False}
+        mute_pbar : bool
             Mute the progress bar. Default is False.
 
-        scalogram_list : pyleoclim.MultipleScalogram object, optional
+        scalogram_list : pyleoclim.MultipleScalogram
             Multiple scalogram object containing pre-computed scalograms to use when calculating spectra, only works with wwz or cwt
 
         Returns
@@ -982,11 +1092,26 @@ class MultipleSeries:
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
-        pyleoclim.core.ui.Series.spectral : Spectral analysis for a single timeseries
+        pyleoclim.core.Series.Series.spectral : Spectral analysis for a single timeseries
 
-        pyleoclim.core.ui.PSD : PSD object
+        pyleoclim.core.PSD.PSD : PSD object
 
-        pyleoclim.core.ui.MultiplePSD : Multiple PSD object
+        pyleoclim.core.MultiplePSD.MultiplePSD : Multiple PSD object
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            tslist = data.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
+            ms_psd = ms.spectral()
         '''
         settings = {} if settings is None else settings.copy()
 
@@ -1001,7 +1126,7 @@ class MultipleSeries:
                 for idx, s in enumerate(tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar)):
                     psd_tmp = s.spectral(method=method, settings=settings, freq_method=freq_method, freq_kwargs=freq_kwargs, label=label, verbose=verbose,scalogram = scalogram_list.scalogram_list[idx])
                     psd_list.append(psd_tmp)
-            #If the scalogram list isn't as long as the series list, we re-use all the scalograms we can and then recalculate the rest
+            #If the scalogram list isn't as long as the series list, we re-use all the scalograms we can and then calculate the rest
             elif scalogram_list_len < series_len:
                 for idx, s in enumerate(tqdm(self.series_list, desc='Performing spectral analysis on individual series', position=0, leave=True, disable=mute_pbar)):
                     if idx < scalogram_list_len:
@@ -1051,7 +1176,9 @@ class MultipleSeries:
 
         Returns
         -------
+
         scals : pyleoclim.MultipleScalograms
+            A Multiple Scalogram object
 
         See also
         --------
@@ -1063,15 +1190,30 @@ class MultipleSeries:
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
-        pyleoclim.core.ui.Series.wavelet : wavelet analysis on single object
+        pyleoclim.core.Series.Series.wavelet : wavelet analysis on single object
 
-        pyleoclim.core.ui.MultipleScalogram : Multiple Scalogram object
+        pyleoclim.core.MultipleScalogram.MultipleScalogram : Multiple Scalogram object
 
         References
         ----------
 
         Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
         Python routines available at http://paos.colorado.edu/research/wavelets/
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            tslist = data.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
+            msinterp = ms.wavelet()
 
         '''
         settings = {} if settings is None else settings.copy()
@@ -1091,6 +1233,7 @@ class MultipleSeries:
              xlabel=None, ylabel=None, title=None,
              legend=True, plot_kwargs=None, lgd_kwargs=None,
              savefig_settings=None, ax=None, invert_xaxis=False):
+
         '''Plot multiple timeseries on the same axis
 
         Parameters
@@ -1101,6 +1244,10 @@ class MultipleSeries:
             marker type. The default is None.
         markersize : float, optional
             marker size. The default is None.
+        linestyle : str, optional
+            Line style. The default is None.
+        linewidth : float, optional
+            The width of the line. The default is None.
         colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
             Colors for plotting.
             If None, the plotting will cycle the 'tab10' colormap;
@@ -1111,10 +1258,6 @@ class MultipleSeries:
         norm : matplotlib.colors.Normalize like
             The normalization for the colormap.
             If None, a linear normalization will be used.
-        linestyle : str, optional
-            Line style. The default is None.
-        linewidth : float, optional
-            The width of the line. The default is None.
         xlabel : str, optional
             x-axis label. The default is None.
         ylabel : str, optional
@@ -1139,7 +1282,32 @@ class MultipleSeries:
 
         Returns
         -------
-        fig, ax
+
+        fig : matplotlib.figure
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
+
+        ax : matplotlib.axis
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            tslist = data.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
+
+            @savefig ms_basic_plot.png
+            fig, ax = ms.plot()
+            pyleo.closefig(fig) #Optional close fig after plotting
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -1208,6 +1376,15 @@ class MultipleSeries:
         ----------
         figsize : list
             Size of the figure.
+        savefig_settings : dictionary
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+        xlim : list
+            The x-axis limit.
+        fill_between_alpha : float
+            The transparency for the fill_between shades.
         colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
             Colors for plotting.
             If None, the plotting will cycle the 'tab10' colormap;
@@ -1223,21 +1400,10 @@ class MultipleSeries:
             If 'auto', uses the labels passed during the creation of pyleoclim.Series
             If list, pass a list of strings for each labels.
             Default is 'auto'
-        savefig_settings : dictionary
-            the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
-              with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
-        xlim : list
-            The x-axis limit.
-        fill_between_alpha : float
-            The transparency for the fill_between shades.
         spine_lw : float
             The linewidth for the spines of the axes.
         grid_lw : float
             The linewidth for the gridlines.
-        linewidth : float
-            The linewidth for the curves.
         font_scale : float
             The scale for the font sizes. Default is 0.8.
         label_x_loc : float
@@ -1245,6 +1411,8 @@ class MultipleSeries:
         v_shift_factor : float
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
+        linewidth : float
+            The linewidth for the curves.
         plot_kwargs: dict or list of dict
             Arguments to further customize the plot from matplotlib.pyplot.plot.
             Dictionary: Arguments will be applied to all lines in the stackplots
@@ -1252,7 +1420,14 @@ class MultipleSeries:
 
         Returns
         -------
-        fig, ax
+
+        fig : matplotlib.figure
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
+
+        ax : matplotlib.axis
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
 
         Examples
         --------
@@ -1283,9 +1458,10 @@ class MultipleSeries:
             sst = d.to_LipdSeries(number=5)
             d18Osw = d.to_LipdSeries(number=3)
             ms = pyleo.MultipleSeries([sst,d18Osw])
+
             @savefig mts_stackplot_customlabels.png
             fig, ax = ms.stackplot(labels=['sst','d18Osw'])
-            pyleo.closefig(fig)
+            pyleo.closefig(fig) #Optional figure close after plotting
 
         And let's remove them completely
 
@@ -1299,9 +1475,10 @@ class MultipleSeries:
             sst = d.to_LipdSeries(number=5)
             d18Osw = d.to_LipdSeries(number=3)
             ms = pyleo.MultipleSeries([sst,d18Osw])
+
             @savefig mts_stackplot_nolabels.png
             fig, ax = ms.stackplot(labels=None)
-            pyleo.closefig(fig)
+            pyleo.closefig(fig) #Optional figure close after plotting
 
         Now, let's add markers to the timeseries.
 
@@ -1315,9 +1492,10 @@ class MultipleSeries:
             sst = d.to_LipdSeries(number=5)
             d18Osw = d.to_LipdSeries(number=3)
             ms = pyleo.MultipleSeries([sst,d18Osw])
+
             @savefig mts_stackplot_samemarkers.png
             fig, ax = ms.stackplot(labels=None, plot_kwargs={'marker':'o'})
-            pyleo.closefig(fig)
+            pyleo.closefig(fig) #Optional figure close after plotting
 
         But I really want to use different markers
 
@@ -1331,9 +1509,10 @@ class MultipleSeries:
             sst = d.to_LipdSeries(number=5)
             d18Osw = d.to_LipdSeries(number=3)
             ms = pyleo.MultipleSeries([sst,d18Osw])
+
             @savefig mts_stackplot_differentmarkers.png
             fig, ax = ms.stackplot(labels=None, plot_kwargs=[{'marker':'o'},{'marker':'^'}])
-            pyleo.closefig(fig)
+            pyleo.closefig(fig) #Optional figure close after plotting
 
         '''
         current_style = deepcopy(mpl.rcParams)
