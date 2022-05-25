@@ -841,6 +841,9 @@ class Series:
             'lanczos': filterutils.lanczos,
         }
 
+        if method not in method_func.keys():
+            raise ValueError('Method value is not an appropriate method for filters')
+
         args = {}
 
         if method in ['butterworth', 'firwin', 'lanczos']:
@@ -864,7 +867,7 @@ class Series:
             args['lanczos'] = {'fc': cutoff_freq, 'fs': fs}
 
         else: # for Savitzky-Golay only
-            if cutoff_scale and cutoff_freq is None:
+            if cutoff_scale is None and cutoff_freq is None:
                 raise ValueError('No cutoff_scale or cutoff_freq argument provided')
             elif cutoff_freq is not None:
                 cutoff_scale = 1 / cutoff_freq
