@@ -33,7 +33,6 @@ from pyleoclim.utils.tsmodel import (
 
 def gen_ts(model, nt, alpha, t=None):
     'wrapper for gen_ts in pyleoclim'
-
     t, v = pyleo.utils.gen_ts(model=model, nt=nt, alpha=alpha, t=t)
     ts = pyleo.Series(t, v)
     return ts
