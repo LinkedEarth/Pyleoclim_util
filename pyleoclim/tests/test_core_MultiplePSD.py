@@ -13,34 +13,27 @@ Notes on how to test:
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 '''
 import numpy as np
-import pandas as pd
-
-from numpy.testing import assert_array_equal
-from pandas.testing import assert_frame_equal
 
 import pytest
 
 import pyleoclim as pyleo
-from pyleoclim.utils.tsmodel import (
-    ar1_sim,
-    colored_noise,
-)
 
 # a collection of useful functions
+
+def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
+    'wrapper for gen_ts in pyleoclim'
+    
+    t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
+    ts=pyleo.Series(t,v)
+    return ts
 
 def gen_normal(loc=0, scale=1, nt=100):
     ''' Generate random data with a Gaussian distribution
     '''
     t = np.arange(nt)
     v = np.random.normal(loc=loc, scale=scale, size=nt)
-    return t, v
-
-def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
-    ''' Generate colored noise
-    '''
-    t = np.arange(nt)
-    v = colored_noise(alpha=alpha, t=t, f0=f0, m=m, seed=seed)
-    return t, v
+    ts = pyleo.Series(t,v)
+    return ts
 
 
 # Tests below
@@ -52,11 +45,9 @@ class TestUiMultiplePsdBetaEst:
         ''' Test MultiplePSD.beta_est() of a list of colored noise
         '''
         alphas = np.arange(0.5, 1.5, 0.1)
-        t, v = {}, {}
         series_list = []
         for idx, alpha in enumerate(alphas):
-            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=alpha)
-            series_list.append(pyleo.Series(time=t[idx], value=v[idx]))
+            series_list.append(gen_ts(nt=1000, alpha=alpha))
 
         ts_surrs = pyleo.MultipleSeries(series_list=series_list)
         psds = ts_surrs.spectral(method='mtm')
@@ -72,15 +63,14 @@ class TestUiMultiplePsdPlot:
         ''' Test MultiplePSD.plot() of a list of colored noise
         '''
         alphas = np.arange(0.5, 1.5, 0.1)
-        t, v = {}, {}
         series_list = []
         for idx, alpha in enumerate(alphas):
-            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=alpha)
-            series_list.append(pyleo.Series(time=t[idx], value=v[idx]))
+            series_list.append(gen_ts(nt=1000, alpha=alpha))
 
         ts_surrs = pyleo.MultipleSeries(series_list=series_list)
         psds = ts_surrs.spectral(method='mtm')
-        fig, ax = psds.plot(mute=True)
+        fig, ax = psds.plot()
+        pyleo.closefig(fig)
 
 
 class TestUiMultiplePsdPlotEnvelope:
@@ -91,12 +81,11 @@ class TestUiMultiplePsdPlotEnvelope:
         ''' Test MultiplePSD.plot() of a list of colored noise
         '''
         alphas = np.arange(0.5, 1.5, 0.1)
-        t, v = {}, {}
         series_list = []
         for idx, alpha in enumerate(alphas):
-            t[idx], v[idx] = gen_colored_noise(nt=1000, alpha=alpha)
-            series_list.append(pyleo.Series(time=t[idx], value=v[idx]))
+            series_list.append(gen_ts(nt=1000, alpha=alpha))
 
         ts_surrs = pyleo.MultipleSeries(series_list=series_list)
         psds = ts_surrs.spectral(method='mtm')
-        fig, ax = psds.plot_envelope(mute=True)
+        fig, ax = psds.plot_envelope()
+        pyleo.closefig(fig)

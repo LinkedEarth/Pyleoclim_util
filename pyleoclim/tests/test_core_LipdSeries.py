@@ -53,7 +53,7 @@ class TestUiLipdSeriesMap():
     
     def test_map_t0(self):
         ts=get_ts()
-        fig,ax=ts.map(mute=True)
+        fig,ax=ts.map()
         pyleo.closefig(fig)
 
 class TestUiLipdSeriesgetMetadata():
@@ -70,7 +70,7 @@ class TestUiLipdSeriesDashboard():
     
     def test_dashboard_t0(self):
         ts=get_ts()
-        fig,ax = ts.dashboard(mute=True)
+        fig,ax = ts.dashboard()
         pyleo.closefig(fig)
 
 class TestUiLipdSeriesMapNearRecord():
@@ -83,19 +83,22 @@ class TestUiLipdSeriesMapNearRecord():
         D=importLiPD()
         d=pyleo.Lipd(lipd_dict=D)
         ts = d.to_LipdSeries(number=6)
-        res=ts.mapNearRecord(d,mute=True)
+        res=ts.mapNearRecord(d)
+        pyleo.closefig(res[0])
     
     def test_mapNearRecord_t1(self):
         D=importLiPD()
         d=pyleo.Lipd(lipd_dict=D)
         ts = d.to_LipdSeries(number=6)
-        res=ts.mapNearRecord(d,n=6,mute=True)
+        res=ts.mapNearRecord(d,n=6)
+        pyleo.closefig(res[0])
     
     def test_mapNearRecord_t2(self):
         D=importLiPD()
         d=pyleo.Lipd(lipd_dict=D)
         ts = d.to_LipdSeries(number=6)
-        res=ts.mapNearRecord(d,radius=1000,mute=True)
+        res=ts.mapNearRecord(d,radius=1000)
+        pyleo.closefig(res[0])
 
 class TestUiLipdSeriesChronEnsembleToPaleo():
     ''' Test the ability to get the chron ensemble tables
@@ -107,7 +110,7 @@ class TestUiLipdSeriesChronEnsembleToPaleo():
         ts = d.to_LipdSeries(number=2)
         ens = ts.chronEnsembleToPaleo(d)
         
-        assert type(ens)==pyleo.core.ui.EnsembleSeries
+        assert type(ens)==pyleo.core.EnsembleSeries
         
         
 class TestUiLipdSeriesPlotAgeDepth():

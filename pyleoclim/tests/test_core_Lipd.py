@@ -26,7 +26,6 @@ import pyleoclim as pyleo
 from urllib.request import urlopen
 import json
 
-from pyleoclim.tests.examples import load_dataset
 
 # For some of the testing importa JSON file with a dictionary of possible LiDPs
 
@@ -83,4 +82,6 @@ class TestUiLipdMapAllArchive():
     '''
     def test_mapAllArchive_t0(self):
         d=load_data()
-        res = d.mapAllArchive(mute=True)
+        res = d.mapAllArchive()
+        pyleo.closefig(res[0])
+        

@@ -13,18 +13,15 @@ Notes on how to test:
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 '''
 import numpy as np
-import pandas as pd
-
-from numpy.testing import assert_array_equal
-from pandas.testing import assert_frame_equal
-
 import pytest
-
 import pyleoclim as pyleo
-from pyleoclim.utils.tsmodel import (
-    ar1_sim,
-    colored_noise,
-)
+
+def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
+    'wrapper for gen_ts in pyleoclim'
+    
+    t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
+    ts=pyleo.Series(t,v)
+    return ts
 
 # a collection of useful functions
 
@@ -33,14 +30,8 @@ def gen_normal(loc=0, scale=1, nt=100):
     '''
     t = np.arange(nt)
     v = np.random.normal(loc=loc, scale=scale, size=nt)
-    return t, v
-
-def gen_colored_noise(alpha=1, nt=100, f0=None, m=None, seed=None):
-    ''' Generate colored noise
-    '''
-    t = np.arange(nt)
-    v = colored_noise(alpha=alpha, t=t, f0=f0, m=m, seed=seed)
-    return t, v
+    ts = pyleo.Series(t,v)
+    return ts
 
 
 # Tests below
@@ -51,11 +42,10 @@ class TestUiPsdPlot:
     def test_plot_t0(self):
         ''' Test PSD.plot() with default parameters
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=alpha)
-        ts = pyleo.Series(time=t, value=v)
+        ts = gen_ts(nt=500)
         psd = ts.spectral(method='mtm')
-        fig, ax = psd.plot(mute=True)
+        fig, ax = psd.plot()
+        pyleo.closefig(fig)
 
 class TestUiPsdSignifTest:
     ''' Tests for PSD.signif_test()
@@ -64,8 +54,8 @@ class TestUiPsdSignifTest:
     def test_signif_test_t0(self):
         ''' Test PSD.signif_test() with default parameters
         '''
-        alpha = 1
-        t, v = gen_colored_noise(nt=500, alpha=alpha)
-        ts = pyleo.Series(time=t, value=v)
+        ts = gen_ts(nt=500)
         psd = ts.spectral(method='mtm')
         psd_signif = psd.signif_test(number=10)
+        fig, ax = psd_signif.plot()
+        pyleo.closefig(fig)
