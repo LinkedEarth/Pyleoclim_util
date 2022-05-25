@@ -9,18 +9,18 @@ Core concerns objects. The pyleoclim defaults (if different from original base
 function should be set in these files)
 """
 
-from .Series import *
-from .PSD import *
-from .MultipleSeries import *
-from .SurrogateSeries import *
-from .EnsembleSeries import *
-from .Scalogram import *
-from .Coherence import *
-from .MultiplePSD import *
-from .MultipleScalogram import *
-from .Corr import *
-from .CorrEns import *
-from .SpatialDecomp import *
-from .SsaRes import *
-from .Lipd import *
-from .LipdSeries import *
+from .Series import Series
+from .PSD import PSD
+from .MultipleSeries import MultipleSeries
+from .SurrogateSeries import SurrogateSeries
+from .EnsembleSeries import EnsembleSeries
+from .Scalogram import Scalogram
+from .Coherence import Coherence
+from .MultiplePSD import MultiplePSD
+from .MultipleScalogram import MultipleScalogram
+from .Corr import Corr
+from .CorrEns import CorrEns
+from .SpatialDecomp import SpatialDecomp
+from .SsaRes import SsaRes
+from .Lipd import Lipd
+from .LipdSeries import LipdSeries
