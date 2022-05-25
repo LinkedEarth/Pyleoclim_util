@@ -1532,7 +1532,7 @@ class Series:
         Parameters
         ----------
 
-        method : str
+        method : str; 
             {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram', 'cwt'}
 
         freq_method : str
@@ -1610,6 +1610,7 @@ class Series:
             psd_ls_signif = psd_ls.signif_test(number=20) #in practice, need more AR1 simulations
             @savefig spec_ls.png
             fig, ax = psd_ls_signif.plot(title='PSD using Lomb-Scargle method')
+            pyleo.closefig(fig)
 
         We may pass in method-specific arguments via "settings", which is a dictionary.
         For instance, to adjust the number of overlapping segment for Lomb-Scargle, we may specify the method-specific argument "n50";
