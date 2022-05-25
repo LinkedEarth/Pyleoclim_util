@@ -2,6 +2,9 @@ from ..utils import plotting, lipdutils
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 
+from ..core.MultiplePSD import MultiplePSD
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 from tabulate import tabulate
@@ -9,7 +12,6 @@ from copy import deepcopy
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
 
-from ..core.MultiplePSD import MultiplePSD
 
 def infer_period_unit_from_time_unit(time_unit):
     ''' infer a period unit based on the given time unit
@@ -46,6 +48,7 @@ class PSD:
     def __init__(self, frequency, amplitude, label=None, timeseries=None, plot_kwargs=None,
                  spec_method=None, spec_args=None, signif_qs=None, signif_method=None, period_unit=None,
                  beta_est_res=None):
+        
         self.frequency = np.array(frequency)
         self.amplitude = np.array(amplitude)
         self.label = label

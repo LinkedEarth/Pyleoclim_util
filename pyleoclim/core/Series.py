@@ -614,7 +614,7 @@ class Series:
 
             nino_ssa.screeplot()
             @savefig ts_eigen.png
-            
+
 
         This highlights a few common phenomena with SSA:
             * the eigenvalues are in descending order
@@ -637,11 +637,11 @@ class Series:
             :okexcept:
 
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
-            fig, ax = ts.plot(title='ONI') 
+            fig, ax = ts.plot(title='ONI')
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
             @savefig ssa_recon.png
-        
+
 
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
             * there was not much rhyme or reason for picking 15 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
@@ -2468,7 +2468,7 @@ class Series:
             arguments for the outliers plot
         figsize : list
             by default [10,4]
-    
+
         Returns
         -------
         new : Series

@@ -1,4 +1,4 @@
-''' Tests for pyleoclim.core.ui.SSARes
+''' Tests for pyleoclim.core.ui.Coherence
 
 Naming rules:
 1. class: Test{filename}{Class}{method} with appropriate camel case
@@ -16,8 +16,14 @@ Notes on how to test:
 
 import pytest
 import pyleoclim as pyleo
-import numpy as np
 
+
+def gen_ts(model,nt):
+    'wrapper for gen_ts in pyleoclim'
+    
+    t,v = pyleo.utils.gen_ts(model=model,nt=nt)
+    ts=pyleo.Series(t,v)
+    return ts
 
 # Tests below
       
@@ -29,32 +35,35 @@ class TestUiCoherencePlot:
         ''' Test Coherence.plot with default parameters
         '''
         nt = 200
-        ts1 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
-        ts2 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts(model='colored_noise', nt=nt)
+        ts2 = gen_ts(model='colored_noise', nt=nt)
         coh = ts2.wavelet_coherence(ts1)
-        coh.plot(mute=True)
+        fig,ax = coh.plot()
+        pyleo.closefig(fig)
     
     def test_plot_t1(self):
         ''' Test Coherence.plot WTC with significance
         '''
         nt = 200
-        ts1 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
-        ts2 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts(model='colored_noise', nt=nt)
+        ts2 = gen_ts(model='colored_noise', nt=nt)
         coh = ts2.wavelet_coherence(ts1)
         
         coh_signif = coh.signif_test(number=10,qs = [0.8, 0.9, .95])
-        coh_signif.plot(mute=True,signif_thresh=0.99)
+        fig,ax = coh_signif.plot(signif_thresh=0.99)
+        pyleo.closefig(fig)
         
     def test_plot_t2(self):
         ''' Test Coherence.plot XWT with significance
         '''
         nt = 200
-        ts1 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
-        ts2 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts(model='colored_noise', nt=nt)
+        ts2 = gen_ts(model='colored_noise', nt=nt)
         coh = ts2.wavelet_coherence(ts1)
         
         coh_signif = coh.signif_test(number=10)
-        coh_signif.plot(var='xwt',mute=True)
+        fig,ax = coh_signif.plot(var='xwt')
+        pyleo.closefig(fig)
         
 class TestUiCoherenceDashboard:
     ''' Tests for Coherence.dashboard()
@@ -63,19 +72,20 @@ class TestUiCoherenceDashboard:
         ''' Test Coherence.dashboard() with default parameters
         '''
         nt = 200
-        ts1 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
-        ts2 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts(model='colored_noise', nt=nt)
+        ts2 = gen_ts(model='colored_noise', nt=nt)
         coh = ts2.wavelet_coherence(ts1)
-        coh.dashboard(mute=True)
+        fig,ax  = coh.dashboard()
+        pyleo.closefig(fig)
         
     def test_dashboard_t1(self):
         ''' Test Coherence.dashboard() with optional parameter
         '''
         nt = 200
-        ts1 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
-        ts2 = pyleo.utils.gen_ts(model='colored_noise', nt=nt)
+        ts1 = gen_ts(model='colored_noise', nt=nt)
+        ts2 = gen_ts(model='colored_noise', nt=nt)
         coh = ts2.wavelet_coherence(ts1)
-        coh.dashboard(mute=True,wavelet_plot_kwargs={'contourf_style':{'cmap': 'cividis'}})
-        
+        fig, ax = coh.dashboard(wavelet_plot_kwargs={'contourf_style':{'cmap': 'cividis'}})
+        pyleo.closefig(fig)
         
         

@@ -74,6 +74,11 @@ class Coherence:
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
         self.wave_method = wave_method
+        if wave_args is not None:
+            if 'freq' in wave_args.keys():
+                wave_args['freq'] = np.array(wave_args['freq'])
+            if 'tau' in wave_args.keys():
+                wave_args['tau'] = np.array(wave_args['tau'])
         self.wave_args = wave_args
 
         if scale_unit is not None:

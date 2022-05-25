@@ -33,7 +33,7 @@ def isPyleoclim(obj):
 
     '''
     class_names=[]
-    for name, ob in inspect.getmembers(pyleo.core.ui):
+    for name, ob in inspect.getmembers(pyleo.core):
             if inspect.isclass(ob):
                 class_names.append(ob)
     return type(obj) in class_names
@@ -66,7 +66,7 @@ def PyleoObj_to_dict(obj):
     else:
         s=vars(obj)
     for k in s.keys():
-        #print(k)
+        print(k)
         if isinstance(s[k],(np.ndarray)):            
             s[k] = s[k].astype('float64').tolist()
         elif isinstance(s[k],(dict)):
@@ -160,21 +160,21 @@ def objname_to_obj(objname):
 
     '''
     
-    possible_objects={'Series':pyleo.core.ui.Series,
-                      'PSD':pyleo.core.ui.PSD,
-                      'Scalogram':pyleo.core.ui.Scalogram,
-                      'Coherence':pyleo.core.ui.Coherence,
-                      'MultipleSeries':pyleo.core.ui.MultipleSeries,
-                      'SurrogateSeries':pyleo.core.ui.SurrogateSeries,
-                      'EnsembleSeries':pyleo.core.ui.EnsembleSeries,
-                      'MultiplePSD':pyleo.core.ui.MultiplePSD,
-                      'MultipleScalogram':pyleo.core.ui.MultipleScalogram,
-                      'Corr':pyleo.core.ui.Corr,
-                      'CorrEns':pyleo.core.ui.CorrEns,
-                      'SpatialDecomp':pyleo.core.ui.SpatialDecomp,
-                      'SsaRes':pyleo.core.ui.SsaRes,
-                      'Lipd':pyleo.core.ui.Lipd,
-                      'LipdSeries':pyleo.core.ui.LipdSeries
+    possible_objects={'Series':pyleo.core.Series,
+                      'PSD':pyleo.core.PSD,
+                      'Scalogram':pyleo.core.Scalogram,
+                      'Coherence':pyleo.core.Coherence,
+                      'MultipleSeries':pyleo.core.MultipleSeries,
+                      'SurrogateSeries':pyleo.core.SurrogateSeries,
+                      'EnsembleSeries':pyleo.core.EnsembleSeries,
+                      'MultiplePSD':pyleo.core.MultiplePSD,
+                      'MultipleScalogram':pyleo.core.MultipleScalogram,
+                      'Corr':pyleo.core.Corr,
+                      'CorrEns':pyleo.core.CorrEns,
+                      'SpatialDecomp':pyleo.core.SpatialDecomp,
+                      'SsaRes':pyleo.core.SsaRes,
+                      'Lipd':pyleo.core.Lipd,
+                      'LipdSeries':pyleo.core.LipdSeries
         }
     
     try:
@@ -211,21 +211,30 @@ def json_to_PyleoObj(filename,objname):
     a = open_json(filename)
 
     for k in a.keys():
-        if k == 'timeseries':
+        if k == 'timeseries' or k == 'timeseries1' or k == 'timeseries2':
             a[k]=pyleo.Series(**a[k])
         if k == 'signif_qs' and a[k] is not None:
-            if obj==pyleo.core.PSD.PSD:
+            if obj==pyleo.core.PSD:
                 for idx,item in enumerate(a[k]['psd_list']):
                     if item['timeseries'] is not None:
                         item['timeseries'] = pyleo.Series(**item['timeseries'])
                     a[k]['psd_list'][idx]=pyleo.PSD(**a[k]['psd_list'][idx])
                 a[k] = pyleo.MultiplePSD(**a[k])
-            elif obj == pyleo.core.Scalogram.Scalogram or obj == pyleo.core.Coherence.Coherence:
+            elif obj == pyleo.core.Scalogram:
                 for idx,item in enumerate(a[k]['scalogram_list']):
                     if item['timeseries'] is not None:
                         item['timeseries'] = pyleo.Series(**item['timeseries'])
                     a[k]['scalogram_list'][idx]=pyleo.Scalogram(**a[k]['scalogram_list'][idx])
                 a[k] = pyleo.MultipleScalogram(**a[k])
+            elif obj == pyleo.core.Coherence:
+                pass
+                # for idx,item in enumerate (a[k]):
+                #     for idx2,item2 in enumerate(item['scalogram_list']):
+                #         if item2['timeseries'] is not None:
+                #             item2['timeseries'] = pyleo.Series(**item2['timeseries'])
+                #         item['scalogram_list'][idx]=pyleo.Scalogram(**a[k]['scalogram_list'][idx])
+                #     a[k] = pyleo.MultipleScalogram(**a[k])
+                        
         if k == 'signif_scals' and a[k] is not None:
             for idx,item in enumerate(a[k]['scalogram_list']):
                 if item['timeseries'] is not None:

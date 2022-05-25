@@ -31,7 +31,7 @@ class TestUiSpatialDecompScreeplot:
 
         '''
         p = 10; n = 100
-        signal = pyleo.utils.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
     
@@ -59,7 +59,7 @@ class TestUipatialDecompModeplot:
 
        '''
        p = 10; n = 100
-       signal = pyleo.utils.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+       signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
        X = signal.value[:,None] + np.random.randn(n,p)
        t = np.arange(n)
    
@@ -82,7 +82,7 @@ class TestUipatialDecompModeplot:
 
        '''
        p = 10; n = 100
-       signal = pyleo.utils.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+       signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
        X = signal.value[:,None] + np.random.randn(n,p)
        t = np.arange(n)
    

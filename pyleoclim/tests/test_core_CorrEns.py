@@ -13,16 +13,16 @@ Notes on how to test:
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 '''
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-
-from numpy.testing import assert_array_equal
-from pandas.testing import assert_frame_equal
 
 import pytest
 
 import pyleoclim as pyleo
 
+def gen_ts(model,nt,alpha):
+    t,v = pyleo.utils.gen_ts(model=model,nt=nt,alpha=alpha)
+    ts=pyleo.Series(t,v)
+    return ts
 
 # Tests below
 class TestUiCorrEns():
@@ -33,7 +33,7 @@ class TestUiCorrEns():
         nn = 20 # number of noise realizations
         nt = 200
         
-        signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
+        signal = gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
         noise = np.random.randn(nt,nn)
 
         list1 = []
@@ -50,9 +50,10 @@ class TestUiCorrEns():
 
         fig, axs = plt.subplots(1,2)
         corr1 = ts_ens1.correlation(signal,settings={'nsim':100})
-        corr1.plot(ax=axs[0],mute=True)
+        corr1.plot(ax=axs[0])
         corr2 = ts_ens2.correlation(signal,settings={'nsim':100})
-        corr2.plot(ax=axs[1],mute=True)
-        #pyleo.showfig(fig)  # debug only
+        corr2.plot(ax=axs[1])
+        pyleo.closefig(fig)
+        
         
 
