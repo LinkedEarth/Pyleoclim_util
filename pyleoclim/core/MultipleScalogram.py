@@ -1,4 +1,4 @@
-from ..core.Scalogram import Scalogram
+from ..core import Scalogram
 
 import numpy as np
 from copy import deepcopy
@@ -59,7 +59,7 @@ class MultipleScalogram:
 
         scal_list = []
         for i, amp in enumerate(amp_qs):
-            scal_tmp = Scalogram(frequency=freq, time=time, amplitude=amp,
+            scal_tmp = Scalogram.Scalogram(frequency=freq, time=time, amplitude=amp,
                                  scale = scale, coi=coi, label=f'{qs[i]*100:g}%')
             scal_list.append(scal_tmp)
 

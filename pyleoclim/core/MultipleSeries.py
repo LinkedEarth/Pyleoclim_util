@@ -10,11 +10,11 @@ to such a collection at once (e.g. process a bunch of series in a consistent fas
 from ..utils import tsutils, plotting
 from ..utils import correlation as corrutils
 
-from ..core.Series import Series
+# from ..core import Series
 from ..core.CorrEns import CorrEns
 from ..core.MultipleScalogram import MultipleScalogram
 from ..core.MultiplePSD import MultiplePSD
-from ..core.SpatialDecomp import SpatialDecomp
+from ..core import SpatialDecomp
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -653,7 +653,7 @@ class MultipleSeries:
 
         # assign result to SpatiamDecomp class
         # Note: need to grab coordinates from Series or LiPDSeries
-        res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+        res = SpatialDecomp.SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
                             pcs = out.scores, pctvar = pctvar,  locs = None,
                             eigvals = out.eigenvals, eigvecs = out.eigenvecs)
         return res

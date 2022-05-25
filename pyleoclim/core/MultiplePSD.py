@@ -1,5 +1,5 @@
 from ..utils import plotting 
-from ..core.PSD import PSD 
+from ..core import PSD
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -62,7 +62,7 @@ class MultiplePSD:
 
         psd_list = []
         for i, amp in enumerate(amp_qs):
-            psd_tmp = PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'linewidth': lw[i]}, period_unit=period_unit)
+            psd_tmp = PSD.PSD(frequency=freq, amplitude=amp, label=f'{qs[i]*100:g}%', plot_kwargs={'color': 'gray', 'linewidth': lw[i]}, period_unit=period_unit)
             psd_list.append(psd_tmp)
 
         psds = MultiplePSD(psd_list=psd_list)

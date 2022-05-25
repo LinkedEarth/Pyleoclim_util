@@ -17,9 +17,9 @@ from ..utils import causality as causalutils
 from ..utils import decomposition
 from ..utils import filter as filterutils
 
-from ..core.PSD import PSD
+from ..core import PSD
 from ..core.SsaRes import SsaRes
-from ..core.MultipleSeries import MultipleSeries
+from ..core import MultipleSeries
 from ..core.Scalogram import Scalogram
 from ..core.Coherence import Coherence
 from ..core.Corr import Corr
@@ -1427,7 +1427,7 @@ class Series:
                               time_unit=self.time_unit, value_name=self.value_name,
                               value_unit=self.value_unit,label=self.label)
                 s_list.append(s_tmp)
-            res=MultipleSeries(series_list=s_list)
+            res=MultipleSeries.MultipleSeries(series_list=s_list)
         elif len(seg_y)==1:
             res=self.copy()
         else:
@@ -1861,7 +1861,7 @@ class Series:
                 args['cwt'].pop('cwt_res')
 
 
-        psd = PSD(
+        psd = PSD.PSD(
             frequency=spec_res.freq,
             amplitude=spec_res.psd,
             label=label,
@@ -2132,7 +2132,7 @@ class Series:
         # put on same time axes if necessary
         if method == 'cwt' and not np.array_equal(self.time, target_series.time):
             warnings.warn("Series have different time axes. Applying common_time().")
-            ms = MultipleSeries([self, target_series])
+            ms = MultipleSeries.MultipleSeries([self, target_series])
             common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
             ct_args = {'method': 'interp'}
             ct_args.update(common_time_kwargs)
@@ -2275,7 +2275,7 @@ class Series:
         corr_args = {'alpha': alpha}
         corr_args.update(settings)
 
-        ms = MultipleSeries([self, target_series])
+        ms = MultipleSeries.MultipleSeries([self, target_series])
         if list(self.time) != list(target_series.time):
             common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
             ct_args = {'method': 'interp'}

@@ -7,7 +7,7 @@ from tabulate import tabulate
 from copy import deepcopy
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter #, MaxNLocator
-from ..core.MultipleScalogram import MultipleScalogram
+from ..core import MultipleScalogram
 
 def infer_period_unit_from_time_unit(time_unit):
     ''' infer a period unit based on the given time unit
@@ -371,7 +371,7 @@ class Scalogram:
                 scalogram_list = signif_scals.scalogram_list
                 #If signif_scals already in scalogram object are more than those requested for significance testing, use as many of them as required
                 if len(scalogram_list) > number:
-                    surr_scal = MultipleScalogram(scalogram_list=scalogram_list[:number])
+                    surr_scal = MultipleScalogram.MultipleScalogram(scalogram_list=scalogram_list[:number])
                 #If number is the same as the length of signif_scals, just use signif_scals
                 elif len(scalogram_list) == number:
                     surr_scal = signif_scals
@@ -384,7 +384,7 @@ class Scalogram:
                                                       method=method, settings=settings)
     
                     surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, settings=self.wave_args).scalogram_list)
-                    surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
+                    surr_scal = MultipleScalogram.MultipleScalogram(scalogram_list=surr_scal_tmp)
             else:
                 surr = self.timeseries.surrogates(number=number, seed=seed,
                                                   method=method, settings=settings)
@@ -424,7 +424,7 @@ class Scalogram:
                               amplitude = signif.T, label=label)
                 ms_base.append(s)
 
-            new.signif_qs = MultipleScalogram(ms_base)
+            new.signif_qs = MultipleScalogram.MultipleScalogram(ms_base)
             
         
         new.signif_method = method
