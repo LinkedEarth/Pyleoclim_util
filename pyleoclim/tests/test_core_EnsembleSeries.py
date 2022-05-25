@@ -29,6 +29,14 @@ from pyleoclim.tests.examples import load_dataset
 
 # a collection of useful functions
 
+def gen_ts(model, nt, alpha):
+    'wrapper for gen_ts in pyleoclim'
+
+    t, v = pyleo.utils.gen_ts(model=model, nt=nt, alpha=alpha)
+    ts = pyleo.Series(t, v)
+    return ts
+
+
 def gen_normal(loc=0, scale=1, nt=100):
     ''' Generate random data with a Gaussian distribution
     '''
@@ -153,7 +161,8 @@ class TestUIEnsembleSeriesCorrelation():
         nt = 500
         series_list = []
 
-        signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
+        signal = gen_ts(model='colored_noise', nt=nt, alpha=1.0).standardize()
+
         noise = np.random.randn(nt,nn)
 
         for idx in range(nn):  # noise
@@ -162,7 +171,8 @@ class TestUIEnsembleSeriesCorrelation():
 
         ts_ens = pyleo.EnsembleSeries(series_list)
 
-        fig, ax = ts_ens.plot_envelope(curve_lw=1.5, mute=True) 
+        fig, ax = ts_ens.plot_envelope(curve_lw=1.5)
+        pyleo.closefig(fig)
 
     def test_plot_traces_t0(self):
         ''' Test EnsembleSeries.plot_traces() on a list of colored noise
@@ -171,8 +181,8 @@ class TestUIEnsembleSeriesCorrelation():
         nt = 500
         series_list = []
 
-        signal = pyleo.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize() 
-        noise = np.random.randn(nt,nn)
+        signal = gen_ts(model='colored_noise', nt=nt, alpha=1.0).standardize()
+        noise = np.random.randn(nt, nn)
 
         for idx in range(nn):  # noise
             ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
@@ -180,4 +190,6 @@ class TestUIEnsembleSeriesCorrelation():
 
         ts_ens = pyleo.EnsembleSeries(series_list)
 
-        fig, ax = ts_ens.plot_traces(alpha=0.2,num_traces=8, mute=True) 
+        fig, ax = ts_ens.plot_traces(alpha=0.2, num_traces=8)
+        pyleo.closefig(fig)
+
