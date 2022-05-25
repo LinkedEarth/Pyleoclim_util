@@ -1140,6 +1140,9 @@ class Series:
         if 'variable' not in wavelet_plot_kwargs:
             wavelet_plot_kwargs.update({'variable':'amplitude'})
 
+        if 'title' not in wavelet_plot_kwargs:
+            wavelet_plot_kwargs.update({'title':None})
+
         if 'cbar_style' not in wavelet_plot_kwargs:
             wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.12, 
                                         'label': wavelet_plot_kwargs['variable'].capitalize() + ' from ' + scalogram.wave_method}})
