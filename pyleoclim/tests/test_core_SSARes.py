@@ -19,6 +19,15 @@ import pyleoclim as pyleo
 import numpy as np
 
 
+# a collection of useful functions
+
+def gen_ts(model, t=None, nt=1000, alpha=1.0):
+    'wrapper for gen_ts in pyleoclim'
+
+    t, v = pyleo.utils.gen_ts(model=model, nt=nt, alpha=alpha, t=t)
+    ts = pyleo.Series(t, v)
+    return ts
+
 # Tests below
       
 class TestUiSSAResScreeplot:
@@ -30,21 +39,23 @@ class TestUiSSAResScreeplot:
          (default is already taken care of in TestUISeriesSsa)
         '''
         nt = 500
-        t  = np.arange(nt)
-        cn = pyleo.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
+        t = np.arange(nt)
+        cn = gen_ts(model='colored_noise', t=t, alpha=1.0)
 
         cn_ssa = cn.ssa()
-        fig, ax = cn_ssa.screeplot(title="Non default title",mute=True) 
+        fig, ax = cn_ssa.screeplot(title="Non default title")
+        pyleo.closefig(fig)
         
     def test_plot_t1(self):
         ''' Test SSARes.screeplot with MC-SSA 
         '''
         nt = 500
         t  = np.arange(nt)
-        cn = pyleo.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
+        cn = gen_ts(model='colored_noise', t=t, alpha=1.0)
 
         cn_ssa = cn.ssa(nMC=200)
-        fig, ax = cn_ssa.screeplot(title="MC-SSA scree plot",mute=True)     
+        fig, ax = cn_ssa.screeplot(title="MC-SSA scree plot")
+        pyleo.closefig(fig)
         
         
 class TestUiSSAResModeplot:
@@ -56,18 +67,20 @@ class TestUiSSAResModeplot:
         '''
         nt = 500
         t  = np.arange(nt)
-        cn = pyleo.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
+        cn = gen_ts(model='colored_noise', t=t, alpha=1.0)
 
         cn_ssa = cn.ssa()
-        fig, ax = cn_ssa.modeplot(spec_method=spec_method,mute=True)   
+        fig, ax = cn_ssa.modeplot(spec_method=spec_method)
+        pyleo.closefig(fig)
         
     def test_plot_t1(self):
         ''' Test SSARes.modeplot with nondefault mode index
         '''
         nt = 500
-        t  = np.arange(nt)
-        cn = pyleo.gen_ts(model = 'colored_noise', t= t, alpha=1.0)
+        t = np.arange(nt)
+        cn = gen_ts(model='colored_noise', t=t, alpha=1.0)
 
         cn_ssa = cn.ssa()
-        fig, ax = cn_ssa.modeplot(index=4,mute=True)   
+        fig, ax = cn_ssa.modeplot(index=4)
+        pyleo.closefig(fig)
         
