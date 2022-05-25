@@ -21,7 +21,14 @@ import numpy as np
 
 # Tests below
 
-         
+def gen_ts(model, nt, alpha):
+    'wrapper for gen_ts in pyleoclim'
+
+    t, v = pyleo.utils.gen_ts(model=model, nt=nt, alpha=alpha)
+    ts = pyleo.Series(t, v)
+    return ts
+
+
 class TestUiSpatialDecompScreeplot:
     ''' Tests for SpatialDecomp.screeplot()
     '''
@@ -31,7 +38,7 @@ class TestUiSpatialDecompScreeplot:
 
         '''
         p = 10; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        signal = gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize()
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
     
@@ -42,7 +49,8 @@ class TestUiSpatialDecompScreeplot:
 
         res = ms.pca()
         
-        fig, ax = res.screeplot(mute=True)
+        fig, ax = res.screeplot()
+        pyleo.closefig(fig)
         
         
 class TestUipatialDecompModeplot:
@@ -59,7 +67,7 @@ class TestUipatialDecompModeplot:
 
        '''
        p = 10; n = 100
-       signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+       signal = gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize()
        X = signal.value[:,None] + np.random.randn(n,p)
        t = np.arange(n)
    
@@ -69,7 +77,8 @@ class TestUipatialDecompModeplot:
        ms = pyleo.MultipleSeries(mslist)
 
        res = ms.pca()      
-       fig, ax = res.modeplot(mute=True,spec_method=spec_method)
+       fig, ax = res.modeplot(spec_method=spec_method)
+       pyleo.closefig(fig)
          
         
     def test_plot_t1(self):
@@ -82,7 +91,7 @@ class TestUipatialDecompModeplot:
 
        '''
        p = 10; n = 100
-       signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+       signal = gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize()
        X = signal.value[:,None] + np.random.randn(n,p)
        t = np.arange(n)
    
@@ -91,7 +100,8 @@ class TestUipatialDecompModeplot:
            mslist.append(pyleo.Series(time = t, value = X[:,i]))
        ms = pyleo.MultipleSeries(mslist)
        res = ms.pca()
-       fig, ax = res.modeplot(index=2,mute=True)
+       fig, ax = res.modeplot(index=2)
+       pyleo.closefig(fig)
        
        
        # TODO: add test for maps, including different projections

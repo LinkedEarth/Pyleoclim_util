@@ -27,9 +27,16 @@ from pyleoclim.utils.tsmodel import (
     ar1_sim,
     colored_noise,
 )
-from pyleoclim.utils.decomposition import mcpca
+# from pyleoclim.utils.decomposition import mcpca
 
 # a collection of useful functions
+
+def gen_ts(model, nt, alpha, t=None):
+    'wrapper for gen_ts in pyleoclim'
+
+    t, v = pyleo.utils.gen_ts(model=model, nt=nt, alpha=alpha, t=t)
+    ts = pyleo.Series(t, v)
+    return ts
 
 def gen_normal(loc=0, scale=1, nt=100):
     ''' Generate random data with a Gaussian distribution
@@ -69,8 +76,8 @@ class TestUIMultipleSeriesDetrend():
         v_trend1 = v + nonlinear_trend1
 
         #create series object
-        ts=pyleo.Series(time=t,value=v_trend)
-        ts1=pyleo.Series(time=t,value=v_trend1)
+        ts = pyleo.Series(time=t,value=v_trend)
+        ts1 = pyleo.Series(time=t,value=v_trend1)
 
         # Create a multiple series object
         ts_all= pyleo.MultipleSeries([ts,ts1])
@@ -235,7 +242,7 @@ class TestMultipleSeriesPca:
 
         '''
         p = 10; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        signal = gen_ts(model='colored_noise', nt=n, alpha=1.0).standardize()
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
     
@@ -256,7 +263,7 @@ class TestMultipleSeriesPca:
 
         '''
         p = 10; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        signal = gen_ts(model='colored_noise', nt=n, alpha=1.0).standardize()
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
         
@@ -272,9 +279,10 @@ class TestMultipleSeriesPca:
             mslist.append(pyleo.Series(time = t, value = X[:,i],clean_ts=False))
         ms = pyleo.MultipleSeries(mslist)
 
-        res = ms.pca(ncomp=4,gls=True)  
+        res = ms.pca(ncomp=4, gls=True)
                 
-        fig, ax = res.screeplot(mute=True) 
+        fig, ax = res.screeplot()
+        pyleo.closefig(fig)
         
     def test_pca_t2(self):
         '''
@@ -289,8 +297,10 @@ class TestMultipleSeriesPca:
     
         res = msl.pca()
         
-        res.screeplot(mute=True)
-        res.modeplot(mute=True)
+        fig, ax = res.screeplot()
+        pyleo.closefig(fig)
+        fig, ax = res.modeplot()
+        pyleo.closefig(fig)
         
     def test_pca_t3(self):
         '''
@@ -302,7 +312,7 @@ class TestMultipleSeriesPca:
 
         '''
         p = 10; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0)
+        signal = gen_ts(model='colored_noise', nt=n, alpha=1.0)
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
     
@@ -323,7 +333,7 @@ class TestMultipleSeriesIncrements:
     @pytest.mark.parametrize('step_style', ['min', 'max', 'mean', 'median'])
     def test_increments(self, step_style):
         p = 2; n = 100
-        signal = pyleo.gen_ts(model='colored_noise',nt=n,alpha=1.0).standardize() 
+        signal = gen_ts(model='colored_noise', nt=n, alpha=1.0).standardize()
         X = signal.value[:,None] + np.random.randn(n,p)
         t = np.arange(n)
     
@@ -381,8 +391,9 @@ class TestMultipleSeriesCommonTime:
         time = np.arange(1900, 2020, step=1/12)
         ndel = 200
         seriesList = []
+        n = 100
         for j in range(4):
-            v = pyleo.gen_ts(model='colored_noise',alpha=1, t=time)
+            v = gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
             deleted_idx = np.random.choice(range(np.size(time)), ndel, replace=False)
             tu =  np.delete(time.copy(), deleted_idx)
             vu =  np.delete(v.value, deleted_idx)
@@ -406,7 +417,8 @@ class TestMultipleSeriesStackPlot():
         sst = d.to_LipdSeries(number=5)
         d18Osw = d.to_LipdSeries(number=3)
         ms = pyleo.MultipleSeries([sst,d18Osw])
-        ms.stackplot(labels=labels, mute=True)
+        fig, ax = ms.stackplot(labels=labels)
+        pyleo.closefig(fig)
     
     @pytest.mark.parametrize('plot_kwargs', [{'marker':'o'},[{'marker':'o'},{'marker':'^'}]])
     def test_StackPlot_t1(self, plot_kwargs):
@@ -415,7 +427,9 @@ class TestMultipleSeriesStackPlot():
         sst = d.to_LipdSeries(number=5)
         d18Osw = d.to_LipdSeries(number=3)
         ms = pyleo.MultipleSeries([sst,d18Osw])
-        ms.stackplot(plot_kwargs=plot_kwargs, mute=True)
+
+        fig, ax = ms.stackplot(plot_kwargs=plot_kwargs)
+        pyleo.closefig(fig)
         
 class TestMultipleSeriesSpectral():
     ''' Test for MultipleSeries.spectral
@@ -425,16 +439,14 @@ class TestMultipleSeriesSpectral():
         '''Test the spectral function with pre-generated scalogram objects
         '''
         
-        d=load_data()
+        d = load_data()
         sst = d.to_LipdSeries(number=5)
         d18Osw = d.to_LipdSeries(number=3)
         if spec_method == 'cwt':
-            sst=sst.interp()
-            d18Osw=d18Osw.interp()
+            sst = sst.interp()
+            d18Osw = d18Osw.interp()
         ms = pyleo.MultipleSeries([sst,d18Osw])
         scals = ms.wavelet(method=spec_method)
         psds = ms.spectral(method=spec_method,scalogram_list=scals)
-        
-        
         
         
