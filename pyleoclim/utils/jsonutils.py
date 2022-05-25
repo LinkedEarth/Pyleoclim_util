@@ -66,7 +66,7 @@ def PyleoObj_to_dict(obj):
     else:
         s=vars(obj)
     for k in s.keys():
-        print(k)
+        #print(k)
         if isinstance(s[k],(np.ndarray)):            
             s[k] = s[k].astype('float64').tolist()
         elif isinstance(s[k],(dict)):
@@ -227,14 +227,13 @@ def json_to_PyleoObj(filename,objname):
                     a[k]['scalogram_list'][idx]=pyleo.Scalogram(**a[k]['scalogram_list'][idx])
                 a[k] = pyleo.MultipleScalogram(**a[k])
             elif obj == pyleo.core.Coherence:
-                pass
-                # for idx,item in enumerate (a[k]):
-                #     for idx2,item2 in enumerate(item['scalogram_list']):
-                #         if item2['timeseries'] is not None:
-                #             item2['timeseries'] = pyleo.Series(**item2['timeseries'])
-                #         item['scalogram_list'][idx]=pyleo.Scalogram(**a[k]['scalogram_list'][idx])
-                #     a[k] = pyleo.MultipleScalogram(**a[k])
-                        
+                 for idx,item in enumerate (a[k]):
+                     for idx2,item2 in enumerate(item['scalogram_list']):
+                         if item2['timeseries'] is not None:
+                             item2['timeseries'] = pyleo.Series(**item2['timeseries'])
+                         item['scalogram_list'][idx2]=pyleo.Scalogram(**item['scalogram_list'][idx2])
+                     a[k][idx] = pyleo.MultipleScalogram(**a[k][idx])
+            
         if k == 'signif_scals' and a[k] is not None:
             for idx,item in enumerate(a[k]['scalogram_list']):
                 if item['timeseries'] is not None:

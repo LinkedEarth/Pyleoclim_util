@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 The Coherence class stores the result of Series.wavelet_coherence(), whether WWZ or CWT.
-It includes wavelet transform coherency and cross-wavelet transform.  
+It includes wavelet transform coherency and cross-wavelet transform.
 """
 from ..utils import plotting
 from ..utils import wavelet as waveutils
@@ -42,7 +42,7 @@ def infer_period_unit_from_time_unit(time_unit):
                 period_unit = f'{time_unit}s'
 
     return period_unit
- 
+
 
 class Coherence:
     '''Coherence object, meant to receive the WTC and XWT part of Series.wavelet_coherence()
@@ -55,7 +55,7 @@ class Coherence:
     '''
     def __init__(self, frequency, scale, time, wtc, xwt, phase, coi=None,
                  wave_method=None, wave_args=None,
-                 timeseries1=None, timeseries2=None, signif_qs=None, signif_method=None,
+                 timeseries1=None, timeseries2=None, signif_qs=None, signif_method=None, qs =None,
                  freq_method=None, freq_kwargs=None, Neff_threshold=3, scale_unit=None, time_label=None):
         self.frequency = np.array(frequency)
         self.time = np.array(time)
@@ -80,6 +80,7 @@ class Coherence:
             if 'tau' in wave_args.keys():
                 wave_args['tau'] = np.array(wave_args['tau'])
         self.wave_args = wave_args
+        self.qs        = qs
 
         if scale_unit is not None:
             self.scale_unit = scale_unit
