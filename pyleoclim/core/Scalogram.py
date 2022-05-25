@@ -1,4 +1,4 @@
-from ..utils import plotting, lipdutils 
+from ..utils import plotting, lipdutils
 from ..utils import wavelet as waveutils
 
 import matplotlib.pyplot as plt
@@ -225,7 +225,7 @@ class Scalogram:
         ax.set_yscale('log')
 
         # plot colorbar
-        cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05}
+        cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05, 'label':variable.capitalize()}
         cbar_args.update(cbar_style)
 
         cb = plt.colorbar(cont, ax = ax, **cbar_args)
@@ -380,9 +380,9 @@ class Scalogram:
                     number -= len(scalogram_list)
                     surr_scal_tmp = []
                     surr_scal_tmp.extend(scalogram_list)
-                    surr = self.timeseries.surrogates(number=number, seed=seed, 
+                    surr = self.timeseries.surrogates(number=number, seed=seed,
                                                       method=method, settings=settings)
-    
+
                     surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, settings=self.wave_args).scalogram_list)
                     surr_scal = MultipleScalogram.MultipleScalogram(scalogram_list=surr_scal_tmp)
             else:
@@ -394,7 +394,7 @@ class Scalogram:
                 raise TypeError('qs should be a list')
 
             new.signif_qs = surr_scal.quantiles(qs=qs)
-           
+
             if export_scal == True:
                 new.signif_scals = surr_scal
 
@@ -425,8 +425,8 @@ class Scalogram:
                 ms_base.append(s)
 
             new.signif_qs = MultipleScalogram.MultipleScalogram(ms_base)
-            
-        
+
+
         new.signif_method = method
         new.qs = qs
 
