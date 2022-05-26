@@ -1,5 +1,6 @@
 """
 This module contains the MultiplePSD object.
+"""
 
 from ..utils import plotting 
 from ..core import PSD
