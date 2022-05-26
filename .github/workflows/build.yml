@@ -11,10 +11,10 @@ jobs:
     steps:
 
     - name: checkout files in repo
-      uses: actions/checkout@master
+      uses: actions/checkout@main
 
     - name: update jupyter dependencies with repo2docker
-      uses: jupyterhub/repo2docker-action@master
+      uses: jupyterhub/repo2docker-action@main
       with: # make sure username & password/token matches your registry
         DOCKER_USERNAME: ${{ secrets.QUAY_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
