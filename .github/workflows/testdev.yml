@@ -3,7 +3,7 @@ name: run pytest for the Development Branch
 on:
   push:
     branches:
-      - Development
+    - Development
 
 jobs:
   build:
