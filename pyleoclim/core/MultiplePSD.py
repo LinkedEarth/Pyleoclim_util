@@ -1,3 +1,6 @@
+"""
+This module contains the MultiplePSD object.
+
 from ..utils import plotting 
 from ..core import PSD
 
@@ -10,11 +13,25 @@ from scipy.stats.mstats import mquantiles
 
 
 class MultiplePSD:
-    ''' Object for multiple PSD.
-
-    Used for significance level
-    '''
+    
     def __init__(self, psd_list, beta_est_res=None):
+        ''' Object for multiple PSD.
+
+        This object stores several PSDs from different Series or ensemble members in an age model.         
+       
+        Parameters
+        ----------
+        
+        beta_est_res : numpy.array
+        
+            Results of the beta estimation calculation
+        
+        See also
+        --------
+        
+        pyleoclim.core.PSD.PSD.beta_est : Calculates the scaling exponent (i.e., the slope in a log-log plot) of the spectrum (beta)
+
+        '''
         self.psd_list = psd_list
         if beta_est_res is None:
             self.beta_est_res = beta_est_res
@@ -27,22 +44,30 @@ class MultiplePSD:
         return deepcopy(self)
 
     def quantiles(self, qs=[0.05, 0.5, 0.95], lw=[0.5, 1.5, 0.5]):
-        '''Calculate quantiles
+        
+        '''Calculate the quantiles of the significance testing
 
         Parameters
         ----------
+        
         qs : list, optional
+        
             List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
+            
         lw : list, optional
+        
             Linewidth to use for plotting each level. Should be the same length as qs. The default is [0.5, 1.5, 0.5].
 
         Raises
         ------
+        
         ValueError
+        
             Frequency axis not consistent across the PSD list!
 
         Returns
         -------
+        
         psds : pyleoclim.MultiplePSD
 
         '''
@@ -69,28 +94,36 @@ class MultiplePSD:
         return psds
 
     def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
-        ''' Estimate the scaling factor beta of the each PSD from the psd_list in a log-log space
+        
+        ''' Estimate the scaling factor beta of the each PSD. 
+        
+        This function calculates the scaling factor for each of the PSD stored in the object. The scaling factor represents the slope of the spectrum line if plot in log-log space. 
 
         Parameters
         ----------
 
         fmin : float
-            the minimum frequency edge for beta estimation; the default is the minimum of the frequency vector of the PSD obj
+        
+            the minimum frequency edge for beta estimation; the default is the minimum of the frequency vector of the PSD object
 
         fmax : float
-            the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
+        
+            the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD object
 
-        logf_binning_step : str, {'max', 'first'}
-            if 'max', then the maximum spacing of log(f) will be used as the binning step
-            if 'first', then the 1st spacing of log(f) will be used as the binning step
+        logf_binning_step : str; {'max', 'first'}
+        
+            if 'max', then the maximum spacing of log(f) will be used as the binning step.
+            if 'first', then the 1st spacing of log(f) will be used as the binning step.
 
         verbose : bool
+        
             If True, will print warning messages if there is any
 
         Returns
         -------
 
         new : pyleoclim.MultiplePSD
+        
             New MultiplePSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
             - beta: the scaling factor
             - std_err: the one standard deviation error of the scaling factor
@@ -101,7 +134,7 @@ class MultiplePSD:
         See also
         --------
 
-        pyleoclim.core.ui.PSD.beta_est : beta estimation for on a single PSD object
+        pyleoclim.core.PSD.PSD.beta_est : beta estimation for on a single PSD object
 
         '''
 
@@ -132,53 +165,91 @@ class MultiplePSD:
 
         Parameters
         ----------
+        
         figsize : list, optional
+        
             Figure size. The default is [10, 4].
+            
         in_loglog : bool, optional
+        
             Whether to plot in loglog. The default is True.
-        in_period : bool, optional
+            
+        in_period : bool, {True, False} optional
+        
             Plots against periods instead of frequencies. The default is True.
+            
         xlabel : str, optional
+        
             x-axis label. The default is None.
+            
         ylabel : str, optional
+        
             y-axis label. The default is 'Amplitude'.
+            
         title : str, optional
+        
             Title for the figure. The default is None.
+            
         xlim : list, optional
+        
             Limits for the x-axis. The default is None.
+            
         ylim : list, optional
+        
             limits for the y-axis. The default is None.
+            
         colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
+        
             Colors for plotting.
             If None, the plotting will cycle the 'tab10' colormap;
             if only one color is specified, then all curves will be plotted with that single color;
             if a list of colors are specified, then the plotting will cycle that color list.
+            
         cmap : str
+        
             The colormap to use when "colors" is None.
+            
         norm : matplotlib.colors.Normalize like
+        
             The nomorlization for the colormap.
             If None, a linear normalization will be used.
+            
         savefig_settings : dict, optional
+        
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
+            
         ax : matplotlib axis, optional
+        
             The matplotlib axis object on which to retrun the figure. The default is None.
+            
         xticks : list, optional
+        
             x-ticks label. The default is None.
+            
         yticks : list, optional
+        
             y-ticks label. The default is None.
+            
         legend : bool, optional
+        
             Whether to plot the legend. The default is True.
+            
         plot_kwargs : dictionary, optional
+        
             Parameters for plot function. The default is None.
+            
         lgd_kwargs : dictionary, optional
+        
             Parameters for legend. The default is None.
 
         Returns
         -------
-        fig, ax
+        fig : matplotlib.pyplot.figure
+        
+        ax : matplotlib.pyplot.axis
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -257,65 +328,117 @@ class MultiplePSD:
              curve_clr=sns.xkcd_rgb['pale red'], curve_lw=3, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.3, shade_label=None,
              lgd_kwargs=None, members_plot_num=10, members_alpha=0.3, members_lw=1, seed=None):
 
-        '''Plot mutiple PSD as an envelope.
+        '''Plot an envelope statistics for mulitple PSD
+        
+        This function plots an envelope statistics from multiple PSD. This is especially useful when the PSD are coming from an ensemble of possible solutions (e.g., age ensembles)
 
         Parameters
         ----------
+        
         figsize : list, optional
+        
             The figure size. The default is [10, 4].
+            
         qs : list, optional
+        
             The significance levels to consider. The default is [0.025, 0.5, 0.975].
+            
         in_loglog : bool, optional
+        
             Plot in log space. The default is True.
+            
         in_period : bool, optional
+        
             Whether to plot periodicity instead of frequency. The default is True.
+            
         xlabel : str, optional
+        
             x-axis label. The default is None.
+            
         ylabel : str, optional
+        
             y-axis label. The default is 'Amplitude'.
+            
         title : str, optional
+        
             Plot title. The default is None.
+            
         xlim : list, optional
+        
             x-axis limits. The default is None.
+            
         ylim : list, optional
+        
             y-axis limits. The default is None.
+            
         savefig_settings : dict, optional
+        
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            
         ax : matplotlib.ax, optional
+        
             Matplotlib axis on which to return the plot. The default is None.
+            
         xticks : list, optional
+        
             xticks label. The default is None.
+            
         yticks : list, optional
+        
             yticks label. The default is None.
+            
         plot_legend : bool, optional
+        
             Wether to plot the legend. The default is True.
+            
         curve_clr : str, optional
+        
             Color of the main PSD. The default is sns.xkcd_rgb['pale red'].
+            
         curve_lw : str, optional
+        
             Width of the main PSD line. The default is 3.
+            
         shade_clr : str, optional
+        
             Color of the shaded envelope. The default is sns.xkcd_rgb['pale red'].
+            
         shade_alpha : float, optional
+        
             Transparency on the envelope. The default is 0.3.
+            
         shade_label : str, optional
+        
             Label for the envelope. The default is None.
+            
         lgd_kwargs : dict, optional
+        
             Parameters for the legend. The default is None.
+            
         members_plot_num : int, optional
+        
             Number of individual members to plot. The default is 10.
+            
         members_alpha : float, optional
+        
             Transparency of the lines representing the multiple members. The default is 0.3.
+            
         members_lw : float, optional
+        
             With of the lines representing the multiple members. The default is 1.
+            
         seed : int, optional
+        
             Set the seed for random number generator. Useful for reproducibility. The default is None.
 
         Returns
         -------
-        fig, ax
+        fig : matplotlib.pyplot.figure
+        
+        ax : matplotlib.pyplot.axis
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
