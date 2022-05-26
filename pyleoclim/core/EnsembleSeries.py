@@ -192,9 +192,9 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
 
-        corr : pyleoclim.ui.CorrEns
+        corr_ens : pyleoclim.CorrEns
 
-            the result object, see `pyleoclim.ui.CorrEns`
+            The resulting object, see pyleoclim.CorrEns
 
         See also
         --------
@@ -203,7 +203,7 @@ class EnsembleSeries(MultipleSeries):
 
         pyleoclim.utils.correlation.fdr : FDR function
 
-        pyleoclim.ui.CorrEns : the correlation ensemble object
+        pyleoclim.core.CorrEns.CorrEns : The correlation ensemble object
 
         Examples
         --------
@@ -371,7 +371,7 @@ class EnsembleSeries(MultipleSeries):
         See also
         --------
 
-        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
 
         Examples
         --------
@@ -538,7 +538,7 @@ class EnsembleSeries(MultipleSeries):
         See also
         --------
 
-        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
 
         Examples
         --------
@@ -580,7 +580,6 @@ class EnsembleSeries(MultipleSeries):
             fig, ax = plt.subplots(figsize=figsize)
 
         ts_qs = self.quantiles(qs=qs)
-
 
         if inner_shade_label is None:
             inner_shade_label = f'{ts_qs.series_list[1].label}-{ts_qs.series_list[-2].label}'
