@@ -183,10 +183,72 @@ class Coherence:
 
         See also
         --------
-
-        pyleoclim.core.ui.Series.wavelet_coherence
+        pyleoclim.core.Coherence.Coherence.dashboard
+        pyleoclim.core.Series.Series.wavelet_coherence
         matplotlib.pyplot.quiver
+        
+        Examples
+        --------
 
+        Calculate the coherence of NINO3 and All India Rainfall and plot it:
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            import pyleoclim as pyleo
+            import pandas as pd
+            import numpy as np
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
+            time = data['t'].values
+            air = data['air'].values
+            nino = data['nino'].values
+            ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)',
+                                  label='All India Rainfall', value_name='AIR (mm/month)')
+            ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)',
+                                   label='NINO3', value_name='NINO3 (K)')
+
+            coh = ts_air.wavelet_coherence(ts_nino)
+            @savefig coh_plot.png
+            coh.plot()
+            pyleo.closefig(fig)
+            
+        Establish significance against an AR(1) benchmark:
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+           
+            coh_sig = coh.signif_test(number=1000, qs=[.9,.95,.99]) 
+            @savefig coh_sig_plot.png
+            coh_sig.plot()
+            pyleo.closefig(fig)
+
+        Note that specifiying 3 significance thresholds does not take any more time as the quantiles are 
+        simply estimated from the same 1,000 member ensemble. By default, the plot function looks 
+        for the closest quantile to 0.95, but this is easy to adjust, e.g. for the 99th percentile:
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            @savefig coh_sig_plot99.png
+            coh_sig.plot(signif_thresh = 0.99)
+            pyleo.closefig(fig)
+            
+        By default, the function plots the wavelet transform coherency (WTC), which quantifies where 
+        two timeseries exhibit similar behavior in time-frequency space, regardless of whether this 
+        corresponds to regions of high common power. To visualize the latter, you want to plot the 
+        cross-wavelet transform (XWT) instead, like so:
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            @savefig xwt_plot.png
+            coh_sig.plot(var='xwt')
+            pyleo.closefig(fig)
+                    
         '''
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
@@ -382,12 +444,21 @@ class Coherence:
              - "path" must be specified; it can be any existed or non-existed path,
                with or without a suffix; if the suffix is not given in "path", it will follow "format"
              - "format" can be one of {"pdf", "eps", "png", "ps"}
+             
+         phase_style : dict, optional
+             Arguments for the phase arrows. The default is {}. It includes:
+             - 'pt': the default threshold above which phase arrows will be plotted
+             - 'skip_x': the number of points to skip between phase arrows along the x-axis
+             - 'skip_y':  the number of points to skip between phase arrows along the y-axis
+             - 'scale': number of data units per arrow length unit (see matplotlib.pyplot.quiver)
+             - 'width': shaft width in arrow units (see matplotlib.pyplot.quiver)
+             - 'color': arrow color (see matplotlib.pyplot.quiver)
 
          ts_plot_kwargs : dict
-              arguments to be passed to the timeseries subplot, see pyleoclim.core.ui.Series.plot for details
+              arguments to be passed to the timeseries subplot, see pyleoclim.core.Series.Series.plot for details
 
          wavelet_plot_kwargs : dict
-              arguments to be passed to the contour subplots (XWT and WTC), see pyleoclim.core.ui.Scalogram.plot for details
+              arguments to be passed to the contour subplots (XWT and WTC), [see pyleoclim.core.Coherence.Coherence.plot for details]
 
 
          Returns
@@ -396,10 +467,39 @@ class Coherence:
 
          See also
          --------
-
-         pyleoclim.core.ui.Series.wavelet_coherence
+         pyleoclim.core.Coherence.Coherence.plot
+         pyleoclim.core.Series.Series.wavelet_coherence
+         pyleoclim.core.Series.Series.plot
          matplotlib.pyplot.quiver
+         
+         Examples
+         --------
 
+         Calculate the coherence of NINO3 and All India Rainfall and plot it as a dashboard:
+
+         .. ipython:: python
+             :okwarning:
+             :okexcept:
+                 
+             import pyleoclim as pyleo
+             import pandas as pd
+             import numpy as np
+             data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
+             time = data['t'].values
+             air = data['air'].values
+             nino = data['nino'].values
+             ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)',
+                                   label='All India Rainfall', value_name='AIR (mm/month)')
+             ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)',
+                                    label='NINO3', value_name='NINO3 (K)')
+
+             coh = ts_air.wavelet_coherence(ts_nino)
+             coh_sig = coh.signif_test()
+             
+             @savefig coh_dash.png
+             coh_sig.dashboard()
+             pyleo.closefig(fig)
+             
          '''
          # prepare options dictionaries
          savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -466,7 +566,7 @@ class Coherence:
         seed : int, optional
             Fixes the seed for the random number generator. Useful for reproducibility. The default is None.
         qs : list, optional
-            Significance level to return. The default is [0.95].
+            Significance levels to return. The default is [0.95].
         settings : dict, optional
             Parameters for surrogate model. The default is None.
         mute_pbar : bool, optional
@@ -474,14 +574,17 @@ class Coherence:
 
         Returns
         -------
-        new : pyleoclim.Coherence
-            Coherence with significance level signif_qs, a list with the following NumPy ndarrays:
-                0:
-
+        new : pyleoclim.core.Coherence.Coherence
+            original Coherence object augmented with significance levels signif_qs, a list with the following NumPy ndarrays:
+                0: MultipleScalogram for the wavelet transform coherency (WTC)
+                1: MultipleScalogram for the cross-wavelet transform (XWT)
+            Each object contains as many Scalogram objects as qs contains values
         See also
         --------
 
-        pyleoclim.core.ui.Series.wavelet_coherence : Wavelet coherence
+        pyleoclim.core.Series.Series.wavelet_coherence : Wavelet coherence
+        pyleoclim.core.MultipleScalogram.MultipleScalogram : Multiple Scalogram object
+
         '''
 
         if number == 0:

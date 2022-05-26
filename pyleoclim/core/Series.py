@@ -1799,7 +1799,7 @@ class Series:
         method : str {wwz, cwt}
             cwt - the continuous wavelet transform (as per Torrence and Compo [1998])
                 is appropriate for evenly-spaced series.
-            wwz - the weighted wavelet Z-trasnform (as per Foster [1996])
+            wwz - the weighted wavelet Z-transform (as per Foster [1996])
                 is appropriate for unevenly-spaced series.
             Default is cwt, returning an error if the Series is unevenly-spaced.
 
@@ -1968,21 +1968,20 @@ class Series:
         Returns
         -------
 
-        coh : pyleoclim.Coherence
+        coh : pyleoclim.core.Coherence.Coherence
+
 
         See also
         --------
 
         pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
-
         pyleoclim.utils.tsutils.detrend : Detrending function
-
-        pyleoclim.core.ui.Coherence : Coherence object
+        pyleoclim.core.MultipleSeries.MultipleSeries.common_time : put timeseries on common time axis
 
         Examples
         --------
 
-        Wavelet coherence with the default arguments:
+        Wavelet coherence on evenly spaced data with default arguments:
 
         .. ipython:: python
             :okwarning:
@@ -1990,19 +1989,20 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
             time = data['t'].values
             air = data['air'].values
             nino = data['nino'].values
             ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)')
             ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)')
 
-            # without any arguments, the `tau` will be determined automatically
             coh = ts_air.wavelet_coherence(ts_nino)
 
             @savefig coh.png
             fig, ax = coh.plot()
             pyleo.closefig()
+            
+            
 
         We may specify `ntau` to adjust the temporal resolution of the WWZ scalogram, which will affect the time consumption of calculation and the result itself:
 
@@ -2057,6 +2057,9 @@ class Series:
             ms = ms.common_time(**ct_args)
             ts1 = ms.series_list[0]
             ts2 = ms.series_list[1]
+        elif method == 'cwt' and (not self.is_evenly_spaced() or not target_series.is_evenly_spaced()):
+            raise ValueError("The chosen method is cwt but at least one the series is unevenly spaced. You can either apply common_time() or use 'wwz'.")
+
         else:
             ts1 = self
             ts2 = target_series

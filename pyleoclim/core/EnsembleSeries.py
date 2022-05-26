@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 The EnsembleSeries class is a child of MultipleSeries, designed for ensemble applications (e.g. draws from a posterior distribution of ages, model ensembles with randomized initial conditions, or some other stochastic ensemble).
-Compared to a MultipleSeries object, an EnsembleSeries object has the following properties:  [TO BE COMPLETED]
+In addition to a MultipleSeries object, an EnsembleSeries object has the following properties:
+- All series members are assumed to share the same time axis and all metadata (e.g., units).
+- The class enables ensemble-oriented methods for computation (e.g., quantiles) and visualization (e.g., envelope plot).    
 """
 
 from ..utils import plotting
