@@ -29,7 +29,7 @@ Getting Started
    :maxdepth: 1
 
    installation.rst
-   core/ui.rst
+   core/api.rst
    tutorials.rst
 
 The :ref:`Pyleoclim UI <core_ui>` makes use of specialized routines which are described in details in advanced funtionalities.

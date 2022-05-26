@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 The Series class describes the most basic objects in Pyleoclim. A Series is a simple `dictionary <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_ that contains 3 things:
 - a series of real-valued numbers;
@@ -259,7 +257,7 @@ class Series:
 
     def make_labels(self):
         '''
-        Initialization of labels
+        Initialization of plot labels based on Series metadata
 
         Returns
         -------
@@ -308,11 +306,11 @@ class Series:
             value_label: self.value,
         }
 
-        msg = print(tabulate(table, headers='keys'))
+        _ = print(tabulate(table, headers='keys'))
         return f'Length: {np.size(self.time)}'
 
     def stats(self):
-        """ Compute basic statistics for the time series
+        """ Compute basic statistics from a Series
 
         Computes the mean, median, min, max, standard deviation, and interquartile range of a numpy array y, ignoring NaNs.
 
@@ -365,7 +363,7 @@ class Series:
 
         marker : str
             e.g., 'o' for dots
-            See [matplotlib.markers](https://matplotlib.org/3.1.3/api/markers_api.html) for details
+            See [matplotlib.markers](https://matplotlib.org/stable/api/markers_api.html) for details
 
         markersize : float
             the size of the marker
@@ -373,11 +371,11 @@ class Series:
         color : str, list
             the color for the line plot
             e.g., 'r' for red
-            See [matplotlib colors] (https://matplotlib.org/3.2.1/tutorials/colors/colors.html) for details
+            See [matplotlib colors](https://matplotlib.org/stable/gallery/color/color_demo.html) for details
 
         linestyle : str
             e.g., '--' for dashed line
-            See [matplotlib.linestyles](https://matplotlib.org/3.1.0/gallery/lines_bars_and_markers/linestyles.html) for details
+            See [matplotlib.linestyles](https://matplotlib.org/stable/gallery/lines_bars_and_markers/linestyles.html) for details
 
         linewidth : float
             the width of the line
@@ -405,11 +403,11 @@ class Series:
 
         plot_kwargs : dict
             the dictionary of keyword arguments for ax.plot()
-            See [matplotlib.pyplot.plot](https://matplotlib.org/3.1.3/api/_as_gen/matplotlib.pyplot.plot.html) for details
+            See [matplotlib.pyplot.plot](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html) for details
 
         lgd_kwargs : dict
             the dictionary of keyword arguments for ax.legend()
-            See [matplotlib.pyplot.legend](https://matplotlib.org/3.1.3/api/_as_gen/matplotlib.pyplot.legend.html) for details
+            See [matplotlib.pyplot.legend](https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.legend.html) for details
 
         alpha : float
             Transparency setting
@@ -430,11 +428,11 @@ class Series:
 
         fig : matplotlib.figure
             the figure object from matplotlib
-            See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
+            See [matplotlib.pyplot.figure](https://matplotlib.org/stable/api/figure_api.html) for details.
 
         ax : matplotlib.axis
             the axis object from matplotlib
-            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+            See [matplotlib.axes](https://matplotlib.org/stable/api/axes_api.html) for details.
 
         Notes
         -----
@@ -444,7 +442,7 @@ class Series:
         See also
         --------
 
-        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+        pyleoclim.utils.plotting.savefig : saving a figure in Pyleoclim
 
         Examples
         --------
@@ -475,7 +473,7 @@ class Series:
                 fig, ax = ts.plot(color='r')
                 pyleo.closefig(fig)
 
-        Save the figure. Two options available:
+        Save the figure. Two options available, only one is needed:
             * Within the plotting command
             * After the figure has been generated
 
@@ -611,9 +609,8 @@ class Series:
             var_pct = nino_ssa['pctvar'] # extract the fraction of variance attributable to each mode
 
             # plot eigenvalues
-
-            nino_ssa.screeplot()
             @savefig ts_eigen.png
+            nino_ssa.screeplot()
 
 
         This highlights a few common phenomena with SSA:
@@ -637,11 +634,10 @@ class Series:
             :okexcept:
 
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
+            @savefig ssa_recon.png
             fig, ax = ts.plot(title='ONI')
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
-            @savefig ssa_recon.png
-
 
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
             * there was not much rhyme or reason for picking 15 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
@@ -663,12 +659,10 @@ class Series:
         .. ipython:: python
             :okwarning:
             :okexcept:
-
-            nino_mcssa.screeplot()
             @savefig scree_nmc.png
+            nino_mcssa.screeplot()
 
         This suggests that modes 1-5 fall above the red noise benchmark.
-
         '''
 
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
@@ -684,11 +678,18 @@ class Series:
 
     def is_evenly_spaced(self, tol=1e-3):
         ''' Check if the Series time axis is evenly-spaced, within tolerance
+        
+        Parameters
+        ----------
+        tol : float
+            tolerance. If time increments are all within tolerance, the series
+            is declared evenly-spaced. default : 1e-3
 
         Returns
         ------
 
         res : bool
+        
         '''
 
         res = tsbase.is_evenly_spaced(self.time, tol)
@@ -701,7 +702,8 @@ class Series:
             - `Finite Impulse Response <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.firwin.html>`_
             - `Savitzky-Golay filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.savgol_filter.html>`_
 
-        By default, this method implements a lowpass filter, though it can easily be turned into a bandpass or high-pass filter (see examples below).
+        By default, this method implements a lowpass filter, though it can easily
+        be turned into a bandpass or high-pass filter (see examples below).
 
         Parameters
         ----------
@@ -739,8 +741,11 @@ class Series:
         --------
 
         pyleoclim.utils.filter.butterworth : Butterworth method
+        
         pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
+        
         pyleoclim.utils.filter.firwin : FIR filter design using the window method
+        
         pyleoclim.utils.filter.lanczos : lowpass filter via Lanczos resampling
 
 
@@ -767,11 +772,11 @@ class Series:
             ts1 = pyleo.Series(time=t, value=sig1)
             ts2 = pyleo.Series(time=t, value=sig2)
             ts = pyleo.Series(time=t, value=sig)
+            @savefig ts_filter1.png
             fig, ax = ts.plot(label='mix')
             ts1.plot(ax=ax, label='10 Hz')
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
-            @savefig ts_filter1.png
 
         - Applying a low-pass filter
 
@@ -781,9 +786,9 @@ class Series:
 
             fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=15).plot(ax=ax, label='After 15 Hz low-pass filter')
+            @savefig ts_filter2.png
             ts1.plot(ax=ax, label='10 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
-            @savefig ts_filter2.png
 
         - Applying a band-pass filter
 
@@ -793,9 +798,9 @@ class Series:
 
             fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=[15, 25]).plot(ax=ax, label='After 15-25 Hz band-pass filter')
+            @savefig ts_filter3.png
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
-            @savefig ts_filter3.png
 
         Above is using the default Butterworth filtering. To use FIR filtering with a window like Hanning is also simple:
 
@@ -803,11 +808,12 @@ class Series:
             :okwarning:
             :okexcept:
 
+                    
             fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
+            @savefig ts_filter4.png
             ts2.plot(ax=ax, label='20 Hz')
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
-            @savefig ts_filter4.png
 
         - Applying a high-pass filter
 
@@ -819,9 +825,9 @@ class Series:
             ts_low  = ts.filter(cutoff_freq=15)
             ts_high = ts.copy()
             ts_high.value = ts.value - ts_low.value # subtract low-pass filtered series from original one
+            @savefig ts_filter5.png
             ts_high.plot(label='High-pass filter @ 15Hz',ax=ax)
             ax.legend(loc='upper left', bbox_to_anchor=(0, 1.1), ncol=3)
-            @savefig ts_filter5.png
 
         '''
         if not self.is_evenly_spaced():
@@ -883,8 +889,6 @@ class Series:
 
         return new
 
-
-
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                   ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
         ''' Plot the distribution of the timeseries values
@@ -915,7 +919,6 @@ class Series:
 
         edgecolor : matplotlib.color
             The color of the edges of the bar
-
 
         plot_kwargs : dict
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
@@ -1028,13 +1031,13 @@ class Series:
             the label for the amplitude axis of PDS
 
         ts_plot_kwargs : dict
-            arguments to be passed to the timeseries subplot, see pyleoclim.core.ui.Series.plot for details
+            arguments to be passed to the timeseries subplot, see pyleoclim.Series.plot for details
 
         wavelet_plot_kwargs : dict
-            arguments to be passed to the scalogram plot, see pyleoclim.core.ui.Scalogram.plot for details
+            arguments to be passed to the scalogram plot, see pyleoclim.Scalogram.plot for details
 
         psd_plot_kwargs : dict
-            arguments to be passed to the psd plot, see pyleoclim.core.ui.PSD.plot for details
+            arguments to be passed to the psd plot, see pyleoclim.PSD.plot for details
                 Certain psd plot settings are required by summary plot formatting. These include:
                     - ylabel
                     - legend
@@ -1053,15 +1056,15 @@ class Series:
         See also
         --------
 
-        pyleoclim.core.ui.Series.spectral : Spectral analysis for a timeseries
+        pyleoclim.core.Series.Series.spectral : Spectral analysis for a timeseries
 
-        pyleoclim.core.ui.Series.wavelet : Wavelet analysis for a timeseries
+        pyleoclim.core.Series.Series.wavelet : Wavelet analysis for a timeseries
 
         pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
 
-        pyleoclim.core.ui.PSD : PSD object
+        pyleoclim.core.PSD.PSD : PSD object
 
-        pyleoclim.core.ui.MultiplePSD : Multiple PSD object
+        pyleoclim.core.MultiplePSD.MultiplePSD : Multiple PSD object
 
         Examples
         --------
@@ -1209,7 +1212,7 @@ class Series:
 
         Returns
         -------
-        Series
+        Series : pyleoclim.Series
             A copy of the Series object
 
         '''
@@ -1225,7 +1228,7 @@ class Series:
 
         Returns
         -------
-        Series
+        new : pyleoclim.Series
             Series object with removed NaNs and sorting
 
         '''
@@ -1246,7 +1249,7 @@ class Series:
 
         Returns
         -------
-        Series
+        new : pyleoclim.Series
             Series object with removed NaNs and sorting
 
         '''
@@ -1323,15 +1326,13 @@ class Series:
         Parameters
         ----------
 
-        ts : pyleoclim Series
-
         factor : float
             The factor that adjusts the threshold for gap detection
 
         Returns
         -------
 
-        res : pyleoclim MultipleSeries Object or pyleoclim Series Object
+        res : pyleoclim.MultipleSeries Object or pyleoclim.Series Object
             If gaps were detected, returns the segments in a MultipleSeries object,
             else, returns the original timeseries.
 
@@ -1368,6 +1369,25 @@ class Series:
 
         new : Series
             The sliced Series object.
+            
+        Examples
+        --------
+
+        slice the SOI from 1972 to 1998
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts = pyleo.Series(time=time, value=value, time_name='Year C.E', value_name='SOI', label='SOI')
+            
+            ts_slice = ts.slice([1972, 1998])
+            print("New time bounds:",ts_slice.time.min(),ts_slice.time.max())
 
         '''
         new = self.copy()
@@ -1553,7 +1573,7 @@ class Series:
         label : str
             Label for the PSD object
 
-        scalogram : pyleoclim.core.ui.Series.Scalogram
+        scalogram : pyleoclim.core.Series.Series.Scalogram
             The return of the wavelet analysis; effective only when the method is 'wwz' or 'cwt'
 
         verbose : bool
@@ -1583,9 +1603,9 @@ class Series:
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
-        pyleoclim.core.ui.PSD : PSD object
+        pyleoclim.core.PSD.PSD : PSD object
 
-        pyleoclim.core.ui.MultiplePSD : Multiple PSD object
+        pyleoclim.core.MultiplePSD.MultiplePSD : Multiple PSD object
 
 
         Examples
@@ -1630,17 +1650,17 @@ class Series:
             psd_LS_n50 = ts_std.spectral(method='lomb_scargle', settings={'n50': 4})  # c=1e-2 yields lower frequency resolution
             psd_LS_freq = ts_std.spectral(method='lomb_scargle', settings={'freq': np.linspace(1/20, 1/0.2, 51)})
             psd_LS_LS = ts_std.spectral(method='lomb_scargle', freq_method='lomb_scargle')  # with frequency vector generated using REDFIT method
+            @savefig spec_ls_n50.png
             fig, ax = psd_LS_n50.plot(
                 title='PSD using Lomb-Scargle method with 4 overlapping segments',
                 label='settings={"n50": 4}')
             psd_ls.plot(ax=ax, label='settings={"n50": 3}', marker='o')
-            @savefig spec_ls_n50.png
 
+            @savefig spec_ls_freq.png
             fig, ax = psd_LS_freq.plot(
                 title='PSD using Lomb-Scargle method with differnt frequency vectors',
                 label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
             psd_ls.plot(ax=ax, label='freq_method="log"', marker='o')
-            @savefig spec_ls_freq.png
 
         You may notice the differences in the PSD curves regarding smoothness and the locations of the analyzed period points.
 
@@ -1830,10 +1850,12 @@ class Series:
         pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
+        
+        pyleoclim.core.Series.Series.spectral : spectral analysis tools
 
-        pyleoclim.core.ui.Scalogram : Scalogram object
+        pyleoclim.core.Scalogram.Scalogram : Scalogram object
 
-        pyleoclim.core.ui.MultipleScalogram : Multiple Scalogram object
+        pyleoclim.core.MultipleScalogram.MultipleScalogram : Multiple Scalogram object
 
         References
         ----------
@@ -1863,17 +1885,19 @@ class Series:
 
             scal1 = ts.wavelet() # method='cwt' will be applied since the series is evenly spaced
             scal_signif = scal1.signif_test(number=200)  # for research-grade work, use number=200 or larger
-            scal_signif.plot(title='CWT scalogram')
             @savefig scal_cwt.png
+            fig, ax = scal_signif.plot(title='CWT scalogram')
+            pyleo.closefig()
 
             # if you wanted to invoke the WWZ instead
             scal2 = ts.wavelet(method='wwz') # no significance testing to lower computational cost
-            scal2.plot(title='WWZ scalogram')
             @savefig scal_wwz.png
+            fig, ax = scal2.plot(title='WWZ scalogram')
+            pyleo.closefig()
 
-            # notice that the two scalograms have different units, which are arbitrary
+        Notice that the two scalograms have different units, which are arbitrary
 
-        See the Series.spectral() functionality as an example to change the wavelet method.
+        To see how to change the wavelet method, see the Series.spectral() functionality as an example
 
         '''
         if not verbose:
@@ -1975,7 +1999,9 @@ class Series:
         --------
 
         pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
+        
         pyleoclim.utils.tsutils.detrend : Detrending function
+        
         pyleoclim.core.MultipleSeries.MultipleSeries.common_time : put timeseries on common time axis
 
         Examples
@@ -2001,8 +2027,6 @@ class Series:
             @savefig coh.png
             fig, ax = coh.plot()
             pyleo.closefig()
-            
-            
 
         We may specify `ntau` to adjust the temporal resolution of the WWZ scalogram, which will affect the time consumption of calculation and the result itself:
 

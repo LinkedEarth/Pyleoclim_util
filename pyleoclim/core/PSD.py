@@ -1,3 +1,9 @@
+'''
+The PSD (Power spectral density) class is intended for conveniently manipulating 
+the result of spectral methods, including performing significance tests, 
+estimating scaling coefficients, and plotting.
+'''
+
 from ..utils import plotting, lipdutils 
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils

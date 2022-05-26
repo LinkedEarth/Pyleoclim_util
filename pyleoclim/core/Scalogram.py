@@ -1,3 +1,7 @@
+'''
+The Scalogram class is analogous to PSD, but for wavelet spectra (scalograms)
+'''
+
 from ..utils import plotting, lipdutils
 from ..utils import wavelet as waveutils
 

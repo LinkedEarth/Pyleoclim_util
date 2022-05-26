@@ -1447,8 +1447,8 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
         contains the cross wavelet coherence, cross-wavelet phase,
         vector of frequency, evenly-spaced time points, AR1 sims, cone of influence
         
-    Reference
-    ---------
+    References
+    ----------
     
     Grinsted, A., J. C. Moore, and S. Jevrejeva (2004), Application of the cross
     wavelet transform and wavelet coherence to geophysical time series, 
@@ -2443,8 +2443,8 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={
         cross-wavelet phase, vector of frequency, evenly-spaced time points, 
         nMC AR1 scalograms, cone of influence.
         
-    Reference
-    ---------
+    References
+    ----------
     
     Grinsted, A., J. C. Moore, and S. Jevrejeva (2004), Application of the cross
     wavelet transform and wavelet coherence to geophysical time series, 

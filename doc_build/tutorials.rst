@@ -3,8 +3,13 @@
 Tutorials
 =========
 
-The main Pyleoclim functionalities are illustrated through this `Jupyter Notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_.
+Tutorials (and functional science examples) for Pyleoclim exist in the form of:
 
-A basic introduction to plotting styles in Pyleoclim is provided in `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/plot_styles.ipynb>`_.
+* Jupyter Notebooks, which are found on the following repositories:
+  * `PaleoBooks <https://github.com/LinkedEarth/PaleoBooks>`_ (sparse for now; will grow in 2022)
+  * `Pyleoclim paper notebooks <https://github.com/LinkedEarth/PyleoclimPaper>`_ (private until publication)
+  * `PaleoHackathon notebooks <https://github.com/LinkedEarth/paleoHackathon>`_ (contact the crew for solutions)
 
-More advanced paleogeoscientific workflows that leverage LiPD datasets are available as Jupyter notebooks through `LiPDBooks <https://github.com/LinkedEarth/LiPDbooks>`_.
+* `The LinkedEarth YouTube Channel <https://www.youtube.com/playlist?list=PL93NbaRnKAuF4WpIQf-4y_U4lo-GqcrcW>`_.
+
+If you still have questions, please see our  `Discourse forum <https://discourse.linked.earth>`_
