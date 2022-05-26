@@ -39,14 +39,17 @@ class MultipleSeries:
     ----------
 
     series_list : list
+    
         a list of pyleoclim.Series objects
 
     time_unit : str
+    
         The target time unit for every series in the list.
         If None, then no conversion will be applied;
         Otherwise, the time unit of every series in the list will be converted to the target.
 
    name : str
+   
         name of the collection of timeseries (e.g. 'PAGES 2k ice cores')
 
     Examples
@@ -87,6 +90,7 @@ class MultipleSeries:
         ----------
 
         time_unit : str
+        
             the target time unit, possible input:
             {
                 'year', 'years', 'yr', 'yrs',
@@ -97,6 +101,7 @@ class MultipleSeries:
 
         Examples
         --------
+        
         .. ipython:: python
             :okwarning:
             :okexcept:
@@ -136,25 +141,29 @@ class MultipleSeries:
         Parameters
         ----------
 
-        method : str, {'savitzky-golay', 'butterworth', 'firwin', 'lanczos'}
-            The filtering method
+        method : str; {'savitzky-golay', 'butterworth', 'firwin', 'lanczos'}
+        
+            The filtering method  
             - 'butterworth': the Butterworth method (default)
             - 'savitzky-golay': the Savitzky-Golay method
             - 'firwin': FIR filter design using the window method, with default window as Hamming
             - 'lanczos': lowpass filter via Lanczos resampling
 
         cutoff_freq : float or list
+        
             The cutoff frequency only works with the Butterworth method.
             If a float, it is interpreted as a low-frequency cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
 
         cutoff_scale : float or list
+        
             cutoff_freq = 1 / cutoff_scale
             The cutoff scale only works with the Butterworth method and when cutoff_freq is None.
             If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
 
         kwargs : dict
+        
             A dictionary of the keyword arguments for the filtering method,
             See pyleoclim.utils.filter.savitzky_golay, pyleoclim.utils.filter.butterworth, pyleoclim.utils.filter.firwin, and pyleoclim.utils.filter.lanczos for the details
 
@@ -173,6 +182,8 @@ class MultipleSeries:
         pyleoclim.utils.filter.firwin : FIR filter design using the window method
 
         pyleoclim.utils.filter.lanczos : lowpass filter via Lanczos resampling
+        
+
 
         Examples
         --------
@@ -213,18 +224,20 @@ class MultipleSeries:
         ----------
 
         ts : pyleoclim.Series
+        
             The pyleoclim Series object to be appended to the MultipleSeries object
 
         Returns
         -------
 
         ms : pyleoclim.MultipleSeries
+        
             The augmented object, comprising the old one plus `ts`
 
         See also
         --------
 
-        pyleoclim.core.Series.Series
+        pyleoclim.core.Series.Series : A Pyleoclim Series object
 
         Examples
         --------
@@ -259,6 +272,7 @@ class MultipleSeries:
         -------
 
         ms : pyleoclim.MultipleSeries
+        
             The copied version of the pyleoclim.MultipleSeries object
 
         Examples
@@ -290,6 +304,7 @@ class MultipleSeries:
         -------
 
         ms : pyleoclim.MultipleSeries
+        
             The standardized pyleoclim.MultipleSeries object
 
         Examples
@@ -326,24 +341,30 @@ class MultipleSeries:
 
         Parameters
         ----------
-        step_style : str
+        
+        step_style : str: {"median","mean,"mode","max"}
+        
             Method to obtain a representative step if x is not evenly spaced.
-            Valid entries: 'median' [default], 'mean', 'mode' or 'max'
-            The mode is the most frequent entry in a dataset, and may be a good choice if the timeseries
+            Valid entries: 'median' [default], 'mean', 'mode' or 'max'.
+            The "mode" is the most frequent entry in a dataset, and may be a good choice if the timeseries
             is nearly equally spaced but for a few gaps.
 
-            Max is a conservative choice, appropriate for binning methods and Gaussian kernel coarse-graining
+            "max" is a conservative choice, appropriate for binning methods and Gaussian kernel coarse-graining
 
         Returns
         -------
 
-        increments : numpy array
+        increments : numpy.array
+        
             n x 3 array, where n is the number of series,
             index 0 is the earliest time
             index 1 is the latest time
             index 2 is the step chosen according to step_style
-
+            
+        See also
+        --------
         
+        pyleoclim.utils.tsutils.increments : The underlying increments function 
 
         '''
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
@@ -354,10 +375,10 @@ class MultipleSeries:
         return gp
 
     def common_time(self, method='interp', step = None, start = None, stop = None, step_style = None, **kwargs):
-        ''' Aligns the time axes of a MultipleSeries object, via binning
-        interpolation., or Gaussian kernel. Alignmentis critical for workflows
+        ''' Aligns the time axes of a MultipleSeries object
+        
+        The alignment is achieved via binning, interpolation., or Gaussian kernel. Alignment is critical for workflows
         that need to assume a common time axis for the group of series under consideration.
-
 
         The common time axis is characterized by the following parameters:
 
@@ -371,28 +392,36 @@ class MultipleSeries:
 
         Parameters
         ----------
-        method :  string
-            either 'bin', 'interp' [default] or 'gkernel'
-        step : float
-            common step for all time axes  [default = None]
-        start : float
-            starting point of the common time axis [default = None]
-        stop : float
-            end point of the common time axis [default = None]
         
-        step_style : string
-            Method to obtain a representative step among all Series
-            (using tsutils.increments)
-            Valid entries: 'median', 'mean', 'mode' or 'max'
-            Default value is None, so that it will be chosen according
-            to the method: 'max' for bin and gkernel, 'mean' for interp. 
+        method :  string; {'bin','interp','gkernel'}
+        
+            either 'bin', 'interp' [default] or 'gkernel'
+            
+        step : float
+        
+            common step for all time axes. Default is None and inferred from the timeseries spacing
+            
+        start : float
+        
+            starting point of the common time axis. Default is None and inferred as the max of the min of the time axes for the timeseries.
+            
+        stop : float
+        
+            end point of the common time axis. Default is None and inferred as the min of the max of the time axes for the timeseries.
+        
+        step_style : string; {'median', 'mean', 'mode', 'max'}
+        
+            Method to obtain a representative step among all Series (using tsutils.increments).
+            Default value is None, so that it will be chosen according to the method: 'max' for bin and gkernel, 'mean' for interp. 
 
         kwargs: dict
+        
             keyword arguments (dictionary) of the (bin, gkernel or interp) methods
 
         Returns
         -------
         ms : pyleoclim.MultipleSeries
+        
             The MultipleSeries objects with all series aligned to the same time axis.
 
 
@@ -528,20 +557,23 @@ class MultipleSeries:
                     fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
 
-        If the target Series is not specified, then the 1st member of MultipleSeries will be the target
 
         Parameters
         ----------
         target : pyleoclim.Series, optional
-            A pyleoclim Series object.
+        
+            The Series against which to take the correlation. If the target Series is not specified, then the 1st member of MultipleSeries will be used as the target
 
-        timespan : tuple
+        timespan : tuple, optional
+        
             The time interval over which to perform the calculation
 
         alpha : float
+        
             The significance level (0.05 by default)
 
         settings : dict
+        
             Parameters for the correlation function, including:
 
             nsim : int
@@ -550,22 +582,27 @@ class MultipleSeries:
                 method for significance testing
 
         fdr_kwargs : dict
+        
             Parameters for the FDR function
 
         common_time_kwargs : dict
+        
             Parameters for the method MultipleSeries.common_time()
 
-        mute_pbar : bool
+        mute_pbar : bool; {True,False}
+        
             If True, the progressbar will be muted. Default is False.
         
         seed : float or int
+        
             random seed for isopersistent and isospectral methods
 
         Returns
         -------
 
         corr : pyleoclim.CorrEns.CorrEns
-            the result object, see `pyleoclim.CorrEns.CorrEns`
+        
+            the result object
 
         See also
         --------
@@ -574,7 +611,7 @@ class MultipleSeries:
 
         pyleoclim.utils.correlation.fdr : FDR function
         
-        pyleoclim.CorrEns.CorrEns : the correlation ensemble object
+        pyleoclim.core.CorrEns.CorrEns : the correlation ensemble object
 
         Examples
         --------
@@ -640,15 +677,6 @@ class MultipleSeries:
         corr_ens = CorrEns(r_list, p_list, signif_list, signif_fdr_list, alpha)
         return corr_ens
 
-    # def mssa(self, M, MC=0, f=0.5):
-    #     data = []
-    #     for val in self.series_list:
-    #         data.append(val.value)
-    #     data = np.transpose(np.asarray(data))
-
-
-    #     res = decomposition.mssa(data, M=M, MC=MC, f=f)
-    #     return res
 
     def equal_lengths(self):
         ''' Test whether all series in object have equal length
@@ -662,9 +690,11 @@ class MultipleSeries:
         -------
 
         flag : bool
+        
             Whether or not the Series in the pyleo.MultipleSeries object are of equal length
 
         lengths : list 
+        
             List of the lengths of the series in object
         '''
 
@@ -693,10 +723,12 @@ class MultipleSeries:
         ----------
 
         weights : ndarray, optional
+        
             Series weights to use after transforming data according to standardize
             or demean when computing the principal components.
 
         missing : {str, None}
+        
             Method for missing data.  Choices are:
 
             * 'drop-row' - drop rows with missing values.
@@ -707,15 +739,23 @@ class MultipleSeries:
             * `None` raises if data contains NaN values.
 
         tol_em : float
+        
             Tolerance to use when checking for convergence of the EM algorithm.
+            
         max_em_iter : int
+        
             Maximum iterations for the EM algorithm.
 
         Returns
         -------
 
         res: pyleoclim.SpatialDecomp.SpatialDecomp
-            the result object, see `pyleoclim.SpatialDecomp.SpatialDecomp`
+        
+        See also
+        --------
+        
+        pyleoclim.core.SpatialDecomp.SpatialDecomp : The spatial decomposition object
+        
 
         Examples
         --------
@@ -854,18 +894,20 @@ class MultipleSeries:
         ----------
 
         kwargs : dict
+        
             Arguments for the binning function. See pyleoclim.utils.tsutils.bin
 
         Returns
         -------
 
         ms : pyleoclim.MultipleSeries
+        
             The MultipleSeries objects with all series aligned to the same time axis.
 
         See also
         --------
 
-        pyleoclim.core.Series.MultipleSeries.common_time: Base function on which this operates
+        pyleoclim.core.MultipleSeries.MultipleSeries.common_time: Base function on which this operates
 
         pyleoclim.utils.tsutils.bin: Underlying binning function
 
@@ -895,6 +937,7 @@ class MultipleSeries:
 
     def gkernel(self, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via Gaussian kernel.
+        
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
 
@@ -910,6 +953,7 @@ class MultipleSeries:
         ----------
 
         kwargs : dict
+        
             Arguments for gkernel. See pyleoclim.utils.tsutils.gkernel for details.
 
         Returns
@@ -949,6 +993,7 @@ class MultipleSeries:
 
     def interp(self, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object, via interpolation.
+        
         This is critical for workflows that need to assume a common time axis
         for the group of series under consideration.
 
@@ -969,6 +1014,7 @@ class MultipleSeries:
         Returns
         -------
         ms : pyleoclim.MultipleSeries
+        
             The MultipleSeries objects with all series aligned to the same time axis.
 
         See also
@@ -1007,19 +1053,24 @@ class MultipleSeries:
 
         Parameters
         ----------
+        
         method : str, optional
+        
             The method for detrending. The default is 'emd'.
             Options include:
                 * linear: the result of a linear least-squares fit to y is subtracted from y.
                 * constant: only the mean of data is subtrated.
                 * "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
                 * "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+                
         **kwargs : dict
             Relevant arguments for each of the methods.
 
         Returns
         -------
+        
         ms : pyleoclim.MultipleSeries
+        
             The detrended timeseries
 
         See also
@@ -1044,34 +1095,39 @@ class MultipleSeries:
         Parameters
         ----------
 
-        method : str
-            {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram', 'cwt'}
+        method : str; {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram', 'cwt'}
 
-        freq_method : str
-            {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
+        freq_method : str; {'log','scale', 'nfft', 'lomb_scargle', 'welch'}
 
         freq_kwargs : dict
+        
             Arguments for frequency vector
 
         settings : dict
+        
             Arguments for the specific spectral method
 
         label : str
+        
             Label for the PSD object
 
         verbose : bool
+        
             If True, will print warning messages if there is any
 
         mute_pbar : bool
+        
             Mute the progress bar. Default is False.
 
         scalogram_list : pyleoclim.MultipleScalogram
+        
             Multiple scalogram object containing pre-computed scalograms to use when calculating spectra, only works with wwz or cwt
 
         Returns
         -------
 
         psd : pyleoclim.MultiplePSD
+        
             A Multiple PSD object
 
         See also
@@ -1149,39 +1205,47 @@ class MultipleSeries:
 
         Parameters
         ----------
+        
         method : str {wwz, cwt}
+        
             cwt - the continuous wavelet transform (as per Torrence and Compo [1998])
-                is appropriate for evenly-spaced series.
+                is appropriate only for evenly-spaced series.
             wwz - the weighted wavelet Z-transform (as per Foster [1996])
-                is appropriate for unevenly-spaced series.
+                is appropriate for both evenly and unevenly-spaced series.
             Default is cwt, returning an error if the Series is unevenly-spaced.
 
         settings : dict, optional
+        
             Settings for the particular method. The default is {}.
 
-        freq_method : str
-            {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
+        freq_method : str; {'log', 'scale', 'nfft', 'lomb_scargle', 'welch'}
 
         freq_kwargs : dict
+        
             Arguments for frequency vector
 
         settings : dict
+        
             Arguments for the specific spectral method
 
         verbose : bool
+        
             If True, will print warning messages if there is any
 
         mute_pbar : bool, optional
+        
             Whether to mute the progress bar. The default is False.
 
         Returns
         -------
 
         scals : pyleoclim.MultipleScalograms
+        
             A Multiple Scalogram object
 
         See also
         --------
+        
         pyleoclim.utils.wavelet.wwz : wwz function
 
         pyleoclim.utils.wavelet.cwt : cwt function
@@ -1199,6 +1263,7 @@ class MultipleSeries:
 
         Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
         Python routines available at http://paos.colorado.edu/research/wavelets/
+        
 
         Examples
         --------
@@ -1238,56 +1303,92 @@ class MultipleSeries:
 
         Parameters
         ----------
+        
         figsize : list, optional
+        
             Size of the figure. The default is [10, 4].
+            
         marker : str, optional
+        
             marker type. The default is None.
+            
         markersize : float, optional
+        
             marker size. The default is None.
+            
         linestyle : str, optional
+        
             Line style. The default is None.
+            
         linewidth : float, optional
+        
             The width of the line. The default is None.
+            
         colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
+        
             Colors for plotting.
             If None, the plotting will cycle the 'tab10' colormap;
             if only one color is specified, then all curves will be plotted with that single color;
             if a list of colors are specified, then the plotting will cycle that color list.
+            
         cmap : str
+        
             The colormap to use when "colors" is None.
-        norm : matplotlib.colors.Normalize like
+            
+        norm : matplotlib.colors.Normalize
+       
             The normalization for the colormap.
             If None, a linear normalization will be used.
+            
         xlabel : str, optional
+        
             x-axis label. The default is None.
+            
         ylabel : str, optional
+        
             y-axis label. The default is None.
+            
         title : str, optional
+        
             Title. The default is None.
+            
         legend : bool, optional
+        
             Wether the show the legend. The default is True.
+            
         plot_kwargs : dict, optional
+        
             Plot parameters. The default is None.
+            
         lgd_kwargs : dict, optional
+        
             Legend parameters. The default is None.
+            
         savefig_settings : dictionary, optional
+        
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            
         ax : matplotlib.ax, optional
+        
             The matplotlib axis onto which to return the figure. The default is None.
+            
         invert_xaxis : bool, optional
+        
             if True, the x-axis of the plot will be inverted
 
         Returns
         -------
 
         fig : matplotlib.figure
+        
             the figure object from matplotlib
             See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
 
         ax : matplotlib.axis
+        
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
 
@@ -1375,45 +1476,74 @@ class MultipleSeries:
         Parameters
         ----------
         figsize : list
+        
             Size of the figure.
+            
         savefig_settings : dictionary
+        
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            
         xlim : list
+        
             The x-axis limit.
+            
         fill_between_alpha : float
+        
             The transparency for the fill_between shades.
+            
         colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
+        
             Colors for plotting.
             If None, the plotting will cycle the 'tab10' colormap;
             if only one color is specified, then all curves will be plotted with that single color;
             if a list of colors are specified, then the plotting will cycle that color list.
+            
         cmap : str
+        
             The colormap to use when "colors" is None.
+            
         norm : matplotlib.colors.Normalize like
+        
             The nomorlization for the colormap.
             If None, a linear normalization will be used.
+            
         labels: None, 'auto' or list
+        
             If None, doesn't add labels to the subplots
             If 'auto', uses the labels passed during the creation of pyleoclim.Series
             If list, pass a list of strings for each labels.
             Default is 'auto'
+            
         spine_lw : float
+        
             The linewidth for the spines of the axes.
+            
         grid_lw : float
+        
             The linewidth for the gridlines.
+            
         font_scale : float
+        
             The scale for the font sizes. Default is 0.8.
+            
         label_x_loc : float
+        
             The x location for the label of each curve.
+            
         v_shift_factor : float
+        
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
+            
         linewidth : float
+        
             The linewidth for the curves.
+            
         plot_kwargs: dict or list of dict
+        
             Arguments to further customize the plot from matplotlib.pyplot.plot.
             Dictionary: Arguments will be applied to all lines in the stackplots
             List of dictionary: Allows to customize one line at a time.
