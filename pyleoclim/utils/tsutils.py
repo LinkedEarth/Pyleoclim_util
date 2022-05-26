@@ -883,7 +883,7 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
         index = [i for i in range(len(distances))]
 
         if auto == True:
-            db = DBSCAN(eps=knee_point, min_samples=minpts)
+            db = DBSCAN(eps=knee_point, min_samples=int(minpts))
             clusters = db.fit(ys.reshape(-1, 1))
             cluster_labels = clusters.labels_
             outliers = np.where(cluster_labels == -1)
@@ -905,7 +905,7 @@ def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
                         arrowprops=dict(facecolor='black', shrink=0.05))
                 plot_xy(index, distances, xlabel='Indices', ylabel='Distances',plot_kwargs=plot_knee_kwargs,ax=ax1)
 
-            db = DBSCAN(eps=eps, min_samples=minpts)
+            db = DBSCAN(eps=eps, min_samples=int(minpts))
             clusters = db.fit(ys.reshape(-1, 1))
             cluster_labels = clusters.labels_
             outliers = np.where(cluster_labels == -1)

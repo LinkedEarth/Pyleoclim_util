@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 This allows to manipulate LiPD objects and take advantage of the metadata information for specific functionalities. Lipd objects are needed to create LipdSeries objects, which carry most of the timeseries functionalities.
 """

@@ -1,3 +1,7 @@
+"""
+This module contains the MultipleScalogram object, which is used to store the results of significance testing for wavelet analysis in signif_qs
+"""
+
 from ..core import Scalogram
 
 import numpy as np
@@ -5,9 +9,23 @@ from copy import deepcopy
 from scipy.stats.mstats import mquantiles
 
 class MultipleScalogram:
-    ''' Multiple Scalogram objects
-    '''
+    
     def __init__(self, scalogram_list):
+        ''' Multiple Scalogram objects.
+        
+        This object is mainly used to store the results of wavelet significance testing in the signif_qs arguments of wavelet. 
+        
+        See also
+        --------
+        
+        pyleoclim.core.Scalogram.Scalogram : Scalogram object
+        
+        pyleoclim.core.Series.Series.wavelet : Wavelet analysis
+        
+        pyleoclim.core.Scalogram.Scalogram.signif_test : Significance testing for wavelet analysis
+        
+        '''
+        
         self.scalogram_list = scalogram_list
 
     def copy(self):
@@ -20,20 +38,27 @@ class MultipleScalogram:
 
         Parameters
         ----------
+        
         qs : list, optional
+        
             List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
 
         Raises
         ------
+        
         ValueError
+        
             Frequency axis not consistent across the PSD list!
 
         Value Error
+        
             Time axis not consistent across the scalogram list!
 
         Returns
         -------
+        
         scals : pyleoclim.MultipleScalogram
+        
         '''
         freq = np.copy(self.scalogram_list[0].frequency)
         scale = np.copy(self.scalogram_list[0].scale)

@@ -1,5 +1,5 @@
+import numpy as np
 from tabulate import tabulate
-
 
 def pval_format(p, threshold=0.01, style='exp'):
     ''' Print p-value with proper format when p is close to 0

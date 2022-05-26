@@ -1,3 +1,7 @@
+"""
+This module is used for the CorrEns object, which stores the result of an ensemble correlation calculation between timeseries and/or ensemble of timeseries. 
+"""
+
 import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt, transforms as transforms
@@ -31,40 +35,49 @@ def pval_format(p, threshold=0.01, style='exp'):
     return s
 
 class CorrEns:
-    ''' Correlation Ensemble
+    ''' This object contains the results of an ensemble correlation
 
     Parameters
     ----------
 
     r: list
+    
         the list of correlation coefficients
 
     p: list
+    
         the list of p-values
 
     p_fmt_td: float
+    
         the threshold for p-value formating (0.01 by default, i.e., if p<0.01, will print "< 0.01" instead of "0")
 
     p_fmt_style: str
+    
         the style for p-value formating (exponential notation by default)
 
     signif: list
+    
         the list of significance without FDR
 
     signif_fdr: list
+    
         the list of significance with FDR
 
     signif_fdr: list
+    
         the list of significance with FDR
 
     alpha : float
+    
         The significance level
 
     See also
     --------
 
     pyleoclim.utils.correlation.corr_sig : Correlation function
-    pyleoclim.utils.correlation.fdr : FDR function
+    
+    pyleoclim.utils.correlation.fdr : FDR (False Discovery Rate) function
     '''
 
     def __init__(self, r, p, signif, signif_fdr, alpha, p_fmt_td=0.01, p_fmt_style='exp'):
@@ -106,34 +119,43 @@ class CorrEns:
         Parameters
         ----------
         figsize : list, optional
+        
             The figure size. The default is [4, 4].
 
         title : str, optional
+        
             Plot title. The default is None.
 
         savefig_settings : dict
+        
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
 
         hist_kwargs : dict
+        
             the keyword arguments for ax.hist()
 
         title_kwargs : dict
+        
             the keyword arguments for ax.set_title()
 
         ax : matplotlib.axis, optional
+        
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
 
         xlim : list, optional
+        
             x-axis limits. The default is None.
 
         See also
         --------
 
         matplotlib.pyplot.hist: https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.hist.html
+        
+        pyleoclim.utils.plotting.savefig : save figures in Pyleoclim
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         hist_kwargs = {} if hist_kwargs is None else hist_kwargs.copy()

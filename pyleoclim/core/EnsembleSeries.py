@@ -38,14 +38,17 @@ class EnsembleSeries(MultipleSeries):
         self.series_list = series_list
 
     def make_labels(self):
-        '''
-        Initialization of labels
+        '''Initialization of labels
 
         Returns
         -------
+
         time_header : str
+
             Label for the time axis
+
         value_header : str
+
             Label for the value axis
 
         '''
@@ -76,15 +79,44 @@ class EnsembleSeries(MultipleSeries):
     def quantiles(self, qs=[0.05, 0.5, 0.95]):
         '''Calculate quantiles of an EnsembleSeries object
 
+        Reuses [scipy.stats.mstats.mquantiles](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mstats.mquantiles.html) function.
+
         Parameters
         ----------
+
         qs : list, optional
+
             List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
 
         Returns
         -------
+
         ens_qs : pyleoclim.EnsembleSeries
 
+            EnsembleSeries object containing empirical quantiles of original 
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            nn = 30 # number of noise realizations
+            nt = 500
+            series_list = []
+
+            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            signal = pyleo.Series(t,v)
+
+            for idx in range(nn):  # noise
+                noise = np.random.randn(nt,nn)*100
+                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                series_list.append(ts)
+
+            ts_ens = pyleo.EnsembleSeries(series_list)
+
+            ens_qs = ts_ens.quantiles()
         '''
         time = np.copy(self.series_list[0].time)
         vals = []
@@ -114,7 +146,9 @@ class EnsembleSeries(MultipleSeries):
 
         Parameters
         ----------
-        target : pyleoclim.Series or pyleoclim.EnsembleSeries, optional
+
+        target : pyleoclim.Series or pyleoclim.EnsembleSeries
+
             A pyleoclim Series object or EnsembleSeries object.
             When the target is also an EnsembleSeries object, then the calculation of correlation is performed in a one-to-one sense,
             and the ourput list of correlation values and p-values will be the size of the series_list of the self object.
@@ -123,12 +157,15 @@ class EnsembleSeries(MultipleSeries):
             otherwise, if the target contains only n-m Series, then the first m Series in the target will be used twice in sequence.
 
         timespan : tuple
+
             The time interval over which to perform the calculation
 
         alpha : float
+
             The significance level (0.05 by default)
 
         settings : dict
+
             Parameters for the correlation function, including:
 
             nsim : int
@@ -137,35 +174,43 @@ class EnsembleSeries(MultipleSeries):
                 method for significance testing
 
         fdr_kwargs : dict
+
             Parameters for the FDR function
 
         common_time_kwargs : dict
+
             Parameters for the method MultipleSeries.common_time()
 
-        mute_pbar : bool
+        mute_pbar : bool; {True,False}
+
             If True, the progressbar will be muted. Default is False.
 
         seed : float or int
+
             random seed for isopersistent and isospectral methods
 
         Returns
         -------
 
-        corr : pyleoclim.ui.CorrEns
-            the result object, see `pyleoclim.ui.CorrEns`
+        corr_ens : pyleoclim.CorrEns
+
+            The resulting object, see pyleoclim.CorrEns
 
         See also
         --------
 
         pyleoclim.utils.correlation.corr_sig : Correlation function
+
         pyleoclim.utils.correlation.fdr : FDR function
-        pyleoclim.ui.CorrEns : the correlation ensemble object
+
+        pyleoclim.core.CorrEns.CorrEns : The correlation ensemble object
 
         Examples
         --------
 
         .. ipython:: python
             :okwarning:
+            :okexcept:
 
             import pyleoclim as pyleo
             import numpy as np
@@ -238,115 +283,163 @@ class EnsembleSeries(MultipleSeries):
     def plot_traces(self, figsize=[10, 4], xlabel=None, ylabel=None, title=None, num_traces=10, seed=None,
              xlim=None, ylim=None, linestyle='-', savefig_settings=None, ax=None, plot_legend=True,
              color=sns.xkcd_rgb['pale red'], lw=0.5, alpha=0.3, lgd_kwargs=None):
-            '''Plot EnsembleSeries as a subset of traces.
+        '''Plot EnsembleSeries as a subset of traces.
 
-            Parameters
-            ----------
-            figsize : list, optional
-                The figure size. The default is [10, 4].
-            xlabel : str, optional
-                x-axis label. The default is None.
-            ylabel : str, optional
-                y-axis label. The default is None.
-            title : str, optional
-                Plot title. The default is None.
-            xlim : list, optional
-                x-axis limits. The default is None.
-            ylim : list, optional
-                y-axis limits. The default is None.
-            color : str, optional
-                Color of the traces. The default is sns.xkcd_rgb['pale red'].
-            alpha : float, optional
-                Transparency of the lines representing the multiple members. The default is 0.3.
-            linestyle : {'-', '--', '-.', ':', '', (offset, on-off-seq), ...}
-                Set the linestyle of the line
-            lw : float, optional
-                Width of the lines representing the multiple members. The default is 0.5.
-            num_traces : int, optional
-                Number of traces to plot. The default is 10.
-            savefig_settings : dict, optional
-                the dictionary of arguments for plt.savefig(); some notes below:
-                - "path" must be specified; it can be any existed or non-existed path,
-                  with or without a suffix; if the suffix is not given in "path", it will follow "format"
-                - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
-            ax : matplotlib.ax, optional
-                Matplotlib axis on which to return the plot. The default is None.
-            plot_legend : bool, optional
-                Whether to plot the legend. The default is True.
-            lgd_kwargs : dict, optional
-                Parameters for the legend. The default is None.
-            seed : int, optional
-                Set the seed for the random number generator. Useful for reproducibility. The default is None.
+        Parameters
+        ----------
 
-            Returns
-            -------
-            fig, ax
+        figsize : list, optional
 
-            Examples
-            --------
+            The figure size. The default is [10, 4].
 
-            .. ipython:: python
-                :okwarning:
-                :okexcept:
+        xlabel : str, optional
 
-                nn = 30 # number of noise realizations
-                nt = 500
-                series_list = []
+            x-axis label. The default is None.
 
-                signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
-                noise = np.random.randn(nt,nn)
+        ylabel : str, optional
 
-                for idx in range(nn):  # noise
-                    ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
-                    series_list.append(ts)
+            y-axis label. The default is None.
 
-                ts_ens = pyleo.EnsembleSeries(series_list)
+        title : str, optional
 
-                fig, ax = ts_ens.plot_traces(alpha=0.2,num_traces=8)
-                pyleo.closefig(fig)
+            Plot title. The default is None.
+
+        xlim : list, optional
+
+            x-axis limits. The default is None.
+
+        ylim : list, optional
+
+            y-axis limits. The default is None.
+
+        color : str, optional
+
+            Color of the traces. The default is sns.xkcd_rgb['pale red'].
+
+        alpha : float, optional
+
+            Transparency of the lines representing the multiple members. The default is 0.3.
+
+        linestyle : {'-', '--', '-.', ':', '', (offset, on-off-seq), ...}
+
+            Set the linestyle of the line
+
+        lw : float, optional
+
+            Width of the lines representing the multiple members. The default is 0.5.
+
+        num_traces : int, optional
+
+            Number of traces to plot. The default is 10.
+
+        savefig_settings : dict, optional
+
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+                with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+
+        ax : matplotlib.ax, optional
+
+            Matplotlib axis on which to return the plot. The default is None.
+
+        plot_legend : bool; {True,False}, optional
+
+            Whether to plot the legend. The default is True.
+
+        lgd_kwargs : dict, optional
+
+            Parameters for the legend. The default is None.
+
+        seed : int, optional
+
+            Set the seed for the random number generator. Useful for reproducibility. The default is None.
+
+        Returns
+        -------
+
+        fig : matplotlib.figure
+        
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
+
+        ax : matplotlib.axis
+        
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            nn = 30 # number of noise realizations
+            nt = 500
+            series_list = []
+
+            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            signal = pyleo.Series(t,v)
+
+            for idx in range(nn):  # noise
+                noise = np.random.randn(nt,nn)*100
+                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                series_list.append(ts)
+
+            ts_ens = pyleo.EnsembleSeries(series_list)
+
+            @savefig ens_plot_traces.png
+            fig, ax = ts_ens.plot_traces(alpha=0.2,num_traces=8)
+            pyleo.closefig(fig) #Optional close fig after plotting
 
             '''
-            savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-            lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
-            # generate default axis labels
-            time_label, value_label = self.make_labels()
+        # generate default axis labels
+        time_label, value_label = self.make_labels()
 
-            if xlabel is None:
-                xlabel = time_label
+        if xlabel is None:
+            xlabel = time_label
 
-            if ylabel is None:
-                ylabel = value_label
+        if ylabel is None:
+            ylabel = value_label
 
-            if ax is None:
-                fig, ax = plt.subplots(figsize=figsize)
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
 
-            if num_traces > 0:
-                if seed is not None:
-                    np.random.seed(seed)
+        if num_traces > 0:
+            if seed is not None:
+                np.random.seed(seed)
 
-                nts = np.size(self.series_list)
-                random_draw_idx = np.random.choice(nts, num_traces)
+            nts = np.size(self.series_list)
+            random_draw_idx = np.random.choice(nts, num_traces)
 
-                for idx in random_draw_idx:
-                    self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=lw,
-                        xlim=xlim, ylim=ylim, ax=ax, color=color, alpha=alpha,linestyle='-')
-                ax.plot(np.nan, np.nan, color=color, label=f'example members (n={num_traces})',linestyle='-')
+            for idx in random_draw_idx:
+                self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=lw,
+                    xlim=xlim, ylim=ylim, ax=ax, color=color, alpha=alpha,linestyle='-')
+            ax.plot(np.nan, np.nan, color=color, label=f'example members (n={num_traces})',linestyle='-')
 
-            if title is not None:
-                ax.set_title(title)
+        if title is not None:
+            ax.set_title(title)
 
-            if plot_legend:
-                lgd_args = {'frameon': False}
-                lgd_args.update(lgd_kwargs)
-                ax.legend(**lgd_args)
+        if plot_legend:
+            lgd_args = {'frameon': False}
+            lgd_args.update(lgd_kwargs)
+            ax.legend(**lgd_args)
 
-            if 'fig' in locals():
-                if 'path' in savefig_settings:
-                    plotting.savefig(fig, settings=savefig_settings)
-                return fig, ax
-            else:
-                return ax
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            return fig, ax
+        else:
+            return ax
 
     def plot_envelope(self, figsize=[10, 4], qs=[0.025, 0.25, 0.5, 0.75, 0.975],
                       xlabel=None, ylabel=None, title=None,
@@ -357,47 +450,95 @@ class EnsembleSeries(MultipleSeries):
 
         Parameters
         ----------
+
         figsize : list, optional
+
             The figure size. The default is [10, 4].
+
         qs : list, optional
+
             The significance levels to consider. The default is [0.025, 0.25, 0.5, 0.75, 0.975] (median, interquartile range, and central 95% region)
+
         xlabel : str, optional
+
             x-axis label. The default is None.
+
         ylabel : str, optional
+
             y-axis label. The default is None.
+
         title : str, optional
+
             Plot title. The default is None.
+
         xlim : list, optional
+
             x-axis limits. The default is None.
+
         ylim : list, optional
+
             y-axis limits. The default is None.
+
         savefig_settings : dict, optional
+
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+
         ax : matplotlib.ax, optional
+
             Matplotlib axis on which to return the plot. The default is None.
-        plot_legend : bool, optional
+
+        plot_legend : bool; {True,False}, optional
+
             Wether to plot the legend. The default is True.
+
         curve_clr : str, optional
+
             Color of the main line (median). The default is sns.xkcd_rgb['pale red'].
+
         curve_lw : str, optional
+
             Width of the main line (median). The default is 2.
+
         shade_clr : str, optional
+
             Color of the shaded envelope. The default is sns.xkcd_rgb['pale red'].
+
         shade_alpha : float, optional
+
             Transparency on the envelope. The default is 0.2.
+
         inner_shade_label : str, optional
+
             Label for the envelope. The default is 'IQR'.
+
         outer_shade_label : str, optional
+
             Label for the envelope. The default is '95\% CI'.
+
         lgd_kwargs : dict, optional
+
             Parameters for the legend. The default is None.
 
         Returns
         -------
-        fig, ax
+
+        fig : matplotlib.figure
+        
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
+
+        ax : matplotlib.axis
+        
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
 
         Examples
         --------
@@ -409,15 +550,19 @@ class EnsembleSeries(MultipleSeries):
             nt = 500
             series_list = []
 
-            signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
-            noise = np.random.randn(nt,nn)
+            t,v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            signal = pyleo.Series(t,v)
 
             for idx in range(nn):  # noise
+                noise = np.random.randn(nt,nn)*100
                 ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
                 series_list.append(ts)
 
             ts_ens = pyleo.EnsembleSeries(series_list)
+
+            @savefig ens_plot_envelope.png
             fig, ax = ts_ens.plot_envelope(curve_lw=1.5)
+            pyleo.closefig(fig) #Optional close fig after plotting
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
@@ -435,7 +580,6 @@ class EnsembleSeries(MultipleSeries):
             fig, ax = plt.subplots(figsize=figsize)
 
         ts_qs = self.quantiles(qs=qs)
-
 
         if inner_shade_label is None:
             inner_shade_label = f'{ts_qs.series_list[1].label}-{ts_qs.series_list[-2].label}'
@@ -481,46 +625,111 @@ class EnsembleSeries(MultipleSeries):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
-                Parameters
+        
+        Parameters
         ----------
+
         figsize : list
+
             Size of the figure.
-        colors : a list of, or one, Python supported color code (a string of hex code or a tuple of rgba values)
+
+        colors : list
+
             Colors for plotting.
             If None, the plotting will cycle the 'tab10' colormap;
             if only one color is specified, then all curves will be plotted with that single color;
             if a list of colors are specified, then the plotting will cycle that color list.
+
         cmap : str
+
             The colormap to use when "colors" is None.
+
         norm : matplotlib.colors.Normalize like
+
             The nomorlization for the colormap.
             If None, a linear normalization will be used.
+
         savefig_settings : dictionary
+
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+
         xlim : list
+
             The x-axis limit.
+
         fill_between_alpha : float
+
             The transparency for the fill_between shades.
+
         spine_lw : float
+
             The linewidth for the spines of the axes.
+
         grid_lw : float
+
             The linewidth for the gridlines.
+
         linewidth : float
+
             The linewidth for the curves.
+
         font_scale : float
+
             The scale for the font sizes. Default is 0.8.
+
         label_x_loc : float
+
             The x location for the label of each curve.
+
         v_shift_factor : float
+
             The factor for the vertical shift of each axis.
             The default value 3/4 means the top of the next axis will be located at 3/4 of the height of the previous one.
 
         Returns
         -------
-        fig, ax
+        
+        fig : matplotlib.figure
+        
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
+
+        ax : matplotlib.axis
+        
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            nn = 30 # number of noise realizations
+            nt = 500
+            series_list = []
+
+            signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
+            noise = np.random.randn(nt,nn)
+
+            for idx in range(nn):  # noise
+                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                series_list.append(ts)
+
+            ts_ens = pyleo.EnsembleSeries(series_list)
+
+            @savefig ens_stackplot.png
+            fig, ax = ts_ens.stackplot()
+            pyleo.closefig(fig) #Optional close fig after plotting
         '''
         current_style = deepcopy(mpl.rcParams)
         plotting.set_style('journal', font_scale=font_scale)
@@ -640,36 +849,77 @@ class EnsembleSeries(MultipleSeries):
 
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                  ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
-        """
-        Plots the distribution of the timeseries across ensembles
+        """ Plots the distribution of the timeseries across ensembles
+
+        Reuses seaborn [histplot](https://seaborn.pydata.org/generated/seaborn.histplot.html) function.
 
         Parameters
         ----------
+
         figsize : list, optional
+
             The size of the figure. The default is [10, 4].
+
         title : str, optional
+
             Title for the figure. The default is None.
+
         savefig_settings : dict, optional
+
             the dictionary of arguments for plt.savefig(); some notes below:
               - "path" must be specified; it can be any existed or non-existed path,
                 with or without a suffix; if the suffix is not given in "path", it will follow "format"
               - "format" can be one of {"pdf", "eps", "png", "ps"}.
             The default is None.
+
         ax : matplotlib.axis, optional
+
             A matplotlib axis. The default is None.
+
         ylabel : str, optional
+
             Label for the count axis. The default is 'KDE'.
-        vertical : {True,False}, optional
+
+        vertical : bool; {True,False}, optional
+
             Whether to flip the plot vertically. The default is False.
+
         edgecolor : matplotlib.color, optional
+
             The color of the edges of the bar. The default is 'w'.
-        **plot_kwargs : dict
+
+        plot_kwargs : dict
+
             Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html.
 
         See also
         --------
 
-        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            nn = 30 # number of noise realizations
+            nt = 500
+            series_list = []
+
+            signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
+            noise = np.random.randn(nt,nn)
+
+            for idx in range(nn):  # noise
+                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                series_list.append(ts)
+
+            ts_ens = pyleo.EnsembleSeries(series_list)
+
+            @savefig ens_distplot.png
+            fig, ax = ts_ens.distplot()
+            pyleo.closefig(fig) #Optional close fig after plotting
 
         """
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -680,11 +930,9 @@ class EnsembleSeries(MultipleSeries):
         time_label, value_label = self.make_labels()
 
         #append all the values together for the plot
-        for item in self.series_list:
-            try:
-                val=np.append(val,item.value)
-            except:
-                val=item.value
+        val = self.series_list[0].value
+        for i in range(1,len(self.series_list)):
+            val=np.append(val,self.series_list[i].value)
 
         if vertical == True:
             data=pd.DataFrame({'value':val})
