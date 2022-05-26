@@ -429,7 +429,7 @@ class TestUiSeriesSummaryPlot:
         Passing pre generated scalogram and psd.
         '''
         ts = gen_ts()
-        scal = ts.scalogram(method='cwt')
+        scal = ts.wavelet(method='cwt')
         psd = ts.spectral(method='cwt')
         period_label='Period'
         psd_label='PSD'
@@ -438,8 +438,7 @@ class TestUiSeriesSummaryPlot:
         fig, ax = ts.summary_plot(
             psd = psd, scalogram=scal, figsize=[4, 5], title='Test',
             period_label=period_label, psd_label=psd_label,
-            value_label=value_label, time_label=time_label,
-            n_signif_test = 1
+            value_label=value_label, time_label=time_label
         )
         
         assert ax['scal'].properties()['ylabel'] == period_label, 'Period label is not being passed properly'
@@ -447,7 +446,7 @@ class TestUiSeriesSummaryPlot:
         assert ax['scal'].properties()['xlabel'] == time_label, 'Time label is not being passed properly'
         assert ax['ts'].properties()['ylabel'] == value_label, 'Value label is not being passed properly'
 
-        pyleo.showfig(fig)
+        plt.close(fig)
 
     def test_summary_plot_t1(self):
         '''Testing that the bare function works
@@ -456,7 +455,7 @@ class TestUiSeriesSummaryPlot:
         Passing just a pre generated psd.
         '''
         ts = gen_ts()
-        scal = ts.scalogram(method='cwt')
+        scal = ts.wavelet(method='cwt')
         psd = ts.spectral(method='cwt')
         fig, ax = ts.summary_plot(psd=psd,scalogram=scal)
     
