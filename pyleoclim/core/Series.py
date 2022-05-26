@@ -2336,7 +2336,8 @@ class Series:
         See also
         --------
 
-        pyleoclim.utils.tsmodel.ar1_sim : AR1 simulator
+        pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
+        
         '''
         settings = {} if settings is None else settings.copy()
         surrogate_func = {

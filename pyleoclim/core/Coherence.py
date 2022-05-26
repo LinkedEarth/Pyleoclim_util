@@ -190,7 +190,7 @@ class Coherence:
         Examples
         --------
 
-        Calculate the coherence of NINO3 and All India Rainfall and plot it:
+        Calculate the wavelet coherence of NINO3 and All India Rainfall and plot it:
 
         .. ipython:: python
             :okwarning:
@@ -393,7 +393,6 @@ class Coherence:
         else:
             phase[signif_boundary.T < 1] = np.nan
 
-
         X, Y = np.meshgrid(self.time, y_axis)
         U, V = np.cos(phase).T, np.sin(phase).T
 
@@ -409,14 +408,13 @@ class Coherence:
         lbl1 = self.timeseries1.label
         lbl2 = self.timeseries2.label
 
-
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
             if title is not None and  title != 'auto':
                 fig.suptitle(title)
             elif title == 'auto' and lbl1 is not None and lbl1 is not None:
-                title = 'Wavelet coherency ('+var.upper() +') between '+ lbl1 + ' and ' + lbl2
+                title = 'Wavelet coherency ('+self.wave_method.upper() +') between '+ lbl1 + ' and ' + lbl2
                 fig.suptitle(title)
             return fig, ax
         else:
@@ -468,8 +466,11 @@ class Coherence:
          See also
          --------
          pyleoclim.core.Coherence.Coherence.plot
+         
          pyleoclim.core.Series.Series.wavelet_coherence
+         
          pyleoclim.core.Series.Series.plot
+         
          matplotlib.pyplot.quiver
          
          Examples
@@ -561,10 +562,12 @@ class Coherence:
         ----------
         number : int, optional
             Number of surrogate series to create for significance testing. The default is 200.
-        method : {'ar1'}, optional
-            Method through which to generate the surrogate series. The default is 'ar1'.
+        method : {'ar1sim'}, optional
+            Method through which to generate the surrogate series. The default is 'ar1sim'.
         seed : int, optional
-            Fixes the seed for the random number generator. Useful for reproducibility. The default is None.
+            Fixes the seed for NumPy's random number generator. 
+            Useful for reproducibility. The default is None, so fresh, unpredictable
+            entropy will be pulled from the operating system. 
         qs : list, optional
             Significance levels to return. The default is [0.95].
         settings : dict, optional
@@ -583,7 +586,80 @@ class Coherence:
         --------
 
         pyleoclim.core.Series.Series.wavelet_coherence : Wavelet coherence
+        
+        pyleoclim.core.Scalogram.Scalogram : Scalogram object
+        
         pyleoclim.core.MultipleScalogram.MultipleScalogram : Multiple Scalogram object
+        
+        pyleoclim.core.Coherence.Coherence.plot : plotting method for Coherence objects
+                
+        Examples
+        --------
+
+        Calculate the coherence of NINO3 and All India Rainfall and assess significance:
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            import pyleoclim as pyleo
+            import pandas as pd
+            import numpy as np
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
+            time = data['t'].values
+            air = data['air'].values
+            nino = data['nino'].values
+            ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)',
+                                  label='All India Rainfall', value_name='AIR (mm/month)')
+            ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)',
+                                   label='NINO3', value_name='NINO3 (K)')
+
+            coh = ts_air.wavelet_coherence(ts_nino)
+            coh_sig = coh.signif_test()
+            @savefig coh_sig_plot.png
+            coh_sig.plot()
+            pyleo.closefig(fig)
+            
+        By default, significance is assessed against a 95% benchmark derived from 
+        an AR(1) process fit to the data, using 200 Monte Carlo simulations. 
+        To customize, one can increase the number of simulations
+        (more reliable, but slower), and the quantile levels.
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            coh_sig2 = coh.signif_test(number=1000, qs=[.9,.95,.99]) 
+            @savefig coh_sig2_plot.png
+            coh_sig2.plot()
+            pyleo.closefig(fig)
+
+        The plot() function will represent the 95% level as contours by default.
+        If you need to show 99%, say, use the `signif_thresh` argument:
+            
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            @savefig coh_sig3_plot.png
+            coh_sig2.plot(signif_thresh=0.99)
+            pyleo.closefig(fig)
+        
+        Note that if the 99% quantile is not present, the plot method will look
+        for the closest match, but lines are always labeled appropriately. 
+        For reproducibility purposes, it may be good to specify the (pseudo)random number
+        generator's seed, like so:
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            coh_sig27 = coh.signif_test(seed=27) 
+         
+        This will generate exactly the same set of draws from the 
+        (pseudo)random number, which may be important for marginal features 
+        in small ensembles. In general, however, we recommend increasing the 
+        number of draws to check that features are robust. 
 
         '''
 
