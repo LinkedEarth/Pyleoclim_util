@@ -182,8 +182,6 @@ class MultipleSeries:
         pyleoclim.utils.filter.firwin : FIR filter design using the window method
 
         pyleoclim.utils.filter.lanczos : lowpass filter via Lanczos resampling
-        
-
 
         Examples
         --------
@@ -342,7 +340,7 @@ class MultipleSeries:
         Parameters
         ----------
         
-        step_style : str: {"median","mean,"mode","max"}
+        step_style : str; {"median","mean,"mode","max"}
         
             Method to obtain a representative step if x is not evenly spaced.
             Valid entries: 'median' [default], 'mean', 'mode' or 'max'.
@@ -364,7 +362,27 @@ class MultipleSeries:
         See also
         --------
         
-        pyleoclim.utils.tsutils.increments : The underlying increments function 
+        pyleoclim.utils.tsutils.increments : The underlying increments function
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
+            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
+            ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
+            increments = ms.increments()
 
         '''
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
@@ -420,6 +438,7 @@ class MultipleSeries:
 
         Returns
         -------
+
         ms : pyleoclim.MultipleSeries
         
             The MultipleSeries objects with all series aligned to the same time axis.
@@ -464,7 +483,7 @@ class MultipleSeries:
             # create MS object from the list
             ms = pyleo.MultipleSeries(serieslist)
 
-            @savefig ms_ct.png
+            @savefig ms_common_time.png
             fig, ax = plt.subplots(2,2,sharex=True,sharey=True)
             fig.tight_layout()
             ax = ax.flatten()
@@ -491,9 +510,9 @@ class MultipleSeries:
         # specify stepping style
         if step_style == None: # if step style isn't specified, pick a robust choice according to method
             if method == 'bin' or method == 'gkernel':
-               step_style = 'max'
+                step_style = 'max'
             elif  method == 'interp':
-               step_style = 'mean'
+                step_style = 'mean'
                
         # obtain grid properties with given step_style
         gp = self.increments(step_style=step_style)  
@@ -556,7 +575,6 @@ class MultipleSeries:
     def correlation(self, target=None, timespan=None, alpha=0.05, settings=None, 
                     fdr_kwargs=None, common_time_kwargs=None, mute_pbar=False, seed=None):
         ''' Calculate the correlation between a MultipleSeries and a target Series
-
 
         Parameters
         ----------
@@ -681,11 +699,6 @@ class MultipleSeries:
     def equal_lengths(self):
         ''' Test whether all series in object have equal length
 
-        Parameters
-        ----------
-
-        None
-
         Returns
         -------
 
@@ -696,6 +709,24 @@ class MultipleSeries:
         lengths : list 
         
             List of the lengths of the series in object
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data = pd.read_csv(
+                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
+                skiprows=0, header=1
+            )
+            time = data.iloc[:,1]
+            value = data.iloc[:,2]
+            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
+            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
+            ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
+            flag, lengths = ms.equal_lengths()
+            print(flag)
         '''
 
         lengths = []
@@ -749,14 +780,17 @@ class MultipleSeries:
         Returns
         -------
 
-        res: pyleoclim.SpatialDecomp.SpatialDecomp
+        res: pyleoclim.SpatialDecomp
+
+            Resulting pyleoclim.SpatialDecomp object
         
         See also
         --------
         
+        pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
+
         pyleoclim.core.SpatialDecomp.SpatialDecomp : The spatial decomposition object
         
-
         Examples
         --------
 
@@ -1132,6 +1166,7 @@ class MultipleSeries:
 
         See also
         --------
+        
         pyleoclim.utils.spectral.mtm : Spectral analysis using the Multitaper approach
 
         pyleoclim.utils.spectral.lomb_scargle : Spectral analysis using the Lomb-Scargle method
@@ -1392,6 +1427,11 @@ class MultipleSeries:
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
 
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
+
         Examples
         --------
 
@@ -1558,6 +1598,11 @@ class MultipleSeries:
         ax : matplotlib.axis
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
 
         Examples
         --------
