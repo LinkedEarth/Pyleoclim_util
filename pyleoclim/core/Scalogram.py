@@ -37,45 +37,84 @@ class Scalogram:
         '''
         Parameters
         ----------
+
             frequency : array
-                the frequency axis
+
+                The frequency axis
+
             scale : array
-                the scale axis
+
+                The scale axis
+
             time : array
-                the time axis
+
+                The time axis
+
             amplitude : array
-                the amplitude at each (frequency, time) point;
+
+                The amplitude at each (frequency, time) point;
                 note the dimension is assumed to be (frequency, time)
+
             coi : array
+
                 Cone of influence
+
             label : str
+
                 Label for the Series
+
             Neff_threshold : int
-                the threshold of the number of effective samples
+
+                The threshold of the number of effective samples
+
             wwz_Neffs : array
-                the matrix of effective number of points in the time-scale coordinates obtained from wwz
+
+                The matrix of effective number of points in the time-scale coordinates obtained from wwz
+
             timeseries : pyleoclim.Series
+
                 A copy of the timeseries for which the scalogram was obtained
+
             wave_method: str
+
                 The method used to obtain the scalogram
+
             wave_args: dict
+
                 The parameters values of the wavelet method
+                
             qs : list
-                quantiles at which significance levels were evaluated & exported
+
+                Quantiles at which significance levels were evaluated & exported
+
             signif_qs : dict
+
                 MultipleScalogram object containing the quantiles qs of the surrogate scalogram distribution
+
             signif_method: str
+
                 The method used to obtain the significance level
+
             freq_method: str
+
                 The method used to obtain the frequency vector
+
             freq_kwargs: dict
+
                 Arguments for the frequency vector
+
             scale_unit: str
+
                 Units for the scale axis
+
             time_label: str
+
                 Label for the time axis
+
             signif_scals: pyleoclim.MultipleScalogram
+
                 A list of the scalogram from the AR1 MC significance testing. Useful when obtaining a PSD.
+
         '''
         self.frequency = np.array(frequency)
         self.scale = np.array(scale)
@@ -126,6 +165,29 @@ class Scalogram:
 
     def copy(self):
         '''Copy object
+
+        Returns
+        -------
+
+        scal : pyleoclim.Scalogram
+
+            The copied version of the pyleoclim.Scalogram object
+        
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
+            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+
+            scalogram = series.wavelet()
+            scalogram_copy = scalogram.copy()
+
         '''
         return deepcopy(self)
 
@@ -148,53 +210,114 @@ class Scalogram:
 
         Parameters
         ----------
+
         in_scale : bool, optional
+
             Plot the in scale instead of frequency space. The default is True.
+
         variable : {'amplitude','power'}
+
             Whether to plot the amplitude or power. Default is amplitude
+
         xlabel : str, optional
+
             Label for the x-axis. The default is None.
+
         ylabel : str, optional
+
             Label for the y-axis. The default is None.
+
         title : str, optional
+
             Title for the figure. The default is 'default', which auto-generates a title.
+
         ylim : list, optional
+
             Limits for the y-axis. The default is None.
+
         xlim : list, optional
+
             Limits for the x-axis. The default is None.
+
         yticks : list, optional
+
             yticks label. The default is None.
+
         figsize : list, optional
+
             Figure size The default is [10, 8].
+
         signif_clr : str, optional
+
             Color of the singificance line. The default is 'white'.
+
         signif_thresh: float in [0, 1]
+
             Significance threshold. Default is 0.95. If this quantile is not
             found in the qs field of the Coherence object, the closest quantile
             will be picked.
+
         signif_linestyles : str, optional
+
             Linestyle of the significance line. The default is '-'.
+
         signif_linewidths : float, optional
+
             Width for the significance line. The default is 1.
+
         contourf_style : dict, optional
+
             Arguments for the contour plot. The default is {}.
+
         cbar_style : dict, optional
+
             Arguments for the colarbar. The default is {}.
+
         savefig_settings : dict, optional
+
             saving options for the figure. The default is {}.
+
         ax : ax, optional
+
             Matplotlib Axis on which to return the figure. The default is None.
 
         Returns
         -------
-        fig, ax
+
+        fig : matplotlib.figure
+        
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
+
+        ax : matplotlib.axis
+        
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
 
         See also
         --------
 
-        pyleoclim.core.Series.wavelet : Wavelet analysis
+        pyleoclim.core.Series.Series.wavelet : Wavelet analysis
 
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
 
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
+            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+
+            scalogram = series.wavelet()
+
+            @savefig scal_basic.png
+            fig,ax = scalogram.plot()
+            pyleo.closefig(fig)
         '''
         contourf_args = {'cmap': 'magma', 'origin': 'lower', 'levels': 11}
         contourf_args.update(contourf_style)
@@ -298,28 +421,52 @@ class Scalogram:
 
         Parameters
         ----------
+
         method : {'ar1asym', 'ar1sim'}
+
             Method to use to generate the surrogates.  AR1sim uses simulated timeseries with similar persistence. AR1asymp represents the closed form solution.The default is AR1sim
             Number of surrogates to generate for significance analysis based on simulations. The default is 200.
+
         seed : int, optional
+
             Set the seed for the random number generator. Useful for reproducibility The default is None.
+
         qs : list, optional
+
             Significane level to consider. The default is [0.95].
+
         settings : dict, optional
+
             Parameters for the model. The default is None.
-        export_scal : bool
+
+        export_scal : bool; {True,False}
+
             Whether or not to export the scalograms used in the noise realizations. Note: For the wwz method, the scalograms used for wavelet analysis are slightly different
             than those used for spectral analysis (different decay constant). As such, this functionality should be used only to expedite exploratory analysis.
 
         Raises
         ------
+
         ValueError
+
             qs should be a list with at least one value.
 
         Returns
         -------
+
         new : pyleoclim.Scalogram
+
             A new Scalogram object with the significance level
+
+        
+        See also
+        --------
+
+        pyleoclim.core.Series.Series.wavelet : Wavelet analysis
+
+        pyleoclim.core.MultipleScalogram.MultipleScalogram : MultipleScalogram object
+
+        pyleoclim.utils.wavelet.tc_wave_signif : Asymptotic significance calculation
 
         Examples
         --------
@@ -337,13 +484,6 @@ class Scalogram:
 
             #By setting export_scal to True, the noise realizations used to generate the significance test will be saved. These come in handy for generating summary plots and for running significance tests on spectral objects.
             scalogram = series.wavelet().signif_test(number=2, export_scal=True)
-
-        See also
-        --------
-
-        pyleoclim.core.Series.wavelet : wavelet analysis
-
-        pyleoclim.utils.wavelet.tc_wave_signif : asymptotic significance calculation
 
         '''
         if self.wave_method == 'wwz' and method == 'ar1asym':
