@@ -2,8 +2,7 @@ name: Build container image
 
 on:
   push:
-    branches:
-    - master
+    branches: [ master ]
 
 jobs:
   build:

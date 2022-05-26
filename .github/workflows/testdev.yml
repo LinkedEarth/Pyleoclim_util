@@ -2,8 +2,9 @@ name: run pytest for the Development Branch
 
 on:
   push:
-    branches:
-    - Development
+    branches: [ Development ]
+  pull_request:
+    branches: [ Development ]
 
 jobs:
   build:
