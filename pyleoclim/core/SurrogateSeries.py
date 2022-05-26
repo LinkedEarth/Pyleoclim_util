@@ -6,7 +6,6 @@ SurrogateSeries is a child of MultipleSeries, designed for Monte Carlo tests
 
 from ..core.MultipleSeries import MultipleSeries
 
-
 class SurrogateSeries(MultipleSeries):
     ''' Object containing surrogate timeseries, usually obtained through recursive modeling (e.g., AR1)
 
