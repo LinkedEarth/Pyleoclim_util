@@ -86,7 +86,7 @@ class Scalogram:
             wave_args: dict
 
                 The parameters values of the wavelet method
-                
+
             qs : list
 
                 Quantiles at which significance levels were evaluated & exported
@@ -176,7 +176,7 @@ class Scalogram:
         scal : pyleoclim.Scalogram
 
             The copied version of the pyleoclim.Scalogram object
-        
+
         Examples
         --------
 
@@ -289,12 +289,12 @@ class Scalogram:
         -------
 
         fig : matplotlib.figure
-        
+
             the figure object from matplotlib
             See [matplotlib.pyplot.figure](https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.pyplot.figure.html) for details.
 
         ax : matplotlib.axis
-        
+
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
 
@@ -392,7 +392,7 @@ class Scalogram:
                 linestyles=signif_linestyles,
                 linewidths=signif_linewidths,
             )
-            if title is 'default':
+            if title == 'default':
                 if self.label is not None:
                     ax.set_title(self.label + " scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
                 else:
@@ -462,7 +462,7 @@ class Scalogram:
 
             A new Scalogram object with the significance level
 
-        
+
         See also
         --------
 
