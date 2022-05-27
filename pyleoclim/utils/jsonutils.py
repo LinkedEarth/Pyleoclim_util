@@ -212,7 +212,10 @@ def json_to_PyleoObj(filename,objname):
 
     for k in a.keys():
         if k == 'timeseries' or k == 'timeseries1' or k == 'timeseries2':
-            a[k]=pyleo.Series(**a[k])
+            try:
+                a[k]=pyleo.Series(**a[k])
+            except:
+                a[k]=pyleo.LipdSeries(a[k]['lipd_ts'])
         if k == 'signif_qs' and a[k] is not None:
             if obj==pyleo.core.PSD:
                 for idx,item in enumerate(a[k]['psd_list']):
