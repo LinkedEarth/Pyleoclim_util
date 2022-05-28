@@ -1,10 +1,10 @@
 '''
-The PSD (Power spectral density) class is intended for conveniently manipulating 
-the result of spectral methods, including performing significance tests, 
+The PSD (Power spectral density) class is intended for conveniently manipulating
+the result of spectral methods, including performing significance tests,
 estimating scaling coefficients, and plotting.
 '''
 
-from ..utils import plotting, lipdutils 
+from ..utils import plotting, lipdutils
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 
@@ -41,20 +41,84 @@ def infer_period_unit_from_time_unit(time_unit):
     return period_unit
 
 class PSD:
-    '''PSD object obtained from spectral analysis.
+    '''Power Spectral Density (PSD) object obtained from spectral analysis.
 
-    See examples in pyleoclim.core.Series.spectral to see how to create and manipulate these objects
+    See examples in pyleoclim.core.Series.Series.spectral to see how to create and manipulate these objects
+
+    Parameters
+    ----------
+
+    frequency : numpy.array, list, or float
+
+        One or more frequencies in power spectrum
+
+    amplitude : numpy.array, list, or float
+
+        The amplitude at each (frequency, time) point;
+        note the dimension is assumed to be (frequency, time)
+
+    label : str, optional
+
+        Descriptor of the PSD.
+        Default is None
+
+    timeseries : pyleoclim.Series, optional
+
+        Default is None
+
+    plot_kwargs : dict, optional
+
+        Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html.
+        Default is None
+
+    spec_method : str, optional
+
+        The name of the spectral method to be applied on the timeseries
+        Default is None
+
+    spec_args : dict, optional
+
+        Arguments for wavelet analysis ('freq', 'scale', 'mother', 'param')
+        Default is None
+
+    signif_qs : pyleoclim.MultipleScalogram, optional
+
+        Pyleoclim MultipleScalogram object containing the quantiles qs of the surrogate scalogram distribution.
+        Default is None
+
+    signif_method : str, optional
+
+        The method used to obtain the significance level.
+        Default is None
+
+    period_unit : str, optional
+
+        Unit of time.
+        Default is None
+
+    beta_est_res : list or numpy.array, optional
+
+        Results of the beta estimation calculation.
+        Default is None.
 
     See also
     --------
 
-    pyleoclim.core.Series.spectral : spectral analysis in Pyleoclim
+    pyleoclim.core.Series.Series.spectral : Spectral analysis
+
+    pyleoclim.core.Scalogram.Scalogram :  Scalogram object
+
+    pyleoclim.core.MultipleScalogram.MultipleScalogram : Object storing multiple scalogram objects
+
+    pyleoclim.core.MultiplePSD.MultiplePSD : Object storing several PSDs from different Series or ensemble members in an age model
+
+
 
     '''
     def __init__(self, frequency, amplitude, label=None, timeseries=None, plot_kwargs=None,
                  spec_method=None, spec_args=None, signif_qs=None, signif_method=None, period_unit=None,
                  beta_est_res=None):
-        
+
         self.frequency = np.array(frequency)
         self.amplitude = np.array(amplitude)
         self.label = label
@@ -69,7 +133,7 @@ class PSD:
         self.plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         if beta_est_res is None:
             self.beta_est_res = beta_est_res
-        else: 
+        else:
             self.beta_est_res = np.array(beta_est_res)
         if period_unit is not None:
             self.period_unit = period_unit
@@ -99,23 +163,37 @@ class PSD:
 
         Parameters
         ----------
+
         number : int, optional
+
             Number of surrogate series to generate for significance testing. The default is None.
-        method : {ar1asym,'ar1sim'}
+
+        method : str; {'ar1asym','ar1sim'}
+
             Method to generate surrogates. AR1sim uses simulated timeseries with similar persistence. AR1asymp represents the closed form solution. The default is AR1sim
+
         seed : int, optional
+
             Option to set the seed for reproducibility. The default is None.
+
         qs : list, optional
-            Singificance levels to return. The default is [0.95].
+
+            Significance levels to return. The default is [0.95].
+
         settings : dict, optional
+
             Parameters for the specific significance test. The default is None. Note that the default value for the asymptotic solution is `time-average`
-        scalogram : Pyleoclim Scalogram object, optional
+
+        scalogram : pyleoclim.Scalogram object, optional
+
             Scalogram containing signif_scals exported during significance testing of scalogram.
             If number is None and signif_scals are present, will use length of scalogram list as number of significance tests
 
         Returns
         -------
+
         new : pyleoclim.PSD
+
             New PSD object with appropriate significance test
 
         Examples
@@ -130,7 +208,7 @@ class PSD:
             import pyleoclim as pyleo
             import pandas as pd
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
-            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+            series = pyleo.Seres.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
 
             #Setting export_scal to True saves the noise realizations generated during significance testing for future use
             scalogram = series.wavelet().signif_test(number=2,export_scal=True)
@@ -147,6 +225,16 @@ class PSD:
 
         pyleoclim.utils.wavelet.tc_wave_signif : asymptotic significance calculation
 
+        pyleoclim.core.MultiplePSD.MultiplePSD : Object storing several PSDs from different Series or ensemble members in an age model
+
+        pyleoclim.core.Scalogram.Scalogram :  Scalogram object
+
+        pyleoclim.core.Series.Series.surrogates : Generate surrogates with increasing time axis
+
+        pyleoclim.core.Series.Series.spectral : Performs spectral analysis on Pyleoclim Series
+
+        pyleoclim.core.Series.Series.wavelet : Performs wavelet analysis on Pyleoclim Series
+
         '''
 
         if self.spec_method == 'wwz' and method == 'ar1asym':
@@ -156,7 +244,7 @@ class PSD:
             raise ValueError('Asymptotic solution is not supported for the Lomb-Scargle method')
 
         if method not in ['ar1sim', 'ar1asym']:
-                raise ValueError("The available methods are ar1sim'and 'ar1asym'")
+                raise ValueError("The available methods are 'ar1sim' and 'ar1asym'")
 
         if method == 'ar1sim':
             signif_scals = None
@@ -239,17 +327,17 @@ class PSD:
         Parameters
         ----------
 
-        fmin : float
+        fmin : float, optional
             the minimum frequency edge for beta estimation; the default is the minimum of the frequency vector of the PSD obj
 
-        fmax : float
+        fmax : float, optional
             the maximum frequency edge for beta estimation; the default is the maximum of the frequency vector of the PSD obj
 
         logf_binning_step : str, {'max', 'first'}
             if 'max', then the maximum spacing of log(f) will be used as the binning step
             if 'first', then the 1st spacing of log(f) will be used as the binning step
 
-        verbose : bool
+        verbose : bool; {True, False}
             If True, will print warning messages if there is any
 
         Returns
@@ -271,7 +359,7 @@ class PSD:
             :okexcept:
 
             # generate colored noise with default scaling slope 'alpha' equals to 1
-            ts = pyleo.gen_ts(model='colored_noise')
+            ts = pyleo.utils.tsmodel.gen_ts(model='colored_noise')
             ts.label = 'colored noise'
             psd = ts.spectral()
 
@@ -281,6 +369,11 @@ class PSD:
             @savefig color_noise_beta.png
             fig, ax = psd_beta.plot()
             pyleo.closefig(fig)
+
+        See also
+        --------
+
+        pyleoclim.utils.spectral.beta_estimation : Estimate the scaling exponent of a power spectral density
 
         '''
         if fmin is None:
@@ -313,72 +406,149 @@ class PSD:
 
         Parameters
         ----------
-        in_loglog : bool, optional
+        in_loglog : bool; {True, False}, optional
+
             Plot on loglog axis. The default is True.
-        in_period : bool, optional
+
+        in_period : bool; {True, False}, optional
+
             Plot the x-axis as periodicity rather than frequency. The default is True.
+
         label : str, optional
+
             label for the series. The default is None.
+
         xlabel : str, optional
+
             Label for the x-axis. The default is None. Will guess based on Series
+
         ylabel : str, optional
+
             Label for the y-axis. The default is 'PSD'.
+
         title : str, optional
+
             Plot title. The default is None.
+
         marker : str, optional
+
             marker to use. The default is None.
+
         markersize : int, optional
+
             size of the marker. The default is None.
+
         color : str, optional
+
             Line color. The default is None.
+
         linestyle : str, optional
+
             linestyle. The default is None.
+
         linewidth : float, optional
+
             Width of the line. The default is None.
-        transpose : bool, optional
+
+        transpose : bool; {True, False}, optional
+
             Plot periodicity on y-. The default is False.
+
         xlim : list, optional
+
             x-axis limits. The default is None.
+
         ylim : list, optional
+
             y-axis limits. The default is None.
+
         figsize : list, optional
+
             Figure size. The default is [10, 4].
+
         savefig_settings : dict, optional
+
             save settings options. The default is None.
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
+
         ax : ax, optional
-            The matplotlib.Axes object onto which to return the plot. The default is None.
-        legend : bool, optional
+
+            The matplotlib.Axes object onto which to return the plot.
+            The default is None.
+
+        legend : bool; {True, False}, optional
+
             whether to plot the legend. The default is True.
+
         lgd_kwargs : dict, optional
+
             Arguments for the legend. The default is None.
+
         xticks : list, optional
+
             xticks to use. The default is None.
+
         yticks : list, optional
+
             yticks to use. The default is None.
+
         alpha : float, optional
+
             Transparency setting. The default is None.
+
         zorder : int, optional
+
             Order for the plot. The default is None.
+
         plot_kwargs : dict, optional
+
             Other plotting argument. The default is None.
+
         signif_clr : str, optional
+
             Color for the significance line. The default is 'red'.
+
         signif_linestyles : list of str, optional
+
             Linestyles for significance. The default is ['--', '-.', ':'].
+
         signif_linewidth : float, optional
+
             width of the significance line. The default is 1.
-        plot_beta : boll, optional
+
+        plot_beta : bool; {True, False}, optional
+
             If True and self.beta_est_res is not None, then the scaling slope line will be plotted
+
         beta_kwargs : dict, optional
+
             The visualization keyword arguments for the scaling slope
 
         Returns
         -------
         fig, ax
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            # generate colored noise with default scaling slope 'alpha' equals to 1
+            ts = pyleo.utils.tsmodel.gen_ts(model='colored_noise')
+            ts.label = 'colored noise'
+            psd = ts.spectral()
+
+            # estimate the scaling slope
+            psd_beta = psd.beta_est(fmin=1/50, fmax=1/2)
+
+            @savefig color_noise_beta2.png
+            fig, ax = psd_beta.plot()
+            pyleo.closefig(fig)
 
         See also
         --------
