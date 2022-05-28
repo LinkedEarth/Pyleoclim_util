@@ -3,7 +3,13 @@
 Pyleoclim Utilities API (pyleoclim.utils)
 =========================================
 
-Pyleoclim makes extensive use of functions from `numpy <https://numpy.org>`_, `Pandas <https://pandas.pydata.org>`_, `Scipy <https://www.scipy.org>`_, and `scikit-learn <https://scikit-learn.org/stable/>`_. Please note that some default parameter values for these functions have been changed to more appropriate values for paleoclimate datasets.
+Utilities upon which Pyleoclim depends for higher-level functionalities accessible to users.
+
+Pyleoclim makes extensive use of functions from `numpy <https://numpy.org>`_,
+`Pandas <https://pandas.pydata.org>`_, `Scipy <https://www.scipy.org>`_, `Matplotlib <https://matplotlib.org>`_,
+`Statsmodels <https://www.statsmodels.org/>`_, and `scikit-learn <https://scikit-learn.org/stable/>`_.
+Please note that some default parameter values for these functions have been changed
+to values more appropriate for paleoclimate datasets.
 
 Causality
 """""""""
@@ -71,7 +77,7 @@ Tsbase
 """"""
 
 .. automodule:: pyleoclim.utils.tsbase
-   :members: clean_ts, dropna, sort_ts, is_evenly_spaced, reduce_duplicated_timestampsers
+   :members: clean_ts, dropna, sort_ts, is_evenly_spaced, reduce_duplicated_timestamps
 
 
 Lipdutils
