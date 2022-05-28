@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-This module is used for the CorrEns object, which stores the result of an ensemble correlation calculation between timeseries and/or ensemble of timeseries. 
+CorrEns objects store the result of an ensemble correlation calculation between timeseries and/or ensemble of timeseries.
+The class enables a print and plot function to easily visualize the result. 
 """
 
 import numpy as np
@@ -114,7 +117,10 @@ class CorrEns:
              clr_insignif=sns.xkcd_rgb['grey'], clr_signif=sns.xkcd_rgb['teal'],
              clr_signif_fdr=sns.xkcd_rgb['pale orange'],
              clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None):
-        ''' Plot the correlation ensembles
+        ''' Plot the distribution of correlation values as a histogram
+        
+        Color-coding is used to indicate significance, with or without applying 
+        the False Discovery Rate (FDR) method. 
 
         Parameters
         ----------
@@ -129,7 +135,7 @@ class CorrEns:
         savefig_settings : dict
         
             the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
+            - "path" must be specified; it can be any existing or new path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
 
@@ -152,6 +158,10 @@ class CorrEns:
 
         See also
         --------
+        
+        pyleoclim.core.Series.Series.correlation: correlation with significance
+        
+        pyleoclim.utils.correlation.fdr: False Discovery Rate
 
         matplotlib.pyplot.hist: https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.hist.html
         

@@ -50,7 +50,7 @@ class Coherence:
     See also
     --------
 
-    pyleoclim.core.ui.Series.wavelet_coherence : Wavelet coherence method
+    pyleoclim.core.Series.Series.wavelet_coherence : Wavelet coherence method
 
     '''
     def __init__(self, frequency, scale, time, wtc, xwt, phase, coi=None,
@@ -184,7 +184,9 @@ class Coherence:
         See also
         --------
         pyleoclim.core.Coherence.Coherence.dashboard
+        
         pyleoclim.core.Series.Series.wavelet_coherence
+        
         matplotlib.pyplot.quiver
         
         Examples
@@ -225,7 +227,7 @@ class Coherence:
             pyleo.closefig(fig)
 
         Note that specifiying 3 significance thresholds does not take any more time as the quantiles are 
-        simply estimated from the same 1,000 member ensemble. By default, the plot function looks 
+        simply estimated from the same ensemble. By default, the plot function looks 
         for the closest quantile to 0.95, but this is easy to adjust, e.g. for the 99th percentile:
         
         .. ipython:: python
@@ -556,8 +558,12 @@ class Coherence:
          return fig, ax
 
     def signif_test(self, number=200, method='ar1sim', seed=None, qs=[0.95], settings=None, mute_pbar=False):
-        '''Significance testing
+        '''Significance testing for Coherence objects
 
+        The method obtains quantiles `qs` of the distribution of coherence between
+        `number` pairs of Monte Carlo simulations of a process that resembles the original series.
+        Currently, only AR(1) surrogates are supported.
+        
         Parameters
         ----------
         number : int, optional
@@ -578,10 +584,14 @@ class Coherence:
         Returns
         -------
         new : pyleoclim.core.Coherence.Coherence
-            original Coherence object augmented with significance levels signif_qs, a list with the following NumPy ndarrays:
-                0: MultipleScalogram for the wavelet transform coherency (WTC)
-                1: MultipleScalogram for the cross-wavelet transform (XWT)
+        
+            original Coherence object augmented with significance levels signif_qs, 
+            a list with the following `MultipleScalogram` objects:
+            * 0: MultipleScalogram for the wavelet transform coherency (WTC)
+            * 1: MultipleScalogram for the cross-wavelet transform (XWT)
+            
             Each object contains as many Scalogram objects as qs contains values
+            
         See also
         --------
 
@@ -657,7 +667,7 @@ class Coherence:
             coh_sig27 = coh.signif_test(seed=27) 
          
         This will generate exactly the same set of draws from the 
-        (pseudo)random number, which may be important for marginal features 
+        (pseudo)random number at every execution, which may be important for marginal features 
         in small ensembles. In general, however, we recommend increasing the 
         number of draws to check that features are robust. 
 

@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-This module contains the MultiplePSD object.
+This object stores several PSDs from different Series or ensemble members from 
+a posterior distribution (e.g. age model, Bayesian climate reconstruction, etc).
 """
 
 from ..utils import plotting 

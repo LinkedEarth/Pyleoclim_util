@@ -48,7 +48,7 @@ class PSD:
     See also
     --------
 
-    pyleoclim.core.Series.spectral : spectral analysis
+    pyleoclim.core.Series.spectral : spectral analysis in Pyleoclim
 
     '''
     def __init__(self, frequency, amplitude, label=None, timeseries=None, plot_kwargs=None,

@@ -1,3 +1,10 @@
+'''
+This class is meant to hold the output of the Singular Spectrum Analysis (SSA) method,
+which applies to Series objets. Two functions are enabled by this class:
+* `screeplot`, which plots the eigenvalue spectrum to help determine what modes to keep
+* `modeplot`, which plots the individual mode temporal EOF and temporal PC
+'''
+
 import numpy as np
 import seaborn as sns
 from matplotlib import pyplot as plt, gridspec

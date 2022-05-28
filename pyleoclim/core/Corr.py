@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Corr objects are used to store the results of the correlation method between Series
+and/or MultipleSeries. Its main purpose is to allow a print function to display the output.
+"""
+
 import numpy as np
 from tabulate import tabulate
 
@@ -26,7 +33,7 @@ def pval_format(p, threshold=0.01, style='exp'):
     return s
 
 class Corr:
-    ''' The object for correlation result in order to format the print message
+    ''' The object for correlation results in order to format the print message
 
     Parameters
     ----------

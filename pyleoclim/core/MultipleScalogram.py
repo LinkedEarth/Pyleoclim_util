@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-This module contains the MultipleScalogram object, which is used to store the results of significance testing for wavelet analysis in signif_qs
+MultipleScalogram objects are used to store the results of significance testing for wavelet analysis in signif_qs
 """
 
 from ..core import Scalogram

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 '''
 The Scalogram class is analogous to PSD, but for wavelet spectra (scalograms)
 '''
@@ -12,27 +14,6 @@ from copy import deepcopy
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter #, MaxNLocator
 from ..core import MultipleScalogram
-
-def infer_period_unit_from_time_unit(time_unit):
-    ''' infer a period unit based on the given time unit
-
-    '''
-    if time_unit is None:
-        period_unit = None
-    else:
-        unit_group = lipdutils.timeUnitsCheck(time_unit)
-        if unit_group != 'unknown':
-            if unit_group == 'kage_units':
-                period_unit = 'kyrs'
-            else:
-                period_unit = 'yrs'
-        else:
-            if time_unit[-1] == 's':
-                period_unit = time_unit
-            else:
-                period_unit = f'{time_unit}s'
-
-    return period_unit
 
 class Scalogram:
     def __init__(self, frequency, scale, time, amplitude, coi=None, label=None, Neff_threshold=3, wwz_Neffs=None, timeseries=None,
@@ -392,7 +373,7 @@ class Scalogram:
                 linestyles=signif_linestyles,
                 linewidths=signif_linewidths,
             )
-            if title is 'default':
+            if title == 'default':
                 if self.label is not None:
                     ax.set_title(self.label + " scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
                 else:
@@ -575,3 +556,25 @@ class Scalogram:
         new.qs = qs
 
         return new
+    
+def infer_period_unit_from_time_unit(time_unit):
+    ''' infer a period unit based on the given time unit
+
+    '''
+    if time_unit is None:
+        period_unit = None
+    else:
+        unit_group = lipdutils.timeUnitsCheck(time_unit)
+        if unit_group != 'unknown':
+            if unit_group == 'kage_units':
+                period_unit = 'kyrs'
+            else:
+                period_unit = 'yrs'
+        else:
+            if time_unit[-1] == 's':
+                period_unit = time_unit
+            else:
+                period_unit = f'{time_unit}s'
+
+    return period_unit
+

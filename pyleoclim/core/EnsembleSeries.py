@@ -201,7 +201,7 @@ class EnsembleSeries(MultipleSeries):
 
         pyleoclim.utils.correlation.corr_sig : Correlation function
 
-        pyleoclim.utils.correlation.fdr : FDR function
+        pyleoclim.utils.correlation.fdr : False Discovery Rate
 
         pyleoclim.core.CorrEns.CorrEns : The correlation ensemble object
 
@@ -212,29 +212,36 @@ class EnsembleSeries(MultipleSeries):
             :okwarning:
             :okexcept:
 
-            import pyleoclim as pyleo
-            import numpy as np
-            from pyleoclim.utils.tsmodel import colored_noise
-
+            nn = 50 # number of noise realizations
             nt = 100
-            t0 = np.arange(nt)
-            v0 = colored_noise(alpha=1, t=t0)
-            noise = np.random.normal(loc=0, scale=1, size=nt)
+            series_list = []
 
-            ts0 = pyleo.Series(time=t0, value=v0)
-            ts1 = pyleo.Series(time=t0, value=v0+noise)
-            ts2 = pyleo.Series(time=t0, value=v0+2*noise)
-            ts3 = pyleo.Series(time=t0, value=v0+1/2*noise)
+            time, signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=2.0)
+            
+            ts = pyleo.Series(time=time, value = signal).standardize()
+            noise = np.random.randn(nt,nn)
 
-            ts_list1 = [ts0, ts1]
-            ts_list2 = [ts2, ts3]
+            for idx in range(nn):  # noise
+                ts = pyleo.Series(time=time, value=ts.value+5*noise[:,idx])
+                series_list.append(ts)
 
-            ts_ens = pyleo.EnsembleSeries(ts_list1)
-            ts_target = pyleo.EnsembleSeries(ts_list2)
+            ts_ens = pyleo.EnsembleSeries(series_list)
 
-            # set an arbitrary randome seed to fix the result
-            corr_res = ts_ens.correlation(ts_target, seed=2333)
+            
+            # set an arbitrary random seed to fix the result
+            corr_res = ts_ens.correlation(ts, seed=2333)
             print(corr_res)
+            
+        The `print` function tabulates the output, and conveys the p-value according
+        to the correlation test applied ("isospec", by default). To plot the result:
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+            
+            @savefig ens_corrplot.png
+            corr_res.plot()
+            pyleo.closefig(fig) 
 
         '''
         if target is None:
@@ -908,18 +915,20 @@ class EnsembleSeries(MultipleSeries):
             nt = 500
             series_list = []
 
-            signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
+            time, signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            
+            ts = pyleo.Series(time=time, value = signal).standardize()
             noise = np.random.randn(nt,nn)
 
             for idx in range(nn):  # noise
-                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                ts = pyleo.Series(time=time, value=signal+noise[:,idx])
                 series_list.append(ts)
 
             ts_ens = pyleo.EnsembleSeries(series_list)
 
             @savefig ens_distplot.png
             fig, ax = ts_ens.distplot()
-            pyleo.closefig(fig) #Optional close fig after plotting
+            pyleo.closefig(fig) 
 
         """
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

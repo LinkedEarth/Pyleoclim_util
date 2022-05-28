@@ -42,7 +42,7 @@ def dict2namedtuple(d):
     return tupletype(**d)
 
 class Series:
-    ''' pyleoSeries object
+    ''' Series class
 
     The Series class is, at its heart, a simple structure containing two arrays y and t of equal length, and some
     metadata allowing to interpret and plot the series. It is similar to a pandas Series, but the concept
@@ -87,7 +87,7 @@ class Series:
     Examples
     --------
 
-    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a pyleoSeries object.
+    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create aSeries object.
 
     .. ipython:: python
         :okwarning:
@@ -107,6 +107,15 @@ class Series:
         )
         ts
         ts.__dict__.keys()
+        
+    For a quick look at the values, one may use the `print()` method: 
+        
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+        
+        print(ts)
+    
     '''
 
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True, verbose=False):
@@ -1345,7 +1354,7 @@ class Series:
                               time_unit=self.time_unit, value_name=self.value_name,
                               value_unit=self.value_unit,label=self.label)
                 s_list.append(s_tmp)
-            res=MultipleSeries.MultipleSeries(series_list=s_list)
+            res=MultipleSeries(series_list=s_list)
         elif len(seg_y)==1:
             res=self.copy()
         else:
@@ -1476,7 +1485,7 @@ class Series:
         Examples
         --------
 
-        We will generate a random signal with a nonlinear trend and use two  detrending options to recover the original signal.
+        We will generate a harmonic signal with a nonlinear trend and use two  detrending options to recover the original signal.
 
         .. ipython:: python
             :okwarning:
@@ -1516,9 +1525,16 @@ class Series:
             fig, ax = ts_emd1.plot(title='Detrended with EMD method')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
+            
+        
 
-            # We see that the default function call results in a "Hockey Stick" at the end, which is undesirable.
-            # There is no automated way to do this, but with a little trial and error, we find that removing the 2 smoothest modes performs reasonably:
+        We see that the default function call results in a "Hockey Stick" at the end, which is undesirable.
+        There is no automated way to do this, but with a little trial and error, we find that removing 
+        the 2 smoothest modes performs reasonably well:
+                
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
 
             ts_emd2 = ts.detrend(method='emd', n=2)
             ts_emd2.label = 'EMD detrending, last 2 modes'
@@ -1527,7 +1543,12 @@ class Series:
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
 
-            # Another option for removing a nonlinear trend is a Savitzky-Golay filter:
+        Another option for removing a nonlinear trend is a Savitzky-Golay filter:
+            
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
             ts_sg = ts.detrend(method='savitzky-golay')
             ts_sg.label = 'savitzky-golay detrending, default parameters'
             @savefig ts_sg.png
@@ -1535,10 +1556,14 @@ class Series:
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
 
-            # As we can see, the result is even worse than with EMD (default). Here it pays to look into the underlying method, which comes from SciPy.
-            # It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges.
-            # By default, this value is close to the length of the series. Choosing a value 10x smaller fixes the problem here, though you will have to tinker with that parameter until you get the result you seek.
-
+        As we can see, the result is even worse than with EMD (default). Here it pays to look into the underlying method, which comes from SciPy.
+        It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges.
+        By default, this value is close to the length of the series. Choosing a value 10x smaller fixes the problem here, though you will have to tinker with that parameter until you get the result you seek.
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
             ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201})
             ts_sg2.label = 'savitzky-golay detrending, window_length = 201'
             @savefig ts_sg2.png
@@ -1583,7 +1608,7 @@ class Series:
         -------
 
         psd : pyleoclim.PSD
-            A :mod:`pyleoclim.PSD` object
+            A PSD object
 
         See also
         --------
@@ -1599,7 +1624,7 @@ class Series:
 
         pyleoclim.utils.spectral.cwt_psd : Spectral analysis using the continuous Wavelet Transform as implemented by Torrence and Compo
 
-        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
+        pyleoclim.utils.spectral.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
@@ -1658,7 +1683,7 @@ class Series:
 
             @savefig spec_ls_freq.png
             fig, ax = psd_LS_freq.plot(
-                title='PSD using Lomb-Scargle method with differnt frequency vectors',
+                title='PSD using Lomb-Scargle method with different frequency vectors',
                 label='freq=np.linspace(1/20, 1/0.2, 51)', marker='o')
             psd_ls.plot(ax=ax, label='freq_method="log"', marker='o')
 
@@ -1752,7 +1777,7 @@ class Series:
         }
         args = {}
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
+        freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
 
         args['wwz'] = {'freq': freq}
         args['cwt'] = {'freq': freq}
@@ -1811,7 +1836,7 @@ class Series:
         return psd
 
     def wavelet(self, method='cwt', settings=None, freq_method='log', freq_kwargs=None, verbose=False):
-        ''' Perform wavelet analysis on the timeseries
+        ''' Perform wavelet analysis on a timeseries
 
         Parameters
         ----------
@@ -1847,7 +1872,7 @@ class Series:
 
         pyleoclim.utils.wavelet.cwt : cwt function
 
-        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
+        pyleoclim.utils.spectral.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
         
@@ -1860,18 +1885,16 @@ class Series:
         References
         ----------
 
-        [1] Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis.
-            Bull. Amer. Meteor. Soc., 79, 61-78.
+        Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
         Python routines available at http://paos.colorado.edu/research/wavelets/
 
-        [2] Foster, G. Wavelets for period analysis of unevenly sampled time series.
-            The Astronomical Journal 112, 1709 (1996).
+        Foster, G., 1996: Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112, 1709.
 
         Examples
         --------
 
-        Wavelet analysis on the SOI record.
-
+        Wavelet analysis on the evenly-spaced SOI record. The CWT method will be applied by default.
+        
         .. ipython:: python
             :okwarning:
             :okexcept:
@@ -1883,29 +1906,59 @@ class Series:
             value = data.iloc[:,2]
             ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
 
-            scal1 = ts.wavelet() # method='cwt' will be applied since the series is evenly spaced
+            scal1 = ts.wavelet() 
             scal_signif = scal1.signif_test(number=200)  # for research-grade work, use number=200 or larger
             @savefig scal_cwt.png
             fig, ax = scal_signif.plot(title='CWT scalogram')
             pyleo.closefig()
-
-            # if you wanted to invoke the WWZ instead
-            scal2 = ts.wavelet(method='wwz') # no significance testing to lower computational cost
+                        
+        If you wanted to invoke the WWZ instead (here with no significance testing, to lower computational cost):
+            
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            scal2 = ts.wavelet(method='wwz') 
             @savefig scal_wwz.png
             fig, ax = scal2.plot(title='WWZ scalogram')
             pyleo.closefig()
 
-        Notice that the two scalograms have different units, which are arbitrary
+        Notice that the two scalograms have different units, which are arbitrary.  Method-specific arguments
+        may be passed via `settings`.  For instance, if yo uwanted to change the default mother wavelet
+        ('MORLET') to a derivative of a Gaussian (DOG), with degree 2 by default ("Mexican Hat wavelet"):
 
-        To see how to change the wavelet method, see the Series.spectral() functionality as an example
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            scal3 = ts.wavelet(settings = {'mother':'DOG'}) 
+            @savefig scal_dog.png
+            fig, ax = scal3.plot(title='CWT scalogram with DOG mother wavelet')
+            pyleo.closefig()
+            
+        As for WWZ, note that, for computational efficiency, the time axis is coarse-grained
+        by default to 50 time points, which explains in part the diffence with the CWT scalogram.
 
+        If you need a custom axis, it (and other method-specific  parameters) can also be passed 
+        via the `settings` dictionary:
+            
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+            
+            tau = np.linspace(np.min(ts.time), np.max(ts.time), 60)
+            scal4 = ts.wavelet(method='wwz', settings={'tau':tau}) 
+            @savefig scal_tau.png
+            fig, ax = scal4.plot(title='WWZ scalogram with finer time axis')
+            pyleo.closefig()
+            
         '''
         if not verbose:
             warnings.simplefilter('ignore')
 
         # Assign method
         if method == 'cwt' and not(self.is_evenly_spaced()):
-            raise ValueError("The chosen method is cwt but the series is unevenly spaced. You can either interpolate/bin or use 'wwz'.")
+            raise ValueError("The chosen method is cwt but the series is unevenly spaced. You can either interpolate/bin or set method='wwz'.")
 
         wave_func = {'wwz': waveutils.wwz,
                       'cwt': waveutils.cwt
@@ -1914,7 +1967,7 @@ class Series:
         # Process options
         settings = {} if settings is None else settings.copy()
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
+        freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
         args = {}
         args['wwz'] = {'freq': freq}
         args['cwt'] = {'freq': freq}
@@ -1994,20 +2047,27 @@ class Series:
 
         coh : pyleoclim.core.Coherence.Coherence
 
+        References
+        ----------
+
+        Grinsted, A., Moore, J. C. & Jevrejeva, S. Application of the cross wavelet transform and
+        wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004). 
 
         See also
         --------
 
-        pyleoclim.utils.wavelet.make_freq_vector : Functions to create the frequency vector
+        pyleoclim.utils.spectral.make_freq_vector : Functions to create the frequency vector
         
         pyleoclim.utils.tsutils.detrend : Detrending function
         
         pyleoclim.core.MultipleSeries.MultipleSeries.common_time : put timeseries on common time axis
+        
+        pyleoclim.core.Series.Series.wavelet : wavelet analysis
 
         Examples
         --------
 
-        Wavelet coherence on evenly spaced data with default arguments:
+        Calculate the wavelet coherence of NINO3 and All India Rainfall with default arguments:
 
         .. ipython:: python
             :okwarning:
@@ -2028,30 +2088,47 @@ class Series:
             fig, ax = coh.plot()
             pyleo.closefig()
 
-        We may specify `ntau` to adjust the temporal resolution of the WWZ scalogram, which will affect the time consumption of calculation and the result itself:
+        Note that in this example both timeseries area already on a common,
+        evenly-spaced time axis. If they are not (either because the data are unevenly spaced,
+        or because the time axes are different in some other way), an error will be raised.
+        To circumvent this error, you can either put the series
+        on a common time axis (e.g. using common_time()) prior to applying CWT, or you
+        can use the Weighted Wavelet Z-transform (WWZ) instead, as it is designed for
+        unevenly-spaced data. However, it is usually far slower:
 
         .. ipython:: python
             :okwarning:
             :okexcept:
 
-            coh_ntau = ts_air.wavelet_coherence(ts_nino, ntau=30)
-
-            @savefig coh_ntau.png
-            fig, ax = coh_ntau.plot()
-            pyleo.closefig()
-
-        We may also specify the `tau` vector explicitly:
-
+             coh_wwz = ts_air.wavelet_coherence(ts_nino, method = 'wwz')
+             @savefig coh_wwz.png
+             fig, ax = coh_wwz.plot()
+            
+        As with wavelet analysis, both CWT and WWZ admit optional arguments through `settings`.
+        Significance is assessed similarly as with PSD or Scalogram objects:
+            
         .. ipython:: python
             :okwarning:
             :okexcept:
 
-            coh_tau = ts_air.wavelet_coherence(ts_nino, tau=np.arange(1880, 2001))
+            cwt_sig = coh.signif_test(number=200, qs=[.9,.95]) # specifiying 2 significance thresholds does not take any more time.
+            @savefig cwt_sig.png
+            # by default, the plot function will look for the closest quantile to 0.95, but it is easy to adjust:
+            cwt_sig.plot(signif_thresh = 0.9)
+            
+        Another plotting option, `dashboard`, allows to visualize both
+        timeseries as well as the wavelet transform coherency (WTC), which quantifies where 
+        two timeseries exhibit similar behavior in time-frequency space, and the cross-wavelet
+        transform (XWT), which indicates regions of high common power. 
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
 
-            @savefig coh_tau.png
-            fig, ax = coh_tau.plot()
-            pyleo.closefig()
-
+            @savefig cwt_sig_dash.png
+            cwt_sig.dashboard()
+             
+        Note: this design balances many considerations, and is not easily customizable. 
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -2066,7 +2143,7 @@ class Series:
         # Process options
         settings = {} if settings is None else settings.copy()
         freq_kwargs = {} if freq_kwargs is None else freq_kwargs.copy()
-        freq = waveutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
+        freq = specutils.make_freq_vector(self.time, method=freq_method, **freq_kwargs)
         args = {}
         args['wwz'] = {'freq': freq}
         args['cwt'] = {'freq': freq}
@@ -2074,7 +2151,7 @@ class Series:
         # put on same time axes if necessary
         if method == 'cwt' and not np.array_equal(self.time, target_series.time):
             warnings.warn("Series have different time axes. Applying common_time().")
-            ms = MultipleSeries.MultipleSeries([self, target_series])
+            ms = MultipleSeries([self, target_series])
             common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
             ct_args = {'method': 'interp'}
             ct_args.update(common_time_kwargs)
@@ -2120,6 +2197,7 @@ class Series:
         )
 
         return coh
+    
     def correlation(self, target_series, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None, seed=None):
         ''' Estimates the Pearson's correlation and associated significance between two non IID time series
 
@@ -2220,7 +2298,7 @@ class Series:
         corr_args = {'alpha': alpha}
         corr_args.update(settings)
 
-        ms = MultipleSeries.MultipleSeries([self, target_series])
+        ms = MultipleSeries([self, target_series])
         if list(self.time) != list(target_series.time):
             common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
             ct_args = {'method': 'interp'}
