@@ -1,4 +1,4 @@
-name: run pytest for the Development Branch
+name: run pytest for the master Branch
 
 on:
   push:
