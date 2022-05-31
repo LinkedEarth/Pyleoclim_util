@@ -43,7 +43,9 @@ def infer_period_unit_from_time_unit(time_unit):
     return period_unit
 
 class PSD:
-    '''Power Spectral Density (PSD) object obtained from spectral analysis.
+    '''The PSD (Power spectral density) class is intended for conveniently manipulating
+    the result of spectral methods, including performing significance tests,
+    estimating scaling coefficients, and plotting. 
 
     See examples in pyleoclim.core.series.Series.spectral to see how to create and manipulate these objects
 

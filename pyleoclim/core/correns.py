@@ -38,7 +38,9 @@ def pval_format(p, threshold=0.01, style='exp'):
     return s
 
 class CorrEns:
-    ''' This object contains the results of an ensemble correlation
+    ''' CorrEns objects store the result of an ensemble correlation calculation 
+    between timeseries and/or ensemble of timeseries. The class enables a print and 
+    plot function to easily visualize the result. 
 
     Parameters
     ----------

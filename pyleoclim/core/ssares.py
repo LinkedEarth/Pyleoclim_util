@@ -15,7 +15,12 @@ from ..utils import plotting
 
 
 class SsaRes:
-    ''' Class to hold the results of SSA method
+    '''This class is meant to hold the output of the Singular Spectrum Analysis (SSA) method,
+    which applies to Series objets. Two functions are enabled by this class:
+        
+    * `screeplot`, which plots the eigenvalue spectrum to help determine what modes to keep
+    
+    * `modeplot`, which plots the individual mode temporal EOF and temporal PC
 
     Parameters
     ----------

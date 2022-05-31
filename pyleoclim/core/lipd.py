@@ -12,7 +12,10 @@ import os
 import lipd as lpd
 
 class Lipd:
-    '''Create a Lipd object from Lipd Files
+    '''The Lipd class allows to create a Lipd object from Lipd files. 
+    This allows to manipulate LiPD objects and take advantage of the metadata information 
+    for specific functionalities. Lipd objects are needed to create LipdSeries objects, 
+    which carry most of the timeseries functionalities.
 
 
     Parameters

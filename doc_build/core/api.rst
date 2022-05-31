@@ -20,48 +20,48 @@ The following describes the various classes that undergird the Pyleoclim edifice
 Series (pyleoclim.Series)
 """""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.series
-   :members: Series
+.. autoclass:: pyleoclim.core.series.Series
+   :members:
 
 
 MultipleSeries (pyleoclim.MultipleSeries)
 """""""""""""""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.multipleseries
-   :members: MultipleSeries
+.. autoclass:: pyleoclim.core.multipleseries.MultipleSeries
+   :members:
 
 
 EnsembleSeries (pyleoclim.EnsembleSeries)
 """""""""""""""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.ensembleseries
-   :members: EnsembleSeries
+.. autoclass:: pyleoclim.core.ensembleseries.EnsembleSeries
+   :members:
 
 SurrogateSeries (pyleoclim.SurrogateSeries)
 """""""""""""""""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.surrogateseries
-  :members: SurrogateSeries
+.. autoclass:: pyleoclim.core.surrogateseries.SurrogateSeries
+  :members:
 
 Lipd (pyleoclim.Lipd)
 """""""""""""""""""""
 
 This class allows to manipulate LiPD objects.
 
-.. automodule:: pyleoclim.core.lipd
-   :members: Lipd
+.. autoclass:: pyleoclim.core.lipd.Lipd
+   :members:
 
 LipdSeries (pyleoclim.LipdSeries)
 """""""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.lipdseries
-   :members: LipdSeries
+.. autoclass:: pyleoclim.core.lipdseries.LipdSeries
+   :members:
 
 PSD (pyleoclim.PSD)
 """""""""""""""""""
 
-.. automodule:: pyleoclim.core.psds
-   :members: PSD
+.. autoclass:: pyleoclim.core.psds.PSD
+   :members:
 
 MultiplePSD (pyleoclim.MultiplePSD)
 """""""""""""""""""""""""""""""""""
@@ -83,29 +83,29 @@ MultipleScalogram (pyleoclim.MultipleScalogram)
 Coherence (pyleoclim.Coherence)
 """""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.coherence
-   :members: Coherence
+.. autoclass:: pyleoclim.core.coherence.Coherence
+   :members:
 
 Corr (pyleoclim.Corr)
 """""""""""""""""""""
 
-.. automodule:: pyleoclim.core.corr
-   :members: Corr
+.. autoclass:: pyleoclim.core.corr.Corr
+   :members:
 
 CorrEns (pyleoclim.CorrEns)
 """""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.correns
-   :members: CorrEns
+.. autoclass:: pyleoclim.core.correns.CorrEns
+   :members:
 
 SpatialDecomp (pyleoclim.SpatialDecomp)
 """""""""""""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.spatialdecomp
-  :members: SpatialDecomp
+.. autoclass:: pyleoclim.core.spatialdecomp.SpatialDecomp
+  :members:
 
 SsaRes (pyleoclim.SsaRes)
-"""""""""""""""""""""""""""
+"""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.ssares
-   :members: SsaRes
+.. autoclass:: pyleoclim.core.ssares.SsaRes
+   :members:

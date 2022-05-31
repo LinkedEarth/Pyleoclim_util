@@ -29,7 +29,7 @@ class MultipleSeries:
 
     This object handles a collection of the type Series and can be created from a list of such objects.
     MultipleSeries should be used when the need to run analysis on multiple records arises, such as running principal component analysis.
-    Some of the methods automatically refocus the time axis prior to analysis to ensure that the analysis is run over the same time period.
+    Some of the methods automatically transform the time axis prior to analysis to ensure consistency.
 
     Parameters
     ----------
@@ -658,11 +658,21 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries(ts_list)
             ts_target = ts0
 
-            # set an arbitrary random seed to fix the result
+        Correlation between the MultipleSeries object and a target Series. We also set an arbitrary random seed to ensure reproducibility:
+       
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+           
             corr_res = ms.correlation(ts_target, settings={'nsim': 20}, seed=2333)
             print(corr_res)
+        
+        Correlation among the series of the MultipleSeries object
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
 
-            # set an arbitrary random seed to fix the result
             corr_res = ms.correlation(settings={'nsim': 20}, seed=2333)
             print(corr_res)
 

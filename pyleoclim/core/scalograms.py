@@ -591,7 +591,7 @@ class Scalogram:
         return new
     
 class MultipleScalogram:
-    '''MultipleScalogram objects are used to store the results of significance testing for wavelet analysis in signif_qs
+    '''MultipleScalogram objects are used to store the results of significance testing for wavelet analysis
     '''
     
     def __init__(self, scalogram_list):

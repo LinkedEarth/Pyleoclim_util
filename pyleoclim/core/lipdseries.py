@@ -23,12 +23,10 @@ import lipd as lpd
 
 
 class LipdSeries(Series):
-    '''Lipd time series object
-
+    '''LipdSeries are (you guessed it), Series objects that are created from LiPD objects. As a subclass of Series, they inherit all its methods.
+    When created, LiPDSeries automatically instantiates the time, value and other parameters from what’s in the lipd file.
     These objects can be obtained from a LiPD file/object either through Pyleoclim or the LiPD utilities.
-    If multiple objects (i.e., a list) is given, then the user will be prompted to choose one timeseries.
-
-    LipdSeries is a child of Series, therefore all the methods available for Series apply to LipdSeries in addition to some specific methods.
+    If multiple objects (i.e., a list) are given, then the user will be prompted to choose one timeseries.
 
     Returns
     -------

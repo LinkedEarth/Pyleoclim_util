@@ -42,11 +42,13 @@ def dict2namedtuple(d):
     return tupletype(**d)
 
 class Series:
-    ''' Series class
+    '''The Series class describes the most basic objects in Pyleoclim. 
+    A Series is a simple `dictionary <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_ that contains 3 things:
+    - a series of real-valued numbers;
+    - a time axis at which those values were measured/simulated ;
+    - optionally, some metadata about both axes, like units, labels and the like.
 
-    The Series class is, at its heart, a simple structure containing two arrays y and t of equal length, and some
-    metadata allowing to interpret and plot the series. It is similar to a pandas Series, but the concept
-    was extended because pandas does not yet support geologic time.
+    How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
 
     Parameters
     ----------
