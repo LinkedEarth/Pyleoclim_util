@@ -171,6 +171,8 @@ class MultipleSeries:
         See also
         --------
 
+        pyleoclim.series.Series.filter : filtering for Series objects    
+
         pyleoclim.utils.filter.butterworth : Butterworth method
 
         pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
@@ -351,14 +353,17 @@ class MultipleSeries:
         increments : numpy.array
         
             n x 3 array, where n is the number of series,
-            index 0 is the earliest time
-            index 1 is the latest time
-            index 2 is the step chosen according to step_style
+            
+            * index 0 is the earliest time among all Series
+            
+            * index 1 is the latest time among all Series
+            
+            * index 2 is the step, chosen according to step_style
             
         See also
         --------
         
-        pyleoclim.utils.tsutils.increments : The underlying increments function
+        pyleoclim.utils.tsutils.increments :  underlying array-level utility
 
         Examples
         --------
@@ -705,6 +710,14 @@ class MultipleSeries:
         lengths : list 
         
             List of the lengths of the series in object
+            
+        See also
+        --------
+        
+        pyleoclim.core.multipleseries.MultipleSeries.common_time : Aligns the time axes of a MultipleSeries object
+            
+        Examples
+        --------    
 
         .. ipython:: python
             :okwarning:
@@ -740,7 +753,6 @@ class MultipleSeries:
 
         Decomposition of dataset ys in terms of orthogonal basis functions.
         Tolerant to missing values, infilled by an EM algorithm.
-        Requires ncomp to be less than the number of missing values.
 
         Do make sure the time axes are aligned, however! (e.g. use `common_time()`)
 
@@ -1307,9 +1319,9 @@ class MultipleSeries:
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
             data = pyleo.Lipd(usr_path = url)
             tslist = data.to_LipdSeriesList()
-            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            tslist = tslist[2:] # drop the first two series which only contain age and depth
             ms = pyleo.MultipleSeries(tslist)
-            msinterp = ms.wavelet()
+            wav = ms.wavelet(method='wwz')
 
         '''
         settings = {} if settings is None else settings.copy()
@@ -1609,8 +1621,8 @@ class MultipleSeries:
 
             import pyleoclim as pyleo
             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            tslist = data.to_LipdSeriesList()
+            d = pyleo.Lipd(usr_path = url)
+            tslist = d.to_LipdSeriesList()
             tslist = tslist[2:] # drop the first two series which only concerns age and depth
             ms = pyleo.MultipleSeries(tslist)
             @savefig mts_stackplot.png
@@ -1623,29 +1635,19 @@ class MultipleSeries:
             :okwarning:
             :okexcept:
 
-            import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
             sst = d.to_LipdSeries(number=5)
             d18Osw = d.to_LipdSeries(number=3)
             ms = pyleo.MultipleSeries([sst,d18Osw])
 
             @savefig mts_stackplot_customlabels.png
             fig, ax = ms.stackplot(labels=['sst','d18Osw'])
-            pyleo.closefig(fig) #Optional figure close after plotting
+            pyleo.closefig(fig) 
 
         And let's remove them completely
 
         .. ipython:: python
             :okwarning:
             :okexcept:
-
-            import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            sst = d.to_LipdSeries(number=5)
-            d18Osw = d.to_LipdSeries(number=3)
-            ms = pyleo.MultipleSeries([sst,d18Osw])
 
             @savefig mts_stackplot_nolabels.png
             fig, ax = ms.stackplot(labels=None)
@@ -1657,29 +1659,15 @@ class MultipleSeries:
             :okwarning:
             :okexcept:
 
-            import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            sst = d.to_LipdSeries(number=5)
-            d18Osw = d.to_LipdSeries(number=3)
-            ms = pyleo.MultipleSeries([sst,d18Osw])
-
             @savefig mts_stackplot_samemarkers.png
             fig, ax = ms.stackplot(labels=None, plot_kwargs={'marker':'o'})
             pyleo.closefig(fig) #Optional figure close after plotting
 
-        But I really want to use different markers
+        Using different marker types on each series:
 
         .. ipython:: python
             :okwarning:
             :okexcept:
-
-            import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            sst = d.to_LipdSeries(number=5)
-            d18Osw = d.to_LipdSeries(number=3)
-            ms = pyleo.MultipleSeries([sst,d18Osw])
 
             @savefig mts_stackplot_differentmarkers.png
             fig, ax = ms.stackplot(labels=None, plot_kwargs=[{'marker':'o'},{'marker':'^'}])
