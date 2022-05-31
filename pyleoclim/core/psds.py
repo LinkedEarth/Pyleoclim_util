@@ -207,7 +207,7 @@ class PSD:
             csv = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
             soi = pyleo.Series(time = csv['Year'],value = csv['Value'], time_name = 'Years', time_unit = 'AD')
             psd = soi.standardize().spectral('mtm',settings={'NW':2})
-            psd_sim = psd.signif_test()
+            psd_sim = psd.signif_test(number=20)
             @savefig psd_sim.png
             fig, ax = psd_sim.plot()
             pyleo.closefig(fig)
@@ -220,7 +220,7 @@ class PSD:
             :okwarning:
             :okexcept:
                 
-            psd_1000 = psd.signif_test(number=1000,qs=[0.90, 0.95])
+            psd_1000 = psd.signif_test(number=100, qs=[0.90, 0.95])
             @savefig psd_1000.png
             fig, ax = psd_1000.plot()
             pyleo.closefig(fig)
@@ -243,7 +243,7 @@ class PSD:
             :okwarning:
             :okexcept:
                 
-            scalogram = soi.standardize().wavelet().signif_test(number=20,export_scal=True)
+            scalogram = soi.standardize().wavelet().signif_test(number=20, export_scal=True)
 
         The psd can be calculated by using the previously generated scalogram
         
@@ -425,7 +425,7 @@ class PSD:
 
         See also
         --------
-        pyleoclim.core.Series.spectral : spectral analysis
+        pyleoclim.core.series.Series.spectral : spectral analysis
 
         pyleoclim.utils.spectral.beta_estimation : Estimate the scaling exponent of a power spectral density
         
@@ -602,7 +602,7 @@ class PSD:
             ts = pyleo.Series(time = t, value = v, label = 'fractal noise')
             tsn = ts.standardize()
     
-            psd_sim = tsn.spectral(method='mtm').signif_test()
+            psd_sim = tsn.spectral(method='mtm').signif_test(number=20)
             @savefig mtm_sim.png
             psd_sim.plot()
             pyleo.closefig(fig)
@@ -623,7 +623,7 @@ class PSD:
         See also
         --------
 
-        pyleoclim.core.Series.spectral : spectral analysis
+        pyleoclim.core.series.Series.spectral : spectral analysis
         
         pyleoclim.core.psds.PSD.signif_test : significance testing for PSD objects
         

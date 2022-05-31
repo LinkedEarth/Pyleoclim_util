@@ -1785,7 +1785,7 @@ class Series:
 
             ts_interp = ts_std.interp()
             psd_cwt = ts_interp.spectral(method='cwt')
-            psd_cwt_signif = psd_cwt.signif_test()
+            psd_cwt_signif = psd_cwt.signif_test(number=20)
             @savefig spec_cwt.png
             fig, ax = psd_cwt_signif.plot(title='PSD using CWT method')
 
@@ -1934,7 +1934,7 @@ class Series:
             ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
 
             scal1 = ts.wavelet() 
-            scal_signif = scal1.signif_test(number=200)  # for research-grade work, use number=200 or larger
+            scal_signif = scal1.signif_test(number=20)  # for research-grade work, use number=200 or larger
             @savefig scal_cwt.png
             fig, ax = scal_signif.plot(title='CWT scalogram')
             pyleo.closefig()
@@ -2072,7 +2072,7 @@ class Series:
         Returns
         -------
 
-        coh : pyleoclim.core.Coherence.Coherence
+        coh : pyleoclim.core.coherence.Coherence
 
         References
         ----------
@@ -2138,7 +2138,7 @@ class Series:
             :okwarning:
             :okexcept:
 
-            cwt_sig = coh.signif_test(number=200, qs=[.9,.95]) # specifiying 2 significance thresholds does not take any more time.
+            cwt_sig = coh.signif_test(number=20, qs=[.9,.95]) # specifiying 2 significance thresholds does not take any more time.
             @savefig cwt_sig.png
             # by default, the plot function will look for the closest quantile to 0.95, but it is easy to adjust:
             cwt_sig.plot(signif_thresh = 0.9)

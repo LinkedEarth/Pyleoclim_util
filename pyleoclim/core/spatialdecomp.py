@@ -86,13 +86,9 @@ class SpatialDecomp:
 
         References
         ----------
-        [1] North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982),
-            Sampling errors in the estimation of empirical orthogonal functions,
-            Mon. Weather Rev., 110, 699–706.
-        [2] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical
-            orthogonal functions and related techniques in atmospheric science:
-            A review, International Journal of Climatology, 27(9),
-            1119–1152, doi:10.1002/joc.1499.
+        _[1] North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982), Sampling errors in the estimation of empirical orthogonal functions, Mon. Weather Rev., 110, 699–706.
+        
+        _[2] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical orthogonal functions and related techniques in atmospheric science: A review, International Journal of Climatology, 27(9), 1119–1152, doi:10.1002/joc.1499.
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()

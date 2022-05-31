@@ -19,7 +19,7 @@ LiPD, however, is not an obligatory entry point to Pyleoclim. Low-level modules 
 
 We've worked very hard to make Pyleoclim accessible to a wide variety of users, from establisher researchers to high-school students, and from seasoned Pythonistas to first-time programmers. A growing collection of workflows that use Pyleoclim are available as Jupyter notebooks on [paleoBooks](https://github.com/LinkedEarth/PaleoBooks/tree/master/notebooks).
 
-A series of training material is also available on [paleoHackthon](https://github.com/LinkedEarth/paleoHackathon). You can run these training notebooks at any time in a myBinder environment. We also run training workshops several times a year. Follow us on our social media accounts for more information.
+A series of training materials is also available on [paleoHackthon](https://github.com/LinkedEarth/paleoHackathon). You can run these training notebooks at any time in a myBinder environment. We also run training workshops several times a year. Follow us on our social media accounts, or join our [Discourse Forum](https://discourse.linked.earth) for more information.
 
 ### Versions
 

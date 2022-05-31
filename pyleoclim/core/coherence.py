@@ -182,7 +182,7 @@ class Coherence:
 
         See also
         --------
-        pyleoclim.core.Coherence.Coherence.dashboard
+        pyleoclim.core.coherence.Coherence.dashboard
 
         pyleoclim.core.series.Series.wavelet_coherence
 
@@ -220,7 +220,7 @@ class Coherence:
             :okwarning:
             :okexcept:
 
-            coh_sig = coh.signif_test(number=250, qs=[.9,.95,.99])
+            coh_sig = coh.signif_test(number=20, qs=[.9,.95,.99])
             @savefig coh_sig_plot.png
             coh_sig.plot()
             pyleo.closefig(fig)
@@ -457,7 +457,7 @@ class Coherence:
               arguments to be passed to the timeseries subplot, see pyleoclim.core.series.Series.plot for details
 
          wavelet_plot_kwargs : dict
-              arguments to be passed to the contour subplots (XWT and WTC), [see pyleoclim.core.Coherence.Coherence.plot for details]
+              arguments to be passed to the contour subplots (XWT and WTC), [see pyleoclim.core.coherence.Coherence.plot for details]
 
 
          Returns
@@ -466,7 +466,7 @@ class Coherence:
 
          See also
          --------
-         pyleoclim.core.Coherence.Coherence.plot
+         pyleoclim.core.coherence.Coherence.plot
 
          pyleoclim.core.series.Series.wavelet_coherence
 
@@ -496,7 +496,7 @@ class Coherence:
                                     label='NINO3', value_name='NINO3 (K)')
 
              coh = ts_air.wavelet_coherence(ts_nino)
-             coh_sig = coh.signif_test()
+             coh_sig = coh.signif_test(number=20)
 
              @savefig coh_dash.png
              coh_sig.dashboard()
@@ -582,7 +582,7 @@ class Coherence:
 
         Returns
         -------
-        new : pyleoclim.core.Coherence.Coherence
+        new : pyleoclim.core.coherence.Coherence
 
             original Coherence object augmented with significance levels signif_qs,
             a list with the following `MultipleScalogram` objects:
@@ -600,7 +600,7 @@ class Coherence:
 
         pyleoclim.core.scalograms.MultipleScalogram : Multiple Scalogram object
 
-        pyleoclim.core.Coherence.Coherence.plot : plotting method for Coherence objects
+        pyleoclim.core.coherence.Coherence.plot : plotting method for Coherence objects
 
         Examples
         --------
@@ -624,7 +624,7 @@ class Coherence:
                                    label='NINO3', value_name='NINO3 (K)')
 
             coh = ts_air.wavelet_coherence(ts_nino)
-            coh_sig = coh.signif_test()
+            coh_sig = coh.signif_test(number=20)
             @savefig coh_sig_plot.png
             coh_sig.plot()
             pyleo.closefig(fig)
@@ -638,7 +638,7 @@ class Coherence:
             :okwarning:
             :okexcept:
 
-            coh_sig2 = coh.signif_test(number=1000, qs=[.9,.95,.99])
+            coh_sig2 = coh.signif_test(number=100, qs=[.9,.95,.99])
             @savefig coh_sig2_plot.png
             coh_sig2.plot()
             pyleo.closefig(fig)
@@ -663,7 +663,7 @@ class Coherence:
             :okwarning:
             :okexcept:
 
-            coh_sig27 = coh.signif_test(seed=27)
+            coh_sig27 = coh.signif_test(number=20, seed=27)
 
         This will generate exactly the same set of draws from the
         (pseudo)random number at every execution, which may be important for marginal features
