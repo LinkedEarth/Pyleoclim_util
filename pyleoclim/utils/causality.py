@@ -49,9 +49,9 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
         matrix for the parameter f_test.
         
     Notes
-    ------
+    -----
 
-    The null hypothesis for grangercausalitytests is that the time series in the second column, x2, does NOT Granger cause the time series in the first column, x1. Grange causality means that past values of x2 have a statistically significant effect on the current value of x1, taking past values of x1 into account as regressors. We reject the null hypothesis that x2 does not Granger cause x1 if the pvalues are below a desired size of the test.
+    The null hypothesis for Granger causality tests is that the time series in the second column, x2, does NOT Granger cause the time series in the first column, x1. Grange causality means that past values of x2 have a statistically significant effect on the current value of x1, taking past values of x1 into account as regressors. We reject the null hypothesis that x2 does not Granger cause x1 if the pvalues are below a desired size of the test.
 
     The null hypothesis for all four test is that the coefficients corresponding to past values of the second time series are zero.
 
@@ -63,7 +63,9 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
     --------
 
     pyleoclim.utils.causality.liang_causality : information flow estimated using the Liang algorithm
+    
     pyleoclim.utils.causality.signif_isopersist : significance test with AR(1) with same persistence
+    
     pyleoclim.utils.causality.signif_isospec : significance test with surrogates with randomized phases
     
     References
@@ -138,24 +140,23 @@ def liang_causality(y1, y2, npt=1, signif_test='isospec', nsim=1000,
     --------
 
     pyleoclim.utils.causality.liang : information flow estimated using the Liang algorithm
+    
     pyleoclim.utils.causality.granger_causality : information flow estimated using the Granger algorithm
+    
     pyleoclim.utils.causality.signif_isopersist : significance test with AR(1) with same persistence
+    
     pyleoclim.utils.causality.causality.signif_isospec : significance test with surrogates with randomized phases
     
     References
     ----------
 
-    Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and
-            Applications. Entropy, 15, 327-360, doi:10.3390/e15010327
+    Liang, X.S. (2013) The Liang-Kleeman Information Flow: Theory and Applications. Entropy, 15, 327-360, doi:10.3390/e15010327
     
-    Liang, X.S. (2014) Unraveling the cause-efect relation between timeseries.
-        Physical review, E 90, 052150
+    Liang, X.S. (2014) Unraveling the cause-effect relation between timeseries. Physical review, E 90, 052150
     
-    Liang, X.S. (2015) Normalizing the causality between time series.
-        Physical review, E 92, 022126
+    Liang, X.S. (2015) Normalizing the causality between time series. Physical review, E 92, 022126
     
-    Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio.
-        Physical review, E 94, 052201
+    Liang, X.S. (2016) Information flow and causality as rigorous notions ab initio. Physical review, E 94, 052201
 
     '''
 

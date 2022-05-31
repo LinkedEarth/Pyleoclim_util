@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt, gridspec
 from matplotlib.ticker import MaxNLocator
 
-from ..core import Series
+from ..core import series
 from ..utils import plotting
 
 
@@ -191,7 +191,7 @@ class SpatialDecomp:
             fig, ax = plt.subplots(figsize=figsize)
 
         PC = self.pcs[:, index]
-        ts = Series.Series(time=self.time, value=PC)  # define timeseries object for the PC
+        ts = series.Series(time=self.time, value=PC)  # define timeseries object for the PC
 
         fig = plt.figure(tight_layout=True, figsize=figsize)
         gs = gridspec.GridSpec(2, 2)  # define grid for subplots

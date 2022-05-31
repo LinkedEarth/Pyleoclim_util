@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-'''
-The Scalogram class is analogous to PSD, but for wavelet spectra (scalograms)
-'''
+
+# It is unclear why the documentation for these two modules does not build automatically using automodule. It therefore had to be built using autoclass
 
 from ..utils import plotting, lipdutils
 from ..utils import wavelet as waveutils
@@ -13,9 +10,35 @@ from tabulate import tabulate
 from copy import deepcopy
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter #, MaxNLocator
-from ..core import MultipleScalogram
+from scipy.stats.mstats import mquantiles
+
+#from ..core import MultipleScalogram
+def infer_period_unit_from_time_unit(time_unit):
+    ''' infer a period unit based on the given time unit
+
+    '''
+    if time_unit is None:
+        period_unit = None
+    else:
+        unit_group = lipdutils.timeUnitsCheck(time_unit)
+        if unit_group != 'unknown':
+            if unit_group == 'kage_units':
+                period_unit = 'kyrs'
+            else:
+                period_unit = 'yrs'
+        else:
+            if time_unit[-1] == 's':
+                period_unit = time_unit
+            else:
+                period_unit = f'{time_unit}s'
+
+    return period_unit
+
 
 class Scalogram:
+    '''
+    The Scalogram class is analogous to PSD, but for wavelet spectra (scalograms).
+    '''
     def __init__(self, frequency, scale, time, amplitude, coi=None, label=None, Neff_threshold=3, wwz_Neffs=None, timeseries=None,
                  wave_method=None, wave_args=None, signif_qs=None, signif_method=None, freq_method=None, freq_kwargs=None,
                  scale_unit=None, time_label=None, signif_scals=None, qs = None):
@@ -191,7 +214,7 @@ class Scalogram:
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              contourf_style={}, cbar_style={}, savefig_settings={}, ax=None,
              signif_thresh = 0.95):
-        '''Plot the scalogram
+        ''' Plot the scalogram
 
         Parameters
         ----------
@@ -282,7 +305,7 @@ class Scalogram:
         See also
         --------
 
-        pyleoclim.core.Series.Series.wavelet : Wavelet analysis
+        pyleoclim.core.series.Series.wavelet : Wavelet analysis
 
         pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
 
@@ -402,15 +425,19 @@ class Scalogram:
 
     def signif_test(self, method='ar1sim', number=None, seed=None, qs=[0.95],
                     settings=None, export_scal = False):
-        '''Significance test for wavelet analysis
+        ''' Significance test for scalograms
 
         Parameters
         ----------
 
         method : {'ar1asym', 'ar1sim'}
 
-            Method to use to generate the surrogates.  AR1sim uses simulated timeseries with similar persistence. AR1asymp represents the closed form solution.The default is AR1sim
-            Number of surrogates to generate for significance analysis based on simulations. The default is 200.
+            Method to use to generate the surrogates.  ar1sim uses simulated timeseries with similar persistence. 
+            ar1asym represents the theoretical, closed-form solution. The default is ar1sim
+            
+       number: int     
+            Number of surrogates to generate for significance analysis based on simulations. 
+            The default is 200.
 
         seed : int, optional
 
@@ -447,9 +474,9 @@ class Scalogram:
         See also
         --------
 
-        pyleoclim.core.Series.Series.wavelet : Wavelet analysis
+        pyleoclim.core.series.Series.wavelet : Wavelet analysis
 
-        pyleoclim.core.MultipleScalogram.MultipleScalogram : MultipleScalogram object
+        pyleoclim.core.scalograms.MultipleScalogram : MultipleScalogram object
 
         pyleoclim.utils.wavelet.tc_wave_signif : Asymptotic significance calculation
 
@@ -467,7 +494,13 @@ class Scalogram:
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
 
-            #By setting export_scal to True, the noise realizations used to generate the significance test will be saved. These come in handy for generating summary plots and for running significance tests on spectral objects.
+        By setting export_scal to True, the noise realizations used to generate the significance test will be saved. 
+        These come in handy for generating summary plots and for running significance tests on spectral objects.
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
             scalogram = series.wavelet().signif_test(number=2, export_scal=True)
 
         '''
@@ -496,7 +529,7 @@ class Scalogram:
                 scalogram_list = signif_scals.scalogram_list
                 #If signif_scals already in scalogram object are more than those requested for significance testing, use as many of them as required
                 if len(scalogram_list) > number:
-                    surr_scal = MultipleScalogram.MultipleScalogram(scalogram_list=scalogram_list[:number])
+                    surr_scal = MultipleScalogram(scalogram_list=scalogram_list[:number])
                 #If number is the same as the length of signif_scals, just use signif_scals
                 elif len(scalogram_list) == number:
                     surr_scal = signif_scals
@@ -509,7 +542,7 @@ class Scalogram:
                                                       method=method, settings=settings)
 
                     surr_scal_tmp.extend(surr.wavelet(method=self.wave_method, settings=self.wave_args).scalogram_list)
-                    surr_scal = MultipleScalogram.MultipleScalogram(scalogram_list=surr_scal_tmp)
+                    surr_scal = MultipleScalogram(scalogram_list=surr_scal_tmp)
             else:
                 surr = self.timeseries.surrogates(number=number, seed=seed,
                                                   method=method, settings=settings)
@@ -549,7 +582,7 @@ class Scalogram:
                               amplitude = signif.T, label=label)
                 ms_base.append(s)
 
-            new.signif_qs = MultipleScalogram.MultipleScalogram(ms_base)
+            new.signif_qs = MultipleScalogram(ms_base)
 
 
         new.signif_method = method
@@ -557,24 +590,93 @@ class Scalogram:
 
         return new
     
-def infer_period_unit_from_time_unit(time_unit):
-    ''' infer a period unit based on the given time unit
-
+class MultipleScalogram:
+    '''MultipleScalogram objects are used to store the results of significance testing for wavelet analysis in signif_qs
     '''
-    if time_unit is None:
-        period_unit = None
-    else:
-        unit_group = lipdutils.timeUnitsCheck(time_unit)
-        if unit_group != 'unknown':
-            if unit_group == 'kage_units':
-                period_unit = 'kyrs'
-            else:
-                period_unit = 'yrs'
-        else:
-            if time_unit[-1] == 's':
-                period_unit = time_unit
-            else:
-                period_unit = f'{time_unit}s'
+    
+    def __init__(self, scalogram_list):
+        ''' Multiple Scalogram objects.
+        
+        This object is mainly used to store the results of wavelet significance testing in the signif_qs arguments of wavelet. 
+        
+        See also
+        --------
+        
+        pyleoclim.core.scalograms.Scalogram : Scalogram object
+        
+        pyleoclim.core.series.Series.wavelet : Wavelet analysis
+        
+        pyleoclim.core.scalograms.Scalogram.signif_test : Significance testing for wavelet analysis
+        
+        '''
+        
+        self.scalogram_list = scalogram_list
 
-    return period_unit
+    def copy(self):
+        ''' Copy the object
+        
+        See also
+        --------
+        
+        pyleoclim.core.scalograms.Scalogram.copy : Scalogram object copy
+        
+        '''
+        return deepcopy(self)
 
+    def quantiles(self, qs=[0.05, 0.5, 0.95]):
+        '''Calculate quantiles
+
+        Parameters
+        ----------
+        
+        qs : list, optional
+        
+            List of quantiles to consider for the calculation. The default is [0.05, 0.5, 0.95].
+
+        Raises
+        ------
+        
+        ValueError
+        
+            Frequency axis not consistent across the PSD list!
+
+        Value Error
+        
+            Time axis not consistent across the scalogram list!
+
+        Returns
+        -------
+        
+        scals : pyleoclim.MultipleScalogram
+        
+        '''
+        freq = np.copy(self.scalogram_list[0].frequency)
+        scale = np.copy(self.scalogram_list[0].scale)
+        time = np.copy(self.scalogram_list[0].time)
+        coi = np.copy(self.scalogram_list[0].coi)
+        amps = []
+        for scal in self.scalogram_list:
+            if not np.array_equal(scal.frequency, freq):
+                raise ValueError('Frequency axis not consistent across the scalogram list!')
+
+            if not np.array_equal(scal.time, time):
+                raise ValueError('Time axis not consistent across the scalogram list!')
+
+            amps.append(scal.amplitude)
+
+        amps = np.array(amps)
+        ne, nf, nt = np.shape(amps)
+        amp_qs = np.ndarray(shape=(np.size(qs), nf, nt))
+
+        for i in range(nf):
+            for j in range(nt):
+                amp_qs[:,i,j] = mquantiles(amps[:,i,j], qs)
+
+        scal_list = []
+        for i, amp in enumerate(amp_qs):
+            scal_tmp = Scalogram(frequency=freq, time=time, amplitude=amp,
+                                 scale = scale, coi=coi, label=f'{qs[i]*100:g}%')
+            scal_list.append(scal_tmp)
+
+        scals = MultipleScalogram(scalogram_list=scal_list)
+        return scals

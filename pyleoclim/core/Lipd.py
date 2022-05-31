@@ -4,7 +4,7 @@ This allows to manipulate LiPD objects and take advantage of the metadata inform
 
 from ..utils import mapping, lipdutils
 
-from ..core.LipdSeries import LipdSeries
+from ..core.lipdseries import LipdSeries
 from copy import deepcopy
 import warnings
 import os
@@ -233,7 +233,7 @@ class Lipd:
         See also
         --------
         
-        pyleoclim.core.LipdSeries.LipdSeries : a LipdSeries object
+        pyleoclim.core.lipdseries.LipdSeries : a LipdSeries object
 
         '''
         cwd = os.getcwd()
@@ -288,7 +288,7 @@ class Lipd:
         See also
         --------
         
-        pyleoclim.core.LipdSeries.LipdSeries : LipdSeries object
+        pyleoclim.core.lipdseries.LipdSeries : LipdSeries object
 
         '''
         cwd = os.getcwd()

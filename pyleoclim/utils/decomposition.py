@@ -325,6 +325,12 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
 
     See also
     --------
+    
+    pyleoclim.core.series.Series.ssa : Singular Spectrum Analysis for timeseries objects
+    
+    pyleoclim.core.ssares.SsaRes.modeplot : plot SSA modes
+    
+    pyleoclim.core.ssares.SsaRes.screeplot : plot SSA eigenvalue spectrum
 
     '''
 

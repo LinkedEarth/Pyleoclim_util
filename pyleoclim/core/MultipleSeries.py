@@ -1,20 +1,16 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 A MultipleSeries object is a collection (more precisely, a 
-`list <https://docs.python.org/3/tutorial/introduction.html#lists>`_) of 
-multiple Series objects. This is handy in case you want to apply the same method 
+list) of multiple Series objects. This is handy in case you want to apply the same method 
 to such a collection at once (e.g. process a bunch of series in a consistent fashion).
 """
 
 from ..utils import tsutils, plotting
 from ..utils import correlation as corrutils
 
-# from ..core import Series
-from ..core.CorrEns import CorrEns
-from ..core.MultipleScalogram import MultipleScalogram
-from ..core.MultiplePSD import MultiplePSD
-from ..core import SpatialDecomp
+from ..core.correns import CorrEns
+from ..core.scalograms import MultipleScalogram
+from ..core.psds import MultiplePSD
+from ..core.spatialdecomp import SpatialDecomp
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -170,7 +166,7 @@ class MultipleSeries:
         Returns
         -------
 
-        ms : pyleoclim.core.MultipleSeries.MultipleSeries
+        ms : pyleoclim.core.multipleseries.MultipleSeries
 
         See also
         --------
@@ -235,7 +231,7 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.core.Series.Series : A Pyleoclim Series object
+        pyleoclim.core.series.Series : A Pyleoclim Series object
 
         Examples
         --------
@@ -502,7 +498,7 @@ class MultipleSeries:
             # apply common_time with gkernel and a large bandwidth
             msc = ms.common_time(method='gkernel', h=11)
             msc.plot(title=r'Gaussian kernel ($h=11$)',ax=ax[3],legend=False)
-
+            
             # Optional close fig after plotting
             pyleo.closefig(fig)
         '''
@@ -629,7 +625,7 @@ class MultipleSeries:
 
         pyleoclim.utils.correlation.fdr : FDR function
         
-        pyleoclim.core.CorrEns.CorrEns : the correlation ensemble object
+        pyleoclim.core.correns.CorrEns : the correlation ensemble object
 
         Examples
         --------
@@ -657,11 +653,11 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries(ts_list)
             ts_target = ts0
 
-            # set an arbitrary randome seed to fix the result
+            # set an arbitrary random seed to fix the result
             corr_res = ms.correlation(ts_target, settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
-            # set an arbitrary randome seed to fix the result
+            # set an arbitrary random seed to fix the result
             corr_res = ms.correlation(settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
@@ -789,7 +785,7 @@ class MultipleSeries:
         
         pyleoclim.utils.tsutils.eff_sample_size : Effective Sample Size of timeseries y
 
-        pyleoclim.core.SpatialDecomp.SpatialDecomp : The spatial decomposition object
+        pyleoclim.core.spatialdecomp.SpatialDecomp : The spatial decomposition object
         
         Examples
         --------
@@ -839,7 +835,7 @@ class MultipleSeries:
 
         # assign result to SpatiamDecomp class
         # Note: need to grab coordinates from Series or LiPDSeries
-        res = SpatialDecomp.SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
+        res = SpatialDecomp(name='PCA', time = self.series_list[0].time, neff= neff,
                             pcs = out.scores, pctvar = pctvar,  locs = None,
                             eigvals = out.eigenvals, eigvecs = out.eigenvecs)
         return res
@@ -941,11 +937,11 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.core.MultipleSeries.MultipleSeries.common_time: Base function on which this operates
+        pyleoclim.core.multipleseries.MultipleSeries.common_time: Base function on which this operates
 
         pyleoclim.utils.tsutils.bin: Underlying binning function
 
-        pyleoclim.core.Series.Series.bin: Bin function for Series object
+        pyleoclim.core.series.Series.bin: Bin function for Series object
 
         Examples
         --------
@@ -998,7 +994,7 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.core.MultipleSeries.MultipleSeries.common_time: Base function on which this operates
+        pyleoclim.core.multipleseries.MultipleSeries.common_time: Base function on which this operates
 
         pyleoclim.utils.tsutils.gkernel: Underlying kernel module
 
@@ -1054,11 +1050,11 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.core.MultipleSeries.MultipleSeries.common_time: Base function on which this operates
+        pyleoclim.core.multipleseries.MultipleSeries.common_time: Base function on which this operates
 
         pyleoclim.utils.tsutils.interp: Underlying interpolation function
 
-        pyleoclim.core.Series.Series.interp: Interpolation function for Series object
+        pyleoclim.core.series.Series.interp: Interpolation function for Series object
 
         Examples
         --------
@@ -1110,7 +1106,7 @@ class MultipleSeries:
         See also
         --------
 
-        pyleoclim.core.Series.Series.detrend : Detrending for a single series
+        pyleoclim.core.series.Series.detrend : Detrending for a single series
 
         pyleoclim.utils.tsutils.detrend : Detrending function
         '''
@@ -1183,11 +1179,11 @@ class MultipleSeries:
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
-        pyleoclim.core.Series.Series.spectral : Spectral analysis for a single timeseries
+        pyleoclim.core.series.Series.spectral : Spectral analysis for a single timeseries
 
         pyleoclim.core.PSD.PSD : PSD object
 
-        pyleoclim.core.MultiplePSD.MultiplePSD : Multiple PSD object
+        pyleoclim.core.psds.MultiplePSD : Multiple PSD object
 
         Examples
         --------
@@ -1289,9 +1285,9 @@ class MultipleSeries:
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
-        pyleoclim.core.Series.Series.wavelet : wavelet analysis on single object
+        pyleoclim.core.series.Series.wavelet : wavelet analysis on single object
 
-        pyleoclim.core.MultipleScalogram.MultipleScalogram : Multiple Scalogram object
+        pyleoclim.core.scalograms.MultipleScalogram : Multiple Scalogram object
 
         References
         ----------

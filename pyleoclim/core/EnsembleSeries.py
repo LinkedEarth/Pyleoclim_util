@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 The EnsembleSeries class is a child of MultipleSeries, designed for ensemble applications (e.g. draws from a posterior distribution of ages, model ensembles with randomized initial conditions, or some other stochastic ensemble).
 In addition to a MultipleSeries object, an EnsembleSeries object has the following properties:
@@ -9,9 +7,9 @@ In addition to a MultipleSeries object, an EnsembleSeries object has the followi
 
 from ..utils import plotting
 from ..utils import correlation as corrutils
-from ..core.Series import Series
-from ..core.CorrEns import CorrEns
-from ..core.MultipleSeries import MultipleSeries
+from ..core.series import Series
+from ..core.correns import CorrEns
+from ..core.multipleseries import MultipleSeries
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -203,7 +201,7 @@ class EnsembleSeries(MultipleSeries):
 
         pyleoclim.utils.correlation.fdr : False Discovery Rate
 
-        pyleoclim.core.CorrEns.CorrEns : The correlation ensemble object
+        pyleoclim.core.correns.CorrEns : The correlation ensemble object
 
         Examples
         --------
@@ -227,7 +225,6 @@ class EnsembleSeries(MultipleSeries):
 
             ts_ens = pyleo.EnsembleSeries(series_list)
 
-            
             # set an arbitrary random seed to fix the result
             corr_res = ts_ens.correlation(ts, seed=2333)
             print(corr_res)
@@ -721,15 +718,16 @@ class EnsembleSeries(MultipleSeries):
             :okwarning:
             :okexcept:
 
-            nn = 30 # number of noise realizations
-            nt = 500
+            nn = 10 # number of noise realizations
+            nt = 200
             series_list = []
 
-            signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0).standardize()
+            t, v = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            signal, _, _ = pyleo.utils.standardize(v)
             noise = np.random.randn(nt,nn)
 
             for idx in range(nn):  # noise
-                ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+                ts = pyleo.Series(time=t, value=signal+noise[:,idx], label='trace #'+str(idx+1))
                 series_list.append(ts)
 
             ts_ens = pyleo.EnsembleSeries(series_list)

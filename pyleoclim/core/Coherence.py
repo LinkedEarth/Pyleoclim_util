@@ -8,8 +8,7 @@ from ..utils import plotting
 from ..utils import wavelet as waveutils
 from ..utils import lipdutils
 
-from ..core.Scalogram import Scalogram
-from ..core.MultipleScalogram import MultipleScalogram
+from ..core.scalograms import Scalogram, MultipleScalogram
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -50,7 +49,7 @@ class Coherence:
     See also
     --------
 
-    pyleoclim.core.Series.Series.wavelet_coherence : Wavelet coherence method
+    pyleoclim.core.series.Series.wavelet_coherence : Wavelet coherence method
 
     '''
     def __init__(self, frequency, scale, time, wtc, xwt, phase, coi=None,
@@ -184,11 +183,11 @@ class Coherence:
         See also
         --------
         pyleoclim.core.Coherence.Coherence.dashboard
-        
-        pyleoclim.core.Series.Series.wavelet_coherence
-        
+
+        pyleoclim.core.series.Series.wavelet_coherence
+
         matplotlib.pyplot.quiver
-        
+
         Examples
         --------
 
@@ -197,7 +196,7 @@ class Coherence:
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
+
             import pyleoclim as pyleo
             import pandas as pd
             import numpy as np
@@ -214,43 +213,43 @@ class Coherence:
             @savefig coh_plot.png
             coh.plot()
             pyleo.closefig(fig)
-            
+
         Establish significance against an AR(1) benchmark:
 
         .. ipython:: python
             :okwarning:
             :okexcept:
-           
-            coh_sig = coh.signif_test(number=1000, qs=[.9,.95,.99]) 
+
+            coh_sig = coh.signif_test(number=250, qs=[.9,.95,.99])
             @savefig coh_sig_plot.png
             coh_sig.plot()
             pyleo.closefig(fig)
 
-        Note that specifiying 3 significance thresholds does not take any more time as the quantiles are 
-        simply estimated from the same ensemble. By default, the plot function looks 
+        Note that specifiying 3 significance thresholds does not take any more time as the quantiles are
+        simply estimated from the same ensemble. By default, the plot function looks
         for the closest quantile to 0.95, but this is easy to adjust, e.g. for the 99th percentile:
-        
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
+
             @savefig coh_sig_plot99.png
             coh_sig.plot(signif_thresh = 0.99)
             pyleo.closefig(fig)
-            
-        By default, the function plots the wavelet transform coherency (WTC), which quantifies where 
-        two timeseries exhibit similar behavior in time-frequency space, regardless of whether this 
-        corresponds to regions of high common power. To visualize the latter, you want to plot the 
+
+        By default, the function plots the wavelet transform coherency (WTC), which quantifies where
+        two timeseries exhibit similar behavior in time-frequency space, regardless of whether this
+        corresponds to regions of high common power. To visualize the latter, you want to plot the
         cross-wavelet transform (XWT) instead, like so:
-        
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
+
             @savefig xwt_plot.png
             coh_sig.plot(var='xwt')
             pyleo.closefig(fig)
-                    
+
         '''
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
@@ -444,7 +443,7 @@ class Coherence:
              - "path" must be specified; it can be any existed or non-existed path,
                with or without a suffix; if the suffix is not given in "path", it will follow "format"
              - "format" can be one of {"pdf", "eps", "png", "ps"}
-             
+
          phase_style : dict, optional
              Arguments for the phase arrows. The default is {}. It includes:
              - 'pt': the default threshold above which phase arrows will be plotted
@@ -455,7 +454,7 @@ class Coherence:
              - 'color': arrow color (see matplotlib.pyplot.quiver)
 
          ts_plot_kwargs : dict
-              arguments to be passed to the timeseries subplot, see pyleoclim.core.Series.Series.plot for details
+              arguments to be passed to the timeseries subplot, see pyleoclim.core.series.Series.plot for details
 
          wavelet_plot_kwargs : dict
               arguments to be passed to the contour subplots (XWT and WTC), [see pyleoclim.core.Coherence.Coherence.plot for details]
@@ -468,13 +467,13 @@ class Coherence:
          See also
          --------
          pyleoclim.core.Coherence.Coherence.plot
-         
-         pyleoclim.core.Series.Series.wavelet_coherence
-         
-         pyleoclim.core.Series.Series.plot
-         
+
+         pyleoclim.core.series.Series.wavelet_coherence
+
+         pyleoclim.core.series.Series.plot
+
          matplotlib.pyplot.quiver
-         
+
          Examples
          --------
 
@@ -483,7 +482,7 @@ class Coherence:
          .. ipython:: python
              :okwarning:
              :okexcept:
-                 
+
              import pyleoclim as pyleo
              import pandas as pd
              import numpy as np
@@ -498,11 +497,11 @@ class Coherence:
 
              coh = ts_air.wavelet_coherence(ts_nino)
              coh_sig = coh.signif_test()
-             
+
              @savefig coh_dash.png
              coh_sig.dashboard()
              pyleo.closefig(fig)
-             
+
          '''
          # prepare options dictionaries
          savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -563,7 +562,7 @@ class Coherence:
         The method obtains quantiles `qs` of the distribution of coherence between
         `number` pairs of Monte Carlo simulations of a process that resembles the original series.
         Currently, only AR(1) surrogates are supported.
-        
+
         Parameters
         ----------
         number : int, optional
@@ -571,9 +570,9 @@ class Coherence:
         method : {'ar1sim'}, optional
             Method through which to generate the surrogate series. The default is 'ar1sim'.
         seed : int, optional
-            Fixes the seed for NumPy's random number generator. 
+            Fixes the seed for NumPy's random number generator.
             Useful for reproducibility. The default is None, so fresh, unpredictable
-            entropy will be pulled from the operating system. 
+            entropy will be pulled from the operating system.
         qs : list, optional
             Significance levels to return. The default is [0.95].
         settings : dict, optional
@@ -584,25 +583,25 @@ class Coherence:
         Returns
         -------
         new : pyleoclim.core.Coherence.Coherence
-        
-            original Coherence object augmented with significance levels signif_qs, 
+
+            original Coherence object augmented with significance levels signif_qs,
             a list with the following `MultipleScalogram` objects:
             * 0: MultipleScalogram for the wavelet transform coherency (WTC)
             * 1: MultipleScalogram for the cross-wavelet transform (XWT)
-            
+
             Each object contains as many Scalogram objects as qs contains values
-            
+
         See also
         --------
 
-        pyleoclim.core.Series.Series.wavelet_coherence : Wavelet coherence
-        
-        pyleoclim.core.Scalogram.Scalogram : Scalogram object
-        
-        pyleoclim.core.MultipleScalogram.MultipleScalogram : Multiple Scalogram object
-        
+        pyleoclim.core.series.Series.wavelet_coherence : Wavelet coherence
+
+        pyleoclim.core.scalograms.Scalogram : Scalogram object
+
+        pyleoclim.core.scalograms.MultipleScalogram : Multiple Scalogram object
+
         pyleoclim.core.Coherence.Coherence.plot : plotting method for Coherence objects
-                
+
         Examples
         --------
 
@@ -611,7 +610,7 @@ class Coherence:
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
+
             import pyleoclim as pyleo
             import pandas as pd
             import numpy as np
@@ -629,47 +628,47 @@ class Coherence:
             @savefig coh_sig_plot.png
             coh_sig.plot()
             pyleo.closefig(fig)
-            
-        By default, significance is assessed against a 95% benchmark derived from 
-        an AR(1) process fit to the data, using 200 Monte Carlo simulations. 
+
+        By default, significance is assessed against a 95% benchmark derived from
+        an AR(1) process fit to the data, using 200 Monte Carlo simulations.
         To customize, one can increase the number of simulations
         (more reliable, but slower), and the quantile levels.
-        
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
-            coh_sig2 = coh.signif_test(number=1000, qs=[.9,.95,.99]) 
+
+            coh_sig2 = coh.signif_test(number=1000, qs=[.9,.95,.99])
             @savefig coh_sig2_plot.png
             coh_sig2.plot()
             pyleo.closefig(fig)
 
         The plot() function will represent the 95% level as contours by default.
         If you need to show 99%, say, use the `signif_thresh` argument:
-            
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
+
             @savefig coh_sig3_plot.png
             coh_sig2.plot(signif_thresh=0.99)
             pyleo.closefig(fig)
-        
+
         Note that if the 99% quantile is not present, the plot method will look
-        for the closest match, but lines are always labeled appropriately. 
+        for the closest match, but lines are always labeled appropriately.
         For reproducibility purposes, it may be good to specify the (pseudo)random number
         generator's seed, like so:
-        
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
-            coh_sig27 = coh.signif_test(seed=27) 
-         
-        This will generate exactly the same set of draws from the 
-        (pseudo)random number at every execution, which may be important for marginal features 
-        in small ensembles. In general, however, we recommend increasing the 
-        number of draws to check that features are robust. 
+
+            coh_sig27 = coh.signif_test(seed=27)
+
+        This will generate exactly the same set of draws from the
+        (pseudo)random number at every execution, which may be important for marginal features
+        in small ensembles. In general, however, we recommend increasing the
+        number of draws to check that features are robust.
 
         '''
 

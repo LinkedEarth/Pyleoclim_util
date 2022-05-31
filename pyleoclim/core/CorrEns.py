@@ -159,7 +159,7 @@ class CorrEns:
         See also
         --------
         
-        pyleoclim.core.Series.Series.correlation: correlation with significance
+        pyleoclim.core.series.Series.correlation: correlation with significance
         
         pyleoclim.utils.correlation.fdr: False Discovery Rate
 

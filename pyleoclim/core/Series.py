@@ -15,13 +15,13 @@ from ..utils import causality as causalutils
 from ..utils import decomposition
 from ..utils import filter as filterutils
 
-from ..core import PSD
-from ..core.SsaRes import SsaRes
-from ..core import MultipleSeries
-from ..core.Scalogram import Scalogram
-from ..core.Coherence import Coherence
-from ..core.Corr import Corr
-from ..core.SurrogateSeries import SurrogateSeries
+from ..core.psds import PSD
+from ..core.ssares import SsaRes
+from ..core.multipleseries import MultipleSeries
+from ..core.scalograms import Scalogram
+from ..core.coherence import Coherence
+from ..core.corr import Corr
+from ..core.surrogateseries import SurrogateSeries
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -586,6 +586,31 @@ class Series:
 
         - eigvals_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
 
+        References
+        ----------
+        [1]_ Vautard, R., and M. Ghil (1989), Singular spectrum analysis in nonlinear
+        dynamics, with applications to paleoclimatic time series, Physica D, 35,
+        395–424.
+
+        [2]_ Ghil, M., R. M. Allen, M. D. Dettinger, K. Ide, D. Kondrashov, M. E. Mann,
+        A. Robertson, A. Saunders, Y. Tian, F. Varadi, and P. Yiou (2002),
+        Advanced spectral methods for climatic time series, Rev. Geophys., 40(1),
+        1003–1052, doi:10.1029/2000RG000092.
+
+        [3]_ Allen, M. R., and L. A. Smith (1996), Monte Carlo SSA: Detecting irregular
+        oscillations in the presence of coloured noise, J. Clim., 9, 3373–3404.
+
+        [4]_ Schoellhamer, D. H. (2001), Singular spectrum analysis for time series with
+        missing data, Geophysical Research Letters, 28(16), 3187–3190, doi:10.1029/2000GL012698.
+
+        See also
+        --------
+        
+        pyleoclim.core.utils.decomposition.ssa : Singular Spectrum Analysis utility
+        
+        pyleoclim.core.ssares.SsaRes.modeplot : plot SSA modes
+        
+        pyleoclim.core.ssares.SsaRes.screeplot : plot SSA eigenvalue spectrum
 
         Examples
         --------
@@ -686,16 +711,16 @@ class Series:
         return resc
 
     def is_evenly_spaced(self, tol=1e-3):
-        ''' Check if the Series time axis is evenly-spaced, within tolerance
+        '''Check if the Series time axis is evenly-spaced, within tolerance
         
         Parameters
         ----------
         tol : float
             tolerance. If time increments are all within tolerance, the series
-            is declared evenly-spaced. default : 1e-3
+            is declared evenly-spaced. default = 1e-3
 
         Returns
-        ------
+        -------
 
         res : bool
         
@@ -1065,15 +1090,15 @@ class Series:
         See also
         --------
 
-        pyleoclim.core.Series.Series.spectral : Spectral analysis for a timeseries
+        pyleoclim.core.series.Series.spectral : Spectral analysis for a timeseries
 
-        pyleoclim.core.Series.Series.wavelet : Wavelet analysis for a timeseries
+        pyleoclim.core.series.Series.wavelet : Wavelet analysis for a timeseries
 
         pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
 
-        pyleoclim.core.PSD.PSD : PSD object
+        pyleoclim.core.psds.PSD : PSD object
 
-        pyleoclim.core.MultiplePSD.MultiplePSD : Multiple PSD object
+        pyleoclim.core.psds.MultiplePSD : Multiple PSD object
 
         Examples
         --------
@@ -1598,7 +1623,7 @@ class Series:
         label : str
             Label for the PSD object
 
-        scalogram : pyleoclim.core.Series.Series.Scalogram
+        scalogram : pyleoclim.core.series.Series.Scalogram
             The return of the wavelet analysis; effective only when the method is 'wwz' or 'cwt'
 
         verbose : bool
@@ -1628,9 +1653,9 @@ class Series:
 
         pyleoclim.utils.tsutils.detrend : Detrending function
 
-        pyleoclim.core.PSD.PSD : PSD object
+        pyleoclim.core.psds.PSD : PSD object
 
-        pyleoclim.core.MultiplePSD.MultiplePSD : Multiple PSD object
+        pyleoclim.core.psds.MultiplePSD : Multiple PSD object
 
 
         Examples
@@ -1824,7 +1849,7 @@ class Series:
                 args['cwt'].pop('cwt_res')
 
 
-        psd = PSD.PSD(
+        psd = PSD(
             frequency=spec_res.freq,
             amplitude=spec_res.psd,
             label=label,
@@ -1876,11 +1901,11 @@ class Series:
 
         pyleoclim.utils.tsutils.detrend : Detrending function
         
-        pyleoclim.core.Series.Series.spectral : spectral analysis tools
+        pyleoclim.core.series.Series.spectral : spectral analysis tools
 
-        pyleoclim.core.Scalogram.Scalogram : Scalogram object
+        pyleoclim.core.scalograms.Scalogram : Scalogram object
 
-        pyleoclim.core.MultipleScalogram.MultipleScalogram : Multiple Scalogram object
+        pyleoclim.core.scalograms.MultipleScalogram : Multiple Scalogram object
 
         References
         ----------
@@ -2060,9 +2085,9 @@ class Series:
         
         pyleoclim.utils.tsutils.detrend : Detrending function
         
-        pyleoclim.core.MultipleSeries.MultipleSeries.common_time : put timeseries on common time axis
+        pyleoclim.core.multipleseries.MultipleSeries.common_time : put timeseries on common time axis
         
-        pyleoclim.core.Series.Series.wavelet : wavelet analysis
+        pyleoclim.core.series.Series.wavelet : wavelet analysis
 
         Examples
         --------
@@ -2279,12 +2304,12 @@ class Series:
             ts_air = pyleo.Series(time=t, value=air)
 
             # with `nsim=20` and default `method='isospectral'`
-            # set an arbitrary randome seed to fix the result
+            # set an arbitrary random seed to fix the result
             corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
             # using a simple t-test
-            # set an arbitrary randome seed to fix the result
+            # set an arbitrary random seed to fix the result
             corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'ttest'}, seed=2333)
             print(corr_res)
 

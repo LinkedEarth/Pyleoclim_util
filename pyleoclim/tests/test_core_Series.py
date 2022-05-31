@@ -376,7 +376,7 @@ class TestUiSeriesSegment:
 
         ts_seg = ts.segment()
 
-        assert str(type(ts_seg)) == "<class 'pyleoclim.core.MultipleSeries.MultipleSeries'>"
+        assert str(type(ts_seg)) == "<class 'pyleoclim.core.multipleseries.MultipleSeries'>"
 
     def test_segment_t1(self):
         '''Test that in the case of no segmentation, segment and original time series

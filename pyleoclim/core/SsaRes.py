@@ -10,7 +10,7 @@ import seaborn as sns
 from matplotlib import pyplot as plt, gridspec
 from matplotlib.ticker import MaxNLocator
 
-from ..core import Series
+from ..core import series
 from ..utils import plotting
 
 
@@ -80,8 +80,10 @@ class SsaRes:
 
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
+                
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
+              
             - "format" can be one of {"pdf", "eps", "png", "ps"}
 
         title_kwargs : dict
@@ -101,9 +103,35 @@ class SsaRes:
         clr_eig : str, optional
             color of the eigenvalues, default: black
 
-        clr_signif: str, optional
-            color of the highlights for significant eigenvalue.
-               default: teal
+        clr_signif : str, optional
+            color of the highlights for significant eigenvalue. (default: teal)
+       
+        See also
+        --------
+        
+        pyleoclim.core.series.Series.ssa : Singular Spectrum Analysis for timeseries objects
+        
+        pyleoclim.core.utils.decomposition.ssa : Singular Spectrum Analysis utility
+        
+        pyleoclim.core.ssares.SsaRes.modeplot : plot SSA modes
+        
+        
+        Examples
+        --------
+
+        Plot the SSA eig envalue spectrum of the Southern Oscillation Index:
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            ts = pyleo.Series(time=data.iloc[:,1], value=data.iloc[:,2], time_name='Year C.E', value_name='SOI', label='SOI')
+            ssa = ts.ssa()
+            
+            @savefig ssa_screeplot.png
+            fig, ax = ssa.screeplot()
+            pyleo.closefig(fig)
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -174,6 +202,42 @@ class SsaRes:
             Note that the data are evenly-spaced, so any spectral method that
             assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
             'wwz' is relevant too if scaling exponents need to be estimated.
+          
+        See also
+        --------
+        
+        pyleoclim.core.series.Series.ssa : Singular Spectrum Analysis for timeseries objects
+        
+        pyleoclim.core.utils.decomposition.ssa : Singular Spectrum Analysis utility
+        
+        pyleoclim.core.ssares.SsaRes.screeplot : plot SSA eigenvalue spectrum
+         
+        Examples
+        --------
+
+        Plot the first SSA mode of the Southern Oscillation Index:
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            ts = pyleo.Series(time=data.iloc[:,1], value=data.iloc[:,2], time_name='Year C.E', value_name='SOI', label='SOI')
+            ssa = ts.ssa()
+            
+            @savefig ssa_modeplot1.png
+            fig, ax = ssa.modeplot()
+            pyleo.closefig(fig)
+            
+        Plot the second mode (note 0-based indexing):
+            
+         .. ipython:: python
+             :okwarning:
+             :okexcept:
+
+             @savefig ssa_modeplot2.png
+             fig, ax = ssa.modeplot(index=1)
+             pyleo.closefig(fig)
 
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
@@ -191,7 +255,7 @@ class SsaRes:
         if plot_original:
             ax.plot(self.time,self.original,color='Silver',lw=1,label='original')
             ax.legend()
-        ax.set_xlabel('Time'),  ax.set_ylabel('RC')
+        ax.set_xlabel('Time'),  ax.set_ylabel(r'$RC_'+str(index+1)+'$')
         ax.set_title('SSA Mode '+str(index+1)+' RC, '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
         # plot T-EOF
         ax = fig.add_subplot(gs[1, 0])
@@ -200,11 +264,11 @@ class SsaRes:
         ax.set_xlabel('Time'), ax.set_ylabel('T-EOF')
         # plot spectrum
         ax = fig.add_subplot(gs[1, 1])
-        ts_rc = Series.Series(time=self.time, value=RC) # define timeseries object for the RC
+        ts_rc = series.Series(time=self.time, value=RC) # define timeseries object for the RC
         psd_mtm_rc = ts_rc.interp().spectral(method=spec_method)
         _ = psd_mtm_rc.plot(ax=ax)
         ax.set_xlabel('Period')
-        ax.set_title('Spectrum ('+spec_method+')')
+        ax.set_title('RC Spectrum ('+spec_method+')')
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)

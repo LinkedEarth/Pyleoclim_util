@@ -7,8 +7,8 @@ When created, LiPDSeries automatically instantiates the time, value and other pa
 """
 
 from ..utils import plotting, mapping, lipdutils
-from ..core.Series import Series
-from ..core.EnsembleSeries import EnsembleSeries
+from ..core.series import Series
+from ..core.ensembleseries import EnsembleSeries
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -37,11 +37,11 @@ class LipdSeries(Series):
     See also
     --------
 
-    pyleoclim.core.Lipd.Lipd : Creates a Lipd object from LiPD Files
+    pyleoclim.core.lipd.Lipd : Creates a Lipd object from LiPD Files
 
-    pyleoclim.core.Series.Series : Creates pyleoclim Series object
+    pyleoclim.core.series.Series : Creates pyleoclim Series object
 
-    pyleoclim.core.MultipleSeries.MultipleSeries : a collection of multiple Series objects
+    pyleoclim.core.multipleseries.MultipleSeries : a collection of multiple Series objects
 
     Examples
     --------
@@ -202,7 +202,7 @@ class LipdSeries(Series):
         See also
         --------
 
-        pyleoclim.core.EnsembleSeries.EnsembleSeries : An EnsembleSeries object with each series representing a possible realization of the age model
+        pyleoclim.core.ensembleseries.EnsembleSeries : An EnsembleSeries object with each series representing a possible realization of the age model
 
         pyleoclim.utils.lipdutils.mapAgeEnsembleToPaleoData : Map the depth for the ensemble age values to the paleo depth
 
@@ -688,17 +688,17 @@ class LipdSeries(Series):
         See also
         --------
 
-        pyleoclim.core.Series.Series.plot : plot a timeseries
+        pyleoclim.core.series.Series.plot : plot a timeseries
 
-        pyleoclim.core.EnsembleSeries.EnsembleSeries.plot_envelope: Envelope plots for an ensemble
+        pyleoclim.core.ensembleseries.EnsembleSeries.plot_envelope: Envelope plots for an ensemble
 
-        pyleoclim.core.Series.Series.distplot : plot a distribution of the timeseries
+        pyleoclim.core.series.Series.distplot : plot a distribution of the timeseries
 
-        pyleoclim.core.EnsembleSeries.EnsembleSeries.distplot : plot a distribution of the timeseries across ensembles
+        pyleoclim.core.ensembleseries.EnsembleSeries.distplot : plot a distribution of the timeseries across ensembles
 
-        pyleoclim.core.Series.Series.spectral : spectral analysis method.
+        pyleoclim.core.series.Series.spectral : spectral analysis method.
 
-        pyleoclim.core.MultipleSeries.MultipleSeries.spectral : spectral analysis method for multiple series.
+        pyleoclim.core.multipleseries.MultipleSeries.spectral : spectral analysis method for multiple series.
 
         pyleoclim.core.PSD.PSD.signif_test : significance test for timeseries analysis
 
@@ -706,9 +706,9 @@ class LipdSeries(Series):
 
         pyleoclim.core.MulitplePSD.MulitplePSD.plot : plot envelope of power spectrum
 
-        pyleoclim.core.LipdSeries.LipdSeries.map : map location of dataset
+        pyleoclim.core.lipdseries.LipdSeries.map : map location of dataset
 
-        pyleolim.core.LipdSeries.LipdSeries.getMetadata : get relevant metadata from the timeseries object
+        pyleolim.core.lipdseries.LipdSeries.getMetadata : get relevant metadata from the timeseries object
 
         pyleoclim.utils.mapping.map : Underlying mapping function for Pyleoclim
 
@@ -1292,7 +1292,7 @@ class LipdSeries(Series):
 
         ensemble_kwargs : dict, optional
 
-            Parameters associated with identifying the chronEnsemble tables. See pyleoclim.core.LipdSeries.LipdSeries.chronEnsembleToPaleo() for details. The default is None.
+            Parameters associated with identifying the chronEnsemble tables. See pyleoclim.core.lipdseries.LipdSeries.chronEnsembleToPaleo() for details. The default is None.
 
         envelope_kwargs : dict, optional
 
@@ -1323,15 +1323,15 @@ class LipdSeries(Series):
         See also
         --------
 
-        pyleoclim.core.Lipd.Lipd : Pyleoclim internal representation of a LiPD file
+        pyleoclim.core.lipd.Lipd : Pyleoclim internal representation of a LiPD file
 
-        pyleoclim.core.Series.Series.plot : Basic plotting in pyleoclim
+        pyleoclim.core.series.Series.plot : Basic plotting in pyleoclim
 
-        pyleoclim.core.LipdSeries.LipdSeries.chronEnsembleToPaleo : Function to map the ensemble table to a paleo depth.
+        pyleoclim.core.lipdseries.LipdSeries.chronEnsembleToPaleo : Function to map the ensemble table to a paleo depth.
 
-        pyleoclim.core.EnsembleSeries.EnsembleSeries.plot_envelope : Create an envelope plot from an ensemble
+        pyleoclim.core.ensembleseries.EnsembleSeries.plot_envelope : Create an envelope plot from an ensemble
 
-        pyleoclim.core.EnsembleSeries.EnsembleSeries.plot_traces : Create a trace plot from an ensemble
+        pyleoclim.core.ensembleseries.EnsembleSeries.plot_traces : Create a trace plot from an ensemble
 
         Examples
         --------

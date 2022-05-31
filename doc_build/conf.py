@@ -38,6 +38,7 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
+    'sphinx_math_dollar',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
@@ -48,6 +49,20 @@ extensions = [
     'IPython.sphinxext.ipython_directive',
     'sphinx_search.extension'
 ]
+
+mathjax_config = {
+    'tex2jax': {
+        'inlineMath': [ ["\\(","\\)"] ],
+        'displayMath': [["\\[","\\]"] ],
+    },
+}
+
+mathjax3_config = {
+  "tex": {
+    "inlineMath": [['\\(', '\\)']],
+    "displayMath": [["\\[", "\\]"]],
+  }
+}
 
 plot_include_source = True
 plot_formats = [("png", 90)]
@@ -72,7 +87,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'Pyleoclim'
 copyright = '2017-2022, Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James'
-author = 'Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James, Pratheek Athreya, Myron Kwan, Daniel Garijo, Jun Hu'
+author = 'Deborah Khider, Feng Zhu, Julien Emile-Geay, Alexander James, Pratheek Athreya, Myron Kwan, Daniel Garijo, Jun Hu, Jordan Landers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

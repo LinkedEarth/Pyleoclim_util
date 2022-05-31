@@ -24,7 +24,7 @@ def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
     
     t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
-    ts=pyleo.Series(t,v)
+    ts  = pyleo.Series(t,v)
     return ts
 
 def gen_normal(loc=0, scale=1, nt=100):

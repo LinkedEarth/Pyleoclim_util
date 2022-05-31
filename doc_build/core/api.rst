@@ -20,27 +20,27 @@ The following describes the various classes that undergird the Pyleoclim edifice
 Series (pyleoclim.Series)
 """""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.Series
+.. automodule:: pyleoclim.core.series
    :members: Series
 
 
 MultipleSeries (pyleoclim.MultipleSeries)
 """""""""""""""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.MultipleSeries
+.. automodule:: pyleoclim.core.multipleseries
    :members: MultipleSeries
 
 
 EnsembleSeries (pyleoclim.EnsembleSeries)
 """""""""""""""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.EnsembleSeries
+.. automodule:: pyleoclim.core.ensembleseries
    :members: EnsembleSeries
 
 SurrogateSeries (pyleoclim.SurrogateSeries)
 """""""""""""""""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.SurrogateSeries
+.. automodule:: pyleoclim.core.surrogateseries
   :members: SurrogateSeries
 
 Lipd (pyleoclim.Lipd)
@@ -48,65 +48,64 @@ Lipd (pyleoclim.Lipd)
 
 This class allows to manipulate LiPD objects.
 
-.. automodule:: pyleoclim.core.Lipd
+.. automodule:: pyleoclim.core.lipd
    :members: Lipd
 
 LipdSeries (pyleoclim.LipdSeries)
 """""""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.LipdSeries
+.. automodule:: pyleoclim.core.lipdseries
    :members: LipdSeries
 
 PSD (pyleoclim.PSD)
 """""""""""""""""""
 
-.. automodule:: pyleoclim.core.PSD
+.. automodule:: pyleoclim.core.psds
    :members: PSD
 
 MultiplePSD (pyleoclim.MultiplePSD)
 """""""""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.MultiplePSD
-  :members: MultiplePSD
+ .. autoclass:: pyleoclim.core.psds.MultiplePSD
+    :members:
 
 Scalogram (pyleoclim.Scalogram)
 """""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.Scalogram
-   :members: Scalogram
+.. autoclass:: pyleoclim.core.scalograms.Scalogram
+   :members:
 
 MultipleScalogram (pyleoclim.MultipleScalogram)
 """""""""""""""""""""""""""""""""""""""""""""""
-
-.. automodule:: pyleoclim.core.MultipleScalogram
-  :members: MultipleScalogram
+.. autoclass:: pyleoclim.core.scalograms.MultipleScalogram
+   :members:
 
 Coherence (pyleoclim.Coherence)
 """""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.Coherence
+.. automodule:: pyleoclim.core.coherence
    :members: Coherence
 
 Corr (pyleoclim.Corr)
 """""""""""""""""""""
 
-.. automodule:: pyleoclim.core.Corr
+.. automodule:: pyleoclim.core.corr
    :members: Corr
 
 CorrEns (pyleoclim.CorrEns)
 """""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.CorrEns
+.. automodule:: pyleoclim.core.correns
    :members: CorrEns
 
 SpatialDecomp (pyleoclim.SpatialDecomp)
 """""""""""""""""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.SpatialDecomp
+.. automodule:: pyleoclim.core.spatialdecomp
   :members: SpatialDecomp
 
 SsaRes (pyleoclim.SsaRes)
 """""""""""""""""""""""""""
 
-.. automodule:: pyleoclim.core.SsaRes
+.. automodule:: pyleoclim.core.ssares
    :members: SsaRes
