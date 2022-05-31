@@ -1,9 +1,3 @@
-'''
-The PSD (Power spectral density) class is intended for conveniently manipulating
-the result of spectral methods, including performing significance tests,
-estimating scaling coefficients, and plotting. 
-'''
-
 from ..utils import plotting, lipdutils
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
@@ -379,7 +373,7 @@ class PSD:
     def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
         ''' Estimate the scaling exponent beta of the PSD 
 
-        For a power law $S(f) \propto f^\beta$ in log-log space, $\beta$ is simply the slope.
+        For a power law S(f) \propto f^\beta in log-log space, \beta is simply the slope.
         
         Parameters
         ----------
