@@ -44,9 +44,12 @@ def dict2namedtuple(d):
 class Series:
     '''The Series class describes the most basic objects in Pyleoclim. 
     A Series is a simple `dictionary <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_ that contains 3 things:
-    - a series of real-valued numbers;
-    - a time axis at which those values were measured/simulated ;
-    - optionally, some metadata about both axes, like units, labels and the like.
+        
+    * a series of real-valued numbers;
+    
+    * a time axis at which those values were measured/simulated ;
+    
+    * optionally, some metadata about both axes, like units, labels and the like.
 
     How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
 
@@ -2215,8 +2218,8 @@ class Series:
             xwt=wtc_res.xw_amplitude,
             phase=wtc_res.xw_phase,
             coi=wtc_res.coi,
-            timeseries1=self,
-            timeseries2=target_series,
+            timeseries1= ts1,
+            timeseries2= ts2,
             wave_method = method,
             wave_args = args[method],
             freq_method=freq_method,

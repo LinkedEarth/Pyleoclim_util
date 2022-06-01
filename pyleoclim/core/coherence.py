@@ -422,8 +422,9 @@ class Coherence:
             return ax
 
 
-    def dashboard(self, title=None, figsize=[9,12], phase_style = {},
-                  savefig_settings={}, ts_plot_kwargs = None, wavelet_plot_kwargs= None):
+    def dashboard(self, title=None, figsize=[9,12], phase_style = {}, 
+                  line_colors = ['tab:blue','tab:orange'], savefig_settings={},
+                  ts_plot_kwargs = None, wavelet_plot_kwargs= None):
          ''' Cross-wavelet dashboard, including the two series, WTC and XWT.
 
              Note: this design balances many considerations, and is not easily customizable.
@@ -436,6 +437,9 @@ class Coherence:
 
          figsize : list, optional
              Figure size. The default is [9, 12], as this is an information-rich figure.
+             
+         line_colors : list, optional
+             Colors for the 2 traces For nomenclature, see https://matplotlib.org/stable/gallery/color/named_colors.html
 
          savefig_settings : dict, optional
              The default is {}.
@@ -485,21 +489,38 @@ class Coherence:
 
              import pyleoclim as pyleo
              import pandas as pd
-             import numpy as np
              data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
              time = data['t'].values
-             air = data['air'].values
-             nino = data['nino'].values
-             ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)',
+             
+             ts_air = pyleo.Series(time=time, value=data['air'].values, time_name='Year (CE)',
                                    label='All India Rainfall', value_name='AIR (mm/month)')
-             ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)',
+             ts_nino = pyleo.Series(time=time, value=data['nino'].values, time_name='Year (CE)',
                                     label='NINO3', value_name='NINO3 (K)')
 
              coh = ts_air.wavelet_coherence(ts_nino)
-             coh_sig = coh.signif_test(number=20)
+             coh_sig = coh.signif_test(number=10)
 
              @savefig coh_dash.png
              coh_sig.dashboard()
+             pyleo.closefig(fig)
+             
+         You may customize colors like so:
+             
+         .. ipython:: python
+             :okwarning:
+             :okexcept:
+             
+             @savefig coh_dash1.png
+             coh_sig.dashboard(line_colors=['teal','gold'])
+             pyleo.closefig(fig)
+             
+         To export the figure, use `savefig_settings`: 
+             
+         .. ipython:: python
+             :okwarning:
+             :okexcept:
+             
+             coh_sig.dashboard(savefig_settings={'path':'coh_dash.png','dpi':300})
              pyleo.closefig(fig)
 
          '''
@@ -512,49 +533,55 @@ class Coherence:
          # create figure
          fig = plt.figure(figsize=figsize)
          gs = gridspec.GridSpec(8, 1)
-         gs.update(wspace=0, hspace=0.3) # add some breathing room
+         gs.update(wspace=0, hspace=0.5) # add some breathing room
          ax = {}
 
          # 1) plot timeseries
+         #plt.rc('ytick', labelsize=8) 
+         ax['ts1'] = plt.subplot(gs[0:2, 0])
+         self.timeseries1.plot(ax=ax['ts1'], color=line_colors[0], **ts_plot_kwargs, legend=False)
+         ax['ts1'].yaxis.label.set_color(line_colors[0])
+         ax['ts1'].tick_params(axis='y', colors=line_colors[0],labelsize=8)
+         ax['ts1'].spines['left'].set_color(line_colors[0])
+         ax['ts1'].spines['bottom'].set_visible(False)
+         ax['ts1'].grid(False)
+         ax['ts1'].set_xlabel('')
 
-         ax['ts'] = plt.subplot(gs[0:2, 0])
-         self.timeseries1.plot(ax=ax['ts'], color='C0', label='', **ts_plot_kwargs)
-         ax['ts'].yaxis.label.set_color('C0')
-         ax['ts'].tick_params(axis='y', colors='C0')
-         ax['ts'].spines['left'].set_color('C0')
-         ax['ts'].spines['bottom'].set_visible(False)
-         ax['ts'].grid(False)
-
-         axts2 = ax['ts'].twinx()
-         self.timeseries2.plot(ax=axts2, color='C1', label='',  **ts_plot_kwargs)
-         axts2.yaxis.label.set_color('C1')
-         axts2.tick_params(axis='y', colors='C1')
-         axts2.spines['right'].set_color('C1')
-         axts2.spines['right'].set_visible(True)
-         axts2.spines['left'].set_visible(False)
-         axts2.grid(False)
+         ax['ts2'] = ax['ts1'].twinx()
+         self.timeseries2.plot(ax=ax['ts2'], color=line_colors[1],  **ts_plot_kwargs, legend=False)
+         ax['ts2'].yaxis.label.set_color(line_colors[1])
+         ax['ts2'].tick_params(axis='y', colors=line_colors[1],labelsize=8)
+         ax['ts2'].spines['right'].set_color(line_colors[1])
+         ax['ts2'].spines['right'].set_visible(True)
+         ax['ts2'].spines['left'].set_visible(False)
+         ax['ts2'].grid(False)
 
          # 2) plot WTC
-         ax['wtc'] = plt.subplot(gs[2:5, 0])
+         ax['wtc'] = plt.subplot(gs[2:5, 0], sharex=ax['ts1'])
          if 'cbar_style' not in wavelet_plot_kwargs:
              wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal',
-                                                       'pad': 0.09, 'aspect': 50}})
+                                                       'pad': 0.15, 'aspect': 60}})
          self.plot(var='wtc',ax=ax['wtc'], title= None, **wavelet_plot_kwargs)
          #ax['wtc'].xaxis.set_visible(False)  # hide x axis
          ax['wtc'].set_xlabel('')
 
         # 3) plot XWT
-         ax['xwt'] = plt.subplot(gs[5:8, 0])
+         ax['xwt'] = plt.subplot(gs[5:8, 0], sharex=ax['ts1'])
          if 'phase_style' not in wavelet_plot_kwargs:
              wavelet_plot_kwargs.update({'phase_style':{'color': 'lightgray'}})
          self.plot(var='xwt',ax=ax['xwt'], title= None,
                    contourf_style={'cmap': 'viridis'},
-                   cbar_style={'orientation': 'horizontal','pad': 0.15, 'aspect': 50},
+                   cbar_style={'orientation': 'horizontal','pad': 0.2, 'aspect': 60},
                    phase_style=wavelet_plot_kwargs['phase_style'])
 
-         #fig.tight_layout() # this does nothing
-
-         return fig, ax
+         #gs.tight_layout(fig) # this does nothing
+         
+         if 'fig' in locals():
+             if 'path' in savefig_settings:
+                 plotting.savefig(fig, settings=savefig_settings)
+             return fig, ax
+         else:
+             return ax
 
     def signif_test(self, number=200, method='ar1sim', seed=None, qs=[0.95], settings=None, mute_pbar=False):
         '''Significance testing for Coherence objects
