@@ -215,7 +215,20 @@ def json_to_PyleoObj(filename,objname):
             try:
                 a[k]=pyleo.Series(**a[k])
             except:
-                a[k]=pyleo.LipdSeries(a[k]['lipd_ts'])
+                # get rid of LiPD
+                del a[k]['plot_default']
+                del a[k]['lipd_ts']
+                a[k]=pyleo.Series(**a[k])
+        if k == 'psd_list':
+            for idx,item in enumerate(a[k]):
+                if item['timeseries'] is not None:
+                    item['timeseries'] = pyleo.Series(**item['timeseries'])
+                a[k][idx] = pyleo.PSD(**a[k][idx])
+        if k == 'scalogram_list':
+            for idx,item in enumerate(a[k]):
+                if item['timeseries'] is not None:
+                    item['timeseries'] = pyleo.Series(**item['timeseries'])
+                a[k][idx] = pyleo.Scalogram(**a[k][idx])
         if k == 'signif_qs' and a[k] is not None:
             if obj==pyleo.core.PSD:
                 for idx,item in enumerate(a[k]['psd_list']):
@@ -235,8 +248,7 @@ def json_to_PyleoObj(filename,objname):
                          if item2['timeseries'] is not None:
                              item2['timeseries'] = pyleo.Series(**item2['timeseries'])
                          item['scalogram_list'][idx2]=pyleo.Scalogram(**item['scalogram_list'][idx2])
-                     a[k][idx] = pyleo.MultipleScalogram(**a[k][idx])
-            
+                     a[k][idx] = pyleo.MultipleScalogram(**a[k][idx])           
         if k == 'signif_scals' and a[k] is not None:
             for idx,item in enumerate(a[k]['scalogram_list']):
                 if item['timeseries'] is not None:
