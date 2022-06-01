@@ -1951,7 +1951,7 @@ class Series:
             pyleo.closefig()
 
         Notice that the two scalograms have different units, which are arbitrary.  Method-specific arguments
-        may be passed via `settings`.  For instance, if yo uwanted to change the default mother wavelet
+        may be passed via `settings`.  For instance, if you wanted to change the default mother wavelet
         ('MORLET') to a derivative of a Gaussian (DOG), with degree 2 by default ("Mexican Hat wavelet"):
 
         .. ipython:: python
