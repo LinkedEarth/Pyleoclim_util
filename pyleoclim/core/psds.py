@@ -371,9 +371,9 @@ class PSD:
         return new
 
     def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
-        ''' Estimate the scaling exponent beta of the PSD 
+        ''' Estimate the scaling exponent (beta) of the PSD 
 
-        For a power law S(f) \propto f^\beta in log-log space, \beta is simply the slope.
+        For a power law S(f) ~ f^beta in log-log space, beta is simply the slope.
         
         Parameters
         ----------
@@ -872,10 +872,10 @@ class MultiplePSD:
 
     def beta_est(self, fmin=None, fmax=None, logf_binning_step='max', verbose=False):
         
-        ''' Estimate the scaling factor beta of the each PSD. 
+        ''' Estimate the scaling exponent of each constituent PSD 
         
-        This function calculates the scaling exponent for each of the PSDs stored in the object. 
-        The scaling exponent represents the slope of the spectrum line if plot in log-log space. 
+        This function calculates the scaling exponent (beta) for each of the PSDs stored in the object. 
+        The scaling exponent represents the slope of the spectrum in log-log space. 
 
         Parameters
         ----------
