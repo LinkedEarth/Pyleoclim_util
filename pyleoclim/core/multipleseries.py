@@ -331,7 +331,7 @@ class MultipleSeries:
             ms.series_list[idx]=s
         return ms
 
-    def increments(self, step_style='median'):
+    def increments(self, step_style='median', verbose=False):
         '''
         Extract grid properties (start, stop, step) of all the Series objects in a collection.
 
@@ -346,7 +346,10 @@ class MultipleSeries:
             is nearly equally spaced but for a few gaps.
 
             "max" is a conservative choice, appropriate for binning methods and Gaussian kernel coarse-graining
-
+        
+        verbose : bool
+            If True, will print out warning messages when they appear
+            
         Returns
         -------
 
@@ -388,7 +391,7 @@ class MultipleSeries:
         '''
         gp = np.empty((len(self.series_list),3)) # obtain grid parameters
         for idx,item in enumerate(self.series_list):
-            item      = item.clean(verbose=idx==0)
+            item      = item.clean(verbose=verbose)
             gp[idx,:] = tsutils.increments(item.time, step_style=step_style)
 
         return gp
@@ -435,7 +438,7 @@ class MultipleSeries:
 
         kwargs: dict
         
-            keyword arguments (dictionary) of the (bin, gkernel or interp) methods
+            keyword arguments (dictionary) of the bin, gkernel or interp methods
 
         Returns
         -------
@@ -485,8 +488,7 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries(serieslist)
 
             @savefig ms_common_time.png
-            fig, ax = plt.subplots(2,2,sharex=True,sharey=True)
-            fig.tight_layout()
+            fig, ax = plt.subplots(2,2,sharex=True,sharey=True, figsize=(10,8))
             ax = ax.flatten()
             # apply common_time with default parameters
             msc = ms.common_time()
@@ -501,9 +503,9 @@ class MultipleSeries:
             msc.plot(title=r'Gaussian kernel ($h=3$)',ax=ax[2],legend=False)
 
             # apply common_time with gkernel and a large bandwidth
-            msc = ms.common_time(method='gkernel', h=11)
-            msc.plot(title=r'Gaussian kernel ($h=11$)',ax=ax[3],legend=False)
-            
+            msc = ms.common_time(method='gkernel', h=.5)
+            msc.plot(title=r'Gaussian kernel ($h=.5$)',ax=ax[3],legend=False)
+            fig.tight_layout()
             # Optional close fig after plotting
             pyleo.closefig(fig)
         '''
@@ -684,6 +686,7 @@ class MultipleSeries:
         if target is None:
             target = self.series_list[0]
 
+        print("Looping over "+ str(len(self.series_list)) +" Series in collection")
         for idx, ts in tqdm(enumerate(self.series_list),  total=len(self.series_list), disable=mute_pbar):
             corr_res = ts.correlation(target, timespan=timespan, alpha=alpha, settings=settings, common_time_kwargs=common_time_kwargs, seed=seed)
             r_list.append(corr_res.r)

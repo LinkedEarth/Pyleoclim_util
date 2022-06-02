@@ -2315,7 +2315,7 @@ class Series:
 
             # using a simple t-test
             # set an arbitrary random seed to fix the result
-            corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'ttest'}, seed=2333)
+            corr_res = ts_nino.correlation(ts_air, settings={'method': 'ttest'})
             print(corr_res)
 
             # using the method "isopersistent"
