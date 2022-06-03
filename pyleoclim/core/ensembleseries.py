@@ -1,7 +1,7 @@
 """
 The EnsembleSeries class is a child of MultipleSeries, designed for ensemble applications (e.g. draws from a posterior distribution of ages, model ensembles with randomized initial conditions, or some other stochastic ensemble).
 In addition to a MultipleSeries object, an EnsembleSeries object has the following properties:
-- All series members are assumed to share the same time axis and all metadata (e.g., units).
+- All series members are assumed to share the same units and other metadata.
 - The class enables ensemble-oriented methods for computation (e.g., quantiles) and visualization (e.g., envelope plot).    
 """
 
@@ -249,6 +249,7 @@ class EnsembleSeries(MultipleSeries):
         r_list = []
         p_list = []
         signif_list = []
+        print("Looping over "+ str(len(self.series_list)) +" Series in the ensemble")
         for idx, ts1 in tqdm(enumerate(self.series_list), total=len(self.series_list), disable=mute_pbar):
             if hasattr(target, 'series_list'):
                 nEns = np.size(target.series_list)
