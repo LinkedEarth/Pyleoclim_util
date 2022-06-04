@@ -241,7 +241,7 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
         stop = np.nanmax(np.asarray(t))
     
     # Get the uniform time axis.
-    tc = np.arange(start,stop,step)
+    tc = np.arange(start,stop+step,step)
         
 
     kernel = lambda x, s : 1.0/(s*np.sqrt(2*np.pi))*np.exp(-0.5*(x/s)**2)  # define kernel function

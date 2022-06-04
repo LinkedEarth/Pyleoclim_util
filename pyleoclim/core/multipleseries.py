@@ -568,7 +568,7 @@ class MultipleSeries:
                 ti, vi = tsutils.gkernel(ts.time,ts.value,step=common_step, start=start, stop=stop, **kwargs)
                 ts.time  = ti
                 ts.value = vi
-                ms.series_list[idx] = ts
+                ms.series_list[idx] = ts.clean() # remove NaNs
 
         else:
             raise NameError('Unknown methods; no action taken')
