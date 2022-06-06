@@ -1,0 +1,27 @@
+cff-version: 0.8.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Khider"
+    given-names: "Deborah"
+    orcid: "https://orcid.org/0000-0001-7501-8430"
+  - family-names: "Emile-Geay"
+    given-names: "Julien"
+    orcid: "https://orcid.org/0000-0001-5920-4751"
+  - family-names: "Zhu"
+    given-names: "Feng"
+    orcid: "https://orcid.org/0000-0002-9969-2953"
+  - family-names: "James"
+    given-names: "Alexander"
+    orcid: "https://orcid.org/0000-0001-8561-3188"
+  - family-names: "Landers"
+    given-names: "Jordan"
+    orcid: "https://orcid.org/0000-0001-9772-7617"
+  - family-names: "Kwan"
+    given-names: "Myron"
+  - family-names: "Athreya"
+    given-names: "Pratheek"
+title: "Pyleoclim: A Python package for the analysis and visualization of paleoclimate data"
+version: v0.8.0
+doi: 10.5281/zenodo.1205661
+date-released: 2022-06-06
+url: "https://github.com/LinkedEarth/Pyleoclim_util"
