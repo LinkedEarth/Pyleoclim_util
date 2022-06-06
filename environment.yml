@@ -13,4 +13,4 @@ dependencies:
   - pip
   - python=3.9.7
   - pip:
-    - git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
+    - pyleoclim==0.8.0
