@@ -12,5 +12,6 @@ dependencies:
   - climlab=0.7.12
   - pip
   - python=3.9.7
+  - libgcc
   - pip:
     - pyleoclim==0.8.0
