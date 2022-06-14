@@ -88,4 +88,14 @@ class TestUiCoherenceDashboard:
         fig, ax = coh.dashboard(wavelet_plot_kwargs={'contourf_style':{'cmap': 'cividis'}})
         pyleo.closefig(fig)
         
-        
+class TestUiCoherencePhaseStats:
+    ''' Tests for Coherence.phase_stats()
+    '''        
+    def test_phasestats_t0(self):
+        ''' Test Coherence.phase_stats() with default parameters
+        '''
+        nt = 200
+        ts1 = gen_ts(model='colored_noise', nt=nt)
+        ts2 = gen_ts(model='colored_noise', nt=nt)
+        coh = ts2.wavelet_coherence(ts1)
+        phase = coh.phase_stats(scales=[2,8])

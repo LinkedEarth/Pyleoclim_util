@@ -1,1 +1,0 @@
-.. automodule:: pyleoclim.utils.tsmodel

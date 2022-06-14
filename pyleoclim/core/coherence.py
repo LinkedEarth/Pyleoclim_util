@@ -20,6 +20,7 @@ from matplotlib import gridspec
 
 from tqdm import tqdm
 from scipy.stats.mstats import mquantiles
+import warnings
 
 def infer_period_unit_from_time_unit(time_unit):
     ''' infer a period unit based on the given time unit
@@ -770,3 +771,135 @@ class Coherence:
         new.qs = qs
 
         return new
+    
+    def phase_stats(self, scales, number=1000, level=0.05):
+        ''' Estimate phase angle statistics of a Coherence object
+
+        As per [1], the strength (consistency) of a phase relationship is assessed using:
+            
+        * sigma, the circular standard deviation   
+        
+        * kappa,  an estimate of the Von Mises distribution's concentration parameter. 
+            It is a reciprocal measure of dispersion, so 1/kappa is analogous to the variance) [3].
+        
+        Because of inherent persistence of geophysical signals and of the 
+        reproducing kernel of the continuous wavelet transform [3], phase statistics are 
+        assessed relative to an AR(1) model fit to the angle deviations observed at the requested scale(s). 
+    
+        Specifically, if `number` is specified, the method simulates `number` 
+        Monte Carlo realizations of an AR(1) process fit to fluctuations around 
+        the mean angle. This ensemble is used to obtain the confidence limits: 
+        `sigma_lo` (`level` quantile) and `kappa_hi` (1-`level` quantile). 
+        These correspond to 1-tailed tests of the strength of the relationship.
+
+        Parameters
+        ----------
+        scales : float
+            scale at which to evaluate the phase angle
+        
+        number : int, optional
+            number of AR(1) series to create for significance testing. The default is 1000.
+       
+        level : float, optional
+           significance level against which to gauge sigma and kappa. default: 0.05
+        
+
+        Returns
+        -------
+        result : dict
+            contains angle_mean (the mean angle for those scales), sigma (the 
+            circular standard deviation), kappa, sigma_lo (alpha-level quantile 
+            for sigma) and kappa_hi, the (1-alpha)-level quantile for kappa. 
+                
+        See also
+        --------
+
+        pyleoclim.core.series.Series.wavelet_coherence : Wavelet coherence
+
+        pyleoclim.core.scalograms.Scalogram : Scalogram object
+
+        pyleoclim.core.scalograms.MultipleScalogram : Multiple Scalogram object
+
+        pyleoclim.core.coherence.Coherence.plot : plotting method for Coherence objects
+        
+        pyleoclime.utils.wavelet.angle_sig : significance of phase angle statistics
+            
+        pyleoclim.utils.wavelet.angle_stats: phase angle statistics
+    
+        
+        References
+        ----------
+        [1] Grinsted, A., J. C. Moore, and S. Jevrejeva (2004), Application of the cross
+        wavelet transform and wavelet coherence to geophysical time series, 
+        Nonlinear Processes in Geophysics, 11, 561–566.
+        
+        [2] Huber, R., Dutra, L. V., & da Costa Freitas, C. (2001).
+        SAR interferogram phase filtering based on the Von Mises distribution. 
+        In IGARSS 2001. Scanning the Present and Resolving the Future. 
+        Proceedings. IEEE 2001 International Geoscience and Remote Sensing Symposium 
+        (Cat. No. 01CH37217) (Vol. 6, pp. 2816-2818). IEEE.  
+        
+        [3] Farge, M. and Schneider, K. (2006): Wavelets: application to turbulence
+        Encyclopedia of Mathematical Physics (Eds. J.-P. Françoise, G. Naber and T.S. Tsun)
+        pp 408-420. 
+
+        Examples
+        --------
+
+        Calculate the phase angle between NINO3 and All India Rainfall at 5y scales:
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            import numpy as np
+            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
+            time = data['t'].values
+            air = data['air'].values
+            nino = data['nino'].values
+            ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)',
+                                  label='All India Rainfall', value_name='AIR (mm/month)')
+            ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)',
+                                   label='NINO3', value_name='NINO3 (K)')
+
+            coh = ts_air.wavelet_coherence(ts_nino)
+            coh.phase_stats(scales=5)
+        
+        One may also obtain phase angle statistics over an interval, like the 2-8y ENSO band: 
+            
+         .. ipython:: python
+             :okwarning:
+             :okexcept:
+             
+             phase = coh.phase_stats(scales=[2,8])
+             print("The mean angle is {:4.2f}°".format(phase.mean_angle/np.pi*180))
+             print(phase)
+            
+        From this example, one diagnoses a strong anti-phased relationship in the ENSO band,
+        with high von Mises concentration (kappa ~ 3.35 >> kappa_hi) and low circular
+        dispersion (sigma ~ 0.6 << sigma_lo). This would be strong evidence of a consistent
+        anti-phasing between NINO3 and AIR at those scales.       
+        '''
+        scales = np.array(scales)
+        
+        if scales.max() > self.scale.max():
+            warnings.warn("Requested scale exceeds largest scale in object. Truncating to "+str(self.scale.max()))
+        
+        if scales.size == 1:
+            scale_idx = np.argmin(np.abs(self.scale - scales))
+            res = waveutils.angle_sig(self.phase[:,scale_idx],nMC=number,level=level)
+        elif  scales.size == 2:
+            idx_lo = np.argmin(np.abs(self.scale - scales.min()))
+            idx_hi = np.argmin(np.abs(self.scale - scales.max()))
+            if (idx_hi >= idx_lo):
+                raise ValueError("Insufficiently spaced scales. Please pick a single one, or a wider interval")
+            else: # average phase over those scales
+                nt, ns = self.phase.shape
+                phase = np.empty((nt)) 
+                for i in range(nt):
+                    phase[i], _, _ = waveutils.angle_stats(self.phase[i,idx_hi:idx_lo]) 
+                res = waveutils.angle_sig(phase,nMC=number,level=level) # assess significance 
+            
+        return res
