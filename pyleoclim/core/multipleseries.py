@@ -1755,8 +1755,8 @@ class MultipleSeries:
             time_label, value_label = ts.make_labels()
             ax[idx].set_ylabel(value_label, weight='bold')
 
-            mu = np.mean(ts.value)
-            std = np.std(ts.value)
+            mu = np.nanmean(ts.value)
+            std = np.nanstd(ts.value)
             ylim = [mu-4*std, mu+4*std]
             ax[idx].fill_between(ts.time, ts.value, y2=mu, alpha=fill_between_alpha, color=clr)
             trans = transforms.blended_transform_factory(ax[idx].transAxes, ax[idx].transData)
