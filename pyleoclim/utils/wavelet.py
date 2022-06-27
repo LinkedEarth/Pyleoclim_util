@@ -14,7 +14,9 @@ __all__ = [
     'cwt',
     'cwt_coherence',
     'wwz',
-    'wwz_coherence'
+    'wwz_coherence',
+    'angle_stats',
+    'angle_sig'
 ]
 
 import numpy as np
@@ -33,7 +35,7 @@ from .tsutils import preprocess
 from .tsbase import (
     clean_ts,
     is_evenly_spaced)
-from .tsmodel import(ar1_fit)
+from .tsmodel import(ar1_fit, ar1_sim)
 
 warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
@@ -2931,3 +2933,140 @@ def chisquare_solve(XGUESS, P, V):
         PDIFF = XGUESS   # then just assign some big number like XGUESS
 
     return PDIFF
+
+def angle_stats(theta):
+    ''' Statistics of a phase angle 
+    
+    Parameters
+    ----------
+    theta : numpy.array    
+        array of phase angles
+        
+    Returns
+    -------
+    mean_theta : float
+        mean angle
+    
+    sigma : float
+        circular standard deviation
+        
+    kappa: float
+        an estimate of the Von Mises distribution's kappa parameter  
+    
+    References
+    ----------
+
+    _[1] Huber, R., Dutra, L. V., & da Costa Freitas, C. (2001, July).
+    SAR interferogram phase filtering based on the Von Mises distribution. 
+    In IGARSS 2001. Scanning the Present and Resolving the Future. 
+    Proceedings. IEEE 2001 International Geoscience and Remote Sensing Symposium 
+    (Cat. No. 01CH37217) (Vol. 6, pp. 2816-2818). IEEE.   
+    
+    See also
+    --------
+    
+    pyleoclim.utils.wavelet.angle_sig: significance of phase angle statistics 
+    
+    '''
+    
+    n = len(theta)
+
+    S = np.sin(theta).sum()
+    C = np.cos(theta).sum()
+    mean_theta = np.arctan2(S,C)
+        
+    R = np.sqrt(S**2+C**2)/n
+    
+    # estimate kappa from von Mises distribution
+    if (R<.53):
+        kappa = 2*R+R**3+5*R**5/6
+    elif (R<.85):
+        kappa = -0.4+1.39*R+0.43/(1-R)
+    else:
+        kappa = 1/(R**3-4*R**2+3*R)
+    
+    sigma = np.sqrt(-2*np.log(R))  # circular standard deviation
+    
+    return  mean_theta, kappa, sigma
+
+def angle_sig(theta, nMC=1000, level = 0.05):
+    ''' Calculates the mean angle and assesses the significance of its statistics.
+    
+    In general, a consistent phase relationship will have low circular standard deviation
+    (sigma <= sigma_lo) and high concentration (kappa >= kappa_hi). 
+
+    Parameters
+    ----------
+    theta : numpy.array    
+        array of phase angles
+        
+    nMC : int
+        number of Monte Carlo simulations to assess angle confidence interval
+        if None, the simulation is not performed.  
+        
+    level : float 
+        significance level against which to gauge sigma and kappa. default: 0.05
+
+    Returns
+    -------
+    
+    angle_mean : float
+        mean angle
+    
+    sigma : float
+        circular standard deviation
+        
+    kappa: float
+        an estimate of the Von Mises distribution's kappa parameter. 
+        kappa is a measure of concentration (a reciprocal measure of dispersion,
+        so 1/kappa is analogous to the variance).
+    
+    sigma_lo : float
+        alpha-level quantile for sigma
+    
+    kappa_hi : float
+        (1-alpha)-level quantile for kappa
+      
+    References
+    ----------
+     
+    _[1] Grinsted, A., J. C. Moore, and S. Jevrejeva (2004), Application of the cross
+    wavelet transform and wavelet coherence to geophysical time series, 
+    Nonlinear Processes in Geophysics, 11, 561–566.
+    
+    _[2] Huber, R., Dutra, L. V., & da Costa Freitas, C. (2001, July).
+    SAR interferogram phase filtering based on the Von Mises distribution. 
+    In IGARSS 2001. Scanning the Present and Resolving the Future. 
+    Proceedings. IEEE 2001 International Geoscience and Remote Sensing Symposium 
+    (Cat. No. 01CH37217) (Vol. 6, pp. 2816-2818). IEEE.   
+    
+    See also
+    --------
+    
+    pyleoclim.utils.wavelet.angle_stats: phase angle statistics
+    
+    '''
+    theta = np.unwrap(theta,discont=2*np.pi)
+    
+    meantheta, kappa, sigma = angle_stats(theta)
+ 
+    if nMC is not None:
+        noise = ar1_sim(theta - meantheta, p=nMC) # generate noise matrix    
+        sigmaMC = np.empty((nMC))
+        kappaMC = np.empty((nMC))
+        for i in range(nMC):
+            _, kappaMC[i], sigmaMC[i]  = angle_stats(meantheta+noise[:,i])    
+        sigma_lo = np.quantile(sigmaMC, level) # obtain sigma threshold
+        kappa_hi = np.quantile(kappaMC, 1-level) # obtain kappa threshold
+    else:
+        sigma_lo = kappa_hi = None
+    
+    Results = collections.namedtuple('Results', ['mean_angle', 'kappa', 'sigma', 'kappa_hi', 'sigma_lo'])
+    res = Results(mean_angle=meantheta, kappa=kappa, sigma=sigma, kappa_hi=kappa_hi, sigma_lo = sigma_lo)
+    
+    return res
+    
+    
+    
+    
+

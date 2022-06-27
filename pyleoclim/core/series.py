@@ -1188,20 +1188,39 @@ class Series:
         if 'cbar_style' not in wavelet_plot_kwargs:
             wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.12, 
                                         'label': wavelet_plot_kwargs['variable'].capitalize() + ' from ' + scalogram.wave_method}})
+        else:
+            if 'orientation' in wavelet_plot_kwargs['cbar_style']:
+                orient = wavelet_plot_kwargs['cbar_style']['orientation']
+            else: 
+                orient = 'horizontal'
+            if 'pad' in wavelet_plot_kwargs['cbar_style']:
+                pad = wavelet_plot_kwargs['cbar_style']['pad'] 
+            else:
+                pad = 0.12
+            if 'label' in wavelet_plot_kwargs['cbar_style']:
+                label = wavelet_plot_kwargs['cbar_style']['label']
+            else:
+                label = wavelet_plot_kwargs['variable'].capitalize() + ' from ' + scalogram.wave_method
+            wavelet_plot_kwargs.update({'cbar_style':{'orientation': orient, 'pad': pad, 
+                                        'label': label}})
 
         ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
-        ax['scal'].invert_yaxis()
         ax['scal'].get_yaxis().set_label_coords(y_label_loc,0.5)
+        
+        if period_lim is not None:
+            ax['scal'].set_ylim(period_lim)
+            if 'ylim' in wavelet_plot_kwargs:
+                print('Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+        ax['scal'].invert_yaxis()
 
         ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
-
         ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, ylabel = 'PSD from \n' + str(psd.spec_method), **psd_plot_kwargs)
 
         if period_lim is not None:
             ax['psd'].set_ylim(period_lim)
             if 'ylim' in psd_plot_kwargs:
                 print('Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-
+    
         ax['psd'].yaxis.set_visible(False)
         ax['psd'].invert_yaxis()
         ax['psd'].set_ylabel(None)

@@ -19,10 +19,6 @@ from .tsbase import (
     is_evenly_spaced
 )
 
-#----
-# Main functions
-#----
-
 def savitzky_golay(ys, window_length=None, polyorder=2, deriv=0, delta=1,
                    axis=-1, mode='mirror', cval=0):
     """ Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
