@@ -14,4 +14,4 @@ dependencies:
   - python=3.9.7
   - libstdcxx-ng=12.1.0
   - pip:
-    - pyleoclim==0.8.0
+    - pyleoclim==0.8.1
