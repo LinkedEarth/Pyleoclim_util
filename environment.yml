@@ -10,6 +10,7 @@ dependencies:
   - Bottleneck=1.3.2
   - dask=2021.9.1
   - climlab=0.7.12
+  - dask-gateway=2022.6.1
   - pip
   - python=3.9.7
   - libstdcxx-ng=12.1.0
