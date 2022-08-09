@@ -635,7 +635,6 @@ class Series:
             # plot
             @savefig ts_plot4.png
             fig, ax = ts.plot()
-            pyleo.closefig(fig)
 
             # SSA
             nino_ssa = ts.ssa(M=60)
@@ -658,15 +657,15 @@ class Series:
             * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered within uncertainties . (5,6) looks like another doublet
             * around i=15, the eigenvalues appear to reach a floor, and all subsequent eigenvalues explain a very small amount of variance.
 
-        So, summing the variance of all modes higher than 19, we get:
+        So, summing the variance of the first 15 modes, we get:
 
         .. ipython:: python
             :okwarning:
             :okexcept:
 
-            print(nino_ssa.pctvar[15:].sum()*100)
+            print(nino_ssa.pctvar[:14].sum())
 
-        That is, over 95% of the variance is in the first 15 modes. That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
+        That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
 
         .. ipython:: python
             :okwarning:
@@ -674,12 +673,13 @@ class Series:
 
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
             @savefig ssa_recon.png
-            fig, ax = ts.plot(title='ONI')
+            fig, ax = ts.plot(title='SOI')
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
 
+        
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
-            * there was not much rhyme or reason for picking 15 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
+            * there was not much rhyme or reason for picking 14 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
             * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies, you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves features and excludes others (i.e, a filter).
             * as with all orthgonal decompositions, summing over all RCs will recover the original signal within numerical precision.
 
@@ -698,10 +698,19 @@ class Series:
         .. ipython:: python
             :okwarning:
             :okexcept:
-            @savefig scree_nmc.png
+                
+            @savefig scree_mc.png
             nino_mcssa.screeplot()
 
-        This suggests that modes 1-5 fall above the red noise benchmark.
+        This suggests that modes 1-5 fall above the red noise benchmark. To inspect mode 1 (index 0), just type:
+            
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            @savefig ssa_mode0plot.png
+            nino_mcssa.modeplot(mode=0)    
+            
         '''
 
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
