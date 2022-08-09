@@ -32,7 +32,7 @@ Getting Started
    core/api.rst
    tutorials.rst
 
-The :ref:`Pyleoclim UI <core_ui>` makes use of specialized routines which are described in details in advanced funtionalities.
+The :ref:`Pyleoclim UI <core_ui>` makes use of specialized routines which are described in details in advanced functionalities.
 
 .. toctree::
    :caption: Advanced functionalities
