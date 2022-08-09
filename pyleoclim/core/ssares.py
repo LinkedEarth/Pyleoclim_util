@@ -68,6 +68,16 @@ class SsaRes:
         self.RCmat      = RCmat
         self.mode_idx   = mode_idx
 
+    def copy(self):
+        '''Make a copy of the SsaRes object
+
+        Returns
+        -------
+        SsaRes : pyleoclim.SsaRes
+            A copy of the SsaRes object
+
+        '''
+        return deepcopy(self)
 
 
     def screeplot(self, figsize=[6, 4], title='SSA scree plot', ax=None, savefig_settings=None, title_kwargs=None, xlim=None,

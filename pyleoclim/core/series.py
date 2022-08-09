@@ -701,6 +701,8 @@ class Series:
                 
             @savefig scree_mc.png
             nino_mcssa.screeplot()
+            
+            print('Indices of modes retained: '+ str(nino_mcssa.mode_idx))
 
         This suggests that modes 1-5 fall above the red noise benchmark. To inspect mode 1 (index 0), just type:
             
