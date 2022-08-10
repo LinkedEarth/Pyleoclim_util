@@ -113,13 +113,13 @@ class Series:
         ts
         ts.__dict__.keys()
         
-    For a quick look at the values, one may use the `print()` method: 
+    For a quick look at the values, one may use the `print()` method. We do so below for a short slice of the data so as not to overwhelm the display: 
         
     .. ipython:: python
         :okwarning:
         :okexcept:
         
-        print(ts)
+        print(ts.slice([1982,1983]))
     
     '''
 
