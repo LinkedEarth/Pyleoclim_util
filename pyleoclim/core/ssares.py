@@ -183,7 +183,7 @@ class SsaRes:
 
         return fig, ax
 
-    def modeplot(self, index=0, figsize=[10, 5], ax=None, savefig_settings=None,
+    def modeplot(self, index=0, figsize=[10, 5], savefig_settings=None,
              title_kwargs=None, spec_method = 'mtm', plot_original=False):
         ''' Dashboard visualizing the properties of a given SSA mode, including:
             1. the analyzing function (T-EOF)
@@ -207,10 +207,6 @@ class SsaRes:
 
         title_kwargs : dict
             the keyword arguments for ax.set_title()
-
-        ax : matplotlib.axis, optional
-            the axis object from matplotlib
-            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
 
         spec_method: str, optional
             The name of the spectral method to be applied on the PC. Default: MTM
@@ -257,9 +253,6 @@ class SsaRes:
         '''
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
-        if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
-
         RC = self.RCmat[:,index]
         fig = plt.figure(tight_layout=True,figsize=figsize)
         gs = gridspec.GridSpec(2, 2)
@@ -270,7 +263,8 @@ class SsaRes:
         if plot_original:
             ax.plot(self.time,self.original,color='Silver',lw=1,label='original')
             ax.legend()
-        ax.set_xlabel('Time'),  ax.set_ylabel(r'$RC_'+str(index+1)+'$')
+        ax.set_xlabel('Time')
+        ax.set_ylabel(r'$RC_'+str(index+1)+'$')
         ax.set_title('SSA Mode '+str(index+1)+' RC, '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
         # plot T-EOF
         ax = fig.add_subplot(gs[1, 0])
@@ -281,7 +275,7 @@ class SsaRes:
         ax = fig.add_subplot(gs[1, 1])
         ts_rc = series.Series(time=self.time, value=RC) # define timeseries object for the RC
         psd_mtm_rc = ts_rc.interp().spectral(method=spec_method)
-        _ = psd_mtm_rc.plot(ax=ax)
+        psd_mtm_rc.plot(ax=ax)
         ax.set_xlabel('Period')
         ax.set_title('RC Spectrum ('+spec_method+')')
 
