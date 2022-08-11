@@ -4,6 +4,7 @@ which applies to Series objets. Two functions are enabled by this class:
 * `screeplot`, which plots the eigenvalue spectrum to help determine what modes to keep
 * `modeplot`, which plots the individual mode temporal EOF and temporal PC
 '''
+from copy import deepcopy
 
 import numpy as np
 import seaborn as sns
