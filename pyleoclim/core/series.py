@@ -1779,7 +1779,6 @@ class Series:
             :okwarning:
             :okexcept:
 
-            ts_interp = ts_std.interp()
             psd_welch = ts_interp.spectral(method='welch')
             psd_welch_signif = psd_welch.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_welch.png
@@ -1791,11 +1790,21 @@ class Series:
             :okwarning:
             :okexcept:
 
-            ts_interp = ts_std.interp()
-            psd_mtm = ts_interp.spectral(method='mtm')
+            psd_mtm = ts_interp.spectral(method='mtm', label='MTM, NW=4')
             psd_mtm_signif = psd_mtm.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_mtm.png
-            fig, ax = psd_mtm_signif.plot(title='PSD using MTM method')
+            fig, ax = psd_mtm_signif.plot(title='PSD using the multitaper method')
+
+        By default, MTM uses a half-bandwidth of 4 times the fundamental (Rayleigh) frequency, i.e. NW = 4, which is the most conservative choice.
+        NW runs from 2 to 4 in multiples of 1/2, and can be adjusted like so (note the sharper peaks and higher overall variance, which may not be desirable):
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            psd_mtm2 = ts_interp.spectral(method='mtm', settings={'NW':2}, label='MTM, NW=2')
+            @savefig spec_mtm2.png
+            psd_mtm2.plot(title='PSD using the multi-taper method', ax=ax)
 
         - Continuous Wavelet Transform
 

@@ -179,7 +179,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
         ax.set_ylabel(ylabel)
 
     if title is not None:
-        ax.set_title(title)
+        ax.set_title(title, fontweight='bold')
 
     if xlim is not None:
         ax.set_xlim(xlim)
@@ -288,7 +288,6 @@ def set_style(style='journal', font_scale=1.0):
         'font.size': 12,
         'axes.labelsize': 12,
         'axes.titlesize': 14,
-        'axes.titlef': 
         'xtick.labelsize': 11,
         'ytick.labelsize': 11,
         'legend.fontsize': 11,
