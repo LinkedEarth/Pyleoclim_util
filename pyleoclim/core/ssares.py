@@ -185,7 +185,7 @@ class SsaRes:
         return fig, ax
 
     def modeplot(self, index=0, figsize=[10, 5], savefig_settings=None,
-             title_kwargs=None, spec_method = 'mtm', plot_original=False):
+             title_kwargs=None, spec_method = 'mtm', plot_original=True):
         ''' Dashboard visualizing the properties of a given SSA mode, including:
             1. the analyzing function (T-EOF)
             2. the reconstructed component (RC)
@@ -212,7 +212,7 @@ class SsaRes:
         spec_method: str, optional
             The name of the spectral method to be applied on the PC. Default: MTM
             Note that the data are evenly-spaced, so any spectral method that
-            assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
+            assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'.
             'wwz' is relevant too if scaling exponents need to be estimated.
           
         See also
@@ -266,7 +266,7 @@ class SsaRes:
             ax.legend()
         ax.set_xlabel('Time')
         ax.set_ylabel(r'$RC_'+str(index+1)+'$')
-        ax.set_title('SSA Mode '+str(index+1)+' RC, '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
+        ax.set_title('SSA reconstructed component '+str(index+1)+', '+ '{:3.2f}'.format(self.pctvar[index]) + '% variance explained',weight='bold')
         # plot T-EOF
         ax = fig.add_subplot(gs[1, 0])
         ax.plot(self.eigvecs[:,index])

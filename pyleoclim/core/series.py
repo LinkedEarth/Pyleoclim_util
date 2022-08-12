@@ -644,7 +644,6 @@ class Series:
         .. ipython:: python
             :okwarning:
             :okexcept:
-            var_pct = nino_ssa['pctvar'] # extract the fraction of variance attributable to each mode
 
             # plot eigenvalues
             @savefig ts_eigen.png
@@ -1965,10 +1964,10 @@ class Series:
             scal1 = ts.wavelet() 
             scal_signif = scal1.signif_test(number=20)  # for research-grade work, use number=200 or larger
             @savefig scal_cwt.png
-            fig, ax = scal_signif.plot(title='CWT scalogram')
+            fig, ax = scal_signif.plot() 
             pyleo.closefig()
                         
-        If you wanted to invoke the WWZ instead (here with no significance testing, to lower computational cost):
+        If you wanted to invoke the WWZ method instead (here with no significance testing, to lower computational cost):
             
         .. ipython:: python
             :okwarning:
@@ -1976,10 +1975,10 @@ class Series:
                 
             scal2 = ts.wavelet(method='wwz') 
             @savefig scal_wwz.png
-            fig, ax = scal2.plot(title='WWZ scalogram')
+            fig, ax = scal2.plot()
             pyleo.closefig()
 
-        Notice that the two scalograms have different units, which are arbitrary.  Method-specific arguments
+        Notice that the two scalograms have different amplitude, which are relative.  Method-specific arguments
         may be passed via `settings`.  For instance, if you wanted to change the default mother wavelet
         ('MORLET') to a derivative of a Gaussian (DOG), with degree 2 by default ("Mexican Hat wavelet"):
 
@@ -1993,7 +1992,7 @@ class Series:
             pyleo.closefig()
             
         As for WWZ, note that, for computational efficiency, the time axis is coarse-grained
-        by default to 50 time points, which explains in part the diffence with the CWT scalogram.
+        by default to 50 time points, which explains in part the difference with the CWT scalogram.
 
         If you need a custom axis, it (and other method-specific  parameters) can also be passed 
         via the `settings` dictionary:

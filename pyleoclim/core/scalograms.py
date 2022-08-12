@@ -209,7 +209,7 @@ class Scalogram:
         msg = print(tabulate(table, headers='keys'))
         return f'Dimension: {np.size(self.frequency)} x {np.size(self.time)}'
 
-    def plot(self, variable = 'amplitude', in_scale=True, xlabel=None, ylabel=None, title='default',
+    def plot(self, variable = 'amplitude', in_scale=True, xlabel=None, ylabel=None, title=None,
              ylim=None, xlim=None, yticks=None, figsize=[10, 8],
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              contourf_style={}, cbar_style={}, savefig_settings={}, ax=None,
@@ -404,9 +404,9 @@ class Scalogram:
             )
             if title is None:
                 if self.label is not None:
-                    ax.set_title(self.label + " scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
+                    ax.set_title(self.label + " scalogram (" + self.wave_method.upper() + ") with " + str(round(self.qs[isig]*100))+"% threshold")
                 else:
-                    ax.set_title("Scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
+                    ax.set_title(self.wave_method.upper() + " scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
             else:
                 ax.set_title(title)
 
