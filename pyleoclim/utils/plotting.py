@@ -287,7 +287,8 @@ def set_style(style='journal', font_scale=1.0):
     font_dict = {
         'font.size': 12,
         'axes.labelsize': 12,
-        'axes.titlesize': 12,
+        'axes.titlesize': 14,
+        'axes.titlef': 
         'xtick.labelsize': 11,
         'ytick.labelsize': 11,
         'legend.fontsize': 11,

@@ -370,9 +370,15 @@ class Scalogram:
             ax.yaxis.set_major_formatter(ScalarFormatter())
             ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 
-        if title is not None:
+        if title is None:
+            if self.label is not None:
+                ax.set_title(self.label + " scalogram (" + self.wave_method.upper() + ")")
+            else:
+                ax.set_title("Scalogram (" + self.wave_method.upper() + ")")
+        else:
             ax.set_title(title)
-
+            
+            
         if ylim is None:
             ylim = [np.min(y_axis), np.min([np.max(y_axis), np.max(self.coi)])]
 
@@ -396,11 +402,13 @@ class Scalogram:
                 linestyles=signif_linestyles,
                 linewidths=signif_linewidths,
             )
-            if title == 'default':
+            if title is None:
                 if self.label is not None:
                     ax.set_title(self.label + " scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
                 else:
                     ax.set_title("Scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
+            else:
+                ax.set_title(title)
 
         if xlabel is None:
             xlabel = self.time_label
