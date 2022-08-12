@@ -123,7 +123,7 @@ class Series:
     
     '''
 
-    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True, verbose=False):
+    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, mean=None, clean_ts=True, verbose=False):
 
         if clean_ts==True:
             value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
@@ -137,6 +137,11 @@ class Series:
         self.label = label
         self.clean_ts=clean_ts
         self.verbose=verbose
+        
+        if mean is None:
+            self.mean=np.mean(self.value)
+        else:
+            self.mean = mean
 
     def convert_time_unit(self, time_unit='years'):
         ''' Convert the time unit of the Series object
@@ -1367,7 +1372,8 @@ class Series:
             ts_mean  = np.nanmean(self.value)
             vc = self.value - ts_mean
         tsc.value = vc
-        return tsc, ts_mean
+        tsc.mean = ts_mean
+        return tsc
 
     def segment(self, factor=10):
         """Gap detection
