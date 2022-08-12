@@ -52,7 +52,7 @@ from .wavelet import (
 
 def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
            return_onesided=True, detrend = None, sg_kwargs = None,
-           gaussianize=False, standardize=False,
+           gaussianize=False, standardize=True,
            scaling='density', average='mean'):
     '''Estimate power spectral density using Welch's periodogram
 
@@ -149,6 +149,9 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
         IEEE Trans. Audio Electroacoust. vol. 15, pp. 70-73, 1967.
 
     '''
+    
+    if standardize == True:
+        warnings.warn('Standardizing the timeseries')
 
     ts = np.array(ts)
     ys = np.array(ys)
@@ -193,11 +196,12 @@ def welch(ys, ts, window='hann',nperseg=None, noverlap=None, nfft=None,
 
 
 def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
-           gaussianize=False, standardize=False, adaptive=False, jackknife=True,
+           gaussianize=False, standardize=True, adaptive=False, jackknife=True,
            low_bias=True, sides='default', nfft=None):
     ''' Spectral density using the multi-taper method.
 
-
+    If the NW product, or the BW and Fs in Hz are not specified by the user, a bandwidth of 4 times the fundamental frequency, corresponding to NW = 4 will be used.
+    
     Based on the nitime package: http://nipy.org/nitime/api/generated/nitime.algorithms.spectral.html
 
     Parameters
@@ -210,7 +214,7 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
     NW : float
         The normalized half-bandwidth of the data tapers, indicating a
         multiple of the fundamental frequency of the DFT (Fs/N).
-        Common choices are n/2, for n >= 4.
+        Common choices are 2, 2.5, 3, 3.5, 4.
     BW : float
         The sampling-relative bandwidth of the data tapers
     detrend : str
@@ -263,6 +267,10 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
     pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     '''
+    
+    if standardize == True:
+        warnings.warn('Standardizing the timeseries')
+        
     # preprocessing
     ts = np.array(ts)
     ys = np.array(ys)
@@ -307,7 +315,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
                  freq_kwargs=None, n50=3, window='hann',
                  detrend = None, sg_kwargs=None,
                  gaussianize=False,
-                 standardize=False,
+                 standardize=True,
                  average='mean'):
     """ Lomb-scargle priodogram
 
@@ -408,6 +416,10 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     Scargle, J. D. (1982). Studies in astronomical time series analysis. II. Statistical aspects of spectral analyis of unvenly spaced data. The Astrophysical Journal, 263(2), 835-853.
 
     """
+    
+    if standardize == True:
+        warnings.warn('Standardizing the timeseries')
+    
     ts = np.array(ts)
     ys = np.array(ys)
 
@@ -517,7 +529,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
 
 def periodogram(ys, ts, window='hann', nfft=None,
            return_onesided=True, detrend = None, sg_kwargs=None,
-           gaussianize=False, standardize=False,
+           gaussianize=False, standardize=True,
            scaling='density'):
     ''' Spectral density estimation using a Blackman-Tukey periodogram
 
@@ -596,6 +608,10 @@ def periodogram(ys, ts, window='hann', nfft=None,
     pyleoclim.utils.tsutils.standardize: Centers and normalizes a given time series.
 
     '''
+    
+    if standardize == True:
+        warnings.warn('Standardizing the timeseries')
+    
     ts = np.array(ts)
     ys = np.array(ys)
 
@@ -637,7 +653,7 @@ def periodogram(ys, ts, window='hann', nfft=None,
 def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
             tau=None, c=1e-3, nproc=8,
             detrend=False, sg_kwargs=None, gaussianize=False,
-            standardize=False, Neff_threshold=3, anti_alias=False, avgs=2,
+            standardize=True, Neff_threshold=3, anti_alias=False, avgs=2,
             method='Kirchner_numba', wwa=None, wwz_Neffs=None, wwz_freq=None):
     ''' Spectral estimation using the Weighted Wavelet Z-transform
     
@@ -752,6 +768,10 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     - Kirchner, J. W. (2005). Aliasin in 1/f^a noise spectra: origins, consequences, and remedies. Physical Review E covering statistical, nonlinear, biological, and soft matter physics, 71, 66110.
     - Kirchner, J. W. and Neal, C. (2013). Universal fractal scaling in stream chemistry and its impli-cations for solute transport and water quality trend detection. Proc Natl Acad Sci USA 110:12213–12218.
     '''
+    
+    if standardize == True:
+        warnings.warn('Standardizing the timeseries')
+    
     ys_cut, ts_cut, freq, tau = prepare_wwz(ys, ts, freq=freq,
                                             freq_method=freq_method,
                                             freq_kwargs=freq_kwargs,tau=tau)
@@ -773,7 +793,7 @@ def wwz_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,
     return res
 
 def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None, 
-            detrend=False,sg_kwargs={}, gaussianize=False, standardize =False, pad=False, 
+            detrend=False,sg_kwargs={}, gaussianize=False, standardize =True, pad=False, 
             mother='MORLET',param=None, cwt_res=None):
     ''' Spectral estimation using the continuous wavelet transform
     Uses the Torrence and Compo [1998] continuous wavelet transform implementation
@@ -800,7 +820,7 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
     gaussianize : bool, optional
         Whether to gaussianize. The default is False.
     standardize : bool, optional
-        Whether to standardize. The default is False.     
+        Whether to standardize. The default is True.     
     pad : bool, optional
         Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
@@ -847,6 +867,8 @@ def cwt_psd(ys, ts, freq=None, freq_method='log', freq_kwargs=None,scale = None,
     
     '''
     
+    if standardize == True:
+        warnings.warn('Standardizing the timeseries')
     
         #get the wavelet:
     if cwt_res is None:
