@@ -212,9 +212,8 @@ def mtm(ys, ts, NW=None, BW=None, detrend = None, sg_kwargs=None,
     ts : array
         time axis of the time series
     NW : float
-        The normalized half-bandwidth of the data tapers, indicating a
-        multiple of the fundamental frequency of the DFT (Fs/N).
-        Common choices are 2, 2.5, 3, 3.5, 4.
+        The time-bandwidth product NW governs the width (and therefore, height) of a peak, which can take the values [2, 5/2, 3, 7/2, 4]. This product controls the classical bias-variance tradeoff inherent to spectral estimation: a large product limits the variance but increases leakage out of harmonic line. In other words, small values of NW mean high spectral resolution, low bias, but high variance. Large values of the parameter mean lower resolution, higher bias, but reduced variance. There is no automated way to choose this parameter, and the default (NW=4) corresponds to a conservative choice with low variance.
+        For a demonstration on the effect of this parameter, see the spectral analysis notebook in our tutorials: https://pyleoclim-util.readthedocs.io/en/master/tutorials.html. 
     BW : float
         The sampling-relative bandwidth of the data tapers
     detrend : str

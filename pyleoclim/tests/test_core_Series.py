@@ -303,9 +303,9 @@ class TestUiSeriesCenter:
         ts = gen_ts(nt=500, alpha=alpha)
 
         #Call function to be tested
-        tsc, mu = ts.center()
+        tsc = ts.center()
 
-        assert np.abs(tsc.value.mean()) <= np.sqrt(sys.float_info.epsilon) 
+        assert np.abs(tsc.mean) <= np.sqrt(sys.float_info.epsilon) 
 
 class TestUiSeriesStandardize:
     '''Test for Series.standardize()
