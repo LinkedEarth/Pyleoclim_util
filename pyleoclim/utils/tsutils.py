@@ -14,6 +14,8 @@ __all__ = [
     'annualize',
     'gaussianize',
     'detrend',
+    'detect_outliers_DBSCAN',
+    'detect_outliers_kmeans',
     'remove_outliers'
 ]
 
@@ -27,10 +29,12 @@ from scipy import signal
 from scipy import interpolate
 from scipy import stats
 from pyhht import EMD
+from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 import matplotlib.pyplot as plt
 
-from sklearn.neighbors import NearestNeighbors
 import statsmodels.tsa.stattools as sms
 
 import math
@@ -754,211 +758,270 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
 
     return ys
 
-
-def distance_neighbors(signal):
-    '''Finds Distance of each point in the timeseries from its 4 nearest neighbors
-
-    Wrapper around [sklearn.neighbors.NearestNeighbors](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestNeighbors.html)
-
-    Parameters
-    ----------
-
-    signal : array
-        The timeseries
-
-    Returns
-    -------
-
-    distances : array
-        Distance of each point from its nearest neighbors in decreasing order
-
-    '''
-    nn = NearestNeighbors(n_neighbors=4) # 4 nearest neighbors
-    nbrs =nn.fit(signal.reshape(-1,1))
-    distances, indices = nbrs.kneighbors(signal.reshape(-1,1))
-    distances = sorted(distances[:,-1],reverse=True)
-    return distances
-
-def find_knee(distances):
-    '''Finds knee point automatically in a given array sorted in decreasing order
+def calculate_distances(ys, n_neighbors=None, NN_kwargs=None):
+    """
+    
+    Uses the scikit-learn unsupervised learner for implementing neighbor searches and calculate the distance between a point and its nearest neighbors to estimate epsilon for DBSCAN. 
+    
 
     Parameters
     ----------
-
-    distances : array
-        Distance of each point in the timeseries from it's nearest neighbors in decreasing order
+    ys : tnumpy.array
+        the y-values for the timeseries
+    n_neighbors : int, optional
+        Number of neighbors to use by default for kneighbors queries. The default is None.
+    NN_kwargs : dict, optional
+        Other arguments for sklearn.neighbors.NearestNeighbors. The default is None.
+        See: https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestNeighbors.html#sklearn.neighbors.NearestNeighbors
 
     Returns
     -------
+    min_eps : int
+        Minimum value for epsilon.
+    max_eps : int
+        Maximum value for epsilon.
 
-    knee : float
-        Knee point in the array
+    """
+    
+    ys=standardize(ys)[0]
+    ys=np.array(ys)
+    
+    if n_neighbors is None:
+        # Lowest number of nearest neighbors
+        neigh = NearestNeighbors(n_neighbors=2)
+        nbrs = neigh.fit(ys.reshape(-1, 1))
+        distances, indices = nbrs.kneighbors(ys.reshape(-1, 1))
+        min_eps = np.min(distances)
+        if min_eps<=0:
+            min_eps=0.01
+    
+        # Highest number of nearest neighbors
+        neigh = NearestNeighbors(n_neighbors=len(ys)-1)
+        nbrs = neigh.fit(ys.reshape(-1, 1))
+        distances, indices = nbrs.kneighbors(ys.reshape(-1, 1))
+        max_eps = np.max(distances)
+    
+    else:
+        neigh = NearestNeighbors(n_neighbors=n_neighbors)
+        nbrs = neigh.fit(ys.reshape(-1, 1))
+        distances, indices = nbrs.kneighbors(ys.reshape(-1, 1))
+        min_eps = np.min(distances)
+        max_eps = np.max(distances)
+    
+    return min_eps, max_eps
 
-    '''
-    nPoints = len(distances)
-    allCoord = np.vstack((range(nPoints), distances)).T
-    np.array([range(nPoints), distances])
-    firstPoint = allCoord[0]
-    lineVec = allCoord[-1] - allCoord[0]
-    lineVecNorm = lineVec / np.sqrt(np.sum(lineVec**2))
-    vecFromFirst = allCoord - firstPoint
-    # scalarProduct = np.sum(vecFromFirst * np.matlib.repmat(lineVecNorm, nPoints, 1), axis=1)
-    scalarProduct = np.sum(vecFromFirst * np.tile(lineVecNorm, (nPoints, 1)), axis=1)
-    vecFromFirstParallel = np.outer(scalarProduct, lineVecNorm)
-    vecToLine = vecFromFirst - vecFromFirstParallel
-    distToLine = np.sqrt(np.sum(vecToLine ** 2, axis=1))
-    idxOfBestPoint = np.argmax(distToLine)
-    knee = distances[idxOfBestPoint]
-    return knee
-
-
-def detect_outliers(ts, ys,auto=True, plot_knee=True,plot_outliers=True,
-                    plot_outliers_kwargs=None,plot_knee_kwargs=None,
-                    figsize=[10,4],saveknee_settings=None,
-                    saveoutliers_settings=None):
-    ''' Function to detect outliers in the given timeseries
-
-    For more details, see: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
+def detect_outliers_DBSCAN(ys, nbr_clusters = None, eps=None, min_samples=None, n_neighbors=None, metric='euclidean', NN_kwargs= None, DBSCAN_kwargs=None):
+    """
+    Uses the unsupervised learning DBSCAN algorithm to identify outliers in timeseries data. 
+    The algorithm uses the silhouette score calculated over a range of epsilon and minimum sample values to determine the best clustering. In this case, we take the largest silhouette score (as close to 1 as possible). 
+    
+    The DBSCAN implementation used here is from scikit-learn: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
+    
+    The Silhouette Coefficient is calculated using the mean intra-cluster distance (a) and the mean nearest-cluster distance (b) for each sample. The best value is 1 and the worst value is -1. Values near 0 indicate overlapping clusters. Negative values generally indicate that a sample has been assigned to the wrong cluster, as a different cluster is more similar. For additional details, see: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html
 
     Parameters
     ----------
+    ys : numpy.array
+        The y-values for the timeseries data.
+    nbr_clusters : int, optional
+        Number of clusters. Note that the DBSCAN algorithm calculates the number of clusters automatically. This paramater affects the optimization over the silhouette score. The default is None.
+    eps : float or list, optional
+        epsilon. The default is None, which allows the algorithm to optimize for the best value of eps, using the silhouette score as the optimization criterion. The maximum distance between two samples for one to be considered as in the neighborhood of the other. This is not a maximum bound on the distances of points within a cluster. This is the most important DBSCAN parameter to choose appropriately for your data set and distance function.
+    min_samples : int or list, optional
+        The number of samples (or total weight) in a neighborhood for a point to be considered as a core point. This includes the point itself.. The default is None and optimized using the silhouette score
+    n_neighbors : int, optional
+        Number of neighbors to use by default for kneighbors queries, which can be used to calculate a range of plausible eps values. The default is None.
+    metric : str, optional
+        The metric to use when calculating distance between instances in a feature array. The default is 'euclidean'. See https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html for alternative values. 
+    NN_kwargs : dict, optional
+        Other arguments for sklearn.neighbors.NearestNeighbors. The default is None.
+        See: https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.NearestNeighbors.html#sklearn.neighbors.NearestNeighbors
 
-    ts : array
-        Time axis of time series
-    ys : array
-        y values of time series
-    auto : boolean
-        True by default, if false the user manually selects the knee point
-    plot_knee : boolean
-        True by default, plots the knee
-    plot_outliers : boolean
-        True by default, plots the outliers using a scatter plot
-    plot_outliers_kwargs : dict
-        Keyword arguments for plot_scatter_xy for outliers plot
-    plot_knee_kwargs : dict
-        Keyword arguments for plot_xy for knee plot
-    figsize : tuple, list
-        Tuple or list of figure size
-    saveknee_settings : dict
-        the dictionary of arguments for plt.savefig() for knee plot; some notes below:
-        - "path" must be specified; it can be any existed or non-existed path,
-          with or without a suffix; if the suffix is not given in "path", it will follow "format"
-        - "format" can be one of {"pdf", "eps", "png", "ps"}
-    saveoutliers_settings : dict
-        the dictionary of arguments for plt.savefig() for outliers plot; some notes below:
-        - "path" must be specified; it can be any existed or non-existed path,
-          with or without a suffix; if the suffix is not given in "path", it will follow "format"
-        - "format" can be one of {"pdf", "eps", "png", "ps"}
+    DBSCAN_kwargs : dict, optional
+        Other arguments for sklearn.cluster.DBSCAN. The default is None.
+        See: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html
+
 
     Returns
     -------
+    indices : list
+        list of indices that are considered outliers.
+    res : pandas.DataFrame
+        Results of the clustering analysis. Contains information about eps value, min_samples value, number of clusters, the silhouette score, the indices of the outliers for each combination, and the cluster assignment for each point. 
 
-    outliers : array
-        a list of values consisting of outlier indices
+    """
+    
+    
+    NN_kwargs = {} if NN_kwargs is None else NN_kwargs.copy()
+    DBSCAN_kwargs = {} if DBSCAN_kwargs is None else DBSCAN_kwargs.copy()
+    
+    ys=standardize(ys)[0] # standardization is key for the alogrithm to work.
+    ys=np.array(ys)
+    
+    if eps is not None and n_neighbors is not None:
+        print('Since eps is passed, ignoring the n_neighbors for distance calculation')
+    
+    if eps is None:
+        min_eps,max_eps = calculate_distances(ys, n_neighbors=n_neighbors, NN_kwargs=NN_kwargs)       
+        eps_list = np.linspace(min_eps,max_eps,50)
+    elif type(eps) is list:
+        eps_list=eps
+    else:
+        print("You have tried to pass a float or integer, coercing to a list")
+        eps_list=list(eps)
+    
+    if min_samples is None:
+        min_samples_list = np.linspace(2,len(ys)/4,50,dtype='int')
+    elif type(min_samples) is list:
+        min_samples_list = min_samples
+    else:
+        print("You have tried to pass a float or integer, coercing to a list")
+        min_samples_list=list(min_samples)
+    
+    print("Optimizing for the best number of clusters, this may take a few minutes")
+    
+    
+    nbr_clusters=[]
+    sil_score =[]
+    eps_matrix=[]
+    min_sample_matrix=[]
+    idx_out = []
+    clusters = []
 
-    See also
-    --------
+    for eps_item in eps_list:
+        for min_samples_item in min_samples_list:
+            eps_matrix.append(eps_item)
+            min_sample_matrix.append(min_samples_item)
+            m = DBSCAN(eps=eps_item, min_samples=min_samples_item,**DBSCAN_kwargs)
+            m.fit(ys.reshape(-1,1))
+            nbr_clusters.append(len(np.unique(m.labels_))-1)
+            try:
+                sil_score.append(silhouette_score(ys.reshape(-1,1), m.labels_))
+            except:
+                sil_score.append(np.nan)
+            idx_out.append(np.where(m.labels_==-1)[0])
+            clusters.append(m.labels_)
+            
+    res = pd.DataFrame({'eps':eps_matrix,'min_samples':min_sample_matrix,'number of clusters':nbr_clusters,'silhouette score':sil_score,'outlier indices':idx_out,'clusters':clusters})
+    
+    if nbr_clusters is None: 
+        res_sil = res.loc[res['silhouette score']==np.max(res['silhouette score'])]
+    else:
+        try: 
+            res_cl = res.loc[res['number of clusters']==nbr_clusters]
+            res_sil = res_cl.loc[res_cl['silhouette score']==np.max(res_cl['silhouette score'])]
+        except:
+            print("No valid solutions for the number of clusters, returning from silhouette score")
+            res_sil = res.loc[res['silhouette score']==np.max(res['silhouette score'])]
+    
+    unique_idx = list(res_sil['outlier indices'].iloc[0])
+    
+    if res_sil.shape[0]>1:
+        for idx,row in res_sil.iterrows():
+            for item in row['outlier indices']:
+                if item not in unique_idx:
+                    unique_idx.append(item)
+            
+    indices = np.array(unique_idx)
+    
+    return indices, res
 
-    pyleoclim.utils.tsutils.distance_neighbors : Finds Distance of each point in the timeseries from its 4 nearest neighbors
+def detect_outliers_kmeans(ys, nbr_clusters = None, max_cluster = 10, threshold=3, kmeans_kwargs=None):
+    """
+    Outlier detection using the unsupervised alogrithm kmeans. The algorithm runs through various number of clusters and optimizes based on the silhouette score.
+    
+    KMeans implementation: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html
+    
+    The Silhouette Coefficient is calculated using the mean intra-cluster distance (a) and the mean nearest-cluster distance (b) for each sample. The best value is 1 and the worst value is -1. Values near 0 indicate overlapping clusters. Negative values generally indicate that a sample has been assigned to the wrong cluster, as a different cluster is more similar. For additional details, see: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.silhouette_score.html
 
-    pyleoclim.utils.tsutils.find_knee : Finds knee point automatically in a given array sorted in decreasing order
+    Parameters
+    ----------
+    ys : numpy.array
+        The y-values for the timeseries data
+    nbr_clusters : int or list, optional
+        A user number of clusters to considered. The default is None.
+    max_cluster : int, optional
+        The maximum number of clusters to consider in the optimization based on the Silhouette Score. The default is 10.
+    threshold : int, optional
+        The algorithm uses the suclidean distance for each point in the cluster to identify the outliers. This parameter sets the threshold on the euclidean distance to define an outlier. The default is 3.
+    kmeans_kwargs : dict, optional
+        Other parameters for the kmeans function. See: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html for details. The default is None.
 
-    pyleoclim.utils.tsutils.remove_outliers : Removes outliers from a timeseries
-
-    pyleoclim.utils.plotting.plot_xy : Plot a timeseries
-
-    pyleoclim.utils.plotting.plot_scatter_xy : Plot a scatter on top of a line plot.
-
-    '''
-    #Take care of arguments for the knee plot
-    saveknee_settings = {} if saveknee_settings is None else saveknee_settings.copy()
-
-    try:
-        minpts = math.log(len(ys))
-        distances = distance_neighbors(ys)
-        flag = all(v < 0.0001 for v in distances)
-
-        knee_point = find_knee(distances)
-        mark = distances.index(knee_point)
-        index = [i for i in range(len(distances))]
-
-        if auto == True:
-            db = DBSCAN(eps=knee_point, min_samples=int(minpts))
-            clusters = db.fit(ys.reshape(-1, 1))
-            cluster_labels = clusters.labels_
-            outliers = np.where(cluster_labels == -1)
-            if plot_knee==True:
-                fig1, ax1 = plt.subplots(figsize=figsize)
-                if flag == True:
-                    knee_point = 0.1
-                ax1.annotate("knee={}".format(knee_point), (mark, knee_point),
-                        arrowprops=dict(facecolor='black', shrink=0.05))
-                plot_xy(index, distances,xlabel='Indices',ylabel='Distances',plot_kwargs=plot_knee_kwargs,ax=ax1)
+    Returns
+    -------
+    indices : list
+        list of indices that are considered outliers.
+    res : pandas.DataFrame
+        Results of the clustering analysis. Contains information about number of clusters, the silhouette score, the indices of the outliers for each combination, and the cluster assignment for each point. 
 
 
-        elif auto == False:
-            plot_xy(index, distances, xlabel='Indices', ylabel='Distances',plot_kwargs=plot_knee_kwargs)
-            eps = float(input('Enter the value for knee point'))
-            if plot_knee==True:
-                fig1,ax1 = plt.subplots(figsize=figsize)
-                ax1.annotate("knee={}".format(eps), (mark, knee_point),
-                        arrowprops=dict(facecolor='black', shrink=0.05))
-                plot_xy(index, distances, xlabel='Indices', ylabel='Distances',plot_kwargs=plot_knee_kwargs,ax=ax1)
-
-            db = DBSCAN(eps=eps, min_samples=int(minpts))
-            clusters = db.fit(ys.reshape(-1, 1))
-            cluster_labels = clusters.labels_
-            outliers = np.where(cluster_labels == -1)
-
-        if 'fig1' in locals():
-            if 'path' in saveknee_settings:
-                savefig(fig1, settings=saveknee_settings)
-
-        if plot_outliers==True:
-            x2 = ts[outliers]
-            y2 = ys[outliers]
-            plot_scatter_xy(ts,ys,x2,y2,figsize=figsize,xlabel='time',ylabel='value',savefig_settings=saveoutliers_settings,plot_kwargs=plot_outliers_kwargs)
-
-        return outliers
-
-    except ValueError:
-        choice = input('Switch to Auto Mode(y/n)?')
-        choice = choice.lower()
-        if choice == 'y':
-            a = detect_outliers(ts, ys, auto=True)
-            return a
+    """
+    
+    
+    kmeans_kwargs = {} if kmeans_kwargs is None else kmeans_kwargs.copy()
+    
+    ys=standardize(ys)[0] # standardization is key for the alogrithm to work.
+    ys=np.array(ys)
+    
+    # run with either one cluster number of several
+    if nbr_clusters is not None:
+        if type(nbr_clusters) == list:
+            range_n_clusters = nbr_clusters
         else:
-            exit(1)
+            range_n_clusters = [nbr_clusters]
+    else:
+        range_n_clusters = np.arange(2,max_cluster+1,1,dtype='int')
+    silhouette_avg = []
+    idx_out=[]
+    clusters = []
+    
+    for num_clusters in range_n_clusters:
+        kmeans = KMeans(n_clusters=num_clusters)
+        kmeans.fit(ys.reshape(-1, 1), **kmeans_kwargs)
+        silhouette_avg.append(silhouette_score(ys.reshape(-1, 1), kmeans.labels_))
+        center=kmeans.cluster_centers_[kmeans.labels_,0]
+        distance=np.sqrt((ys-center)**2)
+        idx_out.append(np.argwhere(distance>threshold).reshape(1,-1)[0])
+        clusters.append(kmeans.labels_)
+    
+    res = pd.DataFrame({'number of clusters':range_n_clusters, 'silhouette score':silhouette_avg,'outlier indices':idx_out,'clusters':clusters})
+    res_sil = res.loc[res['silhouette score']==np.max(res['silhouette score'])]
 
-def remove_outliers(ts,ys,outlier_points):
-    ''' Removes outliers from a timeseries
+    unique_idx = list(res_sil['outlier indices'].iloc[0])
+    
+    if res_sil.shape[0]>1:
+        for idx,row in res_sil.iterrows():
+            for item in row['outlier indices']:
+                if item not in unique_idx:
+                    unique_idx.append(item)
+            
+    indices = np.array(unique_idx)
+    
+    return indices, res
+
+def remove_outliers(ts,ys,indices):
+    """
+    Remove the outliers from timeseries data
 
     Parameters
     ----------
-
-    ts : array
-         x axis of timeseries
-    ys : array
-        y axis of timeseries 
-    outlier_points : array
-        indices of outlier points
+    ts : numpy.array
+        The time axis for the timeseries data.
+    ys : numpy.array
+        The y-values for the timeseries data.
+    indices : numpy.array
+        The indices of the outliers to be removed.
 
     Returns
     -------
-    ys : array
-        y axis of timeseries
-    ts : array
-          x axis of timeseries
+    ys : numpy.array
+        The time axis for the timeseries data after outliers removal
+    ts : numpy.array
+        The y-values for the timeseries data after outliers removal
 
-    See also
-    --------
-
-    pyleoclim.utils.tsutils.detect_outliers : Function to detect outliers in the given timeseries
-
-    '''
-
-    ys = np.delete(ys,outlier_points)
-    ts = np.delete(ts,outlier_points)
+    """
+    ys = np.delete(ys,indices)
+    ts = np.delete(ts,indices)
 
     return ys,ts
 

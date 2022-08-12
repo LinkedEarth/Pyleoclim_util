@@ -303,9 +303,9 @@ class TestUiSeriesCenter:
         ts = gen_ts(nt=500, alpha=alpha)
 
         #Call function to be tested
-        tsc, mu = ts.center()
+        tsc = ts.center()
 
-        assert np.abs(tsc.value.mean()) <= np.sqrt(sys.float_info.epsilon) 
+        assert np.abs(tsc.mean) <= np.sqrt(sys.float_info.epsilon) 
 
 class TestUiSeriesStandardize:
     '''Test for Series.standardize()
@@ -555,7 +555,7 @@ class TestUISeriesOutliers:
     Remove outliers from a timeseries. Note that for CI purposes only, the automated version can be tested
     '''
     @pytest.mark.parametrize('remove_outliers', [True,False])
-    def test_outliers(self,remove_outliers):
+    def test_outliers_t1(self,remove_outliers):
 
         #Generate data
         ts = gen_ts()
@@ -570,7 +570,25 @@ class TestUISeriesOutliers:
         # Get a series object
         ts2 = pyleo.Series(time = ts.time, value = v_out)
         # Remove outliers
-        ts_out = ts.outliers(remove=remove_outliers)
+        ts_out, res = ts.outliers(remove=remove_outliers)
+    
+    @pytest.mark.parametrize('method', ['kmeans','DBSCAN'])
+    def test_outliers_t2(self,method):
+
+        #Generate data
+        ts = gen_ts()
+        #Add outliers
+        outliers_start = np.mean(ts.value)+5*np.std(ts.value)
+        outliers_end = np.mean(ts.value)+7*np.std(ts.value)
+        outlier_values = np.arange(outliers_start,outliers_end,0.1)
+        index = np.random.randint(0,len(ts.value),6)
+        v_out = ts.value
+        for i,ind in enumerate(index):
+            v_out[ind] = outlier_values[i]
+        # Get a series object
+        ts2 = pyleo.Series(time = ts.time, value = v_out)
+        # Remove outliers
+        ts_out, res = ts.outliers(method=method)
 
 class TestUISeriesGkernel:
     ''' Unit tests for the TestUISeriesGkernel function
