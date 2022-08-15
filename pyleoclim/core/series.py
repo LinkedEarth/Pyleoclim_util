@@ -2762,18 +2762,31 @@ class Series:
     def gkernel(self, step_type='median', **kwargs):
         ''' Coarse-grain a Series object via a Gaussian kernel.
 
+        Like .bin() this technique is conservative and uses the max space between points 
+        as the default spacing. Unlike .bin(), gkernel() uses a gaussian kernel to 
+        calculate the weighted average of the time series over these intervals.
+
         Parameters
         ----------
+
         step_type : str
+
             type of timestep: 'mean', 'median', or 'max' of the time increments
+
         kwargs :
+
             Arguments for kernel function. See pyleoclim.utils.tsutils.gkernel for details
+
         Returns
         -------
+
         new : pyleoclim.Series
+
             The coarse-grained Series object
+
         See also
         --------
+
         pyleoclim.utils.tsutils.gkernel : application of a Gaussian kernel
         '''
 
