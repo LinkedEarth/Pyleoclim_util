@@ -1156,6 +1156,7 @@ class Series:
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
+            @savefig ts_summary_plot1.png
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
 
         Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
@@ -1170,6 +1171,7 @@ class Series:
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
+            @savefig ts_summary_plot1.png
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
 
         '''
