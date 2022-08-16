@@ -31,6 +31,8 @@ import pandas as pd
 from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
+import matplotlib.colors as mcolors
+import random
 
 from matplotlib import gridspec
 import warnings
@@ -114,17 +116,17 @@ class Series:
         ts
         ts.__dict__.keys()
         
-    For a quick look at the values, one may use the `print()` method: 
+    For a quick look at the values, one may use the `print()` method. We do so below for a short slice of the data so as not to overwhelm the display: 
         
     .. ipython:: python
         :okwarning:
         :okexcept:
         
-        print(ts)
+        print(ts.slice([1982,1983]))
     
     '''
 
-    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, clean_ts=True, verbose=False):
+    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, mean=None, clean_ts=True, verbose=False):
 
         if clean_ts==True:
             value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
@@ -138,6 +140,11 @@ class Series:
         self.label = label
         self.clean_ts=clean_ts
         self.verbose=verbose
+        
+        if mean is None:
+            self.mean=np.mean(self.value)
+        else:
+            self.mean = mean
 
     def convert_time_unit(self, time_unit='years'):
         ''' Convert the time unit of the Series object
@@ -636,7 +643,6 @@ class Series:
             # plot
             @savefig ts_plot4.png
             fig, ax = ts.plot()
-            pyleo.closefig(fig)
 
             # SSA
             nino_ssa = ts.ssa(M=60)
@@ -646,7 +652,6 @@ class Series:
         .. ipython:: python
             :okwarning:
             :okexcept:
-            var_pct = nino_ssa['pctvar'] # extract the fraction of variance attributable to each mode
 
             # plot eigenvalues
             @savefig ts_eigen.png
@@ -659,15 +664,15 @@ class Series:
             * the eigenvalues tend to come in pairs : (1,2) (3,4), are all clustered within uncertainties . (5,6) looks like another doublet
             * around i=15, the eigenvalues appear to reach a floor, and all subsequent eigenvalues explain a very small amount of variance.
 
-        So, summing the variance of all modes higher than 19, we get:
+        So, summing the variance of the first 15 modes, we get:
 
         .. ipython:: python
             :okwarning:
             :okexcept:
 
-            print(nino_ssa.pctvar[15:].sum()*100)
+            print(nino_ssa.pctvar[:14].sum())
 
-        That is, over 95% of the variance is in the first 15 modes. That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
+        That is a typical result for a (paleo)climate timeseries; a few modes do the vast majority of the work. That means we can focus our attention on these modes and capture most of the interesting behavior. To see this, let's use the reconstructed components (RCs), and sum the RC matrix over the first 15 columns:
 
         .. ipython:: python
             :okwarning:
@@ -675,12 +680,13 @@ class Series:
 
             RCk = nino_ssa.RCmat[:,:14].sum(axis=1)
             @savefig ssa_recon.png
-            fig, ax = ts.plot(title='ONI')
+            fig, ax = ts.plot(title='SOI')
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
 
+        
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
-            * there was not much rhyme or reason for picking 15 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
+            * there was not much rhyme or reason for picking 14 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
             * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies, you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves features and excludes others (i.e, a filter).
             * as with all orthgonal decompositions, summing over all RCs will recover the original signal within numerical precision.
 
@@ -699,10 +705,21 @@ class Series:
         .. ipython:: python
             :okwarning:
             :okexcept:
-            @savefig scree_nmc.png
+                
+            @savefig scree_mc.png
             nino_mcssa.screeplot()
+            
+            print('Indices of modes retained: '+ str(nino_mcssa.mode_idx))
 
-        This suggests that modes 1-5 fall above the red noise benchmark.
+        This suggests that modes 1-5 fall above the red noise benchmark. To inspect mode 1 (index 0), just type:
+            
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            @savefig ssa_mode0plot.png
+            nino_mcssa.modeplot(mode=0)    
+            
         '''
 
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
@@ -1126,19 +1143,6 @@ class Series:
         Examples
         --------
 
-        Simple summary_plot with n_signif_test = 1 for computational ease, defaults otherwise.
-
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-
-            import pyleoclim as pyleo
-            import pandas as pd
-            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
-            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
-            fig, ax = series.summary_plot(n_signif_test=1)
-
-
         Summary_plot with pre-generated psd and scalogram objects. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
 
         .. ipython:: python
@@ -1151,7 +1155,7 @@ class Series:
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
-            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram,n_signif_test=2)
+            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
 
         Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
 
@@ -1165,7 +1169,7 @@ class Series:
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
-            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, n_signif_test=2, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
+            fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
 
         '''
 
@@ -1574,7 +1578,8 @@ class Series:
             ts_mean  = np.nanmean(self.value)
             vc = self.value - ts_mean
         tsc.value = vc
-        return tsc, ts_mean
+        tsc.mean = ts_mean
+        return tsc
 
     def segment(self, factor=10):
         """Gap detection
@@ -1985,7 +1990,6 @@ class Series:
             :okwarning:
             :okexcept:
 
-            ts_interp = ts_std.interp()
             psd_welch = ts_interp.spectral(method='welch')
             psd_welch_signif = psd_welch.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_welch.png
@@ -1997,11 +2001,21 @@ class Series:
             :okwarning:
             :okexcept:
 
-            ts_interp = ts_std.interp()
-            psd_mtm = ts_interp.spectral(method='mtm')
+            psd_mtm = ts_interp.spectral(method='mtm', label='MTM, NW=4')
             psd_mtm_signif = psd_mtm.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_mtm.png
-            fig, ax = psd_mtm_signif.plot(title='PSD using MTM method')
+            fig, ax = psd_mtm_signif.plot(title='PSD using the multitaper method')
+
+        By default, MTM uses a half-bandwidth of 4 times the fundamental (Rayleigh) frequency, i.e. NW = 4, which is the most conservative choice.
+        NW runs from 2 to 4 in multiples of 1/2, and can be adjusted like so (note the sharper peaks and higher overall variance, which may not be desirable):
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            psd_mtm2 = ts_interp.spectral(method='mtm', settings={'NW':2}, label='MTM, NW=2')
+            @savefig spec_mtm2.png
+            psd_mtm2.plot(title='PSD using the multi-taper method', ax=ax)
 
         - Continuous Wavelet Transform
 
@@ -2162,10 +2176,10 @@ class Series:
             scal1 = ts.wavelet() 
             scal_signif = scal1.signif_test(number=20)  # for research-grade work, use number=200 or larger
             @savefig scal_cwt.png
-            fig, ax = scal_signif.plot(title='CWT scalogram')
+            fig, ax = scal_signif.plot() 
             pyleo.closefig()
                         
-        If you wanted to invoke the WWZ instead (here with no significance testing, to lower computational cost):
+        If you wanted to invoke the WWZ method instead (here with no significance testing, to lower computational cost):
             
         .. ipython:: python
             :okwarning:
@@ -2173,10 +2187,10 @@ class Series:
                 
             scal2 = ts.wavelet(method='wwz') 
             @savefig scal_wwz.png
-            fig, ax = scal2.plot(title='WWZ scalogram')
+            fig, ax = scal2.plot()
             pyleo.closefig()
 
-        Notice that the two scalograms have different units, which are arbitrary.  Method-specific arguments
+        Notice that the two scalograms have different amplitude, which are relative.  Method-specific arguments
         may be passed via `settings`.  For instance, if you wanted to change the default mother wavelet
         ('MORLET') to a derivative of a Gaussian (DOG), with degree 2 by default ("Mexican Hat wavelet"):
 
@@ -2190,7 +2204,7 @@ class Series:
             pyleo.closefig()
             
         As for WWZ, note that, for computational efficiency, the time axis is coarse-grained
-        by default to 50 time points, which explains in part the diffence with the CWT scalogram.
+        by default to 50 time points, which explains in part the difference with the CWT scalogram.
 
         If you need a custom axis, it (and other method-specific  parameters) can also be passed 
         via the `settings` dictionary:
@@ -2718,104 +2732,206 @@ class Series:
 
         return surr
 
-    def outliers(self, auto=True, remove=True, fig_outliers=True,fig_knee=True,
-                  plot_outliers_kwargs=None,plot_knee_kwargs=None,figsize=[10,4],
-                  saveknee_settings=None,saveoutliers_settings=None):
-        '''
-        Detects outliers in a timeseries and removes if specified. The method uses clustering to locate outliers.
+    def outliers(self,method='kmeans',remove=True, settings=None, 
+                 fig_outliers=True, figsize_outliers=[10,4], plotoutliers_kwargs=None, savefigoutliers_settings=None,
+                 fig_clusters=True,figsize_clusters=[10,4], plotclusters_kwargs=None,savefigclusters_settings=None):
+        """
+        Remove outliers from timeseries data
 
         Parameters
         ----------
-
-        auto : boolean
-            True by default, detects knee in the plot automatically
-        remove : boolean
-            True by default, removes all outlier points if detected
-        fig_knee  : boolean
-            True by default, plots knee plot if true
-        fig_outliers : boolean
-            True by degault, plots outliers if true
-        save_knee : dict
-            default parameters from matplotlib savefig None by default
-        save_outliers : dict
-            default parameters from matplotlib savefig None by default
-        plot_knee_kwargs : dict
-            arguments for the knee plot
-        plot_outliers_kwargs : dict
-            arguments for the outliers plot
-        figsize : list
-            by default [10,4]
+        method : str, {'kmeans','DBSCAN'}, optional
+            The clustering method to use. The default is 'kmeans'.
+        remove : bool, optional
+            If True, removes the outliers. The default is True.
+        settings : dict, optional
+            Specific arguments for the clustering functions. The default is None.
+        fig_outliers : bool, optional
+            Whether to display the timeseries showing the outliers. The default is True.
+        figsize_outliers : list, optional
+            The dimensions of the outliers figure. The default is [10,4].
+        plotoutliers_kwargs : dict, optional
+            Arguments for the plot displaying the outliers. The default is None.
+        savefigoutliers_settings : dict, optional
+            Saving options for the outlier plot. The default is None.
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+        fig_clusters : bool, optional
+            Whether to display the clusters. The default is True.
+        figsize_clusters : list, optional
+            The dimensions of the cluster figures. The default is [10,4].
+        plotclusters_kwargs : dict, optional
+            Arguments for the cluster plot. The default is None.
+        savefigclusters_settings : TYPE, optional
+            Saving options for the cluster plot. The default is None.
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
 
         Returns
         -------
-        new : Series
-            Time series with outliers removed if they exist
+        ts: pyleoclim.Series
+            A new Series object witthout outliers if remove is True. Otherwise, returns the original timeseries
+        
+        res: pandas.DataFrame
+            Contains relevant diagnostic metrics for the clustering algorithms. 
 
-        See also
-        --------
-
-        pyleoclim.utils.tsutils.remove_outliers : remove outliers function
-
-        pyleoclim.utils.plotting.plot_xy : basic x-y plot
-
-        pyleoclim.utils.plotting.plot_scatter_xy : Scatter plot on top of a line plot
-
-        Examples
-        --------
-
-        Let's create a "perfect" sinusoidal signal and add outliers
-
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-
-            import pyleoclim as pyleo
-            import numpy as np
-
-            # create the signal
-            freqs=[1/20,1/80]
-            time=np.arange(2001)
-            signals=[]
-            for freq in freqs:
-                signals.append(np.cos(2*np.pi*freq*time))
-            signal=sum(signals)
-
-            #add outliers
-            outliers_start = np.mean(signal)+5*np.std(signal)
-            outliers_end = np.mean(signal)+7*np.std(signal)
-            outlier_values = np.arange(outliers_start,outliers_end,0.1)
-            index = np.random.randint(0,len(signal),6)
-            signal_out = signal
-            for i,ind in enumerate(index):
-                signal_out[ind] = outlier_values[i]
-
-            #Make a Series object
-            ts = pyleo.Series(time=time,value=signal_out)
-            @savefig outliers.png
-            fig, ax = ts.plot()
-            pyleo.closefig(fig)
-
-            #Detect and remove outliers
-            ts_new=ts.outliers()
-            @savefig outliers_remove.png
-            fig, ax = ts_new.plot()
-            pyleo.closefig(fig)
-
-        '''
-        new = self.copy()
-        outlier_indices = tsutils.detect_outliers(
-            self.time, self.value, auto=auto, plot_knee=fig_knee,plot_outliers=fig_outliers,
-            figsize=figsize,saveknee_settings=saveknee_settings,saveoutliers_settings=saveoutliers_settings,
-            plot_outliers_kwargs=plot_outliers_kwargs,plot_knee_kwargs=plot_knee_kwargs)
-        outlier_indices = np.asarray(outlier_indices)
-        if remove == True:
-            new = self.copy()
-            ys = np.delete(self.value, outlier_indices)
-            t = np.delete(self.time, outlier_indices)
-            new.value = ys
-            new.time = t
-
-        return new
+        """    
+        if method not in ['kmeans','DBSCAN']:
+            raise ValueError('method should either be "kmeans" or "DBSCAN"')
+        
+        # run the algorithm
+        settings = {} if settings is None else settings.copy()
+        spec_func={
+            'kmeans':tsutils.detect_outliers_kmeans,
+            'DBSCAN':tsutils.detect_outliers_DBSCAN}
+        args = {}
+        args['kmeans'] = {}
+        args['DBSCAN'] = {}
+        args[method].update(settings)
+        
+        indices, res = spec_func[method](self.value,**args[method])
+        
+        # Create the new Series object
+        new=self.copy()        
+        if remove==True:
+            if len(indices)>=1:
+                ts,ys=tsutils.remove_outliers(self.time,self.value,indices)
+                new.value=ys
+                new.time=ts
+        
+        # Figures
+        # Optional parameters
+        savefigoutliers_settings = {} if savefigoutliers_settings is None else savefigoutliers_settings.copy()
+        savefigclusters_settings = {} if savefigclusters_settings is None else savefigclusters_settings.copy()
+        plotoutliers_kwargs = {} if plotoutliers_kwargs is None else plotoutliers_kwargs.copy()
+        plotclusters_kwargs = {} if plotclusters_kwargs is None else plotclusters_kwargs.copy()
+        
+        # Figure showing the outliers
+        
+        if fig_outliers == True:
+            fig,ax = plt.subplots(figsize=figsize_outliers)
+            time_label, value_label = self.make_labels()
+                
+            if 'xlabel' not in plotoutliers_kwargs.keys():
+                xlabel = time_label
+            else:
+                xlabel = plotoutliers_kwargs['xlabel']
+                plotoutliers_kwargs.pop('xlabel')
+            
+            if 'ylabel' not in plotoutliers_kwargs.keys():
+                ylabel = value_label
+            else:
+                ylabel = plotoutliers_kwargs['ylabel']
+                plotoutliers_kwargs.pop('ylabel')
+            
+            if 'title' not in plotoutliers_kwargs.keys():
+                title = None
+            else:
+                title = plotoutliers_kwargs['title']
+                plotoutliers_kwargs.pop('title')
+            
+            if 'xlim' not in plotoutliers_kwargs.keys():
+                xlim = None
+            else:
+                xlim = plotoutliers_kwargs['xlim']
+                plotoutliers_kwargs.pop('xlim')
+            
+            if 'ylim' not in plotoutliers_kwargs.keys():
+                ylim = None
+            else:
+                ylim = plotoutliers_kwargs['ylim']
+                plotoutliers_kwargs.pop('ylim')
+            
+            if 'legend' not in plotoutliers_kwargs.keys():
+                legend = True
+            else:
+                legend = plotoutliers_kwargs['legend']
+                plotoutliers_kwargs.pop('legend')
+            
+            if len(indices)>=1:
+                plotting.plot_scatter_xy(self.time,self.value,self.time[indices],self.value[indices],
+                                                 xlabel=xlabel,ylabel=ylabel,
+                                                 title =  title, xlim=xlim, ylim=ylim, legend=legend, 
+                                                 plot_kwargs=plotoutliers_kwargs,ax=ax)
+            
+            else:
+                plotting.plot_xy(self.time,self.value,
+                                 xlabel=xlabel,ylabel=ylabel,
+                                 title =  title, xlim=xlim, ylim=ylim, legend=legend, 
+                                 plot_kwargs=plotoutliers_kwargs,ax=ax)
+            
+            #Saving options
+            if 'path' in savefigoutliers_settings:
+                plotting.savefig(fig,settings=savefigoutliers_settings)
+        
+        if fig_clusters == True:
+            fig,ax = plt.subplots(figsize=figsize_clusters)
+            
+            # dealt with plot options
+            time_label, value_label = self.make_labels()
+                
+            if 'xlabel' not in plotclusters_kwargs.keys():
+                xlabel = time_label
+            else:
+                xlabel = plotclusters_kwargs['xlabel']
+                plotclusters_kwargs.pop('xlabel')
+            
+            if 'ylabel' not in plotclusters_kwargs.keys():
+                ylabel = value_label
+            else:
+                ylabel = plotclusters_kwargs['ylabel']
+                plotclusters_kwargs.pop('ylabel')
+            
+            if 'title' not in plotclusters_kwargs.keys():
+                title = None
+            else:
+                title = plotclusters_kwargs['title']
+                plotclusters_kwargs.pop('title')
+            
+            if 'xlim' not in plotclusters_kwargs.keys():
+                xlim = None
+            else:
+                xlim = plotclusters_kwargs['xlim']
+                plotclusters_kwargs.pop('xlim')
+            
+            if 'ylim' not in plotclusters_kwargs.keys():
+                ylim = None
+            else:
+                ylim = plotclusters_kwargs['ylim']
+                plotclusters_kwargs.pop('ylim')
+            
+            if 'legend' not in plotclusters_kwargs.keys():
+                legend = True
+            else:
+                legend = plotclusters_kwargs['legend']
+                plotclusters_kwargs.pop('legend')
+            
+            clusters = np.array(res.loc[res['silhouette score']==np.max(res['silhouette score'])]['clusters'])[0]
+            
+            if 'c' not in plotclusters_kwargs.keys():
+                color_list = list(mcolors.CSS4_COLORS.keys())
+                color_list.remove('red')
+                random.Random(9).shuffle(color_list)
+                colors = color_list[0:len(np.unique(clusters))] 
+                vectorizer = np.vectorize(lambda x: colors[x % len(colors)])
+                c = vectorizer(clusters)
+            else:
+                c = plotclusters_kwargs['c']
+                plotclusters_kwargs.pop('c')
+            
+            plotting.scatter_xy(self.time,self.value,c = c, xlabel=xlabel,ylabel=ylabel,
+                       title =  title, xlim=xlim, ylim=ylim, legend=legend,  
+                       plot_kwargs = plotclusters_kwargs, ax=ax)
+                
+            #plot     
+            if np.size(indices) != 0:
+                plotting.scatter_xy(self.time[indices],self.value[indices],c='red',ax=ax)
+            if 'path' in savefigclusters_settings:
+                plotting.savefig(fig,settings=savefigclusters_settings)
+        
+        return new, res  
 
     def interp(self, method='linear', **kwargs):
         '''Interpolate a Series object onto a new time axis
@@ -2850,18 +2966,31 @@ class Series:
     def gkernel(self, step_type='median', **kwargs):
         ''' Coarse-grain a Series object via a Gaussian kernel.
 
+        Like .bin() this technique is conservative and uses the max space between points 
+        as the default spacing. Unlike .bin(), gkernel() uses a gaussian kernel to 
+        calculate the weighted average of the time series over these intervals.
+
         Parameters
         ----------
+
         step_type : str
+
             type of timestep: 'mean', 'median', or 'max' of the time increments
+
         kwargs :
+
             Arguments for kernel function. See pyleoclim.utils.tsutils.gkernel for details
+
         Returns
         -------
+
         new : pyleoclim.Series
+
             The coarse-grained Series object
+
         See also
         --------
+
         pyleoclim.utils.tsutils.gkernel : application of a Gaussian kernel
         '''
 

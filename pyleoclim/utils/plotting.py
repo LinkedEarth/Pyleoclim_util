@@ -12,6 +12,89 @@ import pathlib
 import matplotlib as mpl
 
 
+def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None, 
+            xlim=None, ylim=None, savefig_settings=None, ax=None,
+            legend=True, plot_kwargs=None, lgd_kwargs=None):
+    """
+    Make scatter plot. 
+
+    Parameters
+    ----------
+    x : numpy.array
+        x value
+    y : numpy.array
+        y value
+    c : TYPE, optional
+        DESCRIPTION. The default is None.
+    figsize : list, optional
+        A list of two integers indicating the dimension of the figure. The default is None.
+    xlabel : str, optional
+        x-axis label. The default is None.
+    ylabel : str, optional
+        y-axis label. The default is None.
+    title : str, optional
+        Title for the plot. The default is None.
+    xlim : list, optional
+        Limits for the x-axis. The default is None.
+    ylim : list, optional
+        Limits for the y-axis. The default is None.
+    savefig_settings : dict, optional
+        the dictionary of arguments for plt.savefig(); some notes below:
+        - "path" must be specified; it can be any existed or non-existed path,
+          with or without a suffix; if the suffix is not given in "path", it will follow "format"
+        - "format" can be one of {"pdf", "eps", "png", "ps"}
+       The default is None.
+    ax : pyplot.axis, optional
+        The axis object. The default is None.
+    legend : bool, optional
+        Whether to include a legend. The default is True.
+    plot_kwargs : dict, optional
+        the keyword arguments for ax.plot(). The default is None.
+    lgd_kwargs : dict, optional
+        the keyword arguments for ax.legend(). The default is None.
+
+    Returns
+    -------
+    ax : the pyplot.axis object
+
+    """
+    savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+    plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
+    lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
+    
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+
+    ax.scatter(x, y, c=c, **plot_kwargs)
+
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
+
+    if title is not None:
+        ax.set_title(title)
+
+    if xlim is not None:
+        ax.set_xlim(xlim)
+
+    if ylim is not None:
+        ax.set_ylim(ylim)
+
+    if legend:
+        ax.legend(**lgd_kwargs)
+    else:
+        ax.legend().remove()
+
+    if 'fig' in locals():
+        if 'path' in savefig_settings:
+            savefig(fig, settings=savefig_settings)
+        return fig, ax
+    else:
+        return ax
+
+
 def plot_scatter_xy(x1,y1,x2,y2, figsize=None, xlabel=None,
                     ylabel=None, title=None, xlim=None, ylim=None,
                     savefig_settings=None, ax=None, legend=True, 
@@ -180,6 +263,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 
     if title is not None:
         ax.set_title(title)
+        # TODO replace with ax.set_title(title, fontweight='bold') when all relevant plots use plot_xy
 
     if xlim is not None:
         ax.set_xlim(xlim)
@@ -287,7 +371,7 @@ def set_style(style='journal', font_scale=1.0):
     font_dict = {
         'font.size': 12,
         'axes.labelsize': 12,
-        'axes.titlesize': 12,
+        'axes.titlesize': 14,
         'xtick.labelsize': 11,
         'ytick.labelsize': 11,
         'legend.fontsize': 11,
