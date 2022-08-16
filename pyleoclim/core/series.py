@@ -25,6 +25,7 @@ from ..core.surrogateseries import SurrogateSeries
 
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib as mpl # could also from matplotlib.colors import ColorbarBase
 import numpy as np
 import pandas as pd
 from tabulate import tabulate
@@ -1022,7 +1023,7 @@ class Series:
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None,
                     time_label=None, value_label=None, period_label=None, psd_label=None,
                     ts_plot_kwargs = None, wavelet_plot_kwargs = None,
-                    psd_plot_kwargs = None, y_label_loc = -.15, savefig_settings=None):
+                    psd_plot_kwargs = None, gridspec_kwargs = None, y_label_loc = -.15, savefig_settings=None):
 
         ''' Produce summary plot of timeseries.
 
@@ -1082,6 +1083,23 @@ class Series:
                     - legend
                     - tick parameters
                 These will be overriden by summary plot to prevent formatting errors
+
+        gridspec_kwargs : dict
+            arguments to be passed to the gridspec configuration
+            The plot is constructed with six slots:
+                slot [0] contains a subgridspec containing the timeseries and scalogram (shared x axis)
+                slot [1] contains a subgridspec containing an empty slot and the PSD plot (shared y axis with
+                scalogram)
+                slot [2] and slot [3] are empty to allow ample room for xlabels for the scalogram and PSD plots
+                slot [4] contains the scalogram color bar
+                slot [5] is empty
+            It is possible to tune the size and spacing of the various slots
+                'width_ratios': list of two values describing the relative widths of the two columns (default: [6, 1])
+                'height_ratios': list of three values describing the relative heights of the three rows (default: [8, 1,
+                .35])
+                'hspace': vertical space between gridspec slots (default: 0, however if either the scalogram xlabel or
+                the PSD xlabel contain '\n', .05)
+                'wspace': lateral space between gridspec slots (default: 0.1)
 
         y_label_loc : float
             Plot parameter to adjust horizontal location of y labels to avoid conflict with axis labels, default value is -0.15
@@ -1152,114 +1170,299 @@ class Series:
         '''
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-        fig = plt.figure(figsize=figsize)
-        gs = gridspec.GridSpec(6, 12)
-        gs.update(wspace=0, hspace=0)
 
-        wavelet_plot_kwargs={} if wavelet_plot_kwargs is None else wavelet_plot_kwargs.copy()
-        psd_plot_kwargs={} if psd_plot_kwargs is None else psd_plot_kwargs.copy()
-        ts_plot_kwargs={} if ts_plot_kwargs is None else ts_plot_kwargs.copy()
+        wavelet_plot_kwargs = {} if wavelet_plot_kwargs is None else wavelet_plot_kwargs.copy()
+        psd_plot_kwargs = {} if psd_plot_kwargs is None else psd_plot_kwargs.copy()
+        ts_plot_kwargs = {} if ts_plot_kwargs is None else ts_plot_kwargs.copy()
+        gridspec_kwargs = {} if gridspec_kwargs is None else gridspec_kwargs.copy()
+
+        # spacing
+        if (type(psd_label) == str and '\n' in psd_label) or (psd_label is None):
+            gridspec_kwargs_default = {'width_ratios': [6, 1],
+                                       'height_ratios': [8, 1, .35],
+                                       'hspace': .05, 'wspace': 0.1}
+        else:
+            gridspec_kwargs_default = {'width_ratios': [6, 1],
+                                       'height_ratios': [8, 1, .35],
+                                       'hspace': 0, 'wspace': 0.1}
+
+        for key in gridspec_kwargs_default:
+            if key not in gridspec_kwargs.keys():
+                gridspec_kwargs[key] = gridspec_kwargs_default[key]
+
+        fig = plt.figure(constrained_layout=False, figsize=figsize)
+        gs = fig.add_gridspec(3, 2, **gridspec_kwargs)
+
+        # fig = plt.figure(figsize=figsize)
+        # gs = gridspec.GridSpec(6, 12)
+        # gs.update(wspace=0, hspace=0)
+        #
+        # gs0 = fig.add_gridspec(3, 2, width_ratios=[6, 1], height_ratios=[8, 1, .35],
+        #                        hspace=0, wspace=0.1)
+
+        # Subgridspecs
+        gs_d = {}
+        gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
+        gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
+        gs_d['cb'] = gs[4].subgridspec(1, 1)
 
         ax = {}
-        ax['ts'] = plt.subplot(gs[0:1, :-3])
+        ### Time series
+        ax['ts'] = fig.add_subplot(gs_d['ts_scal'][0, 0])
         ax['ts'] = self.plot(ax=ax['ts'], **ts_plot_kwargs)
-        ax['ts'].xaxis.set_visible(False)
-        ax['ts'].get_yaxis().set_label_coords(y_label_loc,0.5)
 
         if time_lim is not None:
             ax['ts'].set_xlim(time_lim)
             if 'xlim' in ts_plot_kwargs:
-                print('Xlim passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+                print(
+                    'Xlim passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
         if value_lim is not None:
             ax['ts'].set_ylim(value_lim)
             if 'ylim' in ts_plot_kwargs:
-                print('Ylim passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+                print(
+                    'Ylim passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
-        ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
+        if title is not None:
+            ax['ts'].set_title(title)
+            if 'title' in ts_plot_kwargs:
+                print(
+                    'Title passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
-        #Need variable for plotting purposes
+        if value_label is not None:
+            # time_label, value_label = self.make_labels()
+            ax['ts'].set_ylabel(value_label)
+            if 'ylabel' in ts_plot_kwargs:
+                print(
+                    'Ylabel passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+
+        ax['ts'].xaxis.label.set_visible(False)
+
+        # ax = {}
+        # ax['ts'] = plt.subplot(gs[0:1, :-3])
+        # ax['ts'] = self.plot(ax=ax['ts'], **ts_plot_kwargs)
+        # ax['ts'].xaxis.set_visible(False)
+        # ax['ts'].get_yaxis().set_label_coords(y_label_loc,0.5)
+        #
+        # if time_lim is not None:
+        #     ax['ts'].set_xlim(time_lim)
+        #     if 'xlim' in ts_plot_kwargs:
+        #         print('Xlim passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+        #
+        # if value_lim is not None:
+        #     ax['ts'].set_ylim(value_lim)
+        #     if 'ylim' in ts_plot_kwargs:
+        #         print('Ylim passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+
+        ### Scalogram
+        ax['scal'] = fig.add_subplot(gs_d['ts_scal'][1, 0], sharex=ax['ts'])
+
+        # Need variable for plotting purposes
         if 'variable' not in wavelet_plot_kwargs:
-            wavelet_plot_kwargs.update({'variable':'amplitude'})
+            wavelet_plot_kwargs.update({'variable': 'amplitude'})
 
         if 'title' not in wavelet_plot_kwargs:
-            wavelet_plot_kwargs.update({'title':None})
+            wavelet_plot_kwargs.update({'title': None})
 
         if 'cbar_style' not in wavelet_plot_kwargs:
-            wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.12, 
-                                        'label': wavelet_plot_kwargs['variable'].capitalize() + ' from ' + scalogram.wave_method}})
+            wavelet_plot_kwargs.update({'cbar_style': {'orientation': 'horizontal', 'pad': 0.12,
+                                                       'label': wavelet_plot_kwargs[
+                                                                    'variable'].capitalize() + ' from ' + scalogram.wave_method}})
         else:
-            if 'orientation' in wavelet_plot_kwargs['cbar_style']:
-                orient = wavelet_plot_kwargs['cbar_style']['orientation']
-            else: 
-                orient = 'horizontal'
+            orient = 'horizontal'
+            # I think padding is now the hspace
             if 'pad' in wavelet_plot_kwargs['cbar_style']:
-                pad = wavelet_plot_kwargs['cbar_style']['pad'] 
+                pad = wavelet_plot_kwargs['cbar_style']['pad']
             else:
                 pad = 0.12
             if 'label' in wavelet_plot_kwargs['cbar_style']:
                 label = wavelet_plot_kwargs['cbar_style']['label']
             else:
                 label = wavelet_plot_kwargs['variable'].capitalize() + ' from ' + scalogram.wave_method
-            wavelet_plot_kwargs.update({'cbar_style':{'orientation': orient, 'pad': pad, 
-                                        'label': label}})
+            wavelet_plot_kwargs.update({'cbar_style': {'orientation': orient, 'pad': pad,
+                                                       'label': label}})
+
+        # Moving the colorbar to its own axis without leaving white space
+        wavelet_plot_kwargs['cbar_style']['inset'] = True
+        wavelet_plot_kwargs['cbar_style']['drawedges'] = True
 
         ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
-        ax['scal'].get_yaxis().set_label_coords(y_label_loc,0.5)
-        
+
+        # pull colorbar specifications from scalogram plot
+        cbar_data = ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__[
+            '_colorbar'].__dict__
+
+        # remove inset colorbar (moved to its own axis below)
+        ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__[
+            'ax'].remove()  # clear()#remove()#.set_visible(False)
+        if y_label_loc is not None:
+            ax['scal'].get_yaxis().set_label_coords(y_label_loc, 0.5)
+
         if period_lim is not None:
             ax['scal'].set_ylim(period_lim)
-            if 'ylim' in wavelet_plot_kwargs:
-                print('Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-        ax['scal'].invert_yaxis()
+            if 'ylim' in wavelet_plot_kwargs.keys():
+                print(
+                    'Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
-        ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
-        ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, ylabel = 'PSD from \n' + str(psd.spec_method), **psd_plot_kwargs)
+        if time_label is not None:
+            # time_label, value_label = self.make_labels()
+            ax['scal'].set_xlabel(time_label)
+            if 'xlabel' in wavelet_plot_kwargs:
+                print(
+                    'Xlabel passed to scalogram plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+
+        if period_label is not None:
+            # period_unit = infer_period_unit_from_time_unit(self.time_unit)
+            # period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
+            ax['scal'].set_ylabel(period_label)
+            if 'ylabel' in wavelet_plot_kwargs:
+                print(
+                    'Ylabel passed to scalogram plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+
+
+        ax['scal'].set_title(None)
+        ax['scal'].tick_params(axis='x', which='major', pad=12)
+
+        if 'ylims' in psd_plot_kwargs:
+            shared_y_lims = psd_plot_kwargs['ylims']
+        elif 'ylims' in wavelet_plot_kwargs:
+            shared_y_lims = wavelet_plot_kwargs['ylims']
+        else:
+            shared_y_lims = ax['scal'].get_ylim()
+
+        plt.setp(ax['ts'].get_xticklabels(), visible=False)
+
+        # ax['scal'].set_ylim([0.2,50])
+        # >>
+
+        # ax['scal'] = plt.subplot(gs[1:5, :-3], sharex=ax['ts'])
+        #
+        # #Need variable for plotting purposes
+        # if 'variable' not in wavelet_plot_kwargs:
+        #     wavelet_plot_kwargs.update({'variable':'amplitude'})
+        #
+        # if 'title' not in wavelet_plot_kwargs:
+        #     wavelet_plot_kwargs.update({'title':None})
+        #
+        # if 'cbar_style' not in wavelet_plot_kwargs:
+        #     wavelet_plot_kwargs.update({'cbar_style':{'orientation': 'horizontal', 'pad': 0.12,
+        #                                 'label': wavelet_plot_kwargs['variable'].capitalize() + ' from ' + scalogram.wave_method}})
+        # else:
+        #     if 'orientation' in wavelet_plot_kwargs['cbar_style']:
+        #         orient = wavelet_plot_kwargs['cbar_style']['orientation']
+        #     else:
+        #         orient = 'horizontal'
+        #     if 'pad' in wavelet_plot_kwargs['cbar_style']:
+        #         pad = wavelet_plot_kwargs['cbar_style']['pad']
+        #     else:
+        #         pad = 0.12
+        #     if 'label' in wavelet_plot_kwargs['cbar_style']:
+        #         label = wavelet_plot_kwargs['cbar_style']['label']
+        #     else:
+        #         label = wavelet_plot_kwargs['variable'].capitalize() + ' from ' + scalogram.wave_method
+        #     wavelet_plot_kwargs.update({'cbar_style':{'orientation': orient, 'pad': pad,
+        #                                 'label': label}})
+        #
+        # ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
+        # ax['scal'].get_yaxis().set_label_coords(y_label_loc,0.5)
+        #
+        # if period_lim is not None:
+        #     ax['scal'].set_ylim(period_lim)
+        #     if 'ylim' in wavelet_plot_kwargs:
+        #         print('Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+        # ax['scal'].invert_yaxis()
+
+        ### PSD
+        ax['psd'] = fig.add_subplot(gs_d['psd'][1, 0], sharey=ax['scal'])
+        ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, ylabel='PSD from \n' + str(psd.spec_method),
+                             **psd_plot_kwargs)
 
         if period_lim is not None:
             ax['psd'].set_ylim(period_lim)
             if 'ylim' in psd_plot_kwargs:
-                print('Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-    
-        ax['psd'].yaxis.set_visible(False)
-        ax['psd'].invert_yaxis()
-        ax['psd'].set_ylabel(None)
-        ax['psd'].tick_params(axis='y', direction='in', labelleft=False)
-        ax['psd'].legend().remove()
+                print(
+                    'Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+        else:
+            ax['psd'].set_ylim(shared_y_lims)
+            ax['scal'].set_ylim(shared_y_lims)
+
 
         if psd_lim is not None:
             ax['psd'].set_xlim(psd_lim)
             if 'xlim' in psd_plot_kwargs:
-                print('Xlim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument')
-
-        if title is not None:
-            ax['ts'].set_title(title)
-            if 'title' in ts_plot_kwargs:
-                print('Title passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-
-        if value_label is not None:
-            #time_label, value_label = self.make_labels()
-            ax['ts'].set_ylabel(value_label)
-            if 'ylabel' in ts_plot_kwargs:
-                print('Ylabel passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-
-        if time_label is not None:
-            #time_label, value_label = self.make_labels()
-            ax['scal'].set_xlabel(time_label)
-            if  'xlabel' in wavelet_plot_kwargs:
-                print('Xlabel passed to scalogram plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
-
-        if period_label is not None:
-            #period_unit = infer_period_unit_from_time_unit(self.time_unit)
-            #period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
-            ax['scal'].set_ylabel(period_label)
-            if 'ylabel' in wavelet_plot_kwargs:
-                print('Ylabel passed to scalogram plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+                print(
+                    'Xlim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument')
 
         if psd_label is not None:
             ax['psd'].set_xlabel(psd_label)
             if 'xlabel' in psd_plot_kwargs:
-                print('Xlabel passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+                print(
+                    'Xlabel passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+
+        ax['psd'].invert_yaxis()
+        ax['psd'].set_ylabel(None)
+
+        ax['psd'].tick_params(axis='y', direction='in', labelleft=False)
+        ax['psd'].legend().remove()
+        ax['scal'].invert_yaxis()  # not sure where this needs to be
+
+        # ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
+        # ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, ylabel = 'PSD from \n' + str(psd.spec_method), **psd_plot_kwargs)
+        #
+        # if period_lim is not None:
+        #     ax['psd'].set_ylim(period_lim)
+        #     if 'ylim' in psd_plot_kwargs:
+        #         print('Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+        #
+        # ax['psd'].yaxis.set_visible(False)
+        # ax['psd'].invert_yaxis()
+        # ax['psd'].set_ylabel(None)
+        # ax['psd'].tick_params(axis='y', direction='in', labelleft=False)
+        # ax['psd'].legend().remove()
+        #
+        # if psd_lim is not None:
+        #     ax['psd'].set_xlim(psd_lim)
+        #     if 'xlim' in psd_plot_kwargs:
+        #         print('Xlim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument')
+        #
+        # if title is not None:
+        #     ax['ts'].set_title(title)
+        #     if 'title' in ts_plot_kwargs:
+        #         print('Title passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+        #
+        # if value_label is not None:
+        #     #time_label, value_label = self.make_labels()
+        #     ax['ts'].set_ylabel(value_label)
+        #     if 'ylabel' in ts_plot_kwargs:
+        #         print('Ylabel passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+        #
+        # if time_label is not None:
+        #     #time_label, value_label = self.make_labels()
+        #     ax['scal'].set_xlabel(time_label)
+        #     if  'xlabel' in wavelet_plot_kwargs:
+        #         print('Xlabel passed to scalogram plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+        #
+        # if period_label is not None:
+        #     #period_unit = infer_period_unit_from_time_unit(self.time_unit)
+        #     #period_label = f'Period [{period_unit}]' if period_unit is not None else 'Period'
+        #     ax['scal'].set_ylabel(period_label)
+        #     if 'ylabel' in wavelet_plot_kwargs:
+        #         print('Ylabel passed to scalogram plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+        #
+        # if psd_label is not None:
+        #     ax['psd'].set_xlabel(psd_label)
+        #     if 'xlabel' in psd_plot_kwargs:
+        #         print('Xlabel passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
+
+        ax['cb'] = fig.add_subplot(gs_d['cb'][0, 0])
+        cb = mpl.colorbar.ColorbarBase(ax['cb'], orientation='horizontal',
+                                       cmap=cbar_data['cmap'],
+                                       norm=cbar_data['norm'],  # vmax and vmin
+                                       extend=cbar_data['extend'],
+                                       boundaries=cbar_data['boundaries'],  # ,
+                                       label=wavelet_plot_kwargs['cbar_style']['label'],
+                                       drawedges=cbar_data['drawedges'])  # True)
+        # ticks=[0, 3, 6, 9])
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
