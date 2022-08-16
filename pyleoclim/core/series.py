@@ -1095,28 +1095,29 @@ class Series:
 
         psd_plot_kwargs : dict
             arguments to be passed to the psd plot, see pyleoclim.PSD.plot for details
-                Certain psd plot settings are required by summary plot formatting. These include:
-                    - ylabel
-                    - legend
-                    - tick parameters
-                These will be overriden by summary plot to prevent formatting errors
+            Certain psd plot settings are required by summary plot formatting. These include:
+                - ylabel
+                - legend
+                - tick parameters
+            These will be overriden by summary plot to prevent formatting errors
 
         gridspec_kwargs : dict
             arguments to be passed to the gridspec configuration
             The plot is constructed with six slots:
-                slot [0] contains a subgridspec containing the timeseries and scalogram (shared x axis)
-                slot [1] contains a subgridspec containing an empty slot and the PSD plot (shared y axis with
+                - slot [0] contains a subgridspec containing the timeseries and scalogram (shared x axis)
+                - slot [1] contains a subgridspec containing an empty slot and the PSD plot (shared y axis with
                 scalogram)
-                slot [2] and slot [3] are empty to allow ample room for xlabels for the scalogram and PSD plots
-                slot [4] contains the scalogram color bar
-                slot [5] is empty
+                - slot [2] and slot [3] are empty to allow ample room for xlabels for the scalogram and PSD plots
+                - slot [4] contains the scalogram color bar
+                - slot [5] is empty
+            
             It is possible to tune the size and spacing of the various slots
-                'width_ratios': list of two values describing the relative widths of the two columns (default: [6, 1])
-                'height_ratios': list of three values describing the relative heights of the three rows (default: [8, 1,
+                - 'width_ratios': list of two values describing the relative widths of the two columns (default: [6, 1])
+                - 'height_ratios': list of three values describing the relative heights of the three rows (default: [8, 1,
                 .35])
-                'hspace': vertical space between gridspec slots (default: 0, however if either the scalogram xlabel or
+                - 'hspace': vertical space between gridspec slots (default: 0, however if either the scalogram xlabel or
                 the PSD xlabel contain '\n', .05)
-                'wspace': lateral space between gridspec slots (default: 0.1)
+                - 'wspace': lateral space between gridspec slots (default: 0.1)
 
         y_label_loc : float
             Plot parameter to adjust horizontal location of y labels to avoid conflict with axis labels, default value is -0.15
@@ -1271,8 +1272,7 @@ class Series:
 
         if 'cbar_style' not in wavelet_plot_kwargs:
             wavelet_plot_kwargs.update({'cbar_style': {'orientation': 'horizontal', 'pad': 0.12,
-                                                       'label': wavelet_plot_kwargs[
-                                                                    'variable'].capitalize() + ' from ' + scalogram.wave_method}})
+                                                       'label': wavelet_plot_kwargs['variable'].capitalize() + ' from ' + scalogram.wave_method}})
         else:
             orient = 'horizontal'
             # I think padding is now the hspace
@@ -1294,12 +1294,10 @@ class Series:
         ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
 
         # pull colorbar specifications from scalogram plot
-        cbar_data = ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__[
-            '_colorbar'].__dict__
+        cbar_data = ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__
 
         # remove inset colorbar (moved to its own axis below)
-        ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__[
-            'ax'].remove()  # clear()#remove()#.set_visible(False)
+        ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__['ax'].remove()  # clear()#remove()#.set_visible(False)
         if y_label_loc is not None:
             ax['scal'].get_yaxis().set_label_coords(y_label_loc, 0.5)
 
