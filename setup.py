@@ -30,7 +30,7 @@ setup(
     install_requires=[
         "LiPD==0.2.8.8",
         "pandas>=1.3.0",
-        "numpy>=1.21.1",
+        "numpy==1.22.0",
         "matplotlib>=3.4.2",
         "scipy>=1.7.0",
         "statsmodels>=0.11.1",
