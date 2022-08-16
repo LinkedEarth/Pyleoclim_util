@@ -695,15 +695,28 @@ class PSD:
                 xlim = [np.min(xlim), np.max(xlim)]
 
         if transpose:
+            ylim = [np.min(x_axis), np.max(x_axis)]
+            xlim = [np.min(y_axis), np.max(y_axis)]
             x_axis, y_axis = y_axis, x_axis
-            xlim, ylim = ylim, xlim
+            ax.plot(x_axis,y_axis, **plot_kwargs)
+
             xticks, yticks = yticks, xticks
             xlabel, ylabel = ylabel, xlabel
-            ax.set_ylim(ylim[::-1])
         else:
             ax.set_xlim(xlim)
+            ax.plot(x_axis, y_axis, **plot_kwargs)
 
-        ax.plot(x_axis, y_axis, **plot_kwargs)
+        #
+        # if transpose:
+        #     x_axis, y_axis = y_axis, x_axis
+        #     xlim, ylim = ylim, xlim
+        #     xticks, yticks = yticks, xticks
+        #     xlabel, ylabel = ylabel, xlabel
+        #     ax.set_ylim(ylim[::-1])
+        #     # print('thing',ylim[::-1])
+        # else:
+        #     ax.set_xlim(xlim)
+        # ax.plot(x_axis, y_axis, **plot_kwargs)
 
 
         # plot significance levels

@@ -10,6 +10,8 @@ from tabulate import tabulate
 from copy import deepcopy
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter #, MaxNLocator
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
 from scipy.stats.mstats import mquantiles
 
 #from ..core import MultipleScalogram
@@ -359,7 +361,15 @@ class Scalogram:
         cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05, 'label':variable.capitalize()}
         cbar_args.update(cbar_style)
 
-        cb = plt.colorbar(cont, ax = ax, **cbar_args)
+        if 'inset' in cbar_args:
+            cbar_args.pop('inset')
+            axins1 = inset_axes(ax,
+                                width="50%",  # width = 50% of parent_bbox width
+                                height="5%",  # height : 5%
+                                loc='upper right')
+            cb = plt.colorbar(cont, ax =ax, cax=axins1, **cbar_args)
+        else:
+            cb = plt.colorbar(cont, ax = ax, **cbar_args)
 
         # plot cone of influence
         if self.coi is not None:
