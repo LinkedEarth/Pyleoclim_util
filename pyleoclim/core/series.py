@@ -1023,7 +1023,7 @@ class Series:
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None,
                     time_label=None, value_label=None, period_label=None, psd_label=None,
                     ts_plot_kwargs = None, wavelet_plot_kwargs = None,
-                    psd_plot_kwargs = None, gridspec_kwargs = None, y_label_loc = -.15, savefig_settings=None):
+                    psd_plot_kwargs = None, gridspec_kwargs = None, y_label_loc = None, savefig_settings=None):
 
         ''' Produce summary plot of timeseries.
 
