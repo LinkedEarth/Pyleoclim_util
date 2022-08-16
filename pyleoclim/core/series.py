@@ -1237,6 +1237,7 @@ class Series:
                     'Ylabel passed to time series plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
         ax['ts'].xaxis.label.set_visible(False)
+        ax['ts'].tick_params(axis='x', direction='in')#, labelleft=False)
 
         # ax = {}
         # ax['ts'] = plt.subplot(gs[0:1, :-3])
@@ -1322,6 +1323,7 @@ class Series:
 
         ax['scal'].set_title(None)
         ax['scal'].tick_params(axis='x', which='major', pad=12)
+        # fix ts xticks after final edits to scalogram xtick because of the sharedx
 
         if 'ylims' in psd_plot_kwargs:
             shared_y_lims = psd_plot_kwargs['ylims']
@@ -1463,7 +1465,6 @@ class Series:
                                        label=wavelet_plot_kwargs['cbar_style']['label'],
                                        drawedges=cbar_data['drawedges'])  # True)
         # ticks=[0, 3, 6, 9])
-
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
         return fig, ax
