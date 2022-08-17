@@ -1177,7 +1177,7 @@ class Series:
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
             
-            @savefig ts_summary_plot1.png
+            @savefig ts_summary_plot2.png
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
             pyleo.closefig(fig)
         '''
