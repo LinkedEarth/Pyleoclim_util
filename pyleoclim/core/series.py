@@ -1152,12 +1152,16 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
+            
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
+            
             @savefig ts_summary_plot1.png
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
+            pyleo.closefig(fig)
+            
 
         Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
 
@@ -1167,13 +1171,15 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
+            
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
+            
             @savefig ts_summary_plot1.png
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
-
+            pyleo.closefig(fig)
         '''
 
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
