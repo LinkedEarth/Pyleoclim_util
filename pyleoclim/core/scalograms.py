@@ -10,6 +10,8 @@ from tabulate import tabulate
 from copy import deepcopy
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter #, MaxNLocator
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
 from scipy.stats.mstats import mquantiles
 
 #from ..core import MultipleScalogram
@@ -209,7 +211,7 @@ class Scalogram:
         msg = print(tabulate(table, headers='keys'))
         return f'Dimension: {np.size(self.frequency)} x {np.size(self.time)}'
 
-    def plot(self, variable = 'amplitude', in_scale=True, xlabel=None, ylabel=None, title='default',
+    def plot(self, variable = 'amplitude', in_scale=True, xlabel=None, ylabel=None, title=None,
              ylim=None, xlim=None, yticks=None, figsize=[10, 8],
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
              contourf_style={}, cbar_style={}, savefig_settings={}, ax=None,
@@ -359,7 +361,15 @@ class Scalogram:
         cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05, 'label':variable.capitalize()}
         cbar_args.update(cbar_style)
 
-        cb = plt.colorbar(cont, ax = ax, **cbar_args)
+        if 'inset' in cbar_args:
+            cbar_args.pop('inset')
+            axins1 = inset_axes(ax,
+                                width="50%",  # width = 50% of parent_bbox width
+                                height="5%",  # height : 5%
+                                loc='upper right')
+            cb = plt.colorbar(cont, ax =ax, cax=axins1, **cbar_args)
+        else:
+            cb = plt.colorbar(cont, ax = ax, **cbar_args)
 
         # plot cone of influence
         if self.coi is not None:
@@ -370,9 +380,15 @@ class Scalogram:
             ax.yaxis.set_major_formatter(ScalarFormatter())
             ax.yaxis.set_major_formatter(FormatStrFormatter('%g'))
 
-        if title is not None:
+        if title is None:
+            if self.label is not None:
+                ax.set_title(self.label + " scalogram (" + self.wave_method.upper() + ")")
+            else:
+                ax.set_title("Scalogram (" + self.wave_method.upper() + ")")
+        else:
             ax.set_title(title)
-
+            
+            
         if ylim is None:
             ylim = [np.min(y_axis), np.min([np.max(y_axis), np.max(self.coi)])]
 
@@ -396,11 +412,13 @@ class Scalogram:
                 linestyles=signif_linestyles,
                 linewidths=signif_linewidths,
             )
-            if title == 'default':
+            if title is None:
                 if self.label is not None:
-                    ax.set_title(self.label + " scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
+                    ax.set_title(self.label + " scalogram (" + self.wave_method.upper() + ") with " + str(round(self.qs[isig]*100))+"% threshold")
                 else:
-                    ax.set_title("Scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
+                    ax.set_title(self.wave_method.upper() + " scalogram with " + str(round(self.qs[isig]*100))+"% threshold")
+            else:
+                ax.set_title(title)
 
         if xlabel is None:
             xlabel = self.time_label

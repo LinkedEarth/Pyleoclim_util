@@ -1209,7 +1209,7 @@ def wwa2psd(wwa, ts, Neffs, freq=None, Neff_threshold=3, anti_alias=False, avgs=
 def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log', 
         freq_kwargs={}, c=1/(8*np.pi**2), Neff_threshold=3, Neff_coi=3,
         nproc=8, detrend=False, sg_kwargs=None, method='Kirchner_numba',
-        gaussianize=False, standardize=False, len_bd=0,
+        gaussianize=False, standardize=True, len_bd=0,
         bc_mode='reflect', reflect_type='odd'):
     ''' Weighted wavelet Z transform (WWZ) for unevenly-spaced data
 
@@ -1368,6 +1368,9 @@ def wwz(ys, ts, tau=None, ntau=None, freq=None, freq_method='log',
     '''
     #assert isinstance(nMC, int) and nMC >= 0, "nMC should be larger than or equal to 0."
 
+    if standardize == True:
+        warnings.warn('Standardizing the timeseries')
+
     ys_cut, ts_cut, freq, tau = prepare_wwz(
         ys, ts, freq=freq, freq_method=freq_method, freq_kwargs=freq_kwargs,
         tau=tau, len_bd=len_bd,
@@ -1395,7 +1398,7 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
                   tau=None, freq=None, freq_method='log', freq_kwargs=None,
                   c=1/(8*np.pi**2), Neff_threshold=3, nproc=8, detrend=False, sg_kwargs=None,
                   verbose=False,  method='Kirchner_numba',
-                  gaussianize=False, standardize=False):
+                  gaussianize=False, standardize=True):
     ''' Returns the wavelet coherence of two time series (WWZ method).
 
     Parameters
@@ -1482,6 +1485,9 @@ def wwz_coherence(ys1, ts1, ys2, ts2, smooth_factor=0.25,
     pyleoclim.utils.tsutils.preprocess: pre-processes a times series using Gaussianization and detrending.
 
     '''
+    
+    if standardize == True:
+        warnings.warn('Standardizing the timeseries')
 
     # TODO: should this use common_time()?
     if tau is None:
@@ -2255,7 +2261,7 @@ def wtc(coeff1, coeff2, scales, tau, smooth_factor=0.25):
 ############ Methods for Torrence and Compo#############
 
 def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=False,sg_kwargs={},
-        gaussianize=False, standardize=False, pad=False, mother='MORLET',param=None):
+        gaussianize=False, standardize=True, pad=False, mother='MORLET',param=None):
     '''
     Wrapper function to implement Torrence and Compo continuous wavelet transform
 
@@ -2281,7 +2287,7 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     gaussianize : bool, optional
         Whether to gaussianize. The default is False.
     standardize : bool, optional
-        Whether to standardize. The default is False.
+        Whether to standardize. The default is True.
     pad : bool, optional
         Whether or not to pad the timeseries. with zeroes to get N up to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT's used to do the wavelet transform.
@@ -2327,6 +2333,9 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     Python routines available at http://paos.colorado.edu/research/wavelets/
 
     '''    
+    
+    if standardize == True:
+        warnings.warn('Standardizing the timeseries')
     
     ts = np.array(ts)
     ys = np.array(ys)
@@ -2386,7 +2395,7 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
 
 def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={},
                   scale = None, detrend=False,sg_kwargs={}, pad = False,
-                  standardize = False, gaussianize=False, tau = None, Neff_threshold=3,
+                  standardize = True, gaussianize=False, tau = None, Neff_threshold=3,
                   mother='MORLET',param=None, smooth_factor=0.25):
     ''' Returns the wavelet transform coherency of two time series using the CWT.
 
@@ -2420,7 +2429,7 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={
     gaussianize : bool, optional
         Whether to gaussianize. The default is False.
     standardize : bool, optional
-        Whether to standardize. The default is False.
+        Whether to standardize. The default is True.
     pad : bool, optional
         Whether or not to pad the timeseries with zeroes to increase N to the next higher power of 2. 
         This prevents wraparound from the end of the time series to the beginning, and also speeds up the FFT used to do the wavelet transform.
@@ -2469,6 +2478,10 @@ def cwt_coherence(ys1, ts1, ys2, ts2, freq=None, freq_method='log',freq_kwargs={
 
     '''
     assert np.array_equal(ts1,ts2)  and len(ys1) == len(ys2) , "ts1 and ts2 should be the same. Suggest using common_time()"
+    
+    
+    if standardize == True:
+        warnings.warn('Standardizing the timeseries')
     
     if tau is None:
         tau = ts1

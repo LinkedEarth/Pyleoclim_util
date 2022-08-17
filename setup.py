@@ -4,8 +4,8 @@ import io
 
 from setuptools import setup, find_packages
 
-version = '0.8.1'
 
+version = '0.9.0'
 
 # Read the readme file contents into variable
 def read(fname):
@@ -30,8 +30,8 @@ setup(
     install_requires=[
         "LiPD==0.2.8.8",
         "pandas>=1.3.0",
-        "numpy>=1.21.1",
-        "matplotlib>=3.4.2",
+        "numpy==1.22.0",
+        "matplotlib>=3.5.1",
         "scipy>=1.7.0",
         "statsmodels>=0.11.1",
         "seaborn>=0.11",
