@@ -4,8 +4,8 @@ import io
 
 from setuptools import setup, find_packages
 
-version = '0.8.2b'
 
+version = '0.9.0'
 
 # Read the readme file contents into variable
 def read(fname):

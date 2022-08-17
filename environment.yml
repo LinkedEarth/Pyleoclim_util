@@ -12,5 +12,6 @@ dependencies:
   - climlab=0.7.13
   - pip
   - python=3.9.13
+  - libstdcxx-ng=12.1.0
   - pip:
-    - git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
+    - pyleoclim==0.9.0
