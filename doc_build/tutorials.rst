@@ -7,7 +7,7 @@ Tutorials (and functional science examples) for Pyleoclim exist in the form of:
 
 * Jupyter Notebooks, which are found on the following repositories:
 
-  * `PyleoTutorials <https://github.com/LinkedEarth/PyleoTutorials>`_ contains notebooks demonstrating simple workflows with Pyleoclim:
+  * `PyleoTutorials <http://linked.earth/PyleoTutorials/>`_ contains notebooks demonstrating simple workflows with Pyleoclim:
 
     * Loading data from different formats into Pyleoclim objects
 
@@ -17,7 +17,7 @@ Tutorials (and functional science examples) for Pyleoclim exist in the form of:
 
   * `PaleoBooks <https://github.com/LinkedEarth/PaleoBooks>`_ will contain more advanced scientific workflows featuring Pyleoclim. Check for updates in 2023.
 
-  * `Pyleoclim paper notebooks <https://github.com/LinkedEarth/PyleoclimPaper>`_ highlights three scientific case studies featuring Pyleoclim. 
+  * `Pyleoclim paper notebooks <https://github.com/LinkedEarth/PyleoclimPaper>`_ highlights three scientific case studies featuring Pyleoclim.
 
   * `PaleoHackathon notebooks <https://github.com/LinkedEarth/paleoHackathon>`_ (contact the crew for solutions).
 
