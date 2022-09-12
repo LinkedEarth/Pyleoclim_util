@@ -10,6 +10,7 @@ import seaborn as sns
 from matplotlib import pyplot as plt, transforms as transforms
 from matplotlib.ticker import MaxNLocator
 from tabulate import tabulate
+from copy import deepcopy
 
 from ..utils import plotting
 
@@ -93,6 +94,11 @@ class CorrEns:
         self.signif = signif
         self.signif_fdr = signif_fdr
         self.alpha = alpha
+        
+    def copy(self):
+        '''Copy object
+        '''
+        return deepcopy(self)
 
     def __str__(self):
         '''

@@ -7,6 +7,7 @@ and/or MultipleSeries. Its main purpose is to allow a print function to display 
 
 import numpy as np
 from tabulate import tabulate
+from copy import deepcopy
 
 def pval_format(p, threshold=0.01, style='exp'):
     ''' Print p-value with proper format when p is close to 0
@@ -70,6 +71,11 @@ class Corr:
         self.p_fmt_style = p_fmt_style
         self.signif = signif
         self.alpha = alpha
+        
+    def copy(self):
+        '''Copy object
+        '''
+        return deepcopy(self)
 
     def __str__(self):
         '''
