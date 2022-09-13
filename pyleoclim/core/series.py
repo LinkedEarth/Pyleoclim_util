@@ -2551,20 +2551,34 @@ class Series:
             ts_nino = pyleo.Series(time=t, value=nino)
             ts_air = pyleo.Series(time=t, value=air)
 
-            # with `nsim=20` and default `method='isospectral'`
-            # set an arbitrary random seed to fix the result
+        Customizing with `nsim=20` and an arbitrary random seed for reproducibility:
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
             corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
-            # using a simple t-test
-            # set an arbitrary random seed to fix the result
+        Changing the method to a t-test adjusted for autocorrelation
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept: 
+         
             corr_res = ts_nino.correlation(ts_air, settings={'method': 'ttest'})
             print(corr_res)
-
-            # using the method "isopersistent"
-            # set an arbitrary random seed to fix the result
+           
+        Finally, using the method "isopersistent":
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
             corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'isopersistent'}, seed=2333)
             print(corr_res)
+            
+        In this case, the result is consistent with all three methods, but that is not necessarily the case.
         '''
 
         settings = {} if settings is None else settings.copy()
