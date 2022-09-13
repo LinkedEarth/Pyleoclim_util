@@ -1,5 +1,12 @@
 .. _installation:
 
+.. toctree::
+   :Hidden:
+   :caption: Getting Involved
+   :maxdepth: 2
+
+   tutorials.rst
+
 .. note::
 
    Pyleoclim requires the use of Python 3.8 or 3.9.
@@ -80,6 +87,21 @@ If you would like to use Jupyter Notebooks or Spyder for code development, insta
 
   conda install spyder
   conda install jupyter
+
+Optional libraries
+""""""""""""""""""
+
+To run the :ref:`tutorial notebooks <tutorials>`, we recommend installing the `xarray <https://docs.xarray.dev/en/stable/getting-started-guide/installing.html>`_ package suite.
+
+.. code-block:: bash
+
+  conda install -c conda-forge xarray dask netCDF4 bottleneck
+
+You will also need `climlab <https://climlab.readthedocs.io/en/latest/>`_:
+
+.. code-block:: bash
+
+  conda install climlab
 
 Building from source for the f2py feature of WWZ
 """"""""""""""""""""""""""""""""""""""""""""""""

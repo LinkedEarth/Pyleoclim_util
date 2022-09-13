@@ -1546,15 +1546,14 @@ class Series:
         return new
 
     def standardize(self):
-        '''Standardizes the series ((i.e. renove its estimated mean and divides
-            by its estimated standard deviation)
+        """Standardizes the series ((i.e. remove its estimated mean and divides by its estimated standard deviation)
 
         Returns
         -------
         new : pyleoclim.Series
             The standardized series object
 
-        '''
+        """
         new = self.copy()
         v_mod = tsutils.standardize(self.value)[0]
         new.value = v_mod
@@ -2551,34 +2550,20 @@ class Series:
             ts_nino = pyleo.Series(time=t, value=nino)
             ts_air = pyleo.Series(time=t, value=air)
 
-        Customizing with `nsim=20` and an arbitrary random seed for reproducibility:
-        
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-                
+            # with `nsim=20` and default `method='isospectral'`
+            # set an arbitrary random seed to fix the result
             corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20}, seed=2333)
             print(corr_res)
 
-        Changing the method to a t-test adjusted for autocorrelation
-        
-        .. ipython:: python
-            :okwarning:
-            :okexcept: 
-         
+            # using a simple t-test
+            # set an arbitrary random seed to fix the result
             corr_res = ts_nino.correlation(ts_air, settings={'method': 'ttest'})
             print(corr_res)
-           
-        Finally, using the method "isopersistent":
-        
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-                
+
+            # using the method "isopersistent"
+            # set an arbitrary random seed to fix the result
             corr_res = ts_nino.correlation(ts_air, settings={'nsim': 20, 'method': 'isopersistent'}, seed=2333)
             print(corr_res)
-            
-        In this case, the result is consistent with all three methods, but that is not necessarily the case.
         '''
 
         settings = {} if settings is None else settings.copy()

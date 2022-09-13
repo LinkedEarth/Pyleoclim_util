@@ -774,7 +774,7 @@ class LipdSeries(Series):
         distplt_kwargs = {} if distplt_kwargs is None else distplt_kwargs.copy()
         ax['dts'] = plt.subplot(gs[0, 2])
         distplt_kwargs.update({'ax': ax['dts']})
-        distplt_kwargs.update({'ylabel': 'PDF'})
+        distplt_kwargs.update({'ylabel': 'Counts'})
         distplt_kwargs.update({'vertical': True})
         if 'color' not in distplt_kwargs.keys():
             archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ", "")
