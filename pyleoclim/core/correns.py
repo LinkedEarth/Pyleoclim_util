@@ -7,6 +7,7 @@ The class enables a print and plot function to easily visualize the result.
 
 import numpy as np
 import seaborn as sns
+import pandas as pd
 from matplotlib import pyplot as plt, transforms as transforms
 from matplotlib.ticker import MaxNLocator
 from tabulate import tabulate
@@ -183,18 +184,34 @@ class CorrEns:
         if vrange is None:
             vrange = [np.min(self.r), np.max(self.r)]
 
-        clr_list = [clr_insignif, clr_signif, clr_signif_fdr]
-        args = {'rwidth': rwidth, 'bins': bins, 'range': vrange, 'color': clr_list}
-        args.update(hist_kwargs)
+        clr_list = [clr_signif_fdr, clr_signif, clr_insignif]
+        #args = {'rwidth': rwidth, 'bins': bins, 'range': vrange, 'color': clr_list}
+        #args.update(hist_kwargs)
         # insignif_args.update(hist_kwargs)
 
+        
         r_insignif = np.array(self.r)[~np.array(self.signif)]
         r_signif = np.array(self.r)[self.signif]
         r_signif_fdr = np.array(self.r)[self.signif_fdr]
-        r_stack = [r_insignif, r_signif, r_signif_fdr]
-        ax.hist(r_stack, stacked=True, **args)
-        ax.legend([f'p ≥ {self.alpha}', f'p < {self.alpha} (w/o FDR)', f'p < {self.alpha} (w/ FDR)'], loc='upper left',
-                  bbox_to_anchor=(1.1, 1), ncol=1)
+        #r_stack = [r_insignif, r_signif, r_signif_fdr]
+        #ax.hist(r_stack, stacked=True, **args)
+
+        # put everything into a dataframe to be able to use seaborn
+            
+        data = np.empty((len(self.r),3)); data[:] = np.NaN
+        col  = [f'p ≥ {self.alpha}',f'p < {self.alpha} (w/o FDR)', f'p < {self.alpha} (w/ FDR)']
+        data[~np.array(self.signif),2] = r_insignif
+        data[self.signif, 1] = r_signif
+        data[self.signif_fdr,0] = r_signif_fdr        
+
+        df = pd.DataFrame(data,columns=col)
+        #ax = sns.histplot(df,multiple="stack",ax=ax)
+        sns.set_palette(sns.color_palette(clr_list))
+        ax = sns.histplot(df,ax=ax,alpha=0.8)
+
+        sns.move_legend(ax, "upper left", bbox_to_anchor=(1.1, 1))
+    
+        #ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1), ncol=1)
 
         frac_signif = np.size(r_signif) / np.size(self.r)
         frac_signif_fdr = np.size(r_signif_fdr) / np.size(self.r)
