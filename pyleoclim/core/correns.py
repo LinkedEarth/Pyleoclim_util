@@ -121,11 +121,11 @@ class CorrEns:
 
         return f'Ensemble size: {len(self.r)}'
 
-    def plot(self, figsize=[4, 4], title=None, ax=None, savefig_settings=None, hist_kwargs=None, title_kwargs=None,
-             xlim=None,
+    def plot(self, figsize=[4, 4], title=None, ax=None, savefig_settings=None, hist_kwargs=None, 
+             title_kwargs=None, xlim=None,vrange=None, 
              clr_insignif=sns.xkcd_rgb['grey'], clr_signif=sns.xkcd_rgb['teal'],
              clr_signif_fdr=sns.xkcd_rgb['pale orange'],
-             clr_percentile=sns.xkcd_rgb['salmon'], rwidth=0.8, bins=None, vrange=None):
+             clr_percentile=sns.xkcd_rgb['salmon']):
         ''' Plot the distribution of correlation values as a histogram
         
         Color-coding is used to indicate significance, with or without applying 

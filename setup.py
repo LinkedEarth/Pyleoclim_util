@@ -30,7 +30,7 @@ setup(
     install_requires=[
         "LiPD==0.2.8.8",
         "pandas>=1.3.0",
-        "numpy==1.22.0",
+        "numpy<=1.24.0",
         "matplotlib>=3.5.1",
         "scipy>=1.7.0",
         "statsmodels>=0.11.1",
@@ -41,7 +41,7 @@ setup(
         "tftb>=0.1.1",
         "pyhht>=0.1.0",
         "wget>=3.2",
-        "numba>=0.50.1",
+        "numba>=0.56",
         "nitime>=0.8.1",
         "tabulate>=0.8.7",
         "Unidecode>=1.1.1",
