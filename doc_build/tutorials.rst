@@ -1,4 +1,4 @@
-.. tutorials:
+.. _tutorials:
 
 Tutorials
 =========
