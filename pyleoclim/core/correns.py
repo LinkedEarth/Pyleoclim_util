@@ -199,10 +199,10 @@ class CorrEns:
         # put everything into a dataframe to be able to use seaborn
             
         data = np.empty((len(self.r),3)); data[:] = np.NaN
-        col  = [f'p ≥ {self.alpha}',f'p < {self.alpha} (w/o FDR)', f'p < {self.alpha} (w/ FDR)']
-        data[~np.array(self.signif),2] = r_insignif
-        data[self.signif, 1] = r_signif
+        col  = [f'p < {self.alpha} (w/ FDR)',f'p < {self.alpha} (w/o FDR)', f'p ≥ {self.alpha}']
         data[self.signif_fdr,0] = r_signif_fdr        
+        data[self.signif, 1] = r_signif
+        data[~np.array(self.signif),2] = r_insignif
 
         df = pd.DataFrame(data,columns=col)
         #ax = sns.histplot(df,multiple="stack",ax=ax)
@@ -215,9 +215,9 @@ class CorrEns:
 
         frac_signif = np.size(r_signif) / np.size(self.r)
         frac_signif_fdr = np.size(r_signif_fdr) / np.size(self.r)
-        ax.text(x=1.1, y=0.5, s=f'Fraction significant: {frac_signif * 100:.1f}%', transform=ax.transAxes, fontsize=10,
+        ax.text(x=1.1, y=0.4, s=f'Fraction significant: {frac_signif * 100:.1f}%', transform=ax.transAxes, fontsize=10,
                 color=clr_signif)
-        ax.text(x=1.1, y=0.4, s=f'Fraction significant: {frac_signif_fdr * 100:.1f}%', transform=ax.transAxes,
+        ax.text(x=1.1, y=0.5, s=f'Fraction significant: {frac_signif_fdr * 100:.1f}%', transform=ax.transAxes,
                 fontsize=10, color=clr_signif_fdr)
 
         r_pcts = np.percentile(self.r, [2.5, 25, 50, 75, 97.5])
