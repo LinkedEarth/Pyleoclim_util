@@ -374,7 +374,7 @@ class Series:
               linestyle=None, linewidth=None, xlim=None, ylim=None,
               label=None, xlabel=None, ylabel=None, title=None, zorder=None,
               legend=True, plot_kwargs=None, lgd_kwargs=None, alpha=None,
-              savefig_settings=None, ax=None, invert_xaxis=False):
+              savefig_settings=None, ax=None, invert_xaxis=False, invert_yaxis=False):
         ''' Plot the timeseries
 
         Parameters
@@ -422,6 +422,9 @@ class Series:
 
         invert_xaxis : bool, optional
             if True, the x-axis of the plot will be inverted
+        
+        invert_yaxis : bool, optional
+            same for the y-axis
 
         plot_kwargs : dict
             the dictionary of keyword arguments for ax.plot()
@@ -550,7 +553,7 @@ class Series:
             title=title, savefig_settings=savefig_settings,
             ax=ax, legend=legend, xlim=xlim, ylim=ylim,
             plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
-            invert_xaxis=invert_xaxis,
+            invert_xaxis=invert_xaxis, invert_yaxis=invert_yaxis
         )
 
         return res

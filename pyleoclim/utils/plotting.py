@@ -193,7 +193,7 @@ def plot_scatter_xy(x1,y1,x2,y2, figsize=None, xlabel=None,
 def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, 
             xlim=None, ylim=None,savefig_settings=None, ax=None,
             legend=True, plot_kwargs=None, lgd_kwargs=None,
-            invert_xaxis=False):
+            invert_xaxis=False, invert_yaxis=False):
     ''' Plot a timeseries
     
     Parameters
@@ -233,6 +233,8 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
         - "format" can be one of {"pdf", "eps", "png", "ps"}
     invert_xaxis : bool, optional
         if True, the x-axis of the plot will be inverted
+    invert_yaxis : bool, optional
+        if True, the y-axis of the plot will be inverted
         
     Returns
     -------
@@ -278,6 +280,9 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 
     if invert_xaxis:
         ax.invert_xaxis()
+        
+    if invert_yaxis:
+        ax.invert_yaxis()
 
     if 'fig' in locals():
         if 'path' in savefig_settings:
