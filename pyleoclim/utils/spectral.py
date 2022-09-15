@@ -319,7 +319,7 @@ def lomb_scargle(ys, ts, freq=None, freq_method='lomb_scargle',
     """ Lomb-scargle priodogram
 
     Appropriate for unevenly-spaced arrays.
-    Uses the lomb-scargle implementation from scipy.signal: https://scipy.github.io/devdocs/generated/scipy.signal.lombscargle.html#scipy.signal.lombscargle
+    Uses the lomb-scargle implementation from scipy.signal: https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.lombscargle.html
 
     Parameters
     ----------

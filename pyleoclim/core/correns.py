@@ -121,12 +121,13 @@ class CorrEns:
 
         return f'Ensemble size: {len(self.r)}'
 
-    def plot(self, figsize=[4, 4], title=None, ax=None, savefig_settings=None, hist_kwargs=None, 
-             title_kwargs=None, xlim=None,vrange=None, 
-             clr_insignif=sns.xkcd_rgb['grey'], clr_signif=sns.xkcd_rgb['teal'],
-             clr_signif_fdr=sns.xkcd_rgb['pale orange'],
-             clr_percentile=sns.xkcd_rgb['salmon']):
+    def plot(self, figsize=[4, 4], title=None, ax=None, savefig_settings=None, hist_kwargs=None,
+             title_kwargs=None, xlim=None, alpha = 0.8, multiple = 'layer',
+             clr_insignif='silver', clr_signif=sns.xkcd_rgb['teal'],
+             clr_signif_fdr='darkorange', clr_percentile=sns.xkcd_rgb['salmon']):
         ''' Plot the distribution of correlation values as a histogram
+       
+        Uses seaborn's `histplot <https://seaborn.pydata.org/generated/seaborn.histplot.html>`_
         
         Color-coding is used to indicate significance, with or without applying 
         the False Discovery Rate (FDR) method. 
@@ -140,6 +141,13 @@ class CorrEns:
         title : str, optional
         
             Plot title. The default is None.
+            
+        multiple: str, optional 
+            Approach to organizing the 3 different histrograms on the plot. 
+            possible values: “layer”[default], “dodge”, “stack”, “fill”
+            
+        alpha : float in [0, 1]
+            transparency parameter for histrogram bars. Default: 0.8
 
         savefig_settings : dict
         
@@ -150,7 +158,7 @@ class CorrEns:
 
         hist_kwargs : dict
         
-            the keyword arguments for ax.hist()
+            additional keyword arguments for sns.histplot() [experimental]
 
         title_kwargs : dict
         
@@ -172,7 +180,7 @@ class CorrEns:
         
         pyleoclim.utils.correlation.fdr: False Discovery Rate
 
-        matplotlib.pyplot.hist: https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.pyplot.hist.html
+        seaborn.histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
         
         pyleoclim.utils.plotting.savefig : save figures in Pyleoclim
         '''
@@ -181,14 +189,9 @@ class CorrEns:
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
-        if vrange is None:
-            vrange = [np.min(self.r), np.max(self.r)]
-
         clr_list = [clr_signif_fdr, clr_signif, clr_insignif]
-        #args = {'rwidth': rwidth, 'bins': bins, 'range': vrange, 'color': clr_list}
-        #args.update(hist_kwargs)
-        # insignif_args.update(hist_kwargs)
-
+        args = {'multiple': multiple, 'alpha': alpha, 'ax': ax}
+        args.update(hist_kwargs)
         
         r_insignif = np.array(self.r)[~np.array(self.signif)]
         r_signif = np.array(self.r)[self.signif]
@@ -204,12 +207,10 @@ class CorrEns:
         data[self.signif, 1] = r_signif
         data[~np.array(self.signif),2] = r_insignif
 
-        df = pd.DataFrame(data,columns=col)
-        #ax = sns.histplot(df,multiple="stack",ax=ax)
-        sns.set_palette(sns.color_palette(clr_list))
-        ax = sns.histplot(df,ax=ax,alpha=0.8)
-
-        sns.move_legend(ax, "upper left", bbox_to_anchor=(1.1, 1))
+        df = pd.DataFrame(data,columns=col) # place data into a dataframe for seaborn to chew on
+        sns.set_palette(sns.color_palette(clr_list)) # update color palette
+        ax = sns.histplot(data=df, **args) # draw histogram
+        sns.move_legend(ax, "upper left", bbox_to_anchor=(1.08, 1)) # move legend to the right
     
         #ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1), ncol=1)
 

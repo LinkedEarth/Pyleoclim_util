@@ -306,7 +306,7 @@ def closefig(fig=None):
     else:
         plt.close()
 
-def savefig(fig, path=None, settings={}, verbose=True):
+def savefig(fig, path=None, dpi=300, settings={}, verbose=True):
     ''' Save a figure to a path
 
     Parameters
@@ -315,6 +315,8 @@ def savefig(fig, path=None, settings={}, verbose=True):
         the figure to save
     path : str
         the path to save the figure, can be ignored and specify in "settings" instead
+    dpi : int
+        resolution in dot (pixels) per inch. Default: 300. 
     settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified in settings if not assigned with the keyword argument;
@@ -328,7 +330,7 @@ def savefig(fig, path=None, settings={}, verbose=True):
     if path is None and 'path' not in settings:
         raise ValueError('"path" must be specified, either with the keyword argument or be specified in `settings`!')
 
-    savefig_args = {'bbox_inches': 'tight', 'path': path}
+    savefig_args = {'bbox_inches': 'tight', 'path': path, 'dpi': dpi}
     savefig_args.update(settings)
 
     path = pathlib.Path(savefig_args['path'])
