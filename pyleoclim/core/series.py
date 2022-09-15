@@ -1196,11 +1196,11 @@ class Series:
         if (type(psd_label) == str and '\n' in psd_label) or (psd_label is None):
             gridspec_kwargs_default = {'width_ratios': [6, 1],
                                        'height_ratios': [8, 1, .35],
-                                       'hspace': .05, 'wspace': 0.1}
+                                       'hspace': 0.05, 'wspace': 0}
         else:
             gridspec_kwargs_default = {'width_ratios': [6, 1],
                                        'height_ratios': [8, 1, .35],
-                                       'hspace': 0, 'wspace': 0.1}
+                                       'hspace': 0, 'wspace': 0}
 
         for key in gridspec_kwargs_default:
             if key not in gridspec_kwargs.keys():
@@ -1217,9 +1217,14 @@ class Series:
         #                        hspace=0, wspace=0.1)
 
         # Subgridspecs
+        
+        #Let's use the same hspace/wspace if given to a user
+        
         gs_d = {}
-        gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
-        gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
+        gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[1, 4], hspace=gridspec_kwargs['hspace'])
+        gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[1, 4], hspace=gridspec_kwargs['hspace'])
+        #gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
+        #gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
         gs_d['cb'] = gs[4].subgridspec(1, 1)
 
         ax = {}
