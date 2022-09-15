@@ -353,7 +353,7 @@ def savefig(fig, path=None, dpi=300, settings={}, verbose=True):
         print(f'Figure saved at: "{str(path)}"')
 
 
-def set_style(style='journal', font_scale=1.0):
+def set_style(style='journal', font_scale=1.0, dpi=300):
     ''' Modify the visualization style
     
     This function is inspired by [Seaborn](https://github.com/mwaskom/seaborn).
@@ -480,10 +480,14 @@ def set_style(style='journal', font_scale=1.0):
             'axes.grid': False,
         })
 
+    figure_dict = {
+        'savefig.dpi': dpi,
+    }
+
     # modify font size based on font scale
     font_dict.update({k: v * font_scale for k, v in font_dict.items()})
 
-    for d in [style_dict, font_dict]:
+    for d in [style_dict, font_dict, figure_dict]:
         mpl.rcParams.update(d)
 
 
