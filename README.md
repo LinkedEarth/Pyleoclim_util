@@ -50,9 +50,7 @@ Please submit any reproducible bugs you encounter to the [issue tracker](https:/
 ### License
 
 The project is licensed under the GNU Public License. Please refer to the file call license.
-If you use the code in publications, please credit the work using this citation:
-
-_Deborah Khider, Feng Zhu, Julien Emile-Geay, Jun Hu, Alexander James, Pratheek Athreya, Myron Kwan, Daniel Garijo. (xxxx). Pyleoclim: vx.x.x Release. Zenodo. http://doi.org/10.5281/zenodo.1212692_
+If you use the code in publications, please credit the work using the citation file. 
 
 
 ### Disclaimer
