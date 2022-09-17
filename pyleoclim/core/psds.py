@@ -949,7 +949,7 @@ class MultiplePSD:
         return new
 
 
-    def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
+    def plot(self, figsize=[10, 4], in_loglog=True, in_period=True, xlabel=None, ylabel='PSD', title=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, legend=True,
              colors=None, cmap=None, norm=None, plot_kwargs=None, lgd_kwargs=None):
         '''Plot multiple PSDs on the same plot
@@ -1119,7 +1119,7 @@ class MultiplePSD:
             return ax
 
     def plot_envelope(self, figsize=[10, 4], qs=[0.025, 0.5, 0.975],
-             in_loglog=True, in_period=True, xlabel=None, ylabel='Amplitude', title=None,
+             in_loglog=True, in_period=True, xlabel=None, ylabel='PSD', title=None,
              xlim=None, ylim=None, savefig_settings=None, ax=None, xticks=None, yticks=None, plot_legend=True,
              curve_clr=sns.xkcd_rgb['pale red'], curve_lw=3, shade_clr=sns.xkcd_rgb['pale red'], shade_alpha=0.3, shade_label=None,
              lgd_kwargs=None, members_plot_num=10, members_alpha=0.3, members_lw=1, seed=None):

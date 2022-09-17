@@ -736,7 +736,7 @@ class LipdSeries(Series):
         res = self.getMetadata()
         # start plotting
         fig = plt.figure(figsize=figsize)
-        gs = gridspec.GridSpec(2, 5)
+        gs = gridspec.GridSpec(2, 6, wspace=0)
         gs.update(left=0, right=1.1)
 
         if ensemble == True:
@@ -746,7 +746,7 @@ class LipdSeries(Series):
         ax = {}
         # Plot the timeseries
         plt_kwargs = {} if plt_kwargs is None else plt_kwargs.copy()
-        ax['ts'] = plt.subplot(gs[0, :-3])
+        ax['ts'] = fig.add_subplot(gs[0, :-1])
         plt_kwargs.update({'ax': ax['ts']})
         # use the defaults if color/markers not specified
         if ensemble == False:
@@ -772,7 +772,7 @@ class LipdSeries(Series):
 
         # plot the distplot
         distplt_kwargs = {} if distplt_kwargs is None else distplt_kwargs.copy()
-        ax['dts'] = plt.subplot(gs[0, 2])
+        ax['dts'] = fig.add_subplot(gs[0, -1:])
         distplt_kwargs.update({'ax': ax['dts']})
         distplt_kwargs.update({'ylabel': 'Counts'})
         distplt_kwargs.update({'vertical': True})
@@ -856,7 +856,7 @@ class LipdSeries(Series):
         # make the plot map
 
         data_crs = ccrs.PlateCarree()
-        ax['map'] = plt.subplot(gs[1, 0], projection=proj)
+        ax['map'] = fig.add_subplot(gs[1, 0:2], projection=proj)
         ax['map'].coastlines()
         if background is True:
             ax['map'].stock_img()
@@ -885,7 +885,7 @@ class LipdSeries(Series):
             elif ensemble == True:
                 pass
 
-        ax['spec'] = plt.subplot(gs[1, 1:3])
+        ax['spec'] = fig.add_subplot(gs[1, -3:])
         spectralfig_kwargs = {} if spectralfig_kwargs is None else spectralfig_kwargs.copy()
         spectralfig_kwargs.update({'ax': ax['spec']})
 
@@ -933,7 +933,9 @@ class LipdSeries(Series):
                       "Calibration: \n" + \
                       "    Equation: " + res["Calibration_equation"] + "\n" + \
                       "    Notes: " + res["Calibration_notes"]
-            plt.figtext(0.7, 0.4, textstr, fontsize=12)
+            plt.figtext(1.15, 0.4, textstr, fontsize=12)
+        
+        #gs.tight_layout(fig)
 
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
