@@ -10,7 +10,7 @@
 
 **Python Package for the Analysis of Paleoclimate Data**
 
-Paleoclimate data, whether from observations or model simulations, offer unique challenges to the analyst, as they usually come in the form of timeseries with missing values and age uncertainties, which trip up off-the-shelf methods.
+[Paleoclimate](https://www.ncdc.noaa.gov/news/what-paleoclimatology) data, whether from observations or model simulations, offer unique challenges to the analyst, as they usually come in the form of timeseries with missing values and age uncertainties, which trip up off-the-shelf methods.
 Pyleoclim is a Python package primarily geared towards the analysis and visualization of such timeseries. The package includes several low-level methods to deal with these issues under the hood, leaving paleoscientists to interact with intuitive, high-level analysis and plotting methods that support publication-quality scientific workflows.
 
 There are many entry points to Pyleoclim, thanks to its underlying [data structures](https://pyleoclim-util.readthedocs.io/en/master/core/ui.html). The package leverages the Linked Paleo Data ([LiPD](http://www.clim-past.net/12/1093/2016/)) standard container and its associated [utilities](http://nickmckay.github.io/LiPD-utilities/). The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analyses, very much like its R sidekick, [GeoChronR](https://doi.org/10.5194/gchron-2020-25).
@@ -50,9 +50,7 @@ Please submit any reproducible bugs you encounter to the [issue tracker](https:/
 ### License
 
 The project is licensed under the GNU Public License. Please refer to the file call license.
-If you use the code in publications, please credit the work using this citation:
-
-_Deborah Khider, Feng Zhu, Julien Emile-Geay, Jun Hu, Alexander James, Pratheek Athreya, Myron Kwan, Daniel Garijo. (xxxx). Pyleoclim: vx.x.x Release. Zenodo. http://doi.org/10.5281/zenodo.1212692_
+If you use the code in publications, please credit the work using the citation file. 
 
 
 ### Disclaimer

@@ -374,7 +374,7 @@ class Series:
               linestyle=None, linewidth=None, xlim=None, ylim=None,
               label=None, xlabel=None, ylabel=None, title=None, zorder=None,
               legend=True, plot_kwargs=None, lgd_kwargs=None, alpha=None,
-              savefig_settings=None, ax=None, invert_xaxis=False):
+              savefig_settings=None, ax=None, invert_xaxis=False, invert_yaxis=False):
         ''' Plot the timeseries
 
         Parameters
@@ -422,6 +422,9 @@ class Series:
 
         invert_xaxis : bool, optional
             if True, the x-axis of the plot will be inverted
+        
+        invert_yaxis : bool, optional
+            same for the y-axis
 
         plot_kwargs : dict
             the dictionary of keyword arguments for ax.plot()
@@ -550,7 +553,7 @@ class Series:
             title=title, savefig_settings=savefig_settings,
             ax=ax, legend=legend, xlim=xlim, ylim=ylim,
             plot_kwargs=plot_kwargs, lgd_kwargs=lgd_kwargs,
-            invert_xaxis=invert_xaxis,
+            invert_xaxis=invert_xaxis, invert_yaxis=invert_yaxis
         )
 
         return res
@@ -1193,11 +1196,11 @@ class Series:
         if (type(psd_label) == str and '\n' in psd_label) or (psd_label is None):
             gridspec_kwargs_default = {'width_ratios': [6, 1],
                                        'height_ratios': [8, 1, .35],
-                                       'hspace': .05, 'wspace': 0.1}
+                                       'hspace': 0.05, 'wspace': 0}
         else:
             gridspec_kwargs_default = {'width_ratios': [6, 1],
                                        'height_ratios': [8, 1, .35],
-                                       'hspace': 0, 'wspace': 0.1}
+                                       'hspace': 0, 'wspace': 0}
 
         for key in gridspec_kwargs_default:
             if key not in gridspec_kwargs.keys():
@@ -1214,9 +1217,14 @@ class Series:
         #                        hspace=0, wspace=0.1)
 
         # Subgridspecs
+        
+        #Let's use the same hspace/wspace if given to a user
+        
         gs_d = {}
-        gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
-        gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
+        gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[1, 4], hspace=gridspec_kwargs['hspace'])
+        gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[1, 4], hspace=gridspec_kwargs['hspace'])
+        #gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
+        #gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
         gs_d['cb'] = gs[4].subgridspec(1, 1)
 
         ax = {}
@@ -1280,7 +1288,7 @@ class Series:
 
         if 'cbar_style' not in wavelet_plot_kwargs:
             wavelet_plot_kwargs.update({'cbar_style': {'orientation': 'horizontal', 'pad': 0.12,
-                                                       'label': wavelet_plot_kwargs['variable'].capitalize() + ' from ' + scalogram.wave_method}})
+                                                       'label': scalogram.wave_method + ' '+ wavelet_plot_kwargs['variable'].capitalize()}})
         else:
             orient = 'horizontal'
             # I think padding is now the hspace
@@ -1302,10 +1310,14 @@ class Series:
         ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
 
         # pull colorbar specifications from scalogram plot
-        cbar_data = ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__
-
+        #cbar_data = ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__
+        
+        cbar_data = ax['scal'].figure._localaxes[-1]._colorbar
+        
         # remove inset colorbar (moved to its own axis below)
-        ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__['ax'].remove()  # clear()#remove()#.set_visible(False)
+        #ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__['ax'].remove()  # clear()#remove()#.set_visible(False)
+        ax['scal'].figure._localaxes[-1].remove()
+        
         if y_label_loc is not None:
             ax['scal'].get_yaxis().set_label_coords(y_label_loc, 0.5)
 
@@ -1386,7 +1398,7 @@ class Series:
 
         ### PSD
         ax['psd'] = fig.add_subplot(gs_d['psd'][1, 0], sharey=ax['scal'])
-        ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, ylabel='PSD from \n' + str(psd.spec_method),
+        ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, ylabel=str(psd.spec_method) + ' PSD',
                              **psd_plot_kwargs)
 
         if period_lim is not None:
@@ -1467,13 +1479,21 @@ class Series:
         #         print('Xlabel passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
         ax['cb'] = fig.add_subplot(gs_d['cb'][0, 0])
-        cb = mpl.colorbar.ColorbarBase(ax['cb'], orientation='horizontal',
-                                       cmap=cbar_data['cmap'],
-                                       norm=cbar_data['norm'],  # vmax and vmin
-                                       extend=cbar_data['extend'],
-                                       boundaries=cbar_data['boundaries'],  # ,
-                                       label=wavelet_plot_kwargs['cbar_style']['label'],
-                                       drawedges=cbar_data['drawedges'])  # True)
+       # cb = mpl.colorbar.ColorbarBase(ax['cb'], orientation='horizontal',
+       #                                cmap=cbar_data['cmap'],
+       #                                norm=cbar_data['norm'],  # vmax and vmin
+       #                                extend=cbar_data['extend'],
+       #                                boundaries=cbar_data['boundaries'],  # ,
+       #                                label=wavelet_plot_kwargs['cbar_style']['label'],
+       #                                drawedges=cbar_data['drawedges'])  # True)
+        
+        cb = mpl.colorbar.Colorbar(ax['cb'], mappable = cbar_data.mappable,
+                                   orientation='horizontal', 
+                                   extend=cbar_data.extend,
+                                   boundaries=cbar_data.boundaries,  # ,
+                                   label=wavelet_plot_kwargs['cbar_style']['label'],
+                                   drawedges=cbar_data.drawedges)  # True)
+        
         # ticks=[0, 3, 6, 9])
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
@@ -1546,15 +1566,14 @@ class Series:
         return new
 
     def standardize(self):
-        '''Standardizes the series ((i.e. renove its estimated mean and divides
-            by its estimated standard deviation)
+        """Standardizes the series ((i.e. remove its estimated mean and divides by its estimated standard deviation)
 
         Returns
         -------
         new : pyleoclim.Series
             The standardized series object
 
-        '''
+        """
         new = self.copy()
         v_mod = tsutils.standardize(self.value)[0]
         new.value = v_mod

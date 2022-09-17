@@ -193,7 +193,7 @@ def plot_scatter_xy(x1,y1,x2,y2, figsize=None, xlabel=None,
 def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, 
             xlim=None, ylim=None,savefig_settings=None, ax=None,
             legend=True, plot_kwargs=None, lgd_kwargs=None,
-            invert_xaxis=False):
+            invert_xaxis=False, invert_yaxis=False):
     ''' Plot a timeseries
     
     Parameters
@@ -233,6 +233,8 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
         - "format" can be one of {"pdf", "eps", "png", "ps"}
     invert_xaxis : bool, optional
         if True, the x-axis of the plot will be inverted
+    invert_yaxis : bool, optional
+        if True, the y-axis of the plot will be inverted
         
     Returns
     -------
@@ -278,6 +280,9 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 
     if invert_xaxis:
         ax.invert_xaxis()
+        
+    if invert_yaxis:
+        ax.invert_yaxis()
 
     if 'fig' in locals():
         if 'path' in savefig_settings:
@@ -301,7 +306,7 @@ def closefig(fig=None):
     else:
         plt.close()
 
-def savefig(fig, path=None, settings={}, verbose=True):
+def savefig(fig, path=None, dpi=300, settings={}, verbose=True):
     ''' Save a figure to a path
 
     Parameters
@@ -310,6 +315,8 @@ def savefig(fig, path=None, settings={}, verbose=True):
         the figure to save
     path : str
         the path to save the figure, can be ignored and specify in "settings" instead
+    dpi : int
+        resolution in dot (pixels) per inch. Default: 300. 
     settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified in settings if not assigned with the keyword argument;
@@ -323,7 +330,7 @@ def savefig(fig, path=None, settings={}, verbose=True):
     if path is None and 'path' not in settings:
         raise ValueError('"path" must be specified, either with the keyword argument or be specified in `settings`!')
 
-    savefig_args = {'bbox_inches': 'tight', 'path': path}
+    savefig_args = {'bbox_inches': 'tight', 'path': path, 'dpi': dpi}
     savefig_args.update(settings)
 
     path = pathlib.Path(savefig_args['path'])
@@ -346,7 +353,7 @@ def savefig(fig, path=None, settings={}, verbose=True):
         print(f'Figure saved at: "{str(path)}"')
 
 
-def set_style(style='journal', font_scale=1.0):
+def set_style(style='journal', font_scale=1.0, dpi=300):
     ''' Modify the visualization style
     
     This function is inspired by [Seaborn](https://github.com/mwaskom/seaborn).
@@ -473,10 +480,14 @@ def set_style(style='journal', font_scale=1.0):
             'axes.grid': False,
         })
 
+    figure_dict = {
+        'savefig.dpi': dpi,
+    }
+
     # modify font size based on font scale
     font_dict.update({k: v * font_scale for k, v in font_dict.items()})
 
-    for d in [style_dict, font_dict]:
+    for d in [style_dict, font_dict, figure_dict]:
         mpl.rcParams.update(d)
 
 

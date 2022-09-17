@@ -19,7 +19,7 @@ Pyleoclim leverages various data science libraries (numpy, pandas, scikit-learn)
 Pyleoclim natively "speaks" the language of Linked Paleo Data  (`LiPD <http://lipd.net>`_), which enables it to handle most of the data transformations internally, taking a good chunk of the pain out of analyzing paleoclimate data.
 The package is aware of age ensembles stored via LiPD and uses them for time-uncertain analysis. Age ensembles can be generated through the `GeoChronR <http://nickmckay.github.io/GeoChronR/>`_ package, which natively stores them as ensemble tables in LiPD.
 
-While convenient for the representation of paleoclimate observations, LiPD is not the only point of entry into Pyleoclim. The :ref:`Series <core_ui>` class is very flexible, and allows to apply Pyleoclim functionality to virtually any timeseries, including instrumental or model-generated data, as Excel spreadsheets, numpy arrays or pandas dataframes. Indeed, Pyleoclim is the workhorse supporting more general `machine-learning functionalities <https://github.com/KnowledgeCaptureAndDiscovery/autoTS>`_ for all manner of timeseries.
+While convenient for the representation of paleoclimate observations, LiPD is not the only point of entry into Pyleoclim. The :ref:`Series <core_api>` class is very flexible, and allows to apply Pyleoclim functionality to virtually any timeseries, including instrumental or model-generated data, as Excel spreadsheets, numpy arrays or pandas dataframes. Indeed, Pyleoclim is the workhorse supporting more general `machine-learning functionalities <https://github.com/KnowledgeCaptureAndDiscovery/autoTS>`_ for all manner of timeseries.
 
 Getting Started
 ===============
@@ -32,7 +32,7 @@ Getting Started
    core/api.rst
    tutorials.rst
 
-The :ref:`Pyleoclim UI <core_ui>` makes use of specialized routines which are described in details in advanced functionalities.
+The :ref:`Pyleoclim APIs <core_api>` make use of specialized routines which are described in details in advanced functionalities.
 
 .. toctree::
    :caption: Advanced functionalities
@@ -46,7 +46,7 @@ Getting Involved
 .. toctree::
    :Hidden:
    :caption: Getting Involved
-   :maxdepth: 2
+   :maxdepth: 1
 
    citation.rst
    contribution_guide.rst
