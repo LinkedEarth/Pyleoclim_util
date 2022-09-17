@@ -1,12 +1,5 @@
 .. _installation:
 
-.. toctree::
-   :Hidden:
-   :caption: Getting Involved
-   :maxdepth: 2
-
-   tutorials.rst
-
 .. note::
 
    Pyleoclim requires the use of Python 3.8 or 3.9.
