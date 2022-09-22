@@ -1820,7 +1820,6 @@ class MultipleSeries:
             mpl.rcParams.update(current_style)
             return fig, ax
         else:
-            plotting.showfig(fig)
             # reset the plotting style
             mpl.rcParams.update(current_style)
             return ax
