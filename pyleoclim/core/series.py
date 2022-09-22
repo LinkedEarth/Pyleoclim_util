@@ -1009,7 +1009,7 @@ class Series:
             pyleo.closefig(fig)
 
             @savefig ts_dist.png
-            fig, ax = ts.distplot()
+            fig, ax = ts.histplot()
             pyleo.closefig(fig)
 
         '''
