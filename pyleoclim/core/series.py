@@ -949,7 +949,7 @@ class Series:
 
         return new
 
-    def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
+    def histplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                   ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
         ''' Plot the distribution of the timeseries values
 
@@ -1038,6 +1038,77 @@ class Series:
             return fig, ax
         else:
             return ax
+
+    def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
+                  ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
+        ''' Plot the distribution of the timeseries values
+
+        Parameters
+        ----------
+
+        figsize : list
+            a list of two integers indicating the figure size
+
+        title : str
+            the title for the figure
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+              - "path" must be specified; it can be any existed or non-existed path,
+                with or without a suffix; if the suffix is not given in "path", it will follow "format"
+              - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        ax : matplotlib.axis, optional
+            A matplotlib axis
+
+        ylabel : str
+            Label for the count axis
+
+        vertical : {True,False}
+            Whether to flip the plot vertically
+
+        edgecolor : matplotlib.color
+            The color of the edges of the bar
+
+        plot_kwargs : dict
+            Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
+
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+
+        Examples
+        --------
+
+        Distribution of the SOI record
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import pandas as pd
+            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+            time=data.iloc[:,1]
+            value=data.iloc[:,2]
+            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+
+            @savefig ts_plot5.png
+            fig, ax = ts.plot()
+            pyleo.closefig(fig)
+
+            @savefig ts_dist.png
+            fig, ax = ts.distplot()
+            pyleo.closefig(fig)
+
+        '''
+        warnings.warn(
+            "Distplot is deprecated. Function has been renamed histplot in order to maintain consistency with seaborn terminology",
+            DeprecationWarning,
+            stacklevel=2)
+
+        return self.histplot(figsize, title, savefig_settings, ax, ylabel, vertical, edgecolor, **plot_kwargs)
 
     def summary_plot(self, psd, scalogram, figsize=[8, 10], title=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None,

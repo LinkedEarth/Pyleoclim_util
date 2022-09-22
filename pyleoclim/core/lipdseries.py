@@ -618,7 +618,7 @@ class LipdSeries(Series):
 
         return res
 
-    def dashboard(self, figsize=[11, 8], plt_kwargs=None, distplt_kwargs=None, spectral_kwargs=None,
+    def dashboard(self, figsize=[11, 8], plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
                   spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None, metadata=True,
                   savefig_settings=None, ensemble=False, D=None):
         '''
@@ -633,9 +633,9 @@ class LipdSeries(Series):
 
             Optional arguments for the timeseries plot. See Series.plot() or EnsembleSeries.plot_envelope(). The default is None.
 
-        distplt_kwargs : dict, optional
+        histplt_kwargs : dict, optional
 
-            Optional arguments for the distribution plot. See Series.distplot() or EnsembleSeries.plot_displot(). The default is None.
+            Optional arguments for the distribution plot. See Series.histplot() or EnsembleSeries.plot_distplot(). The default is None.
 
         spectral_kwargs : dict, optional
 
@@ -690,7 +690,7 @@ class LipdSeries(Series):
 
         pyleoclim.core.ensembleseries.EnsembleSeries.plot_envelope: Envelope plots for an ensemble
 
-        pyleoclim.core.series.Series.distplot : plot a distribution of the timeseries
+        pyleoclim.core.series.Series.histplot : plot a distribution of the timeseries
 
         pyleoclim.core.ensembleseries.EnsembleSeries.distplot : plot a distribution of the timeseries across ensembles
 
@@ -771,18 +771,18 @@ class LipdSeries(Series):
         ymin, ymax = ax['ts'].get_ylim()
 
         # plot the distplot
-        distplt_kwargs = {} if distplt_kwargs is None else distplt_kwargs.copy()
+        histplt_kwargs = {} if histplt_kwargs is None else histplt_kwargs.copy()
         ax['dts'] = fig.add_subplot(gs[0, -1:])
-        distplt_kwargs.update({'ax': ax['dts']})
-        distplt_kwargs.update({'ylabel': 'Counts'})
-        distplt_kwargs.update({'vertical': True})
-        if 'color' not in distplt_kwargs.keys():
+        histplt_kwargs.update({'ax': ax['dts']})
+        histplt_kwargs.update({'ylabel': 'Counts'})
+        histplt_kwargs.update({'vertical': True})
+        if 'color' not in histplt_kwargs.keys():
             archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ", "")
-            distplt_kwargs.update({'color': self.plot_default[archiveType][0]})
+            histplt_kwargs.update({'edgecolor': self.plot_default[archiveType][0]})
         if ensemble == False:
-            ax['dts'] = self.distplot(**distplt_kwargs)
+            ax['dts'] = self.histplot(**histplt_kwargs)
         elif ensemble == True:
-            ax['dts'] = ensc.distplot(**distplt_kwargs)
+            ax['dts'] = ensc.distplot(**histplt_kwargs)
         ax['dts'].set_ylim([ymin, ymax])
         ax['dts'].set_yticklabels([])
         ax['dts'].set_ylabel('')
