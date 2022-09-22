@@ -21,6 +21,7 @@ from matplotlib.ticker import FormatStrFormatter
 import matplotlib.transforms as transforms
 import matplotlib as mpl
 from tqdm import tqdm
+import warnings
 from scipy.stats.mstats import mquantiles
 
 class EnsembleSeries(MultipleSeries):
@@ -855,6 +856,115 @@ class EnsembleSeries(MultipleSeries):
             return ax
 
 
+    def histplot(self, figsize=[10, 4], title=None, savefig_settings=None,
+                 ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
+        """ Plots the distribution of the timeseries across ensembles
+
+        Reuses seaborn [histplot](https://seaborn.pydata.org/generated/seaborn.histplot.html) function.
+
+        Parameters
+        ----------
+
+        figsize : list, optional
+
+            The size of the figure. The default is [10, 4].
+
+        title : str, optional
+
+            Title for the figure. The default is None.
+
+        savefig_settings : dict, optional
+
+            the dictionary of arguments for plt.savefig(); some notes below:
+              - "path" must be specified; it can be any existed or non-existed path,
+                with or without a suffix; if the suffix is not given in "path", it will follow "format"
+              - "format" can be one of {"pdf", "eps", "png", "ps"}.
+            The default is None.
+
+        ax : matplotlib.axis, optional
+
+            A matplotlib axis. The default is None.
+
+        ylabel : str, optional
+
+            Label for the count axis. The default is 'KDE'.
+
+        vertical : bool; {True,False}, optional
+
+            Whether to flip the plot vertically. The default is False.
+
+        edgecolor : matplotlib.color, optional
+
+            The color of the edges of the bar. The default is 'w'.
+
+        plot_kwargs : dict
+
+            Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html.
+
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : Saving figure in Pyleoclim
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            nn = 30 # number of noise realizations
+            nt = 500
+            series_list = []
+
+            time, signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=1.0)
+            
+            ts = pyleo.Series(time=time, value = signal).standardize()
+            noise = np.random.randn(nt,nn)
+
+            for idx in range(nn):  # noise
+                ts = pyleo.Series(time=time, value=signal+noise[:,idx])
+                series_list.append(ts)
+
+            ts_ens = pyleo.EnsembleSeries(series_list)
+
+            @savefig ens_histplot.png
+            fig, ax = ts_ens.histplot()
+            pyleo.closefig(fig) 
+
+        """
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        if ax is None:
+            fig, ax = plt.subplots(figsize=figsize)
+
+        #make the data into a dataframe so we can flip the figure
+        time_label, value_label = self.make_labels()
+
+        #append all the values together for the plot
+        val = self.series_list[0].value
+        for i in range(1,len(self.series_list)):
+            val=np.append(val,self.series_list[i].value)
+
+        if vertical == True:
+            data=pd.DataFrame({'value':val})
+            ax = sns.histplot(data=data, y="value", ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
+            ax.set_ylabel(value_label)
+            ax.set_xlabel(ylabel)
+        else:
+            ax = sns.histplot(val, ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
+            ax.set_xlabel(value_label)
+            ax.set_ylabel(ylabel)
+
+        if title is not None:
+            ax.set_title(title)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            return fig, ax
+        else:
+            return ax
+
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                  ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
         """ Plots the distribution of the timeseries across ensembles
@@ -932,35 +1042,11 @@ class EnsembleSeries(MultipleSeries):
             pyleo.closefig(fig) 
 
         """
-        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
-        if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
 
-        #make the data into a dataframe so we can flip the figure
-        time_label, value_label = self.make_labels()
+        warnings.warn(
+            "Distplot is deprecated. Function has been renamed histplot in order to maintain consistency with seaborn terminology",
+            DeprecationWarning,
+            stacklevel=2
+            )
 
-        #append all the values together for the plot
-        val = self.series_list[0].value
-        for i in range(1,len(self.series_list)):
-            val=np.append(val,self.series_list[i].value)
-
-        if vertical == True:
-            data=pd.DataFrame({'value':val})
-            ax = sns.histplot(data=data, y="value", ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
-            ax.set_ylabel(value_label)
-            ax.set_xlabel(ylabel)
-        else:
-            ax = sns.histplot(val, ax=ax, kde=True, edgecolor=edgecolor, **plot_kwargs)
-            ax.set_xlabel(value_label)
-            ax.set_ylabel(ylabel)
-
-        if title is not None:
-            ax.set_title(title)
-
-        if 'fig' in locals():
-            if 'path' in savefig_settings:
-                plotting.savefig(fig, settings=savefig_settings)
-            return fig, ax
-        else:
-            return ax
-
+        return self.histplot(figsize, title, savefig_settings, ax, ylabel, vertical, edgecolor, **plot_kwargs)
