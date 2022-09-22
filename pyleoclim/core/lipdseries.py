@@ -778,7 +778,7 @@ class LipdSeries(Series):
         histplt_kwargs.update({'vertical': True})
         if 'color' not in histplt_kwargs.keys():
             archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ", "")
-            histplt_kwargs.update({'edgecolor': self.plot_default[archiveType][0]})
+            histplt_kwargs.update({'color': self.plot_default[archiveType][0]})
         if ensemble == False:
             ax['dts'] = self.histplot(**histplt_kwargs)
         elif ensemble == True:
