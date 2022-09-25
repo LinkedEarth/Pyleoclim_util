@@ -1830,7 +1830,7 @@ class Series:
         Returns
         -------
         new : pyleoclim.Series
-            Detrended Series object
+            Detrended Series object 
 
         See also
         --------
@@ -1883,7 +1883,7 @@ class Series:
         
 
         We see that the default function call results in a "Hockey Stick" at the end, which is undesirable.
-        There is no automated way to do this, but with a little trial and error, we find that removing 
+        There is no automated way to fix this, but with a little trial and error, we find that removing 
         the 2 smoothest modes performs reasonably well:
                 
         .. ipython:: python
@@ -1924,11 +1924,14 @@ class Series:
             fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
+            
 
         '''
+        
         new = self.copy()
-        v_mod = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
+        v_mod, _ = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
         new.value = v_mod
+        
         return new
 
     def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):

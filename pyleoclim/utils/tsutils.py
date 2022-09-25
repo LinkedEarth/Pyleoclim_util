@@ -708,7 +708,10 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
     -------
 
     ys : array
-        The detrended timeseries.
+        The detrended version of y.
+        
+    trend : array
+        The removed trend. Only non-empty for EMD and Savitzy-Golay methods, since SciPy detrending does not retain the trends
 
     See also
     --------
@@ -725,8 +728,10 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
 
     if method == "linear":
         ys = signal.detrend(y,type='linear')
+        trend = None
     elif method == 'constant':
         ys = signal.detrend(y,type='constant')
+        trend = None 
     elif method == "savitzky-golay":
         # Check that the timeseries is uneven and interpolate if needed
         if x is None:
@@ -742,21 +747,20 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
         # Now filter
         y_filt = savitzky_golay(y_interp,**sg_kwargs)
         # Put it all back on the original x axis
-        y_filt_x = np.interp(x,x_interp,y_filt)
-        ys = y-y_filt_x
+        trend = np.interp(x,x_interp,y_filt)
+        ys = y - trend
     elif method == "emd":
         imfs = EMD(y).decompose()
         if np.shape(imfs)[0] == 1:
             trend = np.zeros(np.size(y))
         else:
-            # trend = imfs[-1]
             trend = np.sum(imfs[-n:], axis=0)  # remove the n smoothest modes
 
         ys = y - trend
     else:
         raise KeyError('Not a valid detrending method')
 
-    return ys
+    return ys, trend
 
 def calculate_distances(ys, n_neighbors=None, NN_kwargs=None):
     """
