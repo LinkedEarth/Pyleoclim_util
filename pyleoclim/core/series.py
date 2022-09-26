@@ -2689,8 +2689,9 @@ class Series:
         return corr
 
     def causality(self, target_series, method='liang', settings=None):
-        ''' Perform causality analysis with the target timeseries
+        ''' Perform causality analysis with the target timeseries. Specifically, whether there is information in the target series that influenced the original series. 
             The timeseries are first sorted in ascending order.
+            
 
         Parameters
         ----------
@@ -2735,7 +2736,6 @@ class Series:
             ts_nino=pyleo.Series(time=t,value=nino)
             ts_air=pyleo.Series(time=t,value=air)
 
-            # plot the two timeseries
             @savefig ts_nino.png
             fig, ax = ts_nino.plot(title='NINO3 -- SST Anomalies')
             pyleo.closefig(fig)
@@ -2744,20 +2744,32 @@ class Series:
             fig, ax = ts_air.plot(title='Deasonalized All Indian Rainfall Index')
             pyleo.closefig(fig)
 
-            # we use the specific params below in ts_nino.causality() just to make the example less heavier;
-            # please drop the `settings` for real work
-            caus_res = ts_nino.causality(ts_air, settings={'nsim': 2, 'signif_test': 'isopersist'})
-            print(caus_res)
+        We use the specific params below to lighten computations; you may drop `settings` for real work
+        
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            liang_N2A = ts_air.causality(ts_nino, settings={'nsim': 20, 'signif_test': 'isopersist'})
+            print(liang_N2A)
+            liang_A2N = ts_nino.causality(ts_air, settings={'nsim': 20, 'signif_test': 'isopersist'})
+            print(liang_A2N)
+            
+            liang_N2A['T21']/liang_A2N['T21']
+            
+        Both information flows (T21) are positive, but the flow from NINO3 to AIR is about 3x as large as the other way around, suggesting that NINO3 influences AIR much more than the other way around, which conforms to physical intuition. 
 
-        Granger causality
+        To implement, Granger causality, simply specfiy the method:
 
         .. ipython:: python
             :okwarning:
             :okexcept:
 
-            caus_res = ts_nino.causality(ts_air, method='granger')
-            print(caus_res)
+            granger_A2N = ts_nino.causality(ts_air, method='granger')     
+            granger_N2A = ts_air.causality(ts_nino, method='granger')
 
+        
+        Note that the output is fundamentaklly different for the two methods. Granger causality cannot discriminate between NINO3 -> AIR or AIR -> NINO3, in this case. This is not unusual, and one reason why it is no longer in wide use. 
         '''
 
         # Sort both timeseries

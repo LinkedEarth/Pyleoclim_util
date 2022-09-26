@@ -26,7 +26,7 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
 
     All four tests give similar results. params_ftest and ssr_ftest are equivalent based on F test which is identical to lmtest:grangertest in R.
     
-    Wrapper for the functions described in statsmodel (https://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.grangercausalitytests.html)
+    Wrapper for the functions described in statsmodels (https://www.statsmodels.org/stable/generated/statsmodels.tsa.stattools.grangercausalitytests.html)
 
     Parameters
     ----------
@@ -51,13 +51,13 @@ def granger_causality(y1, y2, maxlag=1,addconst=True,verbose=True):
     Notes
     -----
 
-    The null hypothesis for Granger causality tests is that the time series in the second column, x2, does NOT Granger cause the time series in the first column, x1. Grange causality means that past values of x2 have a statistically significant effect on the current value of x1, taking past values of x1 into account as regressors. We reject the null hypothesis that x2 does not Granger cause x1 if the pvalues are below a desired size of the test.
+    The null hypothesis for Granger causality tests is that y2, does NOT Granger cause y1. Granger causality means that past values of y2 have a statistically significant effect on the current value of y1, taking past values of y1 into account as regressors. We reject the null hypothesis that y2 does not Granger cause y1 if the p-values are below a desired threshold (e.g. 0.05).
 
     The null hypothesis for all four test is that the coefficients corresponding to past values of the second time series are zero.
 
-    ‘params_ftest’, ‘ssr_ftest’ are based on F distribution
+    ‘params_ftest’, ‘ssr_ftest’ are based on the F distribution
 
-    ‘ssr_chi2test’, ‘lrtest’ are based on chi-square distribution
+    ‘ssr_chi2test’, ‘lrtest’ are based on the chi-square distribution
     
     See also
     --------
@@ -503,7 +503,7 @@ def signif_isospec(y1, y2, method,
             'tau21_noise_qs': tau21_noise_qs,
             'T21_noise_qs': T21_noise_qs,
         }
-    #TODO add Granger
+    #TODO Recode with Surrogate class
     else:
         raise KeyError(f'{method} is not a valid method')
 
