@@ -2688,11 +2688,10 @@ class Series:
 
         return corr
 
-    def causality(self, target_series, method='liang', settings=None):
+    def causality(self, target_series, method='liang', timespan=None, settings=None, common_time_kwargs=None):
         ''' Perform causality analysis with the target timeseries. Specifically, whether there is information in the target series that influenced the original series. 
-            The timeseries are first sorted in ascending order.
+            If the two series have different time axes, they are first placed on a common timescale (in ascending order).
             
-
         Parameters
         ----------
 
@@ -2701,10 +2700,16 @@ class Series:
 
         method : {'liang', 'granger'}
             The causality method to use.
+            
+        timespan : tuple
+            The time interval over which to perform the calculation
 
         settings : dict
             Parameters associated with the causality methods. Note that each method has different parameters. See individual methods for details
 
+        common_time_kwargs : dict
+            Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
+                 
         Returns
         -------
 
@@ -2772,10 +2777,22 @@ class Series:
         Note that the output is fundamentaklly different for the two methods. Granger causality cannot discriminate between NINO3 -> AIR or AIR -> NINO3, in this case. This is not unusual, and one reason why it is no longer in wide use. 
         '''
 
-        # Sort both timeseries
+        # Put on common axis if necessary
+        
+        ms = MultipleSeries([self, target_series])
+        if list(self.time) != list(target_series.time):
+            common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
+            ct_args = {'method': 'interp'}
+            ct_args.update(common_time_kwargs)
+            ms = ms.common_time(**ct_args)
 
-        sorted_self   = self.sort(verbose=True)
-        sorted_target = target_series.sort(verbose=True)
+        if timespan is None:
+            value1 = ms.series_list[0].value
+            value2 = ms.series_list[1].value
+        else:
+            value1 = ms.series_list[0].slice(timespan).value
+            value2 = ms.series_list[1].slice(timespan).value
+        
 
         settings = {} if settings is None else settings.copy()
         spec_func={
@@ -2785,7 +2802,8 @@ class Series:
         args['liang'] = {}
         args['granger'] = {}
         args[method].update(settings)
-        causal_res = spec_func[method](sorted_self.value, sorted_target.value, **args[method])
+        
+        causal_res = spec_func[method](value1, value2, **args[method])
         return causal_res
 
     def surrogates(self, method='ar1sim', number=1, length=None, seed=None, settings=None):

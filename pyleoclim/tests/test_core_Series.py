@@ -547,7 +547,24 @@ class TestUiSeriesCausality:
         ts1 = pyleo.Series(time=ts.time, value=v1)
         ts2 = pyleo.Series(time=ts.time, value=v2)
 
-        causal_res = ts1.causality(ts2, method=method)
+        _ = ts1.causality(ts2, method=method)
+        
+    @pytest.mark.parametrize('method', ['liang', 'granger'])
+    def test_causality_t1(self, method, eps=1):
+        ''' Generate two series from a same basic series and calculate their correlation
+            on a specified timespan
+        Note: NO assert statements for this test yet
+        '''
+        alpha = 1
+        nt = 100
+        ts = gen_ts(nt=nt,alpha=alpha)
+        v1 = ts.value + np.random.normal(loc=0, scale=1, size=nt)
+        v2 = ts.value + np.random.normal(loc=0, scale=2, size=nt)
+
+        ts1 = pyleo.Series(time=ts.time, value=v1)
+        ts2 = pyleo.Series(time=ts.time, value=v2)
+
+        _ = ts1.causality(ts2, method=method, timespan=(0, 67))
         
 class TestUISeriesOutliers:
     ''' Tests for Series.outliers()
