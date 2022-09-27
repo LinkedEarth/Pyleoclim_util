@@ -155,7 +155,7 @@ class Series:
         else:
             self.mean = mean
 
-    def convert_time_unit(self, time_unit='years'):
+    def convert_time_unit(self, time_unit='years', keep_log=False):
         ''' Convert the time unit of the Series object
 
         Parameters
@@ -169,6 +169,9 @@ class Series:
                 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
                 'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
             }
+            
+        keep_log : Boolean
+            if True, adds this step and its parameter to the series log.
 
         Examples
         --------
@@ -196,6 +199,7 @@ class Series:
         '''
 
         new_ts = self.copy()
+        
         if time_unit is not None:
             tu = time_unit.lower()
             if tu.find('ky')>=0 or tu.find('ka')>=0:
@@ -283,6 +287,9 @@ class Series:
         new_ts.time = new_time
         new_ts.value = new_value
         new_ts.time_unit = time_unit
+        
+        if keep_log == True:
+            new_ts.log += ({len(new_ts.log):'convert_time_unit', 'time_unit': time_unit},)
 
         return new_ts
 
@@ -764,7 +771,7 @@ class Series:
         res = tsbase.is_evenly_spaced(self.time, tol)
         return res
 
-    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', **kwargs):
+    def filter(self, cutoff_freq=None, cutoff_scale=None, method='butterworth', keep_log= False, **kwargs):
         ''' Filtering methods for Series objects using four possible methods:
             - `Butterworth <https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.butter.html>`_
             - `Lanczos <http://scitools.org.uk/iris/docs/v1.2/examples/graphics/SOI_filtering.html>`_
@@ -796,7 +803,10 @@ class Series:
             The cutoff scale only works with the Butterworth method and when cutoff_freq is None.
             If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
-
+        
+        keep_log : Boolean
+            if True, adds this step and its parameters to the series log.
+            
         kwargs : dict
             a dictionary of the keyword arguments for the filtering method,
             see `pyleoclim.utils.filter.savitzky_golay`, `pyleoclim.utils.filter.butterworth`, `pyleoclim.utils.filter.lanczos` and `pyleoclim.utils.filter.firwin` for the details
@@ -955,7 +965,9 @@ class Series:
 
         new_val = method_func[method](y, **args[method])
         new.value = new_val + mu # restore the mean
-
+        
+        if keep_log == True: 
+            new.log += ({len(new.log): 'filter','method': method, 'args': kwargs, 'fs': fs, 'cutoff_freq': cutoff_freq},) 
         return new
 
     def histplot(self, figsize=[10, 4], title=None, savefig_settings=None,
@@ -1590,13 +1602,16 @@ class Series:
         '''
         return deepcopy(self)
 
-    def clean(self, verbose=False):
+    def clean(self, verbose=False, keep_log = False):
         ''' Clean up the timeseries by removing NaNs and sort with increasing time points
 
         Parameters
         ----------
         verbose : bool
             If True, will print warning messages if there is any
+            
+        keep_log : Boolean
+            if True, adds this step and its parameters to the series log.
 
         Returns
         -------
@@ -1608,9 +1623,11 @@ class Series:
         v_mod, t_mod = tsbase.clean_ts(self.value, self.time, verbose=verbose)
         new.time = t_mod
         new.value = v_mod
+        if keep_log == True:
+            new.log += ({len(new.log):'clean', 'verbose': verbose},)
         return new
 
-    def sort(self, verbose=False):
+    def sort(self, verbose=False, keep_log = False):
         ''' Ensure timeseries is aligned to a prograde axis.
             If the time axis is prograde to begin with, no transformation is applied.
 
@@ -1618,6 +1635,9 @@ class Series:
         ----------
         verbose : bool
             If True, will print warning messages if there is any
+            
+        keep_log : Boolean
+            if True, adds this step and its parameter to the series log.
 
         Returns
         -------
@@ -1629,6 +1649,9 @@ class Series:
         v_mod, t_mod = tsbase.sort_ts(self.value, self.time, verbose=verbose)
         new.time = t_mod
         new.value = v_mod
+        
+        if keep_log == True:
+            new.log += ({len(new.log):'sort', 'verbose': verbose},)
         return new
 
     def gaussianize(self, keep_log = False):
@@ -1647,7 +1670,7 @@ class Series:
         new.value = v_mod
         
         if keep_log == True:
-            new.log = new.log + ({len(new.log):'gaussianize', 'applied': True},)        
+            new.log += ({len(new.log):'gaussianize', 'applied': True},)        
         return new
 
     def standardize(self, keep_log = False, scale=1):
@@ -1669,7 +1692,7 @@ class Series:
         if keep_log == True:
             method_dict = {len(new.log):'standardize', 'args': scale,
                            'previous_mean': mu, 'previous_std': sig}
-            new.log = new.log + (method_dict,)
+            new.log += (method_dict,)
         return new
         
 
@@ -1701,7 +1724,7 @@ class Series:
         new.value = vc
         
         if keep_log == True:
-            new.log = new.log + ({len(new.log): 'center', 'args': timespan, 'previous_mean': ts_mean},)
+            new.log += ({len(new.log): 'center', 'args': timespan, 'previous_mean': ts_mean},)
         return new
 
     def segment(self, factor=10):
@@ -1794,7 +1817,7 @@ class Series:
         new.value = self.value[mask]
         return new
 
-    def fill_na(self, timespan=None, dt=1):
+    def fill_na(self, timespan=None, dt=1, keep_log=False):
         ''' Fill NaNs into the timespan
 
         Parameters
@@ -1807,6 +1830,9 @@ class Series:
 
         dt : float
             The time spacing to fill the NaNs; default is 1.
+            
+        keep_log : Boolean
+            if True, adds this step and its parameters to the series log.
 
         Returns
         -------
@@ -1835,6 +1861,9 @@ class Series:
 
         new.time = new_time
         new.value = new_value
+        
+        if keep_log == True:
+            new.log += ({len(new.log):'fill_na', 'applied': True, 'dt': dt, 'timespan': timespan},)
 
         return new
 
@@ -1851,7 +1880,11 @@ class Series:
                 * "constant": only the mean of data is subtracted.
                 * "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
                 * "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
-        **kwargs : dict
+        
+        keep_log : Boolean
+            if True, adds the removed trend and method parameters to the series log.
+        
+        kwargs : dict
             Relevant arguments for each of the methods.
 
         Returns
@@ -1973,7 +2006,7 @@ class Series:
         new.value = v_mod
         
         if keep_log == True: 
-            new.log = new.log + ({len(new.log): 'detrend','method': method, 'args': kwargs, 'previous_trend': trend},) 
+            new.log += ({len(new.log): 'detrend','method': method, 'args': kwargs, 'previous_trend': trend},) 
         return new
 
     def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
@@ -3104,7 +3137,7 @@ class Series:
         
         return new, res  
 
-    def interp(self, method='linear', **kwargs):
+    def interp(self, method='linear', keep_log= False, **kwargs):
         '''Interpolate a Series object onto a new time axis
 
         Parameters
@@ -3112,7 +3145,10 @@ class Series:
 
         method : {‘linear’, ‘nearest’, ‘zero’, ‘slinear’, ‘quadratic’, ‘cubic’, ‘previous’, ‘next’}
             where ‘zero’, ‘slinear’, ‘quadratic’ and ‘cubic’ refer to a spline interpolation of zeroth, first, second or third order; ‘previous’ and ‘next’ simply return the previous or next value of the point) or as an integer specifying the order of the spline interpolator to use. Default is ‘linear’.
-
+        
+        keep_log : Boolean
+            if True, adds the method name and its parameters to the series log.    
+        
         kwargs :
             Arguments specific to each interpolation function. See pyleoclim.utils.tsutils.interp for details
 
@@ -3132,9 +3168,12 @@ class Series:
         ti, vi = tsutils.interp(self.time,self.value,interp_type=method,**kwargs)
         new.time = ti
         new.value = vi
+        if keep_log == True:
+            new.log += ({len(new.log):'interp', 'method': method, 'args': kwargs},)
+        
         return new
 
-    def gkernel(self, step_type='median', **kwargs):
+    def gkernel(self, step_type='median', keep_log = False, **kwargs):
         ''' Coarse-grain a Series object via a Gaussian kernel.
 
         Like .bin() this technique is conservative and uses the max space between points 
@@ -3147,6 +3186,9 @@ class Series:
         step_type : str
 
             type of timestep: 'mean', 'median', or 'max' of the time increments
+            
+        keep_log : Boolean
+            if True, adds the step type and its keyword arguments to the series log.       
 
         kwargs :
 
@@ -3169,15 +3211,20 @@ class Series:
 
         ti, vi = tsutils.gkernel(self.time, self.value, **kwargs) # apply kernel
         new.time = ti
-        new.value = vi
+        new.value = vi   
+        
+        if keep_log == True:
+            new.log += ({len(new.log):'gkernel', 'step_type': step_type, 'args': kwargs},)
         return new
 
-    def bin(self,**kwargs):
+    def bin(self, keep_log = False, **kwargs):
         '''Bin values in a time series
 
         Parameters
         ----------
-
+        keep_log : Boolean
+            if True, adds this step and its parameters to the series log.
+        
         kwargs :
             Arguments for binning function. See pyleoclim.utils.tsutils.bin for details
 
@@ -3190,11 +3237,13 @@ class Series:
         See also
         --------
 
-        pyleoclim.utils.tsutils.bin : bin the time series into evenly-spaced bins
+        pyleoclim.utils.tsutils.bin : bin the series values into evenly-spaced time bins
 
         '''
         new=self.copy()
         res_dict = tsutils.bin(self.time,self.value,**kwargs)
         new.time = res_dict['bins']
         new.value = res_dict['binned_values']
+        if keep_log == True:
+            new.log += ({len(new.log):'bin', 'args': kwargs},)
         return new

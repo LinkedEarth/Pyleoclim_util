@@ -251,7 +251,7 @@ class TestUiSeriesBin:
         v_unevenly =  np.delete(ts.value, deleted_idx)
 
         ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly)
-        ts2_bin=ts2.bin()
+        ts2_bin=ts2.bin(keep_log=True)
 
     def test_bin_t2(self):
         ''' Test the bin function by passing arguments'''
@@ -303,7 +303,7 @@ class TestUiSeriesCenter:
         ts = gen_ts(nt=500, alpha=alpha)
 
         #Call function to be tested
-        tsc = ts.center()
+        tsc = ts.center(keep_log=True)
 
         assert np.abs(tsc.mean) <= np.sqrt(sys.float_info.epsilon) 
 
@@ -317,7 +317,7 @@ class TestUiSeriesStandardize:
         ts = gen_ts(nt=500, alpha=alpha)
 
         #Call function to be tested
-        ts_std = ts.standardize()
+        ts_std = ts.standardize(keep_log=True)
 
         #Compare maximum and minimum values
         value = ts.__dict__['value']
@@ -339,7 +339,7 @@ class TestUiSeriesClean:
         ts = gen_normal()
 
         #Call function for testing
-        ts_clean = ts.clean()
+        ts_clean = ts.clean(keep_log=True)
 
         #Isolate time and value components
         time = ts_clean.__dict__['time']
@@ -354,7 +354,7 @@ class TestUiSeriesGaussianize:
     Gaussianize normalizes the series object, so we'll simply test maximum and minimum values'''
     def test_gaussianize(self):
         ts = gen_ts()
-        ts_gauss = ts.gaussianize()
+        ts_gauss = ts.gaussianize(keep_log=True)
 
         value = ts.__dict__['value']
         value_std = ts_gauss.__dict__['value']
@@ -610,7 +610,7 @@ class TestUISeriesOutliers:
 class TestUISeriesGkernel:
     ''' Unit tests for the TestUISeriesGkernel function
     '''
-    def test_interp_t1(self):
+    def test_gkernel_t1(self):
         ''' Test the gkernel function with default parameter values'''
 
         ts = gen_ts(nt=550, alpha=1.0)
@@ -621,9 +621,9 @@ class TestUISeriesGkernel:
         v_unevenly =  np.delete(ts.value, deleted_idx)
 
         ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly)
-        ts_interp=ts2.gkernel()
+        ts_interp=ts2.gkernel(keep_log=True)
 
-    def test_interp_t2(self):
+    def test_gkernel_t2(self):
         ''' Test the gkernel function with specified bandwidth'''
 
         ts = gen_ts(nt=550, alpha=1.0)
@@ -651,7 +651,7 @@ class TestUISeriesInterp():
         v_unevenly =  np.delete(ts.value, deleted_idx)
 
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
-        ts_interp=ts.interp()
+        ts_interp=ts.interp(keep_log=True)
 
     def test_interp_t2(self):
         ''' Test the bin function by passing arguments'''
@@ -697,7 +697,7 @@ class TestUISeriesDetrend():
         v_trend = ts.value + nonlinear_trend
         #create a timeseries object
         ts2 = pyleo.Series(time=ts.time, value=v_trend)
-        ts_detrend=ts2.detrend(method=detrend_method)
+        ts_detrend=ts2.detrend(method=detrend_method, keep_log=True)
 
 class TestUISeriesWaveletCoherence():
     ''' Test the wavelet coherence
@@ -906,7 +906,7 @@ class TestUiSeriesFilter:
         sig = sig1 + sig2
         ts1 = pyleo.Series(time=t, value=sig1)
         ts = pyleo.Series(time=t, value=sig)
-        ts_lp = ts.filter(cutoff_freq=15, method=method)
+        ts_lp = ts.filter(cutoff_freq=15, method=method, keep_log=True)
         val_diff = ts_lp.value - ts1.value
         assert np.mean(val_diff**2) < 0.2
 
