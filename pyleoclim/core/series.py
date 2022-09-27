@@ -1404,11 +1404,19 @@ class Series:
         # pull colorbar specifications from scalogram plot
         #cbar_data = ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__
         
-        cbar_data = ax['scal'].figure._localaxes[-1]._colorbar
+        # cbar_data = ax['scal'].figure._localaxes[-1]._colorbar
+        for scal_ax in ax['scal'].figure._localaxes:
+            try:
+                if 'axes' in scal_ax[1]._colorbar.mappable.__dict__.keys():
+                    cbar_data = scal_ax[1]._colorbar
+                    # remove inset colorbar (moved to its own axis below)
+                    scal_ax[1]._colorbar.ax.remove()
+            except:
+                pass
         
-        # remove inset colorbar (moved to its own axis below)
+
         #ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__['ax'].remove()  # clear()#remove()#.set_visible(False)
-        ax['scal'].figure._localaxes[-1].remove()
+        # ax['scal'].figure._localaxes[-1].remove()
         
         if y_label_loc is not None:
             ax['scal'].get_yaxis().set_label_coords(y_label_loc, 0.5)
