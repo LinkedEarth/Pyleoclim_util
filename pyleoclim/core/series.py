@@ -126,10 +126,19 @@ class Series:
     
     '''
 
-    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, value_unit=None, label=None, mean=None, clean_ts=True, verbose=False):
-
-        if clean_ts==True:
+    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, 
+                 value_unit=None, label=None, mean=None, clean_ts=True, log=None, verbose=False):
+        # TODO: remove mean argument once it's safe to do so
+        if log is None:
+            self.log = ()
+            nlog = 0
+        else:
+            self.log = log
+            nlog = len(log)
+                 
+        if clean_ts == True:
             value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
+            self.log = self.log + ({nlog+1:'clean_ts', 'applied': clean_ts, 'verbose': verbose},)
 
         self.time = np.array(time)
         self.value = np.array(value)
@@ -138,8 +147,8 @@ class Series:
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
-        self.clean_ts=clean_ts
-        self.verbose=verbose
+        #self.clean_ts=clean_ts
+        #self.verbose=verbose
         
         if mean is None:
             self.mean=np.mean(self.value)
@@ -1622,35 +1631,49 @@ class Series:
         new.value = v_mod
         return new
 
-    def gaussianize(self):
+    def gaussianize(self, keep_log = False):
         ''' Gaussianizes the timeseries
 
         Returns
         -------
         new : pyleoclim.Series
             The Gaussianized series object
-
+            
+        keep_log : Boolean
+            if True, adds this transformation to the series log. 
         '''
         new = self.copy()
         v_mod = tsutils.gaussianize(self.value)
         new.value = v_mod
+        
+        if keep_log == True:
+            new.log = new.log + ({len(new.log)+1:'gaussianize', 'applied': True},)        
         return new
 
-    def standardize(self):
+    def standardize(self, keep_log = False, scale=1):
         """Standardizes the series ((i.e. remove its estimated mean and divides by its estimated standard deviation)
 
         Returns
         -------
         new : pyleoclim.Series
             The standardized series object
+            
+        keep_log : Boolean
+            if True, adds the previous mean, standard deviation and method parameters to the series log. 
 
         """
         new = self.copy()
-        v_mod = tsutils.standardize(self.value)[0]
-        new.value = v_mod
+        vs, mu, sig = tsutils.standardize(self.value, scale=scale)
+        new.value = vs
+        
+        if keep_log == True:
+            method_dict = {len(new.log)+1:'standardize', 'args': scale,
+                           'previous_mean': mu, 'previous_std': sig}
+            new.log = new.log + (method_dict,)
         return new
+        
 
-    def center(self, timespan=None):
+    def center(self, timespan=None, keep_log=False):
         ''' Centers the series (i.e. renove its estimated mean)
 
         Parameters
@@ -1658,24 +1681,28 @@ class Series:
         timespan : tuple or list
             The timespan over which the mean must be estimated.
             In the form [a, b], where a, b are two points along the series' time axis.
+            
+        keep_log : Boolean
+            if True, adds the previous mean and method parameters to the series log. 
 
         Returns
         -------
-        tsc : pyleoclim.Series
+        new : pyleoclim.Series
             The centered series object
-        ts_mean : estimated mean of the original series, in case it needs to be restored later
 
         '''
-        tsc = self.copy()
+        new = self.copy()
         if timespan is not None:
             ts_mean  = np.nanmean(self.slice(timespan).value)
             vc = self.value - ts_mean
         else:
             ts_mean  = np.nanmean(self.value)
             vc = self.value - ts_mean
-        tsc.value = vc
-        tsc.mean = ts_mean
-        return tsc
+        new.value = vc
+        
+        if keep_log == True:
+            new.log = new.log + ({len(new.log)+1:'center', 'args': timespan, 'previous_mean': ts_mean},)
+        return new
 
     def segment(self, factor=10):
         """Gap detection
@@ -1812,7 +1839,7 @@ class Series:
         return new
 
 
-    def detrend(self, method='emd', **kwargs):
+    def detrend(self, method='emd', keep_log=False, **kwargs):
         '''Detrend Series object
 
         Parameters
@@ -1830,7 +1857,7 @@ class Series:
         Returns
         -------
         new : pyleoclim.Series
-            Detrended Series object 
+            Detrended Series object in "value", with new field "trend" added
 
         See also
         --------
@@ -1890,7 +1917,7 @@ class Series:
             :okwarning:
             :okexcept:
 
-            ts_emd2 = ts.detrend(method='emd', n=2)
+            ts_emd2 = ts.detrend(method='emd', n=2, keep_log=True)
             ts_emd2.label = 'EMD detrending, last 2 modes'
             @savefig ts_emd_n2.png
             fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)')
@@ -1918,20 +1945,35 @@ class Series:
             :okwarning:
             :okexcept:
                 
-            ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201})
+            ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201}, keep_log=True)
             ts_sg2.label = 'savitzky-golay detrending, window_length = 201'
             @savefig ts_sg2.png
             fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
             
-
-        '''
+        Finally, the method returns the trend that was previous, so it can be added back in if need be.
         
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+            
+            trend_ts = pyleo.Series(time = time, value = nonlinear_trend,
+                                    value_name= 'trend', label='original trend')
+            @savefig ts_trend.png   
+            fig, ax = trend_ts.plot(title='Trend recovery')
+            ax.plot(time,ts_emd2.log[1]['previous_trend'],label='EMD ($n=2$)')
+            ax.plot(time,ts_sg2.log[1]['previous_trend'],label='SG,  window_length = 201')
+            ax.legend()
+
+        We can see that both methods can recover the exponential trend, with some edge effects near the end that could be addressed by judicious padding. 
+        '''
         new = self.copy()
-        v_mod, _ = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
+        v_mod, trend = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
         new.value = v_mod
         
+        if keep_log == True: 
+            new.log = new.log + ({len(new.log)+1 :'detrend','method': method, 'args': kwargs, 'previous_trend': trend},) 
         return new
 
     def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
