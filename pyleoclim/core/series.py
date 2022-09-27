@@ -131,14 +131,14 @@ class Series:
         # TODO: remove mean argument once it's safe to do so
         if log is None:
             self.log = ()
-            nlog = 0
+            nlog = -1
         else:
             self.log = log
             nlog = len(log)
                  
         if clean_ts == True:
             value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
-            self.log = self.log + ({nlog+1:'clean_ts', 'applied': clean_ts, 'verbose': verbose},)
+            self.log = self.log + ({nlog+1: 'clean_ts', 'applied': clean_ts, 'verbose': verbose},)
 
         self.time = np.array(time)
         self.value = np.array(value)
@@ -1647,7 +1647,7 @@ class Series:
         new.value = v_mod
         
         if keep_log == True:
-            new.log = new.log + ({len(new.log)+1:'gaussianize', 'applied': True},)        
+            new.log = new.log + ({len(new.log):'gaussianize', 'applied': True},)        
         return new
 
     def standardize(self, keep_log = False, scale=1):
@@ -1667,7 +1667,7 @@ class Series:
         new.value = vs
         
         if keep_log == True:
-            method_dict = {len(new.log)+1:'standardize', 'args': scale,
+            method_dict = {len(new.log):'standardize', 'args': scale,
                            'previous_mean': mu, 'previous_std': sig}
             new.log = new.log + (method_dict,)
         return new
@@ -1701,7 +1701,7 @@ class Series:
         new.value = vc
         
         if keep_log == True:
-            new.log = new.log + ({len(new.log)+1:'center', 'args': timespan, 'previous_mean': ts_mean},)
+            new.log = new.log + ({len(new.log): 'center', 'args': timespan, 'previous_mean': ts_mean},)
         return new
 
     def segment(self, factor=10):
@@ -1908,8 +1908,7 @@ class Series:
             ax.legend()
             
         
-
-        We see that the default function call results in a "Hockey Stick" at the end, which is undesirable.
+        We see that the default function call results in a "hockey stick" at the end, which is undesirable.
         There is no automated way to fix this, but with a little trial and error, we find that removing 
         the 2 smoothest modes performs reasonably well:
                 
@@ -1962,18 +1961,19 @@ class Series:
                                     value_name= 'trend', label='original trend')
             @savefig ts_trend.png   
             fig, ax = trend_ts.plot(title='Trend recovery')
-            ax.plot(time,ts_emd2.log[1]['previous_trend'],label='EMD ($n=2$)')
-            ax.plot(time,ts_sg2.log[1]['previous_trend'],label='SG,  window_length = 201')
+            ax.plot(time,ts_emd2.log[1]['previous_trend'],label=ts_emd2.label)
+            ax.plot(time,ts_sg2.log[1]['previous_trend'], label=ts_sg2.label)
             ax.legend()
 
-        We can see that both methods can recover the exponential trend, with some edge effects near the end that could be addressed by judicious padding. 
+        Both methods can recover the exponential trend, with some edge effects near the end that could be addressed by judicious padding. 
+        The functionality is not available for the methods based on SciPy.detrend(), since their API doesn't return the trend.'
         '''
         new = self.copy()
         v_mod, trend = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
         new.value = v_mod
         
         if keep_log == True: 
-            new.log = new.log + ({len(new.log)+1 :'detrend','method': method, 'args': kwargs, 'previous_trend': trend},) 
+            new.log = new.log + ({len(new.log): 'detrend','method': method, 'args': kwargs, 'previous_trend': trend},) 
         return new
 
     def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
