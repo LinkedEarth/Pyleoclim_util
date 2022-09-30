@@ -376,12 +376,12 @@ def set_style(style='journal', font_scale=1.0, dpi=300):
     
     '''
     font_dict = {
-        'font.size': 12,
-        'axes.labelsize': 12,
-        'axes.titlesize': 14,
-        'xtick.labelsize': 11,
-        'ytick.labelsize': 11,
-        'legend.fontsize': 11,
+        'font.size': 10,
+        'axes.labelsize': 11,
+        'axes.titlesize': 12,
+        'xtick.labelsize': 10,
+        'ytick.labelsize': 10,
+        'legend.fontsize': 9,
     }
 
     style_dict = {}
