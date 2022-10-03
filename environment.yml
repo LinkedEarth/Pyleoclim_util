@@ -15,4 +15,5 @@ dependencies:
   - python=3.9.13
   - libstdcxx-ng=12.1.0
   - pip:
+    - pangaeapy
     - pyleoclim==0.9.1
