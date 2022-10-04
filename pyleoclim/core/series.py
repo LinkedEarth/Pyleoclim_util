@@ -234,7 +234,6 @@ class Series:
                     time_dir = 'retrograde'
                     time_datum = 1950/1e3
                     time_exponent = 3
-                    time_unit_label = 'ky BP'
                 elif tu.find('my')>=0 or tu.find('ma')>=0:
                     time_dir = 'retrograde'
                     time_datum = 1950/1e6
@@ -243,10 +242,12 @@ class Series:
                     time_dir ='retrograde'
                     time_datum = 1950
                     time_exponent = 0
-                else:
+                elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0:
                     time_dir ='prograde'
                     time_datum = 0
                     time_exponent = 0
+                else:
+                    raise ValueError(f"Current Series time_unit={self.time_unit} is not supported. Supported time units are: 'year', 'years', 'yr', 'yrs', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
 
                 new_time = convert_func[time_dir](self.time, time_datum, time_exponent)
             else:
