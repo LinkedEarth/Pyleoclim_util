@@ -427,7 +427,7 @@ class EnsembleSeries(MultipleSeries):
                 np.random.seed(seed)
 
             nts = np.size(self.series_list)
-            random_draw_idx = np.random.choice(nts, num_traces)
+            random_draw_idx = np.random.choice(nts, num_traces, replace=False)
 
             for idx in random_draw_idx:
                 self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=lw,

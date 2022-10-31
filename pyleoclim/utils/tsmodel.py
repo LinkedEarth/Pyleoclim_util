@@ -144,8 +144,6 @@ def ar1_sim(y, p, t=None):
 
         # simulate AR(1) model for each column
         for i in np.arange(p):
-            #ysim[:, i] = sm.tsa.arma_generate_sample(ar=ar, ma=ma, nsample=n, burnin=50, sigma=sig_n) # old statsmodels syntax
-            #ysim[:, i] = sm.tsa.ArmaProcess(ar, ma).generate_sample(nsample=n, scale=sig_n, burnin=50) # statsmodels v0.11.1-?
             ysim[:, i] = arma_generate_sample(ar, ma, nsample=n, scale=sig_n, burnin=50) # statsmodels v0.12+
     else:
         #  tau_est = ar1_fit(y, t=t, detrend=detrend, params=params)
