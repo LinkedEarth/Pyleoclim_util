@@ -1528,20 +1528,21 @@ class Series:
         wavelet_plot_kwargs['cbar_style']['inset'] = True
         wavelet_plot_kwargs['cbar_style']['drawedges'] = True
 
-        ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
+        #ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
+        scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
 
         # pull colorbar specifications from scalogram plot
         #cbar_data = ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__
         
-        # cbar_data = ax['scal'].figure._localaxes[-1]._colorbar
+        #
+    
         for scal_ax in ax['scal'].figure._localaxes:
             try:
-                if 'axes' in scal_ax[1]._colorbar.mappable.__dict__.keys():
-                    cbar_data = scal_ax[1]._colorbar
-                    # remove inset colorbar (moved to its own axis below)
-                    scal_ax[1]._colorbar.ax.remove()
+                cbar_data = scal_ax._colorbar
+                scal_ax._colorbar.ax.remove()
             except:
                 pass
+            
         
 
         #ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__['ax'].remove()  # clear()#remove()#.set_visible(False)
@@ -2568,7 +2569,8 @@ class Series:
             wwz_Neffs = wave_res.Neffs
         elif method=='cwt':
             wwz_Neffs = None
-            args[method].update({'scale':wave_res.scale,'mother':wave_res.mother,'param':wave_res.param})
+            args[method].update({'scale':wave_res.scale,'mother':wave_res.mother,'param':wave_res.param,
+                                 'standardize':wave_res.standardize, 'gaussianize':wave_res.gaussianize})
 
         scal = Scalogram(
             frequency=wave_res.freq,
