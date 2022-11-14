@@ -578,6 +578,130 @@ class Series:
         )
 
         return res
+    
+    def stripes(self, ref_period, LIM = 2.8, thickness=1.0, figsize=[8, 1], xlim=None,
+              label=None, xlabel=None, ylabel=None, title=None, 
+              savefig_settings=None, ax=None, invert_xaxis=False):
+        '''Represents the Series as an Ed Hawkins "warming stripes" pattern
+        
+        Credit: https://matplotlib.org/matplotblog/posts/warming-stripes/
+
+        Parameters
+        ----------
+        ref_period : array-like (2-elements)
+            dates of the reference period, in the form "(first, last)"
+        
+        thickness : float, optional
+            vertical thickness of the stripe . The default is 1.0
+            
+        LIM : float
+            scaling factor for color saturation
+
+        figsize : list
+            a list of two integers indicating the figure size (in inches)
+            
+        xlim : list
+            time axis limits
+
+        label : str
+            the label for the line
+
+        xlabel : str
+            the label for the x-axis
+
+        ylabel : str
+            the label for the y-axis
+
+        title : str
+            the title for the figure
+
+        invert_xaxis : bool, optional
+            if True, the x-axis of the plot will be inverted
+        
+
+        savefig_settings : dict
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}
+
+        ax : matplotlib.axis, optional
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
+
+
+        Returns
+        -------
+
+        fig : matplotlib.figure
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/stable/api/figure_api.html) for details.
+
+        ax : matplotlib.axis
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/stable/api/axes_api.html) for details.
+
+        Notes
+        -----
+
+        When `ax` is passed, the return will be `ax` only; otherwise, both `fig` and `ax` will be returned.
+
+        See also
+        --------
+
+        pyleoclim.utils.plotting.savefig : saving a figure in Pyleoclim
+
+        Examples
+        --------
+
+        Plot the HadCRUT4.6 Global Mean Surface Temperature
+
+            .. ipython:: python
+                :okwarning:
+                :okexcept:
+
+                import pyleoclim as pyleo
+                import pandas as pd
+                url = 'https://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/time_series/HadCRUT.4.6.0.0.annual_ns_avg.txt'
+                df = pd.read_fwf(url, index_col=0,
+                                 usecols=(0, 1), names=['year', 'anomaly'],header=None
+                                 )
+                time = df.index
+                value = df['anomaly']
+                ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='GMST')
+                fig, ax = ts.stripes(ref_period=(1971,2000))
+                pyleo.closefig(fig)
+
+        '''
+               # @savefig soi_stripes.png
+
+        # generate default axis labels
+        time_label, value_label = self.make_labels()
+
+        if xlabel is None:
+            xlabel = time_label
+
+        if ylabel is None:
+            ylabel = value_label
+
+        if label is None:
+            label = self.label
+
+        idx0 = (np.abs(self.time - ref_period[0])).argmin() 
+        idx1 = (np.abs(self.time - ref_period[1])).argmin() 
+
+        LIMs = self.value.std()*LIM
+        
+        res = plotting.stripes_xy(
+            x=self.time, y=self.value, ref_period=(idx0,idx1),
+            LIM = LIMs, thickness = thickness,
+            figsize=figsize, xlabel=xlabel, ylabel=ylabel,
+            title=title, savefig_settings=savefig_settings,
+            ax=ax,  xlim=xlim, invert_xaxis=invert_xaxis, 
+        )
+
+        return res
+
 
     def ssa(self, M=None, nMC=0, f=0.3, trunc = None, var_thresh=80):
         ''' Singular Spectrum Analysis
