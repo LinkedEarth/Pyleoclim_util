@@ -728,10 +728,10 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
 
     if method == "linear":
         ys = signal.detrend(y,type='linear')
-        trend = None
+        trend = y - ys
     elif method == 'constant':
         ys = signal.detrend(y,type='constant')
-        trend = None 
+        trend = y - ys 
     elif method == "savitzky-golay":
         # Check that the timeseries is uneven and interpolate if needed
         if x is None:

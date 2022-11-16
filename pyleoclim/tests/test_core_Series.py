@@ -252,6 +252,7 @@ class TestUiSeriesBin:
 
         ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts2_bin=ts2.bin(keep_log=True)
+        print(ts2_bin.log[1])
 
     def test_bin_t2(self):
         ''' Test the bin function by passing arguments'''
@@ -304,8 +305,11 @@ class TestUiSeriesCenter:
 
         #Call function to be tested
         tsc = ts.center(keep_log=True)
+        print(tsc.log[1])
 
         assert np.abs(tsc.mean) <= np.sqrt(sys.float_info.epsilon) 
+        
+        assert tsc.mean == tsc.log[1]['previous_mean']
 
 class TestUiSeriesStandardize:
     '''Test for Series.standardize()
