@@ -12,13 +12,13 @@ from ..core.scalograms import MultipleScalogram
 from ..core.psds import MultiplePSD
 from ..core.spatialdecomp import SpatialDecomp
 
-import matplotlib.pyplot as plt
 import numpy as np
 from copy import deepcopy
 
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.transforms as transforms
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 from tqdm import tqdm
 from scipy import stats
@@ -80,7 +80,7 @@ class MultipleSeries:
             self.series_list = new_ts_list
 
     def convert_time_unit(self, time_unit='years'):
-        ''' Convert the time unit of the timeseries
+        ''' Convert the time units of the object
 
         Parameters
         ----------
@@ -1813,6 +1813,175 @@ class MultipleSeries:
         xt = ax[n_ts].get_xticks()[1:-1]
         for x in xt:
             ax[n_ts].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            mpl.rcParams.update(current_style)
+            return fig, ax
+        else:
+            # reset the plotting style
+            mpl.rcParams.update(current_style)
+            return ax
+        
+    def stripes(self, ref_period=None, figsize=None, savefig_settings=None,  
+                LIM = 2.8, thickness=1.0, labels='auto',  label_color = 'gray',
+                common_time_kwargs=None, xlim=None, font_scale=0.8, x_offset = 0.05):
+        '''
+        Represents a MultipleSeries object as a quilt of Ed Hawkins' "warming stripes" patterns
+        
+        To ensure comparability, constituent series are placed on a common time axis, using
+        `MultipleSeries.common_time()`. To ensure consistent scaling, all series are Gaussianized
+        prior to plotting. 
+    
+        Credit: https://showyourstripes.info/,
+        Implementation: https://matplotlib.org/matplotblog/posts/warming-stripes/
+
+        Parameters
+        ----------
+        ref_period : TYPE, optional
+            dates of the reference period, in the form "(first, last)".
+            The default is None, which will pick the beginning and end of the common time axis.
+        
+        LIM : float
+            scaling factor for color saturation. default is 2.8. 
+            The higher the LIM, the more compressed the color range (milder hues)
+        
+        thickness : float, optional
+            vertical thickness of the stripe . The default is 1.0
+            
+        figsize : list
+        
+            Size of the figure.
+            
+        savefig_settings : dictionary
+        
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existing or non-existing path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            
+        xlim : list
+            The x-axis limit.
+            
+        x_offset : float
+            value controlling the horizontal offset between stripes and labels (default = 0.05)          
+            
+        labels: None, 'auto' or list
+        
+            If None, doesn't add labels to the subplots
+            If 'auto', uses the labels passed during the creation of pyleoclim.Series
+            If list, pass a list of strings for each labels.
+            Default is 'auto'
+            
+        common_time_kwargs : dict
+            Optional arguments for common_time()
+            
+        font_scale : float
+            The scale for the font sizes. Default is 0.8.   
+
+        Returns
+        -------
+        fig : matplotlib.figure
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/stable/api/figure_api.html) for details.
+
+        ax : matplotlib.axis
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/stable/api/axes_api.html) for details.
+            
+        See also
+        --------
+        
+        pyleoclim.core.multipleseries.MultipleSeries.common_time : aligns the time axes of a MultipleSeries object
+
+        pyleoclim.utils.plotting.savefig : saving a figure in Pyleoclim
+        
+        pyleoclim.core.series.Series.stripes : stripes representation in Pyleoclim   
+        
+        pyleoclim.utils.tsutils.gaussianize : mapping to a standard Normal distribution
+            
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            d = pyleo.Lipd(usr_path = url)
+            tslist = d.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
+            @savefig md76_stripes.png
+            fig, ax = ms.stripes()
+            pyleo.closefig(fig)
+             
+        The default style has rather thick bands, intense colors, and too many stripes.
+        The first issue can be solved by passing a figsize tuple; the second by increasing the LIM parameter; 
+        the third by passing a step of 0.5 (500y) to common_time(). Finally, the 
+        labels are too close to the edge of the plot, which can be adjusted with x_offset, like so:  
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            d = pyleo.Lipd(usr_path = url)
+            tslist = d.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
+            @savefig md76_stripes2.png
+            fig, ax = ms.stripes(common_time_kwargs={'step': 0.5}, x_offset = 200, 
+                                 LIM=4, figsize=figsize=[8,3])
+            pyleo.closefig(fig)     
+            
+        '''
+        current_style = deepcopy(mpl.rcParams)
+        plotting.set_style('journal', font_scale=font_scale)
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
+
+        # put on common timescale
+        msc = self.common_time(**common_time_kwargs)
+        
+        ts0 = msc.series_list[0]
+        time = ts0.time
+        # generate default axis labels
+        time_label, _ = ts0.make_labels()
+           
+        if ref_period is None:
+            ref_period = [time.min(), time.max()]
+        
+        n_ts = len(msc.series_list)
+        last = n_ts-1
+
+        if n_ts < 2:
+            raise ValueError("There is only one series in this object. Please use the Series class instead")
+
+        if type(labels)==list:
+            if len(labels) != n_ts:
+                raise ValueError("The length of the label list should match the number of timeseries to be plotted")
+
+        fig, axs = plt.subplots(n_ts, 1, sharex=True, figsize=figsize, layout = 'tight')
+        ax = axs.flatten()
+
+        if xlim is None:
+            xlim = [time.min(), time.max()]
+
+        for idx in range(n_ts-1):  # loop over series
+            ts = msc.series_list[idx].gaussianize()
+            ts.stripes(ref_period, LIM = LIM, label_color = label_color,
+                       ax=ax[idx], x_offset=x_offset) 
+            
+        # handle bottom plot
+        ts = msc.series_list[last].gaussianize()
+        ts.stripes(ref_period, LIM = LIM, label_color = label_color, 
+                   ax=ax[last], x_offset=x_offset, show_xaxis=True) 
+        ax[last].set_xlabel(time_label)
+        ax[last].set_xlim(xlim)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:

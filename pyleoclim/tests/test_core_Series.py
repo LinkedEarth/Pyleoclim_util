@@ -844,6 +844,21 @@ class TestUiSeriesPlot:
 
         
         pyleo.closefig(fig)
+        
+class TestUiSeriesStripes:
+    '''Test for Series.stripes()
+
+    Series.stripes outputs a matplotlib figure and axis object, so we will compare the time axis
+    of the axis object to the time array.'''
+
+    def test_stripes(self):
+
+        ts = gen_normal()
+
+        fig, ax = ts.stripes(ref_period=[61,90],x_offset=2)
+
+        pyleo.closefig(fig)
+
 
 class TestUiSeriesHistplot:
     '''Test for Series.histplot()'''

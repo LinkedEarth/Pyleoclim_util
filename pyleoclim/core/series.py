@@ -576,8 +576,9 @@ class Series:
         return res
     
     def stripes(self, ref_period, LIM = 2.8, thickness=1.0, figsize=[8, 1], xlim=None,
-              label=None, xlabel=None, ylabel=None, title=None, 
-              savefig_settings=None, ax=None, invert_xaxis=False):
+              top_label=None, bottom_label=None, label_color = 'gray', label_size = None,
+              xlabel=None, savefig_settings=None, ax=None, invert_xaxis=False,
+              show_xaxis=False, x_offset = 0.05):
         '''Represents the Series as an Ed Hawkins "warming stripes" pattern
         
         Credit: https://matplotlib.org/matplotblog/posts/warming-stripes/
@@ -591,7 +592,7 @@ class Series:
             vertical thickness of the stripe . The default is 1.0
             
         LIM : float
-            scaling factor for color saturation
+            scaling factor for color saturation. default is 2.8
 
         figsize : list
             a list of two integers indicating the figure size (in inches)
@@ -599,22 +600,21 @@ class Series:
         xlim : list
             time axis limits
 
-        label : str
-            the label for the line
-
-        xlabel : str
-            the label for the x-axis
-
-        ylabel : str
-            the label for the y-axis
-
-        title : str
-            the title for the figure
+        top_label : str
+            the "title" label for the stripe
+            
+        bottom_label : str
+            the "ylabel" explaining which variable is being plotted
 
         invert_xaxis : bool, optional
             if True, the x-axis of the plot will be inverted
-        
-
+            
+        x_offset : float
+            value controlling the horizontal offset between stripes and labels (default = 0.05)
+         
+        show_xaxis : bool
+            flag indicating whether or not the x-axis should be shown (default = False)
+                
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -624,7 +624,6 @@ class Series:
         ax : matplotlib.axis, optional
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
-
 
         Returns
         -------
@@ -644,13 +643,15 @@ class Series:
 
         See also
         --------
+        
+        pyleoclim.utils.plotting.stripes : stripes representation of a timeseries
 
         pyleoclim.utils.plotting.savefig : saving a figure in Pyleoclim
 
         Examples
         --------
 
-        Plot the HadCRUT4.6 Global Mean Surface Temperature
+        Plot the HadCRUT5 Global Mean Surface Temperature
 
             .. ipython:: python
                 :okwarning:
@@ -658,44 +659,54 @@ class Series:
 
                 import pyleoclim as pyleo
                 import pandas as pd
-                url = 'https://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/time_series/HadCRUT.4.6.0.0.annual_ns_avg.txt'
-                df = pd.read_fwf(url, index_col=0,
-                                 usecols=(0, 1), names=['year', 'anomaly'],header=None
-                                 )
-                time = df.index
-                value = df['anomaly']
-                ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='GMST')
+                url = 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.annual.csv'
+                df = pd.read_csv(url)
+                time = df['Time']
+                gmst = df['Anomaly (deg C)']
+                ts = pyleo.Series(time=time,value=gmst, label = 'HadCRUT5', time_name='Year C.E', value_name='GMST')
+                @savefig hadCRUT5_stripes.png
                 fig, ax = ts.stripes(ref_period=(1971,2000))
                 pyleo.closefig(fig)
-
+                
+        If you wanted to show the time axis, and save to a png file:
+            
+            .. ipython:: python
+                :okwarning:
+                :okexcept:
+                    
+                import pyleoclim as pyleo
+                import pandas as pd
+                url = 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.annual.csv'
+                df = pd.read_csv(url)
+                time = df['Time']
+                gmst = df['Anomaly (deg C)']
+                ts = pyleo.Series(time=time,value=gmst, label = 'HadCRUT5', time_name='Year C.E', value_name='GMST')
+                @savefig hadCRUT5_stripes2.png
+                fig, ax = ts.stripes(ref_period=(1971,2000), savefig_settings = {'path':'./stripes.png'}, show_xaxis=True)
+                pyleo.closefig(fig)
         '''
-               # @savefig soi_stripes.png
 
-        # generate default axis labels
-        time_label, value_label = self.make_labels()
-
-        if xlabel is None:
-            xlabel = time_label
-
-        if ylabel is None:
-            ylabel = value_label
-
-        if label is None:
-            label = self.label
+        if top_label is None:
+            top_label = self.label
+            
+        if bottom_label is None:
+            bottom_label = self.value_name
 
         idx0 = (np.abs(self.time - ref_period[0])).argmin() 
         idx1 = (np.abs(self.time - ref_period[1])).argmin() 
 
         LIMs = self.value.std()*LIM
+        # Ed Hawkins says: Currently I use HadCRUT5 with a 1971-2000 baseline 
+        # and a colour scaling of +/- 0.75K (which is probably similar to LIM). 
+        # It should be relatively simple to duplicate the stripes exactly 
         
         res = plotting.stripes_xy(
-            x=self.time, y=self.value, ref_period=(idx0,idx1),
-            LIM = LIMs, thickness = thickness,
-            figsize=figsize, xlabel=xlabel, ylabel=ylabel,
-            title=title, savefig_settings=savefig_settings,
-            ax=ax,  xlim=xlim, invert_xaxis=invert_xaxis, 
-        )
-
+            x=self.time, y=self.value, ref_period=(idx0,idx1), LIM = LIMs, thickness = thickness,
+            top_label = top_label, bottom_label = bottom_label, label_color = label_color,
+            figsize=figsize, ax=ax,  xlim=xlim, invert_xaxis=invert_xaxis,  label_size=label_size,
+            savefig_settings=savefig_settings, show_xaxis=show_xaxis, x_offset = x_offset,
+        )   
+        
         return res
 
 
