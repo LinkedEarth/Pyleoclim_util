@@ -587,7 +587,7 @@ class TestUISeriesOutliers:
         # Get a series object
         ts2 = pyleo.Series(time = ts.time, value = v_out)
         # Remove outliers
-        ts_out, res = ts.outliers(remove=remove_outliers)
+        ts_out = ts2.outliers(remove=remove_outliers)
     
     @pytest.mark.parametrize('method', ['kmeans','DBSCAN'])
     def test_outliers_t2(self,method):
@@ -605,7 +605,25 @@ class TestUISeriesOutliers:
         # Get a series object
         ts2 = pyleo.Series(time = ts.time, value = v_out)
         # Remove outliers
-        ts_out, res = ts.outliers(method=method)
+        ts_out = ts2.outliers(method=method)
+    
+    @pytest.mark.parametrize('keep_log', [True,False])
+    def test_outliers_t3(self,keep_log):
+
+        #Generate data
+        ts = gen_ts()
+        #Add outliers
+        outliers_start = np.mean(ts.value)+5*np.std(ts.value)
+        outliers_end = np.mean(ts.value)+7*np.std(ts.value)
+        outlier_values = np.arange(outliers_start,outliers_end,0.1)
+        index = np.random.randint(0,len(ts.value),6)
+        v_out = ts.value
+        for i,ind in enumerate(index):
+            v_out[ind] = outlier_values[i]
+        # Get a series object
+        ts2 = pyleo.Series(time = ts.time, value = v_out)
+        # Remove outliers
+        ts_out = ts2.outliers(keep_log=keep_log)
 
 class TestUISeriesGkernel:
     ''' Unit tests for the TestUISeriesGkernel function

@@ -88,6 +88,10 @@ class Series:
     clean_ts : boolean flag
         set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
         Default is True
+    
+    log : dict
+    
+    If keep_log is set to True, then a log of the transformations made to the timeseries will be kept. 
 
     verbose : bool
         If True, will print warning messages if there is any
@@ -1535,20 +1539,21 @@ class Series:
         wavelet_plot_kwargs['cbar_style']['inset'] = True
         wavelet_plot_kwargs['cbar_style']['drawedges'] = True
 
-        ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
+        #ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
+        scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
 
         # pull colorbar specifications from scalogram plot
         #cbar_data = ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__
         
-        # cbar_data = ax['scal'].figure._localaxes[-1]._colorbar
+        #
+    
         for scal_ax in ax['scal'].figure._localaxes:
             try:
-                if 'axes' in scal_ax[1]._colorbar.mappable.__dict__.keys():
-                    cbar_data = scal_ax[1]._colorbar
-                    # remove inset colorbar (moved to its own axis below)
-                    scal_ax[1]._colorbar.ax.remove()
+                cbar_data = scal_ax._colorbar
+                scal_ax._colorbar.ax.remove()
             except:
                 pass
+            
         
 
         #ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__['ax'].remove()  # clear()#remove()#.set_visible(False)
@@ -2575,7 +2580,8 @@ class Series:
             wwz_Neffs = wave_res.Neffs
         elif method=='cwt':
             wwz_Neffs = None
-            args[method].update({'scale':wave_res.scale,'mother':wave_res.mother,'param':wave_res.param})
+            args[method].update({'scale':wave_res.scale,'mother':wave_res.mother,'param':wave_res.param,
+                                 'standardize':wave_res.standardize, 'gaussianize':wave_res.gaussianize})
 
         scal = Scalogram(
             frequency=wave_res.freq,
@@ -3082,7 +3088,7 @@ class Series:
 
     def outliers(self,method='kmeans',remove=True, settings=None, 
                  fig_outliers=True, figsize_outliers=[10,4], plotoutliers_kwargs=None, savefigoutliers_settings=None,
-                 fig_clusters=True,figsize_clusters=[10,4], plotclusters_kwargs=None,savefigclusters_settings=None):
+                 fig_clusters=True,figsize_clusters=[10,4], plotclusters_kwargs=None,savefigclusters_settings=None, keep_log=False):
         """
         Remove outliers from timeseries data
 
@@ -3111,20 +3117,28 @@ class Series:
             The dimensions of the cluster figures. The default is [10,4].
         plotclusters_kwargs : dict, optional
             Arguments for the cluster plot. The default is None.
-        savefigclusters_settings : TYPE, optional
+        savefigclusters_settings : dict, optional
             Saving options for the cluster plot. The default is None.
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
+        keep_log : Boolean
+            if True, adds the previous method parameters to the series log. 
 
         Returns
         -------
         ts: pyleoclim.Series
             A new Series object witthout outliers if remove is True. Otherwise, returns the original timeseries
         
-        res: pandas.DataFrame
-            Contains relevant diagnostic metrics for the clustering algorithms. 
+            
+        See also
+        --------
 
+        pyleoclim.utils.tsutils.detect_outliers_DBSCAN : Outlier detection using the DBSCAN method
+        
+        pyleoclim.utils.tsutils.detect_outliers_kmeans : Outlier detection using the kmeans method
+        
+        pyleoclim.utils.tsutils.remove_outliers : Remove outliers from the series
         """    
         if method not in ['kmeans','DBSCAN']:
             raise ValueError('method should either be "kmeans" or "DBSCAN"')
@@ -3279,7 +3293,26 @@ class Series:
             if 'path' in savefigclusters_settings:
                 plotting.savefig(fig,settings=savefigclusters_settings)
         
-        return new, res  
+        #return the log if asked
+        if keep_log == True: 
+            if method == 'kmeans':
+                new.log += ({len(new.log): 'outliers','method': method, 
+                                           'args': settings,
+                                           'nbr_clusters':np.array(res['number of clusters']),
+                                           'silhouette_score':np.array(res['silhouette score']),
+                                           'outlier_indices':np.array(res['outlier indices']),
+                                           'clusters':np.array(res['clusters'])},)
+            elif method == 'DBSCAN':
+                new.log += ({len(new.log): 'outliers','method': method, 
+                                           'args': settings,
+                                           'eps':np.array(res['eps']),
+                                           'min_samples':np.array(res['min_samples']),
+                                           'nbr_clusters':np.array(res['number of clusters']),
+                                           'silhouette_score':np.array(res['silhouette score']),
+                                           'outlier_indices':np.array(res['outlier indices']),
+                                           'clusters':np.array(res['clusters'])},)
+        
+        return new
 
     def interp(self, method='linear', keep_log= False, **kwargs):
         '''Interpolate a Series object onto a new time axis

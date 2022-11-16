@@ -1,7 +1,7 @@
 
 # It is unclear why the documentation for these two modules does not build automatically using automodule. It therefore had to be built using autoclass
 
-from ..utils import plotting, lipdutils
+from ..utils import plotting, lipdutils, tsutils
 from ..utils import wavelet as waveutils
 
 import matplotlib.pyplot as plt
@@ -582,8 +582,11 @@ class Scalogram:
                 raise TypeError('qs should be a list')
 
             settings = {} if settings is None else settings.copy()
+            
+            ys = tsutils.preprocess(self.timeseries.value, self.timeseries.time, detrend=False, sg_kwargs=None,
+                       gaussianize=self.wave_args['gaussianize'], standardize=self.wave_args['standardize'])
 
-            signif_levels=waveutils.tc_wave_signif(self.timeseries.value,
+            signif_levels=waveutils.tc_wave_signif(ys,
                                                    self.timeseries.time,
                                                    self.wave_args['scale'],
                                                    self.wave_args['mother'],

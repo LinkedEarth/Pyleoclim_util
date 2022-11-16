@@ -70,7 +70,7 @@ Tsutils
 """""""
 
 .. automodule:: pyleoclim.utils.tsutils
-   :members: simple_stats, bin, interp, gkernel, standardize, ts2segments, annualize, gaussianize, gaussianize_1d, detrend, remove_outliers
+   :members: simple_stats, bin, interp, gkernel, standardize, ts2segments, annualize, gaussianize, gaussianize_1d, detrend, remove_outliers, detect_outliers_DBSCAN, detect_outliers_kmeans
 
 
 Tsbase
