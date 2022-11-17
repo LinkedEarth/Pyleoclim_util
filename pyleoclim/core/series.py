@@ -7,7 +7,7 @@ The Series class describes the most basic objects in Pyleoclim. A Series is a si
 How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
 """
 
-from ..utils import tsutils, plotting, tsmodel, tsbase
+from ..utils import tsutils, plotting, tsmodel, tsbase, mapping, lipdutils
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
@@ -34,7 +34,7 @@ from copy import deepcopy
 import matplotlib.colors as mcolors
 import random
 
-from matplotlib import gridspec
+#from matplotlib import gridspec
 import warnings
 import collections
 
@@ -131,7 +131,8 @@ class Series:
     '''
 
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, 
-                 value_unit=None, label=None, mean=None, clean_ts=True, log=None, verbose=False):
+                 value_unit=None, label=None, lat=None, lon=None, dataset_name=None, 
+                 archiveType = None, mean=None, clean_ts=True, log=None, verbose=False):
         # TODO: remove mean argument once it's safe to do so
         if log is None:
             self.log = ()
@@ -151,6 +152,10 @@ class Series:
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
+        self.lat = lat
+        self.lon = lon
+        self.dataset_name = dataset_name
+        self.archiveType = archiveType
         #self.clean_ts=clean_ts
         #self.verbose=verbose
         
@@ -3413,3 +3418,179 @@ class Series:
         if keep_log == True:
             new.log += ({len(new.log):'bin', 'args': kwargs},)
         return new
+
+    def map(self, projection='Orthographic', proj_default=True,
+            background=True, borders=False, rivers=False, lakes=False,
+            figsize=None, ax=None, marker=None, color=None,
+            markersize=None, scatter_kwargs=None,
+            legend=True, lgd_kwargs=None, savefig_settings=None):
+        '''Map the location of the record
+
+        Parameters
+        ----------
+        projection : str, optional
+
+            The projection to use. The default is 'Robinson'.
+
+        proj_default : bool; {True, False}, optional
+
+            Whether to use the Pyleoclim defaults for each projection type. The default is True.
+
+        background :  bool; {True, False}, optional
+
+            Whether to use a background. The default is True.
+
+        borders :  bool; {True, False}, optional
+
+            Draw borders. The default is False.
+
+        rivers :  bool; {True, False}, optional
+
+            Draw rivers. The default is False.
+
+        lakes :  bool; {True, False}, optional
+
+            Draw lakes. The default is False.
+
+        figsize : list or tuple, optional
+
+            The size of the figure. The default is None.
+
+        ax : matplotlib.ax, optional
+
+            The matplotlib axis onto which to return the map. The default is None.
+
+        marker : str, optional
+
+            The marker type for each archive. The default is None. Uses plot_default
+
+        color : str, optional
+
+            Color for each archive. The default is None. Uses plot_default
+
+        markersize : float, optional
+
+            Size of the marker. The default is None.
+
+        scatter_kwargs : dict, optional
+
+            Parameters for the scatter plot. The default is None.
+
+        legend :  bool; {True, False}, optional
+
+            Whether to plot the legend. The default is True.
+
+        lgd_kwargs : dict, optional
+
+            Arguments for the legend. The default is None.
+
+        savefig_settings : dict, optional
+
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
+
+        Returns
+        -------
+
+        res : fig,ax
+
+        See also
+        --------
+
+        pyleoclim.utils.mapping.map : Underlying mapping function for Pyleoclim
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            ts = data.to_LipdSeries(number=5)
+            @savefig mapone.png
+            fig, ax = ts.map()
+            pyleo.closefig(fig)
+
+        '''
+        scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
+        # get the information from the timeseries
+        
+        if self.lat is None or self.lon is None:
+            raise ValueError('Latitude and longitude should be provided for mapping')
+        else:        
+            lat = [self.lat]
+            lon = [self.lon]
+
+        if self.archiveType is None:
+            archiveType = 'other'
+        else:
+            archiveType = lipdutils.LipdToOntology(self.archiveType).lower().replace(" ", "")
+
+        if markersize is not None:
+            scatter_kwargs.update({'s': markersize})
+
+        plot_default = plotting.set_archive_color(archiveType)
+
+        if marker == None:
+            marker = plot_default[1]
+
+        if color == None:
+            color = plot_default[0]
+
+        if proj_default == True:
+            proj1 = {'central_latitude': lat[0],
+                     'central_longitude': lon[0]}
+            proj2 = {'central_latitude': lat[0]}
+            proj3 = {'central_longitude': lon[0]}
+
+        archiveType = [archiveType]  # list so it will work with map
+        marker = [marker]
+        color = [color]
+
+        if proj_default == True:
+
+            try:
+                res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+                                  marker=marker, color=color,
+                                  projection=projection, proj_default=proj1,
+                                  background=background, borders=borders,
+                                  rivers=rivers, lakes=lakes,
+                                  figsize=figsize, ax=ax,
+                                  scatter_kwargs=scatter_kwargs, legend=legend,
+                                  lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings, )
+
+            except:
+                try:
+                    res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+                                      marker=marker, color=color,
+                                      projection=projection, proj_default=proj3,
+                                      background=background, borders=borders,
+                                      rivers=rivers, lakes=lakes,
+                                      figsize=figsize, ax=ax,
+                                      scatter_kwargs=scatter_kwargs, legend=legend,
+                                      lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
+                except:
+                    res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+                                      marker=marker, color=color,
+                                      projection=projection, proj_default=proj2,
+                                      background=background, borders=borders,
+                                      rivers=rivers, lakes=lakes,
+                                      figsize=figsize, ax=ax,
+                                      scatter_kwargs=scatter_kwargs, legend=legend,
+                                      lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
+
+        else:
+            res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+                              marker=marker, color=color,
+                              projection=projection, proj_default=proj_default,
+                              background=background, borders=borders,
+                              rivers=rivers, lakes=lakes,
+                              figsize=figsize, ax=ax,
+                              scatter_kwargs=scatter_kwargs, legend=legend,
+                              lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
+        return res
