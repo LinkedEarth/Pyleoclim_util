@@ -99,7 +99,7 @@ class Series:
     Examples
     --------
 
-    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create aSeries object.
+    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a Series object.
 
     .. ipython:: python
         :okwarning:
