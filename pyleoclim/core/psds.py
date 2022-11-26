@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tabulate import tabulate
 from copy import deepcopy
+from tqdm import tqdm
 import warnings
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
@@ -1179,7 +1180,7 @@ class MultiplePSD:
         else:
             return ax
 
-    def anti_alias(self, avgs=2):
+    def anti_alias(self, avgs=2, mute_pbar=False):
         ''' Apply the anti-aliasing filter
 
         Parameters
@@ -1188,6 +1189,10 @@ class MultiplePSD:
         avgs : int
             flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
             OR from measurements averaged over each sampling interval (avgs==1)
+
+        mute_pbar : bool; {True,False}
+        
+            If True, the progressbar will be muted. Default is False.
 
         Returns
         -------
@@ -1208,7 +1213,7 @@ class MultiplePSD:
         pyleoclim.utils.wavelet.AliasFilter.alias_filter : anti-aliasing filter
         '''
         psd_aa_list = []
-        for psd_obj in self.psd_list:
+        for psd_obj in tqdm(self.psd_list,  total=len(self.psd_list), disable=mute_pbar, desc='Applying the anti-alias filter'):
             psd_aa = psd_obj.anti_alias(avgs=avgs)
             psd_aa_list.append(psd_aa)
 
