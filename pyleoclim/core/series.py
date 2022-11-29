@@ -32,6 +32,7 @@ from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
 import matplotlib.colors as mcolors
+import matplotlib.colorbar as mcb
 import random
 
 from matplotlib import gridspec
@@ -1329,18 +1330,14 @@ class Series:
             arguments to be passed to the gridspec configuration
             The plot is constructed with six slots:
                 - slot [0] contains a subgridspec containing the timeseries and scalogram (shared x axis)
-                - slot [1] contains a subgridspec containing an empty slot and the PSD plot (shared y axis with
-                scalogram)
+                - slot [1] contains a subgridspec containing an empty slot and the PSD plot (shared y axis with scalogram)
                 - slot [2] and slot [3] are empty to allow ample room for xlabels for the scalogram and PSD plots
                 - slot [4] contains the scalogram color bar
                 - slot [5] is empty
-            
             It is possible to tune the size and spacing of the various slots
                 - 'width_ratios': list of two values describing the relative widths of the two columns (default: [6, 1])
-                - 'height_ratios': list of three values describing the relative heights of the three rows (default: [8, 1,
-                .35])
-                - 'hspace': vertical space between gridspec slots (default: 0, however if either the scalogram xlabel or
-                the PSD xlabel contain '\n', .05)
+                - 'height_ratios': list of three values describing the relative heights of the three rows (default: [8, 1, .35])
+                - 'hspace': vertical space between gridspec slots (default: 0, however if either the scalogram xlabel or the PSD xlabel contain '\n', .05)
                 - 'wspace': lateral space between gridspec slots (default: 0.1)
 
         y_label_loc : float
@@ -1513,40 +1510,26 @@ class Series:
         else:
             orient = 'horizontal'
             # I think padding is now the hspace
-            if 'pad' in wavelet_plot_kwargs['cbar_style']:
-                pad = wavelet_plot_kwargs['cbar_style']['pad']
-            else:
-                pad = 0.12
+            # if 'pad' in wavelet_plot_kwargs['cbar_style']:
+            #     pad = wavelet_plot_kwargs['cbar_style']['pad']
+            # else:
+            #     pad = 0.12
             if 'label' in wavelet_plot_kwargs['cbar_style']:
                 label = wavelet_plot_kwargs['cbar_style']['label']
             else:
                 label = wavelet_plot_kwargs['variable'].capitalize() + ' from ' + scalogram.wave_method
-            wavelet_plot_kwargs.update({'cbar_style': {'orientation': orient, 'pad': pad,
-                                                       'label': label}})
+            wavelet_plot_kwargs.update({'cbar_style': {'orientation': orient,
+                                                       'label': label,
+                                                       # 'pad': pad,
+                                                       }})
 
-        # Moving the colorbar to its own axis without leaving white space
-        wavelet_plot_kwargs['cbar_style']['inset'] = True
         wavelet_plot_kwargs['cbar_style']['drawedges'] = True
 
-        #ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
-        scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
+        # Do not plot colorbar in scalogram
+        wavelet_plot_kwargs['plot_cb'] = False
 
-        # pull colorbar specifications from scalogram plot
-        #cbar_data = ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__
-        
-        #
-    
-        for scal_ax in ax['scal'].figure._localaxes:
-            try:
-                cbar_data = scal_ax._colorbar
-                scal_ax._colorbar.ax.remove()
-            except:
-                pass
-            
-        
-
-        #ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__['ax'].remove()  # clear()#remove()#.set_visible(False)
-        # ax['scal'].figure._localaxes[-1].remove()
+        # Plot scalogram
+        ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
         
         if y_label_loc is not None:
             ax['scal'].get_yaxis().set_label_coords(y_label_loc, 0.5)
@@ -1558,7 +1541,6 @@ class Series:
                     'Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
         if time_label is not None:
-            # time_label, value_label = self.make_labels()
             ax['scal'].set_xlabel(time_label)
             if 'xlabel' in wavelet_plot_kwargs:
                 print(
@@ -1708,7 +1690,14 @@ class Series:
         #     if 'xlabel' in psd_plot_kwargs:
         #         print('Xlabel passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
+        # plot color bar for scalogram using filled contour data
         ax['cb'] = fig.add_subplot(gs_d['cb'][0, 0])
+        cb = mcb.Colorbar(ax=ax['cb'], mappable=scalogram.conf,
+                          orientation=wavelet_plot_kwargs['cbar_style']['orientation'],
+                          label=wavelet_plot_kwargs['cbar_style']['label'])#,
+                          # pad=wavelet_plot_kwargs['cbar_style']['pad'])
+
+       #
        # cb = mpl.colorbar.ColorbarBase(ax['cb'], orientation='horizontal',
        #                                cmap=cbar_data['cmap'],
        #                                norm=cbar_data['norm'],  # vmax and vmin
@@ -1716,14 +1705,14 @@ class Series:
        #                                boundaries=cbar_data['boundaries'],  # ,
        #                                label=wavelet_plot_kwargs['cbar_style']['label'],
        #                                drawedges=cbar_data['drawedges'])  # True)
-        
-        cb = mpl.colorbar.Colorbar(ax['cb'], mappable = cbar_data.mappable,
-                                   orientation='horizontal', 
-                                   extend=cbar_data.extend,
-                                   boundaries=cbar_data.boundaries,  # ,
-                                   label=wavelet_plot_kwargs['cbar_style']['label'],
-                                   drawedges=cbar_data.drawedges)  # True)
-        
+
+        # cb = mpl.colorbar.Colorbar(ax['cb'], mappable = cbar_data.mappable,
+        #                            orientation='horizontal',
+        #                            extend=cbar_data.extend,
+        #                            boundaries=cbar_data.boundaries,  # ,
+        #                            label=wavelet_plot_kwargs['cbar_style']['label'],
+        #                            drawedges=cbar_data.drawedges)  # True)
+        #
         # ticks=[0, 3, 6, 9])
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
