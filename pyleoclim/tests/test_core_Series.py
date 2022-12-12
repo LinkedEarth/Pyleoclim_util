@@ -962,3 +962,54 @@ class TestUiSeriesFilter:
         val_diff = ts_bp.value - ts2.value
         assert np.mean(val_diff**2) < 0.1
     
+class TestUISeriesConvertTimeUnit:
+    '''Tests for Series.convert_time_unit'''
+
+    @pytest.mark.parametrize('keep_log',[False,True])
+    def test_convert_time_unit_t0(self,keep_log):
+        ts = gen_ts(nt=550, alpha=1.0)
+        ts.time_unit = 'kyr BP'
+        ts_converted = ts.convert_time_unit('yr BP',keep_log)
+        np.testing.assert_allclose(ts.time*1000,ts_converted.time,atol=1)
+
+    def test_convert_time_unit_t1(self):
+        ts = gen_ts(nt=550, alpha=1.0)
+        ts.time_unit = 'nonsense'
+        with pytest.raises(ValueError):
+            ts.convert_time_unit('yr BP')
+
+class TestUISeriesFillNA:
+    '''Tests for Series.fill_na'''
+
+    @pytest.mark.parametrize('timespan,nt,ts_dt,dt', [(None,500,8,5),(None,500,1,2),([100,400],500,4,2)])
+    def test_fill_na_t0(self,timespan,nt,ts_dt,dt):
+        t = np.arange(0,nt,ts_dt)
+        v = np.ones(len(t))
+        ts = pyleo.Series(t,v)
+        ts.fill_na(timespan=timespan,dt=dt)
+
+    @pytest.mark.parametrize('keep_log', [True,False])
+    def test_fill_na_t1(self,keep_log):
+        t = np.arange(0,500,10)
+        v = np.ones(len(t))
+        ts = pyleo.Series(t,v)
+        ts.fill_na(dt=5,keep_log=keep_log)
+
+class TestUISeriesSort:
+    '''Tests for Series.sort'''
+
+    @pytest.mark.parametrize('keep_log',[True,False])
+    def test_sort_t0(self,keep_log):
+        ts = gen_ts(nt=500,alpha=1.0)
+        ts = ts.sort()
+        np.all(np.diff(ts.time) >= 0)
+    
+    def test_sort_t1(self):
+        t = np.arange(500,0,-1)
+        v = np.ones(len(t))
+        ts = pyleo.Series(t,v)
+        ts.sort()
+        assert np.all(np.diff(ts.time) >= 0)
+
+
+
