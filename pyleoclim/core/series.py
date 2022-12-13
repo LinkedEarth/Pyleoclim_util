@@ -45,13 +45,13 @@ def dict2namedtuple(d):
     return tupletype(**d)
 
 class Series:
-    '''The Series class describes the most basic objects in Pyleoclim. 
+    '''The Series class describes the most basic objects in Pyleoclim.
     A Series is a simple `dictionary <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_ that contains 3 things:
-        
+
     * a series of real-valued numbers;
-    
+
     * a time axis at which those values were measured/simulated ;
-    
+
     * optionally, some metadata about both axes, like units, labels and the like.
 
     How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
@@ -88,10 +88,10 @@ class Series:
     clean_ts : boolean flag
         set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
         Default is True
-    
+
     log : dict
-    
-    If keep_log is set to True, then a log of the transformations made to the timeseries will be kept. 
+
+    If keep_log is set to True, then a log of the transformations made to the timeseries will be kept.
 
     verbose : bool
         If True, will print warning messages if there is any
@@ -119,18 +119,18 @@ class Series:
         )
         ts
         ts.__dict__.keys()
-        
-    For a quick look at the values, one may use the `print()` method. We do so below for a short slice of the data so as not to overwhelm the display: 
-        
+
+    For a quick look at the values, one may use the `print()` method. We do so below for a short slice of the data so as not to overwhelm the display:
+
     .. ipython:: python
         :okwarning:
         :okexcept:
-        
+
         print(ts.slice([1982,1983]))
-    
+
     '''
 
-    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None, 
+    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None,
                  value_unit=None, label=None, mean=None, clean_ts=True, log=None, verbose=False):
         # TODO: remove mean argument once it's safe to do so
         if log is None:
@@ -139,7 +139,7 @@ class Series:
         else:
             self.log = log
             nlog = len(log)
-                 
+
         if clean_ts == True:
             value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
             self.log = self.log + ({nlog+1: 'clean_ts', 'applied': clean_ts, 'verbose': verbose},)
@@ -153,7 +153,7 @@ class Series:
         self.label = label
         #self.clean_ts=clean_ts
         #self.verbose=verbose
-        
+
         if mean is None:
             self.mean=np.mean(self.value)
         else:
@@ -173,7 +173,7 @@ class Series:
                 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
                 'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
             }
-            
+
         keep_log : Boolean
             if True, adds this step and its parameter to the series log.
 
@@ -203,7 +203,7 @@ class Series:
         '''
 
         new_ts = self.copy()
-        
+
         if time_unit is not None:
             tu = time_unit.lower()
             if tu.find('ky')>=0 or tu.find('ka')>=0:
@@ -292,7 +292,7 @@ class Series:
         new_ts.time = new_time
         new_ts.value = new_value
         new_ts.time_unit = time_unit
-        
+
         if keep_log == True:
             new_ts.log += ({len(new_ts.log):'convert_time_unit', 'time_unit': time_unit},)
 
@@ -443,7 +443,7 @@ class Series:
 
         invert_xaxis : bool, optional
             if True, the x-axis of the plot will be inverted
-        
+
         invert_yaxis : bool, optional
             same for the y-axis
 
@@ -578,47 +578,47 @@ class Series:
         )
 
         return res
-    
+
     def stripes(self, ref_period, LIM = 2.8, thickness=1.0, figsize=[8, 1], xlim=None,
               top_label=None, bottom_label=None, label_color = 'gray', label_size = None,
               xlabel=None, savefig_settings=None, ax=None, invert_xaxis=False,
               show_xaxis=False, x_offset = 0.05):
         '''Represents the Series as an Ed Hawkins "warming stripes" pattern
-        
+
         Credit: https://matplotlib.org/matplotblog/posts/warming-stripes/
 
         Parameters
         ----------
         ref_period : array-like (2-elements)
             dates of the reference period, in the form "(first, last)"
-        
+
         thickness : float, optional
             vertical thickness of the stripe . The default is 1.0
-            
+
         LIM : float
             scaling factor for color saturation. default is 2.8
 
         figsize : list
             a list of two integers indicating the figure size (in inches)
-            
+
         xlim : list
             time axis limits
 
         top_label : str
             the "title" label for the stripe
-            
+
         bottom_label : str
             the "ylabel" explaining which variable is being plotted
 
         invert_xaxis : bool, optional
             if True, the x-axis of the plot will be inverted
-            
+
         x_offset : float
             value controlling the horizontal offset between stripes and labels (default = 0.05)
-         
+
         show_xaxis : bool
             flag indicating whether or not the x-axis should be shown (default = False)
-                
+
         savefig_settings : dict
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
@@ -647,7 +647,7 @@ class Series:
 
         See also
         --------
-        
+
         pyleoclim.utils.plotting.stripes : stripes representation of a timeseries
 
         pyleoclim.utils.plotting.savefig : saving a figure in Pyleoclim
@@ -671,13 +671,13 @@ class Series:
                 @savefig hadCRUT5_stripes.png
                 fig, ax = ts.stripes(ref_period=(1971,2000))
                 pyleo.closefig(fig)
-                
+
         If you wanted to show the time axis, and save to a png file:
-            
+
             .. ipython:: python
                 :okwarning:
                 :okexcept:
-                    
+
                 import pyleoclim as pyleo
                 import pandas as pd
                 url = 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.annual.csv'
@@ -692,25 +692,25 @@ class Series:
 
         if top_label is None:
             top_label = self.label
-            
+
         if bottom_label is None:
             bottom_label = self.value_name
 
-        idx0 = (np.abs(self.time - ref_period[0])).argmin() 
-        idx1 = (np.abs(self.time - ref_period[1])).argmin() 
+        idx0 = (np.abs(self.time - ref_period[0])).argmin()
+        idx1 = (np.abs(self.time - ref_period[1])).argmin()
 
         LIMs = self.value.std()*LIM
-        # Ed Hawkins says: Currently I use HadCRUT5 with a 1971-2000 baseline 
-        # and a colour scaling of +/- 0.75K (which is probably similar to LIM). 
-        # It should be relatively simple to duplicate the stripes exactly 
-        
+        # Ed Hawkins says: Currently I use HadCRUT5 with a 1971-2000 baseline
+        # and a colour scaling of +/- 0.75K (which is probably similar to LIM).
+        # It should be relatively simple to duplicate the stripes exactly
+
         res = plotting.stripes_xy(
             x=self.time, y=self.value, ref_period=(idx0,idx1), LIM = LIMs, thickness = thickness,
             top_label = top_label, bottom_label = bottom_label, label_color = label_color,
             figsize=figsize, ax=ax,  xlim=xlim, invert_xaxis=invert_xaxis,  label_size=label_size,
             savefig_settings=savefig_settings, show_xaxis=show_xaxis, x_offset = x_offset,
-        )   
-        
+        )
+
         return res
 
 
@@ -777,11 +777,11 @@ class Series:
 
         See also
         --------
-        
+
         pyleoclim.core.utils.decomposition.ssa : Singular Spectrum Analysis utility
-        
+
         pyleoclim.core.ssares.SsaRes.modeplot : plot SSA modes
-        
+
         pyleoclim.core.ssares.SsaRes.screeplot : plot SSA eigenvalue spectrum
 
         Examples
@@ -843,7 +843,7 @@ class Series:
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
             ax.legend()
 
-        
+
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
             * there was not much rhyme or reason for picking 14 modes. Why not 5, or 39? All we have seen so far is that they gather >95% of the variance, which is by no means a magic number.
             * there is no guarantee that the first few modes will filter out high-frequency behavior, or at what frequency cutoff they will do so. If you need to cut out specific frequencies, you are better off doing it with a classical filter, like the butterworth filter implemented in Pyleoclim. However, in many instances the choice of a cutoff frequency is itself rather arbitrary. In such cases, SSA provides a principled alternative for generating a version of a timeseries that preserves features and excludes others (i.e, a filter).
@@ -864,21 +864,21 @@ class Series:
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
+
             @savefig scree_mc.png
             nino_mcssa.screeplot()
-            
+
             print('Indices of modes retained: '+ str(nino_mcssa.mode_idx))
 
         This suggests that modes 1-5 fall above the red noise benchmark. To inspect mode 1 (index 0), just type:
-            
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
+
             @savefig ssa_mode0plot.png
-            nino_mcssa.modeplot(mode=0)    
-            
+            nino_mcssa.modeplot(mode=0)
+
         '''
 
         res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
@@ -894,7 +894,7 @@ class Series:
 
     def is_evenly_spaced(self, tol=1e-3):
         '''Check if the Series time axis is evenly-spaced, within tolerance
-        
+
         Parameters
         ----------
         tol : float
@@ -905,7 +905,7 @@ class Series:
         -------
 
         res : bool
-        
+
         '''
 
         res = tsbase.is_evenly_spaced(self.time, tol)
@@ -943,10 +943,10 @@ class Series:
             The cutoff scale only works with the Butterworth method and when cutoff_freq is None.
             If a float, it is interpreted as a low-frequency (high-scale) cutoff (lowpass).
             If a list,  it is interpreted as a frequency band (f1, f2), with f1 < f2 (bandpass).
-        
+
         keep_log : Boolean
             if True, adds this step and its parameters to the series log.
-            
+
         kwargs : dict
             a dictionary of the keyword arguments for the filtering method,
             see `pyleoclim.utils.filter.savitzky_golay`, `pyleoclim.utils.filter.butterworth`, `pyleoclim.utils.filter.lanczos` and `pyleoclim.utils.filter.firwin` for the details
@@ -960,11 +960,11 @@ class Series:
         --------
 
         pyleoclim.utils.filter.butterworth : Butterworth method
-        
+
         pyleoclim.utils.filter.savitzky_golay : Savitzky-Golay method
-        
+
         pyleoclim.utils.filter.firwin : FIR filter design using the window method
-        
+
         pyleoclim.utils.filter.lanczos : lowpass filter via Lanczos resampling
 
 
@@ -1027,7 +1027,7 @@ class Series:
             :okwarning:
             :okexcept:
 
-                    
+
             fig, ax = ts.plot(label='mix')
             ts.filter(cutoff_freq=[15, 25], method='firwin', window='hanning').plot(ax=ax, label='After 15-25 Hz band-pass filter')
             @savefig ts_filter4.png
@@ -1105,9 +1105,9 @@ class Series:
 
         new_val = method_func[method](y, **args[method])
         new.value = new_val + mu # restore the mean
-        
-        if keep_log == True: 
-            new.log += ({len(new.log): 'filter','method': method, 'args': kwargs, 'fs': fs, 'cutoff_freq': cutoff_freq},) 
+
+        if keep_log == True:
+            new.log += ({len(new.log): 'filter','method': method, 'args': kwargs, 'fs': fs, 'cutoff_freq': cutoff_freq},)
         return new
 
     def histplot(self, figsize=[10, 4], title=None, savefig_settings=None,
@@ -1289,7 +1289,7 @@ class Series:
             the PSD object of a Series.
 
         scalogram : Scalogram
-            the Scalogram object of a Series. 
+            the Scalogram object of a Series.
             If the passed scalogram object contains stored signif_scals these will be plotted.
 
         figsize : list
@@ -1345,7 +1345,7 @@ class Series:
                 - slot [2] and slot [3] are empty to allow ample room for xlabels for the scalogram and PSD plots
                 - slot [4] contains the scalogram color bar
                 - slot [5] is empty
-            
+
             It is possible to tune the size and spacing of the various slots
                 - 'width_ratios': list of two values describing the relative widths of the two columns (default: [6, 1])
                 - 'height_ratios': list of three values describing the relative heights of the three rows (default: [8, 1,
@@ -1387,16 +1387,16 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
-            
+
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
-            
+
             @savefig ts_summary_plot1.png
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram)
             pyleo.closefig(fig)
-            
+
 
         Summary_plot with pre-generated psd and scalogram objects from before and some plot modification arguments passed. Note that if the scalogram contains saved noise realizations these will be flexibly reused. See pyleo.Scalogram.signif_test() for details
 
@@ -1406,12 +1406,12 @@ class Series:
 
             import pyleoclim as pyleo
             import pandas as pd
-            
+
             ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
             series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
-            
+
             @savefig ts_summary_plot2.png
             fig, ax = series.summary_plot(psd = psd,scalogram = scalogram, period_lim = [5,0], ts_plot_kwargs = {'color':'red','linewidth':.5}, psd_plot_kwargs = {'color':'red','linewidth':.5})
             pyleo.closefig(fig)
@@ -1449,9 +1449,9 @@ class Series:
         #                        hspace=0, wspace=0.1)
 
         # Subgridspecs
-        
+
         #Let's use the same hspace/wspace if given to a user
-        
+
         gs_d = {}
         gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[1, 4], hspace=gridspec_kwargs['hspace'])
         gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[1, 4], hspace=gridspec_kwargs['hspace'])
@@ -1544,21 +1544,21 @@ class Series:
 
         # pull colorbar specifications from scalogram plot
         #cbar_data = ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__
-        
+
         #
-    
+
         for scal_ax in ax['scal'].figure._localaxes:
             try:
                 cbar_data = scal_ax._colorbar
                 scal_ax._colorbar.ax.remove()
             except:
                 pass
-            
-        
+
+
 
         #ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__['ax'].remove()  # clear()#remove()#.set_visible(False)
         # ax['scal'].figure._localaxes[-1].remove()
-        
+
         if y_label_loc is not None:
             ax['scal'].get_yaxis().set_label_coords(y_label_loc, 0.5)
 
@@ -1727,14 +1727,14 @@ class Series:
        #                                boundaries=cbar_data['boundaries'],  # ,
        #                                label=wavelet_plot_kwargs['cbar_style']['label'],
        #                                drawedges=cbar_data['drawedges'])  # True)
-        
+
         cb = mpl.colorbar.Colorbar(ax['cb'], mappable = cbar_data.mappable,
-                                   orientation='horizontal', 
+                                   orientation='horizontal',
                                    extend=cbar_data.extend,
                                    boundaries=cbar_data.boundaries,  # ,
                                    label=wavelet_plot_kwargs['cbar_style']['label'],
                                    drawedges=cbar_data.drawedges)  # True)
-        
+
         # ticks=[0, 3, 6, 9])
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
@@ -1758,7 +1758,7 @@ class Series:
         ----------
         verbose : bool
             If True, will print warning messages if there is any
-            
+
         keep_log : Boolean
             if True, adds this step and its parameters to the series log.
 
@@ -1784,7 +1784,7 @@ class Series:
         ----------
         verbose : bool
             If True, will print warning messages if there is any
-            
+
         keep_log : Boolean
             if True, adds this step and its parameter to the series log.
 
@@ -1798,7 +1798,7 @@ class Series:
         v_mod, t_mod = tsbase.sort_ts(self.value, self.time, verbose=verbose)
         new.time = t_mod
         new.value = v_mod
-        
+
         if keep_log == True:
             new.log += ({len(new.log):'sort', 'verbose': verbose},)
         return new
@@ -1810,16 +1810,16 @@ class Series:
         -------
         new : pyleoclim.Series
             The Gaussianized series object
-            
+
         keep_log : Boolean
-            if True, adds this transformation to the series log. 
+            if True, adds this transformation to the series log.
         '''
         new = self.copy()
         v_mod = tsutils.gaussianize(self.value)
         new.value = v_mod
-        
+
         if keep_log == True:
-            new.log += ({len(new.log):'gaussianize', 'applied': True},)        
+            new.log += ({len(new.log):'gaussianize', 'applied': True},)
         return new
 
     def standardize(self, keep_log = False, scale=1):
@@ -1829,21 +1829,21 @@ class Series:
         -------
         new : pyleoclim.Series
             The standardized series object
-            
+
         keep_log : Boolean
-            if True, adds the previous mean, standard deviation and method parameters to the series log. 
+            if True, adds the previous mean, standard deviation and method parameters to the series log.
 
         """
         new = self.copy()
         vs, mu, sig = tsutils.standardize(self.value, scale=scale)
         new.value = vs
-        
+
         if keep_log == True:
             method_dict = {len(new.log):'standardize', 'args': scale,
                            'previous_mean': mu, 'previous_std': sig}
             new.log += (method_dict,)
         return new
-        
+
 
     def center(self, timespan=None, keep_log=False):
         ''' Centers the series (i.e. renove its estimated mean)
@@ -1853,9 +1853,9 @@ class Series:
         timespan : tuple or list
             The timespan over which the mean must be estimated.
             In the form [a, b], where a, b are two points along the series' time axis.
-            
+
         keep_log : Boolean
-            if True, adds the previous mean and method parameters to the series log. 
+            if True, adds the previous mean and method parameters to the series log.
 
         Returns
         -------
@@ -1871,7 +1871,7 @@ class Series:
             ts_mean  = np.nanmean(self.value)
             vc = self.value - ts_mean
         new.value = vc
-        
+
         if keep_log == True:
             new.log += ({len(new.log): 'center', 'args': timespan, 'previous_mean': ts_mean},)
         return new
@@ -1931,7 +1931,7 @@ class Series:
 
         new : Series
             The sliced Series object.
-            
+
         Examples
         --------
 
@@ -1947,7 +1947,7 @@ class Series:
             time = data.iloc[:,1]
             value = data.iloc[:,2]
             ts = pyleo.Series(time=time, value=value, time_name='Year C.E', value_name='SOI', label='SOI')
-            
+
             ts_slice = ts.slice([1972, 1998])
             print("New time bounds:",ts_slice.time.min(),ts_slice.time.max())
 
@@ -1979,7 +1979,7 @@ class Series:
 
         dt : float
             The time spacing to fill the NaNs; default is 1.
-            
+
         keep_log : Boolean
             if True, adds this step and its parameters to the series log.
 
@@ -2010,7 +2010,7 @@ class Series:
 
         new.time = new_time
         new.value = new_value
-        
+
         if keep_log == True:
             new.log += ({len(new.log):'fill_na', 'applied': True, 'dt': dt, 'timespan': timespan},)
 
@@ -2029,10 +2029,10 @@ class Series:
                 * "constant": only the mean of data is subtracted.
                 * "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
                 * "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
-        
+
         keep_log : Boolean
             if True, adds the removed trend and method parameters to the series log.
-        
+
         kwargs : dict
             Relevant arguments for each of the methods.
 
@@ -2088,12 +2088,12 @@ class Series:
             fig, ax = ts_emd1.plot(title='Detrended with EMD method')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
-            
-        
+
+
         We see that the default function call results in a "hockey stick" at the end, which is undesirable.
-        There is no automated way to fix this, but with a little trial and error, we find that removing 
+        There is no automated way to fix this, but with a little trial and error, we find that removing
         the 2 smoothest modes performs reasonably well:
-                
+
         .. ipython:: python
             :okwarning:
             :okexcept:
@@ -2106,11 +2106,11 @@ class Series:
             ax.legend()
 
         Another option for removing a nonlinear trend is a Savitzky-Golay filter:
-            
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
+
             ts_sg = ts.detrend(method='savitzky-golay')
             ts_sg.label = 'savitzky-golay detrending, default parameters'
             @savefig ts_sg.png
@@ -2121,41 +2121,41 @@ class Series:
         As we can see, the result is even worse than with EMD (default). Here it pays to look into the underlying method, which comes from SciPy.
         It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges.
         By default, this value is close to the length of the series. Choosing a value 10x smaller fixes the problem here, though you will have to tinker with that parameter until you get the result you seek.
-        
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
+
             ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201}, keep_log=True)
             ts_sg2.label = 'savitzky-golay detrending, window_length = 201'
             @savefig ts_sg2.png
             fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter')
             ax.plot(time,signal_noise,label='target signal')
             ax.legend()
-            
+
         Finally, the method returns the trend that was previous, so it can be added back in if need be.
-        
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-            
+
             trend_ts = pyleo.Series(time = time, value = nonlinear_trend,
                                     value_name= 'trend', label='original trend')
-            @savefig ts_trend.png   
+            @savefig ts_trend.png
             fig, ax = trend_ts.plot(title='Trend recovery')
             ax.plot(time,ts_emd2.log[1]['previous_trend'],label=ts_emd2.label)
             ax.plot(time,ts_sg2.log[1]['previous_trend'], label=ts_sg2.label)
             ax.legend()
 
-        Both methods can recover the exponential trend, with some edge effects near the end that could be addressed by judicious padding. 
+        Both methods can recover the exponential trend, with some edge effects near the end that could be addressed by judicious padding.
         The functionality is not available for the methods based on SciPy.detrend(), since their API doesn't return the trend.'
         '''
         new = self.copy()
         v_mod, trend = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
         new.value = v_mod
-        
-        if keep_log == True: 
-            new.log += ({len(new.log): 'detrend','method': method, 'args': kwargs, 'previous_trend': trend},) 
+
+        if keep_log == True:
+            new.log += ({len(new.log): 'detrend','method': method, 'args': kwargs, 'previous_trend': trend},)
         return new
 
     def spectral(self, method='lomb_scargle', freq_method='log', freq_kwargs=None, settings=None, label=None, scalogram=None, verbose=False):
@@ -2164,7 +2164,7 @@ class Series:
         Parameters
         ----------
 
-        method : str; 
+        method : str;
             {'wwz', 'mtm', 'lomb_scargle', 'welch', 'periodogram', 'cwt'}
 
         freq_method : str
@@ -2465,7 +2465,7 @@ class Series:
         pyleoclim.utils.spectral.make_freq_vector : Functions to create the frequency vector
 
         pyleoclim.utils.tsutils.detrend : Detrending function
-        
+
         pyleoclim.core.series.Series.spectral : spectral analysis tools
 
         pyleoclim.core.scalograms.Scalogram : Scalogram object
@@ -2484,7 +2484,7 @@ class Series:
         --------
 
         Wavelet analysis on the evenly-spaced SOI record. The CWT method will be applied by default.
-        
+
         .. ipython:: python
             :okwarning:
             :okexcept:
@@ -2496,19 +2496,19 @@ class Series:
             value = data.iloc[:,2]
             ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
 
-            scal1 = ts.wavelet() 
+            scal1 = ts.wavelet()
             scal_signif = scal1.signif_test(number=20)  # for research-grade work, use number=200 or larger
             @savefig scal_cwt.png
-            fig, ax = scal_signif.plot() 
+            fig, ax = scal_signif.plot()
             pyleo.closefig()
-                        
+
         If you wanted to invoke the WWZ method instead (here with no significance testing, to lower computational cost):
-            
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
-            scal2 = ts.wavelet(method='wwz') 
+
+            scal2 = ts.wavelet(method='wwz')
             @savefig scal_wwz.png
             fig, ax = scal2.plot()
             pyleo.closefig()
@@ -2520,28 +2520,28 @@ class Series:
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
-            scal3 = ts.wavelet(settings = {'mother':'DOG'}) 
+
+            scal3 = ts.wavelet(settings = {'mother':'DOG'})
             @savefig scal_dog.png
             fig, ax = scal3.plot(title='CWT scalogram with DOG mother wavelet')
             pyleo.closefig()
-            
+
         As for WWZ, note that, for computational efficiency, the time axis is coarse-grained
         by default to 50 time points, which explains in part the difference with the CWT scalogram.
 
-        If you need a custom axis, it (and other method-specific  parameters) can also be passed 
+        If you need a custom axis, it (and other method-specific  parameters) can also be passed
         via the `settings` dictionary:
-            
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-            
+
             tau = np.linspace(np.min(ts.time), np.max(ts.time), 60)
-            scal4 = ts.wavelet(method='wwz', settings={'tau':tau}) 
+            scal4 = ts.wavelet(method='wwz', settings={'tau':tau})
             @savefig scal_tau.png
             fig, ax = scal4.plot(title='WWZ scalogram with finer time axis')
             pyleo.closefig()
-            
+
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -2642,17 +2642,17 @@ class Series:
         ----------
 
         Grinsted, A., Moore, J. C. & Jevrejeva, S. Application of the cross wavelet transform and
-        wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004). 
+        wavelet coherence to geophysical time series. Nonlin. Processes Geophys. 11, 561–566 (2004).
 
         See also
         --------
 
         pyleoclim.utils.spectral.make_freq_vector : Functions to create the frequency vector
-        
+
         pyleoclim.utils.tsutils.detrend : Detrending function
-        
+
         pyleoclim.core.multipleseries.MultipleSeries.common_time : put timeseries on common time axis
-        
+
         pyleoclim.core.series.Series.wavelet : wavelet analysis
 
         Examples
@@ -2694,10 +2694,10 @@ class Series:
              coh_wwz = ts_air.wavelet_coherence(ts_nino, method = 'wwz')
              @savefig coh_wwz.png
              fig, ax = coh_wwz.plot()
-            
+
         As with wavelet analysis, both CWT and WWZ admit optional arguments through `settings`.
         Significance is assessed similarly as with PSD or Scalogram objects:
-            
+
         .. ipython:: python
             :okwarning:
             :okexcept:
@@ -2706,20 +2706,20 @@ class Series:
             @savefig cwt_sig.png
             # by default, the plot function will look for the closest quantile to 0.95, but it is easy to adjust:
             cwt_sig.plot(signif_thresh = 0.9)
-            
+
         Another plotting option, `dashboard`, allows to visualize both
-        timeseries as well as the wavelet transform coherency (WTC), which quantifies where 
+        timeseries as well as the wavelet transform coherency (WTC), which quantifies where
         two timeseries exhibit similar behavior in time-frequency space, and the cross-wavelet
-        transform (XWT), which indicates regions of high common power. 
-        
+        transform (XWT), which indicates regions of high common power.
+
         .. ipython:: python
             :okwarning:
             :okexcept:
 
             @savefig cwt_sig_dash.png
             cwt_sig.dashboard()
-             
-        Note: this design balances many considerations, and is not easily customizable. 
+
+        Note: this design balances many considerations, and is not easily customizable.
         '''
         if not verbose:
             warnings.simplefilter('ignore')
@@ -2788,7 +2788,7 @@ class Series:
         )
 
         return coh
-    
+
     def correlation(self, target_series, timespan=None, alpha=0.05, settings=None, common_time_kwargs=None, seed=None):
         ''' Estimates the Pearson's correlation and associated significance between two non IID time series
 
@@ -2914,9 +2914,9 @@ class Series:
         return corr
 
     def causality(self, target_series, method='liang', timespan=None, settings=None, common_time_kwargs=None):
-        ''' Perform causality analysis with the target timeseries. Specifically, whether there is information in the target series that influenced the original series. 
+        ''' Perform causality analysis with the target timeseries. Specifically, whether there is information in the target series that influenced the original series.
             If the two series have different time axes, they are first placed on a common timescale (in ascending order).
-            
+
         Parameters
         ----------
 
@@ -2925,7 +2925,7 @@ class Series:
 
         method : {'liang', 'granger'}
             The causality method to use.
-            
+
         timespan : tuple
             The time interval over which to perform the calculation
 
@@ -2934,7 +2934,7 @@ class Series:
 
         common_time_kwargs : dict
             Parameters for the method `MultipleSeries.common_time()`. Will use interpolation by default.
-                 
+
         Returns
         -------
 
@@ -2975,19 +2975,19 @@ class Series:
             pyleo.closefig(fig)
 
         We use the specific params below to lighten computations; you may drop `settings` for real work
-        
+
         .. ipython:: python
             :okwarning:
             :okexcept:
-                
+
             liang_N2A = ts_air.causality(ts_nino, settings={'nsim': 20, 'signif_test': 'isopersist'})
             print(liang_N2A)
             liang_A2N = ts_nino.causality(ts_air, settings={'nsim': 20, 'signif_test': 'isopersist'})
             print(liang_A2N)
-            
+
             liang_N2A['T21']/liang_A2N['T21']
-            
-        Both information flows (T21) are positive, but the flow from NINO3 to AIR is about 3x as large as the other way around, suggesting that NINO3 influences AIR much more than the other way around, which conforms to physical intuition. 
+
+        Both information flows (T21) are positive, but the flow from NINO3 to AIR is about 3x as large as the other way around, suggesting that NINO3 influences AIR much more than the other way around, which conforms to physical intuition.
 
         To implement, Granger causality, simply specfiy the method:
 
@@ -2995,15 +2995,15 @@ class Series:
             :okwarning:
             :okexcept:
 
-            granger_A2N = ts_nino.causality(ts_air, method='granger')     
+            granger_A2N = ts_nino.causality(ts_air, method='granger')
             granger_N2A = ts_air.causality(ts_nino, method='granger')
 
-        
-        Note that the output is fundamentaklly different for the two methods. Granger causality cannot discriminate between NINO3 -> AIR or AIR -> NINO3, in this case. This is not unusual, and one reason why it is no longer in wide use. 
+
+        Note that the output is fundamentaklly different for the two methods. Granger causality cannot discriminate between NINO3 -> AIR or AIR -> NINO3, in this case. This is not unusual, and one reason why it is no longer in wide use.
         '''
 
         # Put on common axis if necessary
-        
+
         ms = MultipleSeries([self, target_series])
         if list(self.time) != list(target_series.time):
             common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
@@ -3017,7 +3017,7 @@ class Series:
         else:
             value1 = ms.series_list[0].slice(timespan).value
             value2 = ms.series_list[1].slice(timespan).value
-        
+
 
         settings = {} if settings is None else settings.copy()
         spec_func={
@@ -3027,7 +3027,7 @@ class Series:
         args['liang'] = {}
         args['granger'] = {}
         args[method].update(settings)
-        
+
         causal_res = spec_func[method](value1, value2, **args[method])
         return causal_res
 
@@ -3060,7 +3060,7 @@ class Series:
         --------
 
         pyleoclim.utils.tsmodel.ar1_sim : AR(1) simulator
-        
+
         '''
         settings = {} if settings is None else settings.copy()
         surrogate_func = {
@@ -3086,7 +3086,7 @@ class Series:
 
         return surr
 
-    def outliers(self,method='kmeans',remove=True, settings=None, 
+    def outliers(self,method='kmeans',remove=True, settings=None,
                  fig_outliers=True, figsize_outliers=[10,4], plotoutliers_kwargs=None, savefigoutliers_settings=None,
                  fig_clusters=True,figsize_clusters=[10,4], plotclusters_kwargs=None,savefigclusters_settings=None, keep_log=False):
         """
@@ -3123,26 +3123,26 @@ class Series:
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
         keep_log : Boolean
-            if True, adds the previous method parameters to the series log. 
+            if True, adds the previous method parameters to the series log.
 
         Returns
         -------
         ts: pyleoclim.Series
             A new Series object witthout outliers if remove is True. Otherwise, returns the original timeseries
-        
-            
+
+
         See also
         --------
 
         pyleoclim.utils.tsutils.detect_outliers_DBSCAN : Outlier detection using the DBSCAN method
-        
+
         pyleoclim.utils.tsutils.detect_outliers_kmeans : Outlier detection using the kmeans method
-        
+
         pyleoclim.utils.tsutils.remove_outliers : Remove outliers from the series
-        """    
+        """
         if method not in ['kmeans','DBSCAN']:
             raise ValueError('method should either be "kmeans" or "DBSCAN"')
-        
+
         # run the algorithm
         settings = {} if settings is None else settings.copy()
         spec_func={
@@ -3152,158 +3152,158 @@ class Series:
         args['kmeans'] = {}
         args['DBSCAN'] = {}
         args[method].update(settings)
-        
+
         indices, res = spec_func[method](self.value,**args[method])
-        
+
         # Create the new Series object
-        new=self.copy()        
+        new=self.copy()
         if remove==True:
             if len(indices)>=1:
-                ts,ys=tsutils.remove_outliers(self.time,self.value,indices)
+                ys,ts=tsutils.remove_outliers(self.time,self.value,indices)
                 new.value=ys
                 new.time=ts
-        
+
         # Figures
         # Optional parameters
         savefigoutliers_settings = {} if savefigoutliers_settings is None else savefigoutliers_settings.copy()
         savefigclusters_settings = {} if savefigclusters_settings is None else savefigclusters_settings.copy()
         plotoutliers_kwargs = {} if plotoutliers_kwargs is None else plotoutliers_kwargs.copy()
         plotclusters_kwargs = {} if plotclusters_kwargs is None else plotclusters_kwargs.copy()
-        
+
         # Figure showing the outliers
-        
+
         if fig_outliers == True:
             fig,ax = plt.subplots(figsize=figsize_outliers)
             time_label, value_label = self.make_labels()
-                
+
             if 'xlabel' not in plotoutliers_kwargs.keys():
                 xlabel = time_label
             else:
                 xlabel = plotoutliers_kwargs['xlabel']
                 plotoutliers_kwargs.pop('xlabel')
-            
+
             if 'ylabel' not in plotoutliers_kwargs.keys():
                 ylabel = value_label
             else:
                 ylabel = plotoutliers_kwargs['ylabel']
                 plotoutliers_kwargs.pop('ylabel')
-            
+
             if 'title' not in plotoutliers_kwargs.keys():
                 title = None
             else:
                 title = plotoutliers_kwargs['title']
                 plotoutliers_kwargs.pop('title')
-            
+
             if 'xlim' not in plotoutliers_kwargs.keys():
                 xlim = None
             else:
                 xlim = plotoutliers_kwargs['xlim']
                 plotoutliers_kwargs.pop('xlim')
-            
+
             if 'ylim' not in plotoutliers_kwargs.keys():
                 ylim = None
             else:
                 ylim = plotoutliers_kwargs['ylim']
                 plotoutliers_kwargs.pop('ylim')
-            
+
             if 'legend' not in plotoutliers_kwargs.keys():
                 legend = True
             else:
                 legend = plotoutliers_kwargs['legend']
                 plotoutliers_kwargs.pop('legend')
-            
+
             if len(indices)>=1:
                 plotting.plot_scatter_xy(self.time,self.value,self.time[indices],self.value[indices],
                                                  xlabel=xlabel,ylabel=ylabel,
-                                                 title =  title, xlim=xlim, ylim=ylim, legend=legend, 
+                                                 title =  title, xlim=xlim, ylim=ylim, legend=legend,
                                                  plot_kwargs=plotoutliers_kwargs,ax=ax)
-            
+
             else:
                 plotting.plot_xy(self.time,self.value,
                                  xlabel=xlabel,ylabel=ylabel,
-                                 title =  title, xlim=xlim, ylim=ylim, legend=legend, 
+                                 title =  title, xlim=xlim, ylim=ylim, legend=legend,
                                  plot_kwargs=plotoutliers_kwargs,ax=ax)
-            
+
             #Saving options
             if 'path' in savefigoutliers_settings:
                 plotting.savefig(fig,settings=savefigoutliers_settings)
-        
+
         if fig_clusters == True:
             fig,ax = plt.subplots(figsize=figsize_clusters)
-            
+
             # dealt with plot options
             time_label, value_label = self.make_labels()
-                
+
             if 'xlabel' not in plotclusters_kwargs.keys():
                 xlabel = time_label
             else:
                 xlabel = plotclusters_kwargs['xlabel']
                 plotclusters_kwargs.pop('xlabel')
-            
+
             if 'ylabel' not in plotclusters_kwargs.keys():
                 ylabel = value_label
             else:
                 ylabel = plotclusters_kwargs['ylabel']
                 plotclusters_kwargs.pop('ylabel')
-            
+
             if 'title' not in plotclusters_kwargs.keys():
                 title = None
             else:
                 title = plotclusters_kwargs['title']
                 plotclusters_kwargs.pop('title')
-            
+
             if 'xlim' not in plotclusters_kwargs.keys():
                 xlim = None
             else:
                 xlim = plotclusters_kwargs['xlim']
                 plotclusters_kwargs.pop('xlim')
-            
+
             if 'ylim' not in plotclusters_kwargs.keys():
                 ylim = None
             else:
                 ylim = plotclusters_kwargs['ylim']
                 plotclusters_kwargs.pop('ylim')
-            
+
             if 'legend' not in plotclusters_kwargs.keys():
                 legend = True
             else:
                 legend = plotclusters_kwargs['legend']
                 plotclusters_kwargs.pop('legend')
-            
+
             clusters = np.array(res.loc[res['silhouette score']==np.max(res['silhouette score'])]['clusters'])[0]
-            
+
             if 'c' not in plotclusters_kwargs.keys():
                 color_list = list(mcolors.CSS4_COLORS.keys())
                 color_list.remove('red')
                 random.Random(9).shuffle(color_list)
-                colors = color_list[0:len(np.unique(clusters))] 
+                colors = color_list[0:len(np.unique(clusters))]
                 vectorizer = np.vectorize(lambda x: colors[x % len(colors)])
                 c = vectorizer(clusters)
             else:
                 c = plotclusters_kwargs['c']
                 plotclusters_kwargs.pop('c')
-            
+
             plotting.scatter_xy(self.time,self.value,c = c, xlabel=xlabel,ylabel=ylabel,
-                       title =  title, xlim=xlim, ylim=ylim, legend=legend,  
+                       title =  title, xlim=xlim, ylim=ylim, legend=legend,
                        plot_kwargs = plotclusters_kwargs, ax=ax)
-                
-            #plot     
+
+            #plot
             if np.size(indices) != 0:
                 plotting.scatter_xy(self.time[indices],self.value[indices],c='red',ax=ax)
             if 'path' in savefigclusters_settings:
                 plotting.savefig(fig,settings=savefigclusters_settings)
-        
+
         #return the log if asked
-        if keep_log == True: 
+        if keep_log == True:
             if method == 'kmeans':
-                new.log += ({len(new.log): 'outliers','method': method, 
+                new.log += ({len(new.log): 'outliers','method': method,
                                            'args': settings,
                                            'nbr_clusters':np.array(res['number of clusters']),
                                            'silhouette_score':np.array(res['silhouette score']),
                                            'outlier_indices':np.array(res['outlier indices']),
                                            'clusters':np.array(res['clusters'])},)
             elif method == 'DBSCAN':
-                new.log += ({len(new.log): 'outliers','method': method, 
+                new.log += ({len(new.log): 'outliers','method': method,
                                            'args': settings,
                                            'eps':np.array(res['eps']),
                                            'min_samples':np.array(res['min_samples']),
@@ -3311,7 +3311,7 @@ class Series:
                                            'silhouette_score':np.array(res['silhouette score']),
                                            'outlier_indices':np.array(res['outlier indices']),
                                            'clusters':np.array(res['clusters'])},)
-        
+
         return new
 
     def interp(self, method='linear', keep_log= False, **kwargs):
@@ -3322,10 +3322,10 @@ class Series:
 
         method : {‘linear’, ‘nearest’, ‘zero’, ‘slinear’, ‘quadratic’, ‘cubic’, ‘previous’, ‘next’}
             where ‘zero’, ‘slinear’, ‘quadratic’ and ‘cubic’ refer to a spline interpolation of zeroth, first, second or third order; ‘previous’ and ‘next’ simply return the previous or next value of the point) or as an integer specifying the order of the spline interpolator to use. Default is ‘linear’.
-        
+
         keep_log : Boolean
-            if True, adds the method name and its parameters to the series log.    
-        
+            if True, adds the method name and its parameters to the series log.
+
         kwargs :
             Arguments specific to each interpolation function. See pyleoclim.utils.tsutils.interp for details
 
@@ -3347,14 +3347,14 @@ class Series:
         new.value = vi
         if keep_log == True:
             new.log += ({len(new.log):'interp', 'method': method, 'args': kwargs},)
-        
+
         return new
 
     def gkernel(self, step_type='median', keep_log = False, **kwargs):
         ''' Coarse-grain a Series object via a Gaussian kernel.
 
-        Like .bin() this technique is conservative and uses the max space between points 
-        as the default spacing. Unlike .bin(), gkernel() uses a gaussian kernel to 
+        Like .bin() this technique is conservative and uses the max space between points
+        as the default spacing. Unlike .bin(), gkernel() uses a gaussian kernel to
         calculate the weighted average of the time series over these intervals.
 
         Parameters
@@ -3363,9 +3363,9 @@ class Series:
         step_type : str
 
             type of timestep: 'mean', 'median', or 'max' of the time increments
-            
+
         keep_log : Boolean
-            if True, adds the step type and its keyword arguments to the series log.       
+            if True, adds the step type and its keyword arguments to the series log.
 
         kwargs :
 
@@ -3388,8 +3388,8 @@ class Series:
 
         ti, vi = tsutils.gkernel(self.time, self.value, **kwargs) # apply kernel
         new.time = ti
-        new.value = vi   
-        
+        new.value = vi
+
         if keep_log == True:
             new.log += ({len(new.log):'gkernel', 'step_type': step_type, 'args': kwargs},)
         return new
@@ -3401,7 +3401,7 @@ class Series:
         ----------
         keep_log : Boolean
             if True, adds this step and its parameters to the series log.
-        
+
         kwargs :
             Arguments for binning function. See pyleoclim.utils.tsutils.bin for details
 
