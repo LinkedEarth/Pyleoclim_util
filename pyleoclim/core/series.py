@@ -2655,6 +2655,10 @@ class Series:
 
         pyleoclim.core.series.Series.wavelet : wavelet analysis
 
+        pyleoclim.utils.wavelet.wwz_coherence : coherence using the wwz method
+
+        pyleoclim.utils.wavelet.cwt_coherence : coherence using the cwt method
+
         Examples
         --------
 
