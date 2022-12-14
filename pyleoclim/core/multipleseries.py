@@ -1935,7 +1935,7 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries(tslist)
             @savefig md76_stripes2.png
             fig, ax = ms.stripes(common_time_kwargs={'step': 0.5}, x_offset = 200, 
-                                 LIM=4, figsize=figsize=[8,3])
+                                 LIM=4, figsize=[8,3])
             pyleo.closefig(fig)     
             
         '''
