@@ -15,6 +15,7 @@ Causality
 """""""""
 .. automodule:: pyleoclim.utils.causality
   :members:
+  :ignore-module-all: True
 
 
 Correlation
@@ -22,36 +23,42 @@ Correlation
 
 .. automodule:: pyleoclim.utils.correlation
   :members:
+  :ignore-module-all: True
 
 Decomposition
 """""""""""""
 
 .. automodule:: pyleoclim.utils.decomposition
   :members:
+  :ignore-module-all: True
 
 Filter
 """"""
 
 .. automodule:: pyleoclim.utils.filter
   :members:
+  :ignore-module-all: True
 
 Mapping
 """""""
 
 .. automodule:: pyleoclim.utils.mapping
   :members:
+  :ignore-module-all: True
 
 Plotting
 """"""""
 
 .. automodule:: pyleoclim.utils.plotting
   :members:
+  :ignore-module-all: True
 
 Spectral
 """"""""
 
 .. automodule:: pyleoclim.utils.spectral
   :members:
+  :ignore-module-all: True
 
 
 Tsmodel
@@ -59,6 +66,7 @@ Tsmodel
 
 .. automodule:: pyleoclim.utils.tsmodel
   :members:
+  :ignore-module-all: True
 
 
 
@@ -67,6 +75,7 @@ Wavelet
 
 .. automodule:: pyleoclim.utils.wavelet
   :members:
+  :ignore-module-all: True
 
 
 Tsutils
@@ -74,6 +83,7 @@ Tsutils
 
 .. automodule:: pyleoclim.utils.tsutils
   :members:
+  :ignore-module-all: True
 
 
 
@@ -82,6 +92,7 @@ Tsbase
 
 .. automodule:: pyleoclim.utils.tsbase
   :members:
+  :ignore-module-all: True
 
 
 
@@ -90,9 +101,11 @@ Lipdutils
 
 .. automodule:: pyleoclim.utils.lipdutils
   :members:
+  :ignore-module-all: True
 
 jsonutils
 """""""""
 
 .. automodule:: pyleoclim.utils.jsonutils
   :members:
+  :ignore-module-all: True
