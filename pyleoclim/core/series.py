@@ -187,19 +187,18 @@ class Series:
             import pandas as pd
             data = pd.read_csv(
                 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-                skiprows=0, header=1
-            )
+                skiprows=0, header=1)
             time = data.iloc[:,1]
             value = data.iloc[:,2]
             ts = pyleo.Series(time=time, value=value, time_unit='years')
             new_ts = ts.convert_time_unit(time_unit='yrs BP')
             print('Original timeseries:')
             print('time unit:', ts.time_unit)
-            print('time:', ts.time)
+            print('time:', ts.time[:10])
             print()
             print('Converted timeseries:')
             print('time unit:', new_ts.time_unit)
-            print('time:', new_ts.time)
+            print('time:', new_ts.time[:10])
         '''
 
         new_ts = self.copy()
@@ -1203,6 +1202,7 @@ class Series:
     def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                   ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
         ''' Plot the distribution of the timeseries values
+            [legacy only ; please use histplot() instead]
 
         Parameters
         ----------
@@ -2080,14 +2080,14 @@ class Series:
             ts = pyleo.Series(time=time,value=signal_noise + nonlinear_trend)
             @savefig random_series.png
             fig, ax = ts.plot(title='Timeseries with nonlinear trend')
+            fig.tight_layout()
 
             # Detrending with default parameters (using EMD method with 1 mode)
             ts_emd1 = ts.detrend()
             ts_emd1.label = 'default detrending (EMD, last mode)'
             @savefig ts_emd1.png
-            fig, ax = ts_emd1.plot(title='Detrended with EMD method')
-            ax.plot(time,signal_noise,label='target signal')
-            ax.legend()
+            fig, ax = ts_emd1.plot(title='Detrended with EMD method'); ax.plot(time,signal_noise,label='target signal'); ax.legend()
+            fig.tight_layout()
 
 
         We see that the default function call results in a "hockey stick" at the end, which is undesirable.
@@ -2101,9 +2101,8 @@ class Series:
             ts_emd2 = ts.detrend(method='emd', n=2, keep_log=True)
             ts_emd2.label = 'EMD detrending, last 2 modes'
             @savefig ts_emd_n2.png
-            fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)')
-            ax.plot(time,signal_noise,label='target signal')
-            ax.legend()
+            fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)'); ax.plot(time,signal_noise,label='target signal'); ax.legend()
+            fig.tight_layout()
 
         Another option for removing a nonlinear trend is a Savitzky-Golay filter:
 
@@ -2114,9 +2113,8 @@ class Series:
             ts_sg = ts.detrend(method='savitzky-golay')
             ts_sg.label = 'savitzky-golay detrending, default parameters'
             @savefig ts_sg.png
-            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter')
-            ax.plot(time,signal_noise,label='target signal')
-            ax.legend()
+            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter'); ax.plot(time,signal_noise,label='target signal'); ax.legend()
+            fig.tight_layout()
 
         As we can see, the result is even worse than with EMD (default). Here it pays to look into the underlying method, which comes from SciPy.
         It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges.
@@ -2129,9 +2127,8 @@ class Series:
             ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201}, keep_log=True)
             ts_sg2.label = 'savitzky-golay detrending, window_length = 201'
             @savefig ts_sg2.png
-            fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter')
-            ax.plot(time,signal_noise,label='target signal')
-            ax.legend()
+            fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter'); ax.plot(time,signal_noise,label='target signal'); ax.legend()
+            fig.tight_layout()
 
         Finally, the method returns the trend that was previous, so it can be added back in if need be.
 
@@ -2142,10 +2139,10 @@ class Series:
             trend_ts = pyleo.Series(time = time, value = nonlinear_trend,
                                     value_name= 'trend', label='original trend')
             @savefig ts_trend.png
-            fig, ax = trend_ts.plot(title='Trend recovery')
-            ax.plot(time,ts_emd2.log[1]['previous_trend'],label=ts_emd2.label)
-            ax.plot(time,ts_sg2.log[1]['previous_trend'], label=ts_sg2.label)
-            ax.legend()
+            trend_ts = pyleo.Series(time = time, value = nonlinear_trend, 
+                                    value_name= 'trend', label='original trend')
+            fig, ax = trend_ts.plot(title='Trend recovery'); ax.plot(time,ts_emd2.log[1]['previous_trend'],label=ts_emd2.label); 
+            ax.plot(time,ts_sg2.log[1]['previous_trend'], label=ts_sg2.label); ax.legend(); fig.tight_layout()
 
         Both methods can recover the exponential trend, with some edge effects near the end that could be addressed by judicious padding.
         The functionality is not available for the methods based on SciPy.detrend(), since their API doesn't return the trend.'
@@ -2802,7 +2799,7 @@ class Series:
         2) 'isopersistent': AR(1) modeling of x and y.
         3) 'isospectral': phase randomization of original inputs. (default)
 
-        The T-test is a parametric test, hence computationally cheap but can only be performed in ideal circumstances.
+        The T-test is a parametric test, hence computationally cheap, but can only be performed in ideal circumstances.
         The others are non-parametric, but their computational requirements scale with the number of simulations.
 
         The choise of significance test and associated number of Monte-Carlo simulations are passed through the settings parameter.
@@ -2836,7 +2833,7 @@ class Series:
         Returns
         -------
 
-        corr : pyleoclim.ui.Corr
+        corr : pyleoclim.Corr
             the result object, containing
 
             - r : float
@@ -2853,6 +2850,9 @@ class Series:
         --------
 
         pyleoclim.utils.correlation.corr_sig : Correlation function
+        
+        pyleoclim.multipleseries.common_time : Aligning time axes
+
 
         Examples
         --------
@@ -2993,7 +2993,7 @@ class Series:
 
         Both information flows (T21) are positive, but the flow from NINO3 to AIR is about 3x as large as the other way around, suggesting that NINO3 influences AIR much more than the other way around, which conforms to physical intuition.
 
-        To implement, Granger causality, simply specfiy the method:
+        To implement Granger causality, simply specfiy the method:
 
         .. ipython:: python
             :okwarning:
@@ -3003,7 +3003,7 @@ class Series:
             granger_N2A = ts_air.causality(ts_nino, method='granger')
 
 
-        Note that the output is fundamentaklly different for the two methods. Granger causality cannot discriminate between NINO3 -> AIR or AIR -> NINO3, in this case. This is not unusual, and one reason why it is no longer in wide use.
+        Note that the output is fundamentally different for the two methods. Granger causality cannot discriminate between NINO3 -> AIR or AIR -> NINO3, in this case. This is not unusual, and one reason why it is no longer in wide use.
         '''
 
         # Put on common axis if necessary
