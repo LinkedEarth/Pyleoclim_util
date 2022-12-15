@@ -1138,7 +1138,7 @@ class MultipleSeries:
         ms=self.copy()
         for idx,item in enumerate(ms.series_list):
             s=item.copy()
-            v_mod=tsutils.detrend(item.value,x=item.time,method=method,**kwargs)
+            v_mod, _=tsutils.detrend(item.value,x=item.time,method=method,**kwargs)
             s.value=v_mod
             ms.series_list[idx]=s
         return ms
