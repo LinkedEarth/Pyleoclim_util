@@ -782,7 +782,7 @@ class LipdSeries(Series):
         if ensemble == False:
             ax['dts'] = self.histplot(**histplt_kwargs)
         elif ensemble == True:
-            ax['dts'] = ensc.distplot(**histplt_kwargs)
+            ax['dts'] = ensc.histplot(**histplt_kwargs)
         ax['dts'].set_ylim([ymin, ymax])
         ax['dts'].set_yticklabels([])
         ax['dts'].set_ylabel('')
