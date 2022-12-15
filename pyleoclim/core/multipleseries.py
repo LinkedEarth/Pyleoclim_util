@@ -1138,7 +1138,7 @@ class MultipleSeries:
         ms=self.copy()
         for idx,item in enumerate(ms.series_list):
             s=item.copy()
-            v_mod=tsutils.detrend(item.value,x=item.time,method=method,**kwargs)
+            v_mod, _=tsutils.detrend(item.value,x=item.time,method=method,**kwargs)
             s.value=v_mod
             ms.series_list[idx]=s
         return ms
@@ -1935,7 +1935,7 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries(tslist)
             @savefig md76_stripes2.png
             fig, ax = ms.stripes(common_time_kwargs={'step': 0.5}, x_offset = 200, 
-                                 LIM=4, figsize=figsize=[8,3])
+                                 LIM=4, figsize=[8,3])
             pyleo.closefig(fig)     
             
         '''
