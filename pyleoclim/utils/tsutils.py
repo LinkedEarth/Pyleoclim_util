@@ -272,6 +272,7 @@ def increments(x,step_style='median'):
 
     Parameters
     ----------
+
     x : array
 
     step_style : str
@@ -284,6 +285,7 @@ def increments(x,step_style='median'):
 
     Returns
     -------
+
     start : float
         min(x)
     stop : float
