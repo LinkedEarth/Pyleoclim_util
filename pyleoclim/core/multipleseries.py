@@ -1828,7 +1828,7 @@ class MultipleSeries:
                 LIM = 2.8, thickness=1.0, labels='auto',  label_color = 'gray',
                 common_time_kwargs=None, xlim=None, font_scale=0.8, x_offset = 0.05):
         '''
-        Represents a MultipleSeries object as a quilt of Ed Hawkins' "warming stripes" patterns
+        Represents a MultipleSeries object as a quilt of Ed Hawkins' "stripes" patterns
         
         To ensure comparability, constituent series are placed on a common time axis, using
         `MultipleSeries.common_time()`. To ensure consistent scaling, all series are Gaussianized
