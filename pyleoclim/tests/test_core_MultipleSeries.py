@@ -80,7 +80,12 @@ class TestUIMultipleSeriesDetrend():
 
         # Create a multiple series object
         ts_all= pyleo.MultipleSeries([ts,ts1])
-        ts_detrend=ts_all.detrend(method=detrend_method)
+        ts_detrend=ts_all.detrend(method=detrend_method)     
+        detrend_0 = ts_detrend.series_list[0]
+        detrend_1 = ts_detrend.series_list[1]
+
+        assert len(detrend_0.value)==len(detrend_0.time)
+        assert len(detrend_1.value)==len(detrend_1.time)
 
 class TestMultipleSeriesPlot:
     '''Test for MultipleSeries.plot()
