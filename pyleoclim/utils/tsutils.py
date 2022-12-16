@@ -318,7 +318,7 @@ def increments(x,step_style='median'):
     return start, stop, step
 
 
-def     (x,y, interp_type='linear', step=None,start=None,stop=None, step_style= 'mean',**kwargs):
+def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style= 'mean',**kwargs):
     """ Interpolate y onto a new x-axis
 
     Largely a wrapper for [scipy.interpolate.interp1d](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html)
