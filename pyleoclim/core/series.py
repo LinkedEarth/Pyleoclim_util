@@ -526,7 +526,7 @@ class Series:
                 :okwarning:
                 :okexcept:
 
-                fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'})
+                fig, ax = ts.plot(color='k', savefig_settings={'path': 'ts_plot3.png'}); pyleo.closefig(fig)
                 pyleo.savefig(fig,path='ts_plot3.png')
         '''
         # generate default axis labels
@@ -582,7 +582,7 @@ class Series:
               top_label=None, bottom_label=None, label_color = 'gray', label_size = None,
               xlabel=None, savefig_settings=None, ax=None, invert_xaxis=False,
               show_xaxis=False, x_offset = 0.05):
-        '''Represents the Series as an Ed Hawkins "warming stripes" pattern
+        '''Represents the Series as an Ed Hawkins "stripes" pattern
 
         Credit: https://matplotlib.org/matplotblog/posts/warming-stripes/
 
@@ -671,7 +671,7 @@ class Series:
                 fig, ax = ts.stripes(ref_period=(1971,2000))
                 pyleo.closefig(fig)
 
-        If you wanted to show the time axis, and save to a png file:
+        If you wanted to show the time axis:
 
             .. ipython:: python
                 :okwarning:
@@ -685,7 +685,7 @@ class Series:
                 gmst = df['Anomaly (deg C)']
                 ts = pyleo.Series(time=time,value=gmst, label = 'HadCRUT5', time_name='Year C.E', value_name='GMST')
                 @savefig hadCRUT5_stripes2.png
-                fig, ax = ts.stripes(ref_period=(1971,2000), savefig_settings = {'path':'./stripes.png'}, show_xaxis=True)
+                fig, ax = ts.stripes(ref_period=(1971,2000), show_xaxis=True)
                 pyleo.closefig(fig)
         '''
 
@@ -743,19 +743,19 @@ class Series:
         -------
         res : object of the SsaRes class containing:
 
-        - eigvals : (M, ) array of eigenvalues
+        eigvals : (M, ) array of eigenvalues
 
-        - eigvecs : (M, M) Matrix of temporal eigenvectors (T-EOFs)
+        eigvecs : (M, M) Matrix of temporal eigenvectors (T-EOFs)
 
-        - PC : (N - M + 1, M) array of principal components (T-PCs)
+        PC : (N - M + 1, M) array of principal components (T-PCs)
 
-        - RCmat : (N,  M) array of reconstructed components
+        RCmat : (N,  M) array of reconstructed components
 
-        - RCseries : (N,) reconstructed series, with mean and variance restored
+        RCseries : (N,) reconstructed series, with mean and variance restored
 
-        - pctvar: (M, ) array of the fraction of variance (%) associated with each mode
+        pctvar: (M, ) array of the fraction of variance (%) associated with each mode
 
-        - eigvals_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
+        eigvals_q : (M, 2) array contaitning the 5% and 95% quantiles of the Monte-Carlo eigenvalue spectrum [ if nMC >0 ]
 
         References
         ----------
@@ -801,6 +801,7 @@ class Series:
             # plot
             @savefig ts_plot4.png
             fig, ax = ts.plot()
+            pyleo.closefig(fig)
 
             # SSA
             nino_ssa = ts.ssa(M=60)
@@ -813,8 +814,8 @@ class Series:
 
             # plot eigenvalues
             @savefig ts_eigen.png
-            nino_ssa.screeplot()
-
+            fig, ax = nino_ssa.screeplot()
+            pyleo.closefig(fig)
 
         This highlights a few common phenomena with SSA:
             * the eigenvalues are in descending order
@@ -840,7 +841,7 @@ class Series:
             @savefig ssa_recon.png
             fig, ax = ts.plot(title='SOI')
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
-            ax.legend()
+            ax.legend(); pyleo.closefig(fig);
 
 
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
@@ -865,7 +866,8 @@ class Series:
             :okexcept:
 
             @savefig scree_mc.png
-            nino_mcssa.screeplot()
+            fig, ax = nino_mcssa.screeplot()
+            pyleo.closefig(fig)
 
             print('Indices of modes retained: '+ str(nino_mcssa.mode_idx))
 
@@ -876,7 +878,8 @@ class Series:
             :okexcept:
 
             @savefig ssa_mode0plot.png
-            nino_mcssa.modeplot(mode=0)
+            fig, ax = nino_mcssa.modeplot(mode=0)
+            pyleo.closefig(fig)
 
         '''
 
@@ -953,7 +956,7 @@ class Series:
         Returns
         -------
 
-        new : pyleoclim.Series
+        new : Series
 
         See also
         --------
@@ -1199,77 +1202,77 @@ class Series:
         else:
             return ax
 
-    def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
-                  ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
-        ''' Plot the distribution of the timeseries values
-            [legacy only ; please use histplot() instead]
+    # def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
+    #               ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
+    #     ''' Plot the distribution of the timeseries values
+    #         [legacy only ; please use histplot() instead]
 
-        Parameters
-        ----------
+    #     Parameters
+    #     ----------
 
-        figsize : list
-            a list of two integers indicating the figure size
+    #     figsize : list
+    #         a list of two integers indicating the figure size
 
-        title : str
-            the title for the figure
+    #     title : str
+    #         the title for the figure
 
-        savefig_settings : dict
-            the dictionary of arguments for plt.savefig(); some notes below:
-              - "path" must be specified; it can be any existed or non-existed path,
-                with or without a suffix; if the suffix is not given in "path", it will follow "format"
-              - "format" can be one of {"pdf", "eps", "png", "ps"}
+    #     savefig_settings : dict
+    #         the dictionary of arguments for plt.savefig(); some notes below:
+    #           - "path" must be specified; it can be any existed or non-existed path,
+    #             with or without a suffix; if the suffix is not given in "path", it will follow "format"
+    #           - "format" can be one of {"pdf", "eps", "png", "ps"}
 
-        ax : matplotlib.axis, optional
-            A matplotlib axis
+    #     ax : matplotlib.axis, optional
+    #         A matplotlib axis
 
-        ylabel : str
-            Label for the count axis
+    #     ylabel : str
+    #         Label for the count axis
 
-        vertical : {True,False}
-            Whether to flip the plot vertically
+    #     vertical : {True,False}
+    #         Whether to flip the plot vertically
 
-        edgecolor : matplotlib.color
-            The color of the edges of the bar
+    #     edgecolor : matplotlib.color
+    #         The color of the edges of the bar
 
-        plot_kwargs : dict
-            Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
+    #     plot_kwargs : dict
+    #         Plotting arguments for seaborn histplot: https://seaborn.pydata.org/generated/seaborn.histplot.html
 
-        See also
-        --------
+    #     See also
+    #     --------
 
-        pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
+    #     pyleoclim.utils.plotting.savefig : saving figure in Pyleoclim
 
-        Examples
-        --------
+    #     Examples
+    #     --------
 
-        Distribution of the SOI record
+    #     Distribution of the SOI record
 
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
+    #     .. ipython:: python
+    #         :okwarning:
+    #         :okexcept:
 
-            import pyleoclim as pyleo
-            import pandas as pd
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time=data.iloc[:,1]
-            value=data.iloc[:,2]
-            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+    #         import pyleoclim as pyleo
+    #         import pandas as pd
+    #         data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+    #         time=data.iloc[:,1]
+    #         value=data.iloc[:,2]
+    #         ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
 
-            @savefig ts_plot5.png
-            fig, ax = ts.plot()
-            pyleo.closefig(fig)
+    #         @savefig ts_plot5.png
+    #         fig, ax = ts.plot()
+    #         pyleo.closefig(fig)
 
-            @savefig ts_dist.png
-            fig, ax = ts.distplot()
-            pyleo.closefig(fig)
+    #         @savefig ts_dist.png
+    #         fig, ax = ts.distplot()
+    #         pyleo.closefig(fig)
 
-        '''
-        warnings.warn(
-            "Distplot is deprecated. Function has been renamed histplot in order to maintain consistency with seaborn terminology",
-            DeprecationWarning,
-            stacklevel=2)
+    #     '''
+    #     warnings.warn(
+    #         "Distplot is deprecated. Function has been renamed histplot in order to maintain consistency with seaborn terminology",
+    #         DeprecationWarning,
+    #         stacklevel=2)
 
-        return self.histplot(figsize, title, savefig_settings, ax, ylabel, vertical, edgecolor, **plot_kwargs)
+    #     return self.histplot(figsize, title, savefig_settings, ax, ylabel, vertical, edgecolor, **plot_kwargs)
 
     def summary_plot(self, psd, scalogram, figsize=[8, 10], title=None,
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None,
@@ -1323,13 +1326,13 @@ class Series:
             the label for the amplitude axis of PDS
 
         ts_plot_kwargs : dict
-            arguments to be passed to the timeseries subplot, see pyleoclim.Series.plot for details
+            arguments to be passed to the timeseries subplot, see Series.plot for details
 
         wavelet_plot_kwargs : dict
             arguments to be passed to the scalogram plot, see pyleoclim.Scalogram.plot for details
 
         psd_plot_kwargs : dict
-            arguments to be passed to the psd plot, see pyleoclim.PSD.plot for details
+            arguments to be passed to the psd plot, see PSD.plot for details
             Certain psd plot settings are required by summary plot formatting. These include:
                 - ylabel
                 - legend
@@ -1745,7 +1748,7 @@ class Series:
 
         Returns
         -------
-        Series : pyleoclim.Series
+        Series : Series
             A copy of the Series object
 
         '''
@@ -1756,6 +1759,7 @@ class Series:
 
         Parameters
         ----------
+        
         verbose : bool
             If True, will print warning messages if there is any
 
@@ -1764,7 +1768,8 @@ class Series:
 
         Returns
         -------
-        new : pyleoclim.Series
+        
+        new : Series
             Series object with removed NaNs and sorting
 
         '''
@@ -1790,7 +1795,7 @@ class Series:
 
         Returns
         -------
-        new : pyleoclim.Series
+        new : Series
             Series object with removed NaNs and sorting
 
         '''
@@ -1804,15 +1809,19 @@ class Series:
         return new
 
     def gaussianize(self, keep_log = False):
-        ''' Gaussianizes the timeseries
+        ''' Gaussianizes the timeseries (i.e. maps its values to a standard normal)
 
         Returns
         -------
-        new : pyleoclim.Series
+        new : Series
             The Gaussianized series object
 
         keep_log : Boolean
             if True, adds this transformation to the series log.
+            
+        References
+        ----------
+        Emile-Geay, J., and M. Tingley (2016), Inferring climate variability from nonlinear proxies: application to palaeo-enso studies, Climate of the Past, 12 (1), 31–50, doi:10.5194/cp- 12-31-2016.
         '''
         new = self.copy()
         v_mod = tsutils.gaussianize(self.value)
@@ -1827,7 +1836,7 @@ class Series:
 
         Returns
         -------
-        new : pyleoclim.Series
+        new : Series
             The standardized series object
 
         keep_log : Boolean
@@ -1859,7 +1868,7 @@ class Series:
 
         Returns
         -------
-        new : pyleoclim.Series
+        new : Series
             The centered series object
 
         '''
@@ -1894,7 +1903,7 @@ class Series:
         Returns
         -------
 
-        res : pyleoclim.MultipleSeries Object or pyleoclim.Series Object
+        res : MultipleSeries or Series
             If gaps were detected, returns the segments in a MultipleSeries object,
             else, returns the original timeseries.
 
@@ -2038,7 +2047,7 @@ class Series:
 
         Returns
         -------
-        new : pyleoclim.Series
+        new : Series
             Detrended Series object in "value", with new field "trend" added
 
         See also
@@ -2079,16 +2088,13 @@ class Series:
             # Place it all in a series object and plot it:
             ts = pyleo.Series(time=time,value=signal_noise + nonlinear_trend)
             @savefig random_series.png
-            fig, ax = ts.plot(title='Timeseries with nonlinear trend')
-            fig.tight_layout()
+            fig, ax = ts.plot(title='Timeseries with nonlinear trend'); pyleo.closefig(fig)
 
             # Detrending with default parameters (using EMD method with 1 mode)
             ts_emd1 = ts.detrend()
             ts_emd1.label = 'default detrending (EMD, last mode)'
             @savefig ts_emd1.png
-            fig, ax = ts_emd1.plot(title='Detrended with EMD method'); ax.plot(time,signal_noise,label='target signal'); ax.legend()
-            fig.tight_layout()
-
+            fig, ax = ts_emd1.plot(title='Detrended with EMD method'); ax.plot(time,signal_noise,label='target signal'); ax.legend(); pyleo.closefig(fig)
 
         We see that the default function call results in a "hockey stick" at the end, which is undesirable.
         There is no automated way to fix this, but with a little trial and error, we find that removing
@@ -2101,8 +2107,7 @@ class Series:
             ts_emd2 = ts.detrend(method='emd', n=2, keep_log=True)
             ts_emd2.label = 'EMD detrending, last 2 modes'
             @savefig ts_emd_n2.png
-            fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)'); ax.plot(time,signal_noise,label='target signal'); ax.legend()
-            fig.tight_layout()
+            fig, ax = ts_emd2.plot(title='Detrended with EMD (n=2)'); ax.plot(time,signal_noise,label='target signal'); ax.legend(); pyleo.closefig(fig)
 
         Another option for removing a nonlinear trend is a Savitzky-Golay filter:
 
@@ -2113,8 +2118,7 @@ class Series:
             ts_sg = ts.detrend(method='savitzky-golay')
             ts_sg.label = 'savitzky-golay detrending, default parameters'
             @savefig ts_sg.png
-            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter'); ax.plot(time,signal_noise,label='target signal'); ax.legend()
-            fig.tight_layout()
+            fig, ax = ts_sg.plot(title='Detrended with Savitzky-Golay filter'); ax.plot(time,signal_noise,label='target signal'); ax.legend(); pyleo.closefig(fig)
 
         As we can see, the result is even worse than with EMD (default). Here it pays to look into the underlying method, which comes from SciPy.
         It turns out that by default, the Savitzky-Golay filter fits a polynomial to the last "window_length" values of the edges.
@@ -2127,8 +2131,7 @@ class Series:
             ts_sg2 = ts.detrend(method='savitzky-golay',sg_kwargs={'window_length':201}, keep_log=True)
             ts_sg2.label = 'savitzky-golay detrending, window_length = 201'
             @savefig ts_sg2.png
-            fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter'); ax.plot(time,signal_noise,label='target signal'); ax.legend()
-            fig.tight_layout()
+            fig, ax = ts_sg2.plot(title='Detrended with Savitzky-Golay filter'); ax.plot(time,signal_noise,label='target signal'); ax.legend(); pyleo.closefig(fig)
 
         Finally, the method returns the trend that was previous, so it can be added back in if need be.
 
@@ -2141,11 +2144,9 @@ class Series:
             @savefig ts_trend.png
             trend_ts = pyleo.Series(time = time, value = nonlinear_trend, 
                                     value_name= 'trend', label='original trend')
-            fig, ax = trend_ts.plot(title='Trend recovery'); ax.plot(time,ts_emd2.log[1]['previous_trend'],label=ts_emd2.label); 
-            ax.plot(time,ts_sg2.log[1]['previous_trend'], label=ts_sg2.label); ax.legend(); fig.tight_layout()
+            fig, ax = trend_ts.plot(title='Trend recovery'); ax.plot(time,ts_emd2.log[1]['previous_trend'],label=ts_emd2.label); ax.plot(time,ts_sg2.log[1]['previous_trend'], label=ts_sg2.label); ax.legend(); pyleo.closefig(fig);
 
         Both methods can recover the exponential trend, with some edge effects near the end that could be addressed by judicious padding.
-        The functionality is not available for the methods based on SciPy.detrend(), since their API doesn't return the trend.'
         '''
         new = self.copy()
         v_mod, trend = tsutils.detrend(self.value, x=self.time, method=method, **kwargs)
@@ -2185,7 +2186,7 @@ class Series:
         Returns
         -------
 
-        psd : pyleoclim.PSD
+        psd : PSD
             A PSD object
 
         See also
@@ -2279,6 +2280,7 @@ class Series:
             psd_wwz_signif = psd_wwz.signif_test(number=1)  # significance test; for real work, should use number=200 or even larger
             @savefig spec_wwz.png
             fig, ax = psd_wwz_signif.plot(title='PSD using WWZ method')
+            pyleo.closefig(fig)
 
         We may take advantage of a pre-calculated scalogram using WWZ to accelerate the spectral analysis
         (although note that the default parameters for spectral and wavelet analysis using WWZ are different):
@@ -2291,6 +2293,7 @@ class Series:
             psd_wwz_fast = ts_std.spectral(method='wwz', scalogram=scal_wwz)
             @savefig spec_wwz_fast.png
             fig, ax = psd_wwz_fast.plot(title='PSD using WWZ method w/ pre-calculated scalogram')
+            pyleo.closefig(fig)
 
         - Periodogram
 
@@ -2303,6 +2306,7 @@ class Series:
             psd_perio_signif = psd_perio.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_perio.png
             fig, ax = psd_perio_signif.plot(title='PSD using Periodogram method')
+            pyleo.closefig(fig)
 
         - Welch
 
@@ -2314,6 +2318,7 @@ class Series:
             psd_welch_signif = psd_welch.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_welch.png
             fig, ax = psd_welch_signif.plot(title='PSD using Welch method')
+            pyleo.closefig(fig)
 
         - MTM
 
@@ -2325,6 +2330,7 @@ class Series:
             psd_mtm_signif = psd_mtm.signif_test(number=20, method='ar1sim') #in practice, need more AR1 simulations
             @savefig spec_mtm.png
             fig, ax = psd_mtm_signif.plot(title='PSD using the multitaper method')
+            pyleo.closefig(fig)
 
         By default, MTM uses a half-bandwidth of 4 times the fundamental (Rayleigh) frequency, i.e. NW = 4, which is the most conservative choice.
         NW runs from 2 to 4 in multiples of 1/2, and can be adjusted like so (note the sharper peaks and higher overall variance, which may not be desirable):
@@ -2336,6 +2342,7 @@ class Series:
             psd_mtm2 = ts_interp.spectral(method='mtm', settings={'NW':2}, label='MTM, NW=2')
             @savefig spec_mtm2.png
             psd_mtm2.plot(title='PSD using the multi-taper method', ax=ax)
+            pyleo.closefig(fig)
 
         - Continuous Wavelet Transform
 
@@ -2348,6 +2355,7 @@ class Series:
             psd_cwt_signif = psd_cwt.signif_test(number=20)
             @savefig spec_cwt.png
             fig, ax = psd_cwt_signif.plot(title='PSD using CWT method')
+            pyleo.closefig(fig)
 
         '''
         if not verbose:
@@ -2429,9 +2437,9 @@ class Series:
         ----------
 
         method : str {wwz, cwt}
-            cwt - the continuous wavelet transform (as per Torrence and Compo [1998])
+            cwt - the continuous wavelet transform [1]
                 is appropriate for evenly-spaced series.
-            wwz - the weighted wavelet Z-transform (as per Foster [1996])
+            wwz - the weighted wavelet Z-transform [2]
                 is appropriate for unevenly-spaced series.
             Default is cwt, returning an error if the Series is unevenly-spaced.
 
@@ -2472,10 +2480,10 @@ class Series:
         References
         ----------
 
-        Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
+        [1] Torrence, C. and G. P. Compo, 1998: A Practical Guide to Wavelet Analysis. Bull. Amer. Meteor. Soc., 79, 61-78.
         Python routines available at http://paos.colorado.edu/research/wavelets/
 
-        Foster, G., 1996: Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112, 1709.
+        [2] Foster, G., 1996: Wavelets for period analysis of unevenly sampled time series. The Astronomical Journal, 112, 1709.
 
         Examples
         --------
@@ -2497,7 +2505,7 @@ class Series:
             scal_signif = scal1.signif_test(number=20)  # for research-grade work, use number=200 or larger
             @savefig scal_cwt.png
             fig, ax = scal_signif.plot()
-            pyleo.closefig()
+            pyleo.closefig(fig)
 
         If you wanted to invoke the WWZ method instead (here with no significance testing, to lower computational cost):
 
@@ -2508,7 +2516,7 @@ class Series:
             scal2 = ts.wavelet(method='wwz')
             @savefig scal_wwz.png
             fig, ax = scal2.plot()
-            pyleo.closefig()
+            pyleo.closefig(fig)
 
         Notice that the two scalograms have different amplitude, which are relative.  Method-specific arguments
         may be passed via `settings`.  For instance, if you wanted to change the default mother wavelet
@@ -2521,7 +2529,7 @@ class Series:
             scal3 = ts.wavelet(settings = {'mother':'DOG'})
             @savefig scal_dog.png
             fig, ax = scal3.plot(title='CWT scalogram with DOG mother wavelet')
-            pyleo.closefig()
+            pyleo.closefig(fig)
 
         As for WWZ, note that, for computational efficiency, the time axis is coarse-grained
         by default to 50 time points, which explains in part the difference with the CWT scalogram.
@@ -2537,7 +2545,7 @@ class Series:
             scal4 = ts.wavelet(method='wwz', settings={'tau':tau})
             @savefig scal_tau.png
             fig, ax = scal4.plot(title='WWZ scalogram with finer time axis')
-            pyleo.closefig()
+            pyleo.closefig(fig)
 
         '''
         if not verbose:
@@ -2606,7 +2614,7 @@ class Series:
         Parameters
         ----------
 
-        target_series : pyleoclim.Series
+        target_series : Series
             A pyleoclim Series object on which to perform the coherence analysis
 
         method : str
@@ -2675,10 +2683,8 @@ class Series:
             ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)')
 
             coh = ts_air.wavelet_coherence(ts_nino)
-
             @savefig coh.png
-            fig, ax = coh.plot()
-            pyleo.closefig()
+            coh.plot()
 
         Note that in this example both timeseries area already on a common,
         evenly-spaced time axis. If they are not (either because the data are unevenly spaced,
@@ -2694,7 +2700,7 @@ class Series:
 
              coh_wwz = ts_air.wavelet_coherence(ts_nino, method = 'wwz')
              @savefig coh_wwz.png
-             fig, ax = coh_wwz.plot()
+             coh_wwz.plot()
 
         As with wavelet analysis, both CWT and WWZ admit optional arguments through `settings`.
         Significance is assessed similarly as with PSD or Scalogram objects:
@@ -2807,7 +2813,7 @@ class Series:
         Parameters
         ----------
 
-        target_series : pyleoclim.Series
+        target_series : Series
             A pyleoclim Series object
 
         timespan : tuple
@@ -2924,7 +2930,7 @@ class Series:
         Parameters
         ----------
 
-        target_series : pyleoclim.Series
+        target_series : Series
             A pyleoclim Series object on which to compute causality
 
         method : {'liang', 'granger'}
@@ -3048,7 +3054,7 @@ class Series:
             The number of surrogates to generate
 
         length : int
-            Lenght of the series
+            Length of the series
 
         seed : int
             Control seed option for reproducibility
@@ -3131,7 +3137,7 @@ class Series:
 
         Returns
         -------
-        ts: pyleoclim.Series
+        ts: Series
             A new Series object witthout outliers if remove is True. Otherwise, returns the original timeseries
 
 
@@ -3336,7 +3342,7 @@ class Series:
         Returns
         -------
 
-        new : pyleoclim.Series
+        new : Series
             An interpolated Series object
 
         See also
@@ -3378,7 +3384,7 @@ class Series:
         Returns
         -------
 
-        new : pyleoclim.Series
+        new : Series
 
             The coarse-grained Series object
 
@@ -3412,7 +3418,7 @@ class Series:
         Returns
         -------
 
-        new : pyleoclim.Series
+        new : Series
             An binned Series object
 
         See also

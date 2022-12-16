@@ -219,7 +219,7 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
 
     Rehfeld, K., Marwan, N., Heitzig, J., and Kurths, J.: Comparison of correlation analysis
     techniques for irregularly sampled time series, Nonlin. Processes Geophys.,
-    18, 389–404, https://doi.org/10.5194/npg-18-389-2011, 2011.
+    18, 389–404, doi:10.5194/npg-18-389-2011, 2011.
 
     See also
     --------
@@ -268,10 +268,11 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
 
 
 def increments(x,step_style='median'):
-    ''' Establishes the increments of a numerical array: start, stop, and representative step.
+    '''Establishes the increments of a numerical array: start, stop, and representative step.
 
     Parameters
     ----------
+
     x : array
 
     step_style : str
@@ -284,6 +285,7 @@ def increments(x,step_style='median'):
 
     Returns
     -------
+
     start : float
         min(x)
     stop : float
@@ -316,7 +318,7 @@ def increments(x,step_style='median'):
     return start, stop, step
 
 
-def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style= 'mean',**kwargs):
+def     (x,y, interp_type='linear', step=None,start=None,stop=None, step_style= 'mean',**kwargs):
     """ Interpolate y onto a new x-axis
 
     Largely a wrapper for [scipy.interpolate.interp1d](https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp1d.html)
@@ -354,7 +356,7 @@ def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style
     See Also
     --------
 
-    pyleoclim.utils.tsutils.increment : Establishes the increments of a numerical array
+    pyleoclim.utils.tsutils.increments : Establishes the increments of a numerical array
 
     pyleoclim.utils.tsutils.bin : Bin the values
 
