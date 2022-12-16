@@ -798,12 +798,9 @@ class Series:
             time = data.iloc[:,1]
             value = data.iloc[:,2]
             ts = pyleo.Series(time=time, value=value, time_name='Year C.E', value_name='SOI', label='SOI')
-            # plot
             @savefig ts_plot4.png
             fig, ax = ts.plot()
             pyleo.closefig(fig)
-
-            # SSA
             nino_ssa = ts.ssa(M=60)
 
         Let us now see how to make use of all these arrays. The first step is too inspect the eigenvalue spectrum ("scree plot") to identify remarkable modes. Let us restrict ourselves to the first 40, so we can see something:
@@ -812,11 +809,11 @@ class Series:
             :okwarning:
             :okexcept:
 
-            # plot eigenvalues
             @savefig ts_eigen.png
             fig, ax = nino_ssa.screeplot()
             pyleo.closefig(fig)
 
+        
         This highlights a few common phenomena with SSA:
             * the eigenvalues are in descending order
             * their uncertainties are proportional to the eigenvalues themselves
@@ -841,7 +838,8 @@ class Series:
             @savefig ssa_recon.png
             fig, ax = ts.plot(title='SOI')
             ax.plot(time,RCk,label='SSA reconstruction, 14 modes',color='orange')
-            ax.legend(); pyleo.closefig(fig);
+            ax.legend()
+            pyleo.closefig(fig)
 
 
         Indeed, these first few modes capture the vast majority of the low-frequency behavior, including all the El Niño/La Niña events. What is left (the blue wiggles not captured in the orange curve) are high-frequency oscillations that might be considered "noise" from the standpoint of ENSO dynamics. This illustrates how SSA might be used for filtering a timeseries. One must be careful however:
@@ -851,7 +849,7 @@ class Series:
 
         Monte-Carlo SSA
 
-        Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, introduced by Allen & Smith, (1996) to identiy SSA modes that rise above what one would expect from "red noise", specifically an AR(1) process_process). To run it, simply provide the parameter MC, ideally with a number of iterations sufficient to get decent statistics. Here's let's use MC = 1000. The result will be stored in the eigval_q array, which has the same length as eigval, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
+        Selecting meaningful modes in eigenproblems (e.g. EOF analysis) is more art than science. However, one technique stands out: Monte Carlo SSA, introduced by Allen & Smith, (1996) to identify SSA modes that rise above what one would expect from "red noise", specifically an AR(1) process). To run it, simply provide the parameter MC, ideally with a number of iterations sufficient to get decent statistics. Here let's use MC = 1000. The result will be stored in the eigval_q array, which has the same length as eigval, and its two columns contain the 5% and 95% quantiles of the ensemble of MC-SSA eigenvalues.
 
         .. ipython:: python
             :okwarning:
@@ -878,7 +876,7 @@ class Series:
             :okexcept:
 
             @savefig ssa_mode0plot.png
-            fig, ax = nino_mcssa.modeplot(mode=0)
+            fig, ax = nino_mcssa.modeplot(index=0)
             pyleo.closefig(fig)
 
         '''
@@ -2679,8 +2677,10 @@ class Series:
             time = data['t'].values
             air = data['air'].values
             nino = data['nino'].values
-            ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)')
-            ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)')
+            ts_air = pyleo.Series(time=time, value=data['air'].values, time_name='Year (CE)',
+                                  label='All India Rainfall', value_name='AIR (mm/month)')
+            ts_nino = pyleo.Series(time=time, value=data['nino'].values, time_name='Year (CE)',
+                                   label='NINO3', value_name='NINO3 (K)')
 
             coh = ts_air.wavelet_coherence(ts_nino)
             @savefig coh.png
@@ -3064,7 +3064,7 @@ class Series:
 
         Returns
         -------
-        surr : pyleoclim SurrogateSeries
+        surr : SurrogateSeries
 
         See also
         --------
