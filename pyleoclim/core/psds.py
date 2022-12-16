@@ -191,7 +191,7 @@ class PSD:
         Returns
         -------
 
-        new : pyleoclim.PSD
+        new : pyleoclim.core.psds.PSD
 
             New PSD object with appropriate significance test
 
@@ -395,7 +395,7 @@ class PSD:
         Returns
         -------
 
-        new : pyleoclim.PSD
+        new : pyleoclim.core.psds.PSD
             New PSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
             - beta: the scaling factor
             - std_err: the one standard deviation error of the scaling factor
@@ -464,7 +464,7 @@ class PSD:
         Returns
         -------
 
-        new : pyleoclim.PSD
+        new : pyleoclim.core.psds.PSD
             New PSD object with the spectral aliasing effect alleviated.
 
         Examples
@@ -524,6 +524,7 @@ class PSD:
 
         Parameters
         ----------
+        
         in_loglog : bool; {True, False}, optional
 
             Plot on loglog axis. The default is True.
@@ -647,6 +648,7 @@ class PSD:
 
         Returns
         -------
+        
         fig, ax
 
         Examples
@@ -975,7 +977,7 @@ class MultiplePSD:
         Returns
         -------
 
-        new : pyleoclim.MultiplePSD
+        new : pyleoclim.core.psds.MultiplePSD
         
             New MultiplePSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
             - beta: the scaling factor
@@ -1100,6 +1102,7 @@ class MultiplePSD:
 
         Returns
         -------
+        
         fig : matplotlib.pyplot.figure
         
         ax : matplotlib.pyplot.axis
@@ -1187,6 +1190,7 @@ class MultiplePSD:
         ----------
 
         avgs : int
+        
             flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
             OR from measurements averaged over each sampling interval (avgs==1)
 
@@ -1197,7 +1201,7 @@ class MultiplePSD:
         Returns
         -------
 
-        new : pyleoclim.MultiplePSD
+        new : pyleoclim.core.psds.MultiplePSD
             New MultiplePSD object with the spectral aliasing effect alleviated.
 
 
