@@ -1047,8 +1047,8 @@ def eff_sample_size(y, detrend_flag=False):
     neff : float
         The effective sample size
     
-    Reference
-    ---------
+    References
+    ----------
 
     Thiébaux HJ and Zwiers FW, 1984: The interpretation and estimation of
     effective sample sizes. Journal of Climate and Applied Meteorology 23: 800–811.

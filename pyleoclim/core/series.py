@@ -685,8 +685,10 @@ class Series:
                 gmst = df['Anomaly (deg C)']
                 ts = pyleo.Series(time=time,value=gmst, label = 'HadCRUT5', time_name='Year C.E', value_name='GMST')
                 @savefig hadCRUT5_stripes2.png
-                fig, ax = ts.stripes(ref_period=(1971,2000), show_xaxis=True)
+                fig, ax = ts.stripes(ref_period=(1971,2000), show_xaxis=True, figsize=[8, 1.2])
                 pyleo.closefig(fig)
+                
+        Note that we had to increase the figure height to make space for the extra text.  
         '''
 
         if top_label is None:
