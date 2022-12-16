@@ -2140,9 +2140,7 @@ class Series:
             trend_ts = pyleo.Series(time = time, value = nonlinear_trend,
                                     value_name= 'trend', label='original trend')
             @savefig ts_trend.png
-            trend_ts = pyleo.Series(time = time, value = nonlinear_trend, 
-                                    value_name= 'trend', label='original trend')
-            fig, ax = trend_ts.plot(title='Trend recovery'); ax.plot(time,ts_emd2.log[1]['previous_trend'],label=ts_emd2.label); ax.plot(time,ts_sg2.log[1]['previous_trend'], label=ts_sg2.label); ax.legend(); pyleo.closefig(fig);
+            fig, ax = trend_ts.plot(title='Trend recovery'); ax.plot(time,ts_emd2.log[1]['previous_trend'],label=ts_emd2.label); ax.plot(time,ts_sg2.log[1]['previous_trend'], label=ts_sg2.label); ax.legend(); pyleo.closefig(fig)
 
         Both methods can recover the exponential trend, with some edge effects near the end that could be addressed by judicious padding.
         '''
