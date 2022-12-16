@@ -92,7 +92,7 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
 
-        ens_qs : pyleoclim.EnsembleSeries
+        ens_qs : EnsembleSeries
 
             EnsembleSeries object containing empirical quantiles of original 
 
@@ -148,7 +148,7 @@ class EnsembleSeries(MultipleSeries):
         Parameters
         ----------
 
-        target : pyleoclim.Series or pyleoclim.EnsembleSeries
+        target : Series or EnsembleSeries
 
             A pyleoclim Series object or EnsembleSeries object.
             When the target is also an EnsembleSeries object, then the calculation of correlation is performed in a one-to-one sense,
@@ -193,7 +193,7 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
 
-        corr_ens : pyleoclim.CorrEns
+        corr_ens : CorrEns
 
             The resulting object, see pyleoclim.CorrEns
 

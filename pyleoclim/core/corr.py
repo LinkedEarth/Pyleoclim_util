@@ -61,6 +61,7 @@ class Corr:
     --------
 
     pyleoclim.utils.correlation.corr_sig : Correlation function
+    
     pyleoclim.utils.correlation.fdr : FDR function
     '''
 

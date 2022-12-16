@@ -134,6 +134,7 @@ class CorrEns:
 
         Parameters
         ----------
+        
         figsize : list, optional
         
             The figure size. The default is [4, 4].
@@ -143,10 +144,12 @@ class CorrEns:
             Plot title. The default is None.
             
         multiple: str, optional 
+        
             Approach to organizing the 3 different histrograms on the plot. 
             possible values: “layer”[default], “dodge”, “stack”, “fill”
             
         alpha : float in [0, 1]
+        
             transparency parameter for histrogram bars. Default: 0.8
 
         savefig_settings : dict

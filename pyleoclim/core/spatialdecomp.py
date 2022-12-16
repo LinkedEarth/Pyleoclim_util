@@ -10,28 +10,35 @@ class SpatialDecomp:
     ''' Class to hold the results of spatial decompositions
         applies to : `pca()`, `mcpca()`, `mssa()`
 
-        Attributes
+        Parameters
         ----------
 
         time: float
+        
             the common time axis
 
         locs: float (p, 2)
+        
             a p x 2 array of coordinates (latitude, longitude) for mapping the spatial patterns ("EOFs")
 
         name: str
+        
             name of the dataset/analysis to use in plots
 
         eigvals: float
+        
             vector of eigenvalues from the decomposition
 
         eigvecs: float
+        
             array of eigenvectors from the decomposition
 
         pctvar: float
+        
             array of pct variance accounted for by each mode
 
         neff: float
+        
             scalar representing the effective sample size of the leading mode
 
     '''
@@ -52,40 +59,50 @@ class SpatialDecomp:
 
         Parameters
         ----------
+        
         figsize : list, optional
+        
             The figure size. The default is [6, 4].
 
         title : str, optional
+        
             Plot title. The default is 'scree plot'.
 
         savefig_settings : dict
+        
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
 
         title_kwargs : dict, optional
+        
             the keyword arguments for ax.set_title()
 
         ax : matplotlib.axis, optional
+        
             the axis object from matplotlib
             See [matplotlib.axes](https://matplotlib.org/api/axes_api.html) for details.
 
         xlim : list, optional
+        
             x-axis limits. The default is [0, 10] (first 10 eigenvalues)
 
         uq : str, optional
+        
             Method used for uncertainty quantification of the eigenvalues.
             'N82' uses the North et al "rule of thumb" [1] with effective sample size
             computed as in [2].
             'MC' uses Monte-Carlo simulations (e.g. MC-EOF). Returns an error if no ensemble is found.
 
         clr_eig : str, optional
+        
             color to be used for plotting eigenvalues
 
 
         References
         ----------
+        
         _[1] North, G. R., T. L. Bell, R. F. Cahalan, and F. J. Moeng (1982), Sampling errors in the estimation of empirical orthogonal functions, Mon. Weather Rev., 110, 699–706.
         
         _[2] Hannachi, A., I. T. Jolliffe, and D. B. Stephenson (2007), Empirical orthogonal functions and related techniques in atmospheric science: A review, International Journal of Climatology, 27(9), 1119–1152, doi:10.1002/joc.1499.
@@ -154,27 +171,34 @@ class SpatialDecomp:
 
         Parameters
         ----------
+        
         index : int
+        
             the (0-based) index of the mode to visualize.
             Default is 0, corresponding to the first mode.
 
         figsize : list, optional
+        
             The figure size. The default is [10, 5].
 
         savefig_settings : dict
+        
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
 
         title_kwargs : dict
+        
             the keyword arguments for ax.set_title()
 
         gs : matplotlib.gridspec object, optional
+        
             the axis object from matplotlib
             See [matplotlib.gridspec.GridSpec](https://matplotlib.org/stable/tutorials/intermediate/gridspec.html) for details.
 
         spec_method: str, optional
+        
             The name of the spectral method to be applied on the PC. Default: MTM
             Note that the data are evenly-spaced, so any spectral method that
             assumes even spacing is applicable here:  'mtm', 'welch', 'periodogram'
