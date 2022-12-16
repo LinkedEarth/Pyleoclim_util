@@ -1541,7 +1541,7 @@ class MultipleSeries:
             return ax
 
     def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
+                  spine_lw=1.5, grid_lw=0.5, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
@@ -1598,10 +1598,6 @@ class MultipleSeries:
         grid_lw : float
         
             The linewidth for the gridlines.
-            
-        font_scale : float
-        
-            The scale for the font sizes. Default is 0.8.
             
         label_x_loc : float
         
@@ -1701,8 +1697,6 @@ class MultipleSeries:
             pyleo.closefig(fig) #Optional figure close after plotting
 
         '''
-        current_style = deepcopy(mpl.rcParams)
-        plotting.set_style('journal', font_scale=font_scale)
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         n_ts = len(self.series_list)
@@ -1831,11 +1825,8 @@ class MultipleSeries:
         if 'fig' in locals():
             if 'path' in savefig_settings:
                 plotting.savefig(fig, settings=savefig_settings)
-            mpl.rcParams.update(current_style)
             return fig, ax
         else:
-            # reset the plotting style
-            mpl.rcParams.update(current_style)
             return ax
         
     def stripes(self, ref_period=None, figsize=None, savefig_settings=None,  
