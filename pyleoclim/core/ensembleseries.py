@@ -76,6 +76,65 @@ class EnsembleSeries(MultipleSeries):
             time_header = f'{time_name_str}'
 
         return time_header, value_header
+    
+    def slice(self, timespan):
+        ''' Selects a limited time span from the object 
+
+        Parameters
+        ----------
+
+        timespan : tuple or list
+            The list of time points for slicing, whose length must be even.
+            When there are n time points, the output Series includes n/2 segments.
+            For example, if timespan = [a, b], then the sliced output includes one segment [a, b];
+            if timespan = [a, b, c, d], then the sliced output includes segment [a, b] and segment [c, d].
+
+        Returns
+        -------
+
+        new : EnsembleSeries
+            The sliced EnsembleSeries object.
+
+        Examples
+        --------
+
+        slice the SOI from 1972 to 1998
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            nn = 20 # number of noise realizations
+            nt = 200
+            series_list = []
+
+            time, signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=2.0)
+            
+            ts = pyleo.Series(time=time, value = signal).standardize()
+            noise = np.random.randn(nt,nn)
+
+            for idx in range(nn):  # noise
+                ts = pyleo.Series(time=time, value=ts.value+5*noise[:,idx])
+                series_list.append(ts)
+
+            ts_ens = pyleo.EnsembleSeries(series_list)
+            
+            @savefig ts_ens_plot_orig.png
+            fig, ax = ts_ens.plot_envelope(curve_lw=1.5)
+            
+            @savefig ts_ens_plot_trunc.png
+            fig, ax = ts_ens.slice([100, 199]).plot_envelope(curve_lw=1.5)
+            pyleo.closefig(fig) 
+        '''
+        new = self.copy()
+        
+        for idx, ts in enumerate(self.series_list):
+            tsc = ts.slice(timespan)
+            new.series_list[idx] = tsc
+            
+        return new
+
+    
 
     def quantiles(self, qs=[0.05, 0.5, 0.95]):
         '''Calculate quantiles of an EnsembleSeries object
