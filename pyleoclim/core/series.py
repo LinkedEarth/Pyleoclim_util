@@ -388,7 +388,63 @@ class Series:
               'std':std,
               'IQR': IQR}
         return res
+    
+    def flip(self, axis='value', keep_log = False):
+        '''
+        Flips the Series along one or both axes
 
+        Parameters
+        ----------
+        axis : str, optional
+            The axis along which the Series will be flipped. The default is 'value'.
+            Other acceptable options are 'time' or 'both'.
+            TODO: enable time flipping after paleopandas is released
+            
+        keep_log : Boolean
+            if True, adds this transformation to the series log.
+
+        Returns
+        -------
+        new : Series
+            The flipped series object
+            
+        Examples
+        --------
+        
+         .. ipython:: python
+             :okwarning:
+             :okexcept:
+
+             import pyleoclim as pyleo
+             import pandas as pd
+             data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
+             time = data.iloc[:,1]
+             value = data.iloc[:,2]
+             ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+             tsf = ts.flip(keep_log=True)
+             @savefig ts_flipped.png
+             fig, ax = tsf.plot()
+             tsf.log
+             pyleo.closefig(fig)
+        '''
+        if self.log is not None:
+            methods = [self.log[idx][idx] for idx in range(len(self.log))]
+            if 'flip' in methods:
+                warnings.warn("this Series' log indicates that it has previously been flipped")
+        
+        new = self.copy()
+        
+        if axis == 'value':
+            new.value = - self.value
+            new.value_name = new.value_name + ' x (-1)'
+        else:
+            print('Flipping is only enabled along the value axis for now')
+            
+        if keep_log == True:
+            new.log += ({len(new.log): 'flip', 'applied': True, 'axis': axis},)
+            
+        return new
+    
     def plot(self, figsize=[10, 4],
               marker=None, markersize=None, color=None,
               linestyle=None, linewidth=None, xlim=None, ylim=None,
