@@ -2,7 +2,7 @@
 
 .. note::
 
-   Pyleoclim requires the use of Python 3.9.
+   Pyleoclim requires the use of Python 3.9 or above
 
 Installing Pyleoclim
 ====================
@@ -20,11 +20,11 @@ Click :ref:`here <anaconda_installation>` for a quick tutorial on MacOs and Linu
 Creating a new conda environment
 """""""""""""""""""""""""""""""""""
 
-To create a new environment using Python 3.9 via command line:
+To create a new environment using Python 3.10 via command line:
 
 .. code-block:: bash
 
-  conda create -n pyleo python=3.9
+  conda create -n pyleo python=3.10
 
 To view a list of available environment:
 
@@ -62,6 +62,7 @@ First install Cartopy:
 
   conda install -c conda-forge cartopy=0.21
 
+(note: under Python 3.10, cartopy>=0.21 will be installed by default, so specifying this version is unnecessary).
 Then install Pyleoclim through Pypi, which contains the most stable version of Pyleoclim:
 
 .. code-block:: bash
@@ -135,4 +136,4 @@ To run the image:
 
   docker run -it -p 8888:8888 quay.io/linkedearth/pyleoclim:latest
 
-The container will start a Jupyter server automatically. You need to copy the link to the server (localhost) into your web browser on your machine (the command -p 8888:8888 opens the communication port between your machine and the container). You can then create notebook and upload notebook and data using the Jupyter interface. Remember that the container will not save any of your work if you close it. So make sure you donwload your work before closing the container. 
+The container will start a Jupyter server automatically. You need to copy the link to the server (localhost) into your web browser on your machine (the command -p 8888:8888 opens the communication port between your machine and the container). You can then create notebook and upload notebook and data using the Jupyter interface. Remember that the container will not save any of your work if you close it. So make sure you donwload your work before closing the container.

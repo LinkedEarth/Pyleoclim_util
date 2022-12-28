@@ -292,6 +292,50 @@ class MultipleSeries:
             ms_copy = ms.copy()
         '''
         return deepcopy(self)
+    
+    def flip(self, axis='value'):
+        '''
+        Flips the Series along one or both axes
+
+        Parameters
+        ----------
+        axis : str, optional
+            The axis along which the Series will be flipped. The default is 'value'.
+            Other acceptable options are 'time' or 'both'.
+            TODO: enable time flipping after paleopandas is released
+            
+        Returns
+        -------
+        ms : MultipleSeries
+            The flipped object
+            
+         Examples
+         --------
+
+         .. ipython:: python
+             :okwarning:
+             :okexcept:
+
+             import pyleoclim as pyleo
+             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+             data = pyleo.Lipd(usr_path = url)
+             tslist = data.to_LipdSeriesList()
+             tslist = tslist[2:] # drop the first two series which only concerns age and depth
+             ms = pyleo.MultipleSeries(tslist)
+             
+             @savefig ms_flip.png
+             fig, ax = ms.flip().stackplot()
+             pyleo.closefig(fig) 
+            
+            Note that labels have been updated to reflect the flip
+        '''
+        
+        ms=self.copy()
+        for idx,item in enumerate(ms.series_list):
+            s=item.flip(axis=axis, keep_log=False)
+            ms.series_list[idx]=s
+        
+        return ms
 
     def standardize(self):
         '''Standardize each series object in a collection
