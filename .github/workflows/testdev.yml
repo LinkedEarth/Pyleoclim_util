@@ -23,6 +23,9 @@ jobs:
         environment-file: environment.yml
         python-version: "3.10"
         auto-activate-base: true
+    
+    - name: Conda list
+      run: conda list
 
     - name: Test with pytest
       run: |
