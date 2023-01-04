@@ -12,7 +12,7 @@ dependencies:
   - climlab=0.7.13
   - numpy=1.22.0
   - pip
-  - python=3.10.9
+  - python=3.10
   - libstdcxx-ng=12.1.0
   - pip:
     - git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
