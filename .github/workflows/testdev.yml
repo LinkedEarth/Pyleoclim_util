@@ -22,12 +22,15 @@ jobs:
         activate-environment: pyleo
         environment-file: environment.yml
         python-version: "3.10"
-        auto-activate-base: true
+        auto-activate-base: false
     
     - name: Conda list
-      run: conda list
+      run: |
+        conda activate pyleo
+        conda list
 
     - name: Test with pytest
       run: |
+        conda activate pyleo
         conda install pytest
         $CONDA/bin/pytest
