@@ -35,5 +35,4 @@ jobs:
     - name: Test with pytest
       run: |
         conda activate pyleo
-        conda install pytest
-        $CONDA/bin/pytest
+        pytest pyleoclim/tests -svv
