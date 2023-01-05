@@ -135,7 +135,7 @@ class SsaRes:
         Examples
         --------
 
-        Plot the SSA eig envalue spectrum of the Southern Oscillation Index:
+        Plot the SSA eigenvalue spectrum of the Southern Oscillation Index:
 
         .. ipython:: python
             :okwarning:
