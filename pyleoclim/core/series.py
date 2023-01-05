@@ -1331,20 +1331,6 @@ class Series:
             These will be overriden by summary plot to prevent formatting errors
 
         gridspec_kwargs : dict
-            arguments to be passed to the gridspec configuration
-            The plot is constructed with six slots:
-                - slot [0] contains a subgridspec containing the timeseries and scalogram (shared x axis)
-                - slot [1] contains a subgridspec containing an empty slot and the PSD plot (shared y axis with scalogram)
-                - slot [2] and slot [3] are empty to allow ample room for xlabels for the scalogram and PSD plots
-                - slot [4] contains the scalogram color bar
-                - slot [5] is empty
-            It is possible to tune the size and spacing of the various slots
-                - 'width_ratios': list of two values describing the relative widths of the two columns (default: [6, 1])
-                - 'height_ratios': list of three values describing the relative heights of the timeseries, scalogram and colorbar (default: [8, 1, .35])
-                - 'hspace': vertical space between gridspec slots (default: 0, however if either the scalogram xlabel or the PSD xlabel contain '\n', .05)
-                - 'wspace': lateral space between gridspec slots (default: 0.1)
-
-        gridspec_kwargs : dict
             arguments used to build the specifications for gridspec configuration
             The plot is constructed with six slots:
                 - slot [0] contains a subgridspec containing the timeseries and scalogram (shared x axis)
