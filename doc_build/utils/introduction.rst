@@ -14,82 +14,98 @@ to values more appropriate for paleoclimate datasets.
 Causality
 """""""""
 .. automodule:: pyleoclim.utils.causality
-   :members: liang_causality, granger_causality
+  :members:
+  :ignore-module-all: True
+
 
 Correlation
 """""""""""
 
 .. automodule:: pyleoclim.utils.correlation
-   :members: fdr, corr_sig
+  :members:
+  :ignore-module-all: True
 
 Decomposition
 """""""""""""
 
 .. automodule:: pyleoclim.utils.decomposition
-   :members: ssa
+  :members:
+  :ignore-module-all: True
 
 Filter
 """"""
 
 .. automodule:: pyleoclim.utils.filter
-   :members: butterworth, savitzky_golay, firwin, lanczos
+  :members:
+  :ignore-module-all: True
 
 Mapping
 """""""
 
 .. automodule:: pyleoclim.utils.mapping
-   :members: map, compute_distance
+  :members:
+  :ignore-module-all: True
 
 Plotting
 """"""""
 
 .. automodule:: pyleoclim.utils.plotting
-   :members: set_style, closefig, savefig
+  :members:
+  :ignore-module-all: True
 
 Spectral
 """"""""
 
 .. automodule:: pyleoclim.utils.spectral
-   :members: wwz_psd, cwt_psd, mtm, lomb_scargle, welch, periodogram
+  :members:
+  :ignore-module-all: True
+
 
 Tsmodel
 """""""
 
 .. automodule:: pyleoclim.utils.tsmodel
-   :members: ar1_sim, ar1_fit, colored_noise, colored_noise_2regimes, gen_ar1_evenly
+  :members:
+  :ignore-module-all: True
+
 
 
 Wavelet
 """""""
 
 .. automodule:: pyleoclim.utils.wavelet
-   :members: cwt, cwt_coherence, wwz, wwz_coherence
+  :members:
+  :ignore-module-all: True
 
 
 Tsutils
 """""""
 
 .. automodule:: pyleoclim.utils.tsutils
-   :members: simple_stats, bin, interp, gkernel, standardize, ts2segments, annualize, gaussianize, gaussianize_1d, detrend, remove_outliers, detect_outliers_DBSCAN, detect_outliers_kmeans
+  :members:
+  :ignore-module-all: True
+
 
 
 Tsbase
 """"""
 
 .. automodule:: pyleoclim.utils.tsbase
-   :members: clean_ts, dropna, sort_ts, is_evenly_spaced, reduce_duplicated_timestamps
+  :members:
+  :ignore-module-all: True
+
 
 
 Lipdutils
 """""""""
 
-Utilities to manipulate LiPD files and automate data transformation whenever possible.
-These functions are used throughout Pyleoclim but are not meant for direct interaction by users.
-Also handles integration with the LinkedEarth wiki and the LinkedEarth Ontology.
-
+.. automodule:: pyleoclim.utils.lipdutils
+  :members:
+  :ignore-module-all: True
 
 jsonutils
 """""""""
 
 .. automodule:: pyleoclim.utils.jsonutils
-  :members: PyleoObj_to_json, json_to_PyleoObj, isPyleoclim
+  :members:
+  :ignore-module-all: True

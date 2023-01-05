@@ -219,7 +219,7 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
 
     Rehfeld, K., Marwan, N., Heitzig, J., and Kurths, J.: Comparison of correlation analysis
     techniques for irregularly sampled time series, Nonlin. Processes Geophys.,
-    18, 389–404, https://doi.org/10.5194/npg-18-389-2011, 2011.
+    18, 389–404, doi:10.5194/npg-18-389-2011, 2011.
 
     See also
     --------
@@ -268,10 +268,11 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
 
 
 def increments(x,step_style='median'):
-    ''' Establishes the increments of a numerical array: start, stop, and representative step.
+    '''Establishes the increments of a numerical array: start, stop, and representative step.
 
     Parameters
     ----------
+
     x : array
 
     step_style : str
@@ -284,6 +285,7 @@ def increments(x,step_style='median'):
 
     Returns
     -------
+
     start : float
         min(x)
     stop : float
@@ -354,7 +356,7 @@ def interp(x,y, interp_type='linear', step=None,start=None,stop=None, step_style
     See Also
     --------
 
-    pyleoclim.utils.tsutils.increment : Establishes the increments of a numerical array
+    pyleoclim.utils.tsutils.increments : Establishes the increments of a numerical array
 
     pyleoclim.utils.tsutils.bin : Bin the values
 
@@ -728,10 +730,10 @@ def detrend(y, x=None, method="emd", n=1, sg_kwargs=None):
 
     if method == "linear":
         ys = signal.detrend(y,type='linear')
-        trend = None
+        trend = y - ys
     elif method == 'constant':
         ys = signal.detrend(y,type='constant')
-        trend = None 
+        trend = y - ys 
     elif method == "savitzky-golay":
         # Check that the timeseries is uneven and interpolate if needed
         if x is None:
@@ -1045,8 +1047,8 @@ def eff_sample_size(y, detrend_flag=False):
     neff : float
         The effective sample size
     
-    Reference
-    ---------
+    References
+    ----------
 
     Thiébaux HJ and Zwiers FW, 1984: The interpretation and estimation of
     effective sample sizes. Journal of Climate and Applied Meteorology 23: 800–811.

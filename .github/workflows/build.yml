@@ -1,8 +1,9 @@
 name: Build container image
 
 on:
-  push:
+  release:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:

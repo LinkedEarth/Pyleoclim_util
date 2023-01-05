@@ -120,29 +120,52 @@ class Coherence:
 
         Parameters
         ----------
+        
         var : str {'wtc', 'xwt'}
+        
             variable to be plotted as color field. Default: 'wtc', the wavelet transform coherency.
             'xwt' plots the cross-wavelet transform instead.
+        
         xlabel : str, optional
+        
             x-axis label. The default is None.
+        
         ylabel : str, optional
+        
             y-axis label. The default is None.
+        
         title : str, optional
+        
             Title of the plot. The default is 'auto', where it is made from object metadata.
             To mute, pass title = None.
+        
         figsize : list, optional
+        
             Figure size. The default is [10, 8].
+        
         ylim : list, optional
+        
             y-axis limits. The default is None.
+        
         xlim : list, optional
+        
             x-axis limits. The default is None.
+            
         in_scale : bool, optional
+        
+            
             Plots scales instead of frequencies The default is True.
+        
         yticks : list, optional
+        
             y-ticks label. The default is None.
+        
         contourf_style : dict, optional
+        
             Arguments for the contour plot. The default is {}.
+        
         phase_style : dict, optional
+        
             Arguments for the phase arrows. The default is {}. It includes:
             - 'pt': the default threshold above which phase arrows will be plotted
             - 'skip_x': the number of points to skip between phase arrows along the x-axis
@@ -150,44 +173,66 @@ class Coherence:
             - 'scale': number of data units per arrow length unit (see matplotlib.pyplot.quiver)
             - 'width': shaft width in arrow units (see matplotlib.pyplot.quiver)
             - 'color': arrow color (see matplotlib.pyplot.quiver)
+        
         cbar_style : dict, optional
+        
             Arguments for the color bar. The default is {}.
+       
         savefig_settings : dict, optional
+        
             The default is {}.
             the dictionary of arguments for plt.savefig(); some notes below:
             - "path" must be specified; it can be any existed or non-existed path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"}
+        
         ax : ax, optional
+        
             Matplotlib axis on which to return the figure. The default is None.
+       
         signif_thresh: float in [0, 1]
+        
             Significance threshold. Default is 0.95. If this quantile is not
             found in the qs field of the Coherence object, the closest quantile
             will be picked.
+        
         signif_clr : str, optional
+        
             Color of the significance line. The default is 'white'.
+       
         signif_linestyles : str, optional
+        
             Style of the significance line. The default is '-'.
+        
         signif_linewidths : float, optional
+        
             Width of the significance line. The default is 1.
+       
         under_clr : str, optional
+        
             Color for under 0. The default is 'ivory'.
+        
         over_clr : str, optional
+        
             Color for over 1. The default is 'black'.
+       
         bad_clr : str, optional
+        
             Color for missing values. The default is 'dimgray'.
 
         Returns
         -------
+        
         fig, ax
 
         See also
         --------
-        pyleoclim.core.coherence.Coherence.dashboard
+        
+        pyleoclim.core.coherence.Coherence.dashboard : plots a a dashboard showing the coherence and the cross-wavelet transform. 
 
-        pyleoclim.core.series.Series.wavelet_coherence
+        pyleoclim.core.series.Series.wavelet_coherence : computes the coherence from two timeseries.
 
-        matplotlib.pyplot.quiver
+        matplotlib.pyplot.quiver : quiver plot
 
         Examples
         --------
@@ -434,15 +479,19 @@ class Coherence:
          ----------
 
          title : str, optional
+         
              Title of the plot. The default is None.
 
          figsize : list, optional
+         
              Figure size. The default is [9, 12], as this is an information-rich figure.
              
          line_colors : list, optional
+         
              Colors for the 2 traces For nomenclature, see https://matplotlib.org/stable/gallery/color/named_colors.html
 
          savefig_settings : dict, optional
+         
              The default is {}.
              the dictionary of arguments for plt.savefig(); some notes below:
              - "path" must be specified; it can be any existed or non-existed path,
@@ -450,6 +499,7 @@ class Coherence:
              - "format" can be one of {"pdf", "eps", "png", "ps"}
 
          phase_style : dict, optional
+         
              Arguments for the phase arrows. The default is {}. It includes:
              - 'pt': the default threshold above which phase arrows will be plotted
              - 'skip_x': the number of points to skip between phase arrows along the x-axis
@@ -459,25 +509,28 @@ class Coherence:
              - 'color': arrow color (see matplotlib.pyplot.quiver)
 
          ts_plot_kwargs : dict
+         
               arguments to be passed to the timeseries subplot, see pyleoclim.core.series.Series.plot for details
 
          wavelet_plot_kwargs : dict
+         
               arguments to be passed to the contour subplots (XWT and WTC), [see pyleoclim.core.coherence.Coherence.plot for details]
 
 
          Returns
          -------
+         
          fig, ax
 
          See also
          --------
-         pyleoclim.core.coherence.Coherence.plot
+         pyleoclim.core.coherence.Coherence.plot : creates a coherence plot
 
-         pyleoclim.core.series.Series.wavelet_coherence
+         pyleoclim.core.series.Series.wavelet_coherence : computes the coherence between two timeseries.
 
-         pyleoclim.core.series.Series.plot
+         pyleoclim.core.series.Series.plot: plots a timeseries
 
-         matplotlib.pyplot.quiver
+         matplotlib.pyplot.quiver: makes a quiver plot
 
          Examples
          --------
@@ -593,23 +646,36 @@ class Coherence:
 
         Parameters
         ----------
+        
         number : int, optional
+        
             Number of surrogate series to create for significance testing. The default is 200.
+        
         method : {'ar1sim'}, optional
+        
             Method through which to generate the surrogate series. The default is 'ar1sim'.
+       
         seed : int, optional
+        
             Fixes the seed for NumPy's random number generator.
             Useful for reproducibility. The default is None, so fresh, unpredictable
             entropy will be pulled from the operating system.
+        
         qs : list, optional
+        
             Significance levels to return. The default is [0.95].
+            
         settings : dict, optional
+        
             Parameters for surrogate model. The default is None.
+            
         mute_pbar : bool, optional
+        
             Mute the progress bar. The default is False.
 
         Returns
         -------
+        
         new : pyleoclim.core.coherence.Coherence
 
             original Coherence object augmented with significance levels signif_qs,
@@ -794,19 +860,25 @@ class Coherence:
 
         Parameters
         ----------
+        
         scales : float
+        
             scale at which to evaluate the phase angle
         
         number : int, optional
+        
             number of AR(1) series to create for significance testing. The default is 1000.
        
         level : float, optional
+        
            significance level against which to gauge sigma and kappa. default: 0.05
         
 
         Returns
         -------
+        
         result : dict
+        
             contains angle_mean (the mean angle for those scales), sigma (the 
             circular standard deviation), kappa, sigma_lo (alpha-level quantile 
             for sigma) and kappa_hi, the (1-alpha)-level quantile for kappa. 
@@ -829,6 +901,7 @@ class Coherence:
         
         References
         ----------
+        
         [1] Grinsted, A., J. C. Moore, and S. Jevrejeva (2004), Application of the cross
         wavelet transform and wavelet coherence to geophysical time series, 
         Nonlinear Processes in Geophysics, 11, 561–566.

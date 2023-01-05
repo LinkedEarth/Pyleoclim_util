@@ -179,7 +179,7 @@ class Scalogram:
         Returns
         -------
 
-        scal : pyleoclim.Scalogram
+        scal : pyleoclim.core.scalograms.Scalogram
 
             The copied version of the pyleoclim.Scalogram object
 
@@ -453,7 +453,8 @@ class Scalogram:
             Method to use to generate the surrogates.  ar1sim uses simulated timeseries with similar persistence. 
             ar1asym represents the theoretical, closed-form solution. The default is ar1sim
             
-       number: int     
+       number : int 
+       
             Number of surrogates to generate for significance analysis based on simulations. 
             The default is 200.
 
@@ -484,7 +485,7 @@ class Scalogram:
         Returns
         -------
 
-        new : pyleoclim.Scalogram
+        new : pyleoclim.core.scalograms.Scalogram
 
             A new Scalogram object with the significance level
 
@@ -668,7 +669,7 @@ class MultipleScalogram:
         Returns
         -------
         
-        scals : pyleoclim.MultipleScalogram
+        scals : pyleoclim.core.scalograms.MultipleScalogram
         
         '''
         freq = np.copy(self.scalogram_list[0].frequency)

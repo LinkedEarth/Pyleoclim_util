@@ -479,7 +479,7 @@ def corr_isospec(y1, y2, alpha=0.05, nsim=1000):
     pyleoclim.utils.correlation.fdr : Determine significance based on the false discovery rate
     
     References
-    ---------
+    ----------
 
     - Ebisuzaki, W, 1997: A method to estimate the statistical
     significance of a correlation when the data are serially correlated.

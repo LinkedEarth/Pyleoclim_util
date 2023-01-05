@@ -56,7 +56,7 @@ class AliasFilter(object):
     '''
 
     def alias_filter(self, freq, pwr, fs, fc, f_limit, avgs):
-        ''' anti_alias filter
+        ''' The anti-aliasing filter
 
         Parameters
         ----------

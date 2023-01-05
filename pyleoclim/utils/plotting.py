@@ -10,6 +10,7 @@ __all__ = ['set_style','closefig', 'savefig']
 import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
+import numpy as np
 from matplotlib.patches import Rectangle
 from matplotlib.collections import PatchCollection
 from matplotlib.colors import ListedColormap
@@ -195,7 +196,7 @@ def plot_scatter_xy(x1,y1,x2,y2, figsize=None, xlabel=None,
 
 def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, 
             xlim=None, ylim=None,savefig_settings=None, ax=None,
-            legend=True, plot_kwargs=None, lgd_kwargs=None,
+            legend=True, plot_kwargs=None, lgd_kwargs=None, 
             invert_xaxis=False, invert_yaxis=False):
     ''' Plot a timeseries
     
@@ -294,9 +295,10 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
     else:
         return ax
     
-def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.7, figsize=None, xlabel=None, 
+def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.75, figsize=None, xlabel=None, 
                ylabel=None, title=None, xlim=None, savefig_settings=None, ax=None, 
-               invert_xaxis=False): 
+               x_offset = 0.05, label_size = None, show_xaxis = False,
+               invert_xaxis=False, top_label = None, bottom_label = None, label_color = None): 
     '''
     Represent y as an Ed Hawkins "warming stripes" pattern, as a function of x
     
@@ -316,16 +318,18 @@ def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.7, figsize=None, xlabe
         size of the y-value range (default: 0.7) 
     figsize : list
         a list of two integers indicating the figure size
-    xlabel : str
-        label for x-axis
-    ylabel : str
-        label for y-axis
-    title : str
-        the title for the figure
+    top_label : str
+        the "title" label for the stripe
+    bottom_label : str
+        the "ylabel" explaining which variable is being plotted
+    label_size : int
+        size of the text in labels (in points). Default is the Matplotlib 'axes.labelsize'] rcParams
     xlim : list
         set the limits of the x axis
-    ylim : list
-        set the limits of the y axis
+    x_offset : float
+        value controlling the horizontal offset between stripes and labels (default = 0.05)
+    show_xaxis : bool
+        flag indicating whether or not the x-axis should be shown (default = False)
     ax : pyplot.axis
         the pyplot.axis object
     savefig_settings : dict
@@ -346,11 +350,20 @@ def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.7, figsize=None, xlabe
     
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
+      
+    if label_size is None:
+        label_size = mpl.rcParams['axes.labelsize']
+      
+    if thickness is None:
+        thickness = 5*label_size
         
-    ax.set_axis_off() # remove parasitic lines and labels
-
-    FIRST = x.min()
-    LAST = x.max()  # inclusive
+    ax.get_yaxis().set_visible(False) # remove parasitic lines and labels
+    ax.get_xaxis().set_visible(show_xaxis) # remove parasitic lines and labels
+    ax.spines[:].set_visible(False)
+    
+    dx = np.diff(x).mean()
+    xmin = x.min()
+    xmax = x.max() + dx # inclusive
     
     # Reference period for the center of the color scale    
     reference = y[ref_period[0]:ref_period[1]].mean()
@@ -365,7 +378,7 @@ def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.7, figsize=None, xlabe
     
     col = PatchCollection([
         Rectangle((yl, 0), 1, 1)
-        for yl in range(int(FIRST), int(LAST) + 1)
+        for yl in range(int(xmin), int(xmax))
         ])
 
     # set data, colormap and color limits
@@ -375,8 +388,19 @@ def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.7, figsize=None, xlabe
     ax.add_collection(col)
     # adjust axes
     ax.set_ylim(0, thickness)
-    ax.set_xlim(FIRST, LAST + 1);
+    ax.set_xlim(xmin, xmax);
     
+    # add label to the right 
+    #offset = y_offsets[column] / 72
+    #trans = mtransforms.ScaledTranslation(0, offset, fig.dpi_scale_trans)
+    #trans = ax.transData #+ trans
+    
+    ypos = 0.4*thickness
+    ax.text(xmax+dx+x_offset, 0.6*thickness, top_label, color=label_color, 
+            fontsize=label_size, fontweight = 'bold')
+    ax.text(xmax+dx+x_offset, 0.2*thickness, bottom_label, color=label_color,
+            fontsize=label_size)
+
     if xlabel is not None:
         ax.set_xlabel(xlabel)
 
@@ -393,6 +417,7 @@ def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.7, figsize=None, xlabe
         ax.invert_xaxis()       
 
     if 'fig' in locals():
+        fig.tight_layout()
         if 'path' in savefig_settings:
             savefig(fig, settings=savefig_settings)
         return fig, ax
