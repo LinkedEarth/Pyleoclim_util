@@ -14,5 +14,6 @@ dependencies:
   - pip
   - python=3.10
   - libstdcxx-ng=12.1.0
+  - pytest
   - pip:
     - git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
