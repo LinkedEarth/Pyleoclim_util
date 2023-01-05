@@ -9,32 +9,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-20.04
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
 
-    - name: checkout files in repo
-      uses: actions/checkout@v2
+    - name: Checkout files in repo
+      uses: actions/checkout@v3
 
-    - name: Setup Python 3.9
-      uses: actions/setup-python@v2
+    - name: Setup Miniconda
+      uses: conda-incubator/setup-miniconda@v2
       with:
-        python-version: 3.9
-
-    - name: Install dependencies
+        activate-environment: pyleo
+        environment-file: environment.yml
+        python-version: "3.10"
+        auto-activate-base: false
+    
+    - name: Conda list
       run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        $CONDA/bin/conda env update --file environment.yml --name base
-
-    - name: Lint with flake
-      run: |
-        $CONDA/bin/conda install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        $CONDA/bin/flake8 . --count --select=E9,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        $CONDA/bin/flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
+        conda activate pyleo
+        conda list
     - name: Test with pytest
       run: |
-        conda install pytest
-        $CONDA/bin/pytest
+        conda activate pyleo
+        pytest pyleoclim/tests -svv
