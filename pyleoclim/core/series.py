@@ -1265,7 +1265,8 @@ class Series:
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None,
                     time_label=None, value_label=None, period_label=None, psd_label=None,
                     ts_plot_kwargs = None, wavelet_plot_kwargs = None,
-                    psd_plot_kwargs = None, gridspec_kwargs = None, y_label_loc = None, savefig_settings=None):
+                    psd_plot_kwargs = None, gridspec_kwargs = None, y_label_loc = None,
+                    legend = False, savefig_settings=None):
 
         ''' Produce summary plot of timeseries.
 
@@ -1448,6 +1449,10 @@ class Series:
         ax = {}
         ### Time series
         ax['ts'] = fig.add_subplot(gs_d['ts_scal'][0, 0])
+        # if 'label' not in ts_plot_kwargs.keys():
+        #     if legend is True:
+        #         ts_plot_kwargs['label'] = self.value_name
+
         ax['ts'] = self.plot(ax=ax['ts'], **ts_plot_kwargs)
 
         if time_lim is not None:
@@ -1556,7 +1561,11 @@ class Series:
 
 
         ax['scal'].set_title(None)
-        ax['scal'].tick_params(axis='x', which='major', pad=12)
+        xticks = ax['scal'].get_xticks()
+        midpoints = xticks[:-1] + np.diff(xticks) / 2
+        ax['scal'].set_xticks(midpoints[1:-1])
+
+        ax['scal'].tick_params(axis='x', pad=12) # which='major',
         # fix ts xticks after final edits to scalogram xtick because of the sharedx
 
         if 'ylims' in psd_plot_kwargs:
@@ -1638,9 +1647,28 @@ class Series:
         ax['psd'].invert_yaxis()
         ax['psd'].set_ylabel(None)
 
-        ax['psd'].tick_params(axis='y', direction='in', labelleft=False)
-        ax['psd'].legend().remove()
+        ax['psd'].tick_params(axis='y', direction='in', labelleft=False, pad=12)
+        # ax['psd'].legend(bbox_to_anchor=[1, 1])
+        # h, l = ax['psd'].get_legend_handles_labels()
+        # ax['psd'].legend().remove()
+        if legend is True:
+            leg_h, leg_l = [], []
+            for key in ['ts', 'psd']:
+                ax[key].legend()
+                _h, _l = ax[key].get_legend_handles_labels()
+                for ip, label in enumerate(_l):
+                    if label not in leg_l:
+                        leg_l.append(label)
+                        leg_h.append(_h[ip])
+                ax[key].legend().remove()
+
+            ax['leg'] = fig.add_subplot(gs_d['psd'][0, 0])
+            ax['leg'].legend(leg_h, leg_l)
+
         ax['scal'].invert_yaxis()  # not sure where this needs to be
+
+        # ax['leg'] = fig.add_subplot(gs_d['psd_leg'][0, 0])
+        # ax['leg'].legend(h, l)
 
         # ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
         # ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, ylabel = 'PSD from \n' + str(psd.spec_method), **psd_plot_kwargs)
