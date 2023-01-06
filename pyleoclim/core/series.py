@@ -32,6 +32,7 @@ from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
 import matplotlib.colors as mcolors
+import matplotlib.colorbar as mcb
 import random
 
 from matplotlib import gridspec
@@ -1334,7 +1335,8 @@ class Series:
                     time_lim=None, value_lim=None, period_lim=None, psd_lim=None,
                     time_label=None, value_label=None, period_label=None, psd_label=None,
                     ts_plot_kwargs = None, wavelet_plot_kwargs = None,
-                    psd_plot_kwargs = None, gridspec_kwargs = None, y_label_loc = None, savefig_settings=None):
+                    psd_plot_kwargs = None, gridspec_kwargs = None, y_label_loc = None,
+                    legend = None, savefig_settings=None):
 
         ''' Produce summary plot of timeseries.
 
@@ -1381,6 +1383,9 @@ class Series:
         psd_label : str
             the label for the amplitude axis of PDS
 
+        legend : bool
+            if set to True, a legend will be added to the open space above the psd plot
+
         ts_plot_kwargs : dict
             arguments to be passed to the timeseries subplot, see Series.plot for details
 
@@ -1396,22 +1401,20 @@ class Series:
             These will be overriden by summary plot to prevent formatting errors
 
         gridspec_kwargs : dict
-            arguments to be passed to the gridspec configuration
+            arguments used to build the specifications for gridspec configuration
             The plot is constructed with six slots:
                 - slot [0] contains a subgridspec containing the timeseries and scalogram (shared x axis)
-                - slot [1] contains a subgridspec containing an empty slot and the PSD plot (shared y axis with
-                scalogram)
+                - slot [1] contains a subgridspec containing an empty slot and the PSD plot (shared y axis with scalogram)
                 - slot [2] and slot [3] are empty to allow ample room for xlabels for the scalogram and PSD plots
                 - slot [4] contains the scalogram color bar
                 - slot [5] is empty
-
+                
             It is possible to tune the size and spacing of the various slots
                 - 'width_ratios': list of two values describing the relative widths of the two columns (default: [6, 1])
-                - 'height_ratios': list of three values describing the relative heights of the three rows (default: [8, 1,
-                .35])
-                - 'hspace': vertical space between gridspec slots (default: 0, however if either the scalogram xlabel or
-                the PSD xlabel contain '\n', .05)
-                - 'wspace': lateral space between gridspec slots (default: 0.1)
+                - 'height_ratios': list of three values describing the relative heights of the three rows (default: [2, 7, .35])
+                - 'hspace': vertical space between timeseries and scalogram (default: 0, however if either the scalogram xlabel or the PSD xlabel contain '\n', .05)
+                - 'wspace': lateral space between scalogram and psd plot slots (default: 0.05)
+                - 'cbspace': vertical space between the scalogram and colorbar
 
         y_label_loc : float
             Plot parameter to adjust horizontal location of y labels to avoid conflict with axis labels, default value is -0.15
@@ -1486,16 +1489,36 @@ class Series:
         # spacing
         if (type(psd_label) == str and '\n' in psd_label) or (psd_label is None):
             gridspec_kwargs_default = {'width_ratios': [6, 1],
-                                       'height_ratios': [8, 1, .35],
-                                       'hspace': 0.05, 'wspace': 0}
+                                       # 'height_ratios': [8, 1, .35],
+                                       'height_ratios': [2,7,.35],
+                                       'hspace': 0.05, 'wspace': 0.05,
+                                       'cbspace':1}
         else:
             gridspec_kwargs_default = {'width_ratios': [6, 1],
-                                       'height_ratios': [8, 1, .35],
-                                       'hspace': 0, 'wspace': 0}
+                                       # 'height_ratios': [8, 1, .35],
+                                       'height_ratios': [2,7,.35],
+                                       'hspace': 0, 'wspace': 0,
+                                       'cbspace':1}
+
 
         for key in gridspec_kwargs_default:
             if key not in gridspec_kwargs.keys():
                 gridspec_kwargs[key] = gridspec_kwargs_default[key]
+
+        ts_height = gridspec_kwargs['height_ratios'][0]
+        scal_height = gridspec_kwargs['height_ratios'][1]
+        cb_height = gridspec_kwargs['height_ratios'][2]
+
+        psd_width = gridspec_kwargs['width_ratios'][1]
+        scal_width = gridspec_kwargs['width_ratios'][0]
+
+        if 'cbspace' in gridspec_kwargs.keys():
+            cb_space = gridspec_kwargs['cbspace']
+        else:
+            cb_space = 1
+
+        gridspec_kwargs['height_ratios'] = [ts_height+scal_height, cb_space, cb_height]
+        del gridspec_kwargs['cbspace']
 
         fig = plt.figure(constrained_layout=False, figsize=figsize)
         gs = fig.add_gridspec(3, 2, **gridspec_kwargs)
@@ -1512,10 +1535,11 @@ class Series:
         #Let's use the same hspace/wspace if given to a user
 
         gs_d = {}
-        gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[1, 4], hspace=gridspec_kwargs['hspace'])
-        gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[1, 4], hspace=gridspec_kwargs['hspace'])
-        #gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
-        #gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[1, 4], hspace=.10)
+        gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[ts_height, scal_height], hspace=gridspec_kwargs['hspace'])
+        gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[ts_height, scal_height], hspace=gridspec_kwargs['hspace'])
+
+        # gs_d['ts_scal'] = gs[0].subgridspec(2, 1, height_ratios=[1, 4], hspace=gridspec_kwargs['hspace'])
+        # gs_d['psd'] = gs[1].subgridspec(2, 1, height_ratios=[1, 4], hspace=gridspec_kwargs['hspace'])
         gs_d['cb'] = gs[4].subgridspec(1, 1)
 
         ax = {}
@@ -1583,41 +1607,27 @@ class Series:
         else:
             orient = 'horizontal'
             # I think padding is now the hspace
-            if 'pad' in wavelet_plot_kwargs['cbar_style']:
-                pad = wavelet_plot_kwargs['cbar_style']['pad']
-            else:
-                pad = 0.12
+            # if 'pad' in wavelet_plot_kwargs['cbar_style']:
+            #     pad = wavelet_plot_kwargs['cbar_style']['pad']
+            # else:
+            #     pad = 0.12
             if 'label' in wavelet_plot_kwargs['cbar_style']:
                 label = wavelet_plot_kwargs['cbar_style']['label']
             else:
                 label = wavelet_plot_kwargs['variable'].capitalize() + ' from ' + scalogram.wave_method
-            wavelet_plot_kwargs.update({'cbar_style': {'orientation': orient, 'pad': pad,
-                                                       'label': label}})
+            wavelet_plot_kwargs.update({'cbar_style': {'orientation': orient,
+                                                       'label': label,
+                                                       # 'pad': pad,
+                                                       }})
 
-        # Moving the colorbar to its own axis without leaving white space
-        wavelet_plot_kwargs['cbar_style']['inset'] = True
         wavelet_plot_kwargs['cbar_style']['drawedges'] = True
 
-        #ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
-        scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
+        # Do not plot colorbar in scalogram
+        wavelet_plot_kwargs['plot_cb'] = False
 
-        # pull colorbar specifications from scalogram plot
-        #cbar_data = ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__
-
-        #
-
-        for scal_ax in ax['scal'].figure._localaxes:
-            try:
-                cbar_data = scal_ax._colorbar
-                scal_ax._colorbar.ax.remove()
-            except:
-                pass
-
-
-
-        #ax['scal'].figure._localaxes.__dict__['_elements'][2][1].__dict__['_colorbar'].__dict__['ax'].remove()  # clear()#remove()#.set_visible(False)
-        # ax['scal'].figure._localaxes[-1].remove()
-
+        # Plot scalogram
+        ax['scal'] = scalogram.plot(ax=ax['scal'], **wavelet_plot_kwargs)
+        
         if y_label_loc is not None:
             ax['scal'].get_yaxis().set_label_coords(y_label_loc, 0.5)
 
@@ -1628,7 +1638,6 @@ class Series:
                     'Ylim passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
         if time_label is not None:
-            # time_label, value_label = self.make_labels()
             ax['scal'].set_xlabel(time_label)
             if 'xlabel' in wavelet_plot_kwargs:
                 print(
@@ -1644,8 +1653,11 @@ class Series:
 
 
         ax['scal'].set_title(None)
-        ax['scal'].tick_params(axis='x', which='major', pad=12)
-        # fix ts xticks after final edits to scalogram xtick because of the sharedx
+        xticks = ax['scal'].get_xticks()
+        midpoints = xticks[:-1] + np.diff(xticks) / 2
+        ax['scal'].set_xticks(midpoints[1:-1])
+
+        ax['scal'].tick_params(axis='x', pad=12) # which='major',
 
         if 'ylims' in psd_plot_kwargs:
             shared_y_lims = psd_plot_kwargs['ylims']
@@ -1726,9 +1738,44 @@ class Series:
         ax['psd'].invert_yaxis()
         ax['psd'].set_ylabel(None)
 
-        ax['psd'].tick_params(axis='y', direction='in', labelleft=False)
-        ax['psd'].legend().remove()
+        ax['psd'].tick_params(axis='y', direction='in', labelleft=False, pad=12)
+
+        if legend is None:
+            for key in ['ts', 'psd']:
+                ax[key].legend().remove()
+        if legend == True:
+            leg_h, leg_l = [], []
+            for key in ['ts', 'psd']:
+                ax[key].legend()
+                _h, _l = ax[key].get_legend_handles_labels()
+                for ip, label in enumerate(_l):
+                    if label not in leg_l:
+                        if len(label.split(' ')) > 1:
+                            if len(label) > 15:
+                                label = label[:15] + label[15:].replace(' ', '\n', 1)
+                                label = label.replace('simulations', 'sims')
+                                if psd_width/scal_width < .25:
+                                    label = label.replace('threshold', 'C.L.')
+                        leg_l.append(label)
+                        leg_h.append(_h[ip])
+                ax[key].legend().remove()
+
+            ax['leg'] = fig.add_subplot(gs_d['psd'][0, 0])
+            ax['leg'].grid(False)
+            for side in ['top', 'bottom', 'left', 'right']:
+                ax['leg'].spines[side].set_visible(False)
+            ax['leg'].set_xticklabels([])
+            ax['leg'].set_yticklabels([])
+            ax['leg'].tick_params(axis='x', which='both', length=0)
+            ax['leg'].tick_params(axis='y', which='both', length=0)
+
+            x0, y0 = 1,1#0,0#-psd_width*3/4, -ts_height*3/4#, psd_width, ts_height
+            ax['leg'].legend(leg_h, leg_l, fontsize='small', loc='upper left')#, bbox_to_anchor=(x0, y0))# width, height))
+
         ax['scal'].invert_yaxis()  # not sure where this needs to be
+
+        # ax['leg'] = fig.add_subplot(gs_d['psd_leg'][0, 0])
+        # ax['leg'].legend(h, l)
 
         # ax['psd'] = plt.subplot(gs[1:4, -3:], sharey=ax['scal'])
         # ax['psd'] = psd.plot(ax=ax['psd'], transpose=True, ylabel = 'PSD from \n' + str(psd.spec_method), **psd_plot_kwargs)
@@ -1778,7 +1825,14 @@ class Series:
         #     if 'xlabel' in psd_plot_kwargs:
         #         print('Xlabel passed to psd plot through exposed argument and key word argument. The exposed argument takes precedence and will overwrite relevant key word argument.')
 
+        # plot color bar for scalogram using filled contour data
         ax['cb'] = fig.add_subplot(gs_d['cb'][0, 0])
+        cb = mcb.Colorbar(ax=ax['cb'], mappable=scalogram.conf,
+                          orientation=wavelet_plot_kwargs['cbar_style']['orientation'],
+                          label=wavelet_plot_kwargs['cbar_style']['label'])#,
+                          # pad=wavelet_plot_kwargs['cbar_style']['pad'])
+
+       #
        # cb = mpl.colorbar.ColorbarBase(ax['cb'], orientation='horizontal',
        #                                cmap=cbar_data['cmap'],
        #                                norm=cbar_data['norm'],  # vmax and vmin
@@ -1787,13 +1841,13 @@ class Series:
        #                                label=wavelet_plot_kwargs['cbar_style']['label'],
        #                                drawedges=cbar_data['drawedges'])  # True)
 
-        cb = mpl.colorbar.Colorbar(ax['cb'], mappable = cbar_data.mappable,
-                                   orientation='horizontal',
-                                   extend=cbar_data.extend,
-                                   boundaries=cbar_data.boundaries,  # ,
-                                   label=wavelet_plot_kwargs['cbar_style']['label'],
-                                   drawedges=cbar_data.drawedges)  # True)
-
+        # cb = mpl.colorbar.Colorbar(ax['cb'], mappable = cbar_data.mappable,
+        #                            orientation='horizontal',
+        #                            extend=cbar_data.extend,
+        #                            boundaries=cbar_data.boundaries,  # ,
+        #                            label=wavelet_plot_kwargs['cbar_style']['label'],
+        #                            drawedges=cbar_data.drawedges)  # True)
+        #
         # ticks=[0, 3, 6, 9])
         if 'path' in savefig_settings:
             plotting.savefig(fig, settings=savefig_settings)
