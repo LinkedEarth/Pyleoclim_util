@@ -156,6 +156,7 @@ class LipdSeries(Series):
 
         Returns
         -------
+        
         object : pyleoclim.LipdSeries
             New object with data copied from original
 
@@ -194,7 +195,7 @@ class LipdSeries(Series):
         Returns
         -------
 
-        ens : pyleoclim.EnsembleSeries
+        ens : EnsembleSeries
             An EnsembleSeries object with each series representing a possible realization of the age model
 
         See also
@@ -293,6 +294,7 @@ class LipdSeries(Series):
 
         Parameters
         ----------
+        
         projection : str, optional
 
             The projection to use. The default is 'Robinson'.
@@ -625,6 +627,7 @@ class LipdSeries(Series):
 
         Parameters
         ----------
+        
         figsize : list or tuple, optional
 
             Figure size. The default is [11,8].
@@ -675,6 +678,7 @@ class LipdSeries(Series):
 
         Returns
         -------
+        
         fig : matplotlib.figure
 
             The figure
@@ -692,21 +696,21 @@ class LipdSeries(Series):
 
         pyleoclim.core.series.Series.histplot : plot a distribution of the timeseries
 
-        pyleoclim.core.ensembleseries.EnsembleSeries.distplot : plot a distribution of the timeseries across ensembles
+        pyleoclim.core.ensembleseries.EnsembleSeries.histplot : plot a distribution of the timeseries across ensembles
 
         pyleoclim.core.series.Series.spectral : spectral analysis method.
 
         pyleoclim.core.multipleseries.MultipleSeries.spectral : spectral analysis method for multiple series.
 
-        pyleoclim.core.PSD.PSD.signif_test : significance test for timeseries analysis
+        pyleoclim.core.psds.PSD.signif_test : significance test for timeseries analysis
 
-        pyleoclim.core.PSD.PSD.plot : plot power spectrum
+        pyleoclim.core.psds.PSD.plot : plot power spectrum
 
-        pyleoclim.core.MulitplePSD.MulitplePSD.plot : plot envelope of power spectrum
+        pyleoclim.core.psds.MulitplePSD.plot : plot envelope of power spectrum
 
         pyleoclim.core.lipdseries.LipdSeries.map : map location of dataset
 
-        pyleolim.core.lipdseries.LipdSeries.getMetadata : get relevant metadata from the timeseries object
+        pyleoclim.core.lipdseries.LipdSeries.getMetadata : get relevant metadata from the timeseries object
 
         pyleoclim.utils.mapping.map : Underlying mapping function for Pyleoclim
 
@@ -782,7 +786,7 @@ class LipdSeries(Series):
         if ensemble == False:
             ax['dts'] = self.histplot(**histplt_kwargs)
         elif ensemble == True:
-            ax['dts'] = ensc.distplot(**histplt_kwargs)
+            ax['dts'] = ensc.histplot(**histplt_kwargs)
         ax['dts'].set_ylim([ymin, ymax])
         ax['dts'].set_yticklabels([])
         ax['dts'].set_ylabel('')
@@ -953,6 +957,7 @@ class LipdSeries(Series):
 
         Parameters
         ----------
+        
         D : pyleoclim.Lipd
 
             A pyleoclim LiPD object

@@ -213,7 +213,7 @@ class TestUIEnsembleSeriesHistplot():
         ts_ens.histplot()
 
 class TestUIEnsembleSeriesDistplot():
-    def test_distplot_t0(self):
+    def test_histplot_t0(self):
         '''Test for EnsembleSeries.distplot()
         '''
         nn = 30 # number of noise realizations
@@ -229,6 +229,4 @@ class TestUIEnsembleSeriesDistplot():
 
         ts_ens = pyleo.EnsembleSeries(series_list)
 
-        ts_ens.distplot()
-
-
+        ts_ens.histplot()

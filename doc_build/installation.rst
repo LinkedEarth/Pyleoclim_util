@@ -2,7 +2,7 @@
 
 .. note::
 
-   Pyleoclim requires the use of Python 3.8 or 3.9.
+   Pyleoclim requires the use of Python 3.9 or above
 
 Installing Pyleoclim
 ====================
@@ -20,11 +20,11 @@ Click :ref:`here <anaconda_installation>` for a quick tutorial on MacOs and Linu
 Creating a new conda environment
 """""""""""""""""""""""""""""""""""
 
-To create a new environment using Python 3.9 via command line:
+To create a new environment using Python 3.10 via command line:
 
 .. code-block:: bash
 
-  conda create -n pyleo python=3.9
+  conda create -n pyleo python=3.10
 
 To view a list of available environment:
 
@@ -60,8 +60,9 @@ First install Cartopy:
 
 .. code-block:: bash
 
-  conda install -c conda-forge cartopy
+  conda install -c conda-forge cartopy=0.21
 
+(note: under Python 3.10, cartopy>=0.21 will be installed by default, so specifying this version is unnecessary).
 Then install Pyleoclim through Pypi, which contains the most stable version of Pyleoclim:
 
 .. code-block:: bash
@@ -121,10 +122,18 @@ Again, unless you are planning to make heavy use of the WWZ functionality, we re
 
 Docker Container
 """"""""""""""""
-Docker containers with various versions of Pyleoclim are available at: `https://quay.io/repository/2i2c/paleohack-2021?tab=tags <https://quay.io/repository/2i2c/paleohack-2021?tab=tags>`_.
+Docker containers with various versions of Pyleoclim are available `on quay.io <https://quay.io/repository/linkedearth/pyleoclim?tab=tags>`_.
 
 To pull an image:
 
 .. code-block:: bash
 
-  docker pull quay.io/2i2c/paleohack-2021:latest
+  docker pull quay.io/linkedearth/pyleoclim:latest
+
+To run the image:
+
+.. code-block:: bash
+
+  docker run -it -p 8888:8888 quay.io/linkedearth/pyleoclim:latest
+
+The container will start a Jupyter server automatically. You need to copy the link to the server (localhost) into your web browser on your machine (the command -p 8888:8888 opens the communication port between your machine and the container). You can then create notebook and upload notebook and data using the Jupyter interface. Remember that the container will not save any of your work if you close it. So make sure you donwload your work before closing the container.

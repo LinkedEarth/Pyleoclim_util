@@ -12,13 +12,13 @@ from ..core.scalograms import MultipleScalogram
 from ..core.psds import MultiplePSD
 from ..core.spatialdecomp import SpatialDecomp
 
-import matplotlib.pyplot as plt
 import numpy as np
 from copy import deepcopy
 
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.transforms as transforms
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 
 from tqdm import tqdm
 from scipy import stats
@@ -44,7 +44,7 @@ class MultipleSeries:
         If None, then no conversion will be applied;
         Otherwise, the time unit of every series in the list will be converted to the target.
 
-   name : str
+    name : str
    
         name of the collection of timeseries (e.g. 'PAGES 2k ice cores')
 
@@ -80,7 +80,7 @@ class MultipleSeries:
             self.series_list = new_ts_list
 
     def convert_time_unit(self, time_unit='years'):
-        ''' Convert the time unit of the timeseries
+        ''' Convert the time units of the object
 
         Parameters
         ----------
@@ -166,7 +166,7 @@ class MultipleSeries:
         Returns
         -------
 
-        ms : pyleoclim.core.multipleseries.MultipleSeries
+        ms : MultipleSeries
 
         See also
         --------
@@ -226,7 +226,7 @@ class MultipleSeries:
         Returns
         -------
 
-        ms : pyleoclim.MultipleSeries
+        ms : MultipleSeries
         
             The augmented object, comprising the old one plus `ts`
 
@@ -267,7 +267,7 @@ class MultipleSeries:
         Returns
         -------
 
-        ms : pyleoclim.MultipleSeries
+        ms : MultipleSeries
         
             The copied version of the pyleoclim.MultipleSeries object
 
@@ -292,6 +292,50 @@ class MultipleSeries:
             ms_copy = ms.copy()
         '''
         return deepcopy(self)
+    
+    def flip(self, axis='value'):
+        '''
+        Flips the Series along one or both axes
+
+        Parameters
+        ----------
+        axis : str, optional
+            The axis along which the Series will be flipped. The default is 'value'.
+            Other acceptable options are 'time' or 'both'.
+            TODO: enable time flipping after paleopandas is released
+            
+        Returns
+        -------
+        ms : MultipleSeries
+            The flipped object
+            
+         Examples
+         --------
+
+         .. ipython:: python
+             :okwarning:
+             :okexcept:
+
+             import pyleoclim as pyleo
+             url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+             data = pyleo.Lipd(usr_path = url)
+             tslist = data.to_LipdSeriesList()
+             tslist = tslist[2:] # drop the first two series which only concerns age and depth
+             ms = pyleo.MultipleSeries(tslist)
+             
+             @savefig ms_flip.png
+             fig, ax = ms.flip().stackplot()
+             pyleo.closefig(fig) 
+            
+            Note that labels have been updated to reflect the flip
+        '''
+        
+        ms=self.copy()
+        for idx,item in enumerate(ms.series_list):
+            s=item.flip(axis=axis, keep_log=False)
+            ms.series_list[idx]=s
+        
+        return ms
 
     def standardize(self):
         '''Standardize each series object in a collection
@@ -299,7 +343,7 @@ class MultipleSeries:
         Returns
         -------
 
-        ms : pyleoclim.MultipleSeries
+        ms : MultipleSeries
         
             The standardized pyleoclim.MultipleSeries object
 
@@ -338,7 +382,7 @@ class MultipleSeries:
         Parameters
         ----------
         
-        step_style : str; {"median","mean,"mode","max"}
+        step_style : str; {'median','mean','mode','max'}
         
             Method to obtain a representative step if x is not evenly spaced.
             Valid entries: 'median' [default], 'mean', 'mode' or 'max'.
@@ -399,13 +443,15 @@ class MultipleSeries:
     def common_time(self, method='interp', step = None, start = None, stop = None, step_style = None, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object
         
-        The alignment is achieved via binning, interpolation., or Gaussian kernel. Alignment is critical for workflows
+        The alignment is achieved via binning, interpolation, or Gaussian kernel. Alignment is critical for workflows
         that need to assume a common time axis for the group of series under consideration.
 
         The common time axis is characterized by the following parameters:
 
         start : the latest start date of the bunch (maximun of the minima)
+
         stop  : the earliest stop date of the bunch (minimum of the maxima)
+
         step  : The representative spacing between consecutive values
 
         Optional arguments for binning, Gaussian kernel (gkernel) interpolation are those of the underling functions.
@@ -443,7 +489,7 @@ class MultipleSeries:
         Returns
         -------
 
-        ms : pyleoclim.MultipleSeries
+        ms : MultipleSeries
         
             The MultipleSeries objects with all series aligned to the same time axis.
 
@@ -581,6 +627,7 @@ class MultipleSeries:
 
         Parameters
         ----------
+
         target : pyleoclim.Series, optional
         
             The Series against which to take the correlation. If the target Series is not specified, then the 1st member of MultipleSeries will be used as the target
@@ -621,7 +668,7 @@ class MultipleSeries:
         Returns
         -------
 
-        corr : pyleoclim.CorrEns.CorrEns
+        corr : CorrEns
         
             the result object
 
@@ -801,7 +848,7 @@ class MultipleSeries:
         Returns
         -------
 
-        res: pyleoclim.SpatialDecomp
+        res: SpatialDecomp
 
             Resulting pyleoclim.SpatialDecomp object
         
@@ -940,7 +987,9 @@ class MultipleSeries:
         The common time axis is characterized by the following parameters:
 
         start : the latest start date of the bunch (maximin of the minima)
+
         stop  : the earliest stop date of the bunch (minimum of the maxima)
+
         step  : The representative spacing between consecutive values (mean of the median spacings)
 
         This is a special case of the common_time function.
@@ -955,7 +1004,7 @@ class MultipleSeries:
         Returns
         -------
 
-        ms : pyleoclim.MultipleSeries
+        ms : MultipleSeries
         
             The MultipleSeries objects with all series aligned to the same time axis.
 
@@ -999,7 +1048,9 @@ class MultipleSeries:
         The common time axis is characterized by the following parameters:
 
         start : the latest start date of the bunch (maximin of the minima)
+
         stop  : the earliest stop date of the bunch (minimum of the maxima)
+
         step  : The representative spacing between consecutive values (mean of the median spacings)
 
         This is a special case of the common_time function.
@@ -1013,7 +1064,8 @@ class MultipleSeries:
 
         Returns
         -------
-        ms : pyleoclim.MultipleSeries
+
+        ms : MultipleSeries
             The MultipleSeries objects with all series aligned to the same time axis.
 
         See also
@@ -1056,7 +1108,9 @@ class MultipleSeries:
         The common time axis is characterized by the following parameters:
 
         start : the latest start date of the bunch (maximin of the minima)
+
         stop  : the earliest stop date of the bunch (minimum of the maxima)
+
         step  : The representative spacing between consecutive values (mean of the median spacings)
 
         This is a special case of the common_time function.
@@ -1068,7 +1122,8 @@ class MultipleSeries:
 
         Returns
         -------
-        ms : pyleoclim.MultipleSeries
+
+        ms : MultipleSeries
         
             The MultipleSeries objects with all series aligned to the same time axis.
 
@@ -1115,8 +1170,8 @@ class MultipleSeries:
             Options include:
                 * linear: the result of a linear least-squares fit to y is subtracted from y.
                 * constant: only the mean of data is subtrated.
-                * "savitzky-golay", y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
-                * "emd" (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
+                * 'savitzky-golay', y is filtered using the Savitzky-Golay filters and the resulting filtered series is subtracted from y.
+                * 'emd' (default): Empirical mode decomposition. The last mode is assumed to be the trend and removed from the series
                 
         **kwargs : dict
             Relevant arguments for each of the methods.
@@ -1124,7 +1179,7 @@ class MultipleSeries:
         Returns
         -------
         
-        ms : pyleoclim.MultipleSeries
+        ms : MultipleSeries
         
             The detrended timeseries
 
@@ -1138,7 +1193,7 @@ class MultipleSeries:
         ms=self.copy()
         for idx,item in enumerate(ms.series_list):
             s=item.copy()
-            v_mod=tsutils.detrend(item.value,x=item.time,method=method,**kwargs)
+            v_mod, _=tsutils.detrend(item.value,x=item.time,method=method,**kwargs)
             s.value=v_mod
             ms.series_list[idx]=s
         return ms
@@ -1181,7 +1236,7 @@ class MultipleSeries:
         Returns
         -------
 
-        psd : pyleoclim.MultiplePSD
+        psd : MultiplePSD
         
             A Multiple PSD object
 
@@ -1264,10 +1319,11 @@ class MultipleSeries:
         
         method : str {wwz, cwt}
         
-            cwt - the continuous wavelet transform (as per Torrence and Compo [1998])
+            - cwt - the continuous wavelet transform (as per Torrence and Compo [1998])
                 is appropriate only for evenly-spaced series.
-            wwz - the weighted wavelet Z-transform (as per Foster [1996])
+            - wwz - the weighted wavelet Z-transform (as per Foster [1996])
                 is appropriate for both evenly and unevenly-spaced series.
+
             Default is cwt, returning an error if the Series is unevenly-spaced.
 
         settings : dict, optional
@@ -1295,7 +1351,7 @@ class MultipleSeries:
         Returns
         -------
 
-        scals : pyleoclim.MultipleScalograms
+        scals : MultipleScalograms
         
             A Multiple Scalogram object
 
@@ -1366,11 +1422,11 @@ class MultipleSeries:
             
         marker : str, optional
         
-            marker type. The default is None.
+            Marker type. The default is None.
             
         markersize : float, optional
         
-            marker size. The default is None.
+            Marker size. The default is None.
             
         linestyle : str, optional
         
@@ -1410,7 +1466,7 @@ class MultipleSeries:
             
         legend : bool, optional
         
-            Wether the show the legend. The default is True.
+            Whether the show the legend. The default is True.
             
         plot_kwargs : dict, optional
         
@@ -1529,13 +1585,14 @@ class MultipleSeries:
             return ax
 
     def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
-                  spine_lw=1.5, grid_lw=0.5, font_scale=0.8, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
+                  spine_lw=1.5, grid_lw=0.5, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
         ''' Stack plot of multiple series
 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
 
         Parameters
         ----------
+
         figsize : list
         
             Size of the figure.
@@ -1586,10 +1643,6 @@ class MultipleSeries:
         
             The linewidth for the gridlines.
             
-        font_scale : float
-        
-            The scale for the font sizes. Default is 0.8.
-            
         label_x_loc : float
         
             The x location for the label of each curve.
@@ -1606,8 +1659,9 @@ class MultipleSeries:
         plot_kwargs: dict or list of dict
         
             Arguments to further customize the plot from matplotlib.pyplot.plot.
-            Dictionary: Arguments will be applied to all lines in the stackplots
-            List of dictionary: Allows to customize one line at a time.
+
+            - Dictionary: Arguments will be applied to all lines in the stackplots
+            - List of dictionary: Allows to customize one line at a time.
 
         Returns
         -------
@@ -1687,8 +1741,6 @@ class MultipleSeries:
             pyleo.closefig(fig) #Optional figure close after plotting
 
         '''
-        current_style = deepcopy(mpl.rcParams)
-        plotting.set_style('journal', font_scale=font_scale)
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
 
         n_ts = len(self.series_list)
@@ -1813,6 +1865,177 @@ class MultipleSeries:
         xt = ax[n_ts].get_xticks()[1:-1]
         for x in xt:
             ax[n_ts].axvline(x=x, color='lightgray', linewidth=grid_lw, ls='-', zorder=-1)
+
+        if 'fig' in locals():
+            if 'path' in savefig_settings:
+                plotting.savefig(fig, settings=savefig_settings)
+            return fig, ax
+        else:
+            return ax
+        
+    def stripes(self, ref_period=None, figsize=None, savefig_settings=None,  
+                LIM = 2.8, thickness=1.0, labels='auto',  label_color = 'gray',
+                common_time_kwargs=None, xlim=None, font_scale=0.8, x_offset = 0.05):
+        '''
+        Represents a MultipleSeries object as a quilt of Ed Hawkins' "stripes" patterns
+        
+        To ensure comparability, constituent series are placed on a common time axis, using
+        `MultipleSeries.common_time()`. To ensure consistent scaling, all series are Gaussianized
+        prior to plotting. 
+    
+        Credit: https://showyourstripes.info/,
+        Implementation: https://matplotlib.org/matplotblog/posts/warming-stripes/
+
+        Parameters
+        ----------
+
+        ref_period : TYPE, optional
+            dates of the reference period, in the form "(first, last)".
+            The default is None, which will pick the beginning and end of the common time axis.
+        
+        LIM : float
+            scaling factor for color saturation. default is 2.8. 
+            The higher the LIM, the more compressed the color range (milder hues)
+        
+        thickness : float, optional
+            vertical thickness of the stripe . The default is 1.0
+            
+        figsize : list
+        
+            Size of the figure.
+            
+        savefig_settings : dictionary
+        
+            the dictionary of arguments for plt.savefig(); some notes below:
+
+            - 'path' must be specified; it can be any existing or non-existing path,
+              with or without a suffix; if the suffix is not given in 'path', it will follow 'format'
+            - 'format' can be one of {"pdf", 'eps', 'png', ps'} The default is None.
+            
+        xlim : list
+            The x-axis limit.
+            
+        x_offset : float
+            value controlling the horizontal offset between stripes and labels (default = 0.05)          
+            
+        labels: None, 'auto' or list
+        
+            If None, doesn't add labels to the subplots
+
+            If 'auto', uses the labels passed during the creation of pyleoclim.Series
+
+            If list, pass a list of strings for each labels.
+            Default is 'auto'
+            
+        common_time_kwargs : dict
+            Optional arguments for common_time()
+            
+        font_scale : float
+            The scale for the font sizes. Default is 0.8.   
+
+        Returns
+        -------
+
+        fig : matplotlib.figure
+            the figure object from matplotlib
+            See [matplotlib.pyplot.figure](https://matplotlib.org/stable/api/figure_api.html) for details.
+
+        ax : matplotlib.axis
+            the axis object from matplotlib
+            See [matplotlib.axes](https://matplotlib.org/stable/api/axes_api.html) for details.
+            
+        See also
+        --------
+        
+        pyleoclim.core.multipleseries.MultipleSeries.common_time : aligns the time axes of a MultipleSeries object
+
+        pyleoclim.utils.plotting.savefig : saving a figure in Pyleoclim
+        
+        pyleoclim.core.series.Series.stripes : stripes representation in Pyleoclim   
+        
+        pyleoclim.utils.tsutils.gaussianize : mapping to a standard Normal distribution
+            
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            d = pyleo.Lipd(usr_path = url)
+            tslist = d.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
+            @savefig md76_stripes.png
+            fig, ax = ms.stripes()
+            pyleo.closefig(fig)
+             
+        The default style has rather thick bands, intense colors, and too many stripes.
+        The first issue can be solved by passing a figsize tuple; the second by increasing the LIM parameter; 
+        the third by passing a step of 0.5 (500y) to common_time(). Finally, the 
+        labels are too close to the edge of the plot, which can be adjusted with x_offset, like so:  
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            d = pyleo.Lipd(usr_path = url)
+            tslist = d.to_LipdSeriesList()
+            tslist = tslist[2:] # drop the first two series which only concerns age and depth
+            ms = pyleo.MultipleSeries(tslist)
+            @savefig md76_stripes2.png
+            fig, ax = ms.stripes(common_time_kwargs={'step': 0.5}, x_offset = 200, 
+                                 LIM=4, figsize=[8,3])
+            pyleo.closefig(fig)     
+            
+        '''
+        current_style = deepcopy(mpl.rcParams)
+        plotting.set_style('journal', font_scale=font_scale)
+        savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+        common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
+
+        # put on common timescale
+        msc = self.common_time(**common_time_kwargs)
+        
+        ts0 = msc.series_list[0]
+        time = ts0.time
+        # generate default axis labels
+        time_label, _ = ts0.make_labels()
+           
+        if ref_period is None:
+            ref_period = [time.min(), time.max()]
+        
+        n_ts = len(msc.series_list)
+        last = n_ts-1
+
+        if n_ts < 2:
+            raise ValueError("There is only one series in this object. Please use the Series class instead")
+
+        if type(labels)==list:
+            if len(labels) != n_ts:
+                raise ValueError("The length of the label list should match the number of timeseries to be plotted")
+
+        fig, axs = plt.subplots(n_ts, 1, sharex=True, figsize=figsize, layout = 'tight')
+        ax = axs.flatten()
+
+        if xlim is None:
+            xlim = [time.min(), time.max()]
+
+        for idx in range(n_ts-1):  # loop over series
+            ts = msc.series_list[idx].gaussianize()
+            ts.stripes(ref_period, LIM = LIM, label_color = label_color,
+                       ax=ax[idx], x_offset=x_offset) 
+            
+        # handle bottom plot
+        ts = msc.series_list[last].gaussianize()
+        ts.stripes(ref_period, LIM = LIM, label_color = label_color, 
+                   ax=ax[last], x_offset=x_offset, show_xaxis=True) 
+        ax[last].set_xlabel(time_label)
+        ax[last].set_xlim(xlim)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
