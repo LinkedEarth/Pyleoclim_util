@@ -187,7 +187,8 @@ class EnsembleSeries(MultipleSeries):
             vals.append(ts.value)
 
         vals = np.array(vals)
-        ens_qs = mquantiles(vals, qs, axis=0)
+        # ens_qs = mquantiles(vals, qs, axis=0)
+        ens_qs = np.nanquantile(vals, qs, axis=0)
 
         ts_list = []
         for i, quant in enumerate(ens_qs):
@@ -658,12 +659,12 @@ class EnsembleSeries(MultipleSeries):
         # plot outer envelope
         ax.fill_between(
             time, ts_qs.series_list[0].value, ts_qs.series_list[4].value,
-            color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=outer_shade_label,
+            color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=outer_shade_label
         )
         # plot inner envelope on top
         ax.fill_between(
             time, ts_qs.series_list[1].value, ts_qs.series_list[3].value,
-            color=shade_clr, alpha=2*shade_alpha, edgecolor=shade_clr, label=inner_shade_label,
+            color=shade_clr, alpha=2*shade_alpha, edgecolor=shade_clr, label=inner_shade_label
         )
 
         # plot the median
