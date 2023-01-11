@@ -210,6 +210,8 @@ class Series:
     def pandas_method(self, method):
         ser, metadata = self.to_pandas()
         result = method(ser)
+        if not isinstance(result, pd.Series):
+            raise ValueError('Given method does not return a pandas Series and cannot be applied')
         return self.from_pandas(result, metadata)
 
 
