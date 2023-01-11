@@ -1,4 +1,4 @@
-cff-version: 0.9.1
+cff-version: 0.10.0
 message: "If you use this software, please cite it as below."
 authors:
   - family-names: "Khider"
@@ -21,7 +21,7 @@ authors:
   - family-names: "Athreya"
     given-names: "Pratheek"
 title: "Pyleoclim: A Python package for the analysis and visualization of paleoclimate data"
-version: v0.9.1
+version: v0.10.0
 doi: 10.5281/zenodo.1205661
 date-released: 2022-10-17
 url: "https://github.com/LinkedEarth/Pyleoclim_util"
