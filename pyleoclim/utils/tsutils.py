@@ -46,6 +46,59 @@ from .tsbase import (
     clean_ts
 )
 
+SECONDS_PER_YEAR = 365.25 * 60  * 60 * 24
+
+def time_unit_to_datum_exp_dir(time_unit):
+    if time_unit == 'years':
+        datum = '0'
+        exponent = 0
+        direction = 'prograde'
+    elif time_unit in ('ky', 'kyr', 'kyrs', 'kiloyear', 'ka'):
+        datum = '1950'
+        exponent = 3
+        direction = 'retrograde'
+    elif time_unit in ('y', 'yr', 'yrs', 'year', 'year CE', 'years CE', 'year(s) AD'):
+        datum = '0'
+        exponent = 0
+        direction = 'prograde'
+    elif time_unit == 'BP':
+        datum = '1950'
+        exponent = 0
+        direction = 'retrograde'
+    elif time_unit in ('yr BP', 'yrs BP', 'years BP'):
+        datum ='1950'
+        exponent = 0
+        direction = 'retrograde'
+    elif time_unit in ('Ma', 'My'):
+        datum ='1950'
+        exponent = 6
+        direction = 'retrograde'
+    elif time_unit in ('Ga', 'Gy'):
+        datum ='1950'
+        exponent = 3
+        direction = 'retrograde'
+    else:
+        raise ValueError(f'Time unit {time_unit} not supported')
+
+    return (datum, exponent, direction)
+
+def convert_datetime_index_to_time(datetime_index, time_unit):
+    datum, exponent, direction = time_unit_to_datum_exp_dir(time_unit)
+    import operator
+    if direction == 'prograde':
+        multiplier = 1
+    elif direction == 'retrograde':
+        multiplier = -1
+    else:
+        raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
+    year_diff = (datetime_index.year - int(datum))
+    seconds_diff = (datetime_index.to_numpy() - datetime_index.year.astype(str).astype('datetime64[s]').to_numpy()).astype('int')
+    diff = year_diff + seconds_diff / SECONDS_PER_YEAR
+    time = multiplier * diff / 10**exponent
+
+    return time
+
+
 def simple_stats(y, axis=None):
     """ Computes simple statistics
 

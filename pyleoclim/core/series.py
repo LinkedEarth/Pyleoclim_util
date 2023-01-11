@@ -7,6 +7,8 @@ The Series class describes the most basic objects in Pyleoclim. A Series is a si
 How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
 """
 
+import operator
+
 from ..utils import tsutils, plotting, tsmodel, tsbase, mapping, lipdutils
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
@@ -163,6 +165,55 @@ class Series:
             self.mean=np.mean(self.value)
         else:
             self.mean = mean
+    
+    @property
+    def datetime_index(self):
+        datum, exponent, direction = tsutils.time_unit_to_datum_exp_dir(self.time_unit)
+        if direction == 'prograde':
+            op = operator.add
+        elif direction == 'retrograde':
+            op = operator.sub
+        else:
+            raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
+
+        timedelta = self.time * 10**exponent
+        years = timedelta.astype('int')
+        seconds = ((timedelta - timedelta.astype('int')) * tsutils.SECONDS_PER_YEAR).astype('timedelta64[s]')
+        
+        np_times = op(op(int(datum), years).astype(str).astype('datetime64[s]'), seconds)
+        return pd.DatetimeIndex(np_times, name=self.time_name)
+    
+    @property
+    def metadata(self):
+        return dict(
+            time_unit = self.time_unit,
+            value_unit = self.value_unit,
+            label = self.label,
+        )
+    
+    @classmethod
+    def from_pandas(cls, ser, metadata):
+        time = tsutils.convert_datetime_index_to_time(ser.index, metadata['time_unit'])
+        return cls(
+            time=time,
+            value=ser.to_numpy(),
+            time_name=ser.index.name,
+            value_name=ser.name,
+            **metadata,
+        )
+    
+    def to_pandas(self):
+        ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
+        # Could be a dataclass instead?
+        return (ser, self.metadata)
+    
+    def pandas_method(self, method):
+        ser, metadata = self.to_pandas()
+        result = method(ser)
+        if not isinstance(result, pd.Series):
+            raise ValueError('Given method does not return a pandas Series and cannot be applied')
+        return self.from_pandas(result, metadata)
+
 
     def convert_time_unit(self, time_unit='years', keep_log=False):
         ''' Convert the time unit of the Series object
