@@ -169,13 +169,17 @@ class Series:
     @property
     def datetime_index(self):
         datum, exponent, direction = tsutils.time_unit_to_datum_exp_dir(self.time_unit)
-        op = operator.add if direction == 'forward' else operator.sub
-
-        timedelta = self.time * 10**exponent * tsutils.SECONDS_PER_YEAR
-        years = timedelta.astype('int').astype('timedelta64[Y]')
+        if direction == 'prograde':
+            op = operator.add
+        elif direction == 'retrograde':
+            op = operator.sub
+        else:
+            raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
+        timedelta = self.time * 10**exponent
+        years = timedelta.astype('int')
         seconds = ((timedelta % 1) * tsutils.SECONDS_PER_YEAR).astype('timedelta64[s]')
         
-        np_times = op(np.datetime64(datum, 's'), years + seconds)
+        np_times = op(op(int(datum), years).astype(str).astype('datetime64[s]'), seconds)
         return pd.DatetimeIndex(np_times, name=self.time_name)
     
     @property
@@ -205,7 +209,7 @@ class Series:
     def pandas_method(self, method):
         ser, metadata = self.to_pandas()
         result = method(ser)
-        return self.from_pandas(result, **metadata)
+        return self.from_pandas(result, metadata)
 
 
     def convert_time_unit(self, time_unit='years', keep_log=False):
