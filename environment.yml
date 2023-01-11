@@ -17,4 +17,4 @@ dependencies:
   - pytest
   - pip:
     - pangaeapy
-    - pyleoclim=0.10.0
+    - pyleoclim==0.10.0
