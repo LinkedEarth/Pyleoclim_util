@@ -49,15 +49,15 @@ from .tsbase import (
 SECONDS_PER_YEAR = 365.25 * 60  * 60 * 24
 
 def time_unit_to_datum_exp_dir(time_unit):
-    if time_unit is None:
+    if time_unit == 'years':
         datum = '0'
         exponent = 0
         direction = 'prograde'
-    elif any(val in time_unit for val in ('ky', 'kyr', 'kyrs', 'kiloyear', 'ka')):
+    elif time_unit in ('ky', 'kyr', 'kyrs', 'kiloyear', 'ka'):
         datum = '1950'
         exponent = 3
         direction = 'retrograde'
-    elif any(val in time_unit for val in ('y', 'yr', 'yrs', 'year', 'year CE', 'years CE', 'year(s) AD')):
+    elif time_unit in ('y', 'yr', 'yrs', 'year', 'year CE', 'years CE', 'year(s) AD'):
         datum = '0'
         exponent = 0
         direction = 'prograde'
@@ -65,15 +65,15 @@ def time_unit_to_datum_exp_dir(time_unit):
         datum = '1950'
         exponent = 0
         direction = 'retrograde'
-    elif any(val in time_unit for val in ('yr BP', 'yrs BP', 'years BP')):
+    elif time_unit in ('yr BP', 'yrs BP', 'years BP'):
         datum ='1950'
         exponent = 0
         direction = 'retrograde'
-    elif any(val in time_unit for val in ('Ma', 'My')):
+    elif time_unit in ('Ma', 'My'):
         datum ='1950'
         exponent = 6
         direction = 'retrograde'
-    elif any(val in time_unit for val in ('Ga', 'Gy')):
+    elif time_unit in ('Ga', 'Gy'):
         datum ='1950'
         exponent = 3
         direction = 'retrograde'
@@ -90,7 +90,7 @@ def convert_datetime_index_to_time(datetime_index, time_unit):
     elif direction == 'retrograde':
         multiplier = -1
     else:
-        raise ValueError('invalid direction')
+        raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
     year_diff = (datetime_index.year - int(datum))
     seconds_diff = (datetime_index.to_numpy() - datetime_index.year.astype(str).astype('datetime64[s]').to_numpy()).astype('int')
     diff = year_diff + seconds_diff / SECONDS_PER_YEAR

@@ -175,9 +175,10 @@ class Series:
             op = operator.sub
         else:
             raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
+
         timedelta = self.time * 10**exponent
         years = timedelta.astype('int')
-        seconds = ((timedelta % 1) * tsutils.SECONDS_PER_YEAR).astype('timedelta64[s]')
+        seconds = ((timedelta - timedelta.astype('int')) * tsutils.SECONDS_PER_YEAR).astype('timedelta64[s]')
         
         np_times = op(op(int(datum), years).astype(str).astype('datetime64[s]'), seconds)
         return pd.DatetimeIndex(np_times, name=self.time_name)
