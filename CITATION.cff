@@ -23,5 +23,5 @@ authors:
 title: "Pyleoclim: A Python package for the analysis and visualization of paleoclimate data"
 version: v0.10.0
 doi: 10.5281/zenodo.1205661
-date-released: 2022-10-17
+date-released: 2023-01-10
 url: "https://github.com/LinkedEarth/Pyleoclim_util"
