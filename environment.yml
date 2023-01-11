@@ -17,4 +17,4 @@ dependencies:
   - pytest
   - pip:
     - pangaeapy
-    - git+https://github.com/LinkedEarth/Pyleoclim_util.git@master
+    - pyleoclim=0.10.0
