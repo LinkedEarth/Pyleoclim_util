@@ -46,6 +46,22 @@ from .tsbase import (
     clean_ts
 )
 
+SECONDS_PER_YEAR = 365.25 * 60  * 60 * 24
+
+def time_unit_to_datum_exp_dir(time_unit):
+    datum = ...
+    exponent = ...
+    direction = ...
+    return (datum, exponent, direction)
+
+def datum_exp_dir_to_time_unit(datum, exponent, direction):
+    time_unit = ...
+    return time_unit
+
+def convert_datetime_index_to_time(datetime_index, time_unit):
+    time = ...
+    return time
+
 def simple_stats(y, axis=None):
     """ Computes simple statistics
 
