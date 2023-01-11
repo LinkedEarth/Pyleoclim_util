@@ -327,7 +327,8 @@ class MultipleSeries:
              fig, ax = ms.flip().stackplot()
              pyleo.closefig(fig) 
             
-            Note that labels have been updated to reflect the flip
+        
+        Note that labels have been updated to reflect the flip
         '''
         
         ms=self.copy()
