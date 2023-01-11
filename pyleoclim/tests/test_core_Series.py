@@ -39,7 +39,7 @@ import matplotlib.pyplot as plt
 
 def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
-    
+
     t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
     ts=pyleo.Series(t,v)
     return ts
@@ -51,7 +51,7 @@ def gen_normal(loc=0, scale=1, nt=100):
     v = np.random.normal(loc=loc, scale=scale, size=nt)
     ts = pyleo.Series(t,v)
     return ts
-    
+
 # def load_data():
 #     try:
 #         url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/scal_signif_benthic.json'
@@ -222,12 +222,12 @@ class TestUiSeriesSpectral:
         psd = ts2.spectral(method=spec_method)
         beta = psd.beta_est().beta_est_res['beta']
         assert np.abs(beta-alpha) < eps
-    
+
     @pytest.mark.parametrize('spec_method', ['wwz','cwt'])
     def test_spectral_t7(self, spec_method,):
         '''Test the spectral significance testing with pre-generated scalogram objects
         '''
-        
+
         ts = gen_ts()
         scal = ts.wavelet(method=spec_method)
         signif = scal.signif_test(number=2,export_scal = True)
@@ -251,7 +251,8 @@ class TestUiSeriesBin:
         v_unevenly =  np.delete(ts.value, deleted_idx)
 
         ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly)
-        ts2_bin=ts2.bin()
+        ts2_bin=ts2.bin(keep_log=True)
+        print(ts2_bin.log[1])
 
     def test_bin_t2(self):
         ''' Test the bin function by passing arguments'''
@@ -291,7 +292,7 @@ class TestUiSeriesStats:
         key = {'mean': 4.5,'median': 4.5,'min': 0.0,'max': 9.0,'std': np.std(t),'IQR': 4.5}
 
         assert stats == key
-        
+
 class TestUiSeriesCenter:
     '''Test for Series.center()
 
@@ -303,9 +304,12 @@ class TestUiSeriesCenter:
         ts = gen_ts(nt=500, alpha=alpha)
 
         #Call function to be tested
-        tsc = ts.center()
+        tsc = ts.center(keep_log=True)
+        print(tsc.log[1])
 
-        assert np.abs(tsc.mean) <= np.sqrt(sys.float_info.epsilon) 
+        assert np.abs(tsc.mean) <= np.sqrt(sys.float_info.epsilon)
+
+        assert tsc.mean == tsc.log[1]['previous_mean']
 
 class TestUiSeriesStandardize:
     '''Test for Series.standardize()
@@ -317,7 +321,7 @@ class TestUiSeriesStandardize:
         ts = gen_ts(nt=500, alpha=alpha)
 
         #Call function to be tested
-        ts_std = ts.standardize()
+        ts_std = ts.standardize(keep_log=True)
 
         #Compare maximum and minimum values
         value = ts.__dict__['value']
@@ -339,7 +343,7 @@ class TestUiSeriesClean:
         ts = gen_normal()
 
         #Call function for testing
-        ts_clean = ts.clean()
+        ts_clean = ts.clean(keep_log=True)
 
         #Isolate time and value components
         time = ts_clean.__dict__['time']
@@ -354,7 +358,7 @@ class TestUiSeriesGaussianize:
     Gaussianize normalizes the series object, so we'll simply test maximum and minimum values'''
     def test_gaussianize(self):
         ts = gen_ts()
-        ts_gauss = ts.gaussianize()
+        ts_gauss = ts.gaussianize(keep_log=True)
 
         value = ts.__dict__['value']
         value_std = ts_gauss.__dict__['value']
@@ -422,10 +426,10 @@ class TestUiSeriesSummaryPlot:
     ''' Test Series.summary_plot()
     '''
     def test_summary_plot_t0(self):
-        '''Testing that labels are being passed and that psd and scalogram objects dont fail when passed. 
+        '''Testing that labels are being passed and that psd and scalogram objects dont fail when passed.
         Also testing that we can specify fewer significance tests than those stored in the scalogram object
         Note that we should avoid pyleo.showfig() in tests.
-        
+
         Passing pre generated scalogram and psd.
         '''
         ts = gen_ts()
@@ -440,7 +444,7 @@ class TestUiSeriesSummaryPlot:
             period_label=period_label, psd_label=psd_label,
             value_label=value_label, time_label=time_label
         )
-        
+
         assert ax['scal'].properties()['ylabel'] == period_label, 'Period label is not being passed properly'
         assert ax['psd'].properties()['xlabel'] == psd_label, 'PSD label is not being passed properly'
         assert ax['scal'].properties()['xlabel'] == time_label, 'Time label is not being passed properly'
@@ -451,16 +455,16 @@ class TestUiSeriesSummaryPlot:
     def test_summary_plot_t1(self):
         '''Testing that the bare function works
         Note that we should avoid pyleo.showfig() in tests.
-    
+
         Passing just a pre generated psd.
         '''
         ts = gen_ts()
         scal = ts.wavelet(method='cwt')
         psd = ts.spectral(method='cwt')
         fig, ax = ts.summary_plot(psd=psd,scalogram=scal)
-    
-        plt.close(fig)  
-    
+
+        plt.close(fig)
+
 
 class TestUiSeriesCorrelation:
     ''' Test Series.correlation()
@@ -547,8 +551,25 @@ class TestUiSeriesCausality:
         ts1 = pyleo.Series(time=ts.time, value=v1)
         ts2 = pyleo.Series(time=ts.time, value=v2)
 
-        causal_res = ts1.causality(ts2, method=method)
-        
+        _ = ts1.causality(ts2, method=method)
+
+    @pytest.mark.parametrize('method', ['liang', 'granger'])
+    def test_causality_t1(self, method, eps=1):
+        ''' Generate two series from a same basic series and calculate their correlation
+            on a specified timespan
+        Note: NO assert statements for this test yet
+        '''
+        alpha = 1
+        nt = 100
+        ts = gen_ts(nt=nt,alpha=alpha)
+        v1 = ts.value + np.random.normal(loc=0, scale=1, size=nt)
+        v2 = ts.value + np.random.normal(loc=0, scale=2, size=nt)
+
+        ts1 = pyleo.Series(time=ts.time, value=v1)
+        ts2 = pyleo.Series(time=ts.time, value=v2)
+
+        _ = ts1.causality(ts2, method=method, timespan=(0, 67))
+
 class TestUISeriesOutliers:
     ''' Tests for Series.outliers()
 
@@ -570,8 +591,8 @@ class TestUISeriesOutliers:
         # Get a series object
         ts2 = pyleo.Series(time = ts.time, value = v_out)
         # Remove outliers
-        ts_out, res = ts.outliers(remove=remove_outliers)
-    
+        ts_out = ts2.outliers(remove=remove_outliers)
+
     @pytest.mark.parametrize('method', ['kmeans','DBSCAN'])
     def test_outliers_t2(self,method):
 
@@ -588,12 +609,30 @@ class TestUISeriesOutliers:
         # Get a series object
         ts2 = pyleo.Series(time = ts.time, value = v_out)
         # Remove outliers
-        ts_out, res = ts.outliers(method=method)
+        ts_out = ts2.outliers(method=method)
+
+    @pytest.mark.parametrize('keep_log', [True,False])
+    def test_outliers_t3(self,keep_log):
+
+        #Generate data
+        ts = gen_ts()
+        #Add outliers
+        outliers_start = np.mean(ts.value)+5*np.std(ts.value)
+        outliers_end = np.mean(ts.value)+7*np.std(ts.value)
+        outlier_values = np.arange(outliers_start,outliers_end,0.1)
+        index = np.random.randint(0,len(ts.value),6)
+        v_out = ts.value
+        for i,ind in enumerate(index):
+            v_out[ind] = outlier_values[i]
+        # Get a series object
+        ts2 = pyleo.Series(time = ts.time, value = v_out)
+        # Remove outliers
+        ts_out = ts2.outliers(keep_log=keep_log)
 
 class TestUISeriesGkernel:
     ''' Unit tests for the TestUISeriesGkernel function
     '''
-    def test_interp_t1(self):
+    def test_gkernel_t1(self):
         ''' Test the gkernel function with default parameter values'''
 
         ts = gen_ts(nt=550, alpha=1.0)
@@ -604,9 +643,9 @@ class TestUISeriesGkernel:
         v_unevenly =  np.delete(ts.value, deleted_idx)
 
         ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly)
-        ts_interp=ts2.gkernel()
+        ts_interp=ts2.gkernel(keep_log=True)
 
-    def test_interp_t2(self):
+    def test_gkernel_t2(self):
         ''' Test the gkernel function with specified bandwidth'''
 
         ts = gen_ts(nt=550, alpha=1.0)
@@ -634,7 +673,7 @@ class TestUISeriesInterp():
         v_unevenly =  np.delete(ts.value, deleted_idx)
 
         ts = pyleo.Series(time=t_unevenly, value=v_unevenly)
-        ts_interp=ts.interp()
+        ts_interp=ts.interp(keep_log=True)
 
     def test_interp_t2(self):
         ''' Test the bin function by passing arguments'''
@@ -680,7 +719,7 @@ class TestUISeriesDetrend():
         v_trend = ts.value + nonlinear_trend
         #create a timeseries object
         ts2 = pyleo.Series(time=ts.time, value=v_trend)
-        ts_detrend=ts2.detrend(method=detrend_method)
+        ts_detrend=ts2.detrend(method=detrend_method, keep_log=True)
 
 class TestUISeriesWaveletCoherence():
     ''' Test the wavelet coherence
@@ -702,7 +741,7 @@ class TestUISeriesWaveletCoherence():
         ts2 = gen_ts(model='colored_noise', nt=nt)
         freq = np.linspace(1/500, 1/2, 20)
         _ = ts1.wavelet_coherence(ts2,method='wwz',settings={'freq':freq})
-        
+
     @pytest.mark.parametrize('mother',['MORLET', 'PAUL', 'DOG'])
     def test_xwave_t2(self,mother):
         ''' Test Series.wavelet_coherence() with CWT with mother wavelet specified  via `settings`
@@ -715,7 +754,7 @@ class TestUISeriesWaveletCoherence():
     def test_xwave_t3(self):
         ''' Test Series.wavelet_coherence() with WWZ on unevenly spaced data
         '''
-        
+
         ts1 = gen_ts(nt=220, alpha=1)
         ts2 = gen_ts(nt=220, alpha=1)
         #remove points
@@ -749,13 +788,13 @@ class TestUISeriesWavelet():
         ts = gen_ts(model='colored_noise',nt=n)
         freq = np.linspace(1/n, 1/2, 20)
         _ = ts.wavelet(method=wave_method, settings={'freq': freq})
-        
+
     def test_wave_t2(self):
        ''' Test Series.wavelet() ntau option and plot functionality
        '''
        ts = gen_ts(model='colored_noise',nt=200)
        _ = ts.wavelet(method='wwz',settings={'ntau':10})
- 
+
     @pytest.mark.parametrize('mother',['MORLET', 'PAUL', 'DOG'])
     def test_wave_t3(self,mother):
        ''' Test Series.wavelet() with different mother wavelets
@@ -775,7 +814,7 @@ class TestUISeriesSsa():
 
         res = cn.ssa()
         assert abs(res.pctvar.sum() - 100.0)<0.01
-        
+
 
     def test_ssa_t1(self):
         '''Test Series.ssa() with var truncation
@@ -798,7 +837,7 @@ class TestUISeriesSsa():
         '''
         ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
         res = ts.ssa(trunc='kaiser')
-        
+
     def test_ssa_t4(self):
         '''Test Series.ssa() on Allen&Smith dataset
         '''
@@ -825,16 +864,31 @@ class TestUiSeriesPlot:
         x_plot = line.get_xdata()
         y_plot = line.get_ydata()
 
-        
+
         pyleo.closefig(fig)
 
-class TestUiSeriesDistplot:
-    '''Test for Series.distplot()'''
+class TestUiSeriesStripes:
+    '''Test for Series.stripes()
 
-    def test_distplot_t0(self, max_axis = 5):
+    Series.stripes outputs a matplotlib figure and axis object, so we will compare the time axis
+    of the axis object to the time array.'''
+
+    def test_stripes(self):
+
         ts = gen_normal()
-        
-        fig, ax = ts.distplot()
+
+        fig, ax = ts.stripes(ref_period=[61,90],x_offset=2)
+
+        pyleo.closefig(fig)
+
+
+class TestUiSeriesHistplot:
+    '''Test for Series.histplot()'''
+
+    def test_histplot_t0(self, max_axis = 5):
+        ts = gen_normal()
+
+        fig, ax = ts.histplot()
 
         line = ax.lines[0]
 
@@ -842,15 +896,38 @@ class TestUiSeriesDistplot:
         y_plot = line.get_ydata()
 
         assert max(x_plot) < max_axis
-        
+
         pyleo.closefig(fig)
 
-    def test_distplot_t1(self, vertical = True):
+    def test_histplot_t1(self, vertical = True):
         ts = gen_normal()
-        
 
-        fig, ax = ts.distplot(vertical=vertical)
-        
+        fig, ax = ts.histplot(vertical=vertical)
+
+        pyleo.closefig(fig)
+
+class TestUiSeriesDistplot:
+    '''Test for Series.distplot()'''
+
+    def test_histplot_t0(self, max_axis = 5):
+        ts = gen_normal()
+
+        fig, ax = ts.histplot()
+
+        line = ax.lines[0]
+
+        x_plot = line.get_xdata()
+        y_plot = line.get_ydata()
+
+        assert max(x_plot) < max_axis
+
+        pyleo.closefig(fig)
+
+    def test_histplot_t1(self, vertical = True):
+        ts = gen_normal()
+
+        fig, ax = ts.histplot(vertical=vertical)
+
         pyleo.closefig(fig)
 
 class TestUiSeriesFilter:
@@ -866,7 +943,7 @@ class TestUiSeriesFilter:
         sig = sig1 + sig2
         ts1 = pyleo.Series(time=t, value=sig1)
         ts = pyleo.Series(time=t, value=sig)
-        ts_lp = ts.filter(cutoff_freq=15, method=method)
+        ts_lp = ts.filter(cutoff_freq=15, method=method, keep_log=True)
         val_diff = ts_lp.value - ts1.value
         assert np.mean(val_diff**2) < 0.2
 
@@ -884,4 +961,52 @@ class TestUiSeriesFilter:
         ts_bp = ts.filter(cutoff_freq=[15, 25], method=method)
         val_diff = ts_bp.value - ts2.value
         assert np.mean(val_diff**2) < 0.1
-    
+
+class TestUISeriesConvertTimeUnit:
+    '''Tests for Series.convert_time_unit'''
+
+    @pytest.mark.parametrize('keep_log',[False,True])
+    def test_convert_time_unit_t0(self,keep_log):
+        ts = gen_ts(nt=550, alpha=1.0)
+        ts.time_unit = 'kyr BP'
+        ts_converted = ts.convert_time_unit('yr BP',keep_log)
+        np.testing.assert_allclose(ts.time*1000,ts_converted.time,atol=1)
+
+    def test_convert_time_unit_t1(self):
+        ts = gen_ts(nt=550, alpha=1.0)
+        ts.time_unit = 'nonsense'
+        with pytest.raises(ValueError):
+            ts.convert_time_unit('yr BP')
+
+class TestUISeriesFillNA:
+    '''Tests for Series.fill_na'''
+
+    @pytest.mark.parametrize('timespan,nt,ts_dt,dt', [(None,500,8,5),(None,500,1,2),([100,400],500,4,2)])
+    def test_fill_na_t0(self,timespan,nt,ts_dt,dt):
+        t = np.arange(0,nt,ts_dt)
+        v = np.ones(len(t))
+        ts = pyleo.Series(t,v)
+        ts.fill_na(timespan=timespan,dt=dt)
+
+    @pytest.mark.parametrize('keep_log', [True,False])
+    def test_fill_na_t1(self,keep_log):
+        t = np.arange(0,500,10)
+        v = np.ones(len(t))
+        ts = pyleo.Series(t,v)
+        ts.fill_na(dt=5,keep_log=keep_log)
+
+class TestUISeriesSort:
+    '''Tests for Series.sort'''
+
+    @pytest.mark.parametrize('keep_log',[True,False])
+    def test_sort_t0(self,keep_log):
+        ts = gen_ts(nt=500,alpha=1.0)
+        ts = ts.sort()
+        np.all(np.diff(ts.time) >= 0)
+
+    def test_sort_t1(self):
+        t = np.arange(500,0,-1)
+        v = np.ones(len(t))
+        ts = pyleo.Series(t,v)
+        ts.sort()
+        assert np.all(np.diff(ts.time) >= 0)

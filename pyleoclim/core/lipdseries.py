@@ -156,6 +156,7 @@ class LipdSeries(Series):
 
         Returns
         -------
+        
         object : pyleoclim.LipdSeries
             New object with data copied from original
 
@@ -194,7 +195,7 @@ class LipdSeries(Series):
         Returns
         -------
 
-        ens : pyleoclim.EnsembleSeries
+        ens : EnsembleSeries
             An EnsembleSeries object with each series representing a possible realization of the age model
 
         See also
@@ -293,6 +294,7 @@ class LipdSeries(Series):
 
         Parameters
         ----------
+        
         projection : str, optional
 
             The projection to use. The default is 'Robinson'.
@@ -618,13 +620,14 @@ class LipdSeries(Series):
 
         return res
 
-    def dashboard(self, figsize=[11, 8], plt_kwargs=None, distplt_kwargs=None, spectral_kwargs=None,
+    def dashboard(self, figsize=[11, 8], plt_kwargs=None, histplt_kwargs=None, spectral_kwargs=None,
                   spectralsignif_kwargs=None, spectralfig_kwargs=None, map_kwargs=None, metadata=True,
                   savefig_settings=None, ensemble=False, D=None):
         '''
 
         Parameters
         ----------
+        
         figsize : list or tuple, optional
 
             Figure size. The default is [11,8].
@@ -633,9 +636,9 @@ class LipdSeries(Series):
 
             Optional arguments for the timeseries plot. See Series.plot() or EnsembleSeries.plot_envelope(). The default is None.
 
-        distplt_kwargs : dict, optional
+        histplt_kwargs : dict, optional
 
-            Optional arguments for the distribution plot. See Series.distplot() or EnsembleSeries.plot_displot(). The default is None.
+            Optional arguments for the distribution plot. See Series.histplot() or EnsembleSeries.plot_distplot(). The default is None.
 
         spectral_kwargs : dict, optional
 
@@ -675,6 +678,7 @@ class LipdSeries(Series):
 
         Returns
         -------
+        
         fig : matplotlib.figure
 
             The figure
@@ -690,23 +694,23 @@ class LipdSeries(Series):
 
         pyleoclim.core.ensembleseries.EnsembleSeries.plot_envelope: Envelope plots for an ensemble
 
-        pyleoclim.core.series.Series.distplot : plot a distribution of the timeseries
+        pyleoclim.core.series.Series.histplot : plot a distribution of the timeseries
 
-        pyleoclim.core.ensembleseries.EnsembleSeries.distplot : plot a distribution of the timeseries across ensembles
+        pyleoclim.core.ensembleseries.EnsembleSeries.histplot : plot a distribution of the timeseries across ensembles
 
         pyleoclim.core.series.Series.spectral : spectral analysis method.
 
         pyleoclim.core.multipleseries.MultipleSeries.spectral : spectral analysis method for multiple series.
 
-        pyleoclim.core.PSD.PSD.signif_test : significance test for timeseries analysis
+        pyleoclim.core.psds.PSD.signif_test : significance test for timeseries analysis
 
-        pyleoclim.core.PSD.PSD.plot : plot power spectrum
+        pyleoclim.core.psds.PSD.plot : plot power spectrum
 
-        pyleoclim.core.MulitplePSD.MulitplePSD.plot : plot envelope of power spectrum
+        pyleoclim.core.psds.MulitplePSD.plot : plot envelope of power spectrum
 
         pyleoclim.core.lipdseries.LipdSeries.map : map location of dataset
 
-        pyleolim.core.lipdseries.LipdSeries.getMetadata : get relevant metadata from the timeseries object
+        pyleoclim.core.lipdseries.LipdSeries.getMetadata : get relevant metadata from the timeseries object
 
         pyleoclim.utils.mapping.map : Underlying mapping function for Pyleoclim
 
@@ -771,18 +775,18 @@ class LipdSeries(Series):
         ymin, ymax = ax['ts'].get_ylim()
 
         # plot the distplot
-        distplt_kwargs = {} if distplt_kwargs is None else distplt_kwargs.copy()
+        histplt_kwargs = {} if histplt_kwargs is None else histplt_kwargs.copy()
         ax['dts'] = fig.add_subplot(gs[0, -1:])
-        distplt_kwargs.update({'ax': ax['dts']})
-        distplt_kwargs.update({'ylabel': 'Counts'})
-        distplt_kwargs.update({'vertical': True})
-        if 'color' not in distplt_kwargs.keys():
+        histplt_kwargs.update({'ax': ax['dts']})
+        histplt_kwargs.update({'ylabel': 'Counts'})
+        histplt_kwargs.update({'vertical': True})
+        if 'color' not in histplt_kwargs.keys():
             archiveType = lipdutils.LipdToOntology(res['archiveType']).lower().replace(" ", "")
-            distplt_kwargs.update({'color': self.plot_default[archiveType][0]})
+            histplt_kwargs.update({'color': self.plot_default[archiveType][0]})
         if ensemble == False:
-            ax['dts'] = self.distplot(**distplt_kwargs)
+            ax['dts'] = self.histplot(**histplt_kwargs)
         elif ensemble == True:
-            ax['dts'] = ensc.distplot(**distplt_kwargs)
+            ax['dts'] = ensc.histplot(**histplt_kwargs)
         ax['dts'].set_ylim([ymin, ymax])
         ax['dts'].set_yticklabels([])
         ax['dts'].set_ylabel('')
@@ -953,6 +957,7 @@ class LipdSeries(Series):
 
         Parameters
         ----------
+        
         D : pyleoclim.Lipd
 
             A pyleoclim LiPD object

@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tabulate import tabulate
 from copy import deepcopy
+from tqdm import tqdm
 import warnings
 
 from matplotlib.ticker import ScalarFormatter, FormatStrFormatter
@@ -190,7 +191,7 @@ class PSD:
         Returns
         -------
 
-        new : pyleoclim.PSD
+        new : pyleoclim.core.psds.PSD
 
             New PSD object with appropriate significance test
 
@@ -394,7 +395,7 @@ class PSD:
         Returns
         -------
 
-        new : pyleoclim.PSD
+        new : pyleoclim.core.psds.PSD
             New PSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
             - beta: the scaling factor
             - std_err: the one standard deviation error of the scaling factor
@@ -450,6 +451,67 @@ class PSD:
         new.beta_est_res = res_dict
         return new
 
+    def anti_alias(self, avgs=2):
+        ''' Apply the anti-aliasing filter
+
+        Parameters
+        ----------
+
+        avgs : int
+            flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
+            OR from measurements averaged over each sampling interval (avgs==1)
+
+        Returns
+        -------
+
+        new : pyleoclim.core.psds.PSD
+            New PSD object with the spectral aliasing effect alleviated.
+
+        Examples
+        --------
+
+        Generate colored noise with scaling exponent equals to unity, and test the impact of anti-aliasing filter
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+
+            t, v = pyleo.utils.tsmodel.gen_ts('colored_noise', alpha=1, m=1e5) # m=1e5 leads to aliasing
+            ts = pyleo.Series(time=t, value=v, label='colored noise')
+
+            # without the anti-aliasing filter
+            @savefig color_noise_no_anti_alias.png
+            fig, ax = ts.spectral(method='mtm').beta_est().plot()
+
+            # with the anti-aliasing filter
+            @savefig color_noise_anti_alias.png
+            fig, ax = ts.spectral(method='mtm').anti_alias().beta_est().plot()
+
+        References
+        ----------
+
+        Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
+        Phys Rev E Stat Nonlin Soft Matter Phys 71, 66110 (2005).
+
+        See also
+        --------
+
+        pyleoclim.utils.wavelet.AliasFilter.alias_filter : anti-aliasing filter
+        '''
+        new = self.copy()
+
+        dt = np.median(np.diff(self.timeseries.time))
+        f_sampling = 1/dt
+        psd_copy = self.amplitude[1:]
+        freq_copy = self.frequency[1:]
+        alpha, filtered_pwr, model_pwer, aliased_pwr = waveutils.AliasFilter().alias_filter(
+            freq_copy, psd_copy, f_sampling, f_sampling*1e3, np.min(self.frequency), avgs)
+
+        new.amplitude[1:] = np.copy(filtered_pwr)
+        return new
+
     def plot(self, in_loglog=True, in_period=True, label=None, xlabel=None, ylabel='PSD', title=None,
              marker=None, markersize=None, color=None, linestyle=None, linewidth=None, transpose=False,
              xlim=None, ylim=None, figsize=[10, 4], savefig_settings=None, ax=None,
@@ -462,6 +524,7 @@ class PSD:
 
         Parameters
         ----------
+        
         in_loglog : bool; {True, False}, optional
 
             Plot on loglog axis. The default is True.
@@ -585,6 +648,7 @@ class PSD:
 
         Returns
         -------
+        
         fig, ax
 
         Examples
@@ -913,7 +977,7 @@ class MultiplePSD:
         Returns
         -------
 
-        new : pyleoclim.MultiplePSD
+        new : pyleoclim.core.psds.MultiplePSD
         
             New MultiplePSD object with the estimated scaling slope information, which is stored as a dictionary that includes:
             - beta: the scaling factor
@@ -1038,6 +1102,7 @@ class MultiplePSD:
 
         Returns
         -------
+        
         fig : matplotlib.pyplot.figure
         
         ax : matplotlib.pyplot.axis
@@ -1117,6 +1182,50 @@ class MultiplePSD:
             return fig, ax
         else:
             return ax
+
+    def anti_alias(self, avgs=2, mute_pbar=False):
+        ''' Apply the anti-aliasing filter
+
+        Parameters
+        ----------
+
+        avgs : int
+        
+            flag for whether spectrum is derived from instantaneous point measurements (avgs<>1)
+            OR from measurements averaged over each sampling interval (avgs==1)
+
+        mute_pbar : bool; {True,False}
+        
+            If True, the progressbar will be muted. Default is False.
+
+        Returns
+        -------
+
+        new : pyleoclim.core.psds.MultiplePSD
+            New MultiplePSD object with the spectral aliasing effect alleviated.
+
+
+        References
+        ----------
+
+        Kirchner, J. W. Aliasing in 1/f(alpha) noise spectra: origins, consequences, and remedies.
+        Phys Rev E Stat Nonlin Soft Matter Phys 71, 66110 (2005).
+
+        See also
+        --------
+
+        pyleoclim.utils.wavelet.AliasFilter.alias_filter : anti-aliasing filter
+        '''
+        psd_aa_list = []
+        for psd_obj in tqdm(self.psd_list,  total=len(self.psd_list), disable=mute_pbar, desc='Applying the anti-alias filter'):
+            psd_aa = psd_obj.anti_alias(avgs=avgs)
+            psd_aa_list.append(psd_aa)
+
+        new = self.copy()
+        new.psd_list = psd_aa_list
+        return new
+
+
 
     def plot_envelope(self, figsize=[10, 4], qs=[0.025, 0.5, 0.975],
              in_loglog=True, in_period=True, xlabel=None, ylabel='PSD', title=None,

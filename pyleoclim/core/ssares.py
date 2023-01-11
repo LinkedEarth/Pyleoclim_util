@@ -135,7 +135,7 @@ class SsaRes:
         Examples
         --------
 
-        Plot the SSA eig envalue spectrum of the Southern Oscillation Index:
+        Plot the SSA eigenvalue spectrum of the Southern Oscillation Index:
 
         .. ipython:: python
             :okwarning:
@@ -160,13 +160,13 @@ class SsaRes:
         dv = v*np.sqrt(2/(n-1))
         idx = np.arange(len(v))+1
         if self.eigvals_q is not None:
-            plt.fill_between(idx,self.eigvals_q[:,0],self.eigvals_q[:,1], color=clr_mcssa, alpha = 0.3, label='AR(1) 5-95% quantiles')
+            ax.fill_between(idx,self.eigvals_q[:,0],self.eigvals_q[:,1], color=clr_mcssa, alpha = 0.3, label='AR(1) 5-95% quantiles')
 
-        plt.errorbar(x=idx,y=v,yerr = dv, color=clr_eig,marker='o',ls='',alpha=1.0,label=self.name)
-        plt.plot(idx[self.mode_idx],v[self.mode_idx],color=clr_signif,marker='o',ls='',
+        ax.errorbar(x=idx,y=v,yerr = dv, color=clr_eig,marker='o',ls='',alpha=1.0,label=self.name)
+        ax.plot(idx[self.mode_idx],v[self.mode_idx],color=clr_signif,marker='o',ls='',
                  markersize=4, label='modes retained',zorder=10)
-        plt.title(title,fontweight='bold'); plt.legend()
-        plt.xlabel(r'Mode index $i$'); plt.ylabel(r'$\lambda_i$')
+        ax.set_title(title,fontweight='bold'); ax.legend()
+        ax.set_xlabel(r'Mode index $i$'); ax.set_ylabel(r'$\lambda_i$')
         ax.xaxis.set_major_locator(MaxNLocator(integer=True)) # enforce integer values
 
 
@@ -220,7 +220,7 @@ class SsaRes:
         
         pyleoclim.core.series.Series.ssa : Singular Spectrum Analysis for timeseries objects
         
-        pyleoclim.core.utils.decomposition.ssa : Singular Spectrum Analysis utility
+        pyleoclim.utils.decomposition.ssa : Singular Spectrum Analysis utility
         
         pyleoclim.core.ssares.SsaRes.screeplot : plot SSA eigenvalue spectrum
          

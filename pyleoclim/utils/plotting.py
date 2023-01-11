@@ -10,6 +10,10 @@ __all__ = ['set_style','closefig', 'savefig']
 import matplotlib.pyplot as plt
 import pathlib
 import matplotlib as mpl
+import numpy as np
+from matplotlib.patches import Rectangle
+from matplotlib.collections import PatchCollection
+from matplotlib.colors import ListedColormap
 
 
 def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None, 
@@ -40,7 +44,7 @@ def scatter_xy(x,y,c=None, figsize=None, xlabel=None, ylabel=None, title=None,
         Limits for the y-axis. The default is None.
     savefig_settings : dict, optional
         the dictionary of arguments for plt.savefig(); some notes below:
-        - "path" must be specified; it can be any existed or non-existed path,
+        - "path" must be specified; it can be any existing or non-existing path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
        The default is None.
@@ -135,7 +139,7 @@ def plot_scatter_xy(x1,y1,x2,y2, figsize=None, xlabel=None,
         the keyword arguments for ax.plot()
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
-        - "path" must be specified; it can be any existed or non-existed path,
+        - "path" must be specified; it can be any existing or non-existing path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
 
@@ -192,7 +196,7 @@ def plot_scatter_xy(x1,y1,x2,y2, figsize=None, xlabel=None,
 
 def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None, 
             xlim=None, ylim=None,savefig_settings=None, ax=None,
-            legend=True, plot_kwargs=None, lgd_kwargs=None,
+            legend=True, plot_kwargs=None, lgd_kwargs=None, 
             invert_xaxis=False, invert_yaxis=False):
     ''' Plot a timeseries
     
@@ -228,7 +232,7 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
          (going to be deprecated)
     savefig_settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
-        - "path" must be specified; it can be any existed or non-existed path,
+        - "path" must be specified; it can be any existing or non-existing path,
           with or without a suffix; if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
     invert_xaxis : bool, optional
@@ -290,7 +294,135 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
         return fig, ax
     else:
         return ax
+    
+def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.75, figsize=None, xlabel=None, 
+               ylabel=None, title=None, xlim=None, savefig_settings=None, ax=None, 
+               x_offset = 0.05, label_size = None, show_xaxis = False,
+               invert_xaxis=False, top_label = None, bottom_label = None, label_color = None): 
+    '''
+    Represent y as an Ed Hawkins "warming stripes" pattern, as a function of x
+    
+    Credit: https://matplotlib.org/matplotblog/posts/warming-stripes/
+    
+    Parameters
+    ----------
+    x : array
+        Independent variable
+    y : array
+        Dependent variable
+    ref_period : 2-tuple or 2-vector
+        indices of the reference period, in the form "(first, last)"
+    thickness : float, optional
+        vertical thickness of the stripe . The default is 1.0     
+    LIM : float, optional 
+        size of the y-value range (default: 0.7) 
+    figsize : list
+        a list of two integers indicating the figure size
+    top_label : str
+        the "title" label for the stripe
+    bottom_label : str
+        the "ylabel" explaining which variable is being plotted
+    label_size : int
+        size of the text in labels (in points). Default is the Matplotlib 'axes.labelsize'] rcParams
+    xlim : list
+        set the limits of the x axis
+    x_offset : float
+        value controlling the horizontal offset between stripes and labels (default = 0.05)
+    show_xaxis : bool
+        flag indicating whether or not the x-axis should be shown (default = False)
+    ax : pyplot.axis
+        the pyplot.axis object
+    savefig_settings : dict
+        the dictionary of arguments for plt.savefig(); some notes below:
+        - "path" must be specified; it can be any existing or non-existing path,
+          with or without a suffix; if the suffix is not given in "path", it will follow "format"
+        - "format" can be one of {"pdf", "eps", "png", "ps"}
+    invert_xaxis : bool, optional
+        if True, the x-axis of the plot will be inverted
+   
+    Returns
+    -------
+    ax, or fig, ax (if no axes were provided)
 
+    '''
+    # handle dict defaults
+    savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
+    
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+      
+    if label_size is None:
+        label_size = mpl.rcParams['axes.labelsize']
+      
+    if thickness is None:
+        thickness = 5*label_size
+        
+    ax.get_yaxis().set_visible(False) # remove parasitic lines and labels
+    ax.get_xaxis().set_visible(show_xaxis) # remove parasitic lines and labels
+    ax.spines[:].set_visible(False)
+    
+    dx = np.diff(x).mean()
+    xmin = x.min()
+    xmax = x.max() + dx # inclusive
+    
+    # Reference period for the center of the color scale    
+    reference = y[ref_period[0]:ref_period[1]].mean()
+    
+    # colormap: the 8 more saturated colors from the 9 blues / 9 reds
+    cmap = ListedColormap([
+        '#08306b', '#08519c', '#2171b5', '#4292c6',
+        '#6baed6', '#9ecae1', '#c6dbef', '#deebf7',
+        '#fee0d2', '#fcbba1', '#fc9272', '#fb6a4a',
+        '#ef3b2c', '#cb181d', '#a50f15', '#67000d',
+    ])
+    
+    col = PatchCollection([
+        Rectangle((yl, 0), 1, 1)
+        for yl in range(int(xmin), int(xmax))
+        ])
+
+    # set data, colormap and color limits
+    col.set_array(y)
+    col.set_cmap(cmap)
+    col.set_clim(reference - LIM, reference + LIM)
+    ax.add_collection(col)
+    # adjust axes
+    ax.set_ylim(0, thickness)
+    ax.set_xlim(xmin, xmax);
+    
+    # add label to the right 
+    #offset = y_offsets[column] / 72
+    #trans = mtransforms.ScaledTranslation(0, offset, fig.dpi_scale_trans)
+    #trans = ax.transData #+ trans
+    
+    ypos = 0.4*thickness
+    ax.text(xmax+dx+x_offset, 0.6*thickness, top_label, color=label_color, 
+            fontsize=label_size, fontweight = 'bold')
+    ax.text(xmax+dx+x_offset, 0.2*thickness, bottom_label, color=label_color,
+            fontsize=label_size)
+
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
+
+    if title is not None:
+        ax.set_title(title)
+
+    if xlim is not None:
+        ax.set_xlim(xlim)
+
+    if invert_xaxis:
+        ax.invert_xaxis()       
+
+    if 'fig' in locals():
+        fig.tight_layout()
+        if 'path' in savefig_settings:
+            savefig(fig, settings=savefig_settings)
+        return fig, ax
+    else:
+        return ax
 
 def closefig(fig=None):
     '''Close the figure
@@ -320,7 +452,7 @@ def savefig(fig, path=None, dpi=300, settings={}, verbose=True):
     settings : dict
         the dictionary of arguments for plt.savefig(); some notes below:
         - "path" must be specified in settings if not assigned with the keyword argument;
-          it can be any existed or non-existed path, with or without a suffix;
+          it can be any existing or non-existing path, with or without a suffix;
           if the suffix is not given in "path", it will follow "format"
         - "format" can be one of {"pdf", "eps", "png", "ps"}
     verbose : bool, {True,False}
@@ -376,12 +508,12 @@ def set_style(style='journal', font_scale=1.0, dpi=300):
     
     '''
     font_dict = {
-        'font.size': 12,
-        'axes.labelsize': 12,
-        'axes.titlesize': 14,
-        'xtick.labelsize': 11,
-        'ytick.labelsize': 11,
-        'legend.fontsize': 11,
+        'font.size': 10,
+        'axes.labelsize': 11,
+        'axes.titlesize': 12,
+        'xtick.labelsize': 10,
+        'ytick.labelsize': 10,
+        'legend.fontsize': 9,
     }
 
     style_dict = {}

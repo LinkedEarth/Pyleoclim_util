@@ -1091,7 +1091,7 @@ def psd_fBM(freq, ts, H):
         Hurst exponent, should be in (0, 1)
 
     Returns
-    --------
+    -------
 
     psd : array
         power spectral density

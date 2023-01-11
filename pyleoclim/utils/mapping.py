@@ -442,6 +442,7 @@ def compute_dist(lat_r, lon_r, lat_c, lon_c):
     
     Returns
     -------
+    
     dist: list
         A list of distances in km.
     """
@@ -459,15 +460,18 @@ def compute_dist(lat_r, lon_r, lat_c, lon_c):
 def within_distance(distance, radius):
     """ Returns the index of the records that are within a certain distance
     
-    Parameters:
-    -----------    
+    Parameters
+    ----------   
+    
     distance: list
         A list containing the distance
+        
     radius: float
         The radius to be considered
         
     Returns
     -------
+    
     idx: list
         a list of index
     """

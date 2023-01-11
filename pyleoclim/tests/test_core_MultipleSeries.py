@@ -80,7 +80,12 @@ class TestUIMultipleSeriesDetrend():
 
         # Create a multiple series object
         ts_all= pyleo.MultipleSeries([ts,ts1])
-        ts_detrend=ts_all.detrend(method=detrend_method)
+        ts_detrend=ts_all.detrend(method=detrend_method)     
+        detrend_0 = ts_detrend.series_list[0]
+        detrend_1 = ts_detrend.series_list[1]
+
+        assert len(detrend_0.value)==len(detrend_0.time)
+        assert len(detrend_1.value)==len(detrend_1.time)
 
 class TestMultipleSeriesPlot:
     '''Test for MultipleSeries.plot()
@@ -120,6 +125,29 @@ class TestMultipleSeriesPlot:
         assert_array_equal(t_1, x_plot_1)
         assert_array_equal(v_0, y_plot_0)
         assert_array_equal(v_1, y_plot_1)
+
+class TestMultipleSeriesStripes:
+    '''Test for MultipleSeries.stripes()
+
+    '''
+
+    def test_stripes(self):
+
+        #Generate time and value arrays
+        t_0, v_0 = gen_normal()
+        t_1, v_1 = gen_normal()
+
+        #Create series objects
+        ts_0 = pyleo.Series(time = t_0, value = v_0)
+        ts_1 = pyleo.Series(time = t_1, value = v_1)
+
+        #Create a list of series objects
+        serieslist = [ts_0, ts_1]
+
+        #Turn this list into a multiple series object
+        ts_M = pyleo.MultipleSeries(serieslist)
+
+        fig, ax = ts_M.stripes(LIM=4, x_offset=2, label_color = 'red')
 
 
 class TestMultipleSeriesStandardize:

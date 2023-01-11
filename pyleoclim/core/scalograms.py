@@ -1,7 +1,7 @@
 
 # It is unclear why the documentation for these two modules does not build automatically using automodule. It therefore had to be built using autoclass
 
-from ..utils import plotting, lipdutils
+from ..utils import plotting, lipdutils, tsutils
 from ..utils import wavelet as waveutils
 
 import matplotlib.pyplot as plt
@@ -149,6 +149,7 @@ class Scalogram:
         self.freq_method = freq_method
         self.freq_kwargs = freq_kwargs
         self.signif_scals = signif_scals
+        self.conf = None
         #if wave_method == 'wwz':
         if wwz_Neffs is None:
             self.wwz_Neffs = wwz_Neffs
@@ -179,7 +180,7 @@ class Scalogram:
         Returns
         -------
 
-        scal : pyleoclim.Scalogram
+        scal : pyleoclim.core.scalograms.Scalogram
 
             The copied version of the pyleoclim.Scalogram object
 
@@ -214,7 +215,7 @@ class Scalogram:
     def plot(self, variable = 'amplitude', in_scale=True, xlabel=None, ylabel=None, title=None,
              ylim=None, xlim=None, yticks=None, figsize=[10, 8],
              signif_clr='white', signif_linestyles='-', signif_linewidths=1,
-             contourf_style={}, cbar_style={}, savefig_settings={}, ax=None,
+             contourf_style={}, cbar_style={}, plot_cb=True, savefig_settings={}, ax=None,
              signif_thresh = 0.95):
         ''' Plot the scalogram
 
@@ -351,25 +352,22 @@ class Scalogram:
 
         if variable == 'amplitude':
             cont = ax.contourf(self.time, y_axis, self.amplitude.T, **contourf_args)
-        elif variable=='power':
+        elif variable =='power':
             cont = ax.contourf(self.time, y_axis, self.amplitude.T**2, **contourf_args)
         else:
             raise ValueError('Variable should be either "amplitude" or "power"')
         ax.set_yscale('log')
 
-        # plot colorbar
-        cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05, 'label':variable.capitalize()}
-        cbar_args.update(cbar_style)
+        # assign filled contour data to the scalogram object
+        self.conf = cont
 
-        if 'inset' in cbar_args:
-            cbar_args.pop('inset')
-            axins1 = inset_axes(ax,
-                                width="50%",  # width = 50% of parent_bbox width
-                                height="5%",  # height : 5%
-                                loc='upper right')
-            cb = plt.colorbar(cont, ax =ax, cax=axins1, **cbar_args)
-        else:
-            cb = plt.colorbar(cont, ax = ax, **cbar_args)
+        # plot colorbar
+        if plot_cb is True:
+            cbar_args = {'drawedges': False, 'orientation': 'vertical', 'fraction': 0.15, 'pad': 0.05,
+                         'label': variable.capitalize()}
+            cbar_args.update(cbar_style)
+            cb = plt.colorbar(cont, ax=ax, **cbar_args)
+
 
         # plot cone of influence
         if self.coi is not None:
@@ -453,7 +451,8 @@ class Scalogram:
             Method to use to generate the surrogates.  ar1sim uses simulated timeseries with similar persistence. 
             ar1asym represents the theoretical, closed-form solution. The default is ar1sim
             
-       number: int     
+       number : int 
+       
             Number of surrogates to generate for significance analysis based on simulations. 
             The default is 200.
 
@@ -484,7 +483,7 @@ class Scalogram:
         Returns
         -------
 
-        new : pyleoclim.Scalogram
+        new : pyleoclim.core.scalograms.Scalogram
 
             A new Scalogram object with the significance level
 
@@ -582,8 +581,11 @@ class Scalogram:
                 raise TypeError('qs should be a list')
 
             settings = {} if settings is None else settings.copy()
+            
+            ys = tsutils.preprocess(self.timeseries.value, self.timeseries.time, detrend=False, sg_kwargs=None,
+                       gaussianize=self.wave_args['gaussianize'], standardize=self.wave_args['standardize'])
 
-            signif_levels=waveutils.tc_wave_signif(self.timeseries.value,
+            signif_levels=waveutils.tc_wave_signif(ys,
                                                    self.timeseries.time,
                                                    self.wave_args['scale'],
                                                    self.wave_args['mother'],
@@ -665,7 +667,7 @@ class MultipleScalogram:
         Returns
         -------
         
-        scals : pyleoclim.MultipleScalogram
+        scals : pyleoclim.core.scalograms.MultipleScalogram
         
         '''
         freq = np.copy(self.scalogram_list[0].frequency)

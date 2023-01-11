@@ -193,3 +193,40 @@ class TestUIEnsembleSeriesCorrelation():
         fig, ax = ts_ens.plot_traces(alpha=0.2, num_traces=8)
         pyleo.closefig(fig)
 
+class TestUIEnsembleSeriesHistplot():
+    def test_histplot_t0(self):
+        '''Test for EnsembleSeries.histplot()
+        '''
+        nn = 30 # number of noise realizations
+        nt = 500
+        series_list = []
+
+        signal = gen_ts(model='colored_noise', nt=nt, alpha=1.0).standardize()
+        noise = np.random.randn(nt, nn)
+
+        for idx in range(nn):  # noise
+            ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+            series_list.append(ts)
+
+        ts_ens = pyleo.EnsembleSeries(series_list)
+
+        ts_ens.histplot()
+
+class TestUIEnsembleSeriesDistplot():
+    def test_histplot_t0(self):
+        '''Test for EnsembleSeries.distplot()
+        '''
+        nn = 30 # number of noise realizations
+        nt = 500
+        series_list = []
+
+        signal = gen_ts(model='colored_noise', nt=nt, alpha=1.0).standardize()
+        noise = np.random.randn(nt, nn)
+
+        for idx in range(nn):  # noise
+            ts = pyleo.Series(time=signal.time, value=signal.value+noise[:,idx])
+            series_list.append(ts)
+
+        ts_ens = pyleo.EnsembleSeries(series_list)
+
+        ts_ens.histplot()

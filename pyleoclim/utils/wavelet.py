@@ -56,7 +56,7 @@ class AliasFilter(object):
     '''
 
     def alias_filter(self, freq, pwr, fs, fc, f_limit, avgs):
-        ''' anti_alias filter
+        ''' The anti-aliasing filter
 
         Parameters
         ----------
@@ -2388,8 +2388,8 @@ def cwt(ys,ts,freq=None,freq_method='log',freq_kwargs={}, scale = None, detrend=
     wave, coi = tc_wavelet(ys, dt, scale, mother, param, pad)
     amplitude=np.abs(wave)
     
-    Results = collections.namedtuple('Results', ['amplitude', 'coi', 'freq', 'time', 'scale', 'coeff', 'mother','param'])
-    res = Results(amplitude=amplitude.T, coi=coi, freq=freq, time=ts, scale=scale, coeff=wave, mother=mother,param=param)
+    Results = collections.namedtuple('Results', ['amplitude', 'coi', 'freq', 'time', 'scale', 'coeff', 'mother','param','gaussianize','standardize'])
+    res = Results(amplitude=amplitude.T, coi=coi, freq=freq, time=ts, scale=scale, coeff=wave, mother=mother,param=param, gaussianize=gaussianize,standardize=standardize)
 
     return res
 

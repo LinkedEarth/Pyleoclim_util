@@ -196,7 +196,7 @@ class Lipd:
         Returns
         -------
         
-        new : pyleoclim.Lipd
+        new : Lipd
         
             A new object corresponding to a particular dataset
 
@@ -321,6 +321,7 @@ class Lipd:
 
         Parameters
         ----------
+        
         projection : str, optional
         
             The projection to use. The default is 'Robinson'.
@@ -389,6 +390,7 @@ class Lipd:
         
         Returns
         -------
+        
         res : tuple or fig
         
             The figure and axis if asked. 

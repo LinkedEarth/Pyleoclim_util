@@ -21,6 +21,7 @@ from matplotlib.ticker import FormatStrFormatter
 import matplotlib.transforms as transforms
 import matplotlib as mpl
 from tqdm import tqdm
+import warnings
 from scipy.stats.mstats import mquantiles
 
 class EnsembleSeries(MultipleSeries):
@@ -75,6 +76,65 @@ class EnsembleSeries(MultipleSeries):
             time_header = f'{time_name_str}'
 
         return time_header, value_header
+    
+    def slice(self, timespan):
+        ''' Selects a limited time span from the object 
+
+        Parameters
+        ----------
+
+        timespan : tuple or list
+            The list of time points for slicing, whose length must be even.
+            When there are n time points, the output Series includes n/2 segments.
+            For example, if timespan = [a, b], then the sliced output includes one segment [a, b];
+            if timespan = [a, b, c, d], then the sliced output includes segment [a, b] and segment [c, d].
+
+        Returns
+        -------
+
+        new : EnsembleSeries
+            The sliced EnsembleSeries object.
+
+        Examples
+        --------
+
+        slice the SOI from 1972 to 1998
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            nn = 20 # number of noise realizations
+            nt = 200
+            series_list = []
+
+            time, signal = pyleo.utils.gen_ts(model='colored_noise',nt=nt,alpha=2.0)
+            
+            ts = pyleo.Series(time=time, value = signal).standardize()
+            noise = np.random.randn(nt,nn)
+
+            for idx in range(nn):  # noise
+                ts = pyleo.Series(time=time, value=ts.value+5*noise[:,idx])
+                series_list.append(ts)
+
+            ts_ens = pyleo.EnsembleSeries(series_list)
+            
+            @savefig ts_ens_plot_orig.png
+            fig, ax = ts_ens.plot_envelope(curve_lw=1.5)
+            
+            @savefig ts_ens_plot_trunc.png
+            fig, ax = ts_ens.slice([100, 199]).plot_envelope(curve_lw=1.5)
+            pyleo.closefig(fig) 
+        '''
+        new = self.copy()
+        
+        for idx, ts in enumerate(self.series_list):
+            tsc = ts.slice(timespan)
+            new.series_list[idx] = tsc
+            
+        return new
+
+    
 
     def quantiles(self, qs=[0.05, 0.5, 0.95]):
         '''Calculate quantiles of an EnsembleSeries object
@@ -91,7 +151,7 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
 
-        ens_qs : pyleoclim.EnsembleSeries
+        ens_qs : EnsembleSeries
 
             EnsembleSeries object containing empirical quantiles of original 
 
@@ -127,7 +187,8 @@ class EnsembleSeries(MultipleSeries):
             vals.append(ts.value)
 
         vals = np.array(vals)
-        ens_qs = mquantiles(vals, qs, axis=0)
+        # ens_qs = mquantiles(vals, qs, axis=0)
+        ens_qs = np.nanquantile(vals, qs, axis=0)
 
         ts_list = []
         for i, quant in enumerate(ens_qs):
@@ -147,7 +208,7 @@ class EnsembleSeries(MultipleSeries):
         Parameters
         ----------
 
-        target : pyleoclim.Series or pyleoclim.EnsembleSeries
+        target : Series or EnsembleSeries
 
             A pyleoclim Series object or EnsembleSeries object.
             When the target is also an EnsembleSeries object, then the calculation of correlation is performed in a one-to-one sense,
@@ -192,7 +253,7 @@ class EnsembleSeries(MultipleSeries):
         Returns
         -------
 
-        corr_ens : pyleoclim.CorrEns
+        corr_ens : CorrEns
 
             The resulting object, see pyleoclim.CorrEns
 
@@ -426,7 +487,7 @@ class EnsembleSeries(MultipleSeries):
                 np.random.seed(seed)
 
             nts = np.size(self.series_list)
-            random_draw_idx = np.random.choice(nts, num_traces)
+            random_draw_idx = np.random.choice(nts, num_traces, replace=False)
 
             for idx in random_draw_idx:
                 self.series_list[idx].plot(xlabel=xlabel, ylabel=ylabel, zorder=99, linewidth=lw,
@@ -598,12 +659,12 @@ class EnsembleSeries(MultipleSeries):
         # plot outer envelope
         ax.fill_between(
             time, ts_qs.series_list[0].value, ts_qs.series_list[4].value,
-            color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=outer_shade_label,
+            color=shade_clr, alpha=shade_alpha, edgecolor=shade_clr, label=outer_shade_label
         )
         # plot inner envelope on top
         ax.fill_between(
             time, ts_qs.series_list[1].value, ts_qs.series_list[3].value,
-            color=shade_clr, alpha=2*shade_alpha, edgecolor=shade_clr, label=inner_shade_label,
+            color=shade_clr, alpha=2*shade_alpha, edgecolor=shade_clr, label=inner_shade_label
         )
 
         # plot the median
@@ -855,7 +916,7 @@ class EnsembleSeries(MultipleSeries):
             return ax
 
 
-    def distplot(self, figsize=[10, 4], title=None, savefig_settings=None,
+    def histplot(self, figsize=[10, 4], title=None, savefig_settings=None,
                  ax=None, ylabel='KDE', vertical=False, edgecolor='w', **plot_kwargs):
         """ Plots the distribution of the timeseries across ensembles
 
@@ -927,8 +988,8 @@ class EnsembleSeries(MultipleSeries):
 
             ts_ens = pyleo.EnsembleSeries(series_list)
 
-            @savefig ens_distplot.png
-            fig, ax = ts_ens.distplot()
+            @savefig ens_histplot.png
+            fig, ax = ts_ens.histplot()
             pyleo.closefig(fig) 
 
         """
@@ -963,4 +1024,3 @@ class EnsembleSeries(MultipleSeries):
             return fig, ax
         else:
             return ax
-
