@@ -75,7 +75,7 @@ def time_unit_to_datum_exp_dir(time_unit):
         direction = 'retrograde'
     elif time_unit in ('Ga', 'Gy'):
         datum ='1950'
-        exponent = 3
+        exponent = 9
         direction = 'retrograde'
     else:
         raise ValueError(f'Time unit {time_unit} not supported')
