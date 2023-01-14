@@ -269,7 +269,6 @@ def plot_xy(x, y, figsize=None, xlabel=None, ylabel=None, title=None,
 
     if title is not None:
         ax.set_title(title)
-        # TODO replace with ax.set_title(title, fontweight='bold') when all relevant plots use plot_xy
 
     if xlim is not None:
         ax.set_xlim(xlim)

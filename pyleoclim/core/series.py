@@ -134,8 +134,7 @@ class Series:
 
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None,
                  value_unit=None, label=None, lat=None, lon=None, dataset_name=None,
-                 archiveType = None, mean=None, clean_ts=True, log=None, verbose=False):
-        # TODO: remove mean argument once it's safe to do so
+                 archiveType = None, clean_ts=True, log=None, verbose=False):
         if log is None:
             self.log = ()
             nlog = -1
@@ -158,14 +157,8 @@ class Series:
         self.lon = lon
         self.dataset_name = dataset_name
         self.archiveType = archiveType
-        #self.clean_ts=clean_ts
-        #self.verbose=verbose
-
-        if mean is None:
-            self.mean=np.mean(self.value)
-        else:
-            self.mean = mean
-    
+        
+       
     @property
     def datetime_index(self):
         datum, exponent, direction = tsutils.time_unit_to_datum_exp_dir(self.time_unit)
@@ -189,6 +182,10 @@ class Series:
             time_unit = self.time_unit,
             value_unit = self.value_unit,
             label = self.label,
+            lat = self.lat,
+            lon = self.lon,
+            dataset_name = self.dataset_name,
+            log = self.log
         )
     
     @classmethod
@@ -216,7 +213,7 @@ class Series:
 
 
     def convert_time_unit(self, time_unit='years', keep_log=False):
-        ''' Convert the time unit of the Series object
+        ''' Convert the time units of the Series object
 
         Parameters
         ----------
@@ -274,69 +271,71 @@ class Series:
         else:
             return new_ts
 
-        def convert_to_years():
-            def prograde_time(time, time_datum, time_exponent):
-                new_time = (time_datum + time)*10**(time_exponent)
-                return new_time
+        new_time = tsutils.convert_datetime_index_to_time(self.datetime_index, time_unit_label)
 
-            def retrograde_time(time, time_datum, time_exponent):
-                new_time = (time_datum - time)*10**(time_exponent)
-                return new_time
+        # def convert_to_years():
+        #     def prograde_time(time, time_datum, time_exponent):
+        #         new_time = (time_datum + time)*10**(time_exponent)
+        #         return new_time
 
-            convert_func = {
-                'prograde': prograde_time,
-                'retrograde': retrograde_time,
-            }
-            if self.time_unit is not None:
-                tu = self.time_unit.lower()
-                if tu.find('ky')>=0 or tu.find('ka')>=0:
-                    time_dir = 'retrograde'
-                    time_datum = 1950/1e3
-                    time_exponent = 3
-                elif tu.find('my')>=0 or tu.find('ma')>=0:
-                    time_dir = 'retrograde'
-                    time_datum = 1950/1e6
-                    time_exponent = 6
-                elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
-                    time_dir ='retrograde'
-                    time_datum = 1950
-                    time_exponent = 0
-                elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0:
-                    time_dir ='prograde'
-                    time_datum = 0
-                    time_exponent = 0
-                else:
-                    raise ValueError(f"Current Series time_unit={self.time_unit} is not supported. Supported time units are: 'year', 'years', 'yr', 'yrs', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
+        #     def retrograde_time(time, time_datum, time_exponent):
+        #         new_time = (time_datum - time)*10**(time_exponent)
+        #         return new_time
 
-                new_time = convert_func[time_dir](self.time, time_datum, time_exponent)
-            else:
-                new_time = None
+        #     convert_func = {
+        #         'prograde': prograde_time,
+        #         'retrograde': retrograde_time,
+        #     }
+        #     if self.time_unit is not None:
+        #         tu = self.time_unit.lower()
+        #         if tu.find('ky')>=0 or tu.find('ka')>=0:
+        #             time_dir = 'retrograde'
+        #             time_datum = 1950/1e3
+        #             time_exponent = 3
+        #         elif tu.find('my')>=0 or tu.find('ma')>=0:
+        #             time_dir = 'retrograde'
+        #             time_datum = 1950/1e6
+        #             time_exponent = 6
+        #         elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
+        #             time_dir ='retrograde'
+        #             time_datum = 1950
+        #             time_exponent = 0
+        #         elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0:
+        #             time_dir ='prograde'
+        #             time_datum = 0
+        #             time_exponent = 0
+        #         else:
+        #             raise ValueError(f"Current Series time_unit={self.time_unit} is not supported. Supported time units are: 'year', 'years', 'yr', 'yrs', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
 
-            return new_time
+        #         new_time = convert_func[time_dir](self.time, time_datum, time_exponent)
+        #     else:
+        #         new_time = None
 
-        def convert_to_bp():
-            time_yrs = convert_to_years()
-            time_bp = 1950 - time_yrs
-            return time_bp
+        #     return new_time
 
-        def convert_to_ka():
-            time_bp = convert_to_bp()
-            time_ka = time_bp / 1e3
-            return time_ka
+        # def convert_to_bp():
+        #     time_yrs = convert_to_years()
+        #     time_bp = 1950 - time_yrs
+        #     return time_bp
 
-        def convert_to_ma():
-            time_bp = convert_to_bp()
-            time_ma = time_bp / 1e6
-            return time_ma
+        # def convert_to_ka():
+        #     time_bp = convert_to_bp()
+        #     time_ka = time_bp / 1e3
+        #     return time_ka
 
-        convert_to = {
-            'yrs': convert_to_years(),
-            'yrs BP': convert_to_bp(),
-            'ky BP': convert_to_ka(),
-            'my BP': convert_to_ma(),
-        }
+        # def convert_to_ma():
+        #     time_bp = convert_to_bp()
+        #     time_ma = time_bp / 1e6
+        #     return time_ma
 
-        new_time = convert_to[time_unit_label]
+        # convert_to = {
+        #     'yrs': convert_to_years(),
+        #     'yrs BP': convert_to_bp(),
+        #     'ky BP': convert_to_ka(),
+        #     'my BP': convert_to_ma(),
+        # }
+
+        # new_time = convert_to[time_unit_label]
 
         dt = np.diff(new_time)
         if any(dt<=0):
