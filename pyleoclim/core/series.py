@@ -92,6 +92,18 @@ class Series:
         Default is True
 
     log : dict
+    
+    lat : float
+        latitude N in decimal degrees.
+        
+    lon : float
+        longitude East in decimal degrees. Negative values will be converted to an angle in [0 , 360)
+                                                                                             
+    dataset_name : string
+        identifier of the dataset. If it came from a LiPD file, this could be the datasetID property 
+
+    archiveType : string
+        climate archive, one of                                                                                     
 
     If keep_log is set to True, then a log of the transformations made to the timeseries will be kept.
 
@@ -153,10 +165,21 @@ class Series:
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
-        self.lat = lat
-        self.lon = lon
+        # assign latitude
+        if -90 <= lon <= 90: 
+            self.lat = lat
+        else:
+            ValueError('Latitude must be a number in [-90; 90]')
+        # assign longitude
+        if 0 <= lon < 360:     
+            self.lon = lon
+        elif -180 <= lon < 0:
+            self.lon = 360 - lon
+        else:
+            ValueError('Longitude must be a number in [-180,360]')
+            
         self.dataset_name = dataset_name
-        self.archiveType = archiveType
+        self.archiveType = archiveType  #TODO: implement a check on allowable values
         
        
     @property
