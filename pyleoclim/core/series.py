@@ -220,17 +220,21 @@ class Series:
             log = self.log
         )
     
-    @classmethod
-    def from_pandas(cls, ser, metadata):
-        time = tsutils.convert_datetime_index_to_time(ser.index, metadata['time_unit'], metadata['time_name'])
-        return cls(
-            time=time,
-            value=ser.to_numpy(),
-            time_name=ser.index.name,
-            value_name=ser.name,
-            **metadata,
-        )
+    # @classmethod
+    # def from_pandas(cls, ser, metadata):
+    #     time = tsutils.convert_datetime_index_to_time(ser.index, metadata['time_unit'], metadata['time_name'])
+    #     return cls(
+    #         time=time,
+    #         value=ser.to_numpy(),
+    #         time_name= metadata['time_name'] if metadata['time_name'] is not None else ser.index.name,
+    #         value_name=metadata['value_name'] if metadata['value_name'] is not None else ser.name,
+    #         **metadata,
+    #     )
     
+    def from_pandas(ser, metadata):
+        ts = pyleo.Se
+        time = tsutils.convert_datetime_index_to_time(ser.index, metadata['time_unit'], metadata['time_name'])
+        
     def to_pandas(self):
         ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
         # Could be a dataclass instead?
@@ -245,7 +249,7 @@ class Series:
 
     def __repr__(self):
         ser, metadata = self.to_pandas()
-        return repr(ser)
+        return f'{repr(ser)}\n{metadata}'
 
     def convert_time_unit(self, time_unit='ky BP', keep_log=False):
         ''' Convert the time units of the Series object
