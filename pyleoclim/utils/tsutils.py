@@ -48,16 +48,21 @@ from .tsbase import (
 
 SECONDS_PER_YEAR = 365.25 * 60  * 60 * 24
 
-def time_unit_to_datum_exp_dir(time_unit):
-    if time_unit == 'years':
-        datum = '0'
-        exponent = 0
-        direction = 'prograde'
-    elif time_unit in ('ky', 'kyr', 'kyrs', 'kiloyear', 'ka'):
+def time_unit_to_datum_exp_dir(time_unit, time_name=None):
+    
+    if time_name is not None:
+        if time_name.lower() == 'age':
+            direction = 'retrograde'
+        if time_name.lower() == 'year':
+            datum = '0'
+            exponent = 0
+            direction = 'prograde'  
+            
+    if  time_unit in ('ky', 'kyr', 'kyrs', 'kiloyear', 'ka'):
         datum = '1950'
         exponent = 3
         direction = 'retrograde'
-    elif time_unit in ('y', 'yr', 'yrs', 'year', 'year CE', 'years CE', 'year(s) AD'):
+    elif time_unit in ('y', 'yr', 'yrs', 'year', 'years', 'year CE', 'years CE', 'years AD', 'AD', 'CE'):
         datum = '0'
         exponent = 0
         direction = 'prograde'
@@ -69,22 +74,28 @@ def time_unit_to_datum_exp_dir(time_unit):
         datum ='1950'
         exponent = 0
         direction = 'retrograde'
-    elif time_unit in ('Ma', 'My'):
+    elif time_unit in ('Ma', 'My','Myr','Myrs'):
         datum ='1950'
         exponent = 6
         direction = 'retrograde'
-    elif time_unit in ('Ga', 'Gy'):
+    elif time_unit in ('Ga', 'Gy', 'Gyr', 'Gyrs'):
         datum ='1950'
         exponent = 9
         direction = 'retrograde'
     else:
         raise ValueError(f'Time unit {time_unit} not supported')
+    
+    # deal with statements about datum
+    if "b2k" in time_unit.lower():
+        datum = '2000'
+    elif "bnf" in time_unit.lower():
+        datum = '1950'    
 
     return (datum, exponent, direction)
 
-def convert_datetime_index_to_time(datetime_index, time_unit):
-    datum, exponent, direction = time_unit_to_datum_exp_dir(time_unit)
-    import operator
+def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
+    datum, exponent, direction = time_unit_to_datum_exp_dir(time_unit, time_name)
+    #import operator
     if direction == 'prograde':
         multiplier = 1
     elif direction == 'retrograde':
