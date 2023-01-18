@@ -39,6 +39,7 @@ import random
 #from matplotlib import gridspec
 import warnings
 import collections
+from pprint import pprint
 
 def dict2namedtuple(d):
     ''' Convert a dictionary to a namedtuple
@@ -172,7 +173,7 @@ class Series:
             else:
                 ValueError('Latitude must be a number in [-90; 90]')
         else:
-            self.lat = 0 # assign a default value to prevent bugs ?
+            self.lat = np.nan # assign a default value to prevent bugs ?
             
         # assign longitude
         if lon is not None:
@@ -183,7 +184,7 @@ class Series:
             else:
                 ValueError('Longitude must be a number in [-180,360]')
         else:
-            self.lon = 0 # assign a default value to prevent bugs ?
+            self.lon = np.nan # assign a default value to prevent bugs ?
             
         self.dataset_name = dataset_name
         self.archiveType = archiveType  #TODO: implement a check on allowable values (take from LipdVerse + 'model' + 'modern obs')
@@ -216,6 +217,7 @@ class Series:
             label = self.label,
             lat = self.lat,
             lon = self.lon,
+            archiveType = self.archiveType,
             dataset_name = self.dataset_name,
             log = self.log
         )
@@ -231,14 +233,41 @@ class Series:
     #         **metadata,
     #     )
     
+    def __str__(self):
+        '''
+        Prints out the series in a table format and length of the series
+
+        Returns
+        -------
+        str
+            length of the timeseries.
+
+        '''
+        time_label, value_label = self.make_labels()
+
+        table = {
+            time_label: self.time,
+            value_label: self.value,
+        }
+
+        _ = print(tabulate(table, headers='keys'))
+        return f'Length: {np.size(self.time)}'
+    
     def from_pandas(ser, metadata):
-        ts = pyleo.Se
         time = tsutils.convert_datetime_index_to_time(ser.index, metadata['time_unit'], metadata['time_name'])
+        ts = Series(value=ser.values, time=time,  
+                          time_name = metadata['time_name'] if metadata['time_name'] is not None else ser.index.name,
+                          time_unit = metadata['time_unit'],
+                          value_name=metadata['value_name'] if metadata['value_name'] is not None else ser.name,
+                          value_unit = metadata['value_unit'],
+                          label = ser.name
+                          )
+        return ts
         
     def to_pandas(self):
         ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
         # Could be a dataclass instead?
-        return (ser, self.metadata)
+        return ser
     
     def pandas_method(self, method):
         ser, metadata = self.to_pandas()
@@ -248,8 +277,15 @@ class Series:
         return self.from_pandas(result, metadata)
 
     def __repr__(self):
-        ser, metadata = self.to_pandas()
-        return f'{repr(ser)}\n{metadata}'
+        ser = self.to_pandas()
+        d   = self.metadata
+        keys = ['dataset_name', 'label', 'archiveType', 'log']
+        metadata = {key: d[key] for key in keys if d[key] is not None}
+        time_label, value_label = self.make_labels()
+        ser2 = ser.set_axis(self.time)
+        ser2.rename(value_label, inplace=True)
+        ser2.rename_axis(time_label, inplace=True)
+        return f'{repr(ser2)}\n{pprint(metadata)}'   
 
     def convert_time_unit(self, time_unit='ky BP', keep_log=False):
         ''' Convert the time units of the Series object
@@ -365,26 +401,6 @@ class Series:
             time_header = f'{time_name_str}'
 
         return time_header, value_header
-
-    def __str__(self):
-        '''
-        Prints out the series in a table format and length of the series
-
-        Returns
-        -------
-        str
-            length of the timeseries.
-
-        '''
-        time_label, value_label = self.make_labels()
-
-        table = {
-            time_label: self.time,
-            value_label: self.value,
-        }
-
-        _ = print(tabulate(table, headers='keys'))
-        return f'Length: {np.size(self.time)}'
 
     def stats(self):
         """ Compute basic statistics from a Series
