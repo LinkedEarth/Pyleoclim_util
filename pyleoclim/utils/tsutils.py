@@ -19,7 +19,7 @@ __all__ = [
     'remove_outliers'
 ]
 
-
+import operator
 import numpy as np
 import pandas as pd
 import warnings
@@ -63,7 +63,7 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None):
     match_Ma = ['ma', 'my','myr','myrs']
     match_Ga = ['ga', 'gy', 'gyr', 'gyrs']
     if any(c in time_unit.lower() for c in match_ka):
-        datum = '1950'
+        datum = 1950
         exponent = 3
         direction = 'retrograde'
     elif any(c in time_unit.lower() for c in match_a):
@@ -105,13 +105,54 @@ def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
         multiplier = -1
     else:
         raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
-    year_diff = (datetime_index.year - int(datum))
-    seconds_diff = (datetime_index.to_numpy() - datetime_index.year.astype(str).astype('datetime64[s]').to_numpy()).astype('int')
-    diff = year_diff + seconds_diff / SECONDS_PER_YEAR
-    time = multiplier * diff / 10**exponent
+        
+    if not isinstance(datetime_index, pd.DatetimeIndex): 
+        raise ValueError('The provided index is not a proper DatetimeIndex object')
+    else:
+        year_diff = (datetime_index.year - int(datum))
+        seconds_diff = (datetime_index.to_numpy() - datetime_index.year.astype(str).astype('datetime64[s]').to_numpy()).astype('int')
+        diff = year_diff + seconds_diff / SECONDS_PER_YEAR
+        time = multiplier * diff / 10**exponent
 
     return time
 
+def time_to_datetime(time, datum = 0,  exponent = 0, direction = 'prograde', unit = 's'):
+    '''
+    Converts a vector of time values to a pandas datetime object
+
+    Parameters
+    ----------
+    time : array-like
+        the time axis to be converted
+    datum : int, optional
+        origin point for the time scale. The default is 0.
+    exponent : int, optional
+        Base-10 exponent for year multiplier. Dates in kyr should use 3, dates in Myr should use 6, etc.
+        The default is 0. 
+    direction : str, optional
+        Direction of time flow, 'prograde' [default] or 'retrograde'.
+    unit : str, optional
+        Units of the datetime. Default is 's', corresponding to seconds. 
+        Only change if you have an excellent reason to use finer resolution!
+
+    Returns
+    -------
+    index, a datetime64[unit] object
+
+    '''
+    if direction == 'prograde':
+        op = operator.add
+    elif direction == 'retrograde':
+        op = operator.sub
+    else:
+        raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
+    
+    timedelta = np.array(time) * 10**exponent
+    years = timedelta.astype('int')
+    seconds = ((timedelta - timedelta.astype('int')) * SECONDS_PER_YEAR).astype('timedelta64[s]') # incorporate unit here
+    index = op(op(int(datum), years).astype(str).astype('datetime64[s]'), seconds)  # incorporate unit here?
+    
+    return index
 
 def simple_stats(y, axis=None):
     """ Computes simple statistics

@@ -93,15 +93,16 @@ class Series:
         Default is True
 
     log : dict
-    
+        Dictionary of tuples documentating the various transformations applied to the object
+        
     lat : float
         latitude N in decimal degrees.
         
     lon : float
         longitude East in decimal degrees. Negative values will be converted to an angle in [0 , 360)
                                                                                              
-    dataset_name : string
-        identifier of the dataset. If it came from a LiPD file, this could be the datasetID property 
+    importedFrom : string
+        source of the dataset. If it came from a LiPD file, this could be the datasetID property 
 
     archiveType : string
         climate archive, one of                                                                                     
@@ -114,7 +115,7 @@ class Series:
     Examples
     --------
 
-    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a Series object.
+    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a Series object, then display a quick synopsis.
 
     .. ipython:: python
         :okwarning:
@@ -133,20 +134,11 @@ class Series:
             time_name='Year (CE)', value_name='SOI', label='Southern Oscillation Index'
         )
         ts
-        ts.__dict__.keys()
-
-    For a quick look at the values, one may use the `print()` method. We do so below for a short slice of the data so as not to overwhelm the display:
-
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
-
-        print(ts.slice([1982,1983]))
-
+          
     '''
 
     def __init__(self, time, value, time_name=None, time_unit=None, value_name=None,
-                 value_unit=None, label=None, lat=None, lon=None, dataset_name=None,
+                 value_unit=None, label=None, lat=None, lon=None, importedFrom=None,
                  archiveType = None, clean_ts=True, log=None, verbose=False):
         if log is None:
             self.log = ()
@@ -173,7 +165,7 @@ class Series:
             else:
                 ValueError('Latitude must be a number in [-90; 90]')
         else:
-            self.lat = np.nan # assign a default value to prevent bugs ?
+            self.lat = None # assign a default value to prevent bugs ?
             
         # assign longitude
         if lon is not None:
@@ -184,28 +176,39 @@ class Series:
             else:
                 ValueError('Longitude must be a number in [-180,360]')
         else:
-            self.lon = np.nan # assign a default value to prevent bugs ?
+            self.lon = None # assign a default value to prevent bugs ?
             
-        self.dataset_name = dataset_name
+        self.importedFrom = importedFrom
         self.archiveType = archiveType  #TODO: implement a check on allowable values (take from LipdVerse + 'model' + 'modern obs')
-        
+    
+    def __repr__(self):
+        ser = self.to_pandas()
+        d   = self.metadata
+        keys = ['importedFrom', 'label', 'archiveType', 'log']
+        metadata = {key: d[key] for key in keys if d[key] is not None}
+        time_label, value_label = self.make_labels()
+        ser2 = ser.set_axis(self.time)
+        ser2.rename(value_label, inplace=True)
+        ser2.rename_axis(time_label, inplace=True)
+        return f'{repr(ser2)}\n{pprint(metadata)}'   
        
     @property
     def datetime_index(self):
         datum, exponent, direction = tsutils.time_unit_to_datum_exp_dir(self.time_unit)
-        if direction == 'prograde':
-            op = operator.add
-        elif direction == 'retrograde':
-            op = operator.sub
-        else:
-            raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
+        index = tsutils.time_to_datetime(self.time,datum, exponent, direction)
+        # if direction == 'prograde':
+        #     op = operator.add
+        # elif direction == 'retrograde':
+        #     op = operator.sub
+        # else:
+        #     raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
 
-        timedelta = self.time * 10**exponent
-        years = timedelta.astype('int')
-        seconds = ((timedelta - timedelta.astype('int')) * tsutils.SECONDS_PER_YEAR).astype('timedelta64[s]')
+        # timedelta = self.time * 10**exponent
+        # years = timedelta.astype('int')
+        # seconds = ((timedelta - timedelta.astype('int')) * tsutils.SECONDS_PER_YEAR).astype('timedelta64[s]')
         
-        np_times = op(op(int(datum), years).astype(str).astype('datetime64[s]'), seconds)
-        return pd.DatetimeIndex(np_times, name=self.time_name)
+        # np_times = op(op(int(datum), years).astype(str).astype('datetime64[s]'), seconds)
+        return pd.DatetimeIndex(index, name=self.time_name)
     
     @property
     def metadata(self):
@@ -218,51 +221,41 @@ class Series:
             lat = self.lat,
             lon = self.lon,
             archiveType = self.archiveType,
-            dataset_name = self.dataset_name,
+            importedFrom = self.importedFrom,
             log = self.log
         )
     
-    # @classmethod
-    # def from_pandas(cls, ser, metadata):
+    @classmethod
+    def from_pandas(cls, ser, metadata):
+        if isinstance(ser.index, pd.DatetimeIndex):
+            index = ser.index.as_unit('s') if ser.index.unit != 's' else ser.index  
+            time = tsutils.convert_datetime_index_to_time(index, metadata['time_unit'], metadata['time_name'])
+        else:  
+            raise ValueError('The provided index must be a proper DatetimeIndex object')
+        
+        # metadata gap-filling. THis does not handle the edge case where the keys exist but the entries are None 
+        if 'time_name' not in metadata.keys():
+            metadata['time_name'] = ser.index.name 
+        if 'value_name' not in metadata.keys():
+            metadata['value_name'] = ser.name 
+        
+        return cls(time=time,value=ser.values, **metadata)
+                
+               
+        
+    
+   
+    # Alternate formulation
+    # def from_pandas(ser, metadata):
     #     time = tsutils.convert_datetime_index_to_time(ser.index, metadata['time_unit'], metadata['time_name'])
-    #     return cls(
-    #         time=time,
-    #         value=ser.to_numpy(),
-    #         time_name= metadata['time_name'] if metadata['time_name'] is not None else ser.index.name,
-    #         value_name=metadata['value_name'] if metadata['value_name'] is not None else ser.name,
-    #         **metadata,
-    #     )
-    
-    def __str__(self):
-        '''
-        Prints out the series in a table format and length of the series
-
-        Returns
-        -------
-        str
-            length of the timeseries.
-
-        '''
-        time_label, value_label = self.make_labels()
-
-        table = {
-            time_label: self.time,
-            value_label: self.value,
-        }
-
-        _ = print(tabulate(table, headers='keys'))
-        return f'Length: {np.size(self.time)}'
-    
-    def from_pandas(ser, metadata):
-        time = tsutils.convert_datetime_index_to_time(ser.index, metadata['time_unit'], metadata['time_name'])
-        ts = Series(value=ser.values, time=time,  
-                          time_name = metadata['time_name'] if metadata['time_name'] is not None else ser.index.name,
-                          time_unit = metadata['time_unit'],
-                          value_name=metadata['value_name'] if metadata['value_name'] is not None else ser.name,
-                          value_unit = metadata['value_unit'],
-                          label = ser.name
-                          )
-        return ts
+    #     ts = Series(value=ser.values, time=time,  
+    #                       time_name = metadata['time_name'] if metadata['time_name'] is not None else ser.index.name,
+    #                       time_unit = metadata['time_unit'],
+    #                       value_name=metadata['value_name'] if metadata['value_name'] is not None else ser.name,
+    #                       value_unit = metadata['value_unit'],
+    #                       label = ser.name
+    #                       )
+    #     return ts
         
     def to_pandas(self):
         ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
@@ -275,17 +268,7 @@ class Series:
         if not isinstance(result, pd.Series):
             raise ValueError('Given method does not return a pandas Series and cannot be applied')
         return self.from_pandas(result, metadata)
-
-    def __repr__(self):
-        ser = self.to_pandas()
-        d   = self.metadata
-        keys = ['dataset_name', 'label', 'archiveType', 'log']
-        metadata = {key: d[key] for key in keys if d[key] is not None}
-        time_label, value_label = self.make_labels()
-        ser2 = ser.set_axis(self.time)
-        ser2.rename(value_label, inplace=True)
-        ser2.rename_axis(time_label, inplace=True)
-        return f'{repr(ser2)}\n{pprint(metadata)}'   
+    
 
     def convert_time_unit(self, time_unit='ky BP', keep_log=False):
         ''' Convert the time units of the Series object
