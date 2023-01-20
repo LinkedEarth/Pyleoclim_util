@@ -35,6 +35,7 @@ from collections import namedtuple
 from copy import deepcopy
 import matplotlib.colors as mcolors
 import random
+import csv
 
 #from matplotlib import gridspec
 import warnings
@@ -179,36 +180,21 @@ class Series:
             self.lon = None # assign a default value to prevent bugs ?
             
         self.importedFrom = importedFrom
-        self.archiveType = archiveType  #TODO: implement a check on allowable values (take from LipdVerse + 'model' + 'modern obs')
+        self.archiveType = archiveType  #TODO: implement a check on allowable values (take from LipdVerse + 'model' + 'instrumental')
     
     def __repr__(self):
-        ser = self.to_pandas()
+        ser = self.to_pandas(paleo_style=True)
         d   = self.metadata
         keys = ['importedFrom', 'label', 'archiveType', 'log']
         metadata = {key: d[key] for key in keys if d[key] is not None}
-        time_label, value_label = self.make_labels()
-        ser2 = ser.set_axis(self.time)
-        ser2.rename(value_label, inplace=True)
-        ser2.rename_axis(time_label, inplace=True)
-        return f'{repr(ser2)}\n{pprint(metadata)}'   
+        #df = ser.to_frame()
+        return f'{pprint(metadata)}\n{repr(ser)}'   
        
     @property
     def datetime_index(self):
         datum, exponent, direction = tsutils.time_unit_to_datum_exp_dir(self.time_unit)
-        index = tsutils.time_to_datetime(self.time,datum, exponent, direction)
-        # if direction == 'prograde':
-        #     op = operator.add
-        # elif direction == 'retrograde':
-        #     op = operator.sub
-        # else:
-        #     raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
-
-        # timedelta = self.time * 10**exponent
-        # years = timedelta.astype('int')
-        # seconds = ((timedelta - timedelta.astype('int')) * tsutils.SECONDS_PER_YEAR).astype('timedelta64[s]')
-        
-        # np_times = op(op(int(datum), years).astype(str).astype('datetime64[s]'), seconds)
-        return pd.DatetimeIndex(index, name=self.time_name)
+        index = tsutils.time_to_datetime(self.time, datum, exponent, direction)
+        return pd.DatetimeIndex(index, name='datetime')
     
     @property
     def metadata(self):
@@ -257,10 +243,66 @@ class Series:
     #                       )
     #     return ts
         
-    def to_pandas(self):
-        ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
+    def to_pandas(self, paleo_style=False):
+        '''
+        Export to pandas Series
+
+        Parameters
+        ----------
+        paleo_style : boolean, optional
+            If True, will replace datetime with time and label columns with units . The default is False.
+
+        Returns
+        -------
+        ser : pd.Series representation of the pyleo.Series object
+
+        '''
         # Could be a dataclass instead?
+
+        ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
+        if paleo_style:
+            time_label, value_label = self.make_labels()
+            ser2 = ser.set_axis(self.time) # inplace was deprecated, so copy needed; pandas doc too terse to figure out use of "copy"
+            ser2.rename(value_label, inplace=True)
+            ser2.rename_axis(time_label, inplace=True)
+            ser = ser2 
         return ser
+    
+    def to_csv(self, append_metadata=True, path = '.'):
+        '''
+        Export Series to csv
+
+        Parameters
+        ----------
+        append_metadata : boolean, optional
+            DESCRIPTION. The default is True.
+            
+        path : str, optional
+            system path to save the file. Default is '.'
+
+        Returns
+        -------
+        None.
+
+        '''
+        filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
+        ser = self.to_pandas()
+        ser2 = ser.set_axis(self.time)
+        ser2.rename(value_label, inplace=True)
+        ser2.rename_axis(time_label, inplace=True)
+        
+        time_label, value_label = self.make_labels()
+        ser2 = ser.set_axis(self.time)
+        ser2.rename(value_label, inplace=True)
+        ser2.rename_axis(time_label, inplace=True)
+        # export Series object to CSV
+        ser.to_csv(path+'/'+filename, 
+                   header = True)
+        # export metadata
+        with open(path+'/'+filename, 'w', newline='') as csvfile:
+            md_wrtr = csv.writer(csvfile, delimiter=',')
+            md_wrtr.writerow('### Pyleoclim Series Metadata ###')
+            #md_wrtr.writerow(['Spam', 'Lovely Spam', 'Wonderful Spam'])
     
     def pandas_method(self, method):
         ser, metadata = self.to_pandas()
