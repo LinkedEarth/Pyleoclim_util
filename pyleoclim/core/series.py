@@ -138,7 +138,7 @@ class Series:
           
     '''
 
-    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None,
+    def __init__(self, time, value, time_unit, time_name=None, value_name=None,
                  value_unit=None, label=None, lat=None, lon=None, importedFrom=None,
                  archiveType = None, clean_ts=True, log=None, verbose=False):
         if log is None:
@@ -229,7 +229,18 @@ class Series:
                 
                
         
-    
+    def view(self):
+        '''
+        Generates a DataFrame version of the Series object, suitable for viewing in an IPython
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        '''
+        return self.to_pandas(paleo_style=True).to_frame()
+        
    
     # Alternate formulation
     # def from_pandas(ser, metadata):
@@ -286,23 +297,15 @@ class Series:
 
         '''
         filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
-        ser = self.to_pandas()
-        ser2 = ser.set_axis(self.time)
-        ser2.rename(value_label, inplace=True)
-        ser2.rename_axis(time_label, inplace=True)
-        
-        time_label, value_label = self.make_labels()
-        ser2 = ser.set_axis(self.time)
-        ser2.rename(value_label, inplace=True)
-        ser2.rename_axis(time_label, inplace=True)
+        ser = self.to_pandas(paleo_style=True)
         # export Series object to CSV
         ser.to_csv(path+'/'+filename, 
                    header = True)
         # export metadata
-        with open(path+'/'+filename, 'w', newline='') as csvfile:
+        with open(path+'/'+filename, 'a') as csvfile:
             md_wrtr = csv.writer(csvfile, delimiter=',')
-            md_wrtr.writerow('### Pyleoclim Series Metadata ###')
-            #md_wrtr.writerow(['Spam', 'Lovely Spam', 'Wonderful Spam'])
+            #md_wrtr.writerow('### Pyleoclim Series Metadata ###')
+            csvfile.close()
     
     def pandas_method(self, method):
         ser, metadata = self.to_pandas()
