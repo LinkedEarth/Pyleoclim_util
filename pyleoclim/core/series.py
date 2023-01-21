@@ -227,21 +227,6 @@ class Series:
         
         return cls(time=time,value=ser.values, **metadata)
                 
-               
-        
-    def view(self):
-        '''
-        Generates a DataFrame version of the Series object, suitable for viewing in an IPython
-
-        Returns
-        -------
-        TYPE
-            DESCRIPTION.
-
-        '''
-        return self.to_pandas(paleo_style=True).to_frame()
-        
-   
     # Alternate formulation
     # def from_pandas(ser, metadata):
     #     time = tsutils.convert_datetime_index_to_time(ser.index, metadata['time_unit'], metadata['time_name'])
@@ -314,7 +299,61 @@ class Series:
             raise ValueError('Given method does not return a pandas Series and cannot be applied')
         return self.from_pandas(result, metadata)
     
+    def equals(self,ts):
+        '''
+        Test whether two objects contain the same elements (data and metadata)
 
+        Parameters
+        ----------
+        ts : Series object
+           The target series for the comparison
+        Returns
+        -------
+        bool
+            Truth value of the proposition "the two series are identical"
+
+        '''
+        # check that the data are the same
+        same_data = self.to_pandas().equals(ts.to_pandas())
+        if not same_data:
+            print("Difference found among the 2 Series'' data")
+        # check that the metadata are the same
+        same_metadata = (self.metadata == ts.metadata)
+        if not same_metadata:
+            print("Difference found among the 2 Series'' metadata")
+        
+        return same_data & same_metadata 
+    
+    def view(self):
+        '''
+        Generates a DataFrame version of the Series object, suitable for viewing in an IPython or Jupyter Notebook
+
+        Returns
+        -------
+        pd.DataFrame
+        
+        Examples
+        --------
+        
+        Plot the HadCRUT5 Global Mean Surface Temperature
+
+            .. ipython:: python
+                :okwarning:
+                :okexcept:
+
+                import pyleoclim as pyleo
+                import pandas as pd
+                url = 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.annual.csv'
+                df = pd.read_csv(url)
+                time = df['Time']
+                gmst = df['Anomaly (deg C)']
+                ts = pyleo.Series(time=time,value=gmst, label = 'HadCRUT5', 
+                                  time_name='Time', time_unit = 'Year CE', value_name='GMST')
+                ts.view()
+        '''
+        return self.to_pandas(paleo_style=True).to_frame()
+    
+    
     def convert_time_unit(self, time_unit='ky BP', keep_log=False):
         ''' Convert the time units of the Series object
 
