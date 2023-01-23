@@ -138,9 +138,9 @@ class Series:
           
     '''
 
-    def __init__(self, time, value, time_unit, time_name=None, value_name=None,
-                 value_unit=None, label=None, lat=None, lon=None, importedFrom=None,
-                 archiveType = None, clean_ts=True, log=None, verbose=False):
+    def __init__(self, time, value, time_unit='years', time_name='time', 
+                 value_name=None, value_unit=None, label=None, lat=None, lon=None, 
+                 importedFrom=None, archiveType = None, clean_ts=True, log=None, verbose=False):
         if log is None:
             self.log = ()
             nlog = -1
