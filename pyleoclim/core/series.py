@@ -138,9 +138,16 @@ class Series:
           
     '''
 
-    def __init__(self, time, value, time_unit='years', time_name='time', 
+    def __init__(self, time, value, time_unit=None, time_name=None, 
                  value_name=None, value_unit=None, label=None, lat=None, lon=None, 
                  importedFrom=None, archiveType = None, clean_ts=True, log=None, verbose=False):
+        
+        # assign time metadata if they are not provided
+        if time_unit is None:
+            time_unit='years'
+        if time_name is None:    
+            time_name='time'
+        
         if log is None:
             self.log = ()
             nlog = -1
@@ -151,6 +158,7 @@ class Series:
         if clean_ts == True:
             value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
             self.log = self.log + ({nlog+1: 'clean_ts', 'applied': clean_ts, 'verbose': verbose},)
+
 
         self.time = np.array(time)
         self.value = np.array(value)

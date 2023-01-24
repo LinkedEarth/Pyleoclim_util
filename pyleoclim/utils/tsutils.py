@@ -84,13 +84,15 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None):
         warnings.warn(f'Time unit {time_unit} not recognized. Defaulting to years CE')
     
     # deal with statements about datum
-    if 'b2k' in time_unit.lower():
+
+    tu = time_unit.lower().strip('.') # make lowercase + stripm, so "B.P." --> "bp"
+    if 'b2k' in tu:
         datum = 2000
         direction = 'retrograde'
-    elif any(c in time_unit.lower() for c in ['bp', 'bnf']):
+    elif any(c in tu for c in ['bp', 'bnf', 'b1950']):
         datum = 1950
         direction = 'retrograde'
-    elif any(c in time_unit for c in ['AD', 'CE']):
+    elif any(c in tu for c in ['ad', 'ce']):
         datum = 0
         direction = 'prograde'
 
