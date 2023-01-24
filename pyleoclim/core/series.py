@@ -264,13 +264,13 @@ class Series:
             ser = ser2 
         return ser
     
-    def to_csv(self, append_metadata=True, path = '.'):
+    def to_csv(self, metadata_header=True, path = '.'):
         '''
         Export Series to csv
 
         Parameters
         ----------
-        append_metadata : boolean, optional
+        metadata_header : boolean, optional
             DESCRIPTION. The default is True.
             
         path : str, optional
@@ -283,14 +283,20 @@ class Series:
         '''
         filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
         ser = self.to_pandas(paleo_style=True)
-        # export Series object to CSV
-        ser.to_csv(path+'/'+filename, 
-                   header = True)
+        
+
         # export metadata
-        with open(path+'/'+filename, 'a') as csvfile:
-            md_wrtr = csv.writer(csvfile, delimiter=',')
-            #md_wrtr.writerow('### Pyleoclim Series Metadata ###')
-            csvfile.close()
+        if metadata_header:
+            with open(path+'/'+filename, 'a') as csvfile:
+                md_wrtr = csv.writer(csvfile, delimiter=',')
+                #md_wrtr.writerow('### Pyleoclim Series Metadata ###')
+                csvfile.close()
+            # export Series object to CSV
+            ser.to_csv(path+'/'+filename, mode = 'a', header = True)
+        else:
+            # export Series object to CSV
+            ser.to_csv(path+'/'+filename, header = True)
+        
     
     def pandas_method(self, method):
         ser, metadata = self.to_pandas()
