@@ -48,6 +48,11 @@ from .tsbase import (
 
 SECONDS_PER_YEAR = 365.25 * 60  * 60 * 24
 
+MATCH_A  = ['y', 'yr', 'yrs', 'year', 'years']
+MATCH_KA = ['ky', 'kyr', 'kyrs', 'kiloyear', 'ka'] 
+MATCH_MA = ['ma', 'my','myr','myrs']
+MATCH_GA = ['ga', 'gy', 'gyr', 'gyrs']
+
 def time_unit_to_datum_exp_dir(time_unit, time_name=None):
     # default in case nothing else is inferred
     exponent = 0  
@@ -58,25 +63,21 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None):
         if time_name.lower() == 'age':
             direction = 'retrograde'
     
-    match_a  = ['y', 'yr', 'yrs', 'year', 'years']
-    match_ka = ['ky', 'kyr', 'kyrs', 'kiloyear', 'ka'] 
-    match_Ma = ['ma', 'my','myr','myrs']
-    match_Ga = ['ga', 'gy', 'gyr', 'gyrs']
-    if any(c in time_unit.lower() for c in match_ka):
+    if time_unit.lower() in MATCH_KA:
         datum = 1950
         exponent = 3
         direction = 'retrograde'
-    elif any(c in time_unit.lower() for c in match_a):
+    elif time_unit.lower() in MATCH_A:
         exponent = 0
-    elif any(c in time_unit.lower() for c in ['yr BP', 'yrs BP', 'years BP']):
+    elif time_unit.lower() in ['yr BP', 'yrs BP', 'years BP']:
         datum = 1950
         exponent = 0
         direction = 'retrograde'
-    elif any(c in time_unit.lower() for c in match_Ma) :
+    elif time_unit.lower() in MATCH_MA:
         datum = 1950
         exponent = 6
         direction = 'retrograde'
-    elif any(c in time_unit.lower() for c in match_Ga):
+    elif time_unit.lower() in MATCH_GA:
         datum = 1950
         exponent = 9
         direction = 'retrograde'
@@ -116,7 +117,7 @@ def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
 
     return time
 
-def time_to_datetime(time, datum = 0,  exponent = 0, direction = 'prograde', unit = 's'):
+def time_to_datetime(time, datum=0, exponent=0, direction='prograde', unit='s'):
     '''
     Converts a vector of time values to a pandas datetime object
 
