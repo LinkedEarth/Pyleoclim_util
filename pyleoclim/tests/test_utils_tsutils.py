@@ -15,10 +15,14 @@ def test_time_unit_to_datum_exp_dir_unknown_time_unit():
 
     with pytest.warns(match='Time unit'):
         (datum, exponent, direction) = tsutils.time_unit_to_datum_exp_dir(time_unit, time_name='unknown')
+        assert datum == 0
+        assert exponent == 0
         assert direction == 'prograde'
 
     with pytest.warns(match='Time unit'):
         (datum, exponent, direction) = tsutils.time_unit_to_datum_exp_dir(time_unit, time_name='age')
+        assert datum == 0
+        assert exponent == 0
         assert direction == 'retrograde'   
 
 

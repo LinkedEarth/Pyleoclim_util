@@ -48,10 +48,10 @@ from .tsbase import (
 
 SECONDS_PER_YEAR = 365.25 * 60  * 60 * 24
 
-MATCH_A  = ['y', 'yr', 'yrs', 'year', 'years']
-MATCH_KA = ['ky', 'kyr', 'kyrs', 'kiloyear', 'ka'] 
-MATCH_MA = ['ma', 'my','myr','myrs']
-MATCH_GA = ['ga', 'gy', 'gyr', 'gyrs']
+MATCH_A  = frozenset(['y', 'yr', 'yrs', 'year', 'years'])
+MATCH_KA = frozenset(['ky', 'kyr', 'kyrs', 'kiloyear', 'ka']) 
+MATCH_MA = frozenset(['ma', 'my','myr','myrs'])
+MATCH_GA = frozenset(['ga', 'gy', 'gyr', 'gyrs'])
 
 def time_unit_to_datum_exp_dir(time_unit, time_name=None):
     # default in case nothing else is inferred
