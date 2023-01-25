@@ -1019,3 +1019,35 @@ class TestUISeriesSort:
         ts = pyleo.Series(t,v)
         ts.sort()
         assert np.all(np.diff(ts.time) >= 0)
+
+
+class TestResample:
+    @pytest.mark.parametrize('rule', pyleo.utils.tsutils.MATCH_A)
+    def test_resample_simple(self, rule, dataframe_dt):
+        # note: resample with large ranges is still not supported,
+        # so for now we're only testing 'years' as the rule
+        metadata = {'time_unit': 'years CE',
+            'time_name': 'Time',
+            'value_unit': 'mb',
+            'value_name': 'SOI',
+            'label': 'Southern Oscillation Index',
+            'lat': None,
+            'lon': None,
+            'archiveType': None,
+            'importedFrom': None,
+            'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},)
+        }
+        ser = dataframe_dt.loc[:, 0]
+        with pytest.warns(UserWarning, match='Time unit years CE not recognized. Defaulting to years CE'):
+            ts = pyleo.Series.from_pandas(ser, metadata)
+            result =ts.resample(rule).mean()
+            result_ser = result.to_pandas()
+        expected_values = np.array([0., 1., 2., 3., 4.])
+        expected_idx = pd.DatetimeIndex(['2018-12-30 23:59:59', '2019-12-30 23:59:59',
+               '2020-12-30 23:59:59', '2021-12-30 23:59:59',
+               '2022-12-30 23:59:59'], name='datetime').as_unit('s')
+        expected_ser = pd.Series(expected_values, expected_idx, name='SOI')
+        expected_metadata = {'time_unit': 'years CE', 'time_name': 'Time', 'value_unit': 'mb', 'value_name': 'SOI', 'label': 'Southern Oscillation Index', 'lat': None, 'lon': None, 'archiveType': None, 'importedFrom': None, 'log': ({0: 'clean_ts', 'applied': True, 'verbose': False}, {2: 'clean_ts', 'applied': True, 'verbose': False}, {3: 'clean_ts', 'applied': True, 'verbose': False})}
+        pd.testing.assert_series_equal(result_ser, expected_ser)
+        assert result.metadata == expected_metadata
+ 

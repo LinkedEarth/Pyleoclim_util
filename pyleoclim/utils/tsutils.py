@@ -76,7 +76,7 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None):
         exponent = 9
         direction = 'retrograde'
     else:
-        warnings.warn(f'Time unit {time_unit} not recognized. Defaulting to years CE')
+        warnings.warn(f'Time unit {time_unit} not recognized. Defaulting to years CE', stacklevel=4)
     
     # deal with statements about datum/direction
     tu = time_unit.lower().strip('.') # make lowercase + strip stops, so "B.P." --> "bp"

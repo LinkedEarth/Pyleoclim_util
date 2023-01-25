@@ -3951,3 +3951,45 @@ class Series:
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
         return res
+
+    def resample(self, rule, **kwargs):
+        import re
+        search = re.search(r'(\d*)([a-zA-Z]+)', rule)
+        if search is None:
+            raise ValueError(f"Invalid rule provided: got {rule}")
+        multiplier = search.group(1)
+        if multiplier == '':
+            multiplier = 1
+        else:
+            multiplier = int(multiplier)
+        unit = search.group(2)
+        print('multiplier: ', multiplier)
+        print('unit: ', unit)
+        if unit.lower() in tsutils.MATCH_A:
+            pass
+        elif unit.lower() in tsutils.MATCH_KA:
+            multiplier *= 1_000
+        elif unit.lower() in tsutils.MATCH_MA:
+            multiplier *= 1_000_000
+        elif unit.lower() in tsutils.MATCH_GA:
+            multiplier *= 1_000_000_000
+        else:
+            raise ValueError(f'Invalid unit received, got: {unit}')
+        ser = self.to_pandas()
+        return _SeriesResample(f'{multiplier}Y', ser, self.metadata, kwargs)
+
+
+class _SeriesResample:
+    def __init__(self, rule, series, metadata, kwargs):
+        self.rule = rule
+        self.series = series
+        self.metadata = metadata
+        self.kwargs = kwargs
+    
+    def __getattr__(self, attr):
+        attr = getattr(self.series.resample(self.rule, **self.kwargs), attr)
+        def foo(*args, **kwargs):
+            series = attr(*args, **kwargs)
+            from_pandas = Series.from_pandas(series, metadata=self.metadata)
+            return from_pandas
+        return foo
