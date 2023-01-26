@@ -334,7 +334,11 @@ class Series:
         # check that the metadata are the same
         same_metadata = (self.metadata == ts.metadata)
         if not same_metadata:
-            print("Difference found among the 2 Series'' metadata")
+            print("Difference found among the 2 Series'' metadata:")
+            for key in self.metadata:
+                if self.metadata.get(key) != ts.metadata.get(key):
+                    print(f"key {key}, left: {self.metadata.get(key)}, right: {ts.metadata.get(key)}")
+            
         
         return same_data & same_metadata 
     
