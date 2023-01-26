@@ -9,7 +9,7 @@ How to create and manipulate such objects is described in a short example below,
 
 import operator
 
-from ..utils import tsutils, plotting, tsmodel, tsbase, mapping, lipdutils
+from ..utils import tsutils, plotting, tsmodel, tsbase, mapping, lipdutils, jsonutils
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl # could also from matplotlib.colors import ColorbarBase
 import numpy as np
 import pandas as pd
-from tabulate import tabulate
+#from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
 import matplotlib.colors as mcolors
@@ -41,6 +41,8 @@ import csv
 import warnings
 import collections
 from pprint import pprint
+from importlib.metadata import version
+
 
 def dict2namedtuple(d):
     ''' Convert a dictionary to a namedtuple
@@ -138,9 +140,16 @@ class Series:
           
     '''
 
-    def __init__(self, time, value, time_unit='years', time_name='time', 
+    def __init__(self, time, value, time_unit=None, time_name=None, 
                  value_name=None, value_unit=None, label=None, lat=None, lon=None, 
                  importedFrom=None, archiveType = None, clean_ts=True, log=None, verbose=False):
+        
+        # assign time metadata if they are not provided
+        if time_unit is None:
+            time_unit='years'
+        if time_name is None:    
+            time_name='time'
+        
         if log is None:
             self.log = ()
             nlog = -1
@@ -151,6 +160,7 @@ class Series:
         if clean_ts == True:
             value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
             self.log = self.log + ({nlog+1: 'clean_ts', 'applied': clean_ts, 'verbose': verbose},)
+
 
         self.time = np.array(time)
         self.value = np.array(value)
@@ -264,13 +274,13 @@ class Series:
             ser = ser2 
         return ser
     
-    def to_csv(self, append_metadata=True, path = '.'):
+    def to_csv(self, metadata_header=True, path = '.'):
         '''
         Export Series to csv
 
         Parameters
         ----------
-        append_metadata : boolean, optional
+        metadata_header : boolean, optional
             DESCRIPTION. The default is True.
             
         path : str, optional
@@ -283,14 +293,92 @@ class Series:
         '''
         filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
         ser = self.to_pandas(paleo_style=True)
-        # export Series object to CSV
-        ser.to_csv(path+'/'+filename, 
-                   header = True)
+
         # export metadata
-        with open(path+'/'+filename, 'a') as csvfile:
-            md_wrtr = csv.writer(csvfile, delimiter=',')
-            #md_wrtr.writerow('### Pyleoclim Series Metadata ###')
-            csvfile.close()
+        if metadata_header:
+            with open(path+'/'+filename, 'w', newline='')  as file:       
+                hd_writer = csv.writer(file)
+                hd_writer.writerow(["###", "Series metadata"])
+                hd_writer.writerow(["written by", "Pyleoclim " + version('Pyleoclim')])
+                hd_writer.writerows(self.metadata.items())
+                hd_writer.writerow(["###", "end metadata"])
+                #file.close()
+            # export Series object to CSV
+            ser.to_csv(path+'/'+filename, mode = 'a', header = True)
+        else:
+            # export Series object to CSV
+            ser.to_csv(path+'/'+filename, header = True)
+    
+    @classmethod    
+    def from_csv(cls, filename, path = '.'):
+        '''
+        Read in Series object from CSV file. Expects a metadata header 
+        dealineated by '###' lines, as written by the Series.to_csv() method. 
+
+        Parameters
+        ----------
+        filename : str
+            name of the file, e.g. 'myrecord.csv'
+        path : str
+            DESCRIPTION.
+
+        Returns
+        -------
+        Series
+            DESCRIPTION.
+
+        '''
+        
+        # read in metadata header
+        with open(path + '/' + filename, 'r')  as file: 
+            # look for ### pattern to figure out header size
+            # construct metadata dictionary
+            
+        df = pd.read_csv(path, header=?)
+        # export to Series. 
+        return cls(time=ser.time,value=ser.values, **metadata)
+    
+    def to_json(self, path =None):
+        """
+        Export the pyleoclim.Series object to a json file
+
+        Parameters
+        ----------
+        path : string, optional
+            The path to the file. The default is None, resulting in a file saved in the current working directory using the label for the dataset as filename if available or 'series.json' if label is not provided.
+
+        Returns
+        -------
+        None.
+        
+        Examples
+        --------
+
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            import pyleoclim as pyleo
+            import pandas as pd
+
+            url = 'https://raw.githubusercontent.com/LinkedEarth/PyleoTutorials/main/data/wtc_test_data_nino_even.csv'
+            data=pd.read_csv(url)
+            
+            ts_nino = pyleo.Series(time =  data['t'], value = data['nino'], label = 'Kaplan Niño3 SST',
+                              time_name = 'Year', value_name = 'NINO3 index',
+                              time_unit = 'CE',   value_unit = '$^{\circ}$C')            
+            
+            ts_nino.to_json('Nino.json')
+
+        """
+        
+        if path is None:        
+            path = self.label.replace(" ", "_") + '.json' if self.label is not None else 'series.json' 
+        
+        jsonutils.PyleoObj_to_json(self, path)
+        
+        
     
     def pandas_method(self, method):
         ser, metadata = self.to_pandas()
@@ -320,7 +408,11 @@ class Series:
         # check that the metadata are the same
         same_metadata = (self.metadata == ts.metadata)
         if not same_metadata:
-            print("Difference found among the 2 Series'' metadata")
+            print("Difference found among the 2 Series'' metadata:")
+            for key in self.metadata:
+                if self.metadata.get(key) != ts.metadata.get(key):
+                    print(f"key {key}, left: {self.metadata.get(key)}, right: {ts.metadata.get(key)}")
+            
         
         return same_data & same_metadata 
     

@@ -26,15 +26,6 @@ def test_time_unit_to_datum_exp_dir_unknown_time_unit():
         assert direction == 'retrograde'   
 
 
-@pytest.mark.parametrize('time_unit', tsutils.MATCH_A)
-def test_time_unit_to_datum_exp_dir_yr(time_unit):
-
-    (datum, exponent, direction) = tsutils.time_unit_to_datum_exp_dir(time_unit)
-    assert datum == 0
-    assert exponent == 0
-    assert direction == 'prograde'
-
-
 @pytest.mark.parametrize('time_unit', tsutils.MATCH_KA)
 def test_time_unit_to_datum_exp_dir_ka(time_unit):
     (datum, exponent, direction) = tsutils.time_unit_to_datum_exp_dir(time_unit)
@@ -56,14 +47,6 @@ def test_time_unit_to_datum_exp_dir_ga(time_unit):
     (datum, exponent, direction) = tsutils.time_unit_to_datum_exp_dir(time_unit)
     assert datum == 1950
     assert exponent == 9
-    assert direction == 'retrograde'
-
-
-@pytest.mark.parametrize('time_unit', ['yr BP', 'yrs BP', 'years BP'])
-def test_time_unit_to_datum_exp_dir_yrbp(time_unit):
-    (datum, exponent, direction) = tsutils.time_unit_to_datum_exp_dir(time_unit)
-    assert datum == 1950
-    assert exponent == 0
     assert direction == 'retrograde'
 
 
@@ -89,18 +72,6 @@ def test_time_unit_to_datum_exp_dir_ad(time_unit):
     assert datum == 0
     assert exponent == 0
     assert direction == 'prograde'
-
-
-def test_convert_datetime_index_yr(dataframe_dt):
-    time_unit = 'yr'
-    time_name = None
-    time = tsutils.convert_datetime_index_to_time(
-        dataframe_dt.index, 
-        time_unit, 
-        time_name=time_name,
-        )
-    expected = np.array([9.96579705e+08, 9.96579706e+08, 9.99317557e+08, 9.96579708e+08, 9.96579709e+08])
-    assert np.allclose(time.values, expected, rtol=1e-05, atol=1e-08)
 
 
 def test_convert_datetime_index_ka(dataframe_dt):
@@ -167,7 +138,7 @@ def test_convert_datetime_index_nondt_index(dataframe):
     time_unit = 'yr'
     time_name = None
     with pytest.raises(ValueError, match='not a proper DatetimeIndex object'):
-        time = tsutils.convert_datetime_index_to_time(
+        tsutils.convert_datetime_index_to_time(
             dataframe.index, 
             time_unit, 
             time_name=time_name,

@@ -49,7 +49,7 @@ from .tsbase import (
 SECONDS_PER_YEAR = 365.25 * 60  * 60 * 24
 
 MATCH_A  = frozenset(['y', 'yr', 'yrs', 'year', 'years'])
-MATCH_KA = frozenset(['ky', 'kyr', 'kyrs', 'kiloyear', 'ka']) 
+MATCH_KA = frozenset(['ky', 'kyr', 'kyrs', 'kiloyear', 'kiloyr', 'kiloyrs', 'ka']) 
 MATCH_MA = frozenset(['ma', 'my','myr','myrs'])
 MATCH_GA = frozenset(['ga', 'gy', 'gyr', 'gyrs'])
 
@@ -62,16 +62,10 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None):
     if time_name is not None:
         if time_name.lower() == 'age':
             direction = 'retrograde'
-    
+
     if time_unit.lower() in MATCH_KA:
         datum = 1950
         exponent = 3
-        direction = 'retrograde'
-    elif time_unit.lower() in MATCH_A:
-        exponent = 0
-    elif time_unit.lower() in ['yr BP', 'yrs BP', 'years BP']:
-        datum = 1950
-        exponent = 0
         direction = 'retrograde'
     elif time_unit.lower() in MATCH_MA:
         datum = 1950
@@ -85,13 +79,14 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None):
         warnings.warn(f'Time unit {time_unit} not recognized. Defaulting to years CE')
     
     # deal with statements about datum
-    if 'b2k' in time_unit.lower():
+    tu = time_unit.lower().strip('.') # make lowercase + strip stops, so "B.P." --> "bp"
+    if 'b2k' in tu:
         datum = 2000
         direction = 'retrograde'
-    elif any(c in time_unit.lower() for c in ['bp', 'bnf']):
+    elif any(c in tu for c in ['bp', 'bnf', 'b1950']):
         datum = 1950
         direction = 'retrograde'
-    elif any(c in time_unit for c in ['AD', 'CE']):
+    elif any(c in tu for c in ['ad', 'ce']):
         datum = 0
         direction = 'prograde'
 
