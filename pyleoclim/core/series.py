@@ -7,7 +7,9 @@ The Series class describes the most basic objects in Pyleoclim. A Series is a si
 How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
 """
 
-from ..utils import tsutils, plotting, tsmodel, tsbase
+import operator
+
+from ..utils import tsutils, plotting, tsmodel, tsbase, mapping, lipdutils, jsonutils
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
@@ -28,16 +30,20 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl # could also from matplotlib.colors import ColorbarBase
 import numpy as np
 import pandas as pd
-from tabulate import tabulate
+#from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
 import matplotlib.colors as mcolors
 import matplotlib.colorbar as mcb
 import random
+import csv
 
-from matplotlib import gridspec
+#from matplotlib import gridspec
 import warnings
 import collections
+from pprint import pprint
+from importlib.metadata import version
+
 
 def dict2namedtuple(d):
     ''' Convert a dictionary to a namedtuple
@@ -91,6 +97,19 @@ class Series:
         Default is True
 
     log : dict
+        Dictionary of tuples documentating the various transformations applied to the object
+        
+    lat : float
+        latitude N in decimal degrees.
+        
+    lon : float
+        longitude East in decimal degrees. Negative values will be converted to an angle in [0 , 360)
+                                                                                             
+    importedFrom : string
+        source of the dataset. If it came from a LiPD file, this could be the datasetID property 
+
+    archiveType : string
+        climate archive, one of                                                                                     
 
     If keep_log is set to True, then a log of the transformations made to the timeseries will be kept.
 
@@ -100,7 +119,7 @@ class Series:
     Examples
     --------
 
-    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a Series object.
+    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a Series object, then display a quick synopsis.
 
     .. ipython:: python
         :okwarning:
@@ -119,21 +138,19 @@ class Series:
             time_name='Year (CE)', value_name='SOI', label='Southern Oscillation Index'
         )
         ts
-        ts.__dict__.keys()
-
-    For a quick look at the values, one may use the `print()` method. We do so below for a short slice of the data so as not to overwhelm the display:
-
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
-
-        print(ts.slice([1982,1983]))
-
+          
     '''
 
-    def __init__(self, time, value, time_name=None, time_unit=None, value_name=None,
-                 value_unit=None, label=None, mean=None, clean_ts=True, log=None, verbose=False):
-        # TODO: remove mean argument once it's safe to do so
+    def __init__(self, time, value, time_unit=None, time_name=None, 
+                 value_name=None, value_unit=None, label=None, lat=None, lon=None, 
+                 importedFrom=None, archiveType = None, clean_ts=True, log=None, verbose=False):
+        
+        # assign time metadata if they are not provided
+        if time_unit is None:
+            time_unit='years'
+        if time_name is None:    
+            time_name='time'
+        
         if log is None:
             self.log = ()
             nlog = -1
@@ -145,6 +162,7 @@ class Series:
             value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
             self.log = self.log + ({nlog+1: 'clean_ts', 'applied': clean_ts, 'verbose': verbose},)
 
+
         self.time = np.array(time)
         self.value = np.array(value)
         self.time_name = time_name
@@ -152,16 +170,285 @@ class Series:
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
-        #self.clean_ts=clean_ts
-        #self.verbose=verbose
-
-        if mean is None:
-            self.mean=np.mean(self.value)
+        # assign latitude
+        if lat is not None:
+            if -90 <= lat <= 90: 
+                self.lat = lat
+            else:
+                ValueError('Latitude must be a number in [-90; 90]')
         else:
-            self.mean = mean
+            self.lat = None # assign a default value to prevent bugs ?
+            
+        # assign longitude
+        if lon is not None:
+            if 0 <= lon < 360:     
+                self.lon = lon
+            elif -180 <= lon < 0:
+                self.lon = 360 - lon
+            else:
+                ValueError('Longitude must be a number in [-180,360]')
+        else:
+            self.lon = None # assign a default value to prevent bugs ?
+            
+        self.importedFrom = importedFrom
+        self.archiveType = archiveType  #TODO: implement a check on allowable values (take from LipdVerse + 'model' + 'instrumental')
+    
+    def __repr__(self):
+        ser = self.to_pandas(paleo_style=True)
+        d   = self.metadata
+        keys = ['importedFrom', 'label', 'archiveType', 'log']
+        metadata = {key: d[key] for key in keys if d[key] is not None}
+        #df = ser.to_frame()
+        return f'{pprint(metadata)}\n{repr(ser)}'   
+       
+    @property
+    def datetime_index(self):
+        datum, exponent, direction = tsutils.time_unit_to_datum_exp_dir(self.time_unit)
+        index = tsutils.time_to_datetime(self.time, datum, exponent, direction)
+        return pd.DatetimeIndex(index, name='datetime')
+    
+    @property
+    def metadata(self):
+        return dict(
+            time_unit = self.time_unit,
+            time_name = self.time_name,
+            value_unit = self.value_unit,
+            value_name = self.value_name,
+            label = self.label,
+            lat = self.lat,
+            lon = self.lon,
+            archiveType = self.archiveType,
+            importedFrom = self.importedFrom,
+            log = self.log
+        )
+    
+    @classmethod
+    def from_pandas(cls, ser, metadata):
+        if isinstance(ser.index, pd.DatetimeIndex):
+            index = ser.index.as_unit('s') if ser.index.unit != 's' else ser.index  
+            time = tsutils.convert_datetime_index_to_time(index, metadata['time_unit'], metadata['time_name'])
+        else:  
+            raise ValueError('The provided index must be a proper DatetimeIndex object')
+        
+        # metadata gap-filling. THis does not handle the edge case where the keys exist but the entries are None 
+        if 'time_name' not in metadata.keys():
+            metadata['time_name'] = ser.index.name 
+        if 'value_name' not in metadata.keys():
+            metadata['value_name'] = ser.name 
+        
+        return cls(time=time,value=ser.values, **metadata)
+                
+    # Alternate formulation
+    # def from_pandas(ser, metadata):
+    #     time = tsutils.convert_datetime_index_to_time(ser.index, metadata['time_unit'], metadata['time_name'])
+    #     ts = Series(value=ser.values, time=time,  
+    #                       time_name = metadata['time_name'] if metadata['time_name'] is not None else ser.index.name,
+    #                       time_unit = metadata['time_unit'],
+    #                       value_name=metadata['value_name'] if metadata['value_name'] is not None else ser.name,
+    #                       value_unit = metadata['value_unit'],
+    #                       label = ser.name
+    #                       )
+    #     return ts
+        
+    def to_pandas(self, paleo_style=False):
+        '''
+        Export to pandas Series
 
-    def convert_time_unit(self, time_unit='years', keep_log=False):
-        ''' Convert the time unit of the Series object
+        Parameters
+        ----------
+        paleo_style : boolean, optional
+            If True, will replace datetime with time and label columns with units . The default is False.
+
+        Returns
+        -------
+        ser : pd.Series representation of the pyleo.Series object
+
+        '''
+        # Could be a dataclass instead?
+
+        ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
+        if paleo_style:
+            time_label, value_label = self.make_labels()
+            ser2 = ser.set_axis(self.time) # inplace was deprecated, so copy needed; pandas doc too terse to figure out use of "copy"
+            ser2.rename(value_label, inplace=True)
+            ser2.rename_axis(time_label, inplace=True)
+            ser = ser2 
+        return ser
+    
+    def to_csv(self, metadata_header=True, path = '.'):
+        '''
+        Export Series to csv
+
+        Parameters
+        ----------
+        metadata_header : boolean, optional
+            DESCRIPTION. The default is True.
+            
+        path : str, optional
+            system path to save the file. Default is '.'
+
+        Returns
+        -------
+        None.
+
+        '''
+        filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
+        ser = self.to_pandas(paleo_style=True)
+
+        # export metadata
+        if metadata_header:
+            with open(path+'/'+filename, 'w', newline='')  as file:       
+                hd_writer = csv.writer(file)
+                hd_writer.writerow(["###", "Series metadata"])
+                hd_writer.writerow(["written by", "Pyleoclim " + version('Pyleoclim')])
+                hd_writer.writerows(self.metadata.items())
+                hd_writer.writerow(["###", "end metadata"])
+                #file.close()
+            # export Series object to CSV
+            ser.to_csv(path+'/'+filename, mode = 'a', header = True)
+        else:
+            # export Series object to CSV
+            ser.to_csv(path+'/'+filename, header = True)
+    
+    @classmethod    
+    def from_csv(cls, filename, path = '.'):
+        '''
+        Read in Series object from CSV file. Expects a metadata header 
+        dealineated by '###' lines, as written by the Series.to_csv() method. 
+
+        Parameters
+        ----------
+        filename : str
+            name of the file, e.g. 'myrecord.csv'
+        path : str
+            DESCRIPTION.
+
+        Returns
+        -------
+        Series
+            DESCRIPTION.
+
+        '''
+        
+        # read in metadata header
+        with open(path + '/' + filename, 'r')  as file: 
+            # look for ### pattern to figure out header size
+            # construct metadata dictionary
+            
+        df = pd.read_csv(path, header=?)
+        # export to Series. 
+        return cls(time=ser.time,value=ser.values, **metadata)
+    
+    def to_json(self, path =None):
+        """
+        Export the pyleoclim.Series object to a json file
+
+        Parameters
+        ----------
+        path : string, optional
+            The path to the file. The default is None, resulting in a file saved in the current working directory using the label for the dataset as filename if available or 'series.json' if label is not provided.
+
+        Returns
+        -------
+        None.
+        
+        Examples
+        --------
+
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            import pyleoclim as pyleo
+            import pandas as pd
+
+            url = 'https://raw.githubusercontent.com/LinkedEarth/PyleoTutorials/main/data/wtc_test_data_nino_even.csv'
+            data=pd.read_csv(url)
+            
+            ts_nino = pyleo.Series(time =  data['t'], value = data['nino'], label = 'Kaplan Niño3 SST',
+                              time_name = 'Year', value_name = 'NINO3 index',
+                              time_unit = 'CE',   value_unit = '$^{\circ}$C')            
+            
+            ts_nino.to_json('Nino.json')
+
+        """
+        
+        if path is None:        
+            path = self.label.replace(" ", "_") + '.json' if self.label is not None else 'series.json' 
+        
+        jsonutils.PyleoObj_to_json(self, path)
+        
+        
+    
+    def pandas_method(self, method):
+        ser, metadata = self.to_pandas()
+        result = method(ser)
+        if not isinstance(result, pd.Series):
+            raise ValueError('Given method does not return a pandas Series and cannot be applied')
+        return self.from_pandas(result, metadata)
+    
+    def equals(self,ts):
+        '''
+        Test whether two objects contain the same elements (data and metadata)
+
+        Parameters
+        ----------
+        ts : Series object
+           The target series for the comparison
+        Returns
+        -------
+        bool
+            Truth value of the proposition "the two series are identical"
+
+        '''
+        # check that the data are the same
+        same_data = self.to_pandas().equals(ts.to_pandas())
+        if not same_data:
+            print("Difference found among the 2 Series'' data")
+        # check that the metadata are the same
+        same_metadata = (self.metadata == ts.metadata)
+        if not same_metadata:
+            print("Difference found among the 2 Series'' metadata:")
+            for key in self.metadata:
+                if self.metadata.get(key) != ts.metadata.get(key):
+                    print(f"key {key}, left: {self.metadata.get(key)}, right: {ts.metadata.get(key)}")
+            
+        
+        return same_data & same_metadata 
+    
+    def view(self):
+        '''
+        Generates a DataFrame version of the Series object, suitable for viewing in an IPython or Jupyter Notebook
+
+        Returns
+        -------
+        pd.DataFrame
+        
+        Examples
+        --------
+        
+        Plot the HadCRUT5 Global Mean Surface Temperature
+
+            .. ipython:: python
+                :okwarning:
+                :okexcept:
+
+                import pyleoclim as pyleo
+                import pandas as pd
+                url = 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.annual.csv'
+                df = pd.read_csv(url)
+                time = df['Time']
+                gmst = df['Anomaly (deg C)']
+                ts = pyleo.Series(time=time,value=gmst, label = 'HadCRUT5', 
+                                  time_name='Time', time_unit = 'Year CE', value_name='GMST')
+                ts.view()
+        '''
+        return self.to_pandas(paleo_style=True).to_frame()
+    
+    
+    def convert_time_unit(self, time_unit='ky BP', keep_log=False):
+        ''' Convert the time units of the Series object
 
         Parameters
         ----------
@@ -208,80 +495,22 @@ class Series:
             tu = time_unit.lower()
             if tu.find('ky')>=0 or tu.find('ka')>=0:
                 time_unit_label = 'ky BP'
-            elif tu.find('my')>=0 or tu.find('ma')>=0:
-                time_unit_label = 'my BP'
+                time_name = 'Age'
+            elif tu.find('My')>=0 or tu.find('Ma')>=0:
+                time_unit_label = 'My BP'
+                time_name = 'Age'
             elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
                 time_unit_label = 'yrs BP'
+                time_name = 'Age'
             elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0:
                 time_unit_label = 'yrs'
+                time_name = 'Time'
             else:
                 raise ValueError(f"Input time_unit={time_unit} is not supported. Supported input: 'year', 'years', 'yr', 'yrs', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
         else:
             return new_ts
 
-        def convert_to_years():
-            def prograde_time(time, time_datum, time_exponent):
-                new_time = (time_datum + time)*10**(time_exponent)
-                return new_time
-
-            def retrograde_time(time, time_datum, time_exponent):
-                new_time = (time_datum - time)*10**(time_exponent)
-                return new_time
-
-            convert_func = {
-                'prograde': prograde_time,
-                'retrograde': retrograde_time,
-            }
-            if self.time_unit is not None:
-                tu = self.time_unit.lower()
-                if tu.find('ky')>=0 or tu.find('ka')>=0:
-                    time_dir = 'retrograde'
-                    time_datum = 1950/1e3
-                    time_exponent = 3
-                elif tu.find('my')>=0 or tu.find('ma')>=0:
-                    time_dir = 'retrograde'
-                    time_datum = 1950/1e6
-                    time_exponent = 6
-                elif tu.find('y bp')>=0 or tu.find('yr bp')>=0 or tu.find('yrs bp')>=0 or tu.find('year bp')>=0 or tu.find('years bp')>=0:
-                    time_dir ='retrograde'
-                    time_datum = 1950
-                    time_exponent = 0
-                elif tu.find('yr')>=0 or tu.find('year')>=0 or tu.find('yrs')>=0 or tu.find('years')>=0:
-                    time_dir ='prograde'
-                    time_datum = 0
-                    time_exponent = 0
-                else:
-                    raise ValueError(f"Current Series time_unit={self.time_unit} is not supported. Supported time units are: 'year', 'years', 'yr', 'yrs', 'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP', 'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'my BP', 'myr BP', 'myrs BP', 'ma BP'.")
-
-                new_time = convert_func[time_dir](self.time, time_datum, time_exponent)
-            else:
-                new_time = None
-
-            return new_time
-
-        def convert_to_bp():
-            time_yrs = convert_to_years()
-            time_bp = 1950 - time_yrs
-            return time_bp
-
-        def convert_to_ka():
-            time_bp = convert_to_bp()
-            time_ka = time_bp / 1e3
-            return time_ka
-
-        def convert_to_ma():
-            time_bp = convert_to_bp()
-            time_ma = time_bp / 1e6
-            return time_ma
-
-        convert_to = {
-            'yrs': convert_to_years(),
-            'yrs BP': convert_to_bp(),
-            'ky BP': convert_to_ka(),
-            'my BP': convert_to_ma(),
-        }
-
-        new_time = convert_to[time_unit_label]
+        new_time = tsutils.convert_datetime_index_to_time(self.datetime_index, time_unit_label, time_name)
 
         dt = np.diff(new_time)
         if any(dt<=0):
@@ -292,6 +521,7 @@ class Series:
         new_ts.time = new_time
         new_ts.value = new_value
         new_ts.time_unit = time_unit
+        new_ts.time_name = time_name
 
         if keep_log == True:
             new_ts.log += ({len(new_ts.log):'convert_time_unit', 'time_unit': time_unit},)
@@ -332,26 +562,6 @@ class Series:
 
         return time_header, value_header
 
-    def __str__(self):
-        '''
-        Prints out the series in a table format and length of the series
-
-        Returns
-        -------
-        str
-            length of the timeseries.
-
-        '''
-        time_label, value_label = self.make_labels()
-
-        table = {
-            time_label: self.time,
-            value_label: self.value,
-        }
-
-        _ = print(tabulate(table, headers='keys'))
-        return f'Length: {np.size(self.time)}'
-
     def stats(self):
         """ Compute basic statistics from a Series
 
@@ -389,7 +599,7 @@ class Series:
               'std':std,
               'IQR': IQR}
         return res
-    
+
     def flip(self, axis='value', keep_log = False):
         '''
         Flips the Series along one or both axes
@@ -400,7 +610,7 @@ class Series:
             The axis along which the Series will be flipped. The default is 'value'.
             Other acceptable options are 'time' or 'both'.
             TODO: enable time flipping after paleopandas is released
-            
+
         keep_log : Boolean
             if True, adds this transformation to the series log.
 
@@ -408,10 +618,10 @@ class Series:
         -------
         new : Series
             The flipped series object
-            
+
         Examples
         --------
-        
+
          .. ipython:: python
              :okwarning:
              :okexcept:
@@ -432,20 +642,20 @@ class Series:
             methods = [self.log[idx][idx] for idx in range(len(self.log))]
             if 'flip' in methods:
                 warnings.warn("this Series' log indicates that it has previously been flipped")
-        
+
         new = self.copy()
-        
+
         if axis == 'value':
             new.value = - self.value
             new.value_name = new.value_name + ' x (-1)'
         else:
             print('Flipping is only enabled along the value axis for now')
-            
+
         if keep_log == True:
             new.log += ({len(new.log): 'flip', 'applied': True, 'axis': axis},)
-            
+
         return new
-    
+
     def plot(self, figsize=[10, 4],
               marker=None, markersize=None, color=None,
               linestyle=None, linewidth=None, xlim=None, ylim=None,
@@ -744,8 +954,8 @@ class Series:
                 @savefig hadCRUT5_stripes2.png
                 fig, ax = ts.stripes(ref_period=(1971,2000), show_xaxis=True, figsize=[8, 1.2])
                 pyleo.closefig(fig)
-                
-        Note that we had to increase the figure height to make space for the extra text.  
+
+        Note that we had to increase the figure height to make space for the extra text.
         '''
 
         if top_label is None:
@@ -872,7 +1082,7 @@ class Series:
             fig, ax = nino_ssa.screeplot()
             pyleo.closefig(fig)
 
-        
+
         This highlights a few common phenomena with SSA:
             * the eigenvalues are in descending order
             * their uncertainties are proportional to the eigenvalues themselves
@@ -1869,7 +2079,7 @@ class Series:
 
         Parameters
         ----------
-        
+
         verbose : bool
             If True, will print warning messages if there is any
 
@@ -1878,7 +2088,7 @@ class Series:
 
         Returns
         -------
-        
+
         new : Series
             Series object with removed NaNs and sorting
 
@@ -1928,7 +2138,7 @@ class Series:
 
         keep_log : Boolean
             if True, adds this transformation to the series log.
-            
+
         References
         ----------
         Emile-Geay, J., and M. Tingley (2016), Inferring climate variability from nonlinear proxies: application to palaeo-enso studies, Climate of the Past, 12 (1), 31–50, doi:10.5194/cp- 12-31-2016.
@@ -2966,7 +3176,7 @@ class Series:
         --------
 
         pyleoclim.utils.correlation.corr_sig : Correlation function
-        
+
         pyleoclim.multipleseries.common_time : Aligning time axes
 
 
@@ -3544,3 +3754,179 @@ class Series:
         if keep_log == True:
             new.log += ({len(new.log):'bin', 'args': kwargs},)
         return new
+
+    def map(self, projection='Orthographic', proj_default=True,
+            background=True, borders=False, rivers=False, lakes=False,
+            figsize=None, ax=None, marker=None, color=None,
+            markersize=None, scatter_kwargs=None,
+            legend=True, lgd_kwargs=None, savefig_settings=None):
+        '''Map the location of the record
+
+        Parameters
+        ----------
+        projection : str, optional
+
+            The projection to use. The default is 'Robinson'.
+
+        proj_default : bool; {True, False}, optional
+
+            Whether to use the Pyleoclim defaults for each projection type. The default is True.
+
+        background :  bool; {True, False}, optional
+
+            Whether to use a background. The default is True.
+
+        borders :  bool; {True, False}, optional
+
+            Draw borders. The default is False.
+
+        rivers :  bool; {True, False}, optional
+
+            Draw rivers. The default is False.
+
+        lakes :  bool; {True, False}, optional
+
+            Draw lakes. The default is False.
+
+        figsize : list or tuple, optional
+
+            The size of the figure. The default is None.
+
+        ax : matplotlib.ax, optional
+
+            The matplotlib axis onto which to return the map. The default is None.
+
+        marker : str, optional
+
+            The marker type for each archive. The default is None. Uses plot_default
+
+        color : str, optional
+
+            Color for each archive. The default is None. Uses plot_default
+
+        markersize : float, optional
+
+            Size of the marker. The default is None.
+
+        scatter_kwargs : dict, optional
+
+            Parameters for the scatter plot. The default is None.
+
+        legend :  bool; {True, False}, optional
+
+            Whether to plot the legend. The default is True.
+
+        lgd_kwargs : dict, optional
+
+            Arguments for the legend. The default is None.
+
+        savefig_settings : dict, optional
+
+            the dictionary of arguments for plt.savefig(); some notes below:
+            - "path" must be specified; it can be any existed or non-existed path,
+              with or without a suffix; if the suffix is not given in "path", it will follow "format"
+            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
+
+        Returns
+        -------
+
+        res : fig,ax
+
+        See also
+        --------
+
+        pyleoclim.utils.mapping.map : Underlying mapping function for Pyleoclim
+
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
+            data = pyleo.Lipd(usr_path = url)
+            ts = data.to_LipdSeries(number=5)
+            @savefig mapone.png
+            fig, ax = ts.map()
+            pyleo.closefig(fig)
+
+        '''
+        scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
+        # get the information from the timeseries
+
+        if self.lat is None or self.lon is None:
+            raise ValueError('Latitude and longitude should be provided for mapping')
+        else:
+            lat = [self.lat]
+            lon = [self.lon]
+
+        if self.archiveType is None:
+            archiveType = 'other'
+        else:
+            archiveType = lipdutils.LipdToOntology(self.archiveType).lower().replace(" ", "")
+
+        if markersize is not None:
+            scatter_kwargs.update({'s': markersize})
+
+        plot_default = plotting.set_archive_color(archiveType)
+
+        if marker == None:
+            marker = plot_default[1]
+
+        if color == None:
+            color = plot_default[0]
+
+        if proj_default == True:
+            proj1 = {'central_latitude': lat[0],
+                     'central_longitude': lon[0]}
+            proj2 = {'central_latitude': lat[0]}
+            proj3 = {'central_longitude': lon[0]}
+
+        archiveType = [archiveType]  # list so it will work with map
+        marker = [marker]
+        color = [color]
+
+        if proj_default == True:
+
+            try:
+                res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+                                  marker=marker, color=color,
+                                  projection=projection, proj_default=proj1,
+                                  background=background, borders=borders,
+                                  rivers=rivers, lakes=lakes,
+                                  figsize=figsize, ax=ax,
+                                  scatter_kwargs=scatter_kwargs, legend=legend,
+                                  lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings, )
+
+            except:
+                try:
+                    res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+                                      marker=marker, color=color,
+                                      projection=projection, proj_default=proj3,
+                                      background=background, borders=borders,
+                                      rivers=rivers, lakes=lakes,
+                                      figsize=figsize, ax=ax,
+                                      scatter_kwargs=scatter_kwargs, legend=legend,
+                                      lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
+                except:
+                    res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+                                      marker=marker, color=color,
+                                      projection=projection, proj_default=proj2,
+                                      background=background, borders=borders,
+                                      rivers=rivers, lakes=lakes,
+                                      figsize=figsize, ax=ax,
+                                      scatter_kwargs=scatter_kwargs, legend=legend,
+                                      lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
+
+        else:
+            res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
+                              marker=marker, color=color,
+                              projection=projection, proj_default=proj_default,
+                              background=background, borders=borders,
+                              rivers=rivers, lakes=lakes,
+                              figsize=figsize, ax=ax,
+                              scatter_kwargs=scatter_kwargs, legend=legend,
+                              lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
+        return res

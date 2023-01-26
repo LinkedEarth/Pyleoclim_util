@@ -1,0 +1,20 @@
+soi:
+  filename: 'soi_data'
+  file_extension: 'csv'
+  pandas_kwargs:
+    skiprows: 0
+    header: 1
+  pyleo_kwargs:
+    time_name: 'Year (CE)'
+    value_name: 'SOI'
+    label: 'Southern Oscillation Index'
+  time_column: 1
+  value_column: 2
+
+nino3:
+  filename: 'wtc_test_data_nino_even'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  time_column: t
+  value_column: nino
