@@ -5,7 +5,7 @@ import io
 from setuptools import setup, find_packages
 
 
-version = '1.0.0ba'
+version = '1.0.0b'
 
 # Read the readme file contents into variable
 def read(fname):
@@ -46,5 +46,5 @@ setup(
         "tabulate>=0.8.9",
         "Unidecode>=1.1.1",
     ],
-    python_requires=">=3.8.0"
+    python_requires=">=3.9.0"
 )

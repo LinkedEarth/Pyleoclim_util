@@ -9,7 +9,7 @@ How to create and manipulate such objects is described in a short example below,
 
 import operator
 
-from ..utils import tsutils, plotting, tsmodel, tsbase, mapping, lipdutils
+from ..utils import tsutils, plotting, tsmodel, tsbase, mapping, lipdutils, jsonutils
 from ..utils import wavelet as waveutils
 from ..utils import spectral as specutils
 from ..utils import correlation as corrutils
@@ -304,6 +304,47 @@ class Series:
         else:
             # export Series object to CSV
             ser.to_csv(path+'/'+filename, header = True)
+    
+    def to_json(self, path =None):
+        """
+        Export the pyleoclim.Series object to a json file
+
+        Parameters
+        ----------
+        path : string, optional
+            The path to the file. The default is None, resulting in a file saved in the current working directory using the label for the dataset as filename if available or 'series.json' if label is not provided.
+
+        Returns
+        -------
+        None.
+        
+        Examples
+        --------
+
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+                
+            import pyleoclim as pyleo
+            import pandas as pd
+
+            url = 'https://raw.githubusercontent.com/LinkedEarth/PyleoTutorials/main/data/wtc_test_data_nino_even.csv'
+            data=pd.read_csv(url)
+            
+            ts_nino = pyleo.Series(time =  data['t'], value = data['nino'], label = 'Kaplan Niño3 SST',
+                              time_name = 'Year', value_name = 'NINO3 index',
+                              time_unit = 'CE',   value_unit = '$^{\circ}$C')            
+            
+            ts_nino.to_json('Nino.json')
+
+        """
+        
+        if path is None:        
+            path = self.label.replace(" ", "_") + '.json' if self.label is not None else 'series.json' 
+        
+        jsonutils.PyleoObj_to_json(self, path)
+        
         
     
     def pandas_method(self, method):
