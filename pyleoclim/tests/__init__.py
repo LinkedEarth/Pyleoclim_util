@@ -7,5 +7,3 @@ Created on 2020-02-25 14:47:14
 
 consider utils for tests
 """
-
-from .examples import load_dataset
