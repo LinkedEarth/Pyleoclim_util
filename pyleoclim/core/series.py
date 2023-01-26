@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl # could also from matplotlib.colors import ColorbarBase
 import numpy as np
 import pandas as pd
-from tabulate import tabulate
+#from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
 import matplotlib.colors as mcolors
@@ -41,6 +41,8 @@ import csv
 import warnings
 import collections
 from pprint import pprint
+from importlib.metadata import version
+
 
 def dict2namedtuple(d):
     ''' Convert a dictionary to a namedtuple
@@ -291,14 +293,16 @@ class Series:
         '''
         filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
         ser = self.to_pandas(paleo_style=True)
-        
 
         # export metadata
         if metadata_header:
-            with open(path+'/'+filename, 'a') as csvfile:
-                md_wrtr = csv.writer(csvfile, delimiter=',')
-                #md_wrtr.writerow('### Pyleoclim Series Metadata ###')
-                csvfile.close()
+            with open(path+'/'+filename, 'w', newline='')  as file:       
+                hd_writer = csv.writer(file)
+                hd_writer.writerow(["###", "Series metadata"])
+                hd_writer.writerow(["written by", "Pyleoclim " + version('Pyleoclim')])
+                hd_writer.writerows(self.metadata.items())
+                hd_writer.writerow(["###", "end metadata"])
+                #file.close()
             # export Series object to CSV
             ser.to_csv(path+'/'+filename, mode = 'a', header = True)
         else:

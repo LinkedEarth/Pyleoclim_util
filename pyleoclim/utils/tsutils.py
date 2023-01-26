@@ -58,19 +58,13 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None):
         if time_name.lower() == 'age':
             direction = 'retrograde'
     
-    match_a  = ['y', 'yr', 'yrs', 'year', 'years']
-    match_ka = ['ky', 'kyr', 'kyrs', 'kiloyear', 'ka'] 
+    #match_a  = ['y', 'yr', 'yrs', 'year', 'years']
+    match_ka = ['ky', 'kyr', 'kyrs', 'kiloyear', 'kiloyr','kiloyrs', 'ka'] 
     match_Ma = ['ma', 'my','myr','myrs']
     match_Ga = ['ga', 'gy', 'gyr', 'gyrs']
     if any(c in time_unit.lower() for c in match_ka):
         datum = 1950
         exponent = 3
-        direction = 'retrograde'
-    elif any(c in time_unit.lower() for c in match_a):
-        exponent = 0
-    elif any(c in time_unit.lower() for c in ['yr BP', 'yrs BP', 'years BP']):
-        datum = 1950
-        exponent = 0
         direction = 'retrograde'
     elif any(c in time_unit.lower() for c in match_Ma) :
         datum = 1950
@@ -85,7 +79,7 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None):
     
     # deal with statements about datum
 
-    tu = time_unit.lower().strip('.') # make lowercase + stripm, so "B.P." --> "bp"
+    tu = time_unit.lower().strip('.') # make lowercase + strip stops, so "B.P." --> "bp"
     if 'b2k' in tu:
         datum = 2000
         direction = 'retrograde'
