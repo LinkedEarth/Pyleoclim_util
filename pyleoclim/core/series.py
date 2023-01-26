@@ -309,6 +309,35 @@ class Series:
             # export Series object to CSV
             ser.to_csv(path+'/'+filename, header = True)
     
+    @classmethod    
+    def from_csv(cls, filename, path = '.'):
+        '''
+        Read in Series object from CSV file. Expects a metadata header 
+        dealineated by '###' lines, as written by the Series.to_csv() method. 
+
+        Parameters
+        ----------
+        filename : str
+            name of the file, e.g. 'myrecord.csv'
+        path : str
+            DESCRIPTION.
+
+        Returns
+        -------
+        Series
+            DESCRIPTION.
+
+        '''
+        
+        # read in metadata header
+        with open(path + '/' + filename, 'r')  as file: 
+            # look for ### pattern to figure out header size
+            # construct metadata dictionary
+            
+        df = pd.read_csv(path, header=?)
+        # export to Series. 
+        return cls(time=ser.time,value=ser.values, **metadata)
+    
     def to_json(self, path =None):
         """
         Export the pyleoclim.Series object to a json file
