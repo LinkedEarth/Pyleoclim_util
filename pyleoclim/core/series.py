@@ -3954,6 +3954,28 @@ class Series:
         return res
 
     def resample(self, rule, **kwargs):
+        """
+        Run analogue to pandas.Series.resample.
+
+        Parameters
+        ----------
+        rule
+            The offset string or object representing target conversion.
+            Can also accept pyleoclim units, such as 'Ka' (1000 years),
+            'Ma' (1 million years), and 'Ga' (1 billion years).
+        kwargs
+            Any other arguments which will be passed to pandas.Series.resample.
+        
+        Returns
+        -------
+        SeriesResampler
+            Resampler object, not meant to be used to directly. Instead,
+            an aggregation should be called on it, see examples below.
+        
+        Examples
+        --------
+        >>> ts.resample('Ka').mean()  # doctest: +SKIP
+        """
         search = re.search(r'(\d*)([a-zA-Z]+)', rule)
         if search is None:
             raise ValueError(f"Invalid rule provided, got: {rule}")
@@ -3963,8 +3985,6 @@ class Series:
         else:
             multiplier = int(multiplier)
         unit = search.group(2)
-        print('multiplier: ', multiplier)
-        print('unit: ', unit)
         if unit.lower() in tsutils.MATCH_A:
             pass
         elif unit.lower() in tsutils.MATCH_KA:
@@ -3976,10 +3996,22 @@ class Series:
         else:
             raise ValueError(f'Invalid unit provided, got: {unit}')
         ser = self.to_pandas()
-        return _SeriesResample(f'{multiplier}Y', ser, self.metadata, kwargs)
+        return SeriesResampler(f'{multiplier}Y', ser, self.metadata, kwargs)
 
 
-class _SeriesResample:
+class SeriesResampler:
+    """
+    This is only meant to be used internally, and is not meant to 
+    be public-facing or to be used directly by users.
+
+    If users call
+
+        ts.resample('1Y').mean()
+    
+    then they will get back a pyleoclim.Series, and `SeriesResampler`
+    will only be used in an intermediate step. Think of it as an
+    implementation detail.
+    """
     def __init__(self, rule, series, metadata, kwargs):
         self.rule = rule
         self.series = series
@@ -3988,8 +4020,8 @@ class _SeriesResample:
     
     def __getattr__(self, attr):
         attr = getattr(self.series.resample(self.rule, **self.kwargs), attr)
-        def foo(*args, **kwargs):
+        def func(*args, **kwargs):
             series = attr(*args, **kwargs)
             from_pandas = Series.from_pandas(series, metadata=self.metadata)
             return from_pandas
-        return foo
+        return func
