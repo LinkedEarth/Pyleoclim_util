@@ -172,6 +172,7 @@ class Series:
         self.label = label
         # assign latitude
         if lat is not None:
+            lat = float(lat) 
             if -90 <= lat <= 90: 
                 self.lat = lat
             else:
@@ -181,6 +182,7 @@ class Series:
             
         # assign longitude
         if lon is not None:
+            lon = float(lon)
             if 0 <= lon < 360:     
                 self.lon = lon
             elif -180 <= lon < 0:
@@ -309,6 +311,7 @@ class Series:
         else:
             # export Series object to CSV
             ser.to_csv(path+'/'+filename, header = True)
+        print('Series exported to ' + path+'/'+filename)
     
     @classmethod    
     def from_csv(cls, filename, path = '.'):
@@ -321,23 +324,41 @@ class Series:
         filename : str
             name of the file, e.g. 'myrecord.csv'
         path : str
-            DESCRIPTION.
+            directory of the file. Default: current directory, '.'
 
         Returns
         -------
         Series
-            DESCRIPTION.
+            pyleoclim Series object containing data and metadata.
 
         '''
-        
+        metadata = {}
         # read in metadata header
+        # TODO: improve error handling
         with open(path + '/' + filename, 'r')  as file: 
-            # look for ### pattern to figure out header size
-            # construct metadata dictionary
-            
-        df = pd.read_csv(path, header=?)
-        # export to Series. 
-        return cls(time=ser.time,value=ser.values, **metadata)
+            reader_obj = csv.reader(file)
+            for i, row in enumerate(reader_obj):
+                if row[0] == '###' and i > 0:
+                    header = i+1
+                    break
+                else:
+                    metadata[row[0]] = row[1]
+        # pop superfluous entries
+        metadata.pop('###')
+        metadata.pop('written by')
+        empty = [key for key in metadata.keys() if metadata[key] == '']
+        for key in empty:
+            metadata.pop(key)
+        # make sure log is a tuple
+        if 'log' in metadata.keys():
+            metadata['log'] = eval(metadata['log']) # convert string to tuple
+        
+        # read in data    
+        df = pd.read_csv(path + '/' + filename, header=header)
+        # export to Series 
+        return cls(time=df.iloc[:,0],
+                   value=df.iloc[:,1], 
+                   clean_ts=False, **metadata)
     
     def to_json(self, path =None):
         """
@@ -382,11 +403,11 @@ class Series:
         
     
     def pandas_method(self, method):
-        ser, metadata = self.to_pandas()
+        ser = self.to_pandas()
         result = method(ser)
         if not isinstance(result, pd.Series):
             raise ValueError('Given method does not return a pandas Series and cannot be applied')
-        return self.from_pandas(result, metadata)
+        return self.from_pandas(result, self.metadata)
     
     def equals(self,ts):
         '''

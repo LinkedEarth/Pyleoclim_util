@@ -62,6 +62,15 @@ def gen_normal(loc=0, scale=1, nt=100):
 
 # Tests below
 
+class TestUiSeriesIO:
+    ''' Test Series    import from and export to other formats    
+    '''
+    def test_csv(self):
+        ts1 = pyleo.utils.load_dataset('nino3')
+        ts1.to_csv()
+        ts2 = pyleo.Series.from_csv('series.csv')
+        assert ts1.equals(ts2)
+
 class TestUiSeriesMakeLabels:
     ''' Tests for Series.make_labels()
 
