@@ -1023,20 +1023,10 @@ class TestUISeriesSort:
 
 class TestResample:
     @pytest.mark.parametrize('rule', pyleo.utils.tsutils.MATCH_A)
-    def test_resample_simple(self, rule, dataframe_dt):
+    def test_resample_simple(self, rule, dataframe_dt, metadata):
         # note: resample with large ranges is still not supported,
         # so for now we're only testing 'years' as the rule
-        metadata = {'time_unit': 'years CE',
-            'time_name': 'Time',
-            'value_unit': 'mb',
-            'value_name': 'SOI',
-            'label': 'Southern Oscillation Index',
-            'lat': None,
-            'lon': None,
-            'archiveType': None,
-            'importedFrom': None,
-            'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},)
-        }
+        # https://github.com/pandas-dev/pandas/issues/51024
         ser = dataframe_dt.loc[:, 0]
         with pytest.warns(UserWarning, match='Time unit years CE not recognized. Defaulting to years CE'):
             ts = pyleo.Series.from_pandas(ser, metadata)
@@ -1051,20 +1041,9 @@ class TestResample:
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
  
-    def test_resample_invalid(self, dataframe_dt):
+    def test_resample_invalid(self, dataframe_dt, metadata):
         # note: resample with large ranges is still not supported,
         # so for now we're only testing 'years' as the rule
-        metadata = {'time_unit': 'years CE',
-            'time_name': 'Time',
-            'value_unit': 'mb',
-            'value_name': 'SOI',
-            'label': 'Southern Oscillation Index',
-            'lat': None,
-            'lon': None,
-            'archiveType': None,
-            'importedFrom': None,
-            'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},)
-        }
         ser = dataframe_dt.loc[:, 0]
         with pytest.warns(UserWarning, match='Time unit years CE not recognized. Defaulting to years CE'):
             ts = pyleo.Series.from_pandas(ser, metadata)

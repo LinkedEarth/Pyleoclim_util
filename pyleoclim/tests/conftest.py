@@ -17,3 +17,17 @@ def dataframe():
     length = 5
     df = pd.DataFrame(np.ones(length))
     return df
+
+@pytest.fixture
+def metadata():
+    return {'time_unit': 'years CE',
+        'time_name': 'Time',
+        'value_unit': 'mb',
+        'value_name': 'SOI',
+        'label': 'Southern Oscillation Index',
+        'lat': None,
+        'lon': None,
+        'archiveType': None,
+        'importedFrom': None,
+        'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},)
+    }
