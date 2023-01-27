@@ -275,8 +275,8 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True):
             error.append(np.nanstd(y[idx]))
 
     res_dict = {
-        'bins': bins,
-        'binned_values': binned_values,
+        'bins': np.array(bins),
+        'binned_values': np.array(binned_values),
         'n': n,
         'error': error,
     }
