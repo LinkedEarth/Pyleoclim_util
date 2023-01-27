@@ -8,6 +8,7 @@ How to create and manipulate such objects is described in a short example below,
 """
 
 import operator
+import re
 
 from ..utils import tsutils, plotting, tsmodel, tsbase, mapping, lipdutils, jsonutils
 from ..utils import wavelet as waveutils
@@ -3953,10 +3954,9 @@ class Series:
         return res
 
     def resample(self, rule, **kwargs):
-        import re
         search = re.search(r'(\d*)([a-zA-Z]+)', rule)
         if search is None:
-            raise ValueError(f"Invalid rule provided: got {rule}")
+            raise ValueError(f"Invalid rule provided, got: {rule}")
         multiplier = search.group(1)
         if multiplier == '':
             multiplier = 1
@@ -3974,7 +3974,7 @@ class Series:
         elif unit.lower() in tsutils.MATCH_GA:
             multiplier *= 1_000_000_000
         else:
-            raise ValueError(f'Invalid unit received, got: {unit}')
+            raise ValueError(f'Invalid unit provided, got: {unit}')
         ser = self.to_pandas()
         return _SeriesResample(f'{multiplier}Y', ser, self.metadata, kwargs)
 

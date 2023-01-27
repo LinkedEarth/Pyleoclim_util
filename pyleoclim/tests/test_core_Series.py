@@ -1051,3 +1051,24 @@ class TestResample:
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
  
+    def test_resample_invalid(self, dataframe_dt):
+        # note: resample with large ranges is still not supported,
+        # so for now we're only testing 'years' as the rule
+        metadata = {'time_unit': 'years CE',
+            'time_name': 'Time',
+            'value_unit': 'mb',
+            'value_name': 'SOI',
+            'label': 'Southern Oscillation Index',
+            'lat': None,
+            'lon': None,
+            'archiveType': None,
+            'importedFrom': None,
+            'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},)
+        }
+        ser = dataframe_dt.loc[:, 0]
+        with pytest.warns(UserWarning, match='Time unit years CE not recognized. Defaulting to years CE'):
+            ts = pyleo.Series.from_pandas(ser, metadata)
+        with pytest.raises(ValueError, match='Invalid unit provided, got: foo'):
+            ts.resample('foo')
+        with pytest.raises(ValueError, match='Invalid rule provided, got: 412'):
+            ts.resample('412')
