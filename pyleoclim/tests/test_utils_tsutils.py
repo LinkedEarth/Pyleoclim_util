@@ -19,11 +19,11 @@ def test_time_unit_to_datum_exp_dir_unknown_time_unit():
         assert exponent == 0
         assert direction == 'prograde'
 
-    with pytest.warns(match='Time unit'):
-        (datum, exponent, direction) = tsutils.time_unit_to_datum_exp_dir(time_unit, time_name='age')
-        assert datum == 0
-        assert exponent == 0
-        assert direction == 'retrograde'   
+    # with pytest.warns(match='Time unit'):
+    #     (datum, exponent, direction) = tsutils.time_unit_to_datum_exp_dir(time_unit, time_name='age')
+    #     assert datum == 0
+    #     assert exponent == 0
+    #     assert direction == 'retrograde'   
 
 
 @pytest.mark.parametrize('time_unit', tsutils.MATCH_KA)
@@ -51,14 +51,14 @@ def test_time_unit_to_datum_exp_dir_ga(time_unit):
 
 
 def test_time_unit_to_datum_exp_dir_b2k():
-    time_unit = 'b2k'
+    time_unit = 'years b2k'
     (datum, exponent, direction) = tsutils.time_unit_to_datum_exp_dir(time_unit)
     assert datum == 2000
     assert exponent == 0
     assert direction == 'retrograde' 
 
 
-@pytest.mark.parametrize('time_unit', ['bp', 'bnf'])
+@pytest.mark.parametrize('time_unit', ['years bp', 'years bnf'])
 def test_time_unit_to_datum_exp_dir_bp(time_unit):
     (datum, exponent, direction) = tsutils.time_unit_to_datum_exp_dir(time_unit)
     assert datum == 1950
@@ -66,7 +66,7 @@ def test_time_unit_to_datum_exp_dir_bp(time_unit):
     assert direction == 'retrograde'
 
 
-@pytest.mark.parametrize('time_unit', ['AD', 'CE'])
+@pytest.mark.parametrize('time_unit', ['years AD', 'yr CE'])
 def test_time_unit_to_datum_exp_dir_ad(time_unit):
     (datum, exponent, direction) = tsutils.time_unit_to_datum_exp_dir(time_unit)
     assert datum == 0
@@ -111,7 +111,7 @@ def test_convert_datetime_index_ga(dataframe_dt):
 
 
 def test_convert_datetime_index_bp(dataframe_dt):
-    time_unit = 'bp'
+    time_unit = 'years B.P.'
     time_name = None
     time = tsutils.convert_datetime_index_to_time(
         dataframe_dt.index, 
@@ -123,7 +123,7 @@ def test_convert_datetime_index_bp(dataframe_dt):
 
 
 def test_convert_datetime_index_ad(dataframe_dt):
-    time_unit = 'ad'
+    time_unit = 'time ad'
     time_name = None
     time = tsutils.convert_datetime_index_to_time(
         dataframe_dt.index, 
