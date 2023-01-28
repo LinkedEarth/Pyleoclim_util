@@ -74,6 +74,10 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=True):
         datum = 1950
         exponent = 9
         direction = 'retrograde'
+    elif tu[0].replace('.','') in ['ad', 'ce']:
+        exponent = 0  
+        datum = 0
+        direction = 'prograde'    
     else:
         warnings.warn(f'Time unit "{time_unit}" unknown; triggering defaults', stacklevel=4)    
         exponent = 0  
