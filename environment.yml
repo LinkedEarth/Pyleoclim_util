@@ -17,4 +17,4 @@ dependencies:
   - pytest
   - pip:
     - git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
-    - pandas==2.0.0.dev0+877.g4901410697
+    - "--pre --extra-index https://pypi.anaconda.org/scipy-wheels-nightly/simple pandas"
