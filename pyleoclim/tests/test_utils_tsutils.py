@@ -123,7 +123,7 @@ def test_convert_datetime_index_bp(dataframe_dt):
 
 
 def test_convert_datetime_index_ad(dataframe_dt):
-    time_unit = 'time ad'
+    time_unit = 'AD'
     time_name = None
     time = tsutils.convert_datetime_index_to_time(
         dataframe_dt.index, 

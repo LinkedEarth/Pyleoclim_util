@@ -316,9 +316,9 @@ class TestUiSeriesCenter:
         tsc = ts.center(keep_log=True)
         print(tsc.log[1])
 
-        assert np.abs(tsc.mean) <= np.sqrt(sys.float_info.epsilon)
+        assert np.abs(tsc.value.mean()) <= np.sqrt(sys.float_info.epsilon)
 
-        assert tsc.mean == tsc.log[1]['previous_mean']
+        assert ts.value.mean() == tsc.log[1]['previous_mean']
 
 class TestUiSeriesStandardize:
     '''Test for Series.standardize()
