@@ -20,7 +20,7 @@ def dataframe():
     return df
 
 @pytest.fixture
-def unevenly_spaced_series()
+def unevenly_spaced_series():
     """Pyleoclim series with unevenly spaced time axis"""
     length = 10
     t = np.linspace(1,length,length) ** 2
