@@ -86,7 +86,7 @@ class TestUiSeriesMakeLabels:
         # call the target function for testing
         time_header, value_header = ts.make_labels()
 
-        assert time_header == 'time'
+        assert time_header == 'time [years]'
         assert value_header == 'value'
 
 
@@ -99,14 +99,14 @@ class TestUiSeriesMakeLabels:
         # define a Series() obj with meta data
         ts1 = pyleo.Series(
             time=ts.time, value=ts.value,
-            time_name='Year (CE)', time_unit='yr',
+            time_name='Time', time_unit='yr CE',
             value_name='Temperature', value_unit='K',
             label='Gaussian Noise', clean_ts=False
         )
 
         time_header, value_header = ts1.make_labels()
 
-        assert time_header == 'Year (CE) [yr]'
+        assert time_header == 'Time [yr CE]'
         assert value_header == 'Temperature [K]'
 
     def test_make_labels_t2(self):
@@ -118,14 +118,14 @@ class TestUiSeriesMakeLabels:
         # define a Series() obj with meta data
         ts1 = pyleo.Series(
             time=ts.time, value=ts.value,
-            time_name='Year (CE)',
+            time_name='time',
             value_name='Temperature', value_unit='K',
             label='Gaussian Noise', clean_ts=False
         )
 
         time_header, value_header = ts1.make_labels()
 
-        assert time_header == 'Year (CE)'
+        assert time_header == 'time [years]'
         assert value_header == 'Temperature [K]'
 
 
