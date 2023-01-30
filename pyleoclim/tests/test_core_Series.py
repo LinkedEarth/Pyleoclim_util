@@ -915,30 +915,6 @@ class TestUiSeriesHistplot:
 
         pyleo.closefig(fig)
 
-class TestUiSeriesDistplot:
-    '''Test for Series.distplot()'''
-
-    def test_histplot_t0(self, max_axis = 5):
-        ts = gen_normal()
-
-        fig, ax = ts.histplot()
-
-        line = ax.lines[0]
-
-        x_plot = line.get_xdata()
-        y_plot = line.get_ydata()
-
-        assert max(x_plot) < max_axis
-
-        pyleo.closefig(fig)
-
-    def test_histplot_t1(self, vertical = True):
-        ts = gen_normal()
-
-        fig, ax = ts.histplot(vertical=vertical)
-
-        pyleo.closefig(fig)
-
 class TestUiSeriesFilter:
     '''Test for Series.filter()'''
 
