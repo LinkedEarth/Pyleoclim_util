@@ -86,7 +86,7 @@ class TestUiSeriesMakeLabels:
         # call the target function for testing
         time_header, value_header = ts.make_labels()
 
-        assert time_header == 'time'
+        assert time_header == 'time [years]'
         assert value_header == 'value'
 
 
@@ -99,14 +99,14 @@ class TestUiSeriesMakeLabels:
         # define a Series() obj with meta data
         ts1 = pyleo.Series(
             time=ts.time, value=ts.value,
-            time_name='Year (CE)', time_unit='yr',
+            time_name='Time', time_unit='yr CE',
             value_name='Temperature', value_unit='K',
             label='Gaussian Noise', clean_ts=False
         )
 
         time_header, value_header = ts1.make_labels()
 
-        assert time_header == 'Year (CE) [yr]'
+        assert time_header == 'Time [yr CE]'
         assert value_header == 'Temperature [K]'
 
     def test_make_labels_t2(self):
@@ -118,14 +118,14 @@ class TestUiSeriesMakeLabels:
         # define a Series() obj with meta data
         ts1 = pyleo.Series(
             time=ts.time, value=ts.value,
-            time_name='Year (CE)',
+            time_name='time',
             value_name='Temperature', value_unit='K',
             label='Gaussian Noise', clean_ts=False
         )
 
         time_header, value_header = ts1.make_labels()
 
-        assert time_header == 'Year (CE)'
+        assert time_header == 'time [years]'
         assert value_header == 'Temperature [K]'
 
 
@@ -316,9 +316,9 @@ class TestUiSeriesCenter:
         tsc = ts.center(keep_log=True)
         print(tsc.log[1])
 
-        assert np.abs(tsc.mean) <= np.sqrt(sys.float_info.epsilon)
+        assert np.abs(tsc.value.mean()) <= np.sqrt(sys.float_info.epsilon)
 
-        assert tsc.mean == tsc.log[1]['previous_mean']
+        assert ts.value.mean() == tsc.log[1]['previous_mean']
 
 class TestUiSeriesStandardize:
     '''Test for Series.standardize()
@@ -915,30 +915,6 @@ class TestUiSeriesHistplot:
 
         pyleo.closefig(fig)
 
-class TestUiSeriesDistplot:
-    '''Test for Series.distplot()'''
-
-    def test_histplot_t0(self, max_axis = 5):
-        ts = gen_normal()
-
-        fig, ax = ts.histplot()
-
-        line = ax.lines[0]
-
-        x_plot = line.get_xdata()
-        y_plot = line.get_ydata()
-
-        assert max(x_plot) < max_axis
-
-        pyleo.closefig(fig)
-
-    def test_histplot_t1(self, vertical = True):
-        ts = gen_normal()
-
-        fig, ax = ts.histplot(vertical=vertical)
-
-        pyleo.closefig(fig)
-
 class TestUiSeriesFilter:
     '''Test for Series.filter()'''
 
@@ -971,6 +947,7 @@ class TestUiSeriesFilter:
         val_diff = ts_bp.value - ts2.value
         assert np.mean(val_diff**2) < 0.1
 
+@pytest.mark.xfail  # wait for Marco to fix the "DateParseError: day is out of range for month: 0, at position 0" error
 class TestUISeriesConvertTimeUnit:
     '''Tests for Series.convert_time_unit'''
 

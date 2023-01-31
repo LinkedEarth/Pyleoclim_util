@@ -49,47 +49,61 @@ from .tsbase import (
 SECONDS_PER_YEAR = 365.25 * 60  * 60 * 24
 
 MATCH_A  = frozenset(['y', 'yr', 'yrs', 'year', 'years'])
-MATCH_KA = frozenset(['ky', 'kyr', 'kyrs', 'kiloyear', 'kiloyr', 'kiloyrs', 'ka']) 
+MATCH_KA = frozenset(['ka', 'ky', 'kyr', 'kyrs', 'kiloyear', 'kiloyr', 'kiloyrs']) 
 MATCH_MA = frozenset(['ma', 'my','myr','myrs'])
 MATCH_GA = frozenset(['ga', 'gy', 'gyr', 'gyrs'])
 
-def time_unit_to_datum_exp_dir(time_unit, time_name=None):
-    # default in case nothing else is inferred
-    exponent = 0  
-    datum = 0
-    direction = 'prograde'
+def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=True):
+         
+    tu = time_unit.lower().split()
+    
+    # deal with statements explicit about exponents, and take a first guess at datum/direction        
+    if tu[0] in MATCH_A:
+        exponent = 0  
+        datum = 0
+        direction = 'prograde'
+    elif tu[0] in MATCH_KA:
+        datum = 1950
+        exponent = 3
+        direction = 'retrograde'
+    elif tu[0] in MATCH_MA:
+        datum = 1950
+        exponent = 6
+        direction = 'retrograde'
+    elif tu[0] in MATCH_GA:
+        datum = 1950
+        exponent = 9
+        direction = 'retrograde'
+    elif tu[0].replace('.','') in ['ad', 'ce']:
+        exponent = 0  
+        datum = 0
+        direction = 'prograde'    
+    else:
+        warnings.warn(f'Time unit "{time_unit}" unknown; triggering defaults', stacklevel=4)    
+        exponent = 0  
+        datum = 0
+        direction = 'prograde'
+    
+    # if provided, deal with statements about datum/direction, like kyr BP, years CE, etc
+    if len(tu) > 1: 
+        datum_str = tu[1].replace('.','') # make lowercase + strip stops, so "B.P." --> "bp"
+        if datum_str == 'b2k':
+            datum = 2000
+            direction = 'retrograde'
+        elif datum_str in ['bp', 'bnf', 'b1950']:
+            datum = 1950
+            direction = 'retrograde'
+        elif datum_str in ['ad', 'ce']:
+            datum = 0
+            direction = 'prograde'
     
     if time_name is not None:
         if time_name.lower() == 'age':
             direction = 'retrograde'
-
-    if any(ka in time_unit.lower() for ka in MATCH_KA):
-        datum = 1950
-        exponent = 3
-        direction = 'retrograde'
-    elif any(ma in time_unit.lower() for ma in MATCH_MA):
-        datum = 1950
-        exponent = 6
-        direction = 'retrograde'
-    elif any(ga in time_unit.lower() for ga in MATCH_GA):
-        datum = 1950
-        exponent = 9
-        direction = 'retrograde'
-    else:
-        warnings.warn(f'Time unit {time_unit} not recognized. Defaulting to years CE')
-    
-    # deal with statements about datum/direction
-    tu = time_unit.lower().strip('.') # make lowercase + strip stops, so "B.P." --> "bp"
-    if 'b2k' in tu:
-        datum = 2000
-        direction = 'retrograde'
-    elif any(c in tu for c in ['bp', 'bnf', 'b1950']):
-        datum = 1950
-        direction = 'retrograde'
-    elif any(c in tu for c in ['ad', 'ce']):
-        datum = 0
-        direction = 'prograde'
-
+        
+    if verbose:
+        print(f'Provided time medata translated to {direction} flow, 10^{exponent} year units, and year {datum} datum')    
+  
     return (datum, exponent, direction)
 
 def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
