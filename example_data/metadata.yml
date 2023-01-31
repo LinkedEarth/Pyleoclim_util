@@ -28,4 +28,4 @@ nino3:
 
 nino_json:
   filename: 'Nino'
-  file_extention: 'json'
+  file_extension: 'json'
