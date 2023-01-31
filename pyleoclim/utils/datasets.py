@@ -5,6 +5,7 @@ from pathlib import Path
 import pyleoclim as pyleo
 import yaml
 import pandas as pd
+import jsonutils
 
 DATA_DIR = Path(__file__).parents[2].joinpath("example_data").resolve()
 METADATA_PATH = DATA_DIR.joinpath('metadata.yml')
@@ -104,6 +105,10 @@ def load_dataset(name):
             value=value,
             **pyleo_kwargs,
         )
+    # if this is a json
+    if metadata['file_extension'] == 'json':
+        ts=jsonutils.json_to_PyleoObj(path, 'Series')
+        
     else:
         raise RuntimeError(f"Unable to load dataset with file extension {metadata['file_extension']}.")
 

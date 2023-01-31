@@ -25,3 +25,7 @@ nino3:
     value_unit: '$^{\circ}$C'
   time_column: t
   value_column: nino
+
+nino_json:
+  filename: 'Nino'
+  file_extention: 'json'

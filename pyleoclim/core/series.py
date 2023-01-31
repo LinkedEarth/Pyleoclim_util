@@ -160,7 +160,7 @@ class Series:
 
         if clean_ts == True:
             value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
-            self.log = self.log + ({nlog+1: 'clean_ts', 'applied': clean_ts, 'verbose': verbose},)
+            self.log += ({nlog+1: 'clean_ts', 'applied': clean_ts, 'verbose': verbose},)
 
 
         self.time = np.array(time)
@@ -400,7 +400,28 @@ class Series:
         
         jsonutils.PyleoObj_to_json(self, path)
         
+    @classmethod    
+    def from_json(cls, path):
+        ''' Creates a pyleoclim.Series from a JSON file
         
+        The keys in the JSON file must correspond to the parameter associated with a Series object
+
+        Parameters
+        ----------
+        path : str
+            Path to the JSON file
+
+        Returns
+        -------
+        ts : pyleoclim.core.series.Series
+            A Pyleoclim Series object. 
+
+        '''
+        
+        a = jsonutils.open_json(path)
+        b = jsonutils.iterate_through_dict(a, 'Series')
+        
+        return cls(**b)
     
     def pandas_method(self, method):
         ser = self.to_pandas()
