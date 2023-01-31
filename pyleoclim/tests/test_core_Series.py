@@ -947,7 +947,6 @@ class TestUiSeriesFilter:
         val_diff = ts_bp.value - ts2.value
         assert np.mean(val_diff**2) < 0.1
 
-@pytest.mark.xfail  # wait for Marco to fix the "DateParseError: day is out of range for month: 0, at position 0" error
 class TestUISeriesConvertTimeUnit:
     '''Tests for Series.convert_time_unit'''
 
@@ -961,7 +960,7 @@ class TestUISeriesConvertTimeUnit:
     def test_convert_time_unit_t1(self):
         ts = gen_ts(nt=550, alpha=1.0)
         ts.time_unit = 'nonsense'
-        with pytest.raises(ValueError):
+        with pytest.warns(UserWarning, match=r'Time unit "nonsense" unknown; triggering defaults'):
             ts.convert_time_unit('yr BP')
 
 class TestUISeriesFillNA:
