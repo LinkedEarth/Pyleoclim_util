@@ -120,7 +120,9 @@ def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
         raise ValueError('The provided index is not a proper DatetimeIndex object')
     else:
         year_diff = (datetime_index.year - int(datum))
-        seconds_diff = (datetime_index.to_numpy() - datetime_index.year.astype(str).astype('datetime64[s]').to_numpy()).astype('int')
+        numpy_datetime_index = datetime_index.to_numpy()
+        years_floor = numpy_datetime_index.astype('datetime64[Y]').astype('datetime64[s]')
+        seconds_diff = (numpy_datetime_index - years_floor).astype('int')
         diff = year_diff + seconds_diff / SECONDS_PER_YEAR
         time = multiplier * diff / 10**exponent
 
