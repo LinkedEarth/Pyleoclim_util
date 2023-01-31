@@ -1004,10 +1004,9 @@ class TestResample:
         # so for now we're only testing 'years' as the rule
         # https://github.com/pandas-dev/pandas/issues/51024
         ser = dataframe_dt.loc[:, 0]
-        with pytest.warns(UserWarning, match='Time unit years CE not recognized. Defaulting to years CE'):
-            ts = pyleo.Series.from_pandas(ser, metadata)
-            result =ts.resample(rule).mean()
-            result_ser = result.to_pandas()
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        result =ts.resample(rule).mean()
+        result_ser = result.to_pandas()
         expected_values = np.array([0., 1., 2., 3., 4.])
         expected_idx = pd.DatetimeIndex(['2018-12-30 23:59:59', '2019-12-30 23:59:59',
                '2020-12-30 23:59:59', '2021-12-30 23:59:59',
@@ -1021,8 +1020,7 @@ class TestResample:
         # note: resample with large ranges is still not supported,
         # so for now we're only testing 'years' as the rule
         ser = dataframe_dt.loc[:, 0]
-        with pytest.warns(UserWarning, match='Time unit years CE not recognized. Defaulting to years CE'):
-            ts = pyleo.Series.from_pandas(ser, metadata)
+        ts = pyleo.Series.from_pandas(ser, metadata)
         with pytest.raises(ValueError, match='Invalid unit provided, got: foo'):
             ts.resample('foo')
         with pytest.raises(ValueError, match='Invalid rule provided, got: 412'):
