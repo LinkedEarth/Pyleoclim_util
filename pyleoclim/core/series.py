@@ -3959,11 +3959,11 @@ class Series:
 
         Parameters
         ----------
-        rule
+        rule : str
             The offset string or object representing target conversion.
             Can also accept pyleoclim units, such as 'ka' (1000 years),
             'Ma' (1 million years), and 'Ga' (1 billion years).
-        kwargs
+        kwargs : dict
             Any other arguments which will be passed to pandas.Series.resample.
         
         Returns
@@ -4004,8 +4004,13 @@ class Series:
             multiplier *= 1_000_000_000
         else:
             raise ValueError(f'Invalid unit provided, got: {unit}')
+            
+        md = self.metadata
+        if md['label'] is not None:
+            md['label'] = md['label'] + ' (' + rule + ' resampling)'
+        
         ser = self.to_pandas()
-        return SeriesResampler(f'{multiplier}Y', ser, self.metadata, kwargs)
+        return SeriesResampler(f'{multiplier}Y', ser, md, kwargs)
 
 
 class SeriesResampler:
