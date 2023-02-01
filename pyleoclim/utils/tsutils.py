@@ -33,13 +33,13 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.cluster import DBSCAN
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 import statsmodels.tsa.stattools as sms
 
 import math
-from sys import exit
-from .plotting import plot_scatter_xy, plot_xy, savefig
+#from sys import exit
+#from .plotting import plot_scatter_xy, plot_xy, savefig
 from .filter import savitzky_golay
 
 from .tsbase import (

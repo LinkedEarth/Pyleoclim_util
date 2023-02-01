@@ -3961,7 +3961,7 @@ class Series:
         ----------
         rule
             The offset string or object representing target conversion.
-            Can also accept pyleoclim units, such as 'Ka' (1000 years),
+            Can also accept pyleoclim units, such as 'ka' (1000 years),
             'Ma' (1 million years), and 'Ga' (1 billion years).
         kwargs
             Any other arguments which will be passed to pandas.Series.resample.
@@ -3974,7 +3974,16 @@ class Series:
         
         Examples
         --------
-        >>> ts.resample('Ka').mean()  # doctest: +SKIP
+        >>> ts.resample('ka').mean()  # doctest: +SKIP
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            ts = pyleo.utils.load_dataset('nino3')
+            fig, ax = ts.plot()
+            ts.resample('5y').mean().plot(ax=ax)
+        
         """
         search = re.search(r'(\d*)([a-zA-Z]+)', rule)
         if search is None:
