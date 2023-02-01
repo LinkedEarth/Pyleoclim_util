@@ -7,6 +7,7 @@ from pyleoclim.utils import datasets
 TEST_DATASETS = [
     'soi',
     'nino3',
+    'nino_json'
 ]
 
 

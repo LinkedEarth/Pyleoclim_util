@@ -108,7 +108,7 @@ def load_dataset(name):
             **pyleo_kwargs,
         )
     # if this is a json
-    if metadata['file_extension'] == 'json':
+    elif metadata['file_extension'] == 'json':
         ts=jsonutils.json_to_PyleoObj(str(path), 'Series')
         
     else:
