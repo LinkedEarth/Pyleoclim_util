@@ -210,6 +210,33 @@ def json_to_PyleoObj(filename,objname):
     obj = objname_to_obj(objname)
     a = open_json(filename)
 
+    b = iterate_through_dict(a, objname)
+    
+    pyleoObj=obj(**b)
+    
+    return pyleoObj
+
+def iterate_through_dict(dictionary, objname):
+    '''Iterate through the keys of a json file to correctly identify nested Pyleoclim objects and instantiate them
+    
+
+    Parameters
+    ----------
+    dictionary : dict
+        Dictionary obtained from the JSON file
+    objname : str
+        The desired Pyleoclim object
+
+    Returns
+    -------
+    a : dict
+        A dictionary containing the right key-value type for the object
+
+    '''
+    
+    a=dictionary
+    obj = objname_to_obj(objname)
+    
     for k in a.keys():
         if k == 'timeseries' or k == 'timeseries1' or k == 'timeseries2':
             try:
@@ -254,8 +281,8 @@ def json_to_PyleoObj(filename,objname):
                 if item['timeseries'] is not None:
                     item['timeseries'] = pyleo.Series(**item['timeseries'])
                 a[k]['scalogram_list'][idx]=pyleo.Scalogram(**a[k]['scalogram_list'][idx])
-            a[k] = pyleo.MultipleScalogram(**a[k])     
-
-    pyleoObj=obj(**a)
+            a[k] = pyleo.MultipleScalogram(**a[k]) 
+        
+    return a
     
-    return pyleoObj
+    
