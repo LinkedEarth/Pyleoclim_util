@@ -20,6 +20,20 @@ def dataframe():
     return df
 
 @pytest.fixture
+def metadata():
+    return {'time_unit': 'years CE',
+        'time_name': 'Time',
+        'value_unit': 'mb',
+        'value_name': 'SOI',
+        'label': 'Southern Oscillation Index',
+        'lat': None,
+        'lon': None,
+        'archiveType': None,
+        'importedFrom': None,
+        'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},)
+    }
+
+@pytest.fixture
 def unevenly_spaced_series():
     """Pyleoclim series with unevenly spaced time axis"""
     length = 10

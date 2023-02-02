@@ -8,6 +8,7 @@ How to create and manipulate such objects is described in a short example below,
 """
 
 import operator
+import re
 
 from ..utils import tsutils, plotting, tsmodel, tsbase, mapping, lipdutils, jsonutils
 from ..utils import wavelet as waveutils
@@ -3972,3 +3973,90 @@ class Series:
                               scatter_kwargs=scatter_kwargs, legend=legend,
                               lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
         return res
+
+    def resample(self, rule, **kwargs):
+        """
+        Run analogue to pandas.Series.resample.
+
+        Parameters
+        ----------
+        rule : str
+            The offset string or object representing target conversion.
+            Can also accept pyleoclim units, such as 'ka' (1000 years),
+            'Ma' (1 million years), and 'Ga' (1 billion years).
+        kwargs : dict
+            Any other arguments which will be passed to pandas.Series.resample.
+        
+        Returns
+        -------
+        SeriesResampler
+            Resampler object, not meant to be used to directly. Instead,
+            an aggregation should be called on it, see examples below.
+        
+        Examples
+        --------
+        >>> ts.resample('ka').mean()  # doctest: +SKIP
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            ts = pyleo.utils.load_dataset('nino3')
+            fig, ax = ts.plot()
+            ts.resample('5y').mean().plot(ax=ax)
+        
+        """
+        search = re.search(r'(\d*)([a-zA-Z]+)', rule)
+        if search is None:
+            raise ValueError(f"Invalid rule provided, got: {rule}")
+        multiplier = search.group(1)
+        if multiplier == '':
+            multiplier = 1
+        else:
+            multiplier = int(multiplier)
+        unit = search.group(2)
+        if unit.lower() in tsutils.MATCH_A:
+            pass
+        elif unit.lower() in tsutils.MATCH_KA:
+            multiplier *= 1_000
+        elif unit.lower() in tsutils.MATCH_MA:
+            multiplier *= 1_000_000
+        elif unit.lower() in tsutils.MATCH_GA:
+            multiplier *= 1_000_000_000
+        else:
+            raise ValueError(f'Invalid unit provided, got: {unit}')
+            
+        md = self.metadata
+        if md['label'] is not None:
+            md['label'] = md['label'] + ' (' + rule + ' resampling)'
+        
+        ser = self.to_pandas()
+        return SeriesResampler(f'{multiplier}Y', ser, md, kwargs)
+
+
+class SeriesResampler:
+    """
+    This is only meant to be used internally, and is not meant to 
+    be public-facing or to be used directly by users.
+
+    If users call
+
+        ts.resample('1Y').mean()
+    
+    then they will get back a pyleoclim.Series, and `SeriesResampler`
+    will only be used in an intermediate step. Think of it as an
+    implementation detail.
+    """
+    def __init__(self, rule, series, metadata, kwargs):
+        self.rule = rule
+        self.series = series
+        self.metadata = metadata
+        self.kwargs = kwargs
+    
+    def __getattr__(self, attr):
+        attr = getattr(self.series.resample(self.rule, **self.kwargs), attr)
+        def func(*args, **kwargs):
+            series = attr(*args, **kwargs)
+            from_pandas = Series.from_pandas(series, metadata=self.metadata)
+            return from_pandas
+        return func
