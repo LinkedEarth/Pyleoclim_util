@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import pyleoclim as pyleo
 import pytest 
 
 
@@ -17,3 +18,12 @@ def dataframe():
     length = 5
     df = pd.DataFrame(np.ones(length))
     return df
+
+@pytest.fixture
+def unevenly_spaced_series():
+    """Pyleoclim series with unevenly spaced time axis"""
+    length = 10
+    t = np.linspace(1,length,length) ** 2
+    v = np.ones(length)
+    series = pyleo.Series(t,v)
+    return series
