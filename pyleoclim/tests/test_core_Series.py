@@ -1012,7 +1012,22 @@ class TestResample:
                '2020-12-30 23:59:59', '2021-12-30 23:59:59',
                '2022-12-30 23:59:59'], name='datetime').as_unit('s')
         expected_ser = pd.Series(expected_values, expected_idx, name='SOI')
-        expected_metadata = {'time_unit': 'years CE', 'time_name': 'Time', 'value_unit': 'mb', 'value_name': 'SOI', 'label': 'Southern Oscillation Index', 'lat': None, 'lon': None, 'archiveType': None, 'importedFrom': None, 'log': ({0: 'clean_ts', 'applied': True, 'verbose': False}, {2: 'clean_ts', 'applied': True, 'verbose': False}, {3: 'clean_ts', 'applied': True, 'verbose': False})}
+        expected_metadata = {
+            'time_unit': 'years CE',
+            'time_name': 'Time',
+            'value_unit': 'mb',
+            'value_name': 'SOI',
+            'label': f'Southern Oscillation Index ({rule} resampling)',
+            'lat': None,
+            'lon': None,
+            'archiveType': None,
+            'importedFrom': None,
+            'log': (
+                {0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False},
+                {3: 'clean_ts', 'applied': True, 'verbose': False}
+            )
+        }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
  
