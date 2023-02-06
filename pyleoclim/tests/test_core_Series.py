@@ -998,7 +998,7 @@ class TestUISeriesSort:
 
 
 class TestResample:
-    @pytest.mark.parametrize('rule', pyleo.utils.tsutils.MATCH_A)
+    @pytest.mark.parametrize('rule', pyleo.utils.tsbase.MATCH_A)
     def test_resample_simple(self, rule, dataframe_dt, metadata):
         # note: resample with large ranges is still not supported,
         # so for now we're only testing 'years' as the rule
