@@ -206,8 +206,8 @@ class Series:
        
     @property
     def datetime_index(self):
-        datum, exponent, direction = tsutils.time_unit_to_datum_exp_dir(self.time_unit)
-        index = tsutils.time_to_datetime(self.time, datum, exponent, direction)
+        datum, exponent, direction = tsbase.time_unit_to_datum_exp_dir(self.time_unit)
+        index = tsbase.time_to_datetime(self.time, datum, exponent, direction)
         return pd.DatetimeIndex(index, name='datetime')
     
     @property
@@ -229,7 +229,7 @@ class Series:
     def from_pandas(cls, ser, metadata):
         if isinstance(ser.index, pd.DatetimeIndex):
             index = ser.index.as_unit('s') if ser.index.unit != 's' else ser.index  
-            time = tsutils.convert_datetime_index_to_time(index, metadata['time_unit'], metadata['time_name'])
+            time = tsbase.convert_datetime_index_to_time(index, metadata['time_unit'], metadata['time_name'])
         else:  
             raise ValueError('The provided index must be a proper DatetimeIndex object')
         
@@ -243,7 +243,7 @@ class Series:
                 
     # Alternate formulation
     # def from_pandas(ser, metadata):
-    #     time = tsutils.convert_datetime_index_to_time(ser.index, metadata['time_unit'], metadata['time_name'])
+    #     time = tsbase.convert_datetime_index_to_time(ser.index, metadata['time_unit'], metadata['time_name'])
     #     ts = Series(value=ser.values, time=time,  
     #                       time_name = metadata['time_name'] if metadata['time_name'] is not None else ser.index.name,
     #                       time_unit = metadata['time_unit'],
@@ -553,7 +553,7 @@ class Series:
         else:
             return new_ts
 
-        new_time = tsutils.convert_datetime_index_to_time(self.datetime_index, time_unit_label, time_name)
+        new_time = tsbase.convert_datetime_index_to_time(self.datetime_index, time_unit_label, time_name)
 
         dt = np.diff(new_time)
         if any(dt<=0):
@@ -4015,13 +4015,13 @@ class Series:
         else:
             multiplier = int(multiplier)
         unit = search.group(2)
-        if unit.lower() in tsutils.MATCH_A:
+        if unit.lower() in tsbase.MATCH_A:
             pass
-        elif unit.lower() in tsutils.MATCH_KA:
+        elif unit.lower() in tsbase.MATCH_KA:
             multiplier *= 1_000
-        elif unit.lower() in tsutils.MATCH_MA:
+        elif unit.lower() in tsbase.MATCH_MA:
             multiplier *= 1_000_000
-        elif unit.lower() in tsutils.MATCH_GA:
+        elif unit.lower() in tsbase.MATCH_GA:
             multiplier *= 1_000_000_000
         else:
             raise ValueError(f'Invalid unit provided, got: {unit}')
