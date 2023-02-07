@@ -29,7 +29,7 @@ setup(
     classifiers=[],
     install_requires=[
         "LiPD==0.2.8.8",
-        "pandas>=1.3.0",
+        "pandas>=1.9.0",
         "numpy<=1.24.0",
         "matplotlib>=3.6.0",
         "scipy>=1.9.1",
@@ -46,6 +46,7 @@ setup(
         "tabulate>=0.8.9",
         "Unidecode>=1.1.1",
         "pyyaml",
+        "covar>=0.2"
     ],
-    python_requires=">=3.9.0"
+    python_requires=">=3.10.0"
 )

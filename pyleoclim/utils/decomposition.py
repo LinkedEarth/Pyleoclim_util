@@ -16,6 +16,9 @@ import numpy as np
 from .tsutils import standardize
 from .tsmodel import ar1_sim
 from scipy.linalg import eigh, toeplitz
+import covar
+import sys
+import warnings
 #from nitime import algorithms as alg
 #import copy
 
@@ -346,11 +349,16 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         prod = ys[0:N - j] * ys[j:N]
         c[j] = sum(prod[~np.isnan(prod)]) / (sum(~np.isnan(prod)) - 1)
 
-
-    C = toeplitz(c[0:M])  #form correlation matrix
-
-    D, eigvecs = eigh(C) # solve eigendecomposition
-
+    C = toeplitz(c[0:M])  #form sample correlation matrix
+    
+    if np.abs(np.linalg.det(C)) <= np.sqrt(sys.float_info.epsilon):  # if C is singular
+        Cr, g  = covar.cov_shrink_rblw(C, n=M)  # apply Rao-Blackwellized Ledoit-Wolf estimator 
+        warnings.warn('Ill-conditioned covariance matrix; regularized with shrinkage factor: {:3.2f}'.format(g)) 
+    else: 
+        Cr = C
+        
+    # solve eigendecomposition and rank eigenvalues/vectors in decreasing order
+    D, eigvecs = eigh(Cr) 
     sort_tmp = np.sort(D)
     eigvals = sort_tmp[::-1]
     sortarg = np.argsort(-D)
