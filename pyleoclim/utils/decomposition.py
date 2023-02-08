@@ -356,7 +356,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
     
     if any(d <= np.finfo(d.dtype).eps): # if C is singular
         Cr, g  = covar.cov_shrink_rblw(C, n=nmodes)  # apply Rao-Blackwellized Ledoit-Wolf estimator 
-        warnings.warn('Ill-conditioned covariance matrix; regularized with shrinkage factor: {:3.2f}'.format(g)) 
+        warnings.warn('Ill-conditioned covariance matrix; regularized with shrinkage factor: {:3.2f}'.format(g),stacklevel=2) 
     else:
         Cr = C 
     
