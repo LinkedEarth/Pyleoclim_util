@@ -15,7 +15,7 @@ import numpy as np
 #from statsmodels.multivariate.pca import PCA
 from .tsutils import standardize
 from .tsmodel import ar1_sim
-from scipy.linalg import eigh, toeplitz
+from scipy.linalg import eigh, toeplitz, ishermitian, eig
 import covar
 import sys
 import warnings
@@ -350,15 +350,25 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         c[j] = sum(prod[~np.isnan(prod)]) / (sum(~np.isnan(prod)) - 1)
 
     C = toeplitz(c[0:M])  #form sample correlation matrix
+    d, _ = eigh(C)  # extract eigenvalues
     
-    if np.abs(np.linalg.det(C)) <= np.sqrt(sys.float_info.epsilon):  # if C is singular
-        Cr, g  = covar.cov_shrink_rblw(C, n=M)  # apply Rao-Blackwellized Ledoit-Wolf estimator 
+    nmodes = np.where(np.real(d)>0)[0].size # effective number of modes
+    
+    if any(d <= np.finfo(d.dtype).eps): # if C is singular
+        Cr, g  = covar.cov_shrink_rblw(C, n=nmodes)  # apply Rao-Blackwellized Ledoit-Wolf estimator 
         warnings.warn('Ill-conditioned covariance matrix; regularized with shrinkage factor: {:3.2f}'.format(g)) 
-    else: 
-        Cr = C
-        
-    # solve eigendecomposition and rank eigenvalues/vectors in decreasing order
-    D, eigvecs = eigh(Cr) 
+    else:
+        Cr = C 
+    
+    # solve eigendecomposition 
+    if ishermitian(Cr):  
+        D, eigvecs = eigh(Cr) 
+    else:
+        D, eigvecs = eig(Cr) 
+            
+    D[D<0] = 0     # impose positive eigenvalues    
+
+    # rank eigenvalues/vectors in decreasing order     
     sort_tmp = np.sort(D)
     eigvals = sort_tmp[::-1]
     sortarg = np.argsort(-D)
