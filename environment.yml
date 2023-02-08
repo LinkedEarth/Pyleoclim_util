@@ -19,4 +19,4 @@ dependencies:
     - git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
     - "--pre --extra-index https://pypi.anaconda.org/scipy-wheels-nightly/simple"
     - pandas>=1.9
-    - covar>=0.2
+    - covar

@@ -3,7 +3,7 @@
 """
 Eigendecomposition methods:
 Singular Spectrum Analysis (SSA). 
-soon: Monte-Carlo Principal Component Analysis, Multi-Channel SSA
+soon: PCA, Monte-Carlo PCA, Multi-Channel SSA
 """
 
 __all__ = [
@@ -17,7 +17,6 @@ from .tsutils import standardize
 from .tsmodel import ar1_sim
 from scipy.linalg import eigh, toeplitz, ishermitian, eig
 import covar
-import sys
 import warnings
 #from nitime import algorithms as alg
 #import copy
