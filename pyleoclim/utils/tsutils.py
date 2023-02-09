@@ -90,7 +90,7 @@ def simple_stats(y, axis=None):
     return mean, median, min_, max_, std, IQR
 
 
-def bin(x, y, bin_size=None, start=None, stop=None, bins=None, evenly_spaced = True):
+def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True, bins=None):
     """ Bin the values
 
     Parameters
@@ -111,13 +111,13 @@ def bin(x, y, bin_size=None, start=None, stop=None, bins=None, evenly_spaced = T
     stop : float
         When/where to stop binning. Default is the maximum
 
+    evenly_spaced : {True,False}
+        Makes the series evenly-spaced. This option is ignored if bin_size is set to float
+
     bins : array
         The right hand edge of bins to use for binning. 
         Start, stop, bin_size will be ignored if this is passed.
         See scipy.stats.binned_statistic for details.
-
-    evenly_spaced : {True,False}
-        Makes the series evenly-spaced. This option is ignored if bin_size is set to float
 
     Returns
     -------
@@ -144,8 +144,8 @@ def bin(x, y, bin_size=None, start=None, stop=None, bins=None, evenly_spaced = T
     x = np.array(x, dtype='float64')
     y = np.array(y, dtype='float64')
     
-    if bin_size is not None and evenly_spaced == True:
-        warnings.warn('The bin_size has been set, the series may not be evenly_spaced')
+    if (bin_size is not None or bins is not None) and evenly_spaced == True:
+        warnings.warn('The bin_size or bins has been set, the series may not be evenly_spaced')
 
     # Get the bin_size if not available
     if bin_size is None:
@@ -245,7 +245,6 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
     
     # Get the uniform time axis.
     tc = np.arange(start,stop+step,step)
-        
 
     kernel = lambda x, s : 1.0/(s*np.sqrt(2*np.pi))*np.exp(-0.5*(x/s)**2)  # define kernel function
 
