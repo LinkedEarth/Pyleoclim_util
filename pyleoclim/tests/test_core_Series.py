@@ -1040,3 +1040,35 @@ class TestResample:
             ts.resample('foo')
         with pytest.raises(ValueError, match='Invalid rule provided, got: 412'):
             ts.resample('412')
+
+class TestUISeriesEquals():
+    ''' Test for euals() method '''
+    @pytest.mark.parametrize('ds_name',['soi','nino3'])
+    def test_equals_t0(self, ds_name):
+        # test equality of data when true
+        ts1 = pyleo.utils.load_dataset('soi')
+        ts2 = pyleo.utils.load_dataset(ds_name)
+        
+        assert ts1.equals(ts2)
+        
+    def test_equals_t1(self):
+        # test equality of metadata 
+        ts1 = pyleo.utils.load_dataset('soi')
+        ts2 = ts1.copy()
+        ts2.label = 'Counterfeit SOI' 
+        
+        assert ts1.equals(ts2)
+        
+    def test_equals_t2(self):
+        # test toleratance
+        ts1 = pyleo.utils.load_dataset('soi')
+        ts2 = ts1.copy()
+        ts2.value[0] = ts1.value[0]+ 0.001
+        
+        assert ts1.equals(ts2, rtol = 1e-2)     
+        
+        
+        
+        
+        
+        

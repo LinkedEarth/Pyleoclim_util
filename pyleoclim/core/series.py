@@ -28,9 +28,10 @@ from ..core.surrogateseries import SurrogateSeries
 
 import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib as mpl # could also from matplotlib.colors import ColorbarBase
+#import matplotlib as mpl # could also from matplotlib.colors import ColorbarBase
 import numpy as np
 import pandas as pd
+
 #from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
@@ -431,7 +432,7 @@ class Series:
             raise ValueError('Given method does not return a pandas Series and cannot be applied')
         return self.from_pandas(result, self.metadata)
     
-    def equals(self,ts):
+    def equals(self, ts, rtol=1e-05, atol=1e-08):
         '''
         Test whether two objects contain the same elements (data and metadata)
 
@@ -439,25 +440,42 @@ class Series:
         ----------
         ts : Series object
            The target series for the comparison
+           
+        rtol: float, default 1e-5
+           Relative tolerance. 
+
+        atol: float, default 1e-8
+            Absolute tolerance.
+           
         Returns
         -------
         bool
-            Truth value of the proposition "the two series are identical"
+            Truth value of the proposition "the two series have the same data and metadata"
+            
+        See Also
+        --------
+        https://pandas.pydata.org/docs/reference/api/pandas.testing.assert_series_equal.html
 
         '''
-        # check that the data are the same
-        same_data = self.to_pandas().equals(ts.to_pandas())
-        if not same_data:
-            print("Difference found among the 2 Series'' data")
-        # check that the metadata are the same
-        same_metadata = (self.metadata == ts.metadata)
-        if not same_metadata:
-            print("Difference found among the 2 Series'' metadata:")
-            for key in self.metadata:
-                if self.metadata.get(key) != ts.metadata.get(key):
-                    print(f"key {key}, left: {self.metadata.get(key)}, right: {ts.metadata.get(key)}")
-            
+        same_metadata = False
+        same_data = False
+
+        left = self.to_pandas()
+        right = ts.to_pandas()
         
+        try:  # check that the data are the same
+            pd.testing.assert_series_equal(left, right, check_exact=False, rtol=rtol, atol=atol)
+            same_data = True
+            # check that the metadata are the same
+            same_metadata = (self.metadata == ts.metadata)
+            if not same_metadata:
+                print("Metadata are different:")
+                for key in self.metadata:
+                    if self.metadata.get(key) != ts.metadata.get(key):
+                        print(f"key {key}, left: {self.metadata.get(key)}, right: {ts.metadata.get(key)}")
+        except AssertionError as exp:            
+            print(str(exp))
+              
         return same_data & same_metadata 
     
     def view(self):
