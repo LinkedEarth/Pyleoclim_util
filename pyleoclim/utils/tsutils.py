@@ -90,7 +90,7 @@ def simple_stats(y, axis=None):
     return mean, median, min_, max_, std, IQR
 
 
-def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True):
+def bin(x, y, bin_size=None, start=None, stop=None, bins=None, evenly_spaced = True):
     """ Bin the values
 
     Parameters
@@ -98,14 +98,24 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True):
 
     x : array
         The x-axis series.
+
     y : array
         The y-axis series.
+
     bin_size : float
         The size of the bins. Default is the mean resolution if evenly_spaced is not True
+
     start : float
         Where/when to start binning. Default is the minimum
+
     stop : float
         When/where to stop binning. Default is the maximum
+
+    bins : array
+        The right hand edge of bins to use for binning. 
+        Start, stop, bin_size will be ignored if this is passed.
+        See scipy.stats.binned_statistic for details.
+
     evenly_spaced : {True,False}
         Makes the series evenly-spaced. This option is ignored if bin_size is set to float
 
@@ -151,26 +161,17 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True):
         stop = np.nanmax(x)
 
     # Set the bin medians
-    bins = np.arange(start+bin_size/2, stop + bin_size/2, bin_size)
+    if not bins:
+        bins = np.arange(start, stop + bin_size, bin_size)
 
     # Perform the calculation
-    binned_values = []
-    n = []
-    error = []
-    for val in np.nditer(bins):
-        idx = [idx for idx, c in enumerate(x) if c >= (val-bin_size/2) and c < (val+bin_size/2)]
-        if y[idx].size == 0:
-            binned_values.append(np.nan)
-            n.append(np.nan)
-            error.append(np.nan)
-        else:
-            binned_values.append(np.nanmean(y[idx]))
-            n.append(y[idx].size)
-            error.append(np.nanstd(y[idx]))
+    binned_values = stats.binned_statistic(x=x,values=y,bins=bins,statistic='mean').statistic
+    n = stats.binned_statistic(x=x,values=y,bins=bins,statistic='count').statistic
+    error = stats.binned_statistic(x=x,values=y,bins=bins,statistic='std').statistic
 
     res_dict = {
-        'bins': np.array(bins),
-        'binned_values': np.array(binned_values),
+        'bins': bins,
+        'binned_values': binned_values,
         'n': n,
         'error': error,
     }
@@ -195,7 +196,7 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
     step : float
         The interpolation step. Default is max spacing between consecutive points.
 
-        start : float
+    start : float
         where/when to start the interpolation. Default is min(t).
         
     stop : float
