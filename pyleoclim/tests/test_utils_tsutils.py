@@ -24,6 +24,10 @@ def test_bin_t2(unevenly_spaced_series):
     t = res_dict['bins']
     assert_array_equal(t,(bins[1:]+bins[:-1])/2)
 
+@pytest.mark.parametrize('statistic',['mean','std','median','count','sum','min','max'])
+def test_bin_t3(unevenly_spaced_series,statistic):
+    res_dict = tsutils.bin(unevenly_spaced_series.time,unevenly_spaced_series.value,statistic=statistic)
+
 def test_gkernel_t0(unevenly_spaced_series):
     t,v = tsutils.gkernel(unevenly_spaced_series.time,unevenly_spaced_series.value)
     assert isinstance(t,np.ndarray)
