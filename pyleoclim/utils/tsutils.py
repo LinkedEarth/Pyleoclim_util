@@ -90,7 +90,7 @@ def simple_stats(y, axis=None):
     return mean, median, min_, max_, std, IQR
 
 
-def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True, bins=None):
+def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True, statistic = 'mean', bins=None):
     """ Bin the values
 
     Parameters
@@ -113,6 +113,10 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True, bins=N
 
     evenly_spaced : {True,False}
         Makes the series evenly-spaced. This option is ignored if bin_size is set to float
+
+    statistic : str
+        Statistic to calculate and return in values. Default is 'mean'.
+        See scipy.stats.binned_statistic for other options.
 
     bins : array
         The right hand edge of bins to use for binning. 
@@ -165,7 +169,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True, bins=N
         bins = np.arange(start, stop + bin_size, bin_size)
 
     # Perform the calculation
-    binned_values = stats.binned_statistic(x=x,values=y,bins=bins,statistic='mean').statistic
+    binned_values = stats.binned_statistic(x=x,values=y,bins=bins,statistic=statistic).statistic
     n = stats.binned_statistic(x=x,values=y,bins=bins,statistic='count').statistic
     error = stats.binned_statistic(x=x,values=y,bins=bins,statistic='std').statistic
 
