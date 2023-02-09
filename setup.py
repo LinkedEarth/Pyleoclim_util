@@ -46,7 +46,8 @@ setup(
         "tabulate>=0.8.9",
         "Unidecode>=1.1.1",
         "pyyaml",
-        "covar"
+        "covar",
+        "cython"
     ],
     python_requires=">=3.10.0"
 )
