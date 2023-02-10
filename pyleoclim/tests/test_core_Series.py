@@ -62,13 +62,15 @@ def gen_normal(loc=0, scale=1, nt=100):
 
 # Tests below
 
-class TestUiSeriesIO:
-    ''' Test Series    import from and export to other formats    
+
+class TestSeriesIO:
+    ''' Test Series import from and export to other formats    
     '''
-    def test_csv(self):
+    def test_csv_roundtrip(self):
         ts1 = pyleo.utils.load_dataset('nino3')
-        ts1.to_csv()
-        ts2 = pyleo.Series.from_csv('series.csv')
+        ts1.to_csv(path='./test_files')
+        filename = ts1.label.replace(" ", "_") + '.csv'
+        ts2 = pyleo.Series.from_csv('test_files/' +  filename)
         assert ts1.equals(ts2)
 
 class TestUiSeriesMakeLabels:
@@ -1049,15 +1051,17 @@ class TestUISeriesEquals():
         ts1 = pyleo.utils.load_dataset('soi')
         ts2 = pyleo.utils.load_dataset(ds_name)
         
-        assert ts1.equals(ts2)
-        
+        if ds_name == 'soi':
+            assert ts1.equals(ts2)
+        else:
+            assert not ts1.equals(ts2)
     def test_equals_t1(self):
         # test equality of metadata 
         ts1 = pyleo.utils.load_dataset('soi')
         ts2 = ts1.copy()
         ts2.label = 'Counterfeit SOI' 
         
-        assert ts1.equals(ts2)
+        assert not ts1.equals(ts2)
         
     def test_equals_t2(self):
         # test toleratance
