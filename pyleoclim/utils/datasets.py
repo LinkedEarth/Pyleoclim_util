@@ -72,7 +72,6 @@ def load_dataset(name):
     metadata = get_metadata(name)
     # construct the full path to the file in the data directory
     path = DATA_DIR.joinpath(f"{metadata['filename']}.{metadata['file_extension']}")
-    print(type(path))
 
     # if this is a csv
     if metadata['file_extension'] == 'csv':
