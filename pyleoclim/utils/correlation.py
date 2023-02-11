@@ -797,7 +797,9 @@ def prop_alt(pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 
 
 def cov_shrink_rblw(S, n):
     """Compute a shrinkage estimate of the covariance matrix using
-    the Rao-Blackwellized Ledoit-Wolf estimator described by Chen et al.
+    the Rao-Blackwellized Ledoit-Wolf estimator described by Chen et al. 2011 [1]
+
+    Contributed by `Robert McGibbon <https://rmcgibbo.org/>`_.
 
     Parameters
     ----------
@@ -850,14 +852,18 @@ def cov_shrink_rblw(S, n):
     approximating shrinkage estimator (OAS), but makes some mathematical errors
     during the derivation, and futhermore their example code published with
     the paper does not implement the proposed formulas.
+
     References
     ----------
-    .. [2] Chen, Yilun, Ami Wiesel, and Alfred O. Hero III. "Shrinkage
-       estimation of high dimensional covariance matrices" ICASSP (2009)
-       http://doi.org/10.1109/ICASSP.2009.4960239
+
+    [1]_ Y. Chen, A. Wiesel and A. O. Hero (2011), 
+    Robust Shrinkage Estimation of High-Dimensional Covariance Matrices,
+    IEEE Transactions on Signal Processing, vol. 59, no. 9, pp. 4097-4107, 
+    doi:10.1109/TSP.2011.2138698
+
     See Also
     --------
-    cov_shrink_ss : similar method, using a different shrinkage target, :math:`T`.
+  
     sklearn.covariance.ledoit_wolf : very similar approach using the same
         shrinkage target, :math:`T`, but a different method for estimating the
         shrinkage intensity, :math:`gamma`.
