@@ -794,3 +794,100 @@ def prop_alt(pvals, adj_method='mean', adj_args={'edf_lower': 0.8, 'num_steps': 
 
     else:
         raise ValueError('Wrong method: {method}!')
+
+def cov_shrink_rblw(S, n):
+    """Compute a shrinkage estimate of the covariance matrix using
+    the Rao-Blackwellized Ledoit-Wolf estimator described by Chen et al. 2011 [1]
+
+    Contributed by `Robert McGibbon <https://rmcgibbo.org/>`_.
+
+    Parameters
+    ----------
+    S : array, shape=(n, n)
+        Sample covariance matrix (e.g. estimated with np.cov(X.T))
+
+    n : int
+        Number of data points used in the estimate of S.
+
+    Returns
+    -------
+
+    sigma : array, shape=(p, p)
+        Estimated shrunk covariance matrix
+
+    shrinkage : float
+        The applied covariance shrinkage intensity.
+
+    Notes
+    -----
+
+    This shrinkage estimator takes the form
+    .. math::
+        \hat{\Sigma} = (1-\gamma) \Sigma_{sample} + \gamma T
+    where :math:`\Sigma^{sample}` is the (noisy but unbiased) empirical
+    covariance matrix,
+    .. math::
+        \Sigma^{sample}_{ij} = \frac{1}{n-1} \sum_{k=1}^n
+            (x_{ki} - \bar{x}_i)(x_{kj} - \bar{x}_j),
+    the matrix :math:`T` is the shrinkage target, a less noisy but biased
+    estimator for the covariance, and the scalar :math:`\gamma \in [0, 1]` is
+    the shrinkage intensity (regularization strength). This approaches uses a
+    scaled identity target, :math:`T`:
+    .. math::
+        T = \frac{\mathrm{Tr}(S)}{p} I_p
+    The shrinkage intensity, :math:`\gamma`, is determined using the RBLW
+    estimator from [2]. The formula for :math:`\gamma` is
+    .. math::
+        \gamma = \min(\alpha + \frac{\beta}{U})
+    where :math:`\alpha`, :math:`\beta`, and :math:`U` are
+    .. math::
+        \alpha &= \frac{n-2}{n(n+2)} \\
+        \beta  &= \frac{(p+1)n - 2}{n(n+2)} \\
+        U      &= \frac{p\, \mathrm{Tr}(S^2)}{\mathrm{Tr}^2(S)} - 1
+    One particularly useful property of this estimator is that it's **very
+    fast**, because it doesn't require access to the data matrix at all (unlike
+    :func:`cov_shrink_ss`). It only requires the sample covariance matrix
+    and the number of data points `n`, as sufficient statistics.
+    For reference, note that [2] defines another estimator, called the oracle
+    approximating shrinkage estimator (OAS), but makes some mathematical errors
+    during the derivation, and futhermore their example code published with
+    the paper does not implement the proposed formulas.
+
+    References
+    ----------
+
+    [1]_ Y. Chen, A. Wiesel and A. O. Hero (2011), 
+    Robust Shrinkage Estimation of High-Dimensional Covariance Matrices,
+    IEEE Transactions on Signal Processing, vol. 59, no. 9, pp. 4097-4107, 
+    doi:10.1109/TSP.2011.2138698
+
+    See Also
+    --------
+  
+    sklearn.covariance.ledoit_wolf : very similar approach using the same
+        shrinkage target, :math:`T`, but a different method for estimating the
+        shrinkage intensity, :math:`gamma`.
+    """
+
+    p = S.shape[0]
+
+    if S.shape[1] != p:
+        raise ValueError('S must be a (p x p) matrix')
+
+    alpha = (n-2)/(n*(n+2))
+    beta = ((p+1)*n - 2) / (n*(n+2))
+
+    trace_S  = 0  # np.trace(S)
+    trace_S2 = 0  # np.trace(S.dot(S))
+
+    for i in range(p):
+        trace_S += S[i,i]
+        for j in range(p):
+            trace_S2 += S[i,j]*S[i,j]
+
+    U = ((p * trace_S2 / (trace_S*trace_S)) - 1)
+    rho = min(alpha + beta/U, 1)
+
+    F = (trace_S / p) * np.eye(p)
+
+    return (1-rho)*np.asarray(S) + rho*F, rho

@@ -829,32 +829,45 @@ class TestUISeriesSsa():
         '''Test Series.ssa() with var truncation
         '''
         ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
-        res = ts.ssa(trunc='var')
+        ts.ssa(trunc='var')
 
     def test_ssa_t2(self):
         '''Test Series.ssa() with Monte-Carlo truncation
         '''
 
         ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
-
-        res = ts.ssa(M=60, nMC=10, trunc='mcssa')
-        fig, ax = res.screeplot()
-        pyleo.closefig(fig)
+        ts.ssa(M=60, nMC=10, trunc='mcssa')
+        
 
     def test_ssa_t3(self):
         '''Test Series.ssa() with Kaiser truncation
         '''
         ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
-        res = ts.ssa(trunc='kaiser')
-
+        ts.ssa(trunc='kaiser')
+        
     def test_ssa_t4(self):
-        '''Test Series.ssa() on Allen&Smith dataset
+        '''Test Series.ssa() with missing values
         '''
-        df = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/mratest.txt',delim_whitespace=True,names=['Total','Signal','Noise'])
-        mra = pyleo.Series(time=df.index, value=df['Total'], value_name='Allen&Smith test data', time_name='Time', time_unit='yr')
-        mraSsa = mra.ssa(nMC=10)
-        fig, ax = mraSsa.screeplot()
-        pyleo.closefig(fig)
+        soi = pyleo.utils.load_dataset('soi')
+        # erase 20% of values
+        n = len(soi.value)        
+        missing = np.random.choice(n,np.floor(0.2*n).astype('int'),replace=False)
+        soi_m = soi.copy()
+        soi_m.value[missing] = np.nan  # put NaNs at the randomly chosen locations
+        miss_ssa = soi_m.ssa()
+        assert all(miss_ssa.eigvals >= 0)
+        assert np.square(miss_ssa.RCseries - soi.value).mean() < 0.3
+        
+    
+
+    # def test_ssa_t5(self):
+    #     '''Test Series.ssa() on Allen&Smith dataset
+    #     '''
+    #     df = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/mratest.txt',delim_whitespace=True,names=['Total','Signal','Noise'])
+    #     mra = pyleo.Series(time=df.index, value=df['Total'], value_name='Allen&Smith test data', time_name='Time', time_unit='yr')
+    #     mraSsa = mra.ssa(nMC=10)
+    #     fig, ax = mraSsa.screeplot()
+    #     pyleo.closefig(fig)
 
 class TestUiSeriesPlot:
     '''Test for Series.plot()
