@@ -69,12 +69,12 @@ class TestSeriesIO:
     @pytest.mark.parametrize('ds_name',['nino3','AACO2','LR04'])
     def test_csv_roundtrip(self, ds_name):
         ts1 = pyleo.utils.load_dataset(ds_name)
-        ts1.to_csv(path='./test_files')
+        ts1.to_csv()
         filename = ts1.label.replace(" ", "_") + '.csv'
-        ts2 = pyleo.Series.from_csv('test_files/' +  filename)
+        ts2 = pyleo.Series.from_csv(filename)
         assert ts1.equals(ts2)
         #clean up file
-        os.unlink('test_files/' +  filename)
+        os.unlink(filename)
 
 class TestUiSeriesMakeLabels:
     ''' Tests for Series.make_labels()
