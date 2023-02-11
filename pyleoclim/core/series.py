@@ -293,7 +293,20 @@ class Series:
 
         Returns
         -------
-        None.
+        None
+        
+        See Also
+        --------
+        pyleoclim.Series.from_csv
+        
+        Examples
+        --------
+        >>> import pyleoclim as pyleo
+        >>> LR04 = pyleo.utils.load_dataset('LR04')
+        >>> LR04.to_csv()
+        >>> lr04 = pyleo.Series.from_csv('LR04_benthic_stack.csv')
+        >>> LR04.equals(lr04) 
+        
 
         '''
         filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
@@ -332,6 +345,10 @@ class Series:
         -------
         Series
             pyleoclim Series object containing data and metadata.
+            
+        See Also
+        --------
+        pyleoclim.Series.to_csv     
 
         '''
         metadata = {}
