@@ -90,7 +90,7 @@ def simple_stats(y, axis=None):
     return mean, median, min_, max_, std, IQR
 
 
-def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True):
+def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True, statistic = 'mean', bins=None):
     """ Bin the values
 
     Parameters
@@ -98,16 +98,31 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True):
 
     x : array
         The x-axis series.
+
     y : array
         The y-axis series.
+
     bin_size : float
         The size of the bins. Default is the mean resolution if evenly_spaced is not True
+
     start : float
         Where/when to start binning. Default is the minimum
+
     stop : float
         When/where to stop binning. Default is the maximum
+
     evenly_spaced : {True,False}
         Makes the series evenly-spaced. This option is ignored if bin_size is set to float
+
+    statistic : str
+        Statistic to calculate and return in values. Default is 'mean'.
+        See scipy.stats.binned_statistic for other options.
+
+    bins : array
+        The right hand edge of bins to use for binning. 
+        E.g. if bins = [1,2,3,4], bins will be [1,2), [2,3), [3,4].
+        See scipy.stats.binned_statistic for details.
+        Start, stop, bin_size will be ignored if this is passed.
 
     Returns
     -------
@@ -134,43 +149,34 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True):
     x = np.array(x, dtype='float64')
     y = np.array(y, dtype='float64')
     
-    if bin_size is not None and evenly_spaced == True:
-        warnings.warn('The bin_size has been set, the series may not be evenly_spaced')
+    if (bin_size is not None or bins is not None) and evenly_spaced == True:
+        warnings.warn('The bin_size or bins has been set, the series may not be evenly_spaced')
 
-    # Get the bin_size if not available
-    if bin_size is None:
-        if evenly_spaced == True:
-            bin_size = np.nanmax(np.diff(x))
-        else:
-            bin_size = np.nanmean(np.diff(x))
+    # Set the bin edges
+    if bins is None:
+        # Get the bin_size if not available
+        if bin_size is None:
+            if evenly_spaced == True:
+                bin_size = np.nanmax(np.diff(x))
+            else:
+                bin_size = np.nanmean(np.diff(x))
 
-    # Get the start/stop if not given
-    if start is None:
-        start = np.nanmin(x)
-    if stop is None:
-        stop = np.nanmax(x)
-
-    # Set the bin medians
-    bins = np.arange(start+bin_size/2, stop + bin_size/2, bin_size)
+        # Get the start/stop if not given
+        if start is None:
+            start = np.nanmin(x)
+        if stop is None:
+            stop = np.nanmax(x)
+        bins = np.arange(start, stop + bin_size, bin_size)
 
     # Perform the calculation
-    binned_values = []
-    n = []
-    error = []
-    for val in np.nditer(bins):
-        idx = [idx for idx, c in enumerate(x) if c >= (val-bin_size/2) and c < (val+bin_size/2)]
-        if y[idx].size == 0:
-            binned_values.append(np.nan)
-            n.append(np.nan)
-            error.append(np.nan)
-        else:
-            binned_values.append(np.nanmean(y[idx]))
-            n.append(y[idx].size)
-            error.append(np.nanstd(y[idx]))
+    binned_values = stats.binned_statistic(x=x,values=y,bins=bins,statistic=statistic).statistic
+    n = stats.binned_statistic(x=x,values=y,bins=bins,statistic='count').statistic
+    error = stats.binned_statistic(x=x,values=y,bins=bins,statistic='std').statistic
 
+    #Returned bins should be at the midpoint of the bin edges
     res_dict = {
-        'bins': np.array(bins),
-        'binned_values': np.array(binned_values),
+        'bins': (bins[1:] + bins[:-1])/2,
+        'binned_values': binned_values,
         'n': n,
         'error': error,
     }
@@ -178,7 +184,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True):
     return  res_dict
 
 
-def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
+def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', evenly_spaced=True, bins=None):
     '''Coarsen time resolution using a Gaussian kernel
 
     Parameters
@@ -195,7 +201,7 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
     step : float
         The interpolation step. Default is max spacing between consecutive points.
 
-        start : float
+    start : float
         where/when to start the interpolation. Default is min(t).
         
     stop : float
@@ -203,6 +209,16 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
    
     step_style : str
             step style to be applied from 'increments' [default = 'max']
+
+    evenly_spaced : {True,False}
+        Makes the series evenly-spaced. This option is ignored if bins are passed.
+        Will 
+
+    bins : array
+        The right hand edge of bins to use for binning.
+        E.g. if bins = [1,2,3,4], bins will be [1,2), [2,3), [3,4].
+        Same behavior as scipy.stats.binned_statistic
+        Start, stop, step, and step_style will be ignored if this is passed.
 
     Returns
     -------
@@ -232,28 +248,40 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max'):
 
     if len(t) != len(y):
         raise ValueError('y and t must have the same length')
-        
-    # get the interpolation step if not provided
-    if step is None:
-        _, _, step = increments(np.asarray(t), step_style = step_style)
-        # Get the start and end point if not given
-    if start is None:
-        start = np.nanmin(np.asarray(t))
-    if stop is None:
-        stop = np.nanmax(np.asarray(t))
+
+    if (step is not None or bins is not None) and evenly_spaced == True:
+        warnings.warn('The step or bins has been set, the series may not be evenly_spaced')
     
     # Get the uniform time axis.
-    tc = np.arange(start,stop+step,step)
-        
+    if bins is None:
+        # get the interpolation step if not provided
+        if step is None:
+            if evenly_spaced:
+                _, _, step = increments(np.asarray(t), step_style = 'max')
+            elif not evenly_spaced:
+                _, _, step = increments(np.asarray(t), step_style = step_style)
+        # Get the start and end point if not given
+        if start is None:
+            start = np.nanmin(np.asarray(t))
+        if stop is None:
+            stop = np.nanmax(np.asarray(t))
+        bins = np.arange(start,stop+step,step)
+    
+    #Find the midpoints of the bin edges
+    tc = (bins[1:] + bins[:-1])/2
 
     kernel = lambda x, s : 1.0/(s*np.sqrt(2*np.pi))*np.exp(-0.5*(x/s)**2)  # define kernel function
 
     yc    = np.zeros((len(tc)))
     yc[:] = np.nan
 
-    for i in range(len(tc)-1):
-        xslice = t[(t>=tc[i])&(t<tc[i+1])]
-        yslice = y[(t>=tc[i])&(t<tc[i+1])]
+    for i in range(len(bins)-1):
+        if i < len(bins-1):
+            xslice = t[(t>=bins[i])&(t<bins[i+1])]
+            yslice = y[(t>=bins[i])&(t<bins[i+1])]
+        else:
+            xslice = t[(t>=bins[i])&(t<=bins[i+1])]
+            yslice = y[(t>=bins[i])&(t<=bins[i+1])]
 
         if len(xslice)>0:
             d      = xslice-tc[i]
