@@ -3,6 +3,12 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  # jupyterhub-singleuser version 3 or greater is a requirement for working well
+  # with a JupyterHub such as at https://linkedearth.2i2c.cloud. After
+  # https://github.com/jupyterhub/repo2docker/pull/1239 is merged, this doesn't
+  # need to be specified.
+  #
+  - jupyterhub-singleuser>=3.0
   - cartopy=0.21.0
   - jupyter
   - xarray=2022.6.0
