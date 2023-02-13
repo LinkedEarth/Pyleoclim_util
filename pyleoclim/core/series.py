@@ -28,9 +28,10 @@ from ..core.surrogateseries import SurrogateSeries
 
 import seaborn as sns
 import matplotlib.pyplot as plt
-import matplotlib as mpl # could also from matplotlib.colors import ColorbarBase
+#import matplotlib as mpl # could also from matplotlib.colors import ColorbarBase
 import numpy as np
 import pandas as pd
+
 #from tabulate import tabulate
 from collections import namedtuple
 from copy import deepcopy
@@ -292,7 +293,20 @@ class Series:
 
         Returns
         -------
-        None.
+        None
+        
+        See Also
+        --------
+        pyleoclim.Series.from_csv
+        
+        Examples
+        --------
+        >>> import pyleoclim as pyleo
+        >>> LR04 = pyleo.utils.load_dataset('LR04')
+        >>> LR04.to_csv()
+        >>> lr04 = pyleo.Series.from_csv('LR04_benthic_stack.csv')
+        >>> LR04.equals(lr04) 
+        
 
         '''
         filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
@@ -331,6 +345,10 @@ class Series:
         -------
         Series
             pyleoclim Series object containing data and metadata.
+            
+        See Also
+        --------
+        pyleoclim.Series.to_csv     
 
         '''
         metadata = {}
@@ -431,34 +449,72 @@ class Series:
             raise ValueError('Given method does not return a pandas Series and cannot be applied')
         return self.from_pandas(result, self.metadata)
     
-    def equals(self,ts):
+    def equals(self, ts, index_tol = 5, value_tol = 1e-5):
         '''
-        Test whether two objects contain the same elements (data and metadata)
+        Test whether two objects contain the same elements (values and datetime_index)
+        A printout is returned if metadata are different, but the statement is considered 
+        True as long as data match. 
 
         Parameters
         ----------
         ts : Series object
            The target series for the comparison
+           
+        index_tol: int, default 5
+            tolerance on difference in datetime indices (in dtype units, which are seconds by default) 
+
+        value_tol: float, default 1e-5
+            tolerance on difference in values (in %)
+           
         Returns
         -------
-        bool
-            Truth value of the proposition "the two series are identical"
-
+        same_data: bool
+            Truth value of the proposition "the two series have the same data". 
+            
+        same_metadata: bool
+            Truth value of the proposition "the two series have the same metadata".  
+            
+        Examples
+        --------
+        >>> import pyleoclim as pyleo
+        >>> soi = pyleo.utils.load_dataset('soi')
+        >>> nino3 = pyleo.utils.load_dataset('nino3')
+        >>> soi.equals(nino3)
+                    
         '''
-        # check that the data are the same
-        same_data = self.to_pandas().equals(ts.to_pandas())
-        if not same_data:
-            print("Difference found among the 2 Series'' data")
+        left = self.to_pandas()
+        right = ts.to_pandas()
+        
+        if len(left) != len(right): # check that series have the same lengths
+            print(f"The two series have different lengths, left: {len(left)} vs right: {len(right)}")
+            same_values = False
+            same_index = False
+        else:    
+            # check that the values are the same
+            try:
+                same_values = np.allclose(left.values, right.values, rtol=value_tol, equal_nan=True)
+                if not same_values:
+                    print(f"The two series have values differing by more than {value_tol} {self.value_unit}")
+                # check that the indices are the same
+                dt = left.index - right.index
+                same_index = all(dt.total_seconds() < index_tol)
+                 
+                if not same_index:
+                    print(f"The series have indices differing by more than {index_tol} seconds")
+                
+            except AssertionError as exp:
+                print(str(exp))
+                
+        same_data = same_values & same_index
         # check that the metadata are the same
         same_metadata = (self.metadata == ts.metadata)
         if not same_metadata:
-            print("Difference found among the 2 Series'' metadata:")
+            print("Metadata are different:")
             for key in self.metadata:
                 if self.metadata.get(key) != ts.metadata.get(key):
-                    print(f"key {key}, left: {self.metadata.get(key)}, right: {ts.metadata.get(key)}")
+                    print(f"{key} property -- left: {self.metadata.get(key)}, right: {ts.metadata.get(key)}")
             
-        
-        return same_data & same_metadata 
+        return same_data, same_metadata
     
     def view(self):
         '''

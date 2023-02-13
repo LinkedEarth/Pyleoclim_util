@@ -21,10 +21,53 @@ nino3:
   pyleo_kwargs:
     time_name: 'time'
     time_unit: 'year C.E.'
+    label: 'NINO3 SST'
     value_name: 'NINO3'
     value_unit: '$^{\circ}$C'
   time_column: t
   value_column: nino
+  
+air:
+  filename: 'wtc_test_data_nino_even'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  pyleo_kwargs:
+    time_name: 'time'
+    time_unit: 'year C.E.'
+    label: 'All-India Rainfall'
+    value_name: 'AIR'
+    value_unit: 'mm/month'
+  time_column: t
+  value_column: air  
+  
+LR04:
+  filename: 'LR04'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 4
+  pyleo_kwargs:
+    time_name: 'Age'
+    time_unit: 'ky BP'
+    label: 'LR04 benthic stack'
+    value_name: '$\delta^{18}$O' 
+    value_unit: '‰'
+  time_column: Time (ka)
+  value_column: Benthic d18O (per mil)  
+  
+AACO2:
+  filename: 'EPICA_Dome_C_CO2'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 13
+  pyleo_kwargs:
+    time_name: 'Age'
+    time_unit: 'ky BP'
+    label: 'EPICA Dome C CO2'
+    value_name: '$CO_2$' 
+    value_unit: 'ppm'
+  time_column: Age [kyr BP]
+  value_column: $CO_2$ [ppm]      
 
 nino_json:
   filename: 'Nino'

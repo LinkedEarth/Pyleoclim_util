@@ -41,3 +41,13 @@ def unevenly_spaced_series():
     v = np.ones(length)
     series = pyleo.Series(t,v)
     return series
+
+@pytest.fixture
+def evenly_spaced_series():
+    """Pyleoclim series with evenly spaced time axis"""
+    length = 10
+    t = np.linspace(1,length,length) ** 2
+    v = np.cos(2*np.pi*t/10)
+    series = pyleo.Series(time=t, value=v)
+    series.label = 'cosine'
+    return series

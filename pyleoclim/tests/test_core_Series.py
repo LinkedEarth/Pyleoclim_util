@@ -20,7 +20,7 @@ from numpy.testing import assert_array_equal
 import pytest
 #import scipy.io as sio
 import sys#, json
-#import os
+import os
 import pathlib
 test_dirpath = pathlib.Path(__file__).parent.absolute()
 
@@ -62,14 +62,19 @@ def gen_normal(loc=0, scale=1, nt=100):
 
 # Tests below
 
-class TestUiSeriesIO:
-    ''' Test Series    import from and export to other formats    
+
+class TestSeriesIO:
+    ''' Test Series import from and export to other formats    
     '''
-    def test_csv(self):
-        ts1 = pyleo.utils.load_dataset('nino3')
+    @pytest.mark.parametrize('ds_name',['nino3','AACO2','LR04'])
+    def test_csv_roundtrip(self, ds_name):
+        ts1 = pyleo.utils.load_dataset(ds_name)
         ts1.to_csv()
-        ts2 = pyleo.Series.from_csv('series.csv')
+        filename = ts1.label.replace(" ", "_") + '.csv'
+        ts2 = pyleo.Series.from_csv(filename)
         assert ts1.equals(ts2)
+        #clean up file
+        os.unlink(filename)
 
 class TestUiSeriesMakeLabels:
     ''' Tests for Series.make_labels()
@@ -1053,3 +1058,48 @@ class TestResample:
             ts.resample('foo')
         with pytest.raises(ValueError, match='Invalid rule provided, got: 412'):
             ts.resample('412')
+
+class TestUISeriesEquals():
+    ''' Test for equals() method '''
+    @pytest.mark.parametrize('ds_name',['soi','nino3'])
+    def test_equals_t0(self, ds_name):
+        # test equality of data when true
+        ts1 = pyleo.utils.load_dataset('soi')
+        ts2 = pyleo.utils.load_dataset(ds_name)
+        
+        same_data, _ = ts1.equals(ts2)
+        if ds_name == 'soi':
+            assert same_data
+        else:
+            assert not same_data
+            
+    def test_equals_t1(self):
+        # test equality of metadata 
+        ts1 = pyleo.utils.load_dataset('soi')
+        ts2 = ts1.copy()
+        ts2.label = 'Counterfeit SOI' 
+        same_data, same_metadata = ts1.equals(ts2)
+        assert not same_metadata
+        
+    def test_equals_t2(self):
+        # test value tolerance
+        tol = 1e-3
+        ts1 = pyleo.utils.load_dataset('soi')
+        ts2 = ts1.copy()
+        ts2.value[0] = ts1.value[0]+tol
+        same_data, _ = ts1.equals(ts2, value_tol= 2*tol)   
+        assert same_data   
+        
+    def test_equals_t3(self):
+        # test index tolerance
+        soi = pyleo.utils.load_dataset('soi')
+        soi_pd = soi.to_pandas()
+        soi_pd.index = soi_pd.index + pd.DateOffset(1)
+        soi2 = pyleo.Series.from_pandas(soi_pd, soi.metadata)
+        same_data, _ = soi.equals(soi2, index_tol= 1.1*86400)  
+        
+        assert same_data       
+        
+        
+        
+        
