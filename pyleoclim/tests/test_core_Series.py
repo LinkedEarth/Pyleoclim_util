@@ -64,9 +64,9 @@ def gen_normal(loc=0, scale=1, nt=100):
 
 
 class TestSeriesIO:
-    ''' Test Series import from and export to other formats    
+    ''' Test Series import from and export to other formats
     '''
-    @pytest.mark.parametrize('ds_name',['nino3','AACO2','LR04'])
+    @pytest.mark.parametrize('ds_name',['NINO3','AACO2','LR04'])
     def test_csv_roundtrip(self, ds_name):
         ts1 = pyleo.utils.load_dataset(ds_name)
         ts1.to_csv()
@@ -842,28 +842,28 @@ class TestUISeriesSsa():
 
         ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
         ts.ssa(M=60, nMC=10, trunc='mcssa')
-        
+
 
     def test_ssa_t3(self):
         '''Test Series.ssa() with Kaiser truncation
         '''
         ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
         ts.ssa(trunc='kaiser')
-        
+
     def test_ssa_t4(self):
         '''Test Series.ssa() with missing values
         '''
-        soi = pyleo.utils.load_dataset('soi')
+        soi = pyleo.utils.load_dataset('SOI')
         # erase 20% of values
-        n = len(soi.value)        
+        n = len(soi.value)
         missing = np.random.choice(n,np.floor(0.2*n).astype('int'),replace=False)
         soi_m = soi.copy()
         soi_m.value[missing] = np.nan  # put NaNs at the randomly chosen locations
         miss_ssa = soi_m.ssa()
         assert all(miss_ssa.eigvals >= 0)
         assert np.square(miss_ssa.RCseries - soi.value).mean() < 0.3
-        
-    
+
+
 
     # def test_ssa_t5(self):
     #     '''Test Series.ssa() on Allen&Smith dataset
@@ -1048,7 +1048,7 @@ class TestResample:
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
- 
+
     def test_resample_invalid(self, dataframe_dt, metadata):
         # note: resample with large ranges is still not supported,
         # so for now we're only testing 'years' as the rule
@@ -1061,45 +1061,41 @@ class TestResample:
 
 class TestUISeriesEquals():
     ''' Test for equals() method '''
-    @pytest.mark.parametrize('ds_name',['soi','nino3'])
+    @pytest.mark.parametrize('ds_name',['SOI','NINO3'])
     def test_equals_t0(self, ds_name):
         # test equality of data when true
-        ts1 = pyleo.utils.load_dataset('soi')
+        ts1 = pyleo.utils.load_dataset('SOI')
         ts2 = pyleo.utils.load_dataset(ds_name)
-        
+
         same_data, _ = ts1.equals(ts2)
-        if ds_name == 'soi':
+        if ds_name == 'SOI':
             assert same_data
         else:
             assert not same_data
-            
+
     def test_equals_t1(self):
-        # test equality of metadata 
-        ts1 = pyleo.utils.load_dataset('soi')
+        # test equality of metadata
+        ts1 = pyleo.utils.load_dataset('SOI')
         ts2 = ts1.copy()
-        ts2.label = 'Counterfeit SOI' 
+        ts2.label = 'Counterfeit SOI'
         same_data, same_metadata = ts1.equals(ts2)
         assert not same_metadata
-        
+
     def test_equals_t2(self):
         # test value tolerance
         tol = 1e-3
-        ts1 = pyleo.utils.load_dataset('soi')
+        ts1 = pyleo.utils.load_dataset('SOI')
         ts2 = ts1.copy()
         ts2.value[0] = ts1.value[0]+tol
-        same_data, _ = ts1.equals(ts2, value_tol= 2*tol)   
-        assert same_data   
-        
+        same_data, _ = ts1.equals(ts2, value_tol= 2*tol)
+        assert same_data
+
     def test_equals_t3(self):
         # test index tolerance
-        soi = pyleo.utils.load_dataset('soi')
+        soi = pyleo.utils.load_dataset('SOI')
         soi_pd = soi.to_pandas()
         soi_pd.index = soi_pd.index + pd.DateOffset(1)
         soi2 = pyleo.Series.from_pandas(soi_pd, soi.metadata)
-        same_data, _ = soi.equals(soi2, index_tol= 1.1*86400)  
-        
-        assert same_data       
-        
-        
-        
-        
+        same_data, _ = soi.equals(soi2, index_tol= 1.1*86400)
+
+        assert same_data

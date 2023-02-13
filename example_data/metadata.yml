@@ -1,4 +1,4 @@
-soi:
+SOI:
   filename: 'soi_data'
   file_extension: 'csv'
   pandas_kwargs:
@@ -13,7 +13,7 @@ soi:
   time_column: 1
   value_column: 2
 
-nino3:
+NINO3:
   filename: 'wtc_test_data_nino_even'
   file_extension: 'csv'
   pandas_kwargs:
@@ -27,7 +27,21 @@ nino3:
   time_column: t
   value_column: nino
   
-air:
+HadCRUT5:
+  filename: 'HadCRUT.5.0.1.0.analysis.summary_series.global.annual'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  pyleo_kwargs:
+    time_name: 'time'
+    time_unit: 'year C.E.'
+    label: 'HadCRUT5'
+    value_name: 'GMST'
+    value_unit: '$^{\circ}$C'
+  time_column: Time
+  value_column: Anomaly (deg C)  
+  
+AIR:
   filename: 'wtc_test_data_nino_even'
   file_extension: 'csv'
   pandas_kwargs:
