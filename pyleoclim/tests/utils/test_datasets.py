@@ -1,15 +1,17 @@
 # from pyleoclim.utils import load_dataset
 import pyleoclim as pyleo
 import pytest
-from pyleoclim import utils
 from pyleoclim.utils import datasets 
 
 TEST_DATASETS = [
-    'soi',
-    'nino3',
+    'SOI',
+    'NINO3',
+    'HadCRUT5',
+    'AIR',
+    'LR04',
+    'AACO2',
     'nino_json'
 ]
-
 
 def test_load_datasets_metadata():
     """test loading all metadata for all datasets"""
