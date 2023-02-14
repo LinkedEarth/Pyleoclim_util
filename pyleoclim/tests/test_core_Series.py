@@ -1018,9 +1018,6 @@ class TestUISeriesSort:
 class TestResample:
     @pytest.mark.parametrize('rule', pyleo.utils.tsbase.MATCH_A)
     def test_resample_simple(self, rule, dataframe_dt, metadata):
-        # note: resample with large ranges is still not supported,
-        # so for now we're only testing 'years' as the rule
-        # https://github.com/pandas-dev/pandas/issues/51024
         ser = dataframe_dt.loc[:, 0]
         ts = pyleo.Series.from_pandas(ser, metadata)
         result =ts.resample(rule).mean()
@@ -1048,10 +1045,44 @@ class TestResample:
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
+
+    @pytest.mark.parametrize(
+        ('rule', 'expected_idx'),
+        [
+            ('1ga', [np.datetime64('2018-12-30 23:59:59'), np.datetime64('1000002018-12-31 00:00:01')]),
+            ('1ma', [np.datetime64('2018-12-30 23:59:59'), np.datetime64('1002018-12-30 23:59:59')]),
+            ('2ka', [np.datetime64('2018-12-30 23:59:59'), np.datetime64('4018-12-30 23:59:59')]),
+        ]
+    )
+    def test_resample_long_periods(self, rule, expected_idx, dataframe_dt, metadata):
+        ser = dataframe_dt.loc[:, 0]
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        result =ts.resample(rule).mean()
+        result_ser = result.to_pandas()
+        expected_values = np.array([0, 2.5])
+        expected_idx = pd.DatetimeIndex(expected_idx, name='datetime').as_unit('s')
+        expected_ser = pd.Series(expected_values, index=expected_idx, name='SOI')
+        expected_metadata = {
+            'time_unit': 'years CE',
+            'time_name': 'Time',
+            'value_unit': 'mb',
+            'value_name': 'SOI',
+            'label': f'Southern Oscillation Index ({rule} resampling)',
+            'lat': None,
+            'lon': None,
+            'archiveType': None,
+            'importedFrom': None,
+            'log': (
+                {0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False},
+                {3: 'clean_ts', 'applied': True, 'verbose': False}
+            )
+        }
+        pd.testing.assert_series_equal(result_ser, expected_ser)
+        assert result.metadata == expected_metadata
+ 
  
     def test_resample_invalid(self, dataframe_dt, metadata):
-        # note: resample with large ranges is still not supported,
-        # so for now we're only testing 'years' as the rule
         ser = dataframe_dt.loc[:, 0]
         ts = pyleo.Series.from_pandas(ser, metadata)
         with pytest.raises(ValueError, match='Invalid unit provided, got: foo'):
