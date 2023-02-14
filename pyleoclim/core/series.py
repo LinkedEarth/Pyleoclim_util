@@ -4051,16 +4051,11 @@ class Series:
         
         Examples
         --------
-        >>> ts.resample('ka').mean()  # doctest: +SKIP
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-
-            import pyleoclim as pyleo
-            ts = pyleo.utils.load_dataset('nino3')
-            fig, ax = ts.plot()
-            ts.resample('5y').mean().plot(ax=ax)
-        
+        >>> ts = pyleo.utils.load_dataset('LR04')
+        >>> ts5k = ts.resample('5ka').mean()
+        >>> fig, ax = ts.plot(invert_yaxis='True')
+        >>> ts5k.plot(ax=ax,color='C1')
+                
         """
         search = re.search(r'(\d*)([a-zA-Z]+)', rule)
         if search is None:
