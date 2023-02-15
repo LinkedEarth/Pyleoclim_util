@@ -477,9 +477,9 @@ class Series:
         Examples
         --------
         >>> import pyleoclim as pyleo
-        >>> soi = pyleo.utils.load_dataset('soi')
-        >>> nino3 = pyleo.utils.load_dataset('nino3')
-        >>> soi.equals(nino3)
+        >>> soi = pyleo.utils.load_dataset('SOI')
+        >>> NINO3 = pyleo.utils.load_dataset('NINO3')
+        >>> soi.equals(NINO3)
                     
         '''
         left = self.to_pandas()
@@ -1021,38 +1021,16 @@ class Series:
         --------
 
         Plot the HadCRUT5 Global Mean Surface Temperature
-
-            .. ipython:: python
-                :okwarning:
-                :okexcept:
-
-                import pyleoclim as pyleo
-                import pandas as pd
-                url = 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.annual.csv'
-                df = pd.read_csv(url)
-                time = df['Time']
-                gmst = df['Anomaly (deg C)']
-                ts = pyleo.Series(time=time,value=gmst, label = 'HadCRUT5', time_name='Year C.E', value_name='GMST')
-                @savefig hadCRUT5_stripes.png
-                fig, ax = ts.stripes(ref_period=(1971,2000))
-                pyleo.closefig(fig)
+        
+        >>> gmst = pyleo.utils.load_dataset('HadCRUT5')
+        >>> fig, ax = gmst.stripes(ref_period=(1971,2000))
+        >>> pyleo.closefig(fig)
 
         If you wanted to show the time axis:
 
-            .. ipython:: python
-                :okwarning:
-                :okexcept:
-
-                import pyleoclim as pyleo
-                import pandas as pd
-                url = 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.annual.csv'
-                df = pd.read_csv(url)
-                time = df['Time']
-                gmst = df['Anomaly (deg C)']
-                ts = pyleo.Series(time=time,value=gmst, label = 'HadCRUT5', time_name='Year C.E', value_name='GMST')
-                @savefig hadCRUT5_stripes2.png
-                fig, ax = ts.stripes(ref_period=(1971,2000), show_xaxis=True, figsize=[8, 1.2])
-                pyleo.closefig(fig)
+         >>> gmst = pyleo.utils.load_dataset('HadCRUT5')
+         >>> fig, ax = gmst.stripes(ref_period=(1971,2000), show_xaxis=True, figsize=[8, 1.2])
+         >>> pyleo.closefig(fig)
 
         Note that we had to increase the figure height to make space for the extra text.
         '''

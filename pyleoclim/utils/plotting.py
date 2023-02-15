@@ -299,7 +299,7 @@ def stripes_xy(x, y, ref_period, thickness = 1.0, LIM = 0.75, figsize=None, xlab
                x_offset = 0.05, label_size = None, show_xaxis = False,
                invert_xaxis=False, top_label = None, bottom_label = None, label_color = None): 
     '''
-    Represent y as an Ed Hawkins "warming stripes" pattern, as a function of x
+    Represent y = f(x) as an Ed Hawkins "warming stripes" pattern
     
     Credit: https://matplotlib.org/matplotblog/posts/warming-stripes/
     
