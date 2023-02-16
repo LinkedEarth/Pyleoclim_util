@@ -207,6 +207,16 @@ class Series:
        
     @property
     def datetime_index(self):
+        """
+        Convert time to pandas DatetimeIndex.
+
+        Note: conversion will happen using `time_unit`, and will assume:
+
+        - the number of seconds per year is calculated using UDUNITS, see
+          http://cfconventions.org/cf-conventions/cf-conventions#time-coordinate
+        - `time` refers to the Gregorian calendar. If using a different calendar,
+          then please make sure to do any conversions before hand.
+        """
         datum, exponent, direction = tsbase.time_unit_to_datum_exp_dir(self.time_unit)
         index = tsbase.time_to_datetime(self.time, datum, exponent, direction)
         return pd.DatetimeIndex(index, name='datetime')
@@ -268,8 +278,6 @@ class Series:
         ser : pd.Series representation of the pyleo.Series object
 
         '''
-        # Could be a dataclass instead?
-
         ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
         if paleo_style:
             time_label, value_label = self.make_labels()

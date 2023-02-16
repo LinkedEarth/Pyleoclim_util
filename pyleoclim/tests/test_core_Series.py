@@ -1023,9 +1023,10 @@ class TestResample:
         result =ts.resample(rule).mean()
         result_ser = result.to_pandas()
         expected_values = np.array([0., 1., 2., 3., 4.])
-        expected_idx = pd.DatetimeIndex(['2018-12-30 23:59:59', '2019-12-30 23:59:59',
-               '2020-12-30 23:59:59', '2021-12-30 23:59:59',
-               '2022-12-30 23:59:59'], name='datetime').as_unit('s')
+        expected_idx = pd.DatetimeIndex(
+            ['2018-12-31', '2019-12-31', '2020-12-31', '2021-12-31', '2022-12-31'],
+            name='datetime'
+        ).as_unit('s')
         expected_ser = pd.Series(expected_values, expected_idx, name='SOI')
         expected_metadata = {
             'time_unit': 'years CE',
@@ -1049,9 +1050,9 @@ class TestResample:
     @pytest.mark.parametrize(
         ('rule', 'expected_idx'),
         [
-            ('1ga', [np.datetime64('2018-12-30 23:59:59'), np.datetime64('1000002018-12-31 00:00:01')]),
-            ('1ma', [np.datetime64('2018-12-30 23:59:59'), np.datetime64('1002018-12-30 23:59:59')]),
-            ('2ka', [np.datetime64('2018-12-30 23:59:59'), np.datetime64('4018-12-30 23:59:59')]),
+            ('1ga', [np.datetime64('2018-12-31'), np.datetime64('1000002018-12-31')]),
+            ('1ma', [np.datetime64('2018-12-31'), np.datetime64('1002018-12-31')]),
+            ('2ka', [np.datetime64('2018-12-31'), np.datetime64('4018-12-31')]),
         ]
     )
     def test_resample_long_periods(self, rule, expected_idx, dataframe_dt, metadata):
@@ -1128,5 +1129,4 @@ class TestUISeriesEquals():
         soi_pd.index = soi_pd.index + pd.DateOffset(1)
         soi2 = pyleo.Series.from_pandas(soi_pd, soi.metadata)
         same_data, _ = soi.equals(soi2, index_tol= 1.1*86400)
-
         assert same_data
