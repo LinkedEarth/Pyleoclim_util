@@ -4012,12 +4012,26 @@ class Series:
         """
         Run analogue to pandas.Series.resample.
 
+        This is a convenience method: doing
+
+            ser.resample('Y').mean()
+
+        will do the same thing as
+
+            ser.pandas_method(lambda x: x.resample('Y').mean())
+        
+        but will also accept some extra resampling rules, such as `'Ga'` (see below).
+
         Parameters
         ----------
         rule : str
             The offset string or object representing target conversion.
             Can also accept pyleoclim units, such as 'ka' (1000 years),
             'Ma' (1 million years), and 'Ga' (1 billion years).
+
+            Check the [pandas resample docs](https://pandas.pydata.org/docs/dev/reference/api/pandas.DataFrame.resample.html)
+            for more details.
+
         kwargs : dict
             Any other arguments which will be passed to pandas.Series.resample.
         
