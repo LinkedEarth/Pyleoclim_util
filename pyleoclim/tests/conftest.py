@@ -8,7 +8,7 @@ import pytest
 def dataframe_dt():
     """Pandas dataframe with a datetime index and random values"""
     length = 5
-    dti = pd.date_range("2018-01-01", periods=length, freq="Y")
+    dti = pd.date_range("2018-01-01", periods=length, freq="Y", unit='s')
     df = pd.DataFrame(np.array(range(length)), index=dti)
     return df
 

@@ -82,7 +82,7 @@ def test_convert_datetime_index_ka(dataframe_dt):
         time_unit, 
         time_name=time_name,
         )
-    expected = np.array([-996577.75451608, -996577.75551608, -999315.60730322, -996577.75751608, -996577.75851608])
+    expected = np.array([-0.06899658, -0.06999658, -0.07099932, -0.07199658, -0.07299658])
     assert np.allclose(time.values, expected, rtol=1e-05, atol=1e-08)
 
 
@@ -94,7 +94,7 @@ def test_convert_datetime_index_ma(dataframe_dt):
         time_unit, 
         time_name=time_name,
         )
-    expected = np.array([-996.57775452, -996.57775552, -999.3156073 , -996.57775752, -996.57775852])
+    expected = np.array([-6.89965777e-05, -6.99965777e-05, -7.09993155e-05, -7.19965777e-05, -7.29965777e-05])
     assert np.allclose(time.values, expected, rtol=1e-05, atol=1e-08)
 
 
@@ -106,7 +106,7 @@ def test_convert_datetime_index_ga(dataframe_dt):
         time_unit, 
         time_name=time_name,
         )
-    expected = np.array([-0.99657775, -0.99657776, -0.99931561, -0.99657776, -0.99657776])
+    expected = np.array([-6.89965777e-08, -6.99965777e-08, -7.09993155e-08, -7.19965777e-08, -7.29965777e-08])
     assert np.allclose(time.values, expected, rtol=1e-05, atol=1e-08)
 
 
@@ -118,7 +118,7 @@ def test_convert_datetime_index_bp(dataframe_dt):
         time_unit, 
         time_name=time_name,
         )
-    expected = np.array([-9.96577755e+08, -9.96577756e+08, -9.99315607e+08, -9.96577758e+08, -9.96577759e+08])
+    expected = np.array([-68.99657769, -69.99657769, -70.99931554, -71.99657769, -72.99657769])
     assert np.allclose(time.values, expected, rtol=1e-05, atol=1e-08)
 
 
@@ -130,7 +130,7 @@ def test_convert_datetime_index_ad(dataframe_dt):
         time_unit, 
         time_name=time_name,
         )
-    expected = np.array([9.96579705e+08, 9.96579706e+08, 9.99317557e+08, 9.96579708e+08, 9.96579709e+08])
+    expected = np.array([2018.99657769, 2019.99657769, 2020.99931554, 2021.99657769, 2022.99657769])
     assert np.allclose(time.values, expected, rtol=1e-05, atol=1e-08)
 
 
