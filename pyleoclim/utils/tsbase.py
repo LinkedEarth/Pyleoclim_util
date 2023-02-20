@@ -21,7 +21,8 @@ __all__ = [
     'reduce_duplicated_timestamps',
 ]
 
-SECONDS_PER_YEAR = 365.25 * 60  * 60 * 24 ## TODO: generalize to different calendars using cftime
+# UDUNITS, see: http://cfconventions.org/cf-conventions/cf-conventions#time-coordinate
+SECONDS_PER_YEAR = 31556925.974592  # 86400 * 365.24219878
 
 MATCH_A  = frozenset(['y', 'yr', 'yrs', 'year', 'years'])
 MATCH_KA = frozenset(['ka', 'ky', 'kyr', 'kyrs', 'kiloyear', 'kiloyr', 'kiloyrs']) 
@@ -82,8 +83,17 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
     return (datum, exponent, direction)
 
 def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
+    """
+    Convert a DatetimeIndex to time in a given unit. 
+
+    The general formula is:
+
+        datetime_index = datum +/- time*10**exponent
+    
+    where we assume ``time`` to use the Gregorian calendar. If dealing with other
+    calendars, then conversions need to happen before reaching pyleoclim.
+    """
     datum, exponent, direction = time_unit_to_datum_exp_dir(time_unit, time_name)
-    #import operator
     if direction == 'prograde':
         multiplier = 1
     elif direction == 'retrograde':
@@ -98,18 +108,23 @@ def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
             "Only 'second' resolution is currently supported. "
             "Please cast to second resolution with `.as_unit('s')`"
         )
-    year_diff = (datetime_index.year - int(datum))
-    numpy_datetime_index = datetime_index.to_numpy()
-    years_floor = numpy_datetime_index.astype('datetime64[Y]').astype('datetime64[s]')
-    seconds_diff = (numpy_datetime_index - years_floor).astype('int')
-    diff = year_diff + seconds_diff / SECONDS_PER_YEAR
-    time = multiplier * diff / 10**exponent
+    
+    time = (
+        multiplier * (datetime_index.to_numpy() - np.datetime64(str(datum), "s"))
+    ).astype(float) / (10**exponent * SECONDS_PER_YEAR)
+    return pd.Index(time)
 
-    return time
 
 def time_to_datetime(time, datum=0, exponent=0, direction='prograde', unit='s'):
     '''
     Converts a vector of time values to a pandas datetime object
+
+    The general formula is:
+
+        datetime_index = datum +/- time*10**exponent
+    
+    where we assume ``time`` to use the Gregorian calendar. If dealing with other
+    calendars, then conversions need to happen before reaching pyleoclim.
 
     Parameters
     ----------
@@ -129,20 +144,19 @@ def time_to_datetime(time, datum=0, exponent=0, direction='prograde', unit='s'):
     Returns
     -------
     index, a datetime64[unit] object
-
     '''
+    if direction not in ('prograde', 'retrograde'):
+        raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
+    
     if direction == 'prograde':
         op = operator.add
     elif direction == 'retrograde':
         op = operator.sub
-    else:
-        raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
     
-    timedelta = np.array(time) * 10**exponent
-    years = timedelta.astype('int')
-    seconds = ((timedelta - timedelta.astype('int')) * SECONDS_PER_YEAR).astype('timedelta64[s]') # incorporate unit here
-    index = op(op(int(datum), years).astype(str).astype('datetime64[s]'), seconds)  # incorporate unit here?
-    
+    index = op(
+        np.datetime64(str(datum), 's'),
+        (time*SECONDS_PER_YEAR*10**exponent).astype('timedelta64[s]')
+    )
     return index
 
 
