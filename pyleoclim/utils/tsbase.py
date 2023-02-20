@@ -223,7 +223,7 @@ def dropna(ys, ts, verbose=False):
 
     return ys, ts
 
-def sort_ts(ys, ts, verbose=False):
+def sort_ts(ys, ts, ascending = True, verbose=False):
     ''' Sort timeseries
     
     Sort ts values in ascending order
@@ -249,15 +249,20 @@ def sort_ts(ys, ts, verbose=False):
     ts = np.asarray(ts, dtype=float)
     assert ys.size == ts.size, 'time and value arrays must be of equal length'
 
-    # sort the time series so that the time axis will be ascending
-    dt = np.median(np.diff(ts))
-    if dt < 0:
-        sort_ind = np.argsort(ts)
-        ys = ys[sort_ind]
-        ts = ts[sort_ind]
+    sort_ind = np.argsort(ts)
+    
+    ys = ys[sort_ind]
+    ts = ts[sort_ind]
+    
+    if ascending:
         if verbose:
-            print('The time axis has been adjusted to be prograde')
-
+            print('Time axis values sorted in ascending order')
+    else:
+        ys = ys[::-1] # flip the series        
+        ts = ts[::-1]
+        if verbose:
+            print('Time axis values sorted in descending order')
+    
     return ys, ts
 
 def reduce_duplicated_timestamps(ys, ts, verbose=False):

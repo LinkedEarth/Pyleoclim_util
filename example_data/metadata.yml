@@ -66,6 +66,7 @@ LR04:
     label: 'LR04 benthic stack'
     value_name: '$\delta^{18}$O' 
     value_unit: '‰'
+    archiveType: 'Marine Sediment'
   time_column: Time (ka)
   value_column: Benthic d18O (per mil)  
   
@@ -80,8 +81,30 @@ AACO2:
     label: 'EPICA Dome C CO2'
     value_name: '$CO_2$' 
     value_unit: 'ppm'
+    archiveType: 'Glacier Ice'
+    lat: -75.1011
+    lon: 123.3478
+    importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/antarctica2015co2composite.txt'
   time_column: Age [kyr BP]
-  value_column: $CO_2$ [ppm]      
+  value_column: $CO_2$ [ppm]   
+
+GISP2:
+  filename: 'GISP2_d18O'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  pyleo_kwargs:
+    time_unit: 'yr BP'
+    time_name: 'Age'
+    value_unit: '‰'
+    value_name: '$\delta^{18}$O'
+    label: 'GISP2 d18O'
+    lat: 72.6
+    lon: -38.5
+    archiveType: 'Glacier Ice'
+    importedFrom: 'https://www.ncei.noaa.gov/access/paleo-search/study/17796' 
+  time_column: Age [yr BP]
+  value_column: d18O [permil]
 
 nino_json:
   filename: 'Nino'

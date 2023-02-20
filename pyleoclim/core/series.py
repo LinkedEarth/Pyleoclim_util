@@ -94,10 +94,6 @@ class Series:
         Name of the time series (e.g., 'Nino 3.4')
         Default is None
 
-    clean_ts : boolean flag
-        set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
-        Default is True
-
     log : dict
         Dictionary of tuples documentating the various transformations applied to the object
         
@@ -111,41 +107,39 @@ class Series:
         source of the dataset. If it came from a LiPD file, this could be the datasetID property 
 
     archiveType : string
-        climate archive, one of                                                                                     
+        climate archive, one of ....                                                                                    
 
     If keep_log is set to True, then a log of the transformations made to the timeseries will be kept.
 
+    dropna : bool
+        Whether to drop NaNs from the series to prevent downstream functions from choking on them
+        defaults to True
+        
+    sort_ts : str
+        Direction of sorting over the time coordinate; 'ascending' or 'descending'
+        Defaults to 'ascending'
+        
     verbose : bool
         If True, will print warning messages if there is any
+        
+    clean_ts : boolean flag
+         set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
+         Default is None (marked for deprecation)
 
     Examples
     --------
 
-    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a Series object, then display a quick synopsis.
+    In this example, we import the Southern Oscillation Index (SOI) and display a quick synopsis.
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
-
-        import pyleoclim as pyleo
-        import pandas as pd
-        data=pd.read_csv(
-            'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-            skiprows=0, header=1
-        )
-        time=data.iloc[:,1]
-        value=data.iloc[:,2]
-        ts=pyleo.Series(
-            time=time, value=value,
-            time_name='Year (CE)', value_name='SOI', label='Southern Oscillation Index'
-        )
-        ts
+    >>> soi = pyleo.utils.load_dataset('SOI')
+    >>> soi
           
     '''
 
     def __init__(self, time, value, time_unit=None, time_name=None, 
                  value_name=None, value_unit=None, label=None, lat=None, lon=None, 
-                 importedFrom=None, archiveType = None, clean_ts=True, log=None, verbose=False):
+                 importedFrom=None, archiveType = None, log=None, 
+                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=None):
         
         # assign time metadata if they are not provided
         if time_unit is None:
@@ -160,10 +154,38 @@ class Series:
             self.log = log
             nlog = len(log)
 
+        ## TODO: remove in next release
         if clean_ts == True:
-            value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
-            self.log += ({nlog+1: 'clean_ts', 'applied': clean_ts, 'verbose': verbose},)
-
+            warnings.warn('clean_ts is deprecated. Use sort_ts and drop_na flags instead.', DeprecationWarning, stacklevel=2)
+            
+        if dropna == True:
+            value, time = tsbase.dropna(np.array(value), np.array(time), verbose=verbose)
+            self.log += ({nlog+1: 'dropna', 'applied': dropna, 'verbose': verbose},)
+            nlog +=1
+        
+        if  sort_ts in ['ascending', 'descending']:
+            value, time = tsbase.sort_ts(np.array(value), np.array(time),
+                                         ascending = sort_ts == 'ascending', verbose=verbose)
+            self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
+            
+        else:
+            if verbose:
+                print("No time sorting applied")
+          
+        # if sort_ts == 'auto':
+        #     _, _, direction =  tsbase.time_unit_to_datum_exp_dir(time_unit)
+        #     value, time = tsbase.sort_ts(np.array(value), np.array(time),
+        #                                  ascending = (direction == 'prograde'),
+        #                                  verbose=verbose)
+        #     self.log += ({nlog+1: 'sort', 'direction': direction},)    
+        # elif sort_ts == 'prograde':
+        #     value, time = tsbase.sort_ts(np.array(value), np.array(time),
+        #                                  ascending = True, verbose=verbose)
+        #     self.log += ({nlog+1: 'sort', 'direction': 'prograde'},)
+        
+        # else:
+        #     warnings.warn('Unknown sorting option', stacklevel=1)
+         
 
         self.time = np.array(time)
         self.value = np.array(value)
@@ -2178,7 +2200,7 @@ class Series:
             new.log += ({len(new.log):'clean', 'verbose': verbose},)
         return new
 
-    def sort(self, verbose=False, keep_log = False):
+    def sort(self, verbose=False, ascending = True, keep_log = False):
         ''' Ensure timeseries is aligned to a prograde axis.
             If the time axis is prograde to begin with, no transformation is applied.
 
