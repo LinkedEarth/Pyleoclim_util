@@ -41,7 +41,7 @@ def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
 
     t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
-    ts=pyleo.Series(t,v)
+    ts=pyleo.Series(t,v, sort_ts='none')
     return ts
 
 def gen_normal(loc=0, scale=1, nt=100):
@@ -319,7 +319,6 @@ class TestUiSeriesCenter:
 
         #Call function to be tested
         tsc = ts.center(keep_log=True)
-        print(tsc.log[1])
 
         assert np.abs(tsc.value.mean()) <= np.sqrt(sys.float_info.epsilon)
 
@@ -1020,7 +1019,7 @@ class TestResample:
     def test_resample_simple(self, rule, dataframe_dt, metadata):
         ser = dataframe_dt.loc[:, 0]
         ts = pyleo.Series.from_pandas(ser, metadata)
-        result =ts.resample(rule).mean()
+        result = ts.resample(rule).mean()
         result_ser = result.to_pandas()
         expected_values = np.array([0., 1., 2., 3., 4.])
         expected_idx = pd.DatetimeIndex(['2018-12-30 23:59:59', '2019-12-30 23:59:59',
@@ -1037,11 +1036,10 @@ class TestResample:
             'lon': None,
             'archiveType': None,
             'importedFrom': None,
-            'log': (
-                {0: 'clean_ts', 'applied': True, 'verbose': False},
-                {2: 'clean_ts', 'applied': True, 'verbose': False},
-                {3: 'clean_ts', 'applied': True, 'verbose': False}
-            )
+            'verbose': False,
+            'dropna': None,
+            'sort_ts': None,
+            'log': ()
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
@@ -1072,11 +1070,10 @@ class TestResample:
             'lon': None,
             'archiveType': None,
             'importedFrom': None,
-            'log': (
-                {0: 'clean_ts', 'applied': True, 'verbose': False},
-                {2: 'clean_ts', 'applied': True, 'verbose': False},
-                {3: 'clean_ts', 'applied': True, 'verbose': False}
-            )
+            'verbose': False,
+            'dropna': None,
+            'sort_ts': None,
+            'log': ()
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata

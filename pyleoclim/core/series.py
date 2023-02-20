@@ -256,12 +256,12 @@ class Series:
         else:  
             raise ValueError('The provided index must be a proper DatetimeIndex object')
         
-        # metadata gap-filling. THis does not handle the edge case where the keys exist but the entries are None 
+        # metadata gap-filling. This does not handle the edge case where the keys exist but the entries are None 
         if 'time_name' not in metadata.keys():
             metadata['time_name'] = ser.index.name 
         if 'value_name' not in metadata.keys():
             metadata['value_name'] = ser.name 
-        
+                
         return cls(time=time,value=ser.values, **metadata)
                 
     # Alternate formulation
@@ -2294,11 +2294,10 @@ class Series:
         new = self.copy()
         if timespan is not None:
             ts_mean  = np.nanmean(self.slice(timespan).value)
-            vc = self.value - ts_mean
         else:
             ts_mean  = np.nanmean(self.value)
-            vc = self.value - ts_mean
-        new.value = vc
+        
+        new.value = self.value - ts_mean
 
         if keep_log == True:
             new.log += ({len(new.log): 'center', 'args': timespan, 'previous_mean': ts_mean},)

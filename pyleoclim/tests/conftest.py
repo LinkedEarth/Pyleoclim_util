@@ -30,8 +30,12 @@ def metadata():
         'lon': None,
         'archiveType': None,
         'importedFrom': None,
-        'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},)
+        'verbose': False,
+        'dropna': None,
+        'sort_ts': None
     }
+ # 'log': ({0: 'dropna', 'applied': True, 'verbose': True},
+ #         {1: 'sort_ts', 'direction': 'ascending'})
 
 @pytest.fixture
 def unevenly_spaced_series():
