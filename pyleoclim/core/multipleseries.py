@@ -20,6 +20,7 @@ import matplotlib.transforms as transforms
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+import pandas as pd
 from tqdm import tqdm
 from scipy import stats
 from statsmodels.multivariate.pca import PCA
@@ -2047,3 +2048,23 @@ class MultipleSeries:
             # reset the plotting style
             mpl.rcParams.update(current_style)
             return ax
+
+    def to_pandas(self, *args, **kwargs):
+        """
+        Align Series and place in DataFrame.
+
+        Column names will be taken from each Series' label. The index will be
+        construted by first using ``common_time`` to align all Series to have
+        the same index.
+
+        Parameters
+        ----------
+        *args, **kwargs
+            Arguments and keyword arguments to pass to ``common_time``.
+         
+        Returns
+        -------
+        pandas.DataFrame
+        """
+        ms_aligned = self.common_time(*args, **kwargs)
+        return pd.DataFrame({ser.metadata['label']: ser.to_pandas() for ser in ms_aligned.series_list})
