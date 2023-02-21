@@ -9,7 +9,7 @@ from typing import OrderedDict
 import operator
 import warnings
 import pandas as pd
-
+import scipy.stats as st
 
 #APIs
 
@@ -24,17 +24,17 @@ __all__ = [
 SECONDS_PER_YEAR = 365.25 * 60  * 60 * 24 ## TODO: generalize to different calendars using cftime
 
 MATCH_A  = frozenset(['y', 'yr', 'yrs', 'year', 'years'])
-MATCH_KA = frozenset(['ka', 'ky', 'kyr', 'kyrs', 'kiloyear', 'kiloyr', 'kiloyrs']) 
+MATCH_KA = frozenset(['ka', 'ky', 'kyr', 'kyrs', 'kiloyear', 'kiloyr', 'kiloyrs'])
 MATCH_MA = frozenset(['ma', 'my','myr','myrs'])
 MATCH_GA = frozenset(['ga', 'gy', 'gyr', 'gyrs'])
 
 def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
-         
+
     tu = time_unit.lower().split()
-    
-    # deal with statements explicit about exponents, and take a first guess at datum/direction        
+
+    # deal with statements explicit about exponents, and take a first guess at datum/direction
     if tu[0] in MATCH_A:
-        exponent = 0  
+        exponent = 0
         datum = 0
         direction = 'prograde'
     elif tu[0] in MATCH_KA:
@@ -50,17 +50,17 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
         exponent = 9
         direction = 'retrograde'
     elif tu[0].replace('.','') in ['ad', 'ce']:
-        exponent = 0  
-        datum = 0
-        direction = 'prograde'    
-    else:
-        warnings.warn(f'Time unit "{time_unit}" unknown; triggering defaults', stacklevel=4)    
-        exponent = 0  
+        exponent = 0
         datum = 0
         direction = 'prograde'
-    
+    else:
+        warnings.warn(f'Time unit "{time_unit}" unknown; triggering defaults', stacklevel=4)
+        exponent = 0
+        datum = 0
+        direction = 'prograde'
+
     # if provided, deal with statements about datum/direction, like kyr BP, years CE, etc
-    if len(tu) > 1: 
+    if len(tu) > 1:
         datum_str = tu[1].replace('.','') # make lowercase + strip stops, so "B.P." --> "bp"
         if datum_str == 'b2k':
             datum = 2000
@@ -71,14 +71,14 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
         elif datum_str in ['ad', 'ce']:
             datum = 0
             direction = 'prograde'
-    
+
     if time_name is not None:
         if time_name.lower() == 'age':
             direction = 'retrograde'
-        
+
     if verbose:
-        print(f'Provided time medata translated to {direction} flow, 10^{exponent} year units, and year {datum} datum')    
-  
+        print(f'Provided time medata translated to {direction} flow, 10^{exponent} year units, and year {datum} datum')
+
     return (datum, exponent, direction)
 
 def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
@@ -90,8 +90,8 @@ def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
         multiplier = -1
     else:
         raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
-        
-    if not isinstance(datetime_index, pd.DatetimeIndex): 
+
+    if not isinstance(datetime_index, pd.DatetimeIndex):
         raise ValueError('The provided index is not a proper DatetimeIndex object')
     if datetime_index.unit != 's':
         raise ValueError(
@@ -119,11 +119,11 @@ def time_to_datetime(time, datum=0, exponent=0, direction='prograde', unit='s'):
         origin point for the time scale. The default is 0.
     exponent : int, optional
         Base-10 exponent for year multiplier. Dates in kyr should use 3, dates in Myr should use 6, etc.
-        The default is 0. 
+        The default is 0.
     direction : str, optional
         Direction of time flow, 'prograde' [default] or 'retrograde'.
     unit : str, optional
-        Units of the datetime. Default is 's', corresponding to seconds. 
+        Units of the datetime. Default is 's', corresponding to seconds.
         Only change if you have an excellent reason to use finer resolution!
 
     Returns
@@ -137,12 +137,12 @@ def time_to_datetime(time, datum=0, exponent=0, direction='prograde', unit='s'):
         op = operator.sub
     else:
         raise ValueError(f'Expected one of {"prograde", "retrograde"}, got {direction}')
-    
+
     timedelta = np.array(time) * 10**exponent
     years = timedelta.astype('int')
     seconds = ((timedelta - timedelta.astype('int')) * SECONDS_PER_YEAR).astype('timedelta64[s]') # incorporate unit here
     index = op(op(int(datum), years).astype(str).astype('datetime64[s]'), seconds)  # incorporate unit here?
-    
+
     return index
 
 
@@ -187,7 +187,7 @@ def clean_ts(ys, ts, verbose=False):
 
 def dropna(ys, ts, verbose=False):
     '''Drop NaN values
-    
+
     Remove entries of ys or ts that bear NaNs
 
     Parameters
@@ -205,6 +205,10 @@ def dropna(ys, ts, verbose=False):
         The time series without nans
     ts : array
         The time axis of the time series without nans
+
+    See Also
+    --------
+    https://pandas.pydata.org/docs/reference/api/pandas.Series.dropna.html
 
     '''
     ys = np.asarray(ys, dtype=float)
@@ -225,8 +229,6 @@ def dropna(ys, ts, verbose=False):
 
 def sort_ts(ys, ts, ascending = True, verbose=False):
     ''' Sort timeseries
-    
-    Sort ts values in ascending order
 
     Parameters
     ----------
@@ -250,24 +252,24 @@ def sort_ts(ys, ts, ascending = True, verbose=False):
     assert ys.size == ts.size, 'time and value arrays must be of equal length'
 
     sort_ind = np.argsort(ts)
-    
+
     ys = ys[sort_ind]
     ts = ts[sort_ind]
-    
+
     if ascending:
         if verbose:
             print('Time axis values sorted in ascending order')
     else:
-        ys = ys[::-1] # flip the series        
+        ys = ys[::-1] # flip the series
         ts = ts[::-1]
         if verbose:
             print('Time axis values sorted in descending order')
-    
+
     return ys, ts
 
 def reduce_duplicated_timestamps(ys, ts, verbose=False):
     ''' Consolidate duplicated timestamps
-    
+
     Reduce duplicated timestamps in a timeseries by averaging the values
 
     Parameters
@@ -312,15 +314,14 @@ def reduce_duplicated_timestamps(ys, ts, verbose=False):
             print('Duplicate timestamps have been combined by averaging values.')
     return ys, ts
 
-def is_evenly_spaced(ts, tol=1e-4):
-    ''' Check if a time axis is evenly spaced, within a given tolerance
+def is_evenly_spaced(x, tol=1e-4):
+    ''' Check if an axis x is evenly spaced, within a given tolerance
 
     Parameters
     ----------
 
-    ts : array
-        The time axis of a time series
-        
+    x : array
+
     tol : float64
         Numerical tolerance for the relative difference
 
@@ -331,13 +332,37 @@ def is_evenly_spaced(ts, tol=1e-4):
         True - evenly spaced; False - unevenly spaced.
 
     '''
-    if ts is None:
+    if x is None:
         check = True
     else:
-        dts = np.diff(ts)
-        dt_mean = dts.mean()   
-        check = all(np.abs((dt - dt_mean)/dt_mean) < tol for dt in np.diff(ts)) # compare relative spacing to the mean
-        
+        dx = np.diff(x)
+        dx_mean = dx.mean()
+        check = all(np.abs((dx - dx_mean)/dx_mean) < tol for dx in np.diff(x)) # compare relative spacing to the mean
+
     return check
 
+def resolution(x):
+    '''
+    Computes the resolution (increments) of an axis, and returns its descriptive statistics
 
+    Parameters
+    ----------
+    x : array
+
+    Returns
+    -------
+    res : array
+        array of time increments
+
+    stats : DescribeResult
+        descriptive statistics of res
+
+    See Also
+    --------
+
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.describe.html
+    '''
+    res = np.diff(x)
+    stats = st.describe(res)
+
+    return (res, stats)

@@ -61,9 +61,9 @@ class Series:
 
     * a time axis at which those values were measured/simulated ;
 
-    * optionally, some metadata about both axes, like units, labels and the like.
+    * optionally, some metadata about both axes, like units, labels and origin.
 
-    How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
+    How to create, manipulate and use such objects is described in `PyleoTutorials <https://http://linked.earth/PyleoTutorials/>`_.
 
     Parameters
     ----------
@@ -109,8 +109,6 @@ class Series:
     archiveType : string
         climate archive, one of ....                                                                                    
 
-    If keep_log is set to True, then a log of the transformations made to the timeseries will be kept.
-
     dropna : bool
         Whether to drop NaNs from the series to prevent downstream functions from choking on them
         defaults to True
@@ -129,7 +127,7 @@ class Series:
     Examples
     --------
 
-    In this example, we import the Southern Oscillation Index (SOI) and display a quick synopsis.
+    Import the Southern Oscillation Index (SOI) and display a quick synopsis:
 
     >>> soi = pyleo.utils.load_dataset('SOI')
     >>> soi
@@ -2201,7 +2199,7 @@ class Series:
         return new
 
     def sort(self, verbose=False, ascending = True, keep_log = False):
-        ''' Ensure timeseries is aligned to a prograde axis.
+        ''' Ensure timeseries is set to a monotonically increasing axis.
             If the time axis is prograde to begin with, no transformation is applied.
 
         Parameters
@@ -2219,12 +2217,12 @@ class Series:
 
         '''
         new = self.copy()
-        v_mod, t_mod = tsbase.sort_ts(self.value, self.time, verbose=verbose)
+        v_mod, t_mod = tsbase.sort_ts(self.value, self.time, ascending=ascending, verbose=verbose)
         new.time = t_mod
         new.value = v_mod
 
         if keep_log == True:
-            new.log += ({len(new.log):'sort', 'verbose': verbose},)
+            new.log += ({len(new.log):'sort', 'ascending': ascending},)
         return new
 
     def gaussianize(self, keep_log = False):
