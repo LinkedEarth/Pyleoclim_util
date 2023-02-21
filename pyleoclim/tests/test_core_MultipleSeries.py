@@ -500,3 +500,14 @@ class TestToPandas:
         )
         expected = pd.DataFrame({'foo': [6.5], 'bar': [4.5]}, index=expected_index)
         pd.testing.assert_frame_equal(result, expected)
+
+class TestOverloads:
+    def test_add(self):
+        ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
+        ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
+        ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='baz')
+        ms = pyleo.MultipleSeries([ts1, ts2])
+        ms = ms + ts3
+        assert ms.series_list[0].equals(ts1) == (True, True)
+        assert ms.series_list[1].equals(ts2) == (True, True)
+        assert ms.series_list[2].equals(ts3) == (True, True)
