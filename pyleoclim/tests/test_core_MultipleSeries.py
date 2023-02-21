@@ -477,3 +477,19 @@ class TestMultipleSeriesSpectral():
         psds = ms.spectral(method=spec_method,scalogram_list=scals)
         
         
+class TestRemove:
+    def test_remove(self):
+        ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
+        ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
+        ms = pyleo.MultipleSeries([ts1, ts2])
+        ms.remove('bar')
+        assert len(ms.series_list) == 1
+        assert ms.series_list[0].equals(ts1) == (True, True)
+
+    def test_remove_overload(self):
+        ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
+        ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
+        ms = pyleo.MultipleSeries([ts1, ts2])
+        ms - 'bar'
+        assert len(ms.series_list) == 1
+        assert ms.series_list[0].equals(ts1) == (True, True)
