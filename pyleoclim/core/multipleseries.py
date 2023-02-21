@@ -78,6 +78,12 @@ class MultipleSeries:
                 new_ts_list.append(new_ts)
 
             self.series_list = new_ts_list
+    
+    def __add__(self, other):
+        from ..core.series import Series
+        if not isinstance(other, Series):
+            raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
+        return self.append(other)
 
     def convert_time_unit(self, time_unit='years'):
         ''' Convert the time units of the object
