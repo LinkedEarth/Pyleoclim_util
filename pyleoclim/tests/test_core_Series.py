@@ -1036,10 +1036,10 @@ class TestResample:
             'lon': None,
             'archiveType': None,
             'importedFrom': None,
-            'verbose': False,
-            'dropna': None,
-            'sort_ts': None,
-            'log': ()
+            'log': (
+                {1: 'dropna', 'applied': True, 'verbose': True},
+                {2: 'sort_ts', 'direction': 'ascending'}
+            )
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
@@ -1070,10 +1070,10 @@ class TestResample:
             'lon': None,
             'archiveType': None,
             'importedFrom': None,
-            'verbose': False,
-            'dropna': None,
-            'sort_ts': None,
-            'log': ()
+            'log': (
+                {1: 'dropna', 'applied': True, 'verbose': True},
+                {2: 'sort_ts', 'direction': 'ascending'}
+            )
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
