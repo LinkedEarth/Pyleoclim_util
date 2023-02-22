@@ -31,7 +31,6 @@ from pyleoclim.utils.tsmodel import (
     ar1_sim,
     ar1_fit)
 
-
 from statsmodels.tsa.arima_process import arma_generate_sample
 import matplotlib.pyplot as plt
 
@@ -62,6 +61,34 @@ def gen_normal(loc=0, scale=1, nt=100):
 
 # Tests below
 
+class TestUISeriesInit:
+     ''' Test for Series instantiation '''
+    
+     def test_init_no_dropna(evenly_spaced_series):
+         ts = evenly_spaced_series()
+         t = ts.time
+         v = ts.value
+         v[0] = np.nan
+         ts2 = pyleo.Series(time=t,value=v,dropna=False, verbose=False)
+         assert np.isnan(ts2.value[0])
+         
+     def test_init_no_sorting(evenly_spaced_series):
+         ts = evenly_spaced_series()
+         t = ts.time[::-1]
+         v = ts.value[::-1]
+         ts2 = pyleo.Series(time=t,value=v,sort_ts='Nein', verbose=False)
+         res, _, sign = pyleo.utils.tsbase.resolution(ts2.time) 
+         assert sign == 'negative'  
+         
+     def test_init_clean_ts(evenly_spaced_series):
+         ts = evenly_spaced_series()
+         t = ts.time[::-1]
+         v = ts.value[::-1]
+         v[0] = np.nan
+         ts2 = pyleo.Series(time=t,value=v, dropna=False, clean_ts=True, verbose=False)
+         res, _, sign = pyleo.utils.tsbase.resolution(ts2.time) 
+         assert np.isnan(ts2.value[-1])
+         
 
 class TestSeriesIO:
     ''' Test Series import from and export to other formats
@@ -1034,12 +1061,16 @@ class TestResample:
             'label': f'Southern Oscillation Index ({rule} resampling)',
             'lat': None,
             'lon': None,
-            'archiveType': None,
+            'archiveType': 'Instrumental',
             'importedFrom': None,
             'verbose': False,
-            'dropna': None,
-            'sort_ts': None,
-            'log': ()
+            'clean_ts': False,
+            'dropna': True,
+            'sort_ts': 'ascending',
+            'log': (
+                    {1: 'dropna', 'applied': True, 'verbose': True},
+                    {2: 'sort_ts', 'direction': 'ascending'}
+                )
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
@@ -1068,12 +1099,16 @@ class TestResample:
             'label': f'Southern Oscillation Index ({rule} resampling)',
             'lat': None,
             'lon': None,
-            'archiveType': None,
+            'archiveType': 'Instrumental',
             'importedFrom': None,
             'verbose': False,
-            'dropna': None,
-            'sort_ts': None,
-            'log': ()
+            'clean_ts': False,
+            'dropna': True,
+            'sort_ts': 'ascending',
+            'log': (
+                    {1: 'dropna', 'applied': True, 'verbose': True},
+                    {2: 'sort_ts', 'direction': 'ascending'}
+                )
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
@@ -1127,3 +1162,4 @@ class TestUISeriesEquals():
         same_data, _ = soi.equals(soi2, index_tol= 1.1*86400)
 
         assert same_data
+        

@@ -356,6 +356,12 @@ def resolution(x):
 
     stats : DescribeResult
         descriptive statistics of res
+        
+    sign : str
+        sign of the resolution    
+        'positive' if all values of res are > 0
+        'negative' if all values of res are < 0
+        'mixed' otherwise 
 
     See Also
     --------
@@ -364,5 +370,12 @@ def resolution(x):
     '''
     res = np.diff(x)
     stats = st.describe(res)
-
-    return (res, stats)
+        
+    if all(res > 0):
+        sign = 'positive'
+    elif all(res < 0):
+        sign = 'negative'
+    else:
+        sign = 'mixed'
+        
+    return (res, stats, sign)

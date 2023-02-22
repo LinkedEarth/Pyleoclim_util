@@ -10,6 +10,7 @@ SOI:
     value_name: 'SOI'
     value_unit: 'mb'
     label: 'Southern Oscillation Index'
+    archiveType: 'Instrumental'
   time_column: 1
   value_column: 2
 
@@ -24,6 +25,7 @@ NINO3:
     label: 'NINO3 SST'
     value_name: 'NINO3'
     value_unit: '$^{\circ}$C'
+    archiveType: 'Instrumental'
   time_column: t
   value_column: nino
   
@@ -38,6 +40,7 @@ HadCRUT5:
     label: 'HadCRUT5'
     value_name: 'GMST'
     value_unit: '$^{\circ}$C'
+    archiveType: 'Instrumental'
   time_column: Time
   value_column: Anomaly (deg C)  
   
@@ -52,6 +55,7 @@ AIR:
     label: 'All-India Rainfall'
     value_name: 'AIR'
     value_unit: 'mm/month'
+    archiveType: 'Instrumental'
   time_column: t
   value_column: air  
   

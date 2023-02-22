@@ -57,9 +57,9 @@ class Series:
     '''The Series class describes the most basic objects in Pyleoclim.
     A Series is a simple `dictionary <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_ that contains 3 things:
 
-    * a series of real-valued numbers;
+    * value, an array of real-valued numbers;
 
-    * a time axis at which those values were measured/simulated ;
+    * time, a coordinate axis at which those values were obtained ;
 
     * optionally, some metadata about both axes, like units, labels and origin.
 
@@ -137,7 +137,11 @@ class Series:
     def __init__(self, time, value, time_unit=None, time_name=None, 
                  value_name=None, value_unit=None, label=None, lat=None, lon=None, 
                  importedFrom=None, archiveType = None, log=None, 
-                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=None):
+                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False):
+        
+        # ensure ndarray instances
+        time = np.array(time)
+        value = np.array(value)
         
         # assign time metadata if they are not provided
         if time_unit is None:
@@ -152,46 +156,65 @@ class Series:
             self.log = log
             nlog = len(log)
 
-        ## TODO: remove in next release
         if clean_ts == True:
-            warnings.warn('clean_ts is deprecated. Use sort_ts and drop_na flags instead.', DeprecationWarning, stacklevel=2)
-            
+            if dropna == False or sort_ts == 'descending':
+                warnings.warn(f'clean_ts implies dropna=True and sort_ts=ascending; provided values are {dropna, sort_ts}', UserWarning)
+            else:
+                dropna = True
+                sort_ts ='ascending'
+        elif clean_ts == False:
+            pass
+        else:
+            raise ValueError('clean_ts should be a boolean')
+        
         if dropna == True:
-            value, time = tsbase.dropna(np.array(value), np.array(time), verbose=verbose)
+            value, time = tsbase.dropna(value, time, verbose=verbose)
             self.log += ({nlog+1: 'dropna', 'applied': dropna, 'verbose': verbose},)
             nlog +=1
-        
-        if  sort_ts in ['ascending', 'descending']:
-            value, time = tsbase.sort_ts(np.array(value), np.array(time),
-                                         ascending = sort_ts == 'ascending', verbose=verbose)
-            self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
-            
+        elif dropna == False:
+            pass
         else:
-            if verbose:
-                print("No time sorting applied")
+            raise ValueError('dropna should be a boolean')
+            
+        # if check_sorting:
+        #     res, stats, sign = tsbase.resolution(time)
+        #     if sign == 'mixed':
+        #         warnings.warn("The Series time axis is non-monotonic, which may cause errors. Suggest applying .sort()")
+            
+        
+        # if  sort_ts in ['ascending', 'descending']:
+        #     value, time = tsbase.sort_ts(np.array(value), np.array(time),
+        #                                  ascending = sort_ts == 'ascending', verbose=verbose)
+        #     self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
+            
+        # else:
+        #     if verbose:
+        #         print("No time sorting applied")
           
-        # if sort_ts == 'auto':
+        # if sort == 'auto':
         #     _, _, direction =  tsbase.time_unit_to_datum_exp_dir(time_unit)
         #     value, time = tsbase.sort_ts(np.array(value), np.array(time),
-        #                                  ascending = (direction == 'prograde'),
-        #                                  verbose=verbose)
+        #                                   ascending = (direction == 'prograde'),
+        #                                   verbose=verbose)
         #     self.log += ({nlog+1: 'sort', 'direction': direction},)    
-        # elif sort_ts == 'prograde':
-        #     value, time = tsbase.sort_ts(np.array(value), np.array(time),
-        #                                  ascending = True, verbose=verbose)
-        #     self.log += ({nlog+1: 'sort', 'direction': 'prograde'},)
-        
-        # else:
-        #     warnings.warn('Unknown sorting option', stacklevel=1)
+        if sort_ts is not None:
+            if sort_ts in ['ascending', 'descending']:
+                value, time = tsbase.sort_ts(value, time, verbose=verbose, 
+                                             ascending = sort_ts == 'ascending')
+                self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
+            else:
+                print(f"Unknown sorting option {sort_ts}; no sorting applied")
          
-
-        self.time = np.array(time)
-        self.value = np.array(value)
+        self.time = time
+        self.value = value
         self.time_name = time_name
         self.time_unit = time_unit
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
+        self.dropna = dropna
+        self.sort_ts = sort_ts
+        self.clean_ts = clean_ts
         # assign latitude
         if lat is not None:
             lat = float(lat) 
@@ -243,7 +266,10 @@ class Series:
             lon = self.lon,
             archiveType = self.archiveType,
             importedFrom = self.importedFrom,
-            log = self.log
+            log = self.log,
+            dropna = self.dropna,
+            sort_ts = self.sort_ts,
+            clean_ts = self.clean_ts
         )
     
     @classmethod
@@ -259,6 +285,7 @@ class Series:
             metadata['time_name'] = ser.index.name 
         if 'value_name' not in metadata.keys():
             metadata['value_name'] = ser.name 
+        metadata['verbose'] = False    
                 
         return cls(time=time,value=ser.values, **metadata)
                 
@@ -331,14 +358,15 @@ class Series:
         '''
         filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
         ser = self.to_pandas(paleo_style=True)
-
+        
+        metadata = self.metadata.pop('clean_ts')
         # export metadata
         if metadata_header:
             with open(path+'/'+filename, 'w', newline='')  as file:       
                 hd_writer = csv.writer(file)
                 hd_writer.writerow(["###", "Series metadata"])
                 hd_writer.writerow(["written by", "Pyleoclim " + version('Pyleoclim')])
-                hd_writer.writerows(self.metadata.items())
+                hd_writer.writerows(metadata.items())
                 hd_writer.writerow(["###", "end metadata"])
                 #file.close()
             # export Series object to CSV
@@ -395,9 +423,8 @@ class Series:
         # read in data    
         df = pd.read_csv(path + '/' + filename, header=header)
         # export to Series 
-        return cls(time=df.iloc[:,0],
-                   value=df.iloc[:,1], 
-                   clean_ts=False, **metadata)
+        metadata['verbose'] = False
+        return cls(time=df.iloc[:,0],value=df.iloc[:,1], **metadata)
     
     def to_json(self, path =None):
         """
@@ -3427,6 +3454,8 @@ class Series:
 
         Note that the output is fundamentally different for the two methods. Granger causality cannot discriminate between NINO3 -> AIR or AIR -> NINO3, in this case. This is not unusual, and one reason why it is no longer in wide use.
         '''
+
+        # TODO: ensure prograde time
 
         # Put on common axis if necessary
 
