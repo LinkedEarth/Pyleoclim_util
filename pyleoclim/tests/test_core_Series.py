@@ -12,6 +12,7 @@ Notes on how to test:
 4. after `pip install pytest-xdist`, one may execute "pytest -n 4" to test in parallel with number of workers specified by `-n`
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 '''
+import datetime as dt
 import numpy as np
 import pandas as pd
 
@@ -443,6 +444,55 @@ class TestUiSeriesSlice:
 
         assert min(times) == 10
         assert max(times) == 90
+
+class TestSel:
+    @pytest.mark.parametrize(
+        ('value', 'expected_time', 'expected_value', 'tolerance'),
+        [
+            (1, np.array([3]), np.array([1]), 0),
+            (1, np.array([1, 3]), np.array([4, 1]), 3),
+            (slice(1, 4), np.array([1, 3]), np.array([4, 1]), 0),
+            (slice(1, 4), np.array([1, 2, 3]), np.array([4, 6, 1]), 2),
+            (slice(1, None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, 1), np.array([3]), np.array([1]), 0),
+        ]
+    )
+    def test_value(self, value, expected_time, expected_value, tolerance):
+        ts = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP')
+        result = ts.sel(value=value, tolerance=tolerance)
+        expected = pyleo.Series(time=expected_time, value=expected_value, time_unit='years BP')
+        values_match, _ = result.equals(expected)
+        assert values_match
+
+    @pytest.mark.parametrize(
+        ('time', 'expected_time', 'expected_value', 'tolerance'),
+        [
+            (1, np.array([1]), np.array([4]), 0),
+            (1, np.array([1, 2]), np.array([4, 6]), 1),
+            (slice(1, 2), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice(1, 2), np.array([1, 2, 3]), np.array([4, 6, 1]), 1),
+            (slice(1, None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, 1), np.array([1]), np.array([4]), 0),
+            (slice('1948', '1949'), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice('1947', None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, '1948'), np.array([3]), np.array([1]), 0),
+            (slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice(dt.datetime(1947, 1, 1), None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, dt.datetime(1948, 1, 1)), np.array([3]), np.array([1]), 0),
+        ]
+    )
+    def test_time(self, time, expected_time, expected_value, tolerance):
+        ts = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP')
+        result = ts.sel(time=time, tolerance=tolerance)
+        expected = pyleo.Series(time=expected_time, value=expected_value, time_unit='years BP')
+        values_match, _ = result.equals(expected)
+        assert values_match
+    
+    def test_invalid(self):
+        ts = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP')
+        with pytest.raises(TypeError, match="Cannot pass both `value` and `time`"):
+            ts.sel(time=1, value=1)
+
 
 class TestUiSeriesSurrogates:
     ''' Test Series.surrogates()
@@ -1050,9 +1100,10 @@ class TestResample:
         result = ts.resample(rule).mean()
         result_ser = result.to_pandas()
         expected_values = np.array([0., 1., 2., 3., 4.])
-        expected_idx = pd.DatetimeIndex(['2018-12-30 23:59:59', '2019-12-30 23:59:59',
-               '2020-12-30 23:59:59', '2021-12-30 23:59:59',
-               '2022-12-30 23:59:59'], name='datetime').as_unit('s')
+        expected_idx = pd.DatetimeIndex(
+            ['2018-12-31', '2019-12-31', '2020-12-31', '2021-12-31', '2022-12-31'],
+            name='datetime'
+        ).as_unit('s')
         expected_ser = pd.Series(expected_values, expected_idx, name='SOI')
         expected_metadata = {
             'time_unit': 'years CE',
@@ -1075,9 +1126,9 @@ class TestResample:
     @pytest.mark.parametrize(
         ('rule', 'expected_idx'),
         [
-            ('1ga', [np.datetime64('2018-12-30 23:59:59'), np.datetime64('1000002018-12-31 00:00:01')]),
-            ('1ma', [np.datetime64('2018-12-30 23:59:59'), np.datetime64('1002018-12-30 23:59:59')]),
-            ('2ka', [np.datetime64('2018-12-30 23:59:59'), np.datetime64('4018-12-30 23:59:59')]),
+            ('1ga', [np.datetime64('2018-12-31'), np.datetime64('1000002018-12-31')]),
+            ('1ma', [np.datetime64('2018-12-31'), np.datetime64('1002018-12-31')]),
+            ('2ka', [np.datetime64('2018-12-31'), np.datetime64('4018-12-31')]),
         ]
     )
     def test_resample_long_periods(self, rule, expected_idx, dataframe_dt, metadata):
@@ -1153,6 +1204,5 @@ class TestUISeriesEquals():
         soi_pd.index = soi_pd.index + pd.DateOffset(1)
         soi2 = pyleo.Series.from_pandas(soi_pd, soi.metadata)
         same_data, _ = soi.equals(soi2, index_tol= 1.1*86400)
-
         assert same_data
         

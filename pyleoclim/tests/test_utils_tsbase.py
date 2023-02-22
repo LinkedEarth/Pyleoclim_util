@@ -82,8 +82,12 @@ def test_convert_datetime_index_ka(dataframe_dt):
         time_unit, 
         time_name=time_name,
         )
-    expected = np.array([-0.06899658, -0.06999658, -0.07099932, -0.07199658, -0.07299658])
+    expected = np.array([-0.06899805, -0.06999739, -0.07099946, -0.0719988 , -0.07299814])
     assert np.allclose(time.values, expected, rtol=1e-05, atol=1e-08)
+
+    # check we can round-trip
+    result = tsbase.time_to_datetime(time.values, 1950, 3, 'retrograde')
+    assert np.abs(dataframe_dt.index - result).total_seconds().max() <= 1
 
 
 def test_convert_datetime_index_ma(dataframe_dt):
@@ -97,6 +101,10 @@ def test_convert_datetime_index_ma(dataframe_dt):
     expected = np.array([-6.89965777e-05, -6.99965777e-05, -7.09993155e-05, -7.19965777e-05, -7.29965777e-05])
     assert np.allclose(time.values, expected, rtol=1e-05, atol=1e-08)
 
+    # check we can round-trip
+    result = tsbase.time_to_datetime(time.values, 1950, 6, 'retrograde')
+    assert np.abs(dataframe_dt.index - result).total_seconds().max() <= 1
+
 
 def test_convert_datetime_index_ga(dataframe_dt):
     time_unit = 'ga'
@@ -109,6 +117,10 @@ def test_convert_datetime_index_ga(dataframe_dt):
     expected = np.array([-6.89965777e-08, -6.99965777e-08, -7.09993155e-08, -7.19965777e-08, -7.29965777e-08])
     assert np.allclose(time.values, expected, rtol=1e-05, atol=1e-08)
 
+    # check we can round-trip
+    result = tsbase.time_to_datetime(time.values, 1950, 9, 'retrograde')
+    assert np.abs(dataframe_dt.index - result).total_seconds().max() <= 1
+
 
 def test_convert_datetime_index_bp(dataframe_dt):
     time_unit = 'years B.P.'
@@ -118,8 +130,12 @@ def test_convert_datetime_index_bp(dataframe_dt):
         time_unit, 
         time_name=time_name,
         )
-    expected = np.array([-68.99657769, -69.99657769, -70.99931554, -71.99657769, -72.99657769])
+    expected = np.array([-68.99805139, -69.99738827, -70.99946306, -71.99879994, -72.99813682])
     assert np.allclose(time.values, expected, rtol=1e-05, atol=1e-08)
+
+    # check we can round-trip
+    result = tsbase.time_to_datetime(time.values, 1950, 0, 'retrograde')
+    assert np.abs(dataframe_dt.index - result).total_seconds().max() <= 1
 
 
 def test_convert_datetime_index_ad(dataframe_dt):
@@ -133,6 +149,10 @@ def test_convert_datetime_index_ad(dataframe_dt):
     expected = np.array([2018.99657769, 2019.99657769, 2020.99931554, 2021.99657769, 2022.99657769])
     assert np.allclose(time.values, expected, rtol=1e-05, atol=1e-08)
 
+    # check we can round-trip
+    result = tsbase.time_to_datetime(time.values, 0, 0, 'prograde')
+    assert np.abs(dataframe_dt.index - result).total_seconds().max() <= 1
+
 
 def test_convert_datetime_index_nondt_index(dataframe):
     time_unit = 'yr'
@@ -143,4 +163,3 @@ def test_convert_datetime_index_nondt_index(dataframe):
             time_unit, 
             time_name=time_name,
             )
-
