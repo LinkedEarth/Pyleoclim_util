@@ -2330,6 +2330,92 @@ class Series:
         return res
     
     def sel(self, value=None, time=None, tolerance=0):
+        """
+        Slice Series based on 'value' or 'time'.
+
+        Parameters
+        ----------
+        value : int, float, slice
+            If int/float, then the Series will be sliced so that `self.value` is
+            equal to `value` (+/- `tolerance`).
+            If slice, then the Series will be sliced so `self.value` is between
+            slice.start and slice.stop (+/- tolerance).
+        time : int, float, slice
+            If int/float, then the Series will be sliced so that `self.time` is
+            equal to `time`. (+/- `tolerance`)
+            If slice of int/float, then the Series will be sliced so that
+            `self.time` is between slice.start and slice.stop.
+            If slice of `datetime` (or str containing datetime, such as `'2020-01-01'`),
+            then the Series will be sliced so that `self.datetime_index` is
+            between `time.start` and `time.stop`.
+        tolerance : int, float, default 0.
+            Used by `value` and `time`, see above.
+        
+        Returns
+        -------
+        Copy of `self`, sliced according to `value` and `time`.
+
+        Examples
+        --------
+        >>> ts = pyleo.Series(
+        ...     time=np.array([1, 1.1, 2, 3]), value=np.array([4, .9, 6, 1]), time_unit='years BP'
+        ... )
+        >>> ts.sel(value=1)
+        {'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False})}
+
+        None
+        time [years BP]
+        3.0    1.0
+        Name: value, dtype: float64
+
+        If you also want to include the value `3.9`, you could set `tolerance` to `.1`:
+
+        >>> ts.sel(value=1, tolerance=.1)
+        {'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False})}
+
+        None
+        time [years BP]
+        1.1    0.9
+        3.0    1.0
+        Name: value, dtype: float64
+
+        You can also pass a `slice` to select a range of values:
+
+        >>> ts.sel(value=slice(4, 6))
+        {'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False})}
+
+        None
+        time [years BP]
+        1.0    4.0
+        2.0    6.0
+        Name: value, dtype: float64
+
+        >>> ts.sel(value=slice(4, None))
+        {'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False})}
+
+        None
+        time [years BP]
+        1.0    4.0
+        2.0    6.0
+        Name: value, dtype: float64
+
+        >>> ts.sel(value=slice(None, 4))
+        {'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False})}
+
+        None
+        time [years BP]
+        1.0    4.0
+        1.1    0.9
+        3.0    1.0
+        Name: value, dtype: float64
+
+        Similarly, you filter using `time` instead of `value`.
+        """
         if value is not None and time is not None:
             raise TypeError("Cannot pass both `value` and `time`")
 
@@ -2387,6 +2473,7 @@ class Series:
                     return self.pandas_method(
                         lambda x: x[x.index<=time.stop]
                     )
+                raise TypeError("Expected int or float, or slice of int/float/datetime/str.")
 
 
     def slice(self, timespan):

@@ -460,10 +460,12 @@ class TestSel:
         expected = pyleo.Series(time=expected_time, value=expected_value, time_unit='years BP')
         values_match, _ = result.equals(expected)
         assert values_match
+    
+    def test_invalid(self):
+        ts = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP')
+        with pytest.raises(TypeError, match="Cannot pass both `value` and `time`"):
+            ts.sel(time=1, value=1)
 
-# (Pdb) ts.datetime_index
-# DatetimeIndex(['1948-12-31 18:11:15', '1948-01-01 12:22:29',
-#                '1947-01-01 06:33:43'],
 
 class TestUiSeriesSurrogates:
     ''' Test Series.surrogates()
