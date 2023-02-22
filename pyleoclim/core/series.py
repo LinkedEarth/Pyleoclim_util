@@ -1085,12 +1085,13 @@ class Series:
         f : float, optional
             maximum allowable fraction of missing values. The default is 0.3.
         trunc : str
-            if present, truncates the expansion to a level K < M owing to one of 3 criteria:
+            if present, truncates the expansion to a level K < M owing to one of 4 criteria:
                 (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
-                (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% threshold)
+                (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)
                 (3) 'var': first K modes that explain at least var_thresh % of the variance.
             Default is None, which bypasses truncation (K = M)
-
+                (4) 'knee': Wherever the "knee" of the screeplot occurs.
+            See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for details.
         var_thresh : float
             variance threshold for reconstruction (only impactful if trunc is set to 'var')
 
