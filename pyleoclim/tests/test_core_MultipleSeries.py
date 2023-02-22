@@ -432,6 +432,18 @@ class TestMultipleSeriesCommonTime:
         ms1 = ms.common_time(method='interp', start=1910, stop=2010, step=1/12)
         
         assert (np.diff(ms1.series_list[0].time)[0] - 1/12) < 1e-3
+    
+    def test_common_time_same_time(self):
+        # https://github.com/LinkedEarth/Pyleoclim_util/issues/340
+        time=np.array([1, 2, 3])
+        ts1 = pyleo.Series(time=time, value=np.array([8, 3, 5]), time_unit='yr BP')
+        ts2 = pyleo.Series(time=time, value=np.array([6, 2, 1]), time_unit='yr BP')
+        ms = pyleo.MultipleSeries([ts1, ts2])
+        new_ms = ms.common_time('bin')
+        expected_ts1 = pyleo.Series(time=time+.5, value=np.array([8, 3, 5]), time_unit='yr BP')
+        expected_ts2 = pyleo.Series(time=time+.5, value=np.array([6, 2, 1]), time_unit='yr BP')
+        assert new_ms.series_list[0].equals(expected_ts1) == (True, True)
+        assert new_ms.series_list[1].equals(expected_ts2) == (True, True)
         
 class TestMultipleSeriesStackPlot():
     ''' Test for MultipleSeries.Stackplot

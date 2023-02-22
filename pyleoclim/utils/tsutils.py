@@ -166,7 +166,10 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True, statis
             start = np.nanmin(x)
         if stop is None:
             stop = np.nanmax(x)
-        bins = np.arange(start, stop + bin_size, bin_size)
+        # We want to go from `start` to `stop+bin_size` (inclusive),
+        # but np.arange is open on the right (e.g. np.arange(1, 3) goes from
+        # 1 to 2 (inclusive)). Hence, we need the `stop` argument to be 2*bin_size.
+        bins = np.arange(start, stop + 2*bin_size, bin_size)
 
     # Perform the calculation
     binned_values = stats.binned_statistic(x=x,values=y,bins=bins,statistic=statistic).statistic
