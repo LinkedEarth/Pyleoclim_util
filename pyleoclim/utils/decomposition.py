@@ -17,6 +17,7 @@ from .tsutils import standardize
 from .tsmodel import ar1_sim
 from .correlation import cov_shrink_rblw
 from scipy.linalg import eigh, toeplitz, ishermitian, eig
+from kneed import KneeLocator
 import warnings
 #from nitime import algorithms as alg
 #import copy
@@ -254,7 +255,7 @@ import warnings
 
 #     return res
 
-def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
+def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
     '''Singular spectrum analysis
 
     Nonparametric eigendecomposition of timeseries into orthogonal oscillations.
@@ -287,6 +288,11 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
 
     var_thresh : float
         variance threshold for reconstruction (only impactful if trunc is set to 'var')
+    
+    online : bool; {True,False}
+        Whether or not to conduct knee finding analysis online or offline. 
+        Only called when trunc = 'knee'. Default is True
+        See kneed's `documentation <https://kneed.readthedocs.io/en/latest/api.html#kneelocator>`_ for details.
 
     Returns
     -------
@@ -416,6 +422,10 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         mode_idx = np.where(eigvals>=mval)[0]
     elif trunc == 'var':
         mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0]+1)
+    elif trunc == 'knee':
+        modes = np.arange(len(eigvals))
+        knee = KneeLocator(x=modes,y=eigvals,curve='convex',direction='decreasing',online=online).knee
+        mode_idx = np.arange(knee)
     if nMC == 0 and trunc == 'mcssa':
         raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
     elif nMC>0:
