@@ -41,6 +41,7 @@ HadCRUT5:
     value_name: 'GMST'
     value_unit: '$^{\circ}$C'
     archiveType: 'Instrumental'
+    importedFrom: 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.monthly.csv'
   time_column: Time
   value_column: Anomaly (deg C)  
   
