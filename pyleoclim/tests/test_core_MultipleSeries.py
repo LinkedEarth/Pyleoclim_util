@@ -303,7 +303,7 @@ class TestMultipleSeriesPca:
     
         mslist = []
         for i in range(p):
-            mslist.append(pyleo.Series(time = t, value = X[:,i],clean_ts=False))
+            mslist.append(pyleo.Series(time = t, value = X[:,i],dropna=False))
         ms = pyleo.MultipleSeries(mslist)
 
         res = ms.pca(ncomp=4, gls=True)
