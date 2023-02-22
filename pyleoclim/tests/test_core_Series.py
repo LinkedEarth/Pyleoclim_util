@@ -65,25 +65,24 @@ def gen_normal(loc=0, scale=1, nt=100):
 class TestUISeriesInit:
      ''' Test for Series instantiation '''
     
-     def test_init_no_dropna(self):
-         #ts = evenly_spaced_series
-         ts = gen_normal()
+     def test_init_no_dropna(self, evenly_spaced_series):
+         ts = evenly_spaced_series
          t = ts.time
          v = ts.value
          v[0] = np.nan
          ts2 = pyleo.Series(time=t,value=v,dropna=False, verbose=False)
          assert np.isnan(ts2.value[0])
          
-     def test_init_no_sorting(evenly_spaced_series):
-         ts = gen_normal()
+     def test_init_no_sorting(self, evenly_spaced_series):
+         ts = evenly_spaced_series
          t = ts.time[::-1]
          v = ts.value[::-1]
          ts2 = pyleo.Series(time=t,value=v,sort_ts='Nein', verbose=False)
          res, _, sign = pyleo.utils.tsbase.resolution(ts2.time) 
          assert sign == 'negative'  
          
-     def test_init_clean_ts(evenly_spaced_series):
-         ts = gen_normal()
+     def test_init_clean_ts(self, evenly_spaced_series):
+         ts = evenly_spaced_series
          t = ts.time[::-1]
          v = ts.value[::-1]
          v[0] = np.nan
