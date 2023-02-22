@@ -80,6 +80,30 @@ class MultipleSeries:
 
             self.series_list = new_ts_list
     
+    def remove(self, label):
+        """
+        Remove Series based on given label.
+
+        Modifies the MultipleSeries, does not return anything.
+        """
+        to_remove = None
+        for series in self.series_list:
+            if series.metadata['label'] == label:
+                to_remove = series
+                break
+        if to_remove is None:
+            labels = [series.metadata['label'] for series in self.series_list]
+            raise ValueError(f"Label {label} not found, expected one of: {labels}")
+        self.series_list.remove(series)
+    
+    def __sub__(self, label):
+        """
+        Remove Series based on given label.
+
+        Modifies the MultipleSeries, does not return anything.
+        """
+        self.remove(label)
+
     def __add__(self, other):
         from ..core.series import Series
         if not isinstance(other, Series):
