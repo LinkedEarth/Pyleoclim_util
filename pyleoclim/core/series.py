@@ -7,6 +7,7 @@ The Series class describes the most basic objects in Pyleoclim. A Series is a si
 How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
 """
 
+import datetime as dt
 import operator
 import re
 
@@ -2327,6 +2328,66 @@ class Series:
         else:
             raise ValueError('No timeseries detected')
         return res
+    
+    def sel(self, value=None, time=None, tolerance=0):
+        if value is not None and time is not None:
+            raise TypeError("Cannot pass both `value` and `time`")
+
+        if value is not None:
+            if isinstance(value, (int, float)):
+                return self.pandas_method(lambda x: x[x.between(value-tolerance, value+tolerance)])
+            if isinstance(value, slice):
+                if isinstance(value.start, (int, float)) and isinstance(value.stop, (int, float)):
+                    return self.pandas_method(lambda x: x[x.between(value.start-tolerance, value.stop+tolerance)])
+                if isinstance(value.start, (int, float)) and value.stop is None:
+                    return self.pandas_method(lambda x: x[x.ge(value.start-tolerance)])
+                if isinstance(value.stop, (int, float)) and value.start is None:
+                    return self.pandas_method(lambda x: x[x.le(value.stop-tolerance)])
+            raise TypeError(f'Expected slice, int, or float, got: {type(value)}')
+        
+        if time is not None:
+            if isinstance(time, (int, float)):
+                return self.slice([time-tolerance, time+tolerance])
+            if isinstance(time, slice):
+                if isinstance(time.start, (int, float)) and isinstance(time.stop, (int, float)):
+                    return self.slice([time.start-tolerance, time.stop+tolerance])
+                if isinstance(time.start, (int, float)) and time.stop is None:
+                    mask = self.time >= time.start-tolerance
+                    new = self.copy()
+                    new.time = new.time[mask]
+                    new.value = new.value[mask]
+                    return new
+                if isinstance(time.stop, (int, float)) and time.start is None:
+                    mask = self.time <= time.stop-tolerance
+                    new = self.copy()
+                    new.time = new.time[mask]
+                    new.value = new.value[mask]
+                    return new
+                if isinstance(time.start, str) and isinstance(time.stop, str):
+                    return self.pandas_method(
+                        lambda x: x[(x.index>=(np.datetime64(time.start, 's'))) & (x.index<=np.datetime64(time.stop, 's'))]
+                    )
+                if isinstance(time.start, str) and time.stop is None:
+                    return self.pandas_method(
+                        lambda x: x[x.index>=(np.datetime64(time.start, 's'))]
+                    )
+                if isinstance(time.stop, str) and time.start is None:
+                    return self.pandas_method(
+                        lambda x: x[x.index<=(np.datetime64(time.stop, 's'))]
+                    )
+                if isinstance(time.start, dt.datetime) and isinstance(time.stop, dt.datetime):
+                    return self.pandas_method(
+                        lambda x: x[(x.index>=time.start) & (x.index<=time.stop)]
+                    )
+                if isinstance(time.start, dt.datetime) and time.stop is None:
+                    return self.pandas_method(
+                        lambda x: x[x.index>=time.start]
+                    )
+                if isinstance(time.stop, dt.datetime) and time.start is None:
+                    return self.pandas_method(
+                        lambda x: x[x.index<=time.stop]
+                    )
+
 
     def slice(self, timespan):
         ''' Slicing the timeseries with a timespan (tuple or list)
