@@ -30,10 +30,6 @@ def metadata():
         'lon': None,
         'archiveType': 'Instrumental',
         'importedFrom': None,
-        'verbose': False,
-        'clean_ts': False,
-        'dropna': True,
-        'sort_ts': 'ascending',
         'log': (
                 {1: 'dropna', 'applied': True, 'verbose': True},
                 {2: 'sort_ts', 'direction': 'ascending'}

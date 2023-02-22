@@ -267,9 +267,6 @@ class Series:
             archiveType = self.archiveType,
             importedFrom = self.importedFrom,
             log = self.log,
-            dropna = self.dropna,
-            sort_ts = self.sort_ts,
-            clean_ts = self.clean_ts
         )
     
     @classmethod
@@ -284,10 +281,10 @@ class Series:
         if 'time_name' not in metadata.keys():
             metadata['time_name'] = ser.index.name 
         if 'value_name' not in metadata.keys():
-            metadata['value_name'] = ser.name 
-        metadata['verbose'] = False    
+            metadata['value_name'] = ser.name   
                 
-        return cls(time=time,value=ser.values, **metadata)
+        return cls(time=time,value=ser.values, **metadata, 
+                   sort_ts = None, dropna = False, verbose=False)
                 
     # Alternate formulation
     # def from_pandas(ser, metadata):
@@ -359,14 +356,13 @@ class Series:
         filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
         ser = self.to_pandas(paleo_style=True)
         
-        metadata = self.metadata.pop('clean_ts')
         # export metadata
         if metadata_header:
             with open(path+'/'+filename, 'w', newline='')  as file:       
                 hd_writer = csv.writer(file)
                 hd_writer.writerow(["###", "Series metadata"])
                 hd_writer.writerow(["written by", "Pyleoclim " + version('Pyleoclim')])
-                hd_writer.writerows(metadata.items())
+                hd_writer.writerows(self.metadata.items())
                 hd_writer.writerow(["###", "end metadata"])
                 #file.close()
             # export Series object to CSV
@@ -423,7 +419,6 @@ class Series:
         # read in data    
         df = pd.read_csv(path + '/' + filename, header=header)
         # export to Series 
-        metadata['verbose'] = False
         return cls(time=df.iloc[:,0],value=df.iloc[:,1], **metadata)
     
     def to_json(self, path =None):

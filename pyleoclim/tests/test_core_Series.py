@@ -1041,7 +1041,7 @@ class TestUISeriesSort:
         ts.sort()
         assert np.all(np.diff(ts.time) >= 0)
 
-@pytest.mark.xfail
+#@pytest.mark.xfail
 class TestResample:
     @pytest.mark.parametrize('rule', pyleo.utils.tsbase.MATCH_A)
     def test_resample_simple(self, rule, dataframe_dt, metadata):
@@ -1064,10 +1064,6 @@ class TestResample:
             'lon': None,
             'archiveType': 'Instrumental',
             'importedFrom': None,
-            'verbose': False,
-            'clean_ts': False,
-            'dropna': True,
-            'sort_ts': 'ascending',
             'log': (
                     {1: 'dropna', 'applied': True, 'verbose': True},
                     {2: 'sort_ts', 'direction': 'ascending'}
@@ -1102,10 +1098,6 @@ class TestResample:
             'lon': None,
             'archiveType': 'Instrumental',
             'importedFrom': None,
-            'verbose': False,
-            'clean_ts': False,
-            'dropna': True,
-            'sort_ts': 'ascending',
             'log': (
                     {1: 'dropna', 'applied': True, 'verbose': True},
                     {2: 'sort_ts', 'direction': 'ascending'}
