@@ -23,7 +23,7 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       with:
         activate-environment: pyleo
-        environment-file: environment.yml
+        environment-file: environment_dev.yml
         python-version: "3.10"
         auto-activate-base: false
     
