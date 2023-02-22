@@ -30,6 +30,39 @@ MATCH_MA = frozenset(['ma', 'my','myr','myrs'])
 MATCH_GA = frozenset(['ga', 'gy', 'gyr', 'gyrs'])
 
 def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
+    """Convert time unit (yr, ka, ma, etc) to a datum, exponent, direction 
+    triplet. Based on the time_unit (and optionally, the time_name) the datum
+    (year zero), exponent (10^x year units), and direction (prograde/retrograde)
+    can be inferred. A verbose option is included here for users who want to 
+    confirm the resulting inference.
+
+    Parameters
+    ----------
+    time_unit: str
+        Time unit indicates the major unit of time. Examples: annum (yr), 
+        kiloyear (ka, ky), milayear (ma, my), gigayear (ga, gy)
+    time_name: str
+        (Optional) If 'age', direction is always 'retrograde'. Defaults to None,
+        which is effectively unused.
+    verbose: bool
+        (Optional) If True, includes a print statement explaining the 
+        conversion.
+
+    Returns
+    -------
+    datum : int, optional
+        origin point for the time scale.
+    exponent : int, optional
+        Base-10 exponent for year multiplier. Dates in kyr should use 3, dates in Myr should use 6, etc.
+    direction: str
+        Direction of time flow, 'prograde' or 'retrograde'.
+
+    Examples
+    --------
+    >>> from pyleoclim.utils.tsbase import time_unit_to_datum_exp_dir
+    >>> (datum, exponent, direction) = time_unit_to_datum_exp_dir(time_unit)
+    (1950, 3, 'retrograde')
+    """
          
     tu = time_unit.lower().split()
     
@@ -78,20 +111,48 @@ def time_unit_to_datum_exp_dir(time_unit, time_name=None, verbose=False):
             direction = 'retrograde'
         
     if verbose:
-        print(f'Provided time medata translated to {direction} flow, 10^{exponent} year units, and year {datum} datum')    
+        print(f'Provided time metadata translated to {direction} flow, 10^{exponent} year units, and year {datum} datum')    
   
     return (datum, exponent, direction)
 
 def convert_datetime_index_to_time(datetime_index, time_unit, time_name):
-    """
-    Convert a DatetimeIndex to time in a given unit. 
-
+    """ Convert a Pandas DatetimeIndex into a numpy array of floats.
+    
     The general formula is:
 
         datetime_index = datum +/- time*10**exponent
     
     where we assume ``time`` to use the Gregorian calendar. If dealing with other
     calendars, then conversions need to happen before reaching pyleoclim.
+
+    Parameters
+    ----------
+    datetime_index: pd.DatetimeIndex
+        Index to covert to floats
+    time_unit: str
+        Time unit indicates the major unit of time. Examples: annum (yr), 
+        kiloyear (ka, ky), milayear (ma, my), gigayear (ga, gy)
+    time_name: str
+        If 'age', direction is always 'retrograde'. 
+
+    Returns
+    -------
+    np.array((float,)) of converted times
+
+    Examples
+    --------
+    >>> from pyleoclim.utils.tsbase import convert_datetime_index_to_time
+    >>> time_unit = 'ga'
+    >>> time_name = None
+    >>> dti = pd.date_range("2018-01-01", periods=5, freq="Y", unit='s')
+    >>> df = pd.DataFrame(np.array(range(5)), index=dti)
+    >>> time = convert_datetime_index_to_time(
+        df.index, 
+        time_unit, 
+        time_name=time_name,
+        )
+    np.array([-6.89965777e-08, -6.99965777e-08, -7.09993155e-08, -7.19965777e-08, -7.29965777e-08])
+
     """
     datum, exponent, direction = time_unit_to_datum_exp_dir(time_unit, time_name)
     if direction == 'prograde':
