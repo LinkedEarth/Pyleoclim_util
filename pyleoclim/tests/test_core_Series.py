@@ -12,6 +12,7 @@ Notes on how to test:
 4. after `pip install pytest-xdist`, one may execute "pytest -n 4" to test in parallel with number of workers specified by `-n`
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 '''
+import datetime as dt
 import numpy as np
 import pandas as pd
 
@@ -416,6 +417,55 @@ class TestUiSeriesSlice:
 
         assert min(times) == 10
         assert max(times) == 90
+
+class TestSel:
+    @pytest.mark.parametrize(
+        ('value', 'expected_time', 'expected_value', 'tolerance'),
+        [
+            (1, np.array([3]), np.array([1]), 0),
+            (1, np.array([1, 3]), np.array([4, 1]), 3),
+            (slice(1, 4), np.array([1, 3]), np.array([4, 1]), 0),
+            (slice(1, 4), np.array([1, 2, 3]), np.array([4, 6, 1]), 2),
+            (slice(1, None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, 1), np.array([3]), np.array([1]), 0),
+        ]
+    )
+    def test_value(self, value, expected_time, expected_value, tolerance):
+        ts = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP')
+        result = ts.sel(value=value, tolerance=tolerance)
+        expected = pyleo.Series(time=expected_time, value=expected_value, time_unit='years BP')
+        values_match, _ = result.equals(expected)
+        assert values_match
+
+    @pytest.mark.parametrize(
+        ('time', 'expected_time', 'expected_value', 'tolerance'),
+        [
+            (1, np.array([1]), np.array([4]), 0),
+            (1, np.array([1, 2]), np.array([4, 6]), 1),
+            (slice(1, 2), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice(1, 2), np.array([1, 2, 3]), np.array([4, 6, 1]), 1),
+            (slice(1, None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, 1), np.array([1]), np.array([4]), 0),
+            (slice('1948', '1949'), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice('1947', None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, '1948'), np.array([3]), np.array([1]), 0),
+            (slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice(dt.datetime(1947, 1, 1), None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, dt.datetime(1948, 1, 1)), np.array([3]), np.array([1]), 0),
+        ]
+    )
+    def test_time(self, time, expected_time, expected_value, tolerance):
+        ts = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP')
+        result = ts.sel(time=time, tolerance=tolerance)
+        expected = pyleo.Series(time=expected_time, value=expected_value, time_unit='years BP')
+        values_match, _ = result.equals(expected)
+        assert values_match
+    
+    def test_invalid(self):
+        ts = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP')
+        with pytest.raises(TypeError, match="Cannot pass both `value` and `time`"):
+            ts.sel(time=1, value=1)
+
 
 class TestUiSeriesSurrogates:
     ''' Test Series.surrogates()
