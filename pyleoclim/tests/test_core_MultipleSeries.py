@@ -494,6 +494,31 @@ class TestRemove:
         assert len(ms.series_list) == 1
         assert ms.series_list[0].equals(ts1) == (True, True)
 
+class TestToPandas:
+    def test_to_pandas(self): 
+        ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
+        ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
+        ms = pyleo.MultipleSeries([ts1, ts2])
+        result = ms.to_pandas()
+        expected_index = pd.DatetimeIndex(
+            np.array(['0000-12-31 05:48:45', '0002-07-02 02:31:54'], dtype='datetime64[s]'),
+            name='datetime',
+        )
+        expected = pd.DataFrame({'foo': [7, 5.25], 'bar': [7, 7.75]}, index=expected_index)
+        pd.testing.assert_frame_equal(result, expected)
+    
+    def test_to_pandas_args_kwargs(self):
+        ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
+        ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
+        ms = pyleo.MultipleSeries([ts1, ts2])
+        result = ms.to_pandas('bin', start=2)
+        expected_index = pd.DatetimeIndex(
+            np.array(['0002-12-31 17:26:17'], dtype='datetime64[s]'),
+            name='datetime',
+        )
+        expected = pd.DataFrame({'foo': [6.5], 'bar': [4.5]}, index=expected_index)
+        pd.testing.assert_frame_equal(result, expected)
+
 class TestOverloads:
     def test_add(self):
         ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
