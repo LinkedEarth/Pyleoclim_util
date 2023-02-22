@@ -899,8 +899,15 @@ class TestUISeriesSsa():
         '''
         ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
         ts.ssa(trunc='kaiser')
-
+    
     def test_ssa_t4(self):
+        '''Test Series.ssa() with Knee truncation'''
+        ts = pyleo.utils.load_dataset('SOI')
+        ssa = ts.ssa(trunc='knee')
+        knee = 12
+        assert_array_equal(ssa.mode_idx, np.arange(knee))
+
+    def test_ssa_t5(self):
         '''Test Series.ssa() with missing values
         '''
         soi = pyleo.utils.load_dataset('SOI')
