@@ -20,6 +20,7 @@ import matplotlib.transforms as transforms
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+import pandas as pd
 from tqdm import tqdm
 from scipy import stats
 from statsmodels.multivariate.pca import PCA
@@ -78,6 +79,36 @@ class MultipleSeries:
                 new_ts_list.append(new_ts)
 
             self.series_list = new_ts_list
+    
+    def remove(self, label):
+        """
+        Remove Series based on given label.
+
+        Modifies the MultipleSeries, does not return anything.
+        """
+        to_remove = None
+        for series in self.series_list:
+            if series.metadata['label'] == label:
+                to_remove = series
+                break
+        if to_remove is None:
+            labels = [series.metadata['label'] for series in self.series_list]
+            raise ValueError(f"Label {label} not found, expected one of: {labels}")
+        self.series_list.remove(series)
+    
+    def __sub__(self, label):
+        """
+        Remove Series based on given label.
+
+        Modifies the MultipleSeries, does not return anything.
+        """
+        self.remove(label)
+
+    def __add__(self, other):
+        from ..core.series import Series
+        if not isinstance(other, Series):
+            raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
+        return self.append(other)
 
     def convert_time_unit(self, time_unit='years'):
         ''' Convert the time units of the object
@@ -2047,3 +2078,23 @@ class MultipleSeries:
             # reset the plotting style
             mpl.rcParams.update(current_style)
             return ax
+
+    def to_pandas(self, *args, **kwargs):
+        """
+        Align Series and place in DataFrame.
+
+        Column names will be taken from each Series' label. The index will be
+        construted by first using ``common_time`` to align all Series to have
+        the same index.
+
+        Parameters
+        ----------
+        *args, **kwargs
+            Arguments and keyword arguments to pass to ``common_time``.
+         
+        Returns
+        -------
+        pandas.DataFrame
+        """
+        ms_aligned = self.common_time(*args, **kwargs)
+        return pd.DataFrame({ser.metadata['label']: ser.to_pandas() for ser in ms_aligned.series_list})

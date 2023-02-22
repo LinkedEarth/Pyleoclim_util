@@ -7,6 +7,7 @@ The Series class describes the most basic objects in Pyleoclim. A Series is a si
 How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
 """
 
+import datetime as dt
 import operator
 import re
 
@@ -250,6 +251,16 @@ class Series:
        
     @property
     def datetime_index(self):
+        """
+        Convert time to pandas DatetimeIndex.
+
+        Note: conversion will happen using `time_unit`, and will assume:
+
+        - the number of seconds per year is calculated using UDUNITS, see
+          http://cfconventions.org/cf-conventions/cf-conventions#time-coordinate
+        - `time` refers to the Gregorian calendar. If using a different calendar,
+          then please make sure to do any conversions before hand.
+        """
         datum, exponent, direction = tsbase.time_unit_to_datum_exp_dir(self.time_unit)
         index = tsbase.time_to_datetime(self.time, datum, exponent, direction)
         return pd.DatetimeIndex(index, name='datetime')
@@ -312,8 +323,6 @@ class Series:
         ser : pd.Series representation of the pyleo.Series object
 
         '''
-        # Could be a dataclass instead?
-
         ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
         if paleo_style:
             time_label, value_label = self.make_labels()
@@ -2360,6 +2369,153 @@ class Series:
         else:
             raise ValueError('No timeseries detected')
         return res
+    
+    def sel(self, value=None, time=None, tolerance=0):
+        """
+        Slice Series based on 'value' or 'time'.
+
+        Parameters
+        ----------
+        value : int, float, slice
+            If int/float, then the Series will be sliced so that `self.value` is
+            equal to `value` (+/- `tolerance`).
+            If slice, then the Series will be sliced so `self.value` is between
+            slice.start and slice.stop (+/- tolerance).
+        time : int, float, slice
+            If int/float, then the Series will be sliced so that `self.time` is
+            equal to `time`. (+/- `tolerance`)
+            If slice of int/float, then the Series will be sliced so that
+            `self.time` is between slice.start and slice.stop.
+            If slice of `datetime` (or str containing datetime, such as `'2020-01-01'`),
+            then the Series will be sliced so that `self.datetime_index` is
+            between `time.start` and `time.stop`.
+        tolerance : int, float, default 0.
+            Used by `value` and `time`, see above.
+        
+        Returns
+        -------
+        Copy of `self`, sliced according to `value` and `time`.
+
+        Examples
+        --------
+        >>> ts = pyleo.Series(
+        ...     time=np.array([1, 1.1, 2, 3]), value=np.array([4, .9, 6, 1]), time_unit='years BP'
+        ... )
+        >>> ts.sel(value=1)
+        {'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False})}
+
+        None
+        time [years BP]
+        3.0    1.0
+        Name: value, dtype: float64
+
+        If you also want to include the value `3.9`, you could set `tolerance` to `.1`:
+
+        >>> ts.sel(value=1, tolerance=.1)
+        {'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False})}
+
+        None
+        time [years BP]
+        1.1    0.9
+        3.0    1.0
+        Name: value, dtype: float64
+
+        You can also pass a `slice` to select a range of values:
+
+        >>> ts.sel(value=slice(4, 6))
+        {'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False})}
+
+        None
+        time [years BP]
+        1.0    4.0
+        2.0    6.0
+        Name: value, dtype: float64
+
+        >>> ts.sel(value=slice(4, None))
+        {'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False})}
+
+        None
+        time [years BP]
+        1.0    4.0
+        2.0    6.0
+        Name: value, dtype: float64
+
+        >>> ts.sel(value=slice(None, 4))
+        {'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},
+                {2: 'clean_ts', 'applied': True, 'verbose': False})}
+
+        None
+        time [years BP]
+        1.0    4.0
+        1.1    0.9
+        3.0    1.0
+        Name: value, dtype: float64
+
+        Similarly, you filter using `time` instead of `value`.
+        """
+        if value is not None and time is not None:
+            raise TypeError("Cannot pass both `value` and `time`")
+
+        if value is not None:
+            if isinstance(value, (int, float)):
+                return self.pandas_method(lambda x: x[x.between(value-tolerance, value+tolerance)])
+            if isinstance(value, slice):
+                if isinstance(value.start, (int, float)) and isinstance(value.stop, (int, float)):
+                    return self.pandas_method(lambda x: x[x.between(value.start-tolerance, value.stop+tolerance)])
+                if isinstance(value.start, (int, float)) and value.stop is None:
+                    return self.pandas_method(lambda x: x[x.ge(value.start-tolerance)])
+                if isinstance(value.stop, (int, float)) and value.start is None:
+                    return self.pandas_method(lambda x: x[x.le(value.stop-tolerance)])
+            raise TypeError(f'Expected slice, int, or float, got: {type(value)}')
+        
+        if time is not None:
+            if isinstance(time, (int, float)):
+                return self.slice([time-tolerance, time+tolerance])
+            if isinstance(time, slice):
+                if isinstance(time.start, (int, float)) and isinstance(time.stop, (int, float)):
+                    return self.slice([time.start-tolerance, time.stop+tolerance])
+                if isinstance(time.start, (int, float)) and time.stop is None:
+                    mask = self.time >= time.start-tolerance
+                    new = self.copy()
+                    new.time = new.time[mask]
+                    new.value = new.value[mask]
+                    return new
+                if isinstance(time.stop, (int, float)) and time.start is None:
+                    mask = self.time <= time.stop-tolerance
+                    new = self.copy()
+                    new.time = new.time[mask]
+                    new.value = new.value[mask]
+                    return new
+                if isinstance(time.start, str) and isinstance(time.stop, str):
+                    return self.pandas_method(
+                        lambda x: x[(x.index>=(np.datetime64(time.start, 's'))) & (x.index<=np.datetime64(time.stop, 's'))]
+                    )
+                if isinstance(time.start, str) and time.stop is None:
+                    return self.pandas_method(
+                        lambda x: x[x.index>=(np.datetime64(time.start, 's'))]
+                    )
+                if isinstance(time.stop, str) and time.start is None:
+                    return self.pandas_method(
+                        lambda x: x[x.index<=(np.datetime64(time.stop, 's'))]
+                    )
+                if isinstance(time.start, dt.datetime) and isinstance(time.stop, dt.datetime):
+                    return self.pandas_method(
+                        lambda x: x[(x.index>=time.start) & (x.index<=time.stop)]
+                    )
+                if isinstance(time.start, dt.datetime) and time.stop is None:
+                    return self.pandas_method(
+                        lambda x: x[x.index>=time.start]
+                    )
+                if isinstance(time.stop, dt.datetime) and time.start is None:
+                    return self.pandas_method(
+                        lambda x: x[x.index<=time.stop]
+                    )
+                raise TypeError("Expected int or float, or slice of int/float/datetime/str.")
+
 
     def slice(self, timespan):
         ''' Slicing the timeseries with a timespan (tuple or list)
