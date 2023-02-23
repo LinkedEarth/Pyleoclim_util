@@ -28,9 +28,12 @@ def metadata():
         'label': 'Southern Oscillation Index',
         'lat': None,
         'lon': None,
-        'archiveType': None,
+        'archiveType': 'Instrumental',
         'importedFrom': None,
-        'log': ({0: 'clean_ts', 'applied': True, 'verbose': False},)
+        'log': (
+                {1: 'dropna', 'applied': True, 'verbose': True},
+                {2: 'sort_ts', 'direction': 'ascending'}
+            )
     }
 
 @pytest.fixture
@@ -39,15 +42,15 @@ def unevenly_spaced_series():
     length = 10
     t = np.linspace(1,length,length) ** 2
     v = np.ones(length)
-    series = pyleo.Series(t,v)
+    series = pyleo.Series(time=t, value =v, verbose=False)
     return series
 
 @pytest.fixture
 def evenly_spaced_series():
     """Pyleoclim series with evenly spaced time axis"""
     length = 10
-    t = np.linspace(1,length,length) ** 2
+    t = np.linspace(1,length,length)
     v = np.cos(2*np.pi*t/10)
-    series = pyleo.Series(time=t, value=v)
+    series = pyleo.Series(time=t, value=v, verbose=False)
     series.label = 'cosine'
     return series

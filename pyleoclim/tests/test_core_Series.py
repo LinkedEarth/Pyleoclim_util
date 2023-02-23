@@ -32,7 +32,6 @@ from pyleoclim.utils.tsmodel import (
     ar1_sim,
     ar1_fit)
 
-
 from statsmodels.tsa.arima_process import arma_generate_sample
 import matplotlib.pyplot as plt
 
@@ -42,7 +41,7 @@ def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
 
     t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
-    ts=pyleo.Series(t,v)
+    ts=pyleo.Series(t,v, sort_ts='none')
     return ts
 
 def gen_normal(loc=0, scale=1, nt=100):
@@ -63,6 +62,34 @@ def gen_normal(loc=0, scale=1, nt=100):
 
 # Tests below
 
+class TestUISeriesInit:
+     ''' Test for Series instantiation '''
+    
+     def test_init_no_dropna(self, evenly_spaced_series):
+         ts = evenly_spaced_series
+         t = ts.time
+         v = ts.value
+         v[0] = np.nan
+         ts2 = pyleo.Series(time=t,value=v,dropna=False, verbose=False)
+         assert np.isnan(ts2.value[0])
+         
+     def test_init_no_sorting(self, evenly_spaced_series):
+         ts = evenly_spaced_series
+         t = ts.time[::-1]
+         v = ts.value[::-1]
+         ts2 = pyleo.Series(time=t,value=v,sort_ts='Nein', verbose=False)
+         res, _, sign = pyleo.utils.tsbase.resolution(ts2.time) 
+         assert sign == 'negative'  
+         
+     def test_init_clean_ts(self, evenly_spaced_series):
+         ts = evenly_spaced_series
+         t = ts.time[::-1]
+         v = ts.value[::-1]
+         v[0] = np.nan
+         ts2 = pyleo.Series(time=t,value=v, dropna=False, clean_ts=True, verbose=False)
+         res, _, sign = pyleo.utils.tsbase.resolution(ts2.time) 
+         assert np.isnan(ts2.value[-1])
+         
 
 class TestSeriesIO:
     ''' Test Series import from and export to other formats
@@ -320,7 +347,6 @@ class TestUiSeriesCenter:
 
         #Call function to be tested
         tsc = ts.center(keep_log=True)
-        print(tsc.log[1])
 
         assert np.abs(tsc.value.mean()) <= np.sqrt(sys.float_info.epsilon)
 
@@ -1064,13 +1090,13 @@ class TestUISeriesSort:
         ts.sort()
         assert np.all(np.diff(ts.time) >= 0)
 
-
+#@pytest.mark.xfail
 class TestResample:
     @pytest.mark.parametrize('rule', pyleo.utils.tsbase.MATCH_A)
     def test_resample_simple(self, rule, dataframe_dt, metadata):
         ser = dataframe_dt.loc[:, 0]
         ts = pyleo.Series.from_pandas(ser, metadata)
-        result =ts.resample(rule).mean()
+        result = ts.resample(rule).mean()
         result_ser = result.to_pandas()
         expected_values = np.array([0., 1., 2., 3., 4.])
         expected_idx = pd.DatetimeIndex(
@@ -1086,13 +1112,12 @@ class TestResample:
             'label': f'Southern Oscillation Index ({rule} resampling)',
             'lat': None,
             'lon': None,
-            'archiveType': None,
+            'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (
-                {0: 'clean_ts', 'applied': True, 'verbose': False},
-                {2: 'clean_ts', 'applied': True, 'verbose': False},
-                {3: 'clean_ts', 'applied': True, 'verbose': False}
-            )
+                    {1: 'dropna', 'applied': True, 'verbose': True},
+                    {2: 'sort_ts', 'direction': 'ascending'}
+                )
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
@@ -1121,13 +1146,12 @@ class TestResample:
             'label': f'Southern Oscillation Index ({rule} resampling)',
             'lat': None,
             'lon': None,
-            'archiveType': None,
+            'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (
-                {0: 'clean_ts', 'applied': True, 'verbose': False},
-                {2: 'clean_ts', 'applied': True, 'verbose': False},
-                {3: 'clean_ts', 'applied': True, 'verbose': False}
-            )
+                    {1: 'dropna', 'applied': True, 'verbose': True},
+                    {2: 'sort_ts', 'direction': 'ascending'}
+                )
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
@@ -1180,3 +1204,4 @@ class TestUISeriesEquals():
         soi2 = pyleo.Series.from_pandas(soi_pd, soi.metadata)
         same_data, _ = soi.equals(soi2, index_tol= 1.1*86400)
         assert same_data
+        

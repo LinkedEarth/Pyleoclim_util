@@ -58,13 +58,13 @@ class Series:
     '''The Series class describes the most basic objects in Pyleoclim.
     A Series is a simple `dictionary <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_ that contains 3 things:
 
-    * a series of real-valued numbers;
+    * value, an array of real-valued numbers;
 
-    * a time axis at which those values were measured/simulated ;
+    * time, a coordinate axis at which those values were obtained ;
 
-    * optionally, some metadata about both axes, like units, labels and the like.
+    * optionally, some metadata about both axes, like units, labels and origin.
 
-    How to create and manipulate such objects is described in a short example below, while `this notebook <https://nbviewer.jupyter.org/github/LinkedEarth/Pyleoclim_util/blob/master/example_notebooks/pyleoclim_ui_tutorial.ipynb>`_ demonstrates how to apply various Pyleoclim methods to Series objects.
+    How to create, manipulate and use such objects is described in `PyleoTutorials <https://http://linked.earth/PyleoTutorials/>`_.
 
     Parameters
     ----------
@@ -95,10 +95,6 @@ class Series:
         Name of the time series (e.g., 'Nino 3.4')
         Default is None
 
-    clean_ts : boolean flag
-        set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
-        Default is True
-
     log : dict
         Dictionary of tuples documentating the various transformations applied to the object
         
@@ -112,41 +108,41 @@ class Series:
         source of the dataset. If it came from a LiPD file, this could be the datasetID property 
 
     archiveType : string
-        climate archive, one of                                                                                     
+        climate archive, one of ....                                                                                    
 
-    If keep_log is set to True, then a log of the transformations made to the timeseries will be kept.
-
+    dropna : bool
+        Whether to drop NaNs from the series to prevent downstream functions from choking on them
+        defaults to True
+        
+    sort_ts : str
+        Direction of sorting over the time coordinate; 'ascending' or 'descending'
+        Defaults to 'ascending'
+        
     verbose : bool
         If True, will print warning messages if there is any
+        
+    clean_ts : boolean flag
+         set to True to remove the NaNs and make time axis strictly prograde with duplicated timestamps reduced by averaging the values
+         Default is None (marked for deprecation)
 
     Examples
     --------
 
-    In this example, we import the Southern Oscillation Index (SOI) into a pandas dataframe and create a Series object, then display a quick synopsis.
+    Import the Southern Oscillation Index (SOI) and display a quick synopsis:
 
-    .. ipython:: python
-        :okwarning:
-        :okexcept:
-
-        import pyleoclim as pyleo
-        import pandas as pd
-        data=pd.read_csv(
-            'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-            skiprows=0, header=1
-        )
-        time=data.iloc[:,1]
-        value=data.iloc[:,2]
-        ts=pyleo.Series(
-            time=time, value=value,
-            time_name='Year (CE)', value_name='SOI', label='Southern Oscillation Index'
-        )
-        ts
+    >>> soi = pyleo.utils.load_dataset('SOI')
+    >>> soi
           
     '''
 
     def __init__(self, time, value, time_unit=None, time_name=None, 
                  value_name=None, value_unit=None, label=None, lat=None, lon=None, 
-                 importedFrom=None, archiveType = None, clean_ts=True, log=None, verbose=False):
+                 importedFrom=None, archiveType = None, log=None, 
+                 sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False):
+        
+        # ensure ndarray instances
+        time = np.array(time)
+        value = np.array(value)
         
         # assign time metadata if they are not provided
         if time_unit is None:
@@ -162,17 +158,64 @@ class Series:
             nlog = len(log)
 
         if clean_ts == True:
-            value, time = tsbase.clean_ts(np.array(value), np.array(time), verbose=verbose)
-            self.log += ({nlog+1: 'clean_ts', 'applied': clean_ts, 'verbose': verbose},)
-
-
-        self.time = np.array(time)
-        self.value = np.array(value)
+            if dropna == False or sort_ts == 'descending':
+                warnings.warn(f'clean_ts implies dropna=True and sort_ts=ascending; provided values are {dropna, sort_ts}', UserWarning)
+            else:
+                dropna = True
+                sort_ts ='ascending'
+        elif clean_ts == False:
+            pass
+        else:
+            raise ValueError('clean_ts should be a boolean')
+        
+        if dropna == True:
+            value, time = tsbase.dropna(value, time, verbose=verbose)
+            self.log += ({nlog+1: 'dropna', 'applied': dropna, 'verbose': verbose},)
+            nlog +=1
+        elif dropna == False:
+            pass
+        else:
+            raise ValueError('dropna should be a boolean')
+            
+        # if check_sorting:
+        #     res, stats, sign = tsbase.resolution(time)
+        #     if sign == 'mixed':
+        #         warnings.warn("The Series time axis is non-monotonic, which may cause errors. Suggest applying .sort()")
+            
+        
+        # if  sort_ts in ['ascending', 'descending']:
+        #     value, time = tsbase.sort_ts(np.array(value), np.array(time),
+        #                                  ascending = sort_ts == 'ascending', verbose=verbose)
+        #     self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
+            
+        # else:
+        #     if verbose:
+        #         print("No time sorting applied")
+          
+        # if sort == 'auto':
+        #     _, _, direction =  tsbase.time_unit_to_datum_exp_dir(time_unit)
+        #     value, time = tsbase.sort_ts(np.array(value), np.array(time),
+        #                                   ascending = (direction == 'prograde'),
+        #                                   verbose=verbose)
+        #     self.log += ({nlog+1: 'sort', 'direction': direction},)    
+        if sort_ts is not None:
+            if sort_ts in ['ascending', 'descending']:
+                value, time = tsbase.sort_ts(value, time, verbose=verbose, 
+                                             ascending = sort_ts == 'ascending')
+                self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
+            else:
+                print(f"Unknown sorting option {sort_ts}; no sorting applied")
+         
+        self.time = time
+        self.value = value
         self.time_name = time_name
         self.time_unit = time_unit
         self.value_name = value_name
         self.value_unit = value_unit
         self.label = label
+        self.dropna = dropna
+        self.sort_ts = sort_ts
+        self.clean_ts = clean_ts
         # assign latitude
         if lat is not None:
             lat = float(lat) 
@@ -234,7 +277,7 @@ class Series:
             lon = self.lon,
             archiveType = self.archiveType,
             importedFrom = self.importedFrom,
-            log = self.log
+            log = self.log,
         )
     
     @classmethod
@@ -245,13 +288,14 @@ class Series:
         else:  
             raise ValueError('The provided index must be a proper DatetimeIndex object')
         
-        # metadata gap-filling. THis does not handle the edge case where the keys exist but the entries are None 
+        # metadata gap-filling. This does not handle the edge case where the keys exist but the entries are None 
         if 'time_name' not in metadata.keys():
             metadata['time_name'] = ser.index.name 
         if 'value_name' not in metadata.keys():
-            metadata['value_name'] = ser.name 
-        
-        return cls(time=time,value=ser.values, **metadata)
+            metadata['value_name'] = ser.name   
+                
+        return cls(time=time,value=ser.values, **metadata, 
+                   sort_ts = None, dropna = False, verbose=False)
                 
     # Alternate formulation
     # def from_pandas(ser, metadata):
@@ -320,7 +364,7 @@ class Series:
         '''
         filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
         ser = self.to_pandas(paleo_style=True)
-
+        
         # export metadata
         if metadata_header:
             with open(path+'/'+filename, 'w', newline='')  as file:       
@@ -384,9 +428,7 @@ class Series:
         # read in data    
         df = pd.read_csv(path + '/' + filename, header=header)
         # export to Series 
-        return cls(time=df.iloc[:,0],
-                   value=df.iloc[:,1], 
-                   clean_ts=False, **metadata)
+        return cls(time=df.iloc[:,0],value=df.iloc[:,1], **metadata)
     
     def to_json(self, path =None):
         """
@@ -2187,8 +2229,8 @@ class Series:
             new.log += ({len(new.log):'clean', 'verbose': verbose},)
         return new
 
-    def sort(self, verbose=False, keep_log = False):
-        ''' Ensure timeseries is aligned to a prograde axis.
+    def sort(self, verbose=False, ascending = True, keep_log = False):
+        ''' Ensure timeseries is set to a monotonically increasing axis.
             If the time axis is prograde to begin with, no transformation is applied.
 
         Parameters
@@ -2206,12 +2248,12 @@ class Series:
 
         '''
         new = self.copy()
-        v_mod, t_mod = tsbase.sort_ts(self.value, self.time, verbose=verbose)
+        v_mod, t_mod = tsbase.sort_ts(self.value, self.time, ascending=ascending, verbose=verbose)
         new.time = t_mod
         new.value = v_mod
 
         if keep_log == True:
-            new.log += ({len(new.log):'sort', 'verbose': verbose},)
+            new.log += ({len(new.log):'sort', 'ascending': ascending},)
         return new
 
     def gaussianize(self, keep_log = False):
@@ -2281,11 +2323,10 @@ class Series:
         new = self.copy()
         if timespan is not None:
             ts_mean  = np.nanmean(self.slice(timespan).value)
-            vc = self.value - ts_mean
         else:
             ts_mean  = np.nanmean(self.value)
-            vc = self.value - ts_mean
-        new.value = vc
+        
+        new.value = self.value - ts_mean
 
         if keep_log == True:
             new.log += ({len(new.log): 'center', 'args': timespan, 'previous_mean': ts_mean},)
@@ -3564,6 +3605,8 @@ class Series:
 
         Note that the output is fundamentally different for the two methods. Granger causality cannot discriminate between NINO3 -> AIR or AIR -> NINO3, in this case. This is not unusual, and one reason why it is no longer in wide use.
         '''
+
+        # TODO: ensure prograde time
 
         # Put on common axis if necessary
 
