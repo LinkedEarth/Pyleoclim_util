@@ -104,7 +104,7 @@ def load_dataset(name):
         ts=pyleo.Series(
             time=time, 
             value=value,
-            **pyleo_kwargs,
+            **pyleo_kwargs, verbose=False,
         )
     # if this is a json
     elif metadata['file_extension'] == 'json':

@@ -170,8 +170,12 @@ class Series:
         
         if dropna == True:
             value, time = tsbase.dropna(value, time, verbose=verbose)
-            self.log += ({nlog+1: 'dropna', 'applied': dropna, 'verbose': verbose},)
-            nlog +=1
+            if len(self.log) > 0:
+                if self.log[0][0] == 'dropna' and self.log[0]['applied'] == True:
+                    pass # no need to clog the log with redundant information
+            else:
+                self.log += ({nlog+1: 'dropna', 'applied': dropna, 'verbose': verbose},)
+                nlog +=1
         elif dropna == False:
             pass
         else:
@@ -202,7 +206,11 @@ class Series:
             if sort_ts in ['ascending', 'descending']:
                 value, time = tsbase.sort_ts(value, time, verbose=verbose, 
                                              ascending = sort_ts == 'ascending')
-                self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
+                if len(self.log) > 1:
+                    if self.log[1][1] == 'sort_ts' and self.log[1]['direction'] == 'ascending':
+                        pass # no need to clog the log with redundant information
+                else:
+                    self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
             else:
                 print(f"Unknown sorting option {sort_ts}; no sorting applied")
          
