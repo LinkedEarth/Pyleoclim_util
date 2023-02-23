@@ -1068,7 +1068,7 @@ class Series:
         return res
 
 
-    def ssa(self, M=None, nMC=0, f=0.3, trunc = None, var_thresh=80):
+    def ssa(self, M=None, nMC=0, f=0.3, trunc = None, var_thresh=80, online=True):
         ''' Singular Spectrum Analysis
 
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
@@ -1094,6 +1094,10 @@ class Series:
             See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for details.
         var_thresh : float
             variance threshold for reconstruction (only impactful if trunc is set to 'var')
+        online : bool; {True,False}
+            Whether or not to conduct knee finding analysis online or offline. 
+            Only called when trunc = 'knee'. Default is True
+            See kneed's `documentation <https://kneed.readthedocs.io/en/latest/api.html#kneelocator>`_ for details.
 
         Returns
         -------
@@ -1237,7 +1241,7 @@ class Series:
 
         '''
 
-        res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
+        res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh, online=online)
 
 
         resc = SsaRes(name=self.value_name, original=self.value, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
