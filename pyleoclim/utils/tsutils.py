@@ -93,6 +93,10 @@ def simple_stats(y, axis=None):
 def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True, statistic = 'mean', bins=None):
     """ Bin the values
 
+    The behavior of bins, as defined either by start, stop and step or by the bins argument, is to have all bins
+    except the last one be half open. That is if bins are defined as bins = [1,2,3,4], bins will be [1,2), [2,3), [3,4].
+    This is the default behaviour of scipy.stats.binned_statistic (upon which this function is built).
+
     Parameters
     ----------
 
@@ -186,6 +190,10 @@ def bin(x, y, bin_size=None, start=None, stop=None, evenly_spaced = True, statis
 
 def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', evenly_spaced=True, bins=None):
     '''Coarsen time resolution using a Gaussian kernel
+
+    The behavior of bins, as defined either by start, stop and step (or step_style) or by the bins argument, is to have all bins
+    except the last one be half open. That is if bins are defined as bins = [1,2,3,4], bins will be [1,2), [2,3), [3,4].
+    This is the default behaviour of our binning functionality (upon which this function is based).
 
     Parameters
     ----------
