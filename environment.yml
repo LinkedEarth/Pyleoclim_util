@@ -15,6 +15,7 @@ dependencies:
   - python=3.10
   - libstdcxx-ng=12.1.0
   - pytest
+  - kneed=0.7.0
   - pip:
     - git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
     - "--pre --extra-index https://pypi.anaconda.org/scipy-wheels-nightly/simple"

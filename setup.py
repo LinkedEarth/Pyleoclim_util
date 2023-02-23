@@ -45,7 +45,6 @@ setup(
         "nitime>=0.9",
         "tabulate>=0.8.9",
         "Unidecode>=1.1.1",
-        "kneed>=0.7.0",
         "pyyaml",
     ],
     python_requires=">=3.10.0"
