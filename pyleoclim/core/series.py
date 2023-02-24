@@ -1110,7 +1110,7 @@ class Series:
         return res
 
 
-    def ssa(self, M=None, nMC=0, f=0.3, trunc = None, var_thresh=80):
+    def ssa(self, M=None, nMC=0, f=0.3, trunc = None, var_thresh=80, online=True):
         ''' Singular Spectrum Analysis
 
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
@@ -1127,14 +1127,22 @@ class Series:
         f : float, optional
             maximum allowable fraction of missing values. The default is 0.3.
         trunc : str
-            if present, truncates the expansion to a level K < M owing to one of 3 criteria:
+            if present, truncates the expansion to a level K < M owing to one of 4 criteria:
                 (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
-                (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% threshold)
+                (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)
                 (3) 'var': first K modes that explain at least var_thresh % of the variance.
             Default is None, which bypasses truncation (K = M)
-
+                (4) 'knee': Wherever the "knee" of the screeplot occurs.
+            Recommended as a first pass at identifying significant modes as it tends to be more robust than 'kaiser' or 'var', and faster than 'mcssa'.
+            While no truncation method is imposed by default, if the goal is to enhance the S/N ratio and reconstruct a smooth version of the attractor's skeleton, 
+            then the knee-finding method is a good compromise between objectivity and efficiency.
+            See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for more details on the knee finding algorithm.
         var_thresh : float
             variance threshold for reconstruction (only impactful if trunc is set to 'var')
+        online : bool; {True,False}
+            Whether or not to conduct knee finding analysis online or offline. 
+            Only called when trunc = 'knee'. Default is True
+            See kneed's `documentation <https://kneed.readthedocs.io/en/latest/api.html#kneelocator>`_ for details.
 
         Returns
         -------
@@ -1278,7 +1286,7 @@ class Series:
 
         '''
 
-        res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
+        res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh, online=online)
 
 
         resc = SsaRes(name=self.value_name, original=self.value, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
