@@ -931,7 +931,7 @@ class TestUISeriesSsa():
         ts = pyleo.utils.load_dataset('SOI')
         ssa = ts.ssa(trunc='knee')
         knee = 12
-        assert_array_equal(ssa.mode_idx, np.arange(knee))
+        assert_array_equal(ssa.mode_idx, np.arange(knee+1))
 
     def test_ssa_t5(self):
         '''Test Series.ssa() with missing values
