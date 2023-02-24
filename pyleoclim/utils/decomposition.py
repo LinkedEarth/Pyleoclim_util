@@ -286,6 +286,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
             (3) 'var': first K modes that explain at least var_thresh % of the variance.
         Default is None, which bypasses truncation (K = M)
             (4) 'knee': Wherever the "knee" of the screeplot occurs.
+        Recommended as a first pass at identifying significant modes as it tends to be more robust than 'kaiser' or 'var', and faster than 'mcssa'.
         See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for details.
 
     var_thresh : float
