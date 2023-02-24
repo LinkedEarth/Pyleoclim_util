@@ -1092,7 +1092,9 @@ class Series:
             Default is None, which bypasses truncation (K = M)
                 (4) 'knee': Wherever the "knee" of the screeplot occurs.
             Recommended as a first pass at identifying significant modes as it tends to be more robust than 'kaiser' or 'var', and faster than 'mcssa'.
-            See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for details.
+            While no truncation method is imposed by default, if the goal is to enhance the S/N ratio and reconstruct a smooth version of the attractor's skeleton, 
+            then the knee-finding method is a good compromise between objectivity and efficiency.
+            See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for more details on the knee finding algorithm.
         var_thresh : float
             variance threshold for reconstruction (only impactful if trunc is set to 'var')
         online : bool; {True,False}
