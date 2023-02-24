@@ -430,7 +430,7 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
     elif trunc == 'knee':
         modes = np.arange(len(eigvals))
         knee = KneeLocator(x=modes,y=eigvals,curve='convex',direction='decreasing',online=online).knee
-        mode_idx = np.arange(knee)
+        mode_idx = np.arange(knee+1)
     if nMC == 0 and trunc == 'mcssa':
         raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
     elif nMC>0:
