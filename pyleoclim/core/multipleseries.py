@@ -2079,7 +2079,7 @@ class MultipleSeries:
             mpl.rcParams.update(current_style)
             return ax
 
-    def to_pandas(self, *args, use_common_time=True, **kwargs):
+    def to_pandas(self, *args, use_common_time=False, **kwargs):
         """
         Align Series and place in DataFrame.
 
@@ -2094,7 +2094,7 @@ class MultipleSeries:
         use_common_time, bool
             Pass True if you want to use ``common_time`` to align the Series
             to have common times. Else, times for which some Series doesn't
-            have values will be filled with NaN.
+            have values will be filled with NaN (default).
          
         Returns
         -------
