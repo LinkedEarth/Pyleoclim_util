@@ -104,7 +104,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
         The y-axis series.
 
     bin_size : float
-        The size of the bins. Default is the mean resolution if no_nans is not True.
+        The size of the bins. Default is the maximum resolution if no_nans is True.
 
     start : float
         Where/when to start binning. Default is the minimum.
@@ -135,7 +135,8 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
         Start, stop, bin_size, and step_style will be ignored if this is passed.
 
     no_nans : bool; {True,False}
-        Sets the step_style to max, ensuring that the resulting series contains no empty values.
+        Sets the step_style to max, ensuring that the resulting series contains no empty values (nans).
+        Default is True.
 
     Returns
     -------
@@ -160,7 +161,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     if evenly_spaced:
         no_nans=True
-        warnings.warn('This option is being deprecated. Please switch to using the option `no_nans` (behaviour is identical).',DeprecationWarning,stacklevel=2)
+        warnings.warn('`evenly_spaced` is being deprecated. Please switch to using the option `no_nans` (behaviour is identical).',DeprecationWarning,stacklevel=2)
 
     # Make sure x and y are numpy arrays
     x = np.array(x, dtype='float64')
@@ -183,11 +184,8 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
         if start is not None or stop is not None or bin_size is not None or step_style is not None or no_nans is not None:
             warnings.warn('The time axis has been passed with other time axis relevant arguments {start,stop,bin_size,step_style,no_nans}. Time_axis takes priority and will be used.')
     else:
-        time_axis = make_time_axis(x=x,start=start,stop=stop,step=bin_size,step_style=step_style,no_nans=no_nans)
-        bin_edges = np.zeros(len(time_axis)+1)
-        bin_edges[0] = time_axis[0]
-        bin_edges[-1] = time_axis[-1]
-        bin_edges[1:-1] = (time_axis[1:]+time_axis[:-1])/2
+        bin_edges = make_time_axis(x=x,start=start,stop=stop,step=bin_size,step_style=step_style,no_nans=no_nans)
+        time_axis = (bin_edges[1:]+bin_edges[:-1])/2
 
     # Perform the calculation
     binned_values = stats.binned_statistic(x=x,values=y,bins=bin_edges,statistic=statistic).statistic
@@ -480,6 +478,10 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
     x = np.array(x,dtype='float64')
     y = np.array(y,dtype='float64')
 
+    #Drop nans if present before interpolating
+    if np.isnan(y).any():
+        y,x = dropna(y,x)
+
     # get the evenly spaced time axis if one is not passed.
     if time_axis is not None:
         xi = time_axis
@@ -488,12 +490,13 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
     else:
         xi = make_time_axis(x=x,start=start,stop=stop,step=step,step_style=step_style)
 
-    #Drop nans if present before interpolating
-    if np.isnan(y).any():
-        y,x = dropna(y,x)
-
     #Make sure the data is increasing
     data = pd.DataFrame({"x-axis": x, "y-axis": y}).sort_values('x-axis')
+    xi = np.sort(xi)
+
+    #Make sure that values in xi don't exceed those in x
+    if max(xi) > data['x-axis'].max():
+        xi[:] = [t for t in xi if t <= max(data['x-axis'])]
 
     # Add arguments
     yi = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**kwargs)(xi)
