@@ -501,10 +501,10 @@ class TestToPandas:
         ms = pyleo.MultipleSeries([ts1, ts2])
         result = ms.to_pandas()
         expected_index = pd.DatetimeIndex(
-            np.array(['0000-12-31 05:48:45', '0002-07-02 02:31:54'], dtype='datetime64[s]'),
+            np.array(['0000-12-31 05:48:45', '0002-07-02 02:31:54','0003-12-31 23:15:03'], dtype='datetime64[s]'),
             name='datetime',
         )
-        expected = pd.DataFrame({'foo': [7, 5.25], 'bar': [7, 7.75]}, index=expected_index)
+        expected = pd.DataFrame({'foo': [7, 5.25,9.00], 'bar': [7, 7.75,1.00]}, index=expected_index)
         pd.testing.assert_frame_equal(result, expected)
     
     def test_to_pandas_args_kwargs(self):
