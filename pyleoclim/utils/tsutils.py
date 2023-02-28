@@ -164,32 +164,34 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     pyleoclim.utils.tsutils.interp : Interpolate y onto a new x-axis
 
+    `scipy.stats.binned_statistic <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binned_statistic.html>`_ : Scipy function around which this function is written
+
     """
 
     if evenly_spaced:
         no_nans=True
-        warnings.warn('`evenly_spaced` is being deprecated. Please switch to using the option `no_nans` (behaviour is identical).',DeprecationWarning,stacklevel=2)
+        warnings.warn('`evenly_spaced` is being deprecated. Please switch to using the option `no_nans` (behaviour is identical).',DeprecationWarning,stacklevel=3)
 
     # Make sure x and y are numpy arrays
     x = np.array(x, dtype='float64')
     y = np.array(y, dtype='float64')
     
     if (bin_size is not None or bin_edges is not None or time_axis is not None) and no_nans:
-        warnings.warn('The step, time axis, or bin edges have been set, the series may not be evenly_spaced')
+        warnings.warn('The step, time axis, or bin edges have been set, the series may not be evenly_spaced',stacklevel=3)
     
     # Set the bin edges
     if bin_edges is not None:
+        if start is not None or stop is not None or bin_size is not None or step_style is not None or time_axis is not None:
+            warnings.warn('Bins have been passed with other bin relevant arguments {start,stop,bin_size,step_style,time_axis}. Bin_edges take priority and will be used.',stacklevel=3)
         time_axis = (bin_edges[1:] + bin_edges[:-1])/2
-        if start is not None or stop is not None or bin_size is not None or step_style is not None or time_axis is not None or no_nans:
-            warnings.warn('Bins have been passed with other bin relevant arguments {start,stop,bin_size,step_style,time_axis,no_nans}. Bin_edges take priority and will be used.')
     # A bit of wonk is required to get the proper bin edges from the time axis
     elif time_axis is not None:
+        if start is not None or stop is not None or bin_size is not None or step_style is not None:
+            warnings.warn('The time axis has been passed with other time axis relevant arguments {start,stop,bin_size,step_style}. Time_axis takes priority and will be used.',stacklevel=3)
         bin_edges = np.zeros(len(time_axis)+1)
         bin_edges[0] = time_axis[0]
         bin_edges[-1] = time_axis[-1]
         bin_edges[1:-1] = (time_axis[1:]+time_axis[:-1])/2
-        if start is not None or stop is not None or bin_size is not None or step_style is not None or no_nans:
-            warnings.warn('The time axis has been passed with other time axis relevant arguments {start,stop,bin_size,step_style,no_nans}. Time_axis takes priority and will be used.')
     else:
         bin_edges = make_even_axis(x=x,start=start,stop=stop,step=bin_size,step_style=step_style,no_nans=no_nans)
         time_axis = (bin_edges[1:]+bin_edges[:-1])/2
@@ -210,7 +212,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     return  res_dict
 
 
-def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', evenly_spaced=False, bin_edges=None, time_axis=None,no_nans=True):
+def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, evenly_spaced=False, bin_edges=None, time_axis=None,no_nans=True):
     '''Coarsen time resolution using a Gaussian kernel
 
     Parameters
@@ -293,28 +295,28 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', ev
     
     if evenly_spaced:
         no_nans=True
-        warnings.warn('`evenly_spaced` is being deprecated. Please switch to using the option `no_nans` (behaviour is identical).',DeprecationWarning,stacklevel=2)
+        warnings.warn('`evenly_spaced` is being deprecated. Please switch to using the option `no_nans` (behaviour is identical).',DeprecationWarning,stacklevel=3)
 
         # Make sure x and y are numpy arrays
     t = np.array(t, dtype='float64')
     y = np.array(y, dtype='float64')
 
     if (step is not None or bin_edges is not None) and no_nans:
-        warnings.warn('The step or bins has been set, the series may not be evenly_spaced')
+        warnings.warn('The step or bins has been set, the series may not be evenly_spaced',stacklevel=3)
     
     # Set the bin edges
     if bin_edges is not None:
+        if start is not None or stop is not None or step is not None or step_style is not None or time_axis is not None:
+            warnings.warn('Bins have been passed with other axis relevant arguments {start,stop,step,step_style,time_axis}. Bin_edges take priority and will be used.',stacklevel=3)
         time_axis = (bin_edges[1:] + bin_edges[:-1])/2
-        if start is not None or stop is not None or step is not None or step_style is not None or time_axis is not None or no_nans:
-            warnings.warn('Bins have been passed with other axis relevant arguments {start,stop,step,step_style,time_axis,no_nans}. Bin_edges take priority and will be used.')
     # A bit of wonk is required to get the proper bin edges from the time axis
     elif time_axis is not None:
+        if start is not None or stop is not None or step is not None or step_style is not None:
+            warnings.warn('The time axis has been passed with other axis relevant arguments {start,stop,step,step_style}. Time_axis takes priority and will be used.',stacklevel=3)
         bin_edges = np.zeros(len(time_axis)+1)
         bin_edges[0] = time_axis[0]
         bin_edges[-1] = time_axis[-1]
         bin_edges[1:-1] = (time_axis[1:]+time_axis[:-1])/2
-        if start is not None or stop is not None or step is not None or step_style is not None or no_nans:
-            warnings.warn('The time axis has been passed with other axis relevant arguments {start,stop,step,step_style,no_nans}. Time_axis takes priority and will be used.')
     else:
         bin_edges = make_even_axis(x=t,start=start,stop=stop,step=step,step_style=step_style,no_nans=no_nans)
         time_axis = (bin_edges[1:]+bin_edges[:-1])/2
@@ -522,7 +524,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
     # get the evenly spaced time axis if one is not passed.
     if time_axis is not None:
         if start is not None or stop is not None or step is not None or step_style is not None:
-            warnings.warn('A time axis has been passed with other time axis relevant arguments {start,stop,step,step_style}. The passed time axis takes priority and will be used.')
+            warnings.warn('A time axis has been passed with other time axis relevant arguments {start,stop,step,step_style}. The passed time axis takes priority and will be used.',stacklevel=3)
         pass
     else:
         time_axis = make_even_axis(x=x,start=start,stop=stop,step=step,step_style=step_style)
@@ -587,7 +589,7 @@ def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
     sig2 = np.asarray(np.copy(sig) / scale)  # the standard deviation used in the calculation of zscore
 
     if np.any(np.abs(sig) < eps):  # check if x contains (nearly) constant time series
-        warnings.warn('Constant or nearly constant time series not rescaled.')
+        warnings.warn('Constant or nearly constant time series not rescaled.',stacklevel=2)
         where_const = np.abs(sig) < eps  # find out where we have (nearly) constant time series
 
         # if a vector is (nearly) constant, keep it the same as original, i.e., substract by 0 and divide by 1.
@@ -1325,18 +1327,13 @@ def make_even_axis(x=None,start=None,stop=None,step=None,step_style=None,no_nans
         else:
             stop = x[-1]
     
-    if step is not None and step > 0:
-        if step_style is not None or no_nans:
-            warnings.warn('Both step and step_style and/or no_nans have been passed. Passed step has priority and will be used.')
+    if step is not None:
         pass
     elif step_style is not None:
         if x is None:
             raise ValueError('If x is not passed then start, stop and step must be passed')
         else:
             _, _, step = increments(np.asarray(x), step_style = step_style)
-
-        if no_nans:
-            warnings.warn('Both step_style and no_nans have been passed. Passed step_style has priority and will be used.')
     elif no_nans:
         if x is None:
             raise ValueError('If x is not passed then start, stop and step must be passed')
@@ -1348,14 +1345,21 @@ def make_even_axis(x=None,start=None,stop=None,step=None,step_style=None,no_nans
         else:
             _, _, step = increments(np.asarray(x), step_style = 'mean')
     
-
     new_axis = np.arange(start,stop+step,step)
 
     #Make sure that values in time_axis don't exceed the stop value
-    if max(new_axis) > stop:
-        time_axis = np.array([t for t in new_axis if t <= stop])
+    if step > 0:
+        if max(new_axis) > stop:
+            time_axis = np.array([t for t in new_axis if t <= stop])
+        else:
+            time_axis = new_axis
+    elif step < 0:
+        if min(new_axis) < stop:
+            time_axis = np.array([t for t in new_axis if t >= stop])
+        else:
+            time_axis = new_axis
     else:
-        time_axis = new_axis
+        raise ValueError('Step must be nonzero')
 
     return time_axis
 
