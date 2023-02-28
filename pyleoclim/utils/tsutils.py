@@ -283,6 +283,8 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
     --------
 
     pyleoclim.utils.tsutils.increments : Establishes the increments of a numerical array
+    
+    pyleoclim.utils.tsutils.make_even_axis : Create an even time axis
 
     pyleoclim.utils.tsutils.bin : Bin the values
 
@@ -337,10 +339,11 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
         if len(xslice)>0:
             d      = xslice-time_axis[i]
             weight = kernel(d,h)
-            yc[i]  = sum(weight*yslice)/sum(weight)
+            yc[i]  = sum(weight*yslice)
         else:
             yc[i] = np.nan
 
+        yc /= sum(weight) # normalize by the sum of weights
     return time_axis, yc
 
 
