@@ -603,7 +603,7 @@ class MultipleSeries:
         if time_axis is not None:
             if start is not None or stop is not None or step is not None or step_style is not None:
                 warnings.warn('The time axis has been passed with other time axis relevant arguments {start,stop,step,step_style}. Time_axis takes priority and will be used.')
-            pass
+            even_axis=None
         else:
             # specify stepping style
             if step_style is None: # if step style isn't specified, pick a robust choice according to method
@@ -643,15 +643,18 @@ class MultipleSeries:
         if method == 'bin':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                d = tsutils.bin(ts.time, ts.value, bin_edges=even_axis, no_nans=False, **kwargs)
+                d = tsutils.bin(ts.time, ts.value, bin_edges=even_axis, time_axis=time_axis, no_nans=False, **kwargs)
                 ts.time  = d['bins']
                 ts.value = d['binned_values']
                 ms.series_list[idx] = ts
 
         elif method == 'interp':
+
+            if time_axis is None:
+                time_axis = even_axis
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.interp(ts.time, ts.value, time_axis=even_axis, **kwargs)
+                ti, vi = tsutils.interp(ts.time, ts.value, time_axis=time_axis, **kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
@@ -659,7 +662,7 @@ class MultipleSeries:
         elif method == 'gkernel':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.gkernel(ts.time,ts.value,bin_edges=even_axis, no_nans=False,**kwargs)
+                ti, vi = tsutils.gkernel(ts.time,ts.value,bin_edges=even_axis, time_axis=time_axis, no_nans=False,**kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts.clean() # remove NaNs
