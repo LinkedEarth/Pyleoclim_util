@@ -52,9 +52,9 @@ def test_gkernel_t1(unevenly_spaced_series):
     assert tsbase.is_evenly_spaced(t)
 
 def test_gkernel_t2(unevenly_spaced_series):
-    bins = np.arange(0,100,10)
-    t,v = tsutils.gkernel(unevenly_spaced_series.time,unevenly_spaced_series.value,bins=bins)
-    assert_array_equal(t,(bins[1:]+bins[:-1])/2)
+    bin_edges = np.arange(0,100,10)
+    t,v = tsutils.gkernel(unevenly_spaced_series.time,unevenly_spaced_series.value,bin_edges=bin_edges)
+    assert_array_equal(t,(bin_edges[1:]+bin_edges[:-1])/2)
 
 def test_interp_t0(unevenly_spaced_series):
     t,v = tsutils.interp(unevenly_spaced_series.time,unevenly_spaced_series.value)
