@@ -432,6 +432,27 @@ class TestMultipleSeriesCommonTime:
         ms1 = ms.common_time(method='interp', start=1910, stop=2010, step=1/12)
         
         assert (np.diff(ms1.series_list[0].time)[0] - 1/12) < 1e-3
+
+    def test_common_time_t2(self):
+        time = np.arange(1900, 2020, step=1/12)
+        ndel = 200
+        seriesList = []
+        n = 100
+        for j in range(4):
+            v = gen_ts(model='colored_noise', nt=n, alpha=1, t=time)
+            deleted_idx = np.random.choice(range(np.size(time)), ndel, replace=False)
+            tu =  np.delete(time.copy(), deleted_idx)
+            vu =  np.delete(v.value, deleted_idx)
+            ts = pyleo.Series(time=tu, value=vu,  value_name='Series_'+str(j+1))
+            seriesList.append(ts)
+    
+        ms = pyleo.MultipleSeries(seriesList)
+
+        new_time = np.arange(1950,2000,1)
+
+        ms1 = ms.common_time(method='interp', time_axis = new_time)
+        
+        assert_array_equal(new_time,ms1.series_list[0].time)
         
 class TestMultipleSeriesStackPlot():
     ''' Test for MultipleSeries.Stackplot
@@ -501,10 +522,10 @@ class TestToPandas:
         ms = pyleo.MultipleSeries([ts1, ts2])
         result = ms.to_pandas()
         expected_index = pd.DatetimeIndex(
-            np.array(['0000-12-31 05:48:45', '0002-07-02 02:31:54'], dtype='datetime64[s]'),
+            np.array(['0000-12-31 05:48:45', '0002-07-02 02:31:54','0003-12-31 23:15:03'], dtype='datetime64[s]'),
             name='datetime',
         )
-        expected = pd.DataFrame({'foo': [7, 5.25], 'bar': [7, 7.75]}, index=expected_index)
+        expected = pd.DataFrame({'foo': [7, 5.25,9.00], 'bar': [7, 7.75,1.00]}, index=expected_index)
         pd.testing.assert_frame_equal(result, expected)
     
     def test_to_pandas_args_kwargs(self):
