@@ -635,7 +635,7 @@ class MultipleSeries:
             if start > stop:
                 raise ValueError('At least one series has no common time interval with others. Please check the time axis of the series.')
             
-            time_axis = tsutils.make_even_axis(start=start,stop=stop,step=common_step)
+            even_axis = tsutils.make_even_axis(start=start,stop=stop,step=common_step)
         
         ms = self.copy()
 
@@ -643,7 +643,7 @@ class MultipleSeries:
         if method == 'bin':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                d = tsutils.bin(ts.time, ts.value, bin_edges=time_axis, no_nans=False, **kwargs)
+                d = tsutils.bin(ts.time, ts.value, bin_edges=even_axis, no_nans=False, **kwargs)
                 ts.time  = d['bins']
                 ts.value = d['binned_values']
                 ms.series_list[idx] = ts
@@ -651,7 +651,7 @@ class MultipleSeries:
         elif method == 'interp':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.interp(ts.time, ts.value, time_axis=time_axis, **kwargs)
+                ti, vi = tsutils.interp(ts.time, ts.value, time_axis=even_axis, **kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
@@ -659,7 +659,7 @@ class MultipleSeries:
         elif method == 'gkernel':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.gkernel(ts.time,ts.value,bin_edges=time_axis, no_nans=False,**kwargs)
+                ti, vi = tsutils.gkernel(ts.time,ts.value,bin_edges=even_axis, no_nans=False,**kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts.clean() # remove NaNs
