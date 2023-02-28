@@ -166,6 +166,71 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     `scipy.stats.binned_statistic <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binned_statistic.html>`_ : Scipy function around which this function is written
 
+    Examples
+    --------
+
+        Examples
+    --------
+
+    There are several ways to specify the way binning is conducted via this function. Within these there is a hierarchy which we demonstrate below.
+
+    Top priority is given to `bin_edges` if it is not None. All other arguments will be ignored (except for x and y).
+    The resulting time axis will be comprised of the midpoints between bin edges.
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        x = np.array([1,2,3,5,8,12,20])
+        y = np.ones(len(t))
+        xb,yb = pyleo.utils.tsutils.bin(x,y,bin_edges=[1,4,8,12,16,20])
+        xb
+
+    Next, priority will go to `time_axis` if it is passed. In this case, bin edges will be taken as the midpoints between time axis points.
+    The first and last time point will be used as the left most and right most bin edges.
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        x = np.array([1,2,3,5,8,12,20])
+        y = np.ones(len(t))
+        xb,yb = pyleo.utils.tsutils.bin(x,y,time_axis=[1,4,8,12,16,20])
+        xb
+    
+    If `time_axis` is None, `bin_size` will be considered, overriding `step_style if it is passed. `start` and `stop` will be generated using defaults if not passed.
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        x = np.array([1,2,3,5,8,12,20])
+        y = np.ones(len(t))
+        xb,yb = pyleo.utils.tsutils.bin(x,y,bin_size=2)
+        xb
+    
+    If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        x = np.array([1,2,3,5,8,12,20])
+        y = np.ones(len(t))
+        xb,yb = pyleo.utils.tsutils.bin(x,y,step_style='max')
+        xb
+
+    If none of these are specified, the mean spacing will be used.
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        x = np.array([1,2,3,5,8,12,20])
+        y = np.ones(len(t))
+        xb,yb = pyleo.utils.tsutils.bin(x,y)
+        xb
+
     """
 
     if evenly_spaced:
@@ -268,7 +333,7 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
     Notes
     -----
 
-    `start`, `stop`, `bin_size`, and `step_style` are interpreted as defining the `bin_edges` for this function.
+    `start`, `stop`, `step`, and `step_style` are interpreted as defining the `bin_edges` for this function.
     This differs from the `interp` interpretation, which uses these to define the time axis over which interpolation is applied.
     For `gkernel`, the time axis will be specified as the midpoints between `bin_edges`, unless `time_axis` is explicitly passed.
 
@@ -289,6 +354,68 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
     pyleoclim.utils.tsutils.bin : Bin the values
 
     pyleoclim.utils.tsutils.interp : Interpolate y onto a new x-axis
+
+    Examples
+    --------
+
+    There are several ways to specify the way coarsening is done via this function. Within these there is a hierarchy which we demonstrate below.
+
+    Top priority is given to `bin_edges` if it is not None. All other arguments will be ignored (except for x and y).
+    The resulting time axis will be comprised of the midpoints between bin edges.
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        x = np.array([1,2,3,5,8,12,20])
+        y = np.ones(len(t))
+        xc,yc = pyleo.utils.tsutils.gkernel(x,y,bin_edges=[1,4,8,12,16,20])
+        xc
+
+    Next, priority will go to `time_axis` if it is passed. In this case, bin edges will be taken as the midpoints between time axis points.
+    The first and last time point will be used as the left most and right most bin edges.
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        x = np.array([1,2,3,5,8,12,20])
+        y = np.ones(len(t))
+        xc,yc = pyleo.utils.tsutils.gkernel(x,y,time_axis=[1,4,8,12,16,20])
+        xc
+    
+    If `time_axis` is None, `step` will be considered, overriding `step_style` if it is passed. `start` and `stop` will be generated using defaults if not passed.
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        x = np.array([1,2,3,5,8,12,20])
+        y = np.ones(len(t))
+        xc,yc = pyleo.utils.tsutils.gkernel(x,y,step=2)
+        xc
+    
+    If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        x = np.array([1,2,3,5,8,12,20])
+        y = np.ones(len(t))
+        xc,yc = pyleo.utils.tsutils.gkernel(x,y,step_style='max')
+        xc
+
+    If none of these are specified, the mean spacing will be used.
+
+    .. ipython:: python
+        :okwarning:
+        :okexcept:
+
+        x = np.array([1,2,3,5,8,12,20])
+        y = np.ones(len(t))
+        xc,yc = pyleo.utils.tsutils.gkernel(x,y)
+        xc
 
     '''
 
@@ -478,7 +605,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xi,yi = pyleo.utils.tsutils.interp(xi,yi,time_axis=[1,4,8,12,16])
+        xi,yi = pyleo.utils.tsutils.interp(x,y,time_axis=[1,4,8,12,16])
         xi
     
     If `time_axis` is None, `step` will be considered, overriding `step_style if it is passed. `start` and `stop` will be generated using defaults if not passed.
@@ -489,7 +616,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xi,yi = pyleo.utils.tsutils.interp(xi,yi,step=2)
+        xi,yi = pyleo.utils.tsutils.interp(x,y,step=2)
         xi
     
     If both `time_axis` and `step` are None but `step_style` is specified, the step will be generated using the prescribed `step_style`.
@@ -500,7 +627,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xi,yi = pyleo.utils.tsutils.interp(xi,yi,step_style='max')
+        xi,yi = pyleo.utils.tsutils.interp(x,y,step_style='max')
         xi
 
     If none of these are specified, the mean spacing will be used.
@@ -511,7 +638,7 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
         x = np.array([1,2,3,5,8,12,20])
         y = np.ones(len(t))
-        xi,yi = pyleo.utils.tsutils.interp(xi,yi)
+        xi,yi = pyleo.utils.tsutils.interp(x,y)
         xi
 
     """
