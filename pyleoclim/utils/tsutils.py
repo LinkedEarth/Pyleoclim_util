@@ -91,7 +91,7 @@ def simple_stats(y, axis=None):
     return mean, median, min_, max_, std, IQR
 
 
-def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spaced = True, statistic = 'mean', bin_edges=None, time_axis=None,no_nans = True):
+def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spaced = False, statistic = 'mean', bin_edges=None, time_axis=None,no_nans = True):
     """ Bin the values
 
     Parameters
@@ -117,7 +117,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
 
     evenly_spaced : {True,False}
         Makes the series evenly-spaced. This option is ignored if bin_size is set to float.
-        This option is being deprecated.
+        This option is being deprecated, no_nans should be used instead.
 
     statistic : str
         Statistic to calculate and return in values. Default is 'mean'.
@@ -150,6 +150,13 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     error : array
         The standard error on the mean in each bin
 
+    Notes
+    -----
+
+    `start`, `stop`, `bin_size`, and `step_style` are interpreted as defining the `bin_edges` for this function.
+    This differs from the `interp` interpretation, which uses these to define the time axis over which interpolation is applied.
+    For `bin`, the time axis will be specified as the midpoints between `bin_edges`, unless `time_axis` is explicitly passed.
+
     See also
     --------
 
@@ -167,13 +174,13 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     x = np.array(x, dtype='float64')
     y = np.array(y, dtype='float64')
     
-    if (bin_size is not None or bin_edges is not None) and no_nans == True:
-        warnings.warn('The bin_size or bins has been set, the series may contain nan values')
-
+    if (bin_size is not None or bin_edges is not None or time_axis is not None) and no_nans:
+        warnings.warn('The step, time axis, or bin edges have been set, the series may not be evenly_spaced')
+    
     # Set the bin edges
     if bin_edges is not None:
         time_axis = (bin_edges[1:] + bin_edges[:-1])/2
-        if start is not None or stop is not None or bin_size is not None or step_style is not None or time_axis is not None or no_nans is not None:
+        if start is not None or stop is not None or bin_size is not None or step_style is not None or time_axis is not None or no_nans:
             warnings.warn('Bins have been passed with other bin relevant arguments {start,stop,bin_size,step_style,time_axis,no_nans}. Bin_edges take priority and will be used.')
     # A bit of wonk is required to get the proper bin edges from the time axis
     elif time_axis is not None:
@@ -181,10 +188,10 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
         bin_edges[0] = time_axis[0]
         bin_edges[-1] = time_axis[-1]
         bin_edges[1:-1] = (time_axis[1:]+time_axis[:-1])/2
-        if start is not None or stop is not None or bin_size is not None or step_style is not None or no_nans is not None:
+        if start is not None or stop is not None or bin_size is not None or step_style is not None or no_nans:
             warnings.warn('The time axis has been passed with other time axis relevant arguments {start,stop,bin_size,step_style,no_nans}. Time_axis takes priority and will be used.')
     else:
-        bin_edges = make_time_axis(x=x,start=start,stop=stop,step=bin_size,step_style=step_style,no_nans=no_nans)
+        bin_edges = make_even_axis(x=x,start=start,stop=stop,step=bin_size,step_style=step_style,no_nans=no_nans)
         time_axis = (bin_edges[1:]+bin_edges[:-1])/2
 
     # Perform the calculation
@@ -203,7 +210,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     return  res_dict
 
 
-def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', evenly_spaced=True, bins=None):
+def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', evenly_spaced=False, bin_edges=None, time_axis=None,no_nans=True):
     '''Coarsen time resolution using a Gaussian kernel
 
     Parameters
@@ -231,13 +238,22 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', ev
 
     evenly_spaced : {True,False}
         Makes the series evenly-spaced. This option is ignored if bins are passed.
-        Will 
+        This option is being deprecated, no_nans should be used instead. 
 
-    bins : array
+    bin_edges : array
         The right hand edge of bins to use for binning.
         E.g. if bins = [1,2,3,4], bins will be [1,2), [2,3), [3,4].
         Same behavior as scipy.stats.binned_statistic
         Start, stop, step, and step_style will be ignored if this is passed.
+
+    time_axis : np.ndarray
+        The time axis to use for binning. If passed, bin_edges will be set as the midpoints between times.
+        The first time will be used as the left most edge, the last time will be used as the right most edge.
+        Start, stop, bin_size, and step_style will be ignored if this is passed.
+
+    no_nans : bool; {True,False}
+        Sets the step_style to max, ensuring that the resulting series contains no empty values (nans).
+        Default is True.
 
     Returns
     -------
@@ -246,6 +262,13 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', ev
         
     yc:  1d array
         The coarse-grained time series
+
+    Notes
+    -----
+
+    `start`, `stop`, `bin_size`, and `step_style` are interpreted as defining the `bin_edges` for this function.
+    This differs from the `interp` interpretation, which uses these to define the time axis over which interpolation is applied.
+    For `gkernel`, the time axis will be specified as the midpoints between `bin_edges`, unless `time_axis` is explicitly passed.
 
     References
     ----------
@@ -267,49 +290,56 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', ev
 
     if len(t) != len(y):
         raise ValueError('y and t must have the same length')
+    
+    if evenly_spaced:
+        no_nans=True
+        warnings.warn('`evenly_spaced` is being deprecated. Please switch to using the option `no_nans` (behaviour is identical).',DeprecationWarning,stacklevel=2)
 
-    if (step is not None or bins is not None) and evenly_spaced == True:
+        # Make sure x and y are numpy arrays
+    t = np.array(t, dtype='float64')
+    y = np.array(y, dtype='float64')
+
+    if (step is not None or bin_edges is not None) and no_nans:
         warnings.warn('The step or bins has been set, the series may not be evenly_spaced')
     
-    # Get the uniform time axis.
-    if bins is None:
-        # get the interpolation step if not provided
-        if step is None:
-            if evenly_spaced:
-                _, _, step = increments(np.asarray(t), step_style = 'max')
-            elif not evenly_spaced:
-                _, _, step = increments(np.asarray(t), step_style = step_style)
-        # Get the start and end point if not given
-        if start is None:
-            start = np.nanmin(np.asarray(t))
-        if stop is None:
-            stop = np.nanmax(np.asarray(t))
-        bins = np.arange(start,stop+step,step)
-    
-    #Find the midpoints of the bin edges
-    tc = (bins[1:] + bins[:-1])/2
+    # Set the bin edges
+    if bin_edges is not None:
+        time_axis = (bin_edges[1:] + bin_edges[:-1])/2
+        if start is not None or stop is not None or step is not None or step_style is not None or time_axis is not None or no_nans:
+            warnings.warn('Bins have been passed with other axis relevant arguments {start,stop,step,step_style,time_axis,no_nans}. Bin_edges take priority and will be used.')
+    # A bit of wonk is required to get the proper bin edges from the time axis
+    elif time_axis is not None:
+        bin_edges = np.zeros(len(time_axis)+1)
+        bin_edges[0] = time_axis[0]
+        bin_edges[-1] = time_axis[-1]
+        bin_edges[1:-1] = (time_axis[1:]+time_axis[:-1])/2
+        if start is not None or stop is not None or step is not None or step_style is not None or no_nans:
+            warnings.warn('The time axis has been passed with other axis relevant arguments {start,stop,step,step_style,no_nans}. Time_axis takes priority and will be used.')
+    else:
+        bin_edges = make_even_axis(x=t,start=start,stop=stop,step=step,step_style=step_style,no_nans=no_nans)
+        time_axis = (bin_edges[1:]+bin_edges[:-1])/2
 
     kernel = lambda x, s : 1.0/(s*np.sqrt(2*np.pi))*np.exp(-0.5*(x/s)**2)  # define kernel function
 
-    yc    = np.zeros((len(tc)))
+    yc    = np.zeros((len(time_axis)))
     yc[:] = np.nan
 
-    for i in range(len(bins)-1):
-        if i < len(bins-1):
-            xslice = t[(t>=bins[i])&(t<bins[i+1])]
-            yslice = y[(t>=bins[i])&(t<bins[i+1])]
+    for i in range(len(bin_edges)-1):
+        if i < len(bin_edges-1):
+            xslice = t[(t>=bin_edges[i])&(t<bin_edges[i+1])]
+            yslice = y[(t>=bin_edges[i])&(t<bin_edges[i+1])]
         else:
-            xslice = t[(t>=bins[i])&(t<=bins[i+1])]
-            yslice = y[(t>=bins[i])&(t<=bins[i+1])]
+            xslice = t[(t>=bin_edges[i])&(t<=bin_edges[i+1])]
+            yslice = y[(t>=bin_edges[i])&(t<=bin_edges[i+1])]
 
         if len(xslice)>0:
-            d      = xslice-tc[i]
+            d      = xslice-time_axis[i]
             weight = kernel(d,h)
             yc[i]  = sum(weight*yslice)/sum(weight)
         else:
             yc[i] = np.nan
 
-    return tc, yc
+    return time_axis, yc
 
 
 def increments(x,step_style='median'):
@@ -412,12 +442,19 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
     yi : array
         The interpolated y values
 
+    Notes
+    -----
+
+    `start`, `stop`, `step` and `step_styl`e pertain to the creation of the time axis over which interpolation will be conducted.
+    This differs from the way that the functions `bin` and `gkernel` interpret these arguments, which is as defining
+    the `bin_edges` parameter used in those functions.
+
     See Also
     --------
 
     pyleoclim.utils.tsutils.increments : Establishes the increments of a numerical array
 
-    pyleoclim.utils.tsutils.make_time_axis : Makes an evenly spaced time axis
+    pyleoclim.utils.tsutils.make_even_axis : Makes an evenly spaced time axis
 
     pyleoclim.utils.tsutils.bin : Bin the values
 
@@ -484,24 +521,20 @@ def interp(x,y, interp_type='linear', step=None, start=None, stop=None, step_sty
 
     # get the evenly spaced time axis if one is not passed.
     if time_axis is not None:
-        xi = time_axis
         if start is not None or stop is not None or step is not None or step_style is not None:
             warnings.warn('A time axis has been passed with other time axis relevant arguments {start,stop,step,step_style}. The passed time axis takes priority and will be used.')
+        pass
     else:
-        xi = make_time_axis(x=x,start=start,stop=stop,step=step,step_style=step_style)
+        time_axis = make_even_axis(x=x,start=start,stop=stop,step=step,step_style=step_style)
 
     #Make sure the data is increasing
     data = pd.DataFrame({"x-axis": x, "y-axis": y}).sort_values('x-axis')
-    xi = np.sort(xi)
-
-    #Make sure that values in xi don't exceed those in x
-    if max(xi) > data['x-axis'].max():
-        xi[:] = [t for t in xi if t <= max(data['x-axis'])]
+    time_axis = np.sort(time_axis)
 
     # Add arguments
-    yi = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**kwargs)(xi)
+    yi = interpolate.interp1d(data['x-axis'],data['y-axis'],kind=interp_type,**kwargs)(time_axis)
 
-    return xi, yi
+    return time_axis, yi
 
 
 def standardize(x, scale=1, axis=0, ddof=0, eps=1e-3):
@@ -977,7 +1010,7 @@ def detect_outliers_DBSCAN(ys, nbr_clusters = None, eps=None, min_samples=None, 
     ys=standardize(ys)[0] # standardization is key for the alogrithm to work.
     ys=np.array(ys)
     
-    if eps is not None and n_neighbors is not None:
+    if eps and n_neighbors:
         print('Since eps is passed, ignoring the n_neighbors for distance calculation')
     
     if eps is None:
@@ -1249,7 +1282,7 @@ def preprocess(ys, ts, detrend=False, sg_kwargs=None,
 
     return res
 
-def make_time_axis(x,start=None,stop=None,step=None,step_style=None,no_nans=False):
+def make_even_axis(x=None,start=None,stop=None,step=None,step_style=None,no_nans=False):
     """Create a uniform time axis for binning/interpolating
     
     Parameters
@@ -1265,7 +1298,7 @@ def make_time_axis(x,start=None,stop=None,step=None,step_style=None,no_nans=Fals
         Where to stop the axis. Default is the last of value of the passed time axis.
     
     step : float
-        The step size to use for the axis.
+        The step size to use for the axis. Must be greater than 0.
         
     step_style : str; {}
         Step style to use when defining the step size. Will be overridden by `step` if it is passed.
@@ -1281,26 +1314,48 @@ def make_time_axis(x,start=None,stop=None,step=None,step_style=None,no_nans=Fals
         """
     
     if start is None:
-        start = x[0]
-        
+        if x is None:
+            raise ValueError('If x is not passed then start, stop and step must be passed')
+        else:
+            start = x[0]
+
     if stop is None:
-        stop = x[-1]
+        if x is None:
+            raise ValueError('If x is not passed then start, stop and step must be passed')
+        else:
+            stop = x[-1]
     
-    if step is not None:
-        if step_style is not None or no_nans == True:
+    if step is not None and step > 0:
+        if step_style is not None or no_nans:
             warnings.warn('Both step and step_style and/or no_nans have been passed. Passed step has priority and will be used.')
         pass
     elif step_style is not None:
-        _, _, step = increments(np.asarray(x), step_style = step_style)
-        if no_nans == True:
+        if x is None:
+            raise ValueError('If x is not passed then start, stop and step must be passed')
+        else:
+            _, _, step = increments(np.asarray(x), step_style = step_style)
+
+        if no_nans:
             warnings.warn('Both step_style and no_nans have been passed. Passed step_style has priority and will be used.')
     elif no_nans:
-        _, _, step = increments(np.asarray(x), step_style = 'max')
+        if x is None:
+            raise ValueError('If x is not passed then start, stop and step must be passed')
+        else:
+            _, _, step = increments(np.asarray(x), step_style = 'max')
     else:
-        _, _, step = increments(np.asarray(x), step_style = 'mean')
+        if x is None:
+            raise ValueError('If x is not passed then start, stop and step must be passed')
+        else:
+            _, _, step = increments(np.asarray(x), step_style = 'mean')
     
-    #Allow time axis to go up to the stop value but no further
-    time_axis = np.arange(start,stop+1,step)
+
+    new_axis = np.arange(start,stop+step,step)
+
+    #Make sure that values in time_axis don't exceed the stop value
+    if max(new_axis) > stop:
+        time_axis = np.array([t for t in new_axis if t <= stop])
+    else:
+        time_axis = new_axis
 
     return time_axis
 
