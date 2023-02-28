@@ -210,7 +210,7 @@ def bin(x, y, bin_size=None, start=None, stop=None, step_style=None, evenly_spac
     return  res_dict
 
 
-def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', evenly_spaced=False, bin_edges=None, time_axis=None,no_nans=True):
+def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', evenly_spaced=False, bin_edges=None, time_axis=None, no_nans=True):
     '''Coarsen time resolution using a Gaussian kernel
 
     Parameters
@@ -281,6 +281,8 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', ev
     --------
 
     pyleoclim.utils.tsutils.increments : Establishes the increments of a numerical array
+    
+    pyleoclim.utils.tsutils.make_even_axis : Create an even time axis
 
     pyleoclim.utils.tsutils.bin : Bin the values
 
@@ -335,10 +337,11 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = 'max', ev
         if len(xslice)>0:
             d      = xslice-time_axis[i]
             weight = kernel(d,h)
-            yc[i]  = sum(weight*yslice)/sum(weight)
+            yc[i]  = sum(weight*yslice)
         else:
             yc[i] = np.nan
 
+        yc /= sum(weight) # normalize by the sum of weights
     return time_axis, yc
 
 
