@@ -516,23 +516,37 @@ class TestRemove:
         assert ms.series_list[0].equals(ts1) == (True, True)
 
 class TestToPandas:
-    def test_to_pandas(self): 
+    def test_to_pandas_with_common_time(self): 
         ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
         ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
         ms = pyleo.MultipleSeries([ts1, ts2])
-        result = ms.to_pandas()
+        result = ms.to_pandas(use_common_time=True)
         expected_index = pd.DatetimeIndex(
             np.array(['0000-12-31 05:48:45', '0002-07-02 02:31:54','0003-12-31 23:15:03'], dtype='datetime64[s]'),
             name='datetime',
         )
         expected = pd.DataFrame({'foo': [7, 5.25,9.00], 'bar': [7, 7.75,1.00]}, index=expected_index)
         pd.testing.assert_frame_equal(result, expected)
-    
-    def test_to_pandas_args_kwargs(self):
+
+    def test_to_pandas_defau(self): 
         ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
         ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
         ms = pyleo.MultipleSeries([ts1, ts2])
-        result = ms.to_pandas('bin', start=2)
+        result = ms.to_pandas()
+        expected_index = pd.DatetimeIndex(
+            np.array(['0000-12-31 05:48:45', '0001-12-31 11:37:31', '0002-12-31 17:26:17', '0003-12-31 23:15:03'],
+                     dtype='datetime64[s]'),
+            name='datetime',
+            freq='31556926S',
+        )
+        expected = pd.DataFrame({'foo': [7, 4, np.nan, 9], 'bar': [7, np.nan, 8, 1]}, index=expected_index)
+        pd.testing.assert_frame_equal(result, expected)
+    
+    def test_to_pandas_args_kwargs(self):
+        ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo',verbose=False)
+        ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar',verbose=False)
+        ms = pyleo.MultipleSeries([ts1, ts2])
+        result = ms.to_pandas('bin', use_common_time=True, start=2)
         expected_index = pd.DatetimeIndex(
             np.array(['0002-12-31 17:26:17'], dtype='datetime64[s]'),
             name='datetime',

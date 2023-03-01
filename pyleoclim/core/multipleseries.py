@@ -2098,7 +2098,7 @@ class MultipleSeries:
             mpl.rcParams.update(current_style)
             return ax
 
-    def to_pandas(self, *args, **kwargs):
+    def to_pandas(self, *args, use_common_time=False, **kwargs):
         """
         Align Series and place in DataFrame.
 
@@ -2110,10 +2110,17 @@ class MultipleSeries:
         ----------
         *args, **kwargs
             Arguments and keyword arguments to pass to ``common_time``.
+        use_common_time, bool
+            Pass True if you want to use ``common_time`` to align the Series
+            to have common times. Else, times for which some Series doesn't
+            have values will be filled with NaN (default).
          
         Returns
         -------
         pandas.DataFrame
         """
-        ms_aligned = self.common_time(*args, **kwargs)
-        return pd.DataFrame({ser.metadata['label']: ser.to_pandas() for ser in ms_aligned.series_list})
+        if use_common_time:
+            ms = self.common_time(*args, **kwargs)
+        else:
+            ms = self
+        return pd.DataFrame({ser.metadata['label']: ser.to_pandas() for ser in ms.series_list})
