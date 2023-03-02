@@ -2340,7 +2340,7 @@ class Series:
             new.log += ({len(new.log): 'center', 'args': timespan, 'previous_mean': ts_mean},)
         return new
 
-    def segment(self, factor=10):
+    def segment(self, factor=10, verbose = False):
         """Gap detection
 
         This function segments a timeseries into n number of parts following a gap
@@ -2354,6 +2354,9 @@ class Series:
 
         factor : float
             The factor that adjusts the threshold for gap detection
+        
+        verbose : bool
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -2369,7 +2372,7 @@ class Series:
             for idx,s in enumerate(seg_y):
                 s_tmp=Series(time=seg_t[idx],value=s,time_name=self.time_name,
                               time_unit=self.time_unit, value_name=self.value_name,
-                              value_unit=self.value_unit,label=self.label)
+                              value_unit=self.value_unit,label=self.label, verbose=verbose)
                 s_list.append(s_tmp)
             res=MultipleSeries(series_list=s_list)
         elif len(seg_y)==1:
