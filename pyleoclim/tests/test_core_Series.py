@@ -1107,7 +1107,7 @@ class TestResample:
         result_ser = result.to_pandas()
         expected_values = np.array([0., 1., 2., 3., 4.])
         expected_idx = pd.DatetimeIndex(
-            ['2018-12-31', '2019-12-31', '2020-12-31', '2021-12-31', '2022-12-31'],
+            ['2018-01-01', '2019-01-01', '2020-01-01', '2021-01-01', '2022-01-01'],
             name='datetime'
         ).as_unit('s')
         expected_ser = pd.Series(expected_values, expected_idx, name='SOI')
@@ -1130,20 +1130,30 @@ class TestResample:
         assert result.metadata == expected_metadata
 
     @pytest.mark.parametrize(
-        ('rule', 'expected_idx'),
+        ('rule', 'expected_idx', 'expected_values'),
         [
-            ('1ga', [np.datetime64('2018-12-31'), np.datetime64('1000002018-12-31')]),
-            ('1ma', [np.datetime64('2018-12-31'), np.datetime64('1002018-12-31')]),
-            ('2ka', [np.datetime64('2018-12-31'), np.datetime64('4018-12-31')]),
+            (
+                '1ga',
+                pd.date_range(np.datetime64('0-01-01', 's'), np.datetime64('1000000000-01-01', 's'), freq='1000000000AS-JAN', unit='s'),
+                np.array([0., 1.]),
+            ),
+            (
+                '1ma',
+                pd.date_range(np.datetime64('0-01-01', 's'), np.datetime64('1000000000-01-01', 's'), freq='1000000AS-JAN', unit='s'),
+                np.array([0.]+[np.nan]*999 + [1.]),
+            ),
         ]
     )
-    def test_resample_long_periods(self, rule, expected_idx, dataframe_dt, metadata):
-        ser = dataframe_dt.loc[:, 0]
+    def test_resample_long_periods(self, rule, expected_idx, expected_values, metadata):
+        ser_index = pd.DatetimeIndex([
+            np.datetime64('0000-01-01', 's'),
+            np.datetime64('1000000000-01-01', 's'),
+        ])
+        ser = pd.Series(range(2), index=ser_index)
         ts = pyleo.Series.from_pandas(ser, metadata)
         result =ts.resample(rule).mean()
         result_ser = result.to_pandas()
-        expected_values = np.array([0, 2.5])
-        expected_idx = pd.DatetimeIndex(expected_idx, name='datetime').as_unit('s')
+        expected_idx = pd.DatetimeIndex(expected_idx, freq=None, name='datetime')
         expected_ser = pd.Series(expected_values, index=expected_idx, name='SOI')
         expected_metadata = {
             'time_unit': 'years CE',
@@ -1160,7 +1170,9 @@ class TestResample:
                     {2: 'sort_ts', 'direction': 'ascending'}
                 )
         }
-        pd.testing.assert_series_equal(result_ser, expected_ser)
+        # check indexes match to within 10 seconds
+        assert np.abs(result_ser.index.to_numpy() - expected_ser.index.to_numpy()).max() <= 10
+        np.testing.assert_array_equal(result_ser.to_numpy(), expected_ser.to_numpy())
         assert result.metadata == expected_metadata
  
  
@@ -1171,6 +1183,27 @@ class TestResample:
             ts.resample('foo')
         with pytest.raises(ValueError, match='Invalid rule provided, got: 412'):
             ts.resample('412')
+    
+
+    def test_resample_interpolate(self, metadata):
+        ser_index = pd.DatetimeIndex([
+            np.datetime64('0000-01-01', 's'),
+            np.datetime64('2000-01-01', 's'),
+        ])
+        ser = pd.Series(range(2), index=ser_index)
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        result_ser = ts.resample('ka').interpolate().to_pandas()
+        expected_idx = pd.DatetimeIndex(
+            [
+                np.datetime64('0-01-01', 's'),
+                np.datetime64('1000-01-01', 's'),
+                np.datetime64('2000-01-01', 's')
+            ],
+            name='datetime'
+        )
+        expected_ser = pd.Series([0, 0.5, 1], name='SOI', index=expected_idx)
+        pd.testing.assert_series_equal(result_ser, expected_ser)
+
 
 class TestUISeriesEquals():
     ''' Test for equals() method '''

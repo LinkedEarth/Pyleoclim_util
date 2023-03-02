@@ -4221,11 +4221,11 @@ class Series:
 
         This is a convenience method: doing
 
-            ser.resample('Y').mean()
+            ser.resample('AS').mean()
 
         will do the same thing as
 
-            ser.pandas_method(lambda x: x.resample('Y').mean())
+            ser.pandas_method(lambda x: x.resample('AS').mean())
         
         but will also accept some extra resampling rules, such as `'Ga'` (see below).
 
@@ -4281,7 +4281,7 @@ class Series:
             md['label'] = md['label'] + ' (' + rule + ' resampling)'
         
         ser = self.to_pandas()
-        return SeriesResampler(f'{multiplier}Y', ser, md, kwargs)
+        return SeriesResampler(f'{multiplier}AS', ser, md, kwargs)
 
 
 class SeriesResampler:
