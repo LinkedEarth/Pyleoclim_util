@@ -106,10 +106,16 @@ class MultipleSeries:
         self.remove(label)
 
     def __add__(self, other):
-        from ..core.series import Series
-        if not isinstance(other, Series):
-            raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
-        return self.append(other)
+         from ..core.series import Series
+         if isinstance(other, Series):
+             return self.append(other)
+         if isinstance(other, MultipleSeries):
+             for series in other.series_list:
+                 self = self.append(series)
+             return self
+         else:
+            raise TypeError(f"Expected pyleo.Series or pyleo.MultipleSeries, got: {type(other)}")
+         
     
     def __and__(self, other):
         from ..core.series import Series
