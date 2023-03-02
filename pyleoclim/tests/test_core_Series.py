@@ -1179,10 +1179,10 @@ class TestResample:
     def test_resample_invalid(self, dataframe_dt, metadata):
         ser = dataframe_dt.loc[:, 0]
         ts = pyleo.Series.from_pandas(ser, metadata)
-        with pytest.raises(ValueError, match='Invalid unit provided, got: foo'):
-            ts.resample('foo')
+        with pytest.raises(ValueError, match='Invalid frequency: foo'):
+            ts.resample('foo').sum()
         with pytest.raises(ValueError, match='Invalid rule provided, got: 412'):
-            ts.resample('412')
+            ts.resample('412').sum()
     
 
     def test_resample_interpolate(self, metadata):
@@ -1203,6 +1203,17 @@ class TestResample:
         )
         expected_ser = pd.Series([0, 0.5, 1], name='SOI', index=expected_idx)
         pd.testing.assert_series_equal(result_ser, expected_ser)
+
+
+    def test_resample_non_pyleo_unit(self):
+        ts1 = pyleo.Series(time=np.array([1, 1.1, 1.2]), value=np.array([8, 3, 5]), time_unit='yr CE')
+        result= ts1.resample('MS').sum()
+        expected = pyleo.Series(
+            time=np.array([0.9171996 , 1.00207479, 1.08694998, 1.16361144]),
+            value=np.array([8., 0., 3., 5.]),
+            time_unit='yr CE',
+        )
+        assert result.equals(expected) == (True, True)
 
 
 class TestUISeriesEquals():

@@ -4259,6 +4259,11 @@ class Series:
         search = re.search(r'(\d*)([a-zA-Z]+)', rule)
         if search is None:
             raise ValueError(f"Invalid rule provided, got: {rule}")
+
+        md = self.metadata
+        if md['label'] is not None:
+            md['label'] = md['label'] + ' (' + rule + ' resampling)'
+
         multiplier = search.group(1)
         if multiplier == '':
             multiplier = 1
@@ -4266,22 +4271,16 @@ class Series:
             multiplier = int(multiplier)
         unit = search.group(2)
         if unit.lower() in tsbase.MATCH_A:
-            pass
+            rule = f'{multiplier}AS'
         elif unit.lower() in tsbase.MATCH_KA:
-            multiplier *= 1_000
+            rule = f'{1_000*multiplier}AS'
         elif unit.lower() in tsbase.MATCH_MA:
-            multiplier *= 1_000_000
+            rule = f'{1_000_000*multiplier}AS'
         elif unit.lower() in tsbase.MATCH_GA:
-            multiplier *= 1_000_000_000
-        else:
-            raise ValueError(f'Invalid unit provided, got: {unit}')
-            
-        md = self.metadata
-        if md['label'] is not None:
-            md['label'] = md['label'] + ' (' + rule + ' resampling)'
+            rule = f'{1_000_000_000*multiplier}AS'
         
         ser = self.to_pandas()
-        return SeriesResampler(f'{multiplier}AS', ser, md, kwargs)
+        return SeriesResampler(rule, ser, md, kwargs)
 
 
 class SeriesResampler:
