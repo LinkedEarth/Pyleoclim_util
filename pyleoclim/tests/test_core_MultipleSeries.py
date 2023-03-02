@@ -558,7 +558,6 @@ class TestOverloads:
         assert ms.series_list[1].equals(ts2) == (True, True)
         assert ms.series_list[2].equals(ts3) == (True, True)
 
-
     def test_sub(self):
         ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
         ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
@@ -576,3 +575,24 @@ class TestOverloads:
         ms_from_constructor = pyleo.MultipleSeries([ts1, ts2, ts3])
         for i, _ in enumerate(ms_from_constructor.series_list):
             assert ms_from_constructor.series_list[i].equals(ms_from_overloads.series_list[i]) == (True, True)
+
+    def test_add_other_multiple_series(self):
+        ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='sound')
+        ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='the')
+        ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='alarm')
+        ts4 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='climate')
+        ts5 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='emergency')
+        ms1 = pyleo.MultipleSeries([ts1, ts2, ts3])
+        ms2 = pyleo.MultipleSeries([ts4, ts5])
+        ms = ms1 + ms2
+        assert ms.series_list[0].equals(ts1) == (True, True)
+        assert ms.series_list[1].equals(ts2) == (True, True)
+        assert ms.series_list[2].equals(ts3) == (True, True)
+        assert ms.series_list[3].equals(ts4) == (True, True)
+        assert ms.series_list[4].equals(ts5) == (True, True)
+        
+    def test_add_identical_series(self):
+        ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='sound')
+        ms = pyleo.MultipleSeries([ts1])
+        with pytest.raises(ValueError, match='Given series is identical to existing series'):
+            ms + ts1

@@ -293,6 +293,9 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
             ms.append(ts2)
         '''
+        for series in self.series_list:
+            if series.equals(ts) == (True, True):
+                raise ValueError(f"Given series is identical to existing series {series}")
         ms = self.copy()
         ts_list = deepcopy(ms.series_list)
         ts_list.append(ts)

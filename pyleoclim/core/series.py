@@ -331,10 +331,7 @@ class Series:
         ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
         if paleo_style:
             time_label, value_label = self.make_labels()
-            ser2 = ser.set_axis(self.time) # inplace was deprecated, so copy needed; pandas doc too terse to figure out use of "copy"
-            ser2.rename(value_label, inplace=True)
-            ser2.rename_axis(time_label, inplace=True)
-            ser = ser2 
+            ser = ser.set_axis(self.time).rename(value_label).rename_axis(time_label)
         return ser
     
     def to_csv(self, metadata_header=True, path = '.'):
