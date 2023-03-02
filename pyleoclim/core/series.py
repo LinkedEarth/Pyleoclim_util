@@ -2393,7 +2393,8 @@ class Series:
             `self.time` is between slice.start and slice.stop.
             If slice of `datetime` (or str containing datetime, such as `'2020-01-01'`),
             then the Series will be sliced so that `self.datetime_index` is
-            between `time.start` and `time.stop`.
+            between `time.start` and `time.stop` (+/- `tolerance`, which needs to be
+            a `timedelta`).
         tolerance : int, float, default 0.
             Used by `value` and `time`, see above.
         
@@ -2480,6 +2481,30 @@ class Series:
         if time is not None:
             if isinstance(time, (int, float)):
                 return self.slice([time-tolerance, time+tolerance])
+            if isinstance(time, dt.datetime):
+                if tolerance == 0:
+                    tolerance = dt.timedelta(days=0)
+                if not isinstance(tolerance, dt.timedelta):
+                    raise TypeError(
+                        f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                    )
+                return self.pandas_method(
+                    lambda x: x[(x.index>=time-tolerance) & (x.index<=time+tolerance)]
+                )
+            if isinstance(time, str):
+                if tolerance == 0:
+                    tolerance = dt.timedelta(days=0)
+                if not isinstance(tolerance, dt.timedelta):
+                    raise TypeError(
+                        f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                    )
+                tolerance = np.timedelta64(tolerance, 's') 
+                return self.pandas_method(
+                    lambda x: x[
+                        (x.index>=np.datetime64(time, 's')-tolerance)
+                        & (x.index<=np.datetime64(time, 's')+tolerance)
+                    ]
+                )
             if isinstance(time, slice):
                 if isinstance(time.start, (int, float)) and isinstance(time.stop, (int, float)):
                     return self.slice([time.start-tolerance, time.stop+tolerance])
@@ -2490,36 +2515,77 @@ class Series:
                     new.value = new.value[mask]
                     return new
                 if isinstance(time.stop, (int, float)) and time.start is None:
-                    mask = self.time <= time.stop-tolerance
+                    mask = self.time <= time.stop+tolerance
                     new = self.copy()
                     new.time = new.time[mask]
                     new.value = new.value[mask]
                     return new
                 if isinstance(time.start, str) and isinstance(time.stop, str):
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(
+                            f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                        )
+                    tolerance = np.timedelta64(tolerance, 's') 
                     return self.pandas_method(
-                        lambda x: x[(x.index>=(np.datetime64(time.start, 's'))) & (x.index<=np.datetime64(time.stop, 's'))]
+                        lambda x: x[
+                            (x.index>=np.datetime64(time.start, 's')-tolerance)
+                            & (x.index<=np.datetime64(time.stop, 's')+tolerance)
+                        ]
                     )
                 if isinstance(time.start, str) and time.stop is None:
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(
+                            f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                        )
+                    tolerance = np.timedelta64(tolerance, 's') 
                     return self.pandas_method(
-                        lambda x: x[x.index>=(np.datetime64(time.start, 's'))]
+                        lambda x: x[x.index>=np.datetime64(time.start, 's')-tolerance]
                     )
                 if isinstance(time.stop, str) and time.start is None:
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}")
+                    tolerance = np.timedelta64(tolerance, 's') 
                     return self.pandas_method(
-                        lambda x: x[x.index<=(np.datetime64(time.stop, 's'))]
+                        lambda x: x[x.index<=np.datetime64(time.stop, 's')+tolerance]
                     )
                 if isinstance(time.start, dt.datetime) and isinstance(time.stop, dt.datetime):
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(
+                            f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                        )
                     return self.pandas_method(
-                        lambda x: x[(x.index>=time.start) & (x.index<=time.stop)]
+                        lambda x: x[(x.index>=time.start-tolerance) & (x.index<=time.stop+tolerance)]
                     )
                 if isinstance(time.start, dt.datetime) and time.stop is None:
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(
+                            f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                        )
                     return self.pandas_method(
-                        lambda x: x[x.index>=time.start]
+                        lambda x: x[x.index>=time.start-tolerance]
                     )
                 if isinstance(time.stop, dt.datetime) and time.start is None:
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(
+                            f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                        )
                     return self.pandas_method(
-                        lambda x: x[x.index<=time.stop]
+                        lambda x: x[x.index<=time.stop+tolerance]
                     )
                 raise TypeError("Expected int or float, or slice of int/float/datetime/str.")
+        raise TypeError("Invalid combination of arguments received.")
 
 
     def slice(self, timespan):

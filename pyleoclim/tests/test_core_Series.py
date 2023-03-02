@@ -468,6 +468,8 @@ class TestSel:
         [
             (1, np.array([1]), np.array([4]), 0),
             (1, np.array([1, 2]), np.array([4, 6]), 1),
+            (dt.datetime(1948, 1, 1), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+            ('1948', np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
             (slice(1, 2), np.array([1, 2]), np.array([4, 6]), 0),
             (slice(1, 2), np.array([1, 2, 3]), np.array([4, 6, 1]), 1),
             (slice(1, None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
@@ -478,6 +480,12 @@ class TestSel:
             (slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1, 2]), np.array([4, 6]), 0),
             (slice(dt.datetime(1947, 1, 1), None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
             (slice(None, dt.datetime(1948, 1, 1)), np.array([3]), np.array([1]), 0),
+            (slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(dt.datetime(1947, 1, 1), None), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(None, dt.datetime(1948, 1, 1)), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+            (slice('1948', '1949'), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice('1947', None), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(None, '1948'), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
         ]
     )
     def test_time(self, time, expected_time, expected_value, tolerance):
