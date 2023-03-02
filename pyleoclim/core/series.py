@@ -248,6 +248,11 @@ class Series:
         metadata = {key: d[key] for key in keys if d[key] is not None}
         #df = ser.to_frame()
         return f'{pprint(metadata)}\n{repr(ser)}'   
+    
+    def __and__(self, other):
+        if not isinstance(other, Series):
+            raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
+        return MultipleSeries([self, other])
        
     @property
     def datetime_index(self):
