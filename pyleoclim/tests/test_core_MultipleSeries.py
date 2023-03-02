@@ -507,13 +507,6 @@ class TestRemove:
         assert len(ms.series_list) == 1
         assert ms.series_list[0].equals(ts1) == (True, True)
 
-    def test_remove_overload(self):
-        ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
-        ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
-        ms = pyleo.MultipleSeries([ts1, ts2])
-        ms - 'bar'
-        assert len(ms.series_list) == 1
-        assert ms.series_list[0].equals(ts1) == (True, True)
 
 class TestToPandas:
     def test_to_pandas_with_common_time(self): 
@@ -564,6 +557,24 @@ class TestOverloads:
         assert ms.series_list[0].equals(ts1) == (True, True)
         assert ms.series_list[1].equals(ts2) == (True, True)
         assert ms.series_list[2].equals(ts3) == (True, True)
+
+    def test_sub(self):
+        ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
+        ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
+        ms = pyleo.MultipleSeries([ts1, ts2])
+        ms - 'bar'
+        assert len(ms.series_list) == 1
+        assert ms.series_list[0].equals(ts1) == (True, True)
+
+
+    def test_create_from_series(self):
+        ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
+        ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
+        ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='baz')
+        ms_from_overloads = ts1 & ts2 & ts3
+        ms_from_constructor = pyleo.MultipleSeries([ts1, ts2, ts3])
+        for i, _ in enumerate(ms_from_constructor.series_list):
+            assert ms_from_constructor.series_list[i].equals(ms_from_overloads.series_list[i]) == (True, True)
 
     def test_add_other_multiple_series(self):
         ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='sound')
