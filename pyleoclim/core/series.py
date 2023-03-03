@@ -294,7 +294,7 @@ class Series:
         if 'value_name' not in metadata.keys():
             metadata['value_name'] = ser.name   
                 
-        return cls(time=time,value=ser.values, **metadata, 
+        return cls(time=time,value=ser.values, **metadata,
                    sort_ts = None, dropna = False, verbose=False)
                 
     # Alternate formulation
@@ -4215,7 +4215,7 @@ class Series:
                               lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
         return res
 
-    def resample(self, rule, **kwargs):
+    def resample(self, rule, keep_log = False, **kwargs):
         """
         Run analogue to pandas.Series.resample.
 
@@ -4280,7 +4280,7 @@ class Series:
             rule = f'{1_000_000_000*multiplier}AS'
         
         ser = self.to_pandas()
-        return SeriesResampler(rule, ser, md, kwargs)
+        return SeriesResampler(rule, ser, md, keep_log, kwargs)
 
 
 class SeriesResampler:
@@ -4296,16 +4296,19 @@ class SeriesResampler:
     will only be used in an intermediate step. Think of it as an
     implementation detail.
     """
-    def __init__(self, rule, series, metadata, kwargs):
+    def __init__(self, rule, series, metadata, keep_log, kwargs):
         self.rule = rule
         self.series = series
         self.metadata = metadata
         self.kwargs = kwargs
+        self.keep_log = keep_log
     
     def __getattr__(self, attr):
-        attr = getattr(self.series.resample(self.rule, **self.kwargs), attr)
+        attr = getattr(self.series.resample(self.rule,  **self.kwargs), attr)
         def func(*args, **kwargs):
             series = attr(*args, **kwargs)
             from_pandas = Series.from_pandas(series, metadata=self.metadata)
+            if self.keep_log == True:
+                from_pandas.log += ({len(from_pandas.log): 'resample','rule': self.rule},)
             return from_pandas
         return func
