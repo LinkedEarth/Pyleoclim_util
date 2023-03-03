@@ -1122,8 +1122,8 @@ class TestResample:
             'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (
-                    {1: 'dropna', 'applied': True, 'verbose': True},
-                    {2: 'sort_ts', 'direction': 'ascending'}
+                    {0: 'dropna', 'applied': True, 'verbose': True},
+                    {1: 'sort_ts', 'direction': 'ascending'}
                 )
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
@@ -1166,8 +1166,8 @@ class TestResample:
             'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (
-                    {1: 'dropna', 'applied': True, 'verbose': True},
-                    {2: 'sort_ts', 'direction': 'ascending'}
+                    {0: 'dropna', 'applied': True, 'verbose': True},
+                    {1: 'sort_ts', 'direction': 'ascending'}
                 )
         }
         # check indexes match to within 10 seconds
@@ -1229,7 +1229,19 @@ class TestResample:
             time_unit='yr CE',
         )
         assert result.equals(expected) == (True, True)
-
+        
+    def test_resample_log(self, metadata):
+        ser_index = pd.DatetimeIndex([
+            np.datetime64('0000-01-01', 's'),
+            np.datetime64('2000-01-01', 's'),
+        ])
+        ser = pd.Series(range(2), index=ser_index)
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        result_ser = ts.resample('ka',keep_log=True).interpolate()
+        expected_log = ({0: 'dropna', 'applied': True, 'verbose': True},
+                        {1: 'sort_ts', 'direction': 'ascending'},
+                        {2: 'resample', 'rule': '1000AS'})
+        assert result_ser.log == expected_log
 
 class TestUISeriesEquals():
     ''' Test for equals() method '''

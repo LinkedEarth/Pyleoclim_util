@@ -171,7 +171,6 @@ class Series:
         if dropna == True:
             value, time = tsbase.dropna(value, time, verbose=verbose)
             self.log += ({nlog+1: 'dropna', 'applied': dropna, 'verbose': verbose},)
-            nlog +=1
         elif dropna == False:
             pass
         else:
@@ -202,7 +201,7 @@ class Series:
             if sort_ts in ['ascending', 'descending']:
                 value, time = tsbase.sort_ts(value, time, verbose=verbose, 
                                              ascending = sort_ts == 'ascending')
-                self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
+                self.log += ({len(self.log)+1: 'sort_ts', 'direction': sort_ts},)
             else:
                 print(f"Unknown sorting option {sort_ts}; no sorting applied")
          
@@ -4300,8 +4299,8 @@ class SeriesResampler:
         self.rule = rule
         self.series = series
         self.metadata = metadata
-        self.kwargs = kwargs
         self.keep_log = keep_log
+        self.kwargs = kwargs
     
     def __getattr__(self, attr):
         attr = getattr(self.series.resample(self.rule,  **self.kwargs), attr)
