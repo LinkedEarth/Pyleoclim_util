@@ -171,7 +171,6 @@ class Series:
         if dropna == True:
             value, time = tsbase.dropna(value, time, verbose=verbose)
             self.log += ({nlog+1: 'dropna', 'applied': dropna, 'verbose': verbose},)
-            nlog +=1
         elif dropna == False:
             pass
         else:
@@ -202,7 +201,7 @@ class Series:
             if sort_ts in ['ascending', 'descending']:
                 value, time = tsbase.sort_ts(value, time, verbose=verbose, 
                                              ascending = sort_ts == 'ascending')
-                self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
+                self.log += ({len(self.log)+1: 'sort_ts', 'direction': sort_ts},)
             else:
                 print(f"Unknown sorting option {sort_ts}; no sorting applied")
          
@@ -299,7 +298,7 @@ class Series:
         if 'value_name' not in metadata.keys():
             metadata['value_name'] = ser.name   
                 
-        return cls(time=time,value=ser.values, **metadata, 
+        return cls(time=time,value=ser.values, **metadata,
                    sort_ts = None, dropna = False, verbose=False)
                 
     # Alternate formulation
@@ -4288,7 +4287,7 @@ class Series:
                               lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
         return res
 
-    def resample(self, rule, **kwargs):
+    def resample(self, rule, keep_log = False, **kwargs):
         """
         Run analogue to pandas.Series.resample.
 
@@ -4332,6 +4331,11 @@ class Series:
         search = re.search(r'(\d*)([a-zA-Z]+)', rule)
         if search is None:
             raise ValueError(f"Invalid rule provided, got: {rule}")
+
+        md = self.metadata
+        if md['label'] is not None:
+            md['label'] = md['label'] + ' (' + rule + ' resampling)'
+
         multiplier = search.group(1)
         if multiplier == '':
             multiplier = 1
@@ -4339,22 +4343,16 @@ class Series:
             multiplier = int(multiplier)
         unit = search.group(2)
         if unit.lower() in tsbase.MATCH_A:
-            pass
+            rule = f'{multiplier}AS'
         elif unit.lower() in tsbase.MATCH_KA:
-            multiplier *= 1_000
+            rule = f'{1_000*multiplier}AS'
         elif unit.lower() in tsbase.MATCH_MA:
-            multiplier *= 1_000_000
+            rule = f'{1_000_000*multiplier}AS'
         elif unit.lower() in tsbase.MATCH_GA:
-            multiplier *= 1_000_000_000
-        else:
-            raise ValueError(f'Invalid unit provided, got: {unit}')
-            
-        md = self.metadata
-        if md['label'] is not None:
-            md['label'] = md['label'] + ' (' + rule + ' resampling)'
+            rule = f'{1_000_000_000*multiplier}AS'
         
         ser = self.to_pandas()
-        return SeriesResampler(f'{multiplier}AS', ser, md, kwargs)
+        return SeriesResampler(rule, ser, md, keep_log, kwargs)
 
 
 class SeriesResampler:
@@ -4370,16 +4368,19 @@ class SeriesResampler:
     will only be used in an intermediate step. Think of it as an
     implementation detail.
     """
-    def __init__(self, rule, series, metadata, kwargs):
+    def __init__(self, rule, series, metadata, keep_log, kwargs):
         self.rule = rule
         self.series = series
         self.metadata = metadata
+        self.keep_log = keep_log
         self.kwargs = kwargs
     
     def __getattr__(self, attr):
-        attr = getattr(self.series.resample(self.rule, **self.kwargs), attr)
+        attr = getattr(self.series.resample(self.rule,  **self.kwargs), attr)
         def func(*args, **kwargs):
             series = attr(*args, **kwargs)
             from_pandas = Series.from_pandas(series, metadata=self.metadata)
+            if self.keep_log == True:
+                from_pandas.log += ({len(from_pandas.log): 'resample','rule': self.rule},)
             return from_pandas
         return func

@@ -1141,8 +1141,8 @@ class TestResample:
             'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (
-                    {1: 'dropna', 'applied': True, 'verbose': True},
-                    {2: 'sort_ts', 'direction': 'ascending'}
+                    {0: 'dropna', 'applied': True, 'verbose': True},
+                    {1: 'sort_ts', 'direction': 'ascending'}
                 )
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
@@ -1185,8 +1185,8 @@ class TestResample:
             'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (
-                    {1: 'dropna', 'applied': True, 'verbose': True},
-                    {2: 'sort_ts', 'direction': 'ascending'}
+                    {0: 'dropna', 'applied': True, 'verbose': True},
+                    {1: 'sort_ts', 'direction': 'ascending'}
                 )
         }
         # check indexes match to within 10 seconds
@@ -1198,10 +1198,10 @@ class TestResample:
     def test_resample_invalid(self, dataframe_dt, metadata):
         ser = dataframe_dt.loc[:, 0]
         ts = pyleo.Series.from_pandas(ser, metadata)
-        with pytest.raises(ValueError, match='Invalid unit provided, got: foo'):
-            ts.resample('foo')
+        with pytest.raises(ValueError, match='Invalid frequency: foo'):
+            ts.resample('foo').sum()
         with pytest.raises(ValueError, match='Invalid rule provided, got: 412'):
-            ts.resample('412')
+            ts.resample('412').sum()
     
 
     def test_resample_interpolate(self, metadata):
@@ -1223,6 +1223,44 @@ class TestResample:
         expected_ser = pd.Series([0, 0.5, 1], name='SOI', index=expected_idx)
         pd.testing.assert_series_equal(result_ser, expected_ser)
 
+
+    @pytest.mark.parametrize(
+        ['rule', 'expected_idx', 'expected_values'],
+        (
+            (
+                'MS',
+                [0.9171996 , 1.00207479, 1.08694998, 1.16361144],
+                [8., 0., 3., 5.],
+            ),
+            (
+                'SMS',
+                [0.95553033, 1.00207479, 1.04040552, 1.08694998, 1.12528071, 1.16361144],
+                [8., 0., 0., 3., 0., 5.],
+            ),
+        )
+    )
+    def test_resample_non_pyleo_unit(self, rule, expected_idx, expected_values):
+        ts1 = pyleo.Series(time=np.array([1, 1.1, 1.2]), value=np.array([8, 3, 5]), time_unit='yr CE')
+        result= ts1.resample(rule).sum()
+        expected = pyleo.Series(
+            time=np.array(expected_idx),
+            value=np.array(expected_values),
+            time_unit='yr CE',
+        )
+        assert result.equals(expected) == (True, True)
+        
+    def test_resample_log(self, metadata):
+        ser_index = pd.DatetimeIndex([
+            np.datetime64('0000-01-01', 's'),
+            np.datetime64('2000-01-01', 's'),
+        ])
+        ser = pd.Series(range(2), index=ser_index)
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        result_ser = ts.resample('ka',keep_log=True).interpolate()
+        expected_log = ({0: 'dropna', 'applied': True, 'verbose': True},
+                        {1: 'sort_ts', 'direction': 'ascending'},
+                        {2: 'resample', 'rule': '1000AS'})
+        assert result_ser.log == expected_log
 
 class TestUISeriesEquals():
     ''' Test for equals() method '''
