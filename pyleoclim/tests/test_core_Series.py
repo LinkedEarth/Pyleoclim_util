@@ -430,6 +430,17 @@ class TestUiSeriesSegment:
         ts_seg = ts.segment()
 
         assert type(ts_seg) == type(ts)
+        
+    def test_segment_t2(self):
+        '''Test that in the case of segmentation, segment returns a Multiple Series object'''
+        t = (1,2,3000)
+        v = (1,2,3)
+
+        ts = pyleo.Series(time = t, value = v, label = 'series')
+
+        ts_seg = ts.segment()
+
+        assert ts_seg.series_list[0].label == 'series segment 1'
 
 class TestUiSeriesSlice:
     '''Test for Series.slice()
