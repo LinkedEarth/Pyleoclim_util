@@ -1205,12 +1205,27 @@ class TestResample:
         pd.testing.assert_series_equal(result_ser, expected_ser)
 
 
-    def test_resample_non_pyleo_unit(self):
+    @pytest.mark.parametrize(
+        ['rule', 'expected_idx', 'expected_values'],
+        (
+            (
+                'MS',
+                [0.9171996 , 1.00207479, 1.08694998, 1.16361144],
+                [8., 0., 3., 5.],
+            ),
+            (
+                'SMS',
+                [0.95553033, 1.00207479, 1.04040552, 1.08694998, 1.12528071, 1.16361144],
+                [8., 0., 0., 3., 0., 5.],
+            ),
+        )
+    )
+    def test_resample_non_pyleo_unit(self, rule, expected_idx, expected_values):
         ts1 = pyleo.Series(time=np.array([1, 1.1, 1.2]), value=np.array([8, 3, 5]), time_unit='yr CE')
-        result= ts1.resample('MS').sum()
+        result= ts1.resample(rule).sum()
         expected = pyleo.Series(
-            time=np.array([0.9171996 , 1.00207479, 1.08694998, 1.16361144]),
-            value=np.array([8., 0., 3., 5.]),
+            time=np.array(expected_idx),
+            value=np.array(expected_values),
             time_unit='yr CE',
         )
         assert result.equals(expected) == (True, True)
