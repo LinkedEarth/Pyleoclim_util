@@ -69,7 +69,7 @@ LR04:
     time_name: 'Age'
     time_unit: 'ky BP'
     label: 'LR04 benthic stack'
-    value_name: '$\delta^{18}$O' 
+    value_name: '$\delta^{18} \mathrm{O}$' 
     value_unit: '‰'
     archiveType: 'Marine Sediment'
   time_column: Time (ka)
@@ -102,8 +102,8 @@ GISP2:
     time_unit: 'yr BP'
     time_name: 'Age'
     value_unit: '‰'
-    value_name: '$\delta^{18}$O'
-    label: 'GISP2 d18O'
+    value_name: '$\delta^{18} \mathrm{O}$'
+    label: 'GISP2'
     lat: 72.6
     lon: -38.5
     archiveType: 'Glacier Ice'
