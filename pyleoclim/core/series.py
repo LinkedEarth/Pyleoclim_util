@@ -247,6 +247,28 @@ class Series:
         return f'{pprint(metadata)}\n{repr(ser)}'   
     
     def __and__(self, other):
+        """
+        Combine with another Series to get MultipleSeries.
+
+        Parameters
+        ----------
+        other
+            Series to combine with.
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import numpy as np
+            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1')
+            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2')
+            ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3')
+            # Combine ts1, ts2, and ts3 into a multiple series:
+            ms = ts1 & ts2 & ts3
+        """
         if not isinstance(other, Series):
             raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
         return MultipleSeries([self, other])
