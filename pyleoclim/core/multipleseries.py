@@ -12,6 +12,7 @@ from ..core.scalograms import MultipleScalogram
 from ..core.psds import MultiplePSD
 from ..core.spatialdecomp import SpatialDecomp
 
+import warnings
 import numpy as np
 from copy import deepcopy
 
@@ -105,6 +106,18 @@ class MultipleSeries:
         self.remove(label)
 
     def __add__(self, other):
+         from ..core.series import Series
+         if isinstance(other, Series):
+             return self.append(other)
+         if isinstance(other, MultipleSeries):
+             for series in other.series_list:
+                 self = self.append(series)
+             return self
+         else:
+            raise TypeError(f"Expected pyleo.Series or pyleo.MultipleSeries, got: {type(other)}")
+         
+    
+    def __and__(self, other):
         from ..core.series import Series
         if not isinstance(other, Series):
             raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
@@ -286,6 +299,9 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
             ms.append(ts2)
         '''
+        for series in self.series_list:
+            if series.equals(ts) == (True, True):
+                raise ValueError(f"Given series is identical to existing series {series}")
         ms = self.copy()
         ts_list = deepcopy(ms.series_list)
         ts_list.append(ts)
@@ -472,7 +488,7 @@ class MultipleSeries:
 
         return gp
 
-    def common_time(self, method='interp', step = None, start = None, stop = None, step_style = None, **kwargs):
+    def common_time(self, method='interp', step = None, start = None, stop = None, step_style = None, time_axis = None, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object
         
         The alignment is achieved via binning, interpolation, or Gaussian kernel. Alignment is critical for workflows
@@ -514,6 +530,9 @@ class MultipleSeries:
             Method to obtain a representative step among all Series (using tsutils.increments).
             Default value is None, so that it will be chosen according to the method: 'max' for bin and gkernel, 'mean' for interp. 
 
+        time_axis : array
+            Time axis onto which all the series will be aligned. Will override step,start,stop, and step_style if they are passed.
+
         kwargs: dict
         
             keyword arguments (dictionary) of the bin, gkernel or interp methods
@@ -524,6 +543,14 @@ class MultipleSeries:
         ms : MultipleSeries
         
             The MultipleSeries objects with all series aligned to the same time axis.
+
+        Notes
+        -----
+
+        `start`, `stop`, `step`, and `step_style` are interpreted differently depending on the method used. 
+        Interp uses these to specify the `time_axis` onto which interpolation will be applied.
+        Bin and gkernel use these to specify the `bin_edges` which define the "buckets" used for the
+        respective methods.
 
 
         See also
@@ -588,54 +615,61 @@ class MultipleSeries:
             pyleo.closefig(fig)
         '''
         
-        # specify stepping style
-        if step_style == None: # if step style isn't specified, pick a robust choice according to method
-            if method == 'bin' or method == 'gkernel':
-                step_style = 'max'
-            elif  method == 'interp':
-                step_style = 'mean'
-               
-        # obtain grid properties with given step_style
-        gp = self.increments(step_style=step_style)  
-        
-        # define grid step     
-        if step is not None and step > 0:
-            common_step = step 
+        if time_axis is not None:
+            if start is not None or stop is not None or step is not None or step_style is not None:
+                warnings.warn('The time axis has been passed with other time axis relevant arguments {start,stop,step,step_style}. Time_axis takes priority and will be used.')
+            even_axis=None
         else:
-            if step_style == 'mean':
-                common_step = gp[:,2].mean()
-            elif step_style == 'max':
-                common_step = gp[:,2].max()
-            elif step_style == 'mode':
-                common_step = stats.mode(gp[:,2])[0][0]
+            # specify stepping style
+            if step_style is None: # if step style isn't specified, pick a robust choice according to method
+                if method == 'bin' or method == 'gkernel':
+                    step_style = 'max'
+                elif  method == 'interp':
+                    step_style = 'mean'
+                
+            # obtain grid properties with given step_style
+            gp = self.increments(step_style=step_style)
+            
+            # define grid step     
+            if step is not None and step > 0:
+                common_step = step 
             else:
-                common_step = np.median(gp[:,2])
-   
-        # define start and stop
-        if start is None: 
-            start = gp[:,0].max() # pick the latest of the start times
+                if step_style == 'mean':
+                    common_step = gp[:,2].mean()
+                elif step_style == 'max':
+                    common_step = gp[:,2].max()
+                elif step_style == 'mode':
+                    common_step = stats.mode(gp[:,2])[0][0]
+                else:
+                    common_step = np.median(gp[:,2])
+            # define start and stop
+            if start is None: 
+                start = gp[:,0].max() # pick the latest of the start times
+            if stop is None:
+                stop  = gp[:,1].min() # pick the earliest of the stop times
+            if start > stop:
+                raise ValueError('At least one series has no common time interval with others. Please check the time axis of the series.')
+            
+            even_axis = tsutils.make_even_axis(start=start,stop=stop,step=common_step)
         
-        if stop is None:
-            stop  = gp[:,1].min() # pick the earliest of the stop times
-        
-        if start > stop:
-            raise ValueError('At least one series has no common time interval with others. Please check the time axis of the series.')
-    
         ms = self.copy()
 
         # apply each method
         if method == 'bin':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                d = tsutils.bin(ts.time, ts.value, bin_size=common_step, start=start, stop=stop, evenly_spaced = False, **kwargs)
+                d = tsutils.bin(ts.time, ts.value, bin_edges=even_axis, time_axis=time_axis, no_nans=False, **kwargs)
                 ts.time  = d['bins']
                 ts.value = d['binned_values']
                 ms.series_list[idx] = ts
 
         elif method == 'interp':
+
+            if time_axis is None:
+                time_axis = even_axis
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.interp(ts.time, ts.value, step=common_step, start=start, stop=stop,**kwargs)
+                ti, vi = tsutils.interp(ts.time, ts.value, time_axis=time_axis, **kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
@@ -643,7 +677,7 @@ class MultipleSeries:
         elif method == 'gkernel':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.gkernel(ts.time,ts.value,step=common_step, start=start, stop=stop, **kwargs)
+                ti, vi = tsutils.gkernel(ts.time,ts.value,bin_edges=even_axis, time_axis=time_axis, no_nans=False,**kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts.clean() # remove NaNs
@@ -2079,7 +2113,7 @@ class MultipleSeries:
             mpl.rcParams.update(current_style)
             return ax
 
-    def to_pandas(self, *args, **kwargs):
+    def to_pandas(self, *args, use_common_time=False, **kwargs):
         """
         Align Series and place in DataFrame.
 
@@ -2091,10 +2125,17 @@ class MultipleSeries:
         ----------
         *args, **kwargs
             Arguments and keyword arguments to pass to ``common_time``.
+        use_common_time, bool
+            Pass True if you want to use ``common_time`` to align the Series
+            to have common times. Else, times for which some Series doesn't
+            have values will be filled with NaN (default).
          
         Returns
         -------
         pandas.DataFrame
         """
-        ms_aligned = self.common_time(*args, **kwargs)
-        return pd.DataFrame({ser.metadata['label']: ser.to_pandas() for ser in ms_aligned.series_list})
+        if use_common_time:
+            ms = self.common_time(*args, **kwargs)
+        else:
+            ms = self
+        return pd.DataFrame({ser.metadata['label']: ser.to_pandas() for ser in ms.series_list})

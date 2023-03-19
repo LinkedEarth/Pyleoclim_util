@@ -1,0 +1,31 @@
+# Development environment. This environment includes all the required 
+# packages for this repo including running the test suite.
+name: pyleo
+channels:
+  - LinkedEarth 
+  - conda-forge
+  - default
+dependencies:
+  - python>=3.8
+  - cartopy
+  - matplotlib
+  - nitime
+  - numba
+  - numpy
+  - pathos
+  - pip
+  - pytest
+  - pyyaml
+  - requests
+  - scikit-learn
+  - scipy
+  - seaborn
+  - statsmodels
+  - tabulate
+  - tqdm
+  - wget
+  - pip:
+    - pyhht
+    - '-e .'
+    - "--pre --extra-index https://pypi.anaconda.org/scipy-wheels-nightly/simple"
+    - pandas>=1.9

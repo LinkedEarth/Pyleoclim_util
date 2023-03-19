@@ -152,10 +152,8 @@ class Series:
         
         if log is None:
             self.log = ()
-            nlog = -1
         else:
             self.log = log
-            nlog = len(log)
 
         if clean_ts == True:
             if dropna == False or sort_ts == 'descending':
@@ -256,6 +254,11 @@ class Series:
         metadata = {key: d[key] for key in keys if d[key] is not None}
         #df = ser.to_frame()
         return f'{pprint(metadata)}\n{repr(ser)}'   
+    
+    def __and__(self, other):
+        if not isinstance(other, Series):
+            raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
+        return MultipleSeries([self, other])
        
     @property
     def datetime_index(self):
@@ -302,7 +305,7 @@ class Series:
         if 'value_name' not in metadata.keys():
             metadata['value_name'] = ser.name   
                 
-        return cls(time=time,value=ser.values, **metadata, 
+        return cls(time=time,value=ser.values, **metadata,
                    sort_ts = None, dropna = False, verbose=False)
                 
     # Alternate formulation
@@ -334,10 +337,7 @@ class Series:
         ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
         if paleo_style:
             time_label, value_label = self.make_labels()
-            ser2 = ser.set_axis(self.time) # inplace was deprecated, so copy needed; pandas doc too terse to figure out use of "copy"
-            ser2.rename(value_label, inplace=True)
-            ser2.rename_axis(time_label, inplace=True)
-            ser = ser2 
+            ser = ser.set_axis(self.time).rename(value_label).rename_axis(time_label)
         return ser
     
     def to_csv(self, metadata_header=True, path = '.'):
@@ -1118,7 +1118,7 @@ class Series:
         return res
 
 
-    def ssa(self, M=None, nMC=0, f=0.3, trunc = None, var_thresh=80):
+    def ssa(self, M=None, nMC=0, f=0.3, trunc = None, var_thresh=80, online=True):
         ''' Singular Spectrum Analysis
 
         Nonparametric, orthogonal decomposition of timeseries into constituent oscillations.
@@ -1135,14 +1135,22 @@ class Series:
         f : float, optional
             maximum allowable fraction of missing values. The default is 0.3.
         trunc : str
-            if present, truncates the expansion to a level K < M owing to one of 3 criteria:
+            if present, truncates the expansion to a level K < M owing to one of 4 criteria:
                 (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
-                (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% threshold)
+                (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)
                 (3) 'var': first K modes that explain at least var_thresh % of the variance.
             Default is None, which bypasses truncation (K = M)
-
+                (4) 'knee': Wherever the "knee" of the screeplot occurs.
+            Recommended as a first pass at identifying significant modes as it tends to be more robust than 'kaiser' or 'var', and faster than 'mcssa'.
+            While no truncation method is imposed by default, if the goal is to enhance the S/N ratio and reconstruct a smooth version of the attractor's skeleton, 
+            then the knee-finding method is a good compromise between objectivity and efficiency.
+            See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for more details on the knee finding algorithm.
         var_thresh : float
             variance threshold for reconstruction (only impactful if trunc is set to 'var')
+        online : bool; {True,False}
+            Whether or not to conduct knee finding analysis online or offline. 
+            Only called when trunc = 'knee'. Default is True
+            See kneed's `documentation <https://kneed.readthedocs.io/en/latest/api.html#kneelocator>`_ for details.
 
         Returns
         -------
@@ -1286,7 +1294,7 @@ class Series:
 
         '''
 
-        res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh)
+        res = decomposition.ssa(self.value, M=M, nMC=nMC, f=f, trunc = trunc, var_thresh=var_thresh, online=online)
 
 
         resc = SsaRes(name=self.value_name, original=self.value, time = self.time, eigvals = res['eigvals'], eigvecs = res['eigvecs'],
@@ -2370,9 +2378,14 @@ class Series:
         if len(seg_y)>1:
             s_list=[]
             for idx,s in enumerate(seg_y):
+                if self.label is not None: 
+                    s_lbl =  self.label + ' segment ' + str(idx+1)  
+                else:
+                    s_lbl =  'segment ' + str(idx+1)  
                 s_tmp=Series(time=seg_t[idx],value=s,time_name=self.time_name,
                               time_unit=self.time_unit, value_name=self.value_name,
-                              value_unit=self.value_unit,label=self.label, verbose=verbose)
+                              value_unit=self.value_unit,label=s_lbl, verbose=verbose)
+
                 s_list.append(s_tmp)
             res=MultipleSeries(series_list=s_list)
         elif len(seg_y)==1:
@@ -2380,6 +2393,7 @@ class Series:
         else:
             raise ValueError('No timeseries detected')
         return res
+    
     
     def sel(self, value=None, time=None, tolerance=0):
         """
@@ -2399,7 +2413,8 @@ class Series:
             `self.time` is between slice.start and slice.stop.
             If slice of `datetime` (or str containing datetime, such as `'2020-01-01'`),
             then the Series will be sliced so that `self.datetime_index` is
-            between `time.start` and `time.stop`.
+            between `time.start` and `time.stop` (+/- `tolerance`, which needs to be
+            a `timedelta`).
         tolerance : int, float, default 0.
             Used by `value` and `time`, see above.
         
@@ -2486,6 +2501,30 @@ class Series:
         if time is not None:
             if isinstance(time, (int, float)):
                 return self.slice([time-tolerance, time+tolerance])
+            if isinstance(time, dt.datetime):
+                if tolerance == 0:
+                    tolerance = dt.timedelta(days=0)
+                if not isinstance(tolerance, dt.timedelta):
+                    raise TypeError(
+                        f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                    )
+                return self.pandas_method(
+                    lambda x: x[(x.index>=time-tolerance) & (x.index<=time+tolerance)]
+                )
+            if isinstance(time, str):
+                if tolerance == 0:
+                    tolerance = dt.timedelta(days=0)
+                if not isinstance(tolerance, dt.timedelta):
+                    raise TypeError(
+                        f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                    )
+                tolerance = np.timedelta64(tolerance, 's') 
+                return self.pandas_method(
+                    lambda x: x[
+                        (x.index>=np.datetime64(time, 's')-tolerance)
+                        & (x.index<=np.datetime64(time, 's')+tolerance)
+                    ]
+                )
             if isinstance(time, slice):
                 if isinstance(time.start, (int, float)) and isinstance(time.stop, (int, float)):
                     return self.slice([time.start-tolerance, time.stop+tolerance])
@@ -2496,36 +2535,77 @@ class Series:
                     new.value = new.value[mask]
                     return new
                 if isinstance(time.stop, (int, float)) and time.start is None:
-                    mask = self.time <= time.stop-tolerance
+                    mask = self.time <= time.stop+tolerance
                     new = self.copy()
                     new.time = new.time[mask]
                     new.value = new.value[mask]
                     return new
                 if isinstance(time.start, str) and isinstance(time.stop, str):
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(
+                            f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                        )
+                    tolerance = np.timedelta64(tolerance, 's') 
                     return self.pandas_method(
-                        lambda x: x[(x.index>=(np.datetime64(time.start, 's'))) & (x.index<=np.datetime64(time.stop, 's'))]
+                        lambda x: x[
+                            (x.index>=np.datetime64(time.start, 's')-tolerance)
+                            & (x.index<=np.datetime64(time.stop, 's')+tolerance)
+                        ]
                     )
                 if isinstance(time.start, str) and time.stop is None:
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(
+                            f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                        )
+                    tolerance = np.timedelta64(tolerance, 's') 
                     return self.pandas_method(
-                        lambda x: x[x.index>=(np.datetime64(time.start, 's'))]
+                        lambda x: x[x.index>=np.datetime64(time.start, 's')-tolerance]
                     )
                 if isinstance(time.stop, str) and time.start is None:
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}")
+                    tolerance = np.timedelta64(tolerance, 's') 
                     return self.pandas_method(
-                        lambda x: x[x.index<=(np.datetime64(time.stop, 's'))]
+                        lambda x: x[x.index<=np.datetime64(time.stop, 's')+tolerance]
                     )
                 if isinstance(time.start, dt.datetime) and isinstance(time.stop, dt.datetime):
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(
+                            f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                        )
                     return self.pandas_method(
-                        lambda x: x[(x.index>=time.start) & (x.index<=time.stop)]
+                        lambda x: x[(x.index>=time.start-tolerance) & (x.index<=time.stop+tolerance)]
                     )
                 if isinstance(time.start, dt.datetime) and time.stop is None:
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(
+                            f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                        )
                     return self.pandas_method(
-                        lambda x: x[x.index>=time.start]
+                        lambda x: x[x.index>=time.start-tolerance]
                     )
                 if isinstance(time.stop, dt.datetime) and time.start is None:
+                    if tolerance == 0:
+                        tolerance = dt.timedelta(days=0)
+                    if not isinstance(tolerance, dt.timedelta):
+                        raise TypeError(
+                            f"Invalid 'tolerance' passed. Expected timedelta, received: {type(tolerance)}"
+                        )
                     return self.pandas_method(
-                        lambda x: x[x.index<=time.stop]
+                        lambda x: x[x.index<=time.stop+tolerance]
                     )
                 raise TypeError("Expected int or float, or slice of int/float/datetime/str.")
+        raise TypeError("Invalid combination of arguments received.")
 
 
     def slice(self, timespan):
@@ -4218,17 +4298,17 @@ class Series:
                               lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
         return res
 
-    def resample(self, rule, **kwargs):
+    def resample(self, rule, keep_log = False, **kwargs):
         """
         Run analogue to pandas.Series.resample.
 
         This is a convenience method: doing
 
-            ser.resample('Y').mean()
+            ser.resample('AS').mean()
 
         will do the same thing as
 
-            ser.pandas_method(lambda x: x.resample('Y').mean())
+            ser.pandas_method(lambda x: x.resample('AS').mean())
         
         but will also accept some extra resampling rules, such as `'Ga'` (see below).
 
@@ -4262,6 +4342,11 @@ class Series:
         search = re.search(r'(\d*)([a-zA-Z]+)', rule)
         if search is None:
             raise ValueError(f"Invalid rule provided, got: {rule}")
+
+        md = self.metadata
+        if md['label'] is not None:
+            md['label'] = md['label'] + ' (' + rule + ' resampling)'
+
         multiplier = search.group(1)
         if multiplier == '':
             multiplier = 1
@@ -4269,22 +4354,16 @@ class Series:
             multiplier = int(multiplier)
         unit = search.group(2)
         if unit.lower() in tsbase.MATCH_A:
-            pass
+            rule = f'{multiplier}AS'
         elif unit.lower() in tsbase.MATCH_KA:
-            multiplier *= 1_000
+            rule = f'{1_000*multiplier}AS'
         elif unit.lower() in tsbase.MATCH_MA:
-            multiplier *= 1_000_000
+            rule = f'{1_000_000*multiplier}AS'
         elif unit.lower() in tsbase.MATCH_GA:
-            multiplier *= 1_000_000_000
-        else:
-            raise ValueError(f'Invalid unit provided, got: {unit}')
-            
-        md = self.metadata
-        if md['label'] is not None:
-            md['label'] = md['label'] + ' (' + rule + ' resampling)'
+            rule = f'{1_000_000_000*multiplier}AS'
         
         ser = self.to_pandas()
-        return SeriesResampler(f'{multiplier}Y', ser, md, kwargs)
+        return SeriesResampler(rule, ser, md, keep_log, kwargs)
 
 
 class SeriesResampler:
@@ -4300,16 +4379,19 @@ class SeriesResampler:
     will only be used in an intermediate step. Think of it as an
     implementation detail.
     """
-    def __init__(self, rule, series, metadata, kwargs):
+    def __init__(self, rule, series, metadata, keep_log, kwargs):
         self.rule = rule
         self.series = series
         self.metadata = metadata
+        self.keep_log = keep_log
         self.kwargs = kwargs
     
     def __getattr__(self, attr):
-        attr = getattr(self.series.resample(self.rule, **self.kwargs), attr)
+        attr = getattr(self.series.resample(self.rule,  **self.kwargs), attr)
         def func(*args, **kwargs):
             series = attr(*args, **kwargs)
             from_pandas = Series.from_pandas(series, metadata=self.metadata)
+            if self.keep_log == True:
+                from_pandas.log += ({len(from_pandas.log): 'resample','rule': self.rule},)
             return from_pandas
         return func

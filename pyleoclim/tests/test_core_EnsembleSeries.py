@@ -211,6 +211,7 @@ class TestUIEnsembleSeriesHistplot():
         ts_ens = pyleo.EnsembleSeries(series_list)
 
         ts_ens.histplot()
+        pyleo.closefig()
 
 class TestUIEnsembleSeriesDistplot():
     def test_histplot_t0(self):
@@ -230,3 +231,4 @@ class TestUIEnsembleSeriesDistplot():
         ts_ens = pyleo.EnsembleSeries(series_list)
 
         ts_ens.histplot()
+        pyleo.closefig()

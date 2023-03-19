@@ -31,8 +31,8 @@ def metadata():
         'archiveType': 'Instrumental',
         'importedFrom': None,
         'log': (
-                {1: 'dropna', 'applied': True, 'verbose': True},
-                {2: 'sort_ts', 'direction': 'ascending'}
+                {0: 'dropna', 'applied': True, 'verbose': True},
+                {1: 'sort_ts', 'direction': 'ascending'}
             )
     }
 

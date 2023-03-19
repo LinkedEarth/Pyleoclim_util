@@ -22,6 +22,16 @@ def load_datasets_metadata(path=METADATA_PATH):
     Returns
     -------
     Dictionary of sample dataset metadata
+
+    Examples
+    -------
+    >>> from pyleoclim.utils.datasets import load_datasets_metadata
+    Load the metadata yaml file (with the default path)
+    >>> metadata = load_datasets_metadata()
+    Alternately, if you have a new metadata file, you can load it directly using
+    this method as well.
+    >>> metadata = load_datasets_metadata(path='path/to/metadata.yml')
+
     """
     with open(path, "r") as stream:
         try:
@@ -31,7 +41,18 @@ def load_datasets_metadata(path=METADATA_PATH):
 
 
 def available_dataset_names():
-    """Helper function to easily see what datasets are available to load"""
+    """Helper function to easily see what datasets are available to load
+
+    Returns
+    -------
+    List of datasets available via the `load_dataset` method. 
+    
+    Examples
+    --------
+    >>> from pyleoclim.utils.datasets import available_dataset_names
+    >>> available_dataset_names()
+
+    """
     meta = load_datasets_metadata()
     return list(meta.keys())
 
@@ -48,6 +69,11 @@ def get_metadata(name):
     Returns
     -------
     Dictionary of metadata for this dataset
+
+    Examples
+    --------
+    >>> from pyleoclim.utils.datasets import get_metadata
+    >>> meta = get_metadata('LR04')
     """
     all_metadata = load_datasets_metadata()
     metadata = all_metadata.get(name, None)
@@ -58,6 +84,7 @@ def get_metadata(name):
 
 def load_dataset(name):
     """Load example dataset given the nickname
+    Note: Available datasets can be seen via `available_dataset_names`
     
     Parameters
     ----------
@@ -67,6 +94,11 @@ def load_dataset(name):
     Returns
     -------
     pyleoclim_util.Series of the dataset
+
+    Examples
+    --------
+    >>> from pyleoclim.utils.datasets import load_dataset
+    >>> pyleo_series = load_dataset('LR04')
     """
     # load the metadata for this dataset
     metadata = get_metadata(name)
@@ -104,7 +136,8 @@ def load_dataset(name):
         ts=pyleo.Series(
             time=time, 
             value=value,
-            **pyleo_kwargs, verbose=False,
+            **pyleo_kwargs, 
+            verbose=False
         )
     # if this is a json
     elif metadata['file_extension'] == 'json':

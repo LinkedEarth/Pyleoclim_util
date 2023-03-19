@@ -430,6 +430,17 @@ class TestUiSeriesSegment:
         ts_seg = ts.segment()
 
         assert type(ts_seg) == type(ts)
+        
+    def test_segment_t2(self):
+        '''Test that in the case of segmentation, segment returns a Multiple Series object'''
+        t = (1,2,3000)
+        v = (1,2,3)
+
+        ts = pyleo.Series(time = t, value = v, label = 'series')
+
+        ts_seg = ts.segment()
+
+        assert ts_seg.series_list[0].label == 'series segment 1'
 
 class TestUiSeriesSlice:
     '''Test for Series.slice()
@@ -468,6 +479,8 @@ class TestSel:
         [
             (1, np.array([1]), np.array([4]), 0),
             (1, np.array([1, 2]), np.array([4, 6]), 1),
+            (dt.datetime(1948, 1, 1), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+            ('1948', np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
             (slice(1, 2), np.array([1, 2]), np.array([4, 6]), 0),
             (slice(1, 2), np.array([1, 2, 3]), np.array([4, 6, 1]), 1),
             (slice(1, None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
@@ -478,6 +491,12 @@ class TestSel:
             (slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1, 2]), np.array([4, 6]), 0),
             (slice(dt.datetime(1947, 1, 1), None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
             (slice(None, dt.datetime(1948, 1, 1)), np.array([3]), np.array([1]), 0),
+            (slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(dt.datetime(1947, 1, 1), None), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(None, dt.datetime(1948, 1, 1)), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+            (slice('1948', '1949'), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice('1947', None), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(None, '1948'), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
         ]
     )
     def test_time(self, time, expected_time, expected_value, tolerance):
@@ -925,8 +944,15 @@ class TestUISeriesSsa():
         '''
         ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
         ts.ssa(trunc='kaiser')
-
+    
     def test_ssa_t4(self):
+        '''Test Series.ssa() with Knee truncation'''
+        ts = pyleo.utils.load_dataset('SOI')
+        ssa = ts.ssa(trunc='knee')
+        knee = 12
+        assert_array_equal(ssa.mode_idx, np.arange(knee+1))
+
+    def test_ssa_t5(self):
         '''Test Series.ssa() with missing values
         '''
         soi = pyleo.utils.load_dataset('SOI')
@@ -1100,7 +1126,7 @@ class TestResample:
         result_ser = result.to_pandas()
         expected_values = np.array([0., 1., 2., 3., 4.])
         expected_idx = pd.DatetimeIndex(
-            ['2018-12-31', '2019-12-31', '2020-12-31', '2021-12-31', '2022-12-31'],
+            ['2018-01-01', '2019-01-01', '2020-01-01', '2021-01-01', '2022-01-01'],
             name='datetime'
         ).as_unit('s')
         expected_ser = pd.Series(expected_values, expected_idx, name='SOI')
@@ -1115,28 +1141,38 @@ class TestResample:
             'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (
-                    {1: 'dropna', 'applied': True, 'verbose': True},
-                    {2: 'sort_ts', 'direction': 'ascending'}
+                    {0: 'dropna', 'applied': True, 'verbose': True},
+                    {1: 'sort_ts', 'direction': 'ascending'}
                 )
         }
         pd.testing.assert_series_equal(result_ser, expected_ser)
         assert result.metadata == expected_metadata
 
     @pytest.mark.parametrize(
-        ('rule', 'expected_idx'),
+        ('rule', 'expected_idx', 'expected_values'),
         [
-            ('1ga', [np.datetime64('2018-12-31'), np.datetime64('1000002018-12-31')]),
-            ('1ma', [np.datetime64('2018-12-31'), np.datetime64('1002018-12-31')]),
-            ('2ka', [np.datetime64('2018-12-31'), np.datetime64('4018-12-31')]),
+            (
+                '1ga',
+                pd.date_range(np.datetime64('0-01-01', 's'), np.datetime64('1000000000-01-01', 's'), freq='1000000000AS-JAN', unit='s'),
+                np.array([0., 1.]),
+            ),
+            (
+                '1ma',
+                pd.date_range(np.datetime64('0-01-01', 's'), np.datetime64('1000000000-01-01', 's'), freq='1000000AS-JAN', unit='s'),
+                np.array([0.]+[np.nan]*999 + [1.]),
+            ),
         ]
     )
-    def test_resample_long_periods(self, rule, expected_idx, dataframe_dt, metadata):
-        ser = dataframe_dt.loc[:, 0]
+    def test_resample_long_periods(self, rule, expected_idx, expected_values, metadata):
+        ser_index = pd.DatetimeIndex([
+            np.datetime64('0000-01-01', 's'),
+            np.datetime64('1000000000-01-01', 's'),
+        ])
+        ser = pd.Series(range(2), index=ser_index)
         ts = pyleo.Series.from_pandas(ser, metadata)
         result =ts.resample(rule).mean()
         result_ser = result.to_pandas()
-        expected_values = np.array([0, 2.5])
-        expected_idx = pd.DatetimeIndex(expected_idx, name='datetime').as_unit('s')
+        expected_idx = pd.DatetimeIndex(expected_idx, freq=None, name='datetime')
         expected_ser = pd.Series(expected_values, index=expected_idx, name='SOI')
         expected_metadata = {
             'time_unit': 'years CE',
@@ -1149,21 +1185,82 @@ class TestResample:
             'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (
-                    {1: 'dropna', 'applied': True, 'verbose': True},
-                    {2: 'sort_ts', 'direction': 'ascending'}
+                    {0: 'dropna', 'applied': True, 'verbose': True},
+                    {1: 'sort_ts', 'direction': 'ascending'}
                 )
         }
-        pd.testing.assert_series_equal(result_ser, expected_ser)
+        # check indexes match to within 10 seconds
+        assert np.abs(result_ser.index.to_numpy() - expected_ser.index.to_numpy()).max() <= 10
+        np.testing.assert_array_equal(result_ser.to_numpy(), expected_ser.to_numpy())
         assert result.metadata == expected_metadata
  
  
     def test_resample_invalid(self, dataframe_dt, metadata):
         ser = dataframe_dt.loc[:, 0]
         ts = pyleo.Series.from_pandas(ser, metadata)
-        with pytest.raises(ValueError, match='Invalid unit provided, got: foo'):
-            ts.resample('foo')
+        with pytest.raises(ValueError, match='Invalid frequency: foo'):
+            ts.resample('foo').sum()
         with pytest.raises(ValueError, match='Invalid rule provided, got: 412'):
-            ts.resample('412')
+            ts.resample('412').sum()
+    
+
+    def test_resample_interpolate(self, metadata):
+        ser_index = pd.DatetimeIndex([
+            np.datetime64('0000-01-01', 's'),
+            np.datetime64('2000-01-01', 's'),
+        ])
+        ser = pd.Series(range(2), index=ser_index)
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        result_ser = ts.resample('ka').interpolate().to_pandas()
+        expected_idx = pd.DatetimeIndex(
+            [
+                np.datetime64('0-01-01', 's'),
+                np.datetime64('1000-01-01', 's'),
+                np.datetime64('2000-01-01', 's')
+            ],
+            name='datetime'
+        )
+        expected_ser = pd.Series([0, 0.5, 1], name='SOI', index=expected_idx)
+        pd.testing.assert_series_equal(result_ser, expected_ser)
+
+
+    @pytest.mark.parametrize(
+        ['rule', 'expected_idx', 'expected_values'],
+        (
+            (
+                'MS',
+                [0.9171996 , 1.00207479, 1.08694998, 1.16361144],
+                [8., 0., 3., 5.],
+            ),
+            (
+                'SMS',
+                [0.95553033, 1.00207479, 1.04040552, 1.08694998, 1.12528071, 1.16361144],
+                [8., 0., 0., 3., 0., 5.],
+            ),
+        )
+    )
+    def test_resample_non_pyleo_unit(self, rule, expected_idx, expected_values):
+        ts1 = pyleo.Series(time=np.array([1, 1.1, 1.2]), value=np.array([8, 3, 5]), time_unit='yr CE')
+        result= ts1.resample(rule).sum()
+        expected = pyleo.Series(
+            time=np.array(expected_idx),
+            value=np.array(expected_values),
+            time_unit='yr CE',
+        )
+        assert result.equals(expected) == (True, True)
+        
+    def test_resample_log(self, metadata):
+        ser_index = pd.DatetimeIndex([
+            np.datetime64('0000-01-01', 's'),
+            np.datetime64('2000-01-01', 's'),
+        ])
+        ser = pd.Series(range(2), index=ser_index)
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        result_ser = ts.resample('ka',keep_log=True).interpolate()
+        expected_log = ({0: 'dropna', 'applied': True, 'verbose': True},
+                        {1: 'sort_ts', 'direction': 'ascending'},
+                        {2: 'resample', 'rule': '1000AS'})
+        assert result_ser.log == expected_log
 
 class TestUISeriesEquals():
     ''' Test for equals() method '''
