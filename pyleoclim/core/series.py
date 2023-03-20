@@ -172,8 +172,7 @@ class Series:
                 if self.log[0][0] == 'dropna' and self.log[0]['applied'] == True:
                     pass # no need to clog the log with redundant information
             else:
-                self.log += ({nlog+1: 'dropna', 'applied': dropna, 'verbose': verbose},)
-                nlog +=1
+                self.log += ({len(self.log): 'dropna', 'applied': dropna, 'verbose': verbose},)
         elif dropna == False:
             pass
         else:
@@ -184,15 +183,7 @@ class Series:
         #     if sign == 'mixed':
         #         warnings.warn("The Series time axis is non-monotonic, which may cause errors. Suggest applying .sort()")
             
-        
-        # if  sort_ts in ['ascending', 'descending']:
-        #     value, time = tsbase.sort_ts(np.array(value), np.array(time),
-        #                                  ascending = sort_ts == 'ascending', verbose=verbose)
-        #     self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
-            
-        # else:
-        #     if verbose:
-        #         print("No time sorting applied")
+    
           
         # if sort == 'auto':
         #     _, _, direction =  tsbase.time_unit_to_datum_exp_dir(time_unit)
@@ -208,7 +199,7 @@ class Series:
                     if self.log[1][1] == 'sort_ts' and self.log[1]['direction'] == 'ascending':
                         pass # no need to clog the log with redundant information
                 else:
-                    self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
+                    self.log += ({len(self.log): 'sort_ts', 'direction': sort_ts},)
             else:
                 print(f"Unknown sorting option {sort_ts}; no sorting applied")
          
