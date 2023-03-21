@@ -111,6 +111,6 @@ GISP2:
   time_column: Age [yr BP]
   value_column: d18O [permil]
 
-nino_json:
-  filename: 'Nino'
-  file_extension: 'json'
+#nino_json:
+#  filename: 'Nino'
+#  file_extension: 'json'
