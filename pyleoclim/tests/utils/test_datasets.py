@@ -10,7 +10,7 @@ TEST_DATASETS = [
     'AIR',
     'LR04',
     'AACO2',
-    'nino_json'
+    'GISP2'
 ]
 
 def test_load_datasets_metadata():

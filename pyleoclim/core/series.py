@@ -168,7 +168,11 @@ class Series:
         
         if dropna == True:
             value, time = tsbase.dropna(value, time, verbose=verbose)
-            self.log += ({len(self.log): 'dropna', 'applied': dropna, 'verbose': verbose},)
+            if len(self.log) > 0:
+                if self.log[0][0] == 'dropna' and self.log[0]['applied'] == True:
+                    pass # no need to clog the log with redundant information
+            else:
+                self.log += ({len(self.log): 'dropna', 'applied': dropna, 'verbose': verbose},)
         elif dropna == False:
             pass
         else:
@@ -179,15 +183,7 @@ class Series:
         #     if sign == 'mixed':
         #         warnings.warn("The Series time axis is non-monotonic, which may cause errors. Suggest applying .sort()")
             
-        
-        # if  sort_ts in ['ascending', 'descending']:
-        #     value, time = tsbase.sort_ts(np.array(value), np.array(time),
-        #                                  ascending = sort_ts == 'ascending', verbose=verbose)
-        #     self.log += ({nlog+1: 'sort_ts', 'direction': sort_ts},)
-            
-        # else:
-        #     if verbose:
-        #         print("No time sorting applied")
+    
           
         # if sort == 'auto':
         #     _, _, direction =  tsbase.time_unit_to_datum_exp_dir(time_unit)
@@ -199,7 +195,11 @@ class Series:
             if sort_ts in ['ascending', 'descending']:
                 value, time = tsbase.sort_ts(value, time, verbose=verbose, 
                                              ascending = sort_ts == 'ascending')
-                self.log += ({len(self.log): 'sort_ts', 'direction': sort_ts},)
+                if len(self.log) > 1:
+                    if self.log[1][1] == 'sort_ts' and self.log[1]['direction'] == 'ascending':
+                        pass # no need to clog the log with redundant information
+                else:
+                    self.log += ({len(self.log): 'sort_ts', 'direction': sort_ts},)
             else:
                 print(f"Unknown sorting option {sort_ts}; no sorting applied")
          
@@ -2339,7 +2339,7 @@ class Series:
             new.log += ({len(new.log): 'center', 'args': timespan, 'previous_mean': ts_mean},)
         return new
 
-    def segment(self, factor=10):
+    def segment(self, factor=10, verbose = False):
         """Gap detection
 
         This function segments a timeseries into n number of parts following a gap
@@ -2353,6 +2353,9 @@ class Series:
 
         factor : float
             The factor that adjusts the threshold for gap detection
+        
+        verbose : bool
+            If True, will print warning messages if there is any
 
         Returns
         -------
@@ -2372,7 +2375,8 @@ class Series:
                     s_lbl =  'segment ' + str(idx+1)  
                 s_tmp=Series(time=seg_t[idx],value=s,time_name=self.time_name,
                               time_unit=self.time_unit, value_name=self.value_name,
-                              value_unit=self.value_unit,label=s_lbl)
+                              value_unit=self.value_unit,label=s_lbl, verbose=verbose)
+
                 s_list.append(s_tmp)
             res=MultipleSeries(series_list=s_list)
         elif len(seg_y)==1:
