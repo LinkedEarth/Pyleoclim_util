@@ -4381,7 +4381,11 @@ class SeriesResampler:
         attr = getattr(self.series.resample(self.rule,  **self.kwargs), attr)
         def func(*args, **kwargs):
             series = attr(*args, **kwargs)
-            from_pandas = Series.from_pandas(series, metadata=self.metadata)
+            _, __, direction = tsbase.time_unit_to_datum_exp_dir(self.metadata['time_unit'], self.metadata['time_name'])
+            if direction == 'prograde':
+                from_pandas = Series.from_pandas(series, metadata=self.metadata)
+            else:
+                from_pandas = Series.from_pandas(series.sort_index(ascending=False), metadata=self.metadata)
             if self.keep_log == True:
                 from_pandas.log += ({len(from_pandas.log): 'resample','rule': self.rule},)
             return from_pandas

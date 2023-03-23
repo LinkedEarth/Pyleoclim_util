@@ -1261,6 +1261,21 @@ class TestResample:
                         {1: 'sort_ts', 'direction': 'ascending'},
                         {2: 'resample', 'rule': '1000AS'})
         assert result_ser.log == expected_log
+    
+
+    def test_resample_retrograde(self):
+        ts1 = pyleo.Series(
+            time=np.array([-3, -2, -1]),
+            value=np.array([8, 3, 5]),
+            time_unit='yrs BP',
+        )
+        result = ts1.resample('Y').mean().to_pandas()
+        expected = pd.Series(
+            [5.5, 5],
+            index=pd.DatetimeIndex(['1952-01-01', '1951-01-01'], name='datetime').as_unit('s')
+        )
+        pd.testing.assert_series_equal(result, expected)
+
 
 class TestUISeriesEquals():
     ''' Test for equals() method '''
