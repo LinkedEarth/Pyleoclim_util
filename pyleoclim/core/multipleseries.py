@@ -151,15 +151,15 @@ class MultipleSeries:
             # Combine the Multiple Series ms1 and ms2 by using the addition operator:
             ms = ms1 + ms2
         """
-         from ..core.series import Series
-         if isinstance(other, Series):
-             return self.append(other)
-         if isinstance(other, MultipleSeries):
-             for series in other.series_list:
-                 self = self.append(series)
-             return self
-         else:
-            raise TypeError(f"Expected pyleo.Series or pyleo.MultipleSeries, got: {type(other)}")
+        from ..core.series import Series
+        if isinstance(other, Series):
+            return self.append(other)
+        if isinstance(other, MultipleSeries):
+            for series in other.series_list:
+                self = self.append(series)
+            return self
+        else:
+           raise TypeError(f"Expected pyleo.Series or pyleo.MultipleSeries, got: {type(other)}")
          
     
     def __and__(self, other):
