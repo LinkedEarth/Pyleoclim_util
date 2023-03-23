@@ -102,22 +102,89 @@ class MultipleSeries:
         Remove Series based on given label.
 
         Modifies the MultipleSeries, does not return anything.
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import numpy as np
+            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
+            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
+            ms = pyleo.MultipleSeries([ts1, ts2])
+            # Remove pyleo.Series labelled 'bar' from the multiple series:
+            ms - 'bar'
         """
         self.remove(label)
 
     def __add__(self, other):
-         from ..core.series import Series
-         if isinstance(other, Series):
-             return self.append(other)
-         if isinstance(other, MultipleSeries):
-             for series in other.series_list:
-                 self = self.append(series)
-             return self
-         else:
-            raise TypeError(f"Expected pyleo.Series or pyleo.MultipleSeries, got: {type(other)}")
+        """
+        Append a pyleo.Series, or combine with another pyleo.MultipleSeries.
+        
+        Parameters
+        ----------
+        other
+            pyleo.Series or pyleo.MultipleSeries to combine with.
+        
+        Returns
+        -------
+        pyleo.MultipleSeries
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import numpy as np
+            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1')
+            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2')
+            ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3')
+            ts4 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts4')
+            ts5 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts5')
+            ms1 = pyleo.MultipleSeries([ts1, ts2, ts3])
+            ms2 = pyleo.MultipleSeries([ts4, ts5])
+        
+            # Combine the Multiple Series ms1 and ms2 by using the addition operator:
+            ms = ms1 + ms2
+        """
+        from ..core.series import Series
+        if isinstance(other, Series):
+            return self.append(other)
+        if isinstance(other, MultipleSeries):
+            for series in other.series_list:
+                self = self.append(series)
+            return self
+        else:
+           raise TypeError(f"Expected pyleo.Series or pyleo.MultipleSeries, got: {type(other)}")
          
     
     def __and__(self, other):
+        """
+        Append a Series.
+
+        Parameters
+        ----------
+        other
+            Series to append.
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import numpy as np
+            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1')
+            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2')
+            ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3')
+            # Combine ts1, ts2, and ts3 into a multiple series:
+            ms = ts1 & ts2 & ts3
+        """
         from ..core.series import Series
         if not isinstance(other, Series):
             raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
