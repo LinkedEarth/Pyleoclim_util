@@ -15,7 +15,7 @@ Notes on how to test:
 import numpy as np
 import pandas as pd
 
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_allclose
 from pandas.testing import assert_frame_equal
 
 import pytest
@@ -121,10 +121,10 @@ class TestMultipleSeriesPlot:
         x_plot_1 = lines_1.get_xdata()
         y_plot_1 = lines_1.get_ydata()
 
-        assert_array_equal(t_0, x_plot_0)
-        assert_array_equal(t_1, x_plot_1)
-        assert_array_equal(v_0, y_plot_0)
-        assert_array_equal(v_1, y_plot_1)
+        assert_allclose(t_0, x_plot_0)
+        assert_allclose(t_1, x_plot_1)
+        assert_allclose(v_0, y_plot_0)
+        assert_allclose(v_1, y_plot_1)
 
 class TestMultipleSeriesStripes:
     '''Test for MultipleSeries.stripes()

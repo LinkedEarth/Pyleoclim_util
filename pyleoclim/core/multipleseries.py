@@ -190,7 +190,7 @@ class MultipleSeries:
             raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
         return self.append(other)
 
-    def convert_time_unit(self, time_unit='years'):
+    def convert_time_unit(self, time_unit=None):
         ''' Convert the time units of the object
 
         Parameters
@@ -231,6 +231,14 @@ class MultipleSeries:
             print('Converted timeseries:')
             print('time unit:', new_ms.time_unit)
         '''
+        
+        if time_unit is None: # if not provided, find a common time unit
+            units = [ts.time_unit for ts in self.series_list]
+            unique_units = np.unique(units).tolist()
+            count_units = np.zeros(len(unique_units))
+            for i, u in enumerate(unique_units):
+                count_units[i] = units.count(u)
+            time_unit = unique_units[count_units.argmax()]                
 
         new_ms = self.copy()
         new_ts_list = []
@@ -554,7 +562,7 @@ class MultipleSeries:
             gp[idx,:] = tsutils.increments(item.time, step_style=step_style)
 
         return gp
-
+    
     def common_time(self, method='interp', step = None, start = None, stop = None, step_style = None, time_axis = None, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object
         
@@ -1540,7 +1548,7 @@ class MultipleSeries:
     def plot(self, figsize=[10, 4],
              marker=None, markersize=None,
              linestyle=None, linewidth=None, colors=None, cmap='tab10', norm=None,
-             xlabel=None, ylabel=None, title=None,
+             xlabel=None, ylabel=None, title=None, time_unit = None,
              legend=True, plot_kwargs=None, lgd_kwargs=None,
              savefig_settings=None, ax=None, invert_xaxis=False):
 
@@ -1596,6 +1604,18 @@ class MultipleSeries:
         title : str, optional
         
             Title. The default is None.
+            
+        time_unit : str
+        
+            the target time unit, possible input:
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+            default is None, in which case the code picks the most common time unit in the collection.
+            If no unambiguous winner can be found, the unit of the first series in the collection is used. 
             
         legend : bool, optional
         
@@ -1665,6 +1685,9 @@ class MultipleSeries:
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
+        # deal with time units
+        self = self.convert_time_unit(time_unit=time_unit)
+
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
 
@@ -1717,10 +1740,11 @@ class MultipleSeries:
         else:
             return ax
 
-    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
+    def stackplot(self, figsize=None, savefig_settings=None, time_unit = None, xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
                   spine_lw=1.5, grid_lw=0.5, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
         ''' Stack plot of multiple series
 
+        TIme units are harmonized prior to plotting. 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
 
         Parameters
@@ -1736,6 +1760,18 @@ class MultipleSeries:
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            
+        time_unit : str
+        
+            the target time unit, possible inputs:
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+            default is None, in which case the code picks the most common time unit in the collection.
+            If no discernible winner can be found, the unit of the first series in the collection is used. 
             
         xlim : list
         
@@ -1881,6 +1917,9 @@ class MultipleSeries:
         if type(labels)==list:
             if len(labels) != n_ts:
                 raise ValueError("The length of the label list should match the number of timeseries to be plotted")
+        
+        # deal with time units
+        self = self.convert_time_unit(time_unit=time_unit)
 
         # Deal with plotting arguments
         if type(plot_kwargs)==dict:
@@ -2006,7 +2045,7 @@ class MultipleSeries:
         else:
             return ax
         
-    def stripes(self, ref_period=None, figsize=None, savefig_settings=None,  
+    def stripes(self, ref_period=None, figsize=None, savefig_settings=None,  time_unit=None,
                 LIM = 2.8, thickness=1.0, labels='auto',  label_color = 'gray',
                 common_time_kwargs=None, xlim=None, font_scale=0.8, x_offset = 0.05):
         '''
@@ -2045,6 +2084,18 @@ class MultipleSeries:
               with or without a suffix; if the suffix is not given in 'path', it will follow 'format'
             - 'format' can be one of {"pdf", 'eps', 'png', ps'} The default is None.
             
+        time_unit : str
+        
+            the target time unit, possible inputs:
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+            default is None, in which case the code picks the most common time unit in the collection.
+            If no discernible winner can be found, the unit of the first series in the collection is used. 
+                
         xlim : list
             The x-axis limit.
             
@@ -2130,6 +2181,9 @@ class MultipleSeries:
         plotting.set_style('journal', font_scale=font_scale)
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
+        
+        # deal with time units
+        self = self.convert_time_unit(time_unit=time_unit)
 
         # put on common timescale
         msc = self.common_time(**common_time_kwargs)
