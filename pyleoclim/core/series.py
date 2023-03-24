@@ -98,6 +98,9 @@ class Series:
     log : dict
         Dictionary of tuples documentating the various transformations applied to the object
         
+    keep_log : bool
+        Whether to keep a log of applied transformations. False by default
+        
     lat : float
         latitude N in decimal degrees.
         
@@ -137,7 +140,7 @@ class Series:
 
     def __init__(self, time, value, time_unit=None, time_name=None, 
                  value_name=None, value_unit=None, label=None, lat=None, lon=None, 
-                 importedFrom=None, archiveType = None, log=None, 
+                 importedFrom=None, archiveType = None, log=None, keep_log=False,
                  sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False):
         
         # ensure ndarray instances
@@ -151,9 +154,13 @@ class Series:
             time_name='time'
         
         if log is None:
-            self.log = ()
+            if keep_log == True:
+                self.log = ()
+            else:
+                self.log = None
         else:
             self.log = log
+
 
         if clean_ts == True:
             if dropna == False or sort_ts == 'descending':
@@ -168,11 +175,15 @@ class Series:
         
         if dropna == True:
             value, time = tsbase.dropna(value, time, verbose=verbose)
-            if len(self.log) > 0:
-                if self.log[0][0] == 'dropna' and self.log[0]['applied'] == True:
-                    pass # no need to clog the log with redundant information
-            else:
-                self.log += ({len(self.log): 'dropna', 'applied': dropna, 'verbose': verbose},)
+            if keep_log == True:
+                if len(self.log) > 0:
+                    if self.log[0][0] == 'dropna' and self.log[0]['applied'] == True:
+                        pass # no need to clog the log with redundant information
+                    elif self.log[0][0] == 'clean_ts' and self.log[0]['applied']==True:
+                        self.log[0]['legacy']=True
+                        self.log += ({len(self.log): 'dropna', 'applied': dropna, 'verbose': verbose},)
+                else:
+                    self.log += ({len(self.log): 'dropna', 'applied': dropna, 'verbose': verbose},)
         elif dropna == False:
             pass
         else:
@@ -195,14 +206,19 @@ class Series:
             if sort_ts in ['ascending', 'descending']:
                 value, time = tsbase.sort_ts(value, time, verbose=verbose, 
                                              ascending = sort_ts == 'ascending')
-                if len(self.log) > 1:
-                    if self.log[1][1] == 'sort_ts' and self.log[1]['direction'] == 'ascending':
-                        pass # no need to clog the log with redundant information
-                else:
-                    self.log += ({len(self.log): 'sort_ts', 'direction': sort_ts},)
+                if keep_log == True:
+                    if len(self.log) > 1:
+                        if self.log[1][1] == 'sort_ts' and self.log[1]['direction'] == 'ascending':
+                            pass # no need to clog the log with redundant information
+                        elif self.log[0][0] == 'clean_ts' and self.log[0]['applied']==True:
+                            self.log[0]['legacy']=True
+                            self.log += ({len(self.log): 'sort_ts', 'direction': sort_ts},)
+                    else:
+                        self.log += ({len(self.log): 'sort_ts', 'direction': sort_ts},)
             else:
                 print(f"Unknown sorting option {sort_ts}; no sorting applied")
          
+        
         self.time = time
         self.value = value
         self.time_name = time_name
@@ -695,6 +711,8 @@ class Series:
         new_ts.time_name = time_name
 
         if keep_log == True:
+            if new_ts.log is None:
+                new_ts.log=()
             new_ts.log += ({len(new_ts.log):'convert_time_unit', 'time_unit': time_unit},)
 
         return new_ts
@@ -823,6 +841,8 @@ class Series:
             print('Flipping is only enabled along the value axis for now')
 
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             new.log += ({len(new.log): 'flip', 'applied': True, 'axis': axis},)
 
         return new
@@ -1533,6 +1553,8 @@ class Series:
         new.value = new_val + mu # restore the mean
 
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             new.log += ({len(new.log): 'filter','method': method, 'args': kwargs, 'fs': fs, 'cutoff_freq': cutoff_freq},)
         return new
 
@@ -2255,6 +2277,8 @@ class Series:
         new.time = t_mod
         new.value = v_mod
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             new.log += ({len(new.log):'clean', 'verbose': verbose},)
         return new
 
@@ -2282,6 +2306,8 @@ class Series:
         new.value = v_mod
 
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             new.log += ({len(new.log):'sort', 'ascending': ascending},)
         return new
 
@@ -2305,6 +2331,8 @@ class Series:
         new.value = v_mod
 
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             new.log += ({len(new.log):'gaussianize', 'applied': True},)
         return new
 
@@ -2325,6 +2353,8 @@ class Series:
         new.value = vs
 
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             method_dict = {len(new.log):'standardize', 'args': scale,
                            'previous_mean': mu, 'previous_std': sig}
             new.log += (method_dict,)
@@ -2358,6 +2388,8 @@ class Series:
         new.value = self.value - ts_mean
 
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             new.log += ({len(new.log): 'center', 'args': timespan, 'previous_mean': ts_mean},)
         return new
 
@@ -2719,6 +2751,8 @@ class Series:
         new.value = new_value
 
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             new.log += ({len(new.log):'fill_na', 'applied': True, 'dt': dt, 'timespan': timespan},)
 
         return new
@@ -2849,6 +2883,8 @@ class Series:
         new.value = v_mod
 
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             new.log += ({len(new.log): 'detrend','method': method, 'args': kwargs, 'previous_trend': trend},)
         return new
 
@@ -4005,22 +4041,11 @@ class Series:
 
         #return the log if asked
         if keep_log == True:
-            if method == 'kmeans':
-                new.log += ({len(new.log): 'outliers','method': method,
+            if new.log is None:
+                new.log=()
+            new.log += ({len(new.log): 'outliers','method': method,
                                            'args': settings,
-                                           'nbr_clusters':np.array(res['number of clusters']),
-                                           'silhouette_score':np.array(res['silhouette score']),
-                                           'outlier_indices':np.array(res['outlier indices']),
-                                           'clusters':np.array(res['clusters'])},)
-            elif method == 'DBSCAN':
-                new.log += ({len(new.log): 'outliers','method': method,
-                                           'args': settings,
-                                           'eps':np.array(res['eps']),
-                                           'min_samples':np.array(res['min_samples']),
-                                           'nbr_clusters':np.array(res['number of clusters']),
-                                           'silhouette_score':np.array(res['silhouette score']),
-                                           'outlier_indices':np.array(res['outlier indices']),
-                                           'clusters':np.array(res['clusters'])},)
+                                           'results': res},)
 
         return new
 
@@ -4056,6 +4081,8 @@ class Series:
         new.time = ti
         new.value = vi
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             new.log += ({len(new.log):'interp', 'method': method, 'args': kwargs},)
 
         return new
@@ -4101,6 +4128,8 @@ class Series:
         new.value = vi
 
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             new.log += ({len(new.log):'gkernel', 'step_type': step_type, 'args': kwargs},)
         return new
 
@@ -4132,6 +4161,8 @@ class Series:
         new.time = res_dict['bins']
         new.value = res_dict['binned_values']
         if keep_log == True:
+            if new.log is None:
+                new.log=()
             new.log += ({len(new.log):'bin', 'args': kwargs},)
         return new
 
@@ -4376,6 +4407,7 @@ class Series:
             rule = f'{1_000_000_000*multiplier}AS'
         
         ser = self.to_pandas()
+        
         return SeriesResampler(rule, ser, md, keep_log, kwargs)
 
 
@@ -4405,6 +4437,8 @@ class SeriesResampler:
             series = attr(*args, **kwargs)
             from_pandas = Series.from_pandas(series, metadata=self.metadata)
             if self.keep_log == True:
+                if from_pandas.log is None:
+                    from_pandas.log=()
                 from_pandas.log += ({len(from_pandas.log): 'resample','rule': self.rule},)
             return from_pandas
         return func
