@@ -846,10 +846,12 @@ class PSD:
             ax.set_title(title)
 
         if xlim is not None:
-            ax.set_xlim(xlim)
+            if False not in np.isfinite(xlim):
+                ax.set_xlim(xlim)
 
         if ylim is not None:
-            ax.set_ylim(ylim)
+            if False not in np.isfinite(ylim):
+                ax.set_ylim(ylim)
 
         if 'fig' in locals():
             if 'path' in savefig_settings:
