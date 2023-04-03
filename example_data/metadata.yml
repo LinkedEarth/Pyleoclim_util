@@ -91,7 +91,25 @@ AACO2:
     lon: 123.3478
     importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/antarctica2015co2composite.txt'
   time_column: Age [kyr BP]
-  value_column: $CO_2$ [ppm]   
+  value_column: $CO_2$ [ppm]
+  
+EDC-dD:
+  filename: 'edc3deuttemp2007'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  pyleo_kwargs:
+    time_name: 'Age'
+    time_unit: 'y BP'
+    label: 'EPICA Dome C deuterium'
+    value_name: '$\delta \mathrm{D}$' 
+    value_unit: '‰'
+    archiveType: 'Glacier Ice'
+    lat: -75.1011
+    lon: 123.3478
+    importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/epica_domec/edc3deuttemp2007.txt'
+  time_column: Age
+  value_column: Deuterium    
 
 GISP2:
   filename: 'GISP2_d18O'
