@@ -134,7 +134,7 @@ class Series:
     Import the Southern Oscillation Index (SOI) and display a quick synopsis:
 
     >>> soi = pyleo.utils.load_dataset('SOI')
-    >>> soi
+    >>> soi.view()
           
     '''
 
@@ -3825,7 +3825,7 @@ class Series:
 
         s_list = []
         for s in surr_res.T:
-            s_tmp = Series(time=self.time, value=s, time_name=self.time_name, time_unit=self.time_unit, value_name=self.value_name, value_unit=self.value_unit)
+            s_tmp = Series(time=self.time, value=s, time_name=self.time_name, time_unit=self.time_unit, value_name=self.value_name, value_unit=self.value_unit, verbose=False)
             s_list.append(s_tmp)
 
         surr = SurrogateSeries(series_list=s_list, surrogate_method=method, surrogate_args=args[method])
