@@ -1126,8 +1126,8 @@ class TestResample:
         result_ser = result.to_pandas()
         expected_values = np.array([0., 1., 2., 3., 4.])
         expected_idx = pd.DatetimeIndex(
-            ['2018-01-01', '2019-01-01', '2020-01-01', '2021-01-01', '2022-01-01'],
-            name='datetime'
+            ['2018-07-02T12:00:00', '2019-07-02T12:00:00', '2020-07-01T12:00:00', '2021-07-02T12:00:00', '2022-07-02T12:00:00'],
+            name='datetime',
         ).as_unit('s')
         expected_ser = pd.Series(expected_values, expected_idx, name='SOI')
         expected_metadata = {
@@ -1153,12 +1153,12 @@ class TestResample:
         [
             (
                 '1ga',
-                pd.date_range(np.datetime64('0-01-01', 's'), np.datetime64('1000000000-01-01', 's'), freq='1000000000AS-JAN', unit='s'),
+                pd.date_range(np.datetime64('500000000-01-01', 's'), np.datetime64('1500000000-01-01', 's'), freq='1000000000AS-JAN', unit='s'),
                 np.array([0., 1.]),
             ),
             (
                 '1ma',
-                pd.date_range(np.datetime64('0-01-01', 's'), np.datetime64('1000000000-01-01', 's'), freq='1000000AS-JAN', unit='s'),
+                pd.date_range(np.datetime64('500000-01-01', 's'), np.datetime64('1000500000-01-01', 's'), freq='1000000AS-JAN', unit='s'),
                 np.array([0.]+[np.nan]*999 + [1.]),
             ),
         ]
@@ -1214,9 +1214,9 @@ class TestResample:
         result_ser = ts.resample('ka').interpolate().to_pandas()
         expected_idx = pd.DatetimeIndex(
             [
-                np.datetime64('0-01-01', 's'),
-                np.datetime64('1000-01-01', 's'),
-                np.datetime64('2000-01-01', 's')
+                np.datetime64('499-12-31 12:00:00', 's'),
+                np.datetime64('1500-01-01 12:00:00', 's'),
+                np.datetime64('2499-12-31 12:00:00', 's')
             ],
             name='datetime'
         )
@@ -1229,12 +1229,12 @@ class TestResample:
         (
             (
                 'MS',
-                [0.9171996 , 1.00207479, 1.08694998, 1.16361144],
+                [0.9596372 , 1.04451238, 1.12938757, 1.20604903],
                 [8., 0., 3., 5.],
             ),
             (
                 'SMS',
-                [0.95553033, 1.00207479, 1.04040552, 1.08694998, 1.12528071, 1.16361144],
+                [0.97880256, 1.02534702, 1.06367775, 1.11022221, 1.14855294, 1.18688367],
                 [8., 0., 0., 3., 0., 5.],
             ),
         )
@@ -1272,7 +1272,7 @@ class TestResample:
         result = ts1.resample('Y').mean().to_pandas()
         expected = pd.Series(
             [5.5, 5],
-            index=pd.DatetimeIndex(['1952-01-01', '1951-01-01'], name='datetime').as_unit('s')
+            index=pd.DatetimeIndex(['1952-07-01 12:00:00', '1951-07-02 12:00:00'], name='datetime').as_unit('s')
         )
         pd.testing.assert_series_equal(result, expected)
 
