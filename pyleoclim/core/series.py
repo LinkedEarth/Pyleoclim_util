@@ -335,19 +335,7 @@ class Series:
             metadata['value_name'] = ser.name   
                 
         return cls(time=time,value=ser.values, **metadata,
-                   sort_ts = None, dropna = False, verbose=False)
-                
-    # Alternate formulation
-    # def from_pandas(ser, metadata):
-    #     time = tsbase.convert_datetime_index_to_time(ser.index, metadata['time_unit'], metadata['time_name'])
-    #     ts = Series(value=ser.values, time=time,  
-    #                       time_name = metadata['time_name'] if metadata['time_name'] is not None else ser.index.name,
-    #                       time_unit = metadata['time_unit'],
-    #                       value_name=metadata['value_name'] if metadata['value_name'] is not None else ser.name,
-    #                       value_unit = metadata['value_unit'],
-    #                       label = ser.name
-    #                       )
-    #     return ts
+                   sort_ts = None, dropna = False, verbose=False) 
         
     def to_pandas(self, paleo_style=False):
         '''
@@ -4379,7 +4367,7 @@ class Series:
         --------
         >>> ts = pyleo.utils.load_dataset('LR04')
         >>> ts5k = ts.resample('5ka').mean()
-        >>> fig, ax = ts.plot(invert_yaxis='True')
+        >>> fig, ax = ts.plot(invert_yaxis='True',xlim=[0, 1000])
         >>> ts5k.plot(ax=ax,color='C1')
                 
         """
@@ -4435,6 +4423,7 @@ class SeriesResampler:
         attr = getattr(self.series.resample(self.rule,  **self.kwargs), attr)
         def func(*args, **kwargs):
             series = attr(*args, **kwargs)
+            series.index = series.index + (series.index[1] - series.index[0])/2 # sample midpoints
             _, __, direction = tsbase.time_unit_to_datum_exp_dir(self.metadata['time_unit'], self.metadata['time_name'])
             if direction == 'prograde':
                 from_pandas = Series.from_pandas(series, metadata=self.metadata)
