@@ -737,6 +737,39 @@ class TestUISeriesOutliers:
         ts2 = pyleo.Series(time = ts.time, value = v_out)
         # Remove outliers
         ts_out = ts2.outliers(keep_log=keep_log)
+    
+    def test_outliers_t4(self):
+        #Generate data
+        ts = gen_ts()
+        #Add outliers
+        outliers_start = np.mean(ts.value)+5*np.std(ts.value)
+        outliers_end = np.mean(ts.value)+7*np.std(ts.value)
+        outlier_values = np.arange(outliers_start,outliers_end,0.1)
+        index = np.random.randint(0,len(ts.value),6)
+        v_out = ts.value
+        for i,ind in enumerate(index):
+            v_out[ind] = outlier_values[i]
+        # Get a series object
+        ts2 = pyleo.Series(time = ts.time, value = v_out)
+        # Remove outliers
+        ts_out = ts2.outliers(method = 'kmeans', settings={'nbr_clusters':2, 'threshold':2})
+    
+    def test_outliers_t5(self):
+        #Generate data
+        ts = gen_ts()
+        #Add outliers
+        outliers_start = np.mean(ts.value)+5*np.std(ts.value)
+        outliers_end = np.mean(ts.value)+7*np.std(ts.value)
+        outlier_values = np.arange(outliers_start,outliers_end,0.1)
+        index = np.random.randint(0,len(ts.value),6)
+        v_out = ts.value
+        for i,ind in enumerate(index):
+            v_out[ind] = outlier_values[i]
+        # Get a series object
+        ts2 = pyleo.Series(time = ts.time, value = v_out)
+        # Remove outliers
+        ts_out = ts2.outliers(method = 'DBSCAN', settings={'nbr_clusters':2})
+        
 
 class TestUISeriesGkernel:
     ''' Unit tests for the TestUISeriesGkernel function
