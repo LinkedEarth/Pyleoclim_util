@@ -3824,8 +3824,8 @@ class Series:
                  fig_outliers=True, figsize_outliers=[10,4], plotoutliers_kwargs=None, savefigoutliers_settings=None,
                  fig_clusters=True,figsize_clusters=[10,4], plotclusters_kwargs=None,savefigclusters_settings=None, keep_log=False):
         """
-        Remove outliers from timeseries data. The method emplys clustering to identify clusters in the data. Points falling a certain distance from the cluster (either away from the centroid k-means or in a area of low density for DBSCAN) are considered outliers.
-        This method uses the k-means and DBSCAN algorithms from scikit-learn. The method uses the silhouette score to optimze the values of parameters. 
+        Remove outliers from timeseries data. The method employs clustering to identify clusters in the data, using the k-means and DBSCAN algorithms from scikit-learn. Points falling a certain distance from the cluster (either away from the centroid for k-means or in a area of low density for DBSCAN) are considered outliers.
+        The silhouette score is used to optimize parameter values. 
         
         A tutorial explaining how to use this method and set the parameters is available at https://github.com/LinkedEarth/PyleoTutorials/blob/main/notebooks/L2_outliers_detection.ipynb. 
 
@@ -3865,7 +3865,7 @@ class Series:
         Returns
         -------
         ts: Series
-            A new Series object witthout outliers if remove is True. Otherwise, returns the original timeseries
+            A new Series object without outliers if remove is True. Otherwise, returns the original timeseries
 
 
         See also
