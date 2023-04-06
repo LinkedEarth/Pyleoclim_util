@@ -282,6 +282,11 @@ def iterate_through_dict(dictionary, objname):
                     item['timeseries'] = pyleo.Series(**item['timeseries'])
                 a[k]['scalogram_list'][idx]=pyleo.Scalogram(**a[k]['scalogram_list'][idx])
             a[k] = pyleo.MultipleScalogram(**a[k]) 
+    
+    #Deal with MultipleSeries
+    if objname == 'MultipleSeries':
+        for idx,item in enumerate(a['series_list']):
+            a['series_list'][idx]=pyleo.Series(**item)
         
     return a
     

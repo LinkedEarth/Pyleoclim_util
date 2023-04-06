@@ -4,7 +4,7 @@ list) of multiple Series objects. This is handy in case you want to apply the sa
 to such a collection at once (e.g. process a bunch of series in a consistent fashion).
 """
 
-from ..utils import tsutils, plotting
+from ..utils import tsutils, plotting, jsonutils
 from ..utils import correlation as corrutils
 
 from ..core.correns import CorrEns
@@ -2288,3 +2288,47 @@ class MultipleSeries:
             tl = ms.series_list[0].time_name
             df.index.name = tl if tl is not None else 'time' 
         return df
+    
+    
+    def to_json(self, path=None):
+        '''
+        Export the pyleoclim.MultipleSeries object to a json file
+
+        Parameters
+        ----------
+        path : string, optional
+            The path to the file. The default is None, resulting in a file saved in the current working directory using the label for the dataset as filename if available or 'mulitpleseries.json' if label is not provided.
+
+        Returns
+        -------
+        None.
+
+        '''
+        
+        if path is None:        
+            path = self.series_list[0].label.replace(" ", "_") + '.json' if self.series_list[0].label is not None else 'multipleseries.json' 
+        
+        jsonutils.PyleoObj_to_json(self, path)
+    
+    @classmethod    
+    def from_json(cls, path):
+        ''' Creates a pyleoclim.MulitpleSeries from a JSON file
+        
+        The keys in the JSON file must correspond to the parameter associated with MulitpleSeries and Series objects
+
+        Parameters
+        ----------
+        path : str
+            Path to the JSON file
+
+        Returns
+        -------
+        ts : pyleoclim.core.series.MulitplesSeries
+            A Pyleoclim MultipleSeries object. 
+
+        '''
+        
+        a = jsonutils.open_json(path)
+        b = jsonutils.iterate_through_dict(a, 'MultipleSeries')
+        
+        return cls(**b)
