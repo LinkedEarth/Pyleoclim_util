@@ -101,7 +101,7 @@ class MultipleSeries:
             ms.name = 'ENSO'
             ms.view()
         '''
-        return self.to_pandas()
+        return self.to_pandas(paleo_style=True)
     
     def remove(self, label):
         """
@@ -2256,16 +2256,18 @@ class MultipleSeries:
             mpl.rcParams.update(current_style)
             return ax
 
-    def to_pandas(self, *args, use_common_time=False, **kwargs):
+    def to_pandas(self, paleo_style=False, *args, use_common_time=False, **kwargs):
         """
         Align Series and place in DataFrame.
 
-        Column names will be taken from each Series' label. The index will be
-        construted by first using ``common_time`` to align all Series to have
-        the same index.
+        Column names will be taken from each Series' label. 
 
         Parameters
         ----------
+        paleo_style : boolean, optional
+            If True, will format datetime as the common time vector and assign as 
+            index name the time_name of the first series in the object. 
+            
         *args, **kwargs
             Arguments and keyword arguments to pass to ``common_time``.
         use_common_time, bool
@@ -2281,4 +2283,8 @@ class MultipleSeries:
             ms = self.common_time(*args, **kwargs)
         else:
             ms = self
-        return pd.DataFrame({ser.metadata['label']: ser.to_pandas() for ser in ms.series_list})
+        df = pd.DataFrame({ser.metadata['label']: ser.to_pandas(paleo_style=paleo_style) for ser in ms.series_list})
+        if paleo_style:
+            tl = ms.series_list[0].time_name
+            df.index.name = tl if tl is not None else 'time' 
+        return df
