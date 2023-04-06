@@ -2259,4 +2259,34 @@ class MultipleSeries:
             ms = self.common_time(*args, **kwargs)
         else:
             ms = self
+            
         return pd.DataFrame({ser.metadata['label']: ser.to_pandas() for ser in ms.series_list})
+    
+    def to_csv(self, label=None, path = '.', *args, use_common_time=False,  **kwargs):
+        '''
+        Export MultipleSeries to CSV
+
+        Parameters
+        ----------
+        label : str
+            a distinctinve name for the collection of series, which will be used to create the filename as '{label}.csv'
+            The default is None, in which case the filename defaults to the poetic 'MultipleSeries.csv' 
+        path : str, optional
+            system path to save the file. Default is '.'
+        *args, **kwargs
+            Arguments and keyword arguments to pass to ``common_time``.
+        use_common_time, bool
+            Pass True if you want to use ``common_time`` to align the Series
+            to have common times. Else, times for which some Series doesn't
+            have values will be filled with NaN (default).
+
+        Returns
+        -------
+        None.
+
+        '''
+        filename = label.replace(" ", "_") + '.csv' if label is not None else 'MultipleSeries.csv' 
+        self.to_pandas(*args, use_common_time=False,  **kwargs).to_csv(path+'/'+filename, header = True)
+
+
+
