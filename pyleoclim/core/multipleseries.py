@@ -56,17 +56,13 @@ class MultipleSeries:
         :okwarning:
         :okexcept:
 
-        import pyleoclim as pyleo
-        import pandas as pd
-        data = pd.read_csv(
-            'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-            skiprows=0, header=1
-        )
-        time = data.iloc[:,1]
-        value = data.iloc[:,2]
-        ts1 = pyleo.Series(time=time, value=value, time_unit='years')
-        ts2 = pyleo.Series(time=time, value=value, time_unit='years')
-        ms = pyleo.MultipleSeries([ts1, ts2], name = 'SOI x2')
+        import pyleoclim as pyleo        
+        soi = pyleo.utils.load_dataset('SOI')
+        nino = pyleo.utils.load_dataset('NINO3')
+        ms = soi & nino
+        ms.name = 'ENSO'
+        ms
+                
     '''
     def __init__(self, series_list, time_unit=None, name=None):
         self.series_list = series_list
@@ -80,6 +76,32 @@ class MultipleSeries:
                 new_ts_list.append(new_ts)
 
             self.series_list = new_ts_list
+            
+    def __repr__(self):
+        return repr(self.to_pandas()) 
+    
+    def view(self):
+        '''
+        Generates a DataFrame version of the MultipleSeries object, suitable for viewing in a Jupyter Notebook
+
+        Returns
+        -------
+        pd.DataFrame
+        
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo        
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
+            ms.name = 'ENSO'
+            ms.view()
+        '''
+        return self.to_pandas()
     
     def remove(self, label):
         """

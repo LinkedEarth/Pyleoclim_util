@@ -594,7 +594,7 @@ class Series:
     
     def view(self):
         '''
-        Generates a DataFrame version of the Series object, suitable for viewing in an IPython or Jupyter Notebook
+        Generates a DataFrame version of the Series object, suitable for viewing in a Jupyter Notebook
 
         Returns
         -------
@@ -610,13 +610,7 @@ class Series:
                 :okexcept:
 
                 import pyleoclim as pyleo
-                import pandas as pd
-                url = 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.annual.csv'
-                df = pd.read_csv(url)
-                time = df['Time']
-                gmst = df['Anomaly (deg C)']
-                ts = pyleo.Series(time=time,value=gmst, label = 'HadCRUT5', 
-                                  time_name='Time', time_unit = 'Year CE', value_name='GMST')
+                ts = pyleo.utils.load_dataset('HadCRUT5')
                 ts.view()
         '''
         return self.to_pandas(paleo_style=True).to_frame()
