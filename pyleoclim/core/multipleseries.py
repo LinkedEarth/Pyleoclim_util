@@ -2260,3 +2260,57 @@ class MultipleSeries:
         else:
             ms = self
         return pd.DataFrame({ser.metadata['label']: ser.to_pandas() for ser in ms.series_list})
+    
+    
+    def sel(self, value=None, time=None, tolerance=0):
+        '''
+        Slice MulitpleSeries based on 'value' or 'time'. See examples in pyleoclim.series.Series for usage. 
+
+        Parameters
+        ----------
+        value : int, float, slice
+            If int/float, then the Series will be sliced so that `self.value` is
+            equal to `value` (+/- `tolerance`).
+            If slice, then the Series will be sliced so `self.value` is between
+            slice.start and slice.stop (+/- tolerance).
+        time : int, float, slice
+            If int/float, then the Series will be sliced so that `self.time` is
+            equal to `time`. (+/- `tolerance`)
+            If slice of int/float, then the Series will be sliced so that
+            `self.time` is between slice.start and slice.stop.
+            If slice of `datetime` (or str containing datetime, such as `'2020-01-01'`),
+            then the Series will be sliced so that `self.datetime_index` is
+            between `time.start` and `time.stop` (+/- `tolerance`, which needs to be
+            a `timedelta`).
+        tolerance : int, float, default 0.
+            Used by `value` and `time`, see above.
+
+        Returns
+        -------
+        ms_new : pyleoclim.mulitpleseries.MultipleSeries
+            Copy of `self`, sliced according to `value` and `time`.
+            
+        See also
+        --------
+        
+        pyleoclim.series.Series.sel : Slicing a series by `value` and `time`. 
+
+        '''
+        
+        if value is not None:
+            warnings.warn('You are selecting by values. Make sure the units are consistent across all timeseries or that they have been standardized')
+            
+        #loop it
+        
+        new_list = []
+        
+        for item in self.series_list:
+            new_list.append(item.sel(value=value,time=time,tolerance=tolerance))
+        
+        ms_new = self.copy()
+        ms_new.series_list=new_list
+        
+        return ms_new
+        
+        
+        

@@ -12,6 +12,7 @@ Notes on how to test:
 4. after `pip install pytest-xdist`, one may execute "pytest -n 4" to test in parallel with number of workers specified by `-n`
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 '''
+import datetime as dt
 import numpy as np
 import pandas as pd
 
@@ -596,3 +597,75 @@ class TestOverloads:
         ms = pyleo.MultipleSeries([ts1])
         with pytest.raises(ValueError, match='Given series is identical to existing series'):
             ms + ts1
+
+class TestSel:
+    
+    @pytest.mark.parametrize(
+        ('value', 'expected_time', 'expected_value', 'tolerance'),
+        [
+            (1, np.array([3]), np.array([1]), 0),
+            (1, np.array([1, 3]), np.array([4, 1]), 3),
+            (slice(1, 4), np.array([1, 3]), np.array([4, 1]), 0),
+            (slice(1, 4), np.array([1, 2, 3]), np.array([4, 6, 1]), 2),
+            (slice(1, None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, 1), np.array([3]), np.array([1]), 0),
+        ])
+    
+    def test_value(self, value, expected_time, expected_value, tolerance):
+    
+        ts1 = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP', label='ts1')
+        ts2 = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP', label='ts2')
+        ts3 = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP', label='ts3')
+        ms = pyleo.MultipleSeries([ts1, ts2, ts3])
+        result = ms.sel(value=value, tolerance=tolerance)
+        #check
+        expected = pyleo.Series(time=expected_time, value=expected_value, time_unit='years BP')
+        for item in result.series_list:
+            values_match, _ = item.equals(expected)
+            assert values_match
+    
+    @pytest.mark.parametrize(
+        ('time', 'expected_time', 'expected_value', 'tolerance'),
+        [
+            (1, np.array([1]), np.array([4]), 0),
+            (1, np.array([1, 2]), np.array([4, 6]), 1),
+            (dt.datetime(1948, 1, 1), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+            ('1948', np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+            (slice(1, 2), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice(1, 2), np.array([1, 2, 3]), np.array([4, 6, 1]), 1),
+            (slice(1, None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, 1), np.array([1]), np.array([4]), 0),
+            (slice('1948', '1949'), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice('1947', None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, '1948'), np.array([3]), np.array([1]), 0),
+            (slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice(dt.datetime(1947, 1, 1), None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, dt.datetime(1948, 1, 1)), np.array([3]), np.array([1]), 0),
+            (slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(dt.datetime(1947, 1, 1), None), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(None, dt.datetime(1948, 1, 1)), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+            (slice('1948', '1949'), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice('1947', None), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(None, '1948'), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+        ]
+    )
+    def test_time(self, time, expected_time, expected_value, tolerance):
+        ts1 = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP', label='ts1')
+        ts2 = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP', label='ts2')
+        ts3 = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP', label='ts3')
+        ms = pyleo.MultipleSeries([ts1, ts2, ts3])
+        result = ms.sel(time=time, tolerance=tolerance)
+        expected = pyleo.Series(time=expected_time, value=expected_value, time_unit='years BP')
+        for item in result.series_list:
+            values_match, _ = item.equals(expected)
+            assert values_match
+    
+    def test_invalid(self):
+        ts1 = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP', label='ts1')
+        ts2 = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP', label='ts2')
+        ts3 = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP', label='ts3')
+        ms = pyleo.MultipleSeries([ts1, ts2, ts3])
+        with pytest.raises(TypeError, match="Cannot pass both `value` and `time`"):
+            ms.sel(time=1, value=1)
+
+    
