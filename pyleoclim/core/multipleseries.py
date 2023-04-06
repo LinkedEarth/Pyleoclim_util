@@ -2279,13 +2279,26 @@ class MultipleSeries:
             Pass True if you want to use ``common_time`` to align the Series
             to have common times. Else, times for which some Series doesn't
             have values will be filled with NaN (default).
+            
+        Examples
+        --------
+
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
+            ms.to_csv(label='enso')
 
         Returns
         -------
         None.
 
         '''
-        filename = label.replace(" ", "_") + '.csv' if label is not None else 'MultipleSeries.csv' 
+        filename = label.split('.')[0].replace(" ", "_") + '.csv' if label is not None else 'MultipleSeries.csv' 
         self.to_pandas(*args, use_common_time=False,  **kwargs).to_csv(path+'/'+filename, header = True)
 
 
