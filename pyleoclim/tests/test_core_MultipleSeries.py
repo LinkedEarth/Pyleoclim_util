@@ -535,16 +535,20 @@ class TestToPandas:
         )
         expected = pd.DataFrame({'foo': [7, 4, np.nan, 9], 'bar': [7, np.nan, 8, 1]}, index=expected_index)
         pd.testing.assert_frame_equal(result, expected)
-    
-    def test_to_pandas_args_kwargs(self):
+        
+    @pytest.mark.parametrize('paleo_style',[True,False])
+    def test_to_pandas_args_kwargs(self, paleo_style):
         ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo',verbose=False)
         ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar',verbose=False)
         ms = pyleo.MultipleSeries([ts1, ts2])
-        result = ms.to_pandas('bin', use_common_time=True, start=2)
-        expected_index = pd.DatetimeIndex(
-            np.array(['0002-12-31 17:26:17'], dtype='datetime64[s]'),
-            name='datetime',
-        )
+        result = ms.to_pandas(paleo_style=paleo_style,method='bin', use_common_time=True, start=2)
+        if paleo_style:
+            expected_index = pd.Index([3.0], dtype='float64', name='time')
+        else:
+            expected_index = pd.DatetimeIndex(
+                np.array(['0002-12-31 17:26:17'], dtype='datetime64[s]'),
+                name='datetime',
+            )
         expected = pd.DataFrame({'foo': [6.5], 'bar': [4.5]}, index=expected_index)
         pd.testing.assert_frame_equal(result, expected)
 

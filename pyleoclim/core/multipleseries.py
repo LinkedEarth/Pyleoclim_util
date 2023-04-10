@@ -4,7 +4,7 @@ list) of multiple Series objects. This is handy in case you want to apply the sa
 to such a collection at once (e.g. process a bunch of series in a consistent fashion).
 """
 
-from ..utils import tsutils, plotting
+from ..utils import tsutils, plotting, jsonutils
 from ..utils import correlation as corrutils
 
 from ..core.correns import CorrEns
@@ -56,17 +56,13 @@ class MultipleSeries:
         :okwarning:
         :okexcept:
 
-        import pyleoclim as pyleo
-        import pandas as pd
-        data = pd.read_csv(
-            'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-            skiprows=0, header=1
-        )
-        time = data.iloc[:,1]
-        value = data.iloc[:,2]
-        ts1 = pyleo.Series(time=time, value=value, time_unit='years')
-        ts2 = pyleo.Series(time=time, value=value, time_unit='years')
-        ms = pyleo.MultipleSeries([ts1, ts2], name = 'SOI x2')
+        import pyleoclim as pyleo        
+        soi = pyleo.utils.load_dataset('SOI')
+        nino = pyleo.utils.load_dataset('NINO3')
+        ms = soi & nino
+        ms.name = 'ENSO'
+        ms
+                
     '''
     def __init__(self, series_list, time_unit=None, name=None):
         self.series_list = series_list
@@ -80,6 +76,32 @@ class MultipleSeries:
                 new_ts_list.append(new_ts)
 
             self.series_list = new_ts_list
+            
+    def __repr__(self):
+        return repr(self.to_pandas()) 
+    
+    def view(self):
+        '''
+        Generates a DataFrame version of the MultipleSeries object, suitable for viewing in a Jupyter Notebook
+
+        Returns
+        -------
+        pd.DataFrame
+        
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo        
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
+            ms.name = 'ENSO'
+            ms.view()
+        '''
+        return self.to_pandas(paleo_style=True)
     
     def remove(self, label):
         """
@@ -2234,16 +2256,18 @@ class MultipleSeries:
             mpl.rcParams.update(current_style)
             return ax
 
-    def to_pandas(self, *args, use_common_time=False, **kwargs):
+    def to_pandas(self, paleo_style=False, *args, use_common_time=False, **kwargs):
         """
         Align Series and place in DataFrame.
 
-        Column names will be taken from each Series' label. The index will be
-        construted by first using ``common_time`` to align all Series to have
-        the same index.
+        Column names will be taken from each Series' label. 
 
         Parameters
         ----------
+        paleo_style : boolean, optional
+            If True, will format datetime as the common time vector and assign as 
+            index name the time_name of the first series in the object. 
+            
         *args, **kwargs
             Arguments and keyword arguments to pass to ``common_time``.
         use_common_time, bool
@@ -2258,9 +2282,12 @@ class MultipleSeries:
         if use_common_time:
             ms = self.common_time(*args, **kwargs)
         else:
-            ms = self
-        return pd.DataFrame({ser.metadata['label']: ser.to_pandas() for ser in ms.series_list})
-    
+            ms = self 
+        df = pd.DataFrame({ser.metadata['label']: ser.to_pandas(paleo_style=paleo_style) for ser in ms.series_list})
+        if paleo_style:
+            tl = ms.series_list[0].time_name
+            df.index.name = tl if tl is not None else 'time' 
+        return df
     
     def sel(self, value=None, time=None, tolerance=0):
         '''
@@ -2311,6 +2338,47 @@ class MultipleSeries:
         ms_new.series_list=new_list
         
         return ms_new
+    
+    
+    def to_json(self, path=None):
+        '''
+        Export the pyleoclim.MultipleSeries object to a json file
+
+        Parameters
+        ----------
+        path : string, optional
+            The path to the file. The default is None, resulting in a file saved in the current working directory using the label for the dataset as filename if available or 'mulitpleseries.json' if label is not provided.
+
+        Returns
+        -------
+        None.
+
+        '''
         
+        if path is None:        
+            path = self.series_list[0].label.replace(" ", "_") + '.json' if self.series_list[0].label is not None else 'multipleseries.json' 
         
+        jsonutils.PyleoObj_to_json(self, path)
+    
+    @classmethod    
+    def from_json(cls, path):
+        ''' Creates a pyleoclim.MulitpleSeries from a JSON file
         
+        The keys in the JSON file must correspond to the parameter associated with MulitpleSeries and Series objects
+
+        Parameters
+        ----------
+        path : str
+            Path to the JSON file
+
+        Returns
+        -------
+        ts : pyleoclim.core.series.MulitplesSeries
+            A Pyleoclim MultipleSeries object. 
+
+        '''
+        
+        a = jsonutils.open_json(path)
+        b = jsonutils.iterate_through_dict(a, 'MultipleSeries')
+        
+        return cls(**b)
