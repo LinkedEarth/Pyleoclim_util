@@ -2262,7 +2262,7 @@ class MultipleSeries:
             
         return pd.DataFrame({ser.metadata['label']: ser.to_pandas() for ser in ms.series_list})
     
-    def to_csv(self, label=None, path = '.', *args, use_common_time=False,  **kwargs):
+    def to_csv(self, label=None, path = None, *args, use_common_time=False,  **kwargs):
         '''
         Export MultipleSeries to CSV
 
@@ -2298,8 +2298,10 @@ class MultipleSeries:
         None.
 
         '''
-        filename = label.split('.')[0].replace(" ", "_") + '.csv' if label is not None else 'MultipleSeries.csv' 
-        self.to_pandas(*args, use_common_time=False,  **kwargs).to_csv(path+'/'+filename, header = True)
+        if path is None:  
+            path = label.split('.')[0].replace(" ", "_") + '.csv' if label is not None else 'MultipleSeries.csv' 
+            
+        self.to_pandas(*args, use_common_time=False,  **kwargs).to_csv(path, header = True)
 
 
 
