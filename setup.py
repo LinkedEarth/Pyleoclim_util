@@ -1,6 +1,6 @@
 import os
-import sys
-import io
+#import sys
+#import io
 
 from setuptools import setup, find_packages
 
@@ -29,7 +29,7 @@ setup(
     classifiers=[],
     install_requires=[
         "LiPD==0.2.8.8",
-        "pandas>=1.9.0",
+        "pandas>=2.0.0",
         "numpy<=1.24.0",
         "matplotlib>=3.6.0",
         "scipy>=1.9.1",
@@ -48,5 +48,5 @@ setup(
         "kneed>=0.7.0",
         "pyyaml",
     ],
-    python_requires=">=3.10.0"
+    python_requires=">=3.9.0"
 )

@@ -6,7 +6,7 @@ channels:
   - conda-forge
   - default
 dependencies:
-  - python>=3.8
+  - python>=3.9
   - cartopy
   - matplotlib
   - nitime
@@ -27,5 +27,4 @@ dependencies:
   - pip:
     - pyhht
     - '-e .'
-    - "--pre --extra-index https://pypi.anaconda.org/scipy-wheels-nightly/simple"
-    - pandas>=1.9
+    - pandas>=2.0
