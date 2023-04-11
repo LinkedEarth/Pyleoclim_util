@@ -26,4 +26,5 @@ dependencies:
   - wget
   - pip:
     - pyhht
+    - '-e .'
     - pandas>=2.0
