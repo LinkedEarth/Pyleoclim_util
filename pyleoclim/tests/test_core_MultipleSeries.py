@@ -505,6 +505,7 @@ class TestToCSV:
         nino = pyleo.utils.load_dataset('NINO3')
         ms = soi & nino
         ms.to_csv()
+        os.unlink('MultipleSeries.csv')
     def test_to_csv_label(self):
         soi = pyleo.utils.load_dataset('SOI')
         nino = pyleo.utils.load_dataset('NINO3')
