@@ -1,6 +1,4 @@
 import os
-#import sys
-#import io
 
 from setuptools import setup, find_packages
 
@@ -14,6 +12,8 @@ setup(
     name='pyleoclim',
     packages=find_packages(),
     include_package_data=True,
+    package_data={'': ['data/*.csv','data/metadata.yml']},
+    package_dir={"": "pyleoclim"},
     zip_safe=False,
     version=version,
     license='GPL-3.0 License',

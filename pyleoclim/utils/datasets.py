@@ -7,7 +7,7 @@ import yaml
 import pandas as pd
 from ..utils import jsonutils
 
-DATA_DIR = Path(__file__).parents[2].joinpath("example_data").resolve()
+DATA_DIR = Path(__file__).parents[1].joinpath("data").resolve()
 METADATA_PATH = DATA_DIR.joinpath('metadata.yml')
 
 
