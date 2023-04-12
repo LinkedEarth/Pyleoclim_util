@@ -4,7 +4,6 @@
 [![license](https://img.shields.io/github/license/linkedearth/Pyleoclim_util.svg)]()
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6999279.svg)](https://doi.org/10.5281/zenodo.6999279)
 [![NSF-1541029](https://img.shields.io/badge/NSF-1541029-blue.svg)](https://nsf.gov/awardsearch/showAward?AWD_ID=1541029)
-[![Build Status](https://travis-ci.org/LinkedEarth/Pyleoclim_util.svg?branch=master)](https://travis-ci.org/LinkedEarth/Pyleoclim_util)
 
 ![](https://github.com/LinkedEarth/Logos/raw/master/pyleoclim_logo_full_white.png)
 
@@ -27,17 +26,15 @@ See our [releases page](https://github.com/LinkedEarth/Pyleoclim_util/releases) 
 
 ### Documentation
 
-Online documentation is available through readthedocs:
-- [Stable version](https://pyleoclim-util.readthedocs.io/en/master/) (available through Pypi)
-- [Latest version](https://pyleoclim-util.readthedocs.io/en/latest/) (from the development branch)
+Online documentation is available through [readthedocs](https://pyleoclim-util.readthedocs.io/en/latest/).
 
 ### Dependencies
 
-pyleoclim **only** supports Python 3.8, 3.9
+pyleoclim **only** supports Python 3.9, 3.10
 
 ### Installation
 
-The latest stable release is available through Pypi. We recommend using Anaconda or Miniconda with a dedicated environment. Full installation instructions are available in the [package documentation](https://pyleoclim-util.readthedocs.io/en/master/installation.html)
+The latest stable release is available through Pypi. We recommend using Anaconda or Miniconda with a dedicated environment. Full installation instructions are available in the [package documentation](https://pyleoclim-util.readthedocs.io/en/latest/installation.html)
 
 ## Citation
 If you use our code in any way, please consider adding these citations to your publications: 
