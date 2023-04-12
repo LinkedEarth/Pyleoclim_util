@@ -30,7 +30,7 @@ import json
 # For some of the testing importa JSON file with a dictionary of possible LiDPs
 
 def importLiPD():
-    url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/lipds.json'
+    url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/lipds.json'
     response = urlopen(url)
     d = json.loads(response.read())
     return d

@@ -23,13 +23,13 @@ from urllib.request import urlopen
 import json
 
 def importLiPD():
-    url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/lipds.json'
+    url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/lipds.json'
     response = urlopen(url)
     d = json.loads(response.read())
     return d
 
 def importEnsLiPD():
-    url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/crystalcave_ens.json'
+    url = 'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/crystalcave_ens.json'
     response = urlopen(url)
     d = json.loads(response.read())
     return d
