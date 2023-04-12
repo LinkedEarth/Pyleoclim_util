@@ -475,10 +475,10 @@ def gkernel(t,y, h = 3.0, step=None,start=None,stop=None, step_style = None, eve
             d      = xslice-time_axis[i]
             weight = kernel(d,h)
             yc[i]  = sum(weight*yslice)
+            yc    /= sum(weight) # normalize by the sum of weights
         else:
             yc[i] = np.nan
 
-        yc /= sum(weight) # normalize by the sum of weights
     return time_axis, yc
 
 
