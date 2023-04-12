@@ -1,24 +1,30 @@
-# This environment is used for JupyterHub
-
+# Development environment. This environment includes all the required 
+# packages for this repo including running the test suite.
 name: pyleo
 channels:
+  - LinkedEarth 
   - conda-forge
-  - defaults
+  - default
 dependencies:
-  - cartopy=0.21.0
-  - jupyter
-  - xarray=2022.6.0
-  - netCDF4=1.5.8
-  - Bottleneck=1.3.4
-  - dask=2022.8.0
-  - climlab=0.7.13
-  - numpy=1.22.0
+  - python>=3.9
+  - cartopy
+  - matplotlib
+  - nitime
+  - numba
+  - numpy
+  - pathos
   - pip
-  - python=3.10
-  - libstdcxx-ng=12.1.0
   - pytest
-  - kneed=0.7.0
+  - pyyaml
+  - requests
+  - scikit-learn
+  - scipy
+  - seaborn
+  - statsmodels
+  - tabulate
+  - tqdm
+  - wget
   - pip:
-    - git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
-    - "--pre --extra-index https://pypi.anaconda.org/scipy-wheels-nightly/simple"
-    - pandas>=1.9
+    - pyhht
+    - '-e .'
+    - pandas>=2.0
