@@ -26,8 +26,6 @@ def metadata():
         'value_unit': 'mb',
         'value_name': 'SOI',
         'label': 'Southern Oscillation Index',
-        'lat': None,
-        'lon': None,
         'archiveType': 'Instrumental',
         'importedFrom': None,
         'log': (

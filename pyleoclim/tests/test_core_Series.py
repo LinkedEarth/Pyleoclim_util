@@ -1169,8 +1169,6 @@ class TestResample:
             'value_unit': 'mb',
             'value_name': 'SOI',
             'label': f'Southern Oscillation Index ({rule} resampling)',
-            'lat': None,
-            'lon': None,
             'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (
@@ -1213,8 +1211,6 @@ class TestResample:
             'value_unit': 'mb',
             'value_name': 'SOI',
             'label': f'Southern Oscillation Index ({rule} resampling)',
-            'lat': None,
-            'lon': None,
             'archiveType': 'Instrumental',
             'importedFrom': None,
             'log': (

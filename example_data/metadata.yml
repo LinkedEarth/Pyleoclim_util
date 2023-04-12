@@ -87,8 +87,6 @@ AACO2:
     value_name: '$CO_2$' 
     value_unit: 'ppm'
     archiveType: 'Glacier Ice'
-    lat: -75.1011
-    lon: 123.3478
     importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/antarctica2015co2composite.txt'
   time_column: Age [kyr BP]
   value_column: $CO_2$ [ppm]
@@ -105,8 +103,6 @@ EDC-dD:
     value_name: '$\delta \mathrm{D}$' 
     value_unit: '‰'
     archiveType: 'Glacier Ice'
-    lat: -75.1011
-    lon: 123.3478
     importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/epica_domec/edc3deuttemp2007.txt'
   time_column: Age
   value_column: Deuterium    
@@ -122,8 +118,6 @@ GISP2:
     value_unit: '‰'
     value_name: '$\delta^{18} \mathrm{O}$'
     label: 'GISP2'
-    lat: 72.6
-    lon: -38.5
     archiveType: 'Glacier Ice'
     importedFrom: 'https://www.ncei.noaa.gov/access/paleo-search/study/17796' 
   time_column: Age [yr BP]

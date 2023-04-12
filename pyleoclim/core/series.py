@@ -100,12 +100,6 @@ class Series:
         
     keep_log : bool
         Whether to keep a log of applied transformations. False by default
-        
-    lat : float
-        latitude N in decimal degrees.
-        
-    lon : float
-        longitude East in decimal degrees. Negative values will be converted to an angle in [0 , 360)
                                                                                              
     importedFrom : string
         source of the dataset. If it came from a LiPD file, this could be the datasetID property 
@@ -139,7 +133,7 @@ class Series:
     '''
 
     def __init__(self, time, value, time_unit=None, time_name=None, 
-                 value_name=None, value_unit=None, label=None, lat=None, lon=None, 
+                 value_name=None, value_unit=None, label=None, 
                  importedFrom=None, archiveType = None, log=None, keep_log=False,
                  sort_ts = 'ascending', dropna = True, verbose=True, clean_ts=False):
         
@@ -229,28 +223,6 @@ class Series:
         self.dropna = dropna
         self.sort_ts = sort_ts
         self.clean_ts = clean_ts
-        # assign latitude
-        if lat is not None:
-            lat = float(lat) 
-            if -90 <= lat <= 90: 
-                self.lat = lat
-            else:
-                ValueError('Latitude must be a number in [-90; 90]')
-        else:
-            self.lat = None # assign a default value to prevent bugs ?
-            
-        # assign longitude
-        if lon is not None:
-            lon = float(lon)
-            if 0 <= lon < 360:     
-                self.lon = lon
-            elif -180 <= lon < 0:
-                self.lon = 360 - lon
-            else:
-                ValueError('Longitude must be a number in [-180,360]')
-        else:
-            self.lon = None # assign a default value to prevent bugs ?
-            
         self.importedFrom = importedFrom
         self.archiveType = archiveType  #TODO: implement a check on allowable values (take from LipdVerse + 'model' + 'instrumental')
     
@@ -313,8 +285,6 @@ class Series:
             value_unit = self.value_unit,
             value_name = self.value_name,
             label = self.label,
-            lat = self.lat,
-            lon = self.lon,
             archiveType = self.archiveType,
             importedFrom = self.importedFrom,
             log = self.log,
@@ -4167,182 +4137,6 @@ class Series:
                 new.log=()
             new.log += ({len(new.log):'bin', 'args': kwargs},)
         return new
-
-    def map(self, projection='Orthographic', proj_default=True,
-            background=True, borders=False, rivers=False, lakes=False,
-            figsize=None, ax=None, marker=None, color=None,
-            markersize=None, scatter_kwargs=None,
-            legend=True, lgd_kwargs=None, savefig_settings=None):
-        '''Map the location of the record
-
-        Parameters
-        ----------
-        projection : str, optional
-
-            The projection to use. The default is 'Robinson'.
-
-        proj_default : bool; {True, False}, optional
-
-            Whether to use the Pyleoclim defaults for each projection type. The default is True.
-
-        background :  bool; {True, False}, optional
-
-            Whether to use a background. The default is True.
-
-        borders :  bool; {True, False}, optional
-
-            Draw borders. The default is False.
-
-        rivers :  bool; {True, False}, optional
-
-            Draw rivers. The default is False.
-
-        lakes :  bool; {True, False}, optional
-
-            Draw lakes. The default is False.
-
-        figsize : list or tuple, optional
-
-            The size of the figure. The default is None.
-
-        ax : matplotlib.ax, optional
-
-            The matplotlib axis onto which to return the map. The default is None.
-
-        marker : str, optional
-
-            The marker type for each archive. The default is None. Uses plot_default
-
-        color : str, optional
-
-            Color for each archive. The default is None. Uses plot_default
-
-        markersize : float, optional
-
-            Size of the marker. The default is None.
-
-        scatter_kwargs : dict, optional
-
-            Parameters for the scatter plot. The default is None.
-
-        legend :  bool; {True, False}, optional
-
-            Whether to plot the legend. The default is True.
-
-        lgd_kwargs : dict, optional
-
-            Arguments for the legend. The default is None.
-
-        savefig_settings : dict, optional
-
-            the dictionary of arguments for plt.savefig(); some notes below:
-            - "path" must be specified; it can be any existed or non-existed path,
-              with or without a suffix; if the suffix is not given in "path", it will follow "format"
-            - "format" can be one of {"pdf", "eps", "png", "ps"}. The default is None.
-
-        Returns
-        -------
-
-        res : fig,ax
-
-        See also
-        --------
-
-        pyleoclim.utils.mapping.map : Underlying mapping function for Pyleoclim
-
-        Examples
-        --------
-
-        .. ipython:: python
-            :okwarning:
-            :okexcept:
-
-            import pyleoclim as pyleo
-            url = 'http://wiki.linked.earth/wiki/index.php/Special:WTLiPD?op=export&lipdid=MD982176.Stott.2004'
-            data = pyleo.Lipd(usr_path = url)
-            ts = data.to_LipdSeries(number=5)
-            @savefig mapone.png
-            fig, ax = ts.map()
-            pyleo.closefig(fig)
-
-        '''
-        scatter_kwargs = {} if scatter_kwargs is None else scatter_kwargs.copy()
-        # get the information from the timeseries
-
-        if self.lat is None or self.lon is None:
-            raise ValueError('Latitude and longitude should be provided for mapping')
-        else:
-            lat = [self.lat]
-            lon = [self.lon]
-
-        if self.archiveType is None:
-            archiveType = 'other'
-        else:
-            archiveType = lipdutils.LipdToOntology(self.archiveType).lower().replace(" ", "")
-
-        if markersize is not None:
-            scatter_kwargs.update({'s': markersize})
-
-        plot_default = plotting.set_archive_color(archiveType)
-
-        if marker == None:
-            marker = plot_default[1]
-
-        if color == None:
-            color = plot_default[0]
-
-        if proj_default == True:
-            proj1 = {'central_latitude': lat[0],
-                     'central_longitude': lon[0]}
-            proj2 = {'central_latitude': lat[0]}
-            proj3 = {'central_longitude': lon[0]}
-
-        archiveType = [archiveType]  # list so it will work with map
-        marker = [marker]
-        color = [color]
-
-        if proj_default == True:
-
-            try:
-                res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-                                  marker=marker, color=color,
-                                  projection=projection, proj_default=proj1,
-                                  background=background, borders=borders,
-                                  rivers=rivers, lakes=lakes,
-                                  figsize=figsize, ax=ax,
-                                  scatter_kwargs=scatter_kwargs, legend=legend,
-                                  lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings, )
-
-            except:
-                try:
-                    res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-                                      marker=marker, color=color,
-                                      projection=projection, proj_default=proj3,
-                                      background=background, borders=borders,
-                                      rivers=rivers, lakes=lakes,
-                                      figsize=figsize, ax=ax,
-                                      scatter_kwargs=scatter_kwargs, legend=legend,
-                                      lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-                except:
-                    res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-                                      marker=marker, color=color,
-                                      projection=projection, proj_default=proj2,
-                                      background=background, borders=borders,
-                                      rivers=rivers, lakes=lakes,
-                                      figsize=figsize, ax=ax,
-                                      scatter_kwargs=scatter_kwargs, legend=legend,
-                                      lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-
-        else:
-            res = mapping.map(lat=lat, lon=lon, criteria=archiveType,
-                              marker=marker, color=color,
-                              projection=projection, proj_default=proj_default,
-                              background=background, borders=borders,
-                              rivers=rivers, lakes=lakes,
-                              figsize=figsize, ax=ax,
-                              scatter_kwargs=scatter_kwargs, legend=legend,
-                              lgd_kwargs=lgd_kwargs, savefig_settings=savefig_settings)
-        return res
 
     def resample(self, rule, keep_log = False, **kwargs):
         """
