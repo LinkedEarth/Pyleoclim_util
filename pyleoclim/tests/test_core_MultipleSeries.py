@@ -509,13 +509,15 @@ class TestToCSV:
         soi = pyleo.utils.load_dataset('SOI')
         nino = pyleo.utils.load_dataset('NINO3')
         ms = soi & nino
-        ms.to_csv(label='enso')
-        os.unlink('enso.csv') # this check that the file does exist
-    def test_to_csv_label_ext(self):
+        ms.label='enso series'
+        ms.to_csv()
+        os.unlink('enso_series.csv') # this check that the file does exist
+    def test_to_csv_label_path(self):
         soi = pyleo.utils.load_dataset('SOI')
         nino = pyleo.utils.load_dataset('NINO3')
         ms = soi & nino
-        ms.to_csv(label='enso.csv')
+        ms.label='enso wah wah'
+        ms.to_csv(path='./enso.csv')
         os.unlink('enso.csv') # this check that the file does exist
         
 class TestRemove:

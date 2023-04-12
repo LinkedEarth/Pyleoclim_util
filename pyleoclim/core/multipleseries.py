@@ -2303,16 +2303,13 @@ class MultipleSeries:
 
         Parameters
         ----------
-        label : str
-            a distinctinve name for the collection of series, which will be used to create the filename as '{label}.csv'
-            The default is None, in which case the filename defaults to the poetic 'MultipleSeries.csv' 
         path : str, optional
-            system path to save the file. Default is '.'
+            system path to save the file. The default is None, in which case the filename defaults to the poetic 'MultipleSeries.csv' in the current directory.
         *args, **kwargs
             Arguments and keyword arguments to pass to ``common_time``.
         use_common_time, bool
-            Pass True if you want to use ``common_time`` to align the Series
-            to have common times. Else, times for which some Series doesn't
+            Set to True if you want to use ``common_time`` to align the Series
+            to a common timescale. Else, times for which some Series don't
             have values will be filled with NaN (default).
         Returns
         -------
@@ -2320,7 +2317,7 @@ class MultipleSeries:
     
         Examples
         --------
-
+        This will place the NINO3 and SOI datasets into a MultipleSeries object and export it to enso.csv.
         .. ipython:: python
             :okwarning:
             :okexcept:
@@ -2329,12 +2326,15 @@ class MultipleSeries:
             soi = pyleo.utils.load_dataset('SOI')
             nino = pyleo.utils.load_dataset('NINO3')
             ms = soi & nino
-            ms.to_csv(label='enso')     
+            ms.label = 'enso'
+            ms.to_csv()      
         '''
         if path is None:  
-            path = label.split('.')[0].replace(" ", "_") + '.csv' if self.label is not None else 'MultipleSeries.csv' 
+            path = self.label.split('.')[0].replace(" ", "_") + '.csv' if self.label is not None else 'MultipleSeries.csv' 
             
-        self.to_pandas(*args, use_common_time=False,  **kwargs).to_csv(path, header = True)
+        self.to_pandas(paleo_style=True, *args,
+                       use_common_time=use_common_time,
+                       **kwargs).to_csv(path, header = True)
     
     def sel(self, value=None, time=None, tolerance=0):
         '''
