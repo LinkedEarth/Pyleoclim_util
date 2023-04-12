@@ -64,10 +64,14 @@ class MultipleSeries:
         ms
                 
     '''
-    def __init__(self, series_list, time_unit=None, name=None):
+    def __init__(self, series_list, time_unit=None, label=None, name=None):
         self.series_list = series_list
         self.time_unit = time_unit
+        self.label = label
         self.name = name
+        if name is not None:
+            warnings.warn("`name` is a deprecated property, which will be removed in future releases, Please use `label` instead",
+                          DeprecationWarning, stacklevel=2)
 
         if self.time_unit is not None:
             new_ts_list = []
@@ -1712,6 +1716,9 @@ class MultipleSeries:
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
+            
+        if title is None and self.label is not None:
+            ax.set_title(self.label, fontweight='bold')
 
         if ylabel is None:
             consistent_ylabels = True
@@ -1952,7 +1959,7 @@ class MultipleSeries:
 
 
         fig = plt.figure(figsize=figsize)
-
+        
         if xlim is None:
             time_min = np.inf
             time_max = -np.inf
@@ -2282,12 +2289,52 @@ class MultipleSeries:
         if use_common_time:
             ms = self.common_time(*args, **kwargs)
         else:
-            ms = self 
+            ms = self
+        
         df = pd.DataFrame({ser.metadata['label']: ser.to_pandas(paleo_style=paleo_style) for ser in ms.series_list})
         if paleo_style:
             tl = ms.series_list[0].time_name
             df.index.name = tl if tl is not None else 'time' 
         return df
+        
+    def to_csv(self, path = None, *args, use_common_time=False,  **kwargs):
+        '''
+        Export MultipleSeries to CSV
+
+        Parameters
+        ----------
+        path : str, optional
+            system path to save the file. The default is None, in which case the filename defaults to the poetic 'MultipleSeries.csv' in the current directory.
+        *args, **kwargs
+            Arguments and keyword arguments to pass to ``common_time``.
+        use_common_time, bool
+            Set to True if you want to use ``common_time`` to align the Series
+            to a common timescale. Else, times for which some Series don't
+            have values will be filled with NaN (default).
+        Returns
+        -------
+        None.
+    
+        Examples
+        --------
+        This will place the NINO3 and SOI datasets into a MultipleSeries object and export it to enso.csv.
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
+            ms.label = 'enso'
+            ms.to_csv()      
+        '''
+        if path is None:  
+            path = self.label.split('.')[0].replace(" ", "_") + '.csv' if self.label is not None else 'MultipleSeries.csv' 
+            
+        self.to_pandas(paleo_style=True, *args,
+                       use_common_time=use_common_time,
+                       **kwargs).to_csv(path, header = True)
     
     def sel(self, value=None, time=None, tolerance=0):
         '''
@@ -2352,7 +2399,7 @@ class MultipleSeries:
         Returns
         -------
         None.
-
+        
         '''
         
         if path is None:        

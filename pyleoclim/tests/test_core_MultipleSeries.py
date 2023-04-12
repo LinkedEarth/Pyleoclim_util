@@ -15,6 +15,7 @@ Notes on how to test:
 import datetime as dt
 import numpy as np
 import pandas as pd
+import os
 
 from numpy.testing import assert_array_equal, assert_allclose
 from pandas.testing import assert_frame_equal
@@ -496,8 +497,28 @@ class TestMultipleSeriesSpectral():
             d18Osw = d18Osw.interp()
         ms = pyleo.MultipleSeries([sst,d18Osw])
         scals = ms.wavelet(method=spec_method)
-        psds = ms.spectral(method=spec_method,scalogram_list=scals)
-        
+        ms.spectral(method=spec_method,scalogram_list=scals)
+ 
+class TestToCSV:
+    def test_to_csv_default(self):
+        soi = pyleo.utils.load_dataset('SOI')
+        nino = pyleo.utils.load_dataset('NINO3')
+        ms = soi & nino
+        ms.to_csv()
+    def test_to_csv_label(self):
+        soi = pyleo.utils.load_dataset('SOI')
+        nino = pyleo.utils.load_dataset('NINO3')
+        ms = soi & nino
+        ms.label='enso series'
+        ms.to_csv()
+        os.unlink('enso_series.csv') # this check that the file does exist
+    def test_to_csv_label_path(self):
+        soi = pyleo.utils.load_dataset('SOI')
+        nino = pyleo.utils.load_dataset('NINO3')
+        ms = soi & nino
+        ms.label='enso wah wah'
+        ms.to_csv(path='./enso.csv')
+        os.unlink('enso.csv') # this check that the file does exist
         
 class TestRemove:
     def test_remove(self):

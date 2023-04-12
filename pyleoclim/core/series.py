@@ -357,7 +357,7 @@ class Series:
             ser = ser.set_axis(self.time).rename(value_label).rename_axis(time_label)
         return ser
     
-    def to_csv(self, metadata_header=True, path = '.'):
+    def to_csv(self, metadata_header=True, path = None):
         '''
         Export Series to csv
 
@@ -387,12 +387,13 @@ class Series:
         
 
         '''
-        filename = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
+        if path is None:
+            path = self.label.replace(" ", "_") + '.csv' if self.label is not None else 'series.csv' 
         ser = self.to_pandas(paleo_style=True)
         
         # export metadata
         if metadata_header:
-            with open(path+'/'+filename, 'w', newline='')  as file:       
+            with open(path, 'w', newline='')  as file:       
                 hd_writer = csv.writer(file)
                 hd_writer.writerow(["###", "Series metadata"])
                 hd_writer.writerow(["written by", "Pyleoclim " + version('Pyleoclim')])
@@ -400,11 +401,11 @@ class Series:
                 hd_writer.writerow(["###", "end metadata"])
                 #file.close()
             # export Series object to CSV
-            ser.to_csv(path+'/'+filename, mode = 'a', header = True)
+            ser.to_csv(path, mode = 'a', header = True)
         else:
             # export Series object to CSV
-            ser.to_csv(path+'/'+filename, header = True)
-        print('Series exported to ' + path+'/'+filename)
+            ser.to_csv(path, header = True)
+        print('Series exported to ' + path)
     
     @classmethod    
     def from_csv(cls, filename, path = '.'):
