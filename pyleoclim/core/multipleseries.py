@@ -64,10 +64,14 @@ class MultipleSeries:
         ms
                 
     '''
-    def __init__(self, series_list, time_unit=None, name=None):
+    def __init__(self, series_list, time_unit=None, label=None, name=None):
         self.series_list = series_list
         self.time_unit = time_unit
+        self.label = label
         self.name = name
+        if name is not None:
+            warnings.warn("`name` is a deprecated property, which will be removed in future releases, Please use `label` instead",
+                          DeprecationWarning, stacklevel=2)
 
         if self.time_unit is not None:
             new_ts_list = []
@@ -1712,6 +1716,9 @@ class MultipleSeries:
 
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
+            
+        if title is None and self.label is not None:
+            ax.set_title(self.label, fontweight='bold')
 
         if ylabel is None:
             consistent_ylabels = True
@@ -1952,7 +1959,7 @@ class MultipleSeries:
 
 
         fig = plt.figure(figsize=figsize)
-
+        
         if xlim is None:
             time_min = np.inf
             time_max = -np.inf
@@ -2290,7 +2297,7 @@ class MultipleSeries:
             df.index.name = tl if tl is not None else 'time' 
         return df
         
-    def to_csv(self, label=None, path = None, *args, use_common_time=False,  **kwargs):
+    def to_csv(self, path = None, *args, use_common_time=False,  **kwargs):
         '''
         Export MultipleSeries to CSV
 
@@ -2325,7 +2332,7 @@ class MultipleSeries:
             ms.to_csv(label='enso')     
         '''
         if path is None:  
-            path = label.split('.')[0].replace(" ", "_") + '.csv' if label is not None else 'MultipleSeries.csv' 
+            path = label.split('.')[0].replace(" ", "_") + '.csv' if self.label is not None else 'MultipleSeries.csv' 
             
         self.to_pandas(*args, use_common_time=False,  **kwargs).to_csv(path, header = True)
     
