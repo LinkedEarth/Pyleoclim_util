@@ -1,0 +1,134 @@
+SOI:
+  filename: 'soi_data'
+  file_extension: 'csv'
+  pandas_kwargs:
+    skiprows: 0
+    header: 1
+  pyleo_kwargs:
+    time_name: 'time'
+    time_unit: 'year C.E.'
+    value_name: 'SOI'
+    value_unit: 'mb'
+    label: 'Southern Oscillation Index'
+    archiveType: 'Instrumental'
+  time_column: 1
+  value_column: 2
+
+NINO3:
+  filename: 'wtc_test_data_nino_even'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  pyleo_kwargs:
+    time_name: 'time'
+    time_unit: 'year C.E.'
+    label: 'NINO3 SST'
+    value_name: 'NINO3'
+    value_unit: '$^{\circ}$C'
+    archiveType: 'Instrumental'
+  time_column: t
+  value_column: nino
+  
+HadCRUT5:
+  filename: 'HadCRUT.5.0.1.0.analysis.summary_series.global.annual'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  pyleo_kwargs:
+    time_name: 'time'
+    time_unit: 'year C.E.'
+    label: 'HadCRUT5'
+    value_name: 'GMST'
+    value_unit: '$^{\circ}$C'
+    archiveType: 'Instrumental'
+    importedFrom: 'https://www.metoffice.gov.uk/hadobs/hadcrut5/data/current/analysis/diagnostics/HadCRUT.5.0.1.0.analysis.summary_series.global.monthly.csv'
+  time_column: Time
+  value_column: Anomaly (deg C)  
+  
+AIR:
+  filename: 'wtc_test_data_nino_even'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  pyleo_kwargs:
+    time_name: 'time'
+    time_unit: 'year C.E.'
+    label: 'All-India Rainfall'
+    value_name: 'AIR'
+    value_unit: 'mm/month'
+    archiveType: 'Instrumental'
+  time_column: t
+  value_column: air  
+  
+LR04:
+  filename: 'LR04'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 4
+  pyleo_kwargs:
+    time_name: 'Age'
+    time_unit: 'ky BP'
+    label: 'LR04 benthic stack'
+    value_name: '$\delta^{18} \mathrm{O}$' 
+    value_unit: '‰'
+    archiveType: 'Marine Sediment'
+  time_column: Time (ka)
+  value_column: Benthic d18O (per mil)  
+  
+AACO2:
+  filename: 'EPICA_Dome_C_CO2'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 13
+  pyleo_kwargs:
+    time_name: 'Age'
+    time_unit: 'ky BP'
+    label: 'EPICA Dome C CO2'
+    value_name: '$CO_2$' 
+    value_unit: 'ppm'
+    archiveType: 'Glacier Ice'
+    lat: -75.1011
+    lon: 123.3478
+    importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/antarctica2015co2composite.txt'
+  time_column: Age [kyr BP]
+  value_column: $CO_2$ [ppm]
+  
+EDC-dD:
+  filename: 'edc3deuttemp2007'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  pyleo_kwargs:
+    time_name: 'Age'
+    time_unit: 'y BP'
+    label: 'EPICA Dome C deuterium'
+    value_name: '$\delta \mathrm{D}$' 
+    value_unit: '‰'
+    archiveType: 'Glacier Ice'
+    lat: -75.1011
+    lon: 123.3478
+    importedFrom: 'https://www.ncei.noaa.gov/pub/data/paleo/icecore/antarctica/epica_domec/edc3deuttemp2007.txt'
+  time_column: Age
+  value_column: Deuterium    
+
+GISP2:
+  filename: 'GISP2_d18O'
+  file_extension: 'csv'
+  pandas_kwargs:
+    header: 0
+  pyleo_kwargs:
+    time_unit: 'yr BP'
+    time_name: 'Age'
+    value_unit: '‰'
+    value_name: '$\delta^{18} \mathrm{O}$'
+    label: 'GISP2'
+    lat: 72.6
+    lon: -38.5
+    archiveType: 'Glacier Ice'
+    importedFrom: 'https://www.ncei.noaa.gov/access/paleo-search/study/17796' 
+  time_column: Age [yr BP]
+  value_column: d18O [permil]
+
+#nino_json:
+#  filename: 'Nino'
+#  file_extension: 'json'

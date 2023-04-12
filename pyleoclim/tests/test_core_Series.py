@@ -12,6 +12,7 @@ Notes on how to test:
 4. after `pip install pytest-xdist`, one may execute "pytest -n 4" to test in parallel with number of workers specified by `-n`
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 '''
+import datetime as dt
 import numpy as np
 import pandas as pd
 
@@ -20,7 +21,7 @@ from numpy.testing import assert_array_equal
 import pytest
 #import scipy.io as sio
 import sys#, json
-#import os
+import os
 import pathlib
 test_dirpath = pathlib.Path(__file__).parent.absolute()
 
@@ -31,7 +32,6 @@ from pyleoclim.utils.tsmodel import (
     ar1_sim,
     ar1_fit)
 
-
 from statsmodels.tsa.arima_process import arma_generate_sample
 import matplotlib.pyplot as plt
 
@@ -41,7 +41,7 @@ def gen_ts(model='colored_noise',alpha=1, nt=100, f0=None, m=None, seed=None):
     'wrapper for gen_ts in pyleoclim'
 
     t,v = pyleo.utils.gen_ts(model=model,alpha=alpha, nt=nt, f0=f0, m=m, seed=seed)
-    ts=pyleo.Series(t,v)
+    ts=pyleo.Series(t,v, sort_ts='none')
     return ts
 
 def gen_normal(loc=0, scale=1, nt=100):
@@ -62,6 +62,48 @@ def gen_normal(loc=0, scale=1, nt=100):
 
 # Tests below
 
+class TestUISeriesInit:
+     ''' Test for Series instantiation '''
+    
+     def test_init_no_dropna(self, evenly_spaced_series):
+         ts = evenly_spaced_series
+         t = ts.time
+         v = ts.value
+         v[0] = np.nan
+         ts2 = pyleo.Series(time=t,value=v,dropna=False, verbose=False)
+         assert np.isnan(ts2.value[0])
+         
+     def test_init_no_sorting(self, evenly_spaced_series):
+         ts = evenly_spaced_series
+         t = ts.time[::-1]
+         v = ts.value[::-1]
+         ts2 = pyleo.Series(time=t,value=v,sort_ts='Nein', verbose=False)
+         res, _, sign = pyleo.utils.tsbase.resolution(ts2.time) 
+         assert sign == 'negative'  
+         
+     def test_init_clean_ts(self, evenly_spaced_series):
+         ts = evenly_spaced_series
+         t = ts.time[::-1]
+         v = ts.value[::-1]
+         v[0] = np.nan
+         ts2 = pyleo.Series(time=t,value=v, dropna=False, clean_ts=True, verbose=False)
+         res, _, sign = pyleo.utils.tsbase.resolution(ts2.time) 
+         assert np.isnan(ts2.value[-1])
+         
+
+class TestSeriesIO:
+    ''' Test Series import from and export to other formats
+    '''
+    @pytest.mark.parametrize('ds_name',['NINO3','AACO2','LR04'])
+    def test_csv_roundtrip(self, ds_name):
+        ts1 = pyleo.utils.load_dataset(ds_name)
+        ts1.to_csv()
+        filename = ts1.label.replace(" ", "_") + '.csv'
+        ts2 = pyleo.Series.from_csv(filename)
+        assert ts1.equals(ts2)
+        #clean up file
+        os.unlink(filename)
+
 class TestUiSeriesMakeLabels:
     ''' Tests for Series.make_labels()
 
@@ -77,7 +119,7 @@ class TestUiSeriesMakeLabels:
         # call the target function for testing
         time_header, value_header = ts.make_labels()
 
-        assert time_header == 'time'
+        assert time_header == 'time [years]'
         assert value_header == 'value'
 
 
@@ -90,14 +132,14 @@ class TestUiSeriesMakeLabels:
         # define a Series() obj with meta data
         ts1 = pyleo.Series(
             time=ts.time, value=ts.value,
-            time_name='Year (CE)', time_unit='yr',
+            time_name='Time', time_unit='yr CE',
             value_name='Temperature', value_unit='K',
             label='Gaussian Noise', clean_ts=False
         )
 
         time_header, value_header = ts1.make_labels()
 
-        assert time_header == 'Year (CE) [yr]'
+        assert time_header == 'Time [yr CE]'
         assert value_header == 'Temperature [K]'
 
     def test_make_labels_t2(self):
@@ -109,14 +151,14 @@ class TestUiSeriesMakeLabels:
         # define a Series() obj with meta data
         ts1 = pyleo.Series(
             time=ts.time, value=ts.value,
-            time_name='Year (CE)',
+            time_name='time',
             value_name='Temperature', value_unit='K',
             label='Gaussian Noise', clean_ts=False
         )
 
         time_header, value_header = ts1.make_labels()
 
-        assert time_header == 'Year (CE)'
+        assert time_header == 'time [years]'
         assert value_header == 'Temperature [K]'
 
 
@@ -252,7 +294,7 @@ class TestUiSeriesBin:
 
         ts2 = pyleo.Series(time=t_unevenly, value=v_unevenly)
         ts2_bin=ts2.bin(keep_log=True)
-        print(ts2_bin.log[1])
+        print(ts2_bin.log[-1])
 
     def test_bin_t2(self):
         ''' Test the bin function by passing arguments'''
@@ -305,11 +347,10 @@ class TestUiSeriesCenter:
 
         #Call function to be tested
         tsc = ts.center(keep_log=True)
-        print(tsc.log[1])
 
-        assert np.abs(tsc.mean) <= np.sqrt(sys.float_info.epsilon)
+        assert np.abs(tsc.value.mean()) <= np.sqrt(sys.float_info.epsilon)
 
-        assert tsc.mean == tsc.log[1]['previous_mean']
+        #assert ts.value.mean() == tsc.log[1]['previous_mean']
 
 class TestUiSeriesStandardize:
     '''Test for Series.standardize()
@@ -389,6 +430,17 @@ class TestUiSeriesSegment:
         ts_seg = ts.segment()
 
         assert type(ts_seg) == type(ts)
+        
+    def test_segment_t2(self):
+        '''Test that in the case of segmentation, segment returns a Multiple Series object'''
+        t = (1,2,3000)
+        v = (1,2,3)
+
+        ts = pyleo.Series(time = t, value = v, label = 'series')
+
+        ts_seg = ts.segment()
+
+        assert ts_seg.series_list[0].label == 'series segment 1'
 
 class TestUiSeriesSlice:
     '''Test for Series.slice()
@@ -402,6 +454,63 @@ class TestUiSeriesSlice:
 
         assert min(times) == 10
         assert max(times) == 90
+
+class TestSel:
+    @pytest.mark.parametrize(
+        ('value', 'expected_time', 'expected_value', 'tolerance'),
+        [
+            (1, np.array([3]), np.array([1]), 0),
+            (1, np.array([1, 3]), np.array([4, 1]), 3),
+            (slice(1, 4), np.array([1, 3]), np.array([4, 1]), 0),
+            (slice(1, 4), np.array([1, 2, 3]), np.array([4, 6, 1]), 2),
+            (slice(1, None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, 1), np.array([3]), np.array([1]), 0),
+        ]
+    )
+    def test_value(self, value, expected_time, expected_value, tolerance):
+        ts = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP')
+        result = ts.sel(value=value, tolerance=tolerance)
+        expected = pyleo.Series(time=expected_time, value=expected_value, time_unit='years BP')
+        values_match, _ = result.equals(expected)
+        assert values_match
+
+    @pytest.mark.parametrize(
+        ('time', 'expected_time', 'expected_value', 'tolerance'),
+        [
+            (1, np.array([1]), np.array([4]), 0),
+            (1, np.array([1, 2]), np.array([4, 6]), 1),
+            (dt.datetime(1948, 1, 1), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+            ('1948', np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+            (slice(1, 2), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice(1, 2), np.array([1, 2, 3]), np.array([4, 6, 1]), 1),
+            (slice(1, None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, 1), np.array([1]), np.array([4]), 0),
+            (slice('1948', '1949'), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice('1947', None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, '1948'), np.array([3]), np.array([1]), 0),
+            (slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1, 2]), np.array([4, 6]), 0),
+            (slice(dt.datetime(1947, 1, 1), None), np.array([1, 2, 3]), np.array([4, 6, 1]), 0),
+            (slice(None, dt.datetime(1948, 1, 1)), np.array([3]), np.array([1]), 0),
+            (slice(dt.datetime(1948, 1, 1), dt.datetime(1949, 1, 1)), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(dt.datetime(1947, 1, 1), None), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(None, dt.datetime(1948, 1, 1)), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+            (slice('1948', '1949'), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice('1947', None), np.array([1, 2, 3]), np.array([4, 6, 1]), dt.timedelta(days=365)),
+            (slice(None, '1948'), np.array([2, 3]), np.array([6, 1]), dt.timedelta(days=365)),
+        ]
+    )
+    def test_time(self, time, expected_time, expected_value, tolerance):
+        ts = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP')
+        result = ts.sel(time=time, tolerance=tolerance)
+        expected = pyleo.Series(time=expected_time, value=expected_value, time_unit='years BP')
+        values_match, _ = result.equals(expected)
+        assert values_match
+    
+    def test_invalid(self):
+        ts = pyleo.Series(time=np.array([1, 2, 3]), value=np.array([4, 6, 1]), time_unit='years BP')
+        with pytest.raises(TypeError, match="Cannot pass both `value` and `time`"):
+            ts.sel(time=1, value=1)
+
 
 class TestUiSeriesSurrogates:
     ''' Test Series.surrogates()
@@ -628,6 +737,39 @@ class TestUISeriesOutliers:
         ts2 = pyleo.Series(time = ts.time, value = v_out)
         # Remove outliers
         ts_out = ts2.outliers(keep_log=keep_log)
+    
+    def test_outliers_t4(self):
+        #Generate data
+        ts = gen_ts()
+        #Add outliers
+        outliers_start = np.mean(ts.value)+5*np.std(ts.value)
+        outliers_end = np.mean(ts.value)+7*np.std(ts.value)
+        outlier_values = np.arange(outliers_start,outliers_end,0.1)
+        index = np.random.randint(0,len(ts.value),6)
+        v_out = ts.value
+        for i,ind in enumerate(index):
+            v_out[ind] = outlier_values[i]
+        # Get a series object
+        ts2 = pyleo.Series(time = ts.time, value = v_out)
+        # Remove outliers
+        ts_out = ts2.outliers(method = 'kmeans', settings={'nbr_clusters':2, 'threshold':2})
+    
+    def test_outliers_t5(self):
+        #Generate data
+        ts = gen_ts()
+        #Add outliers
+        outliers_start = np.mean(ts.value)+5*np.std(ts.value)
+        outliers_end = np.mean(ts.value)+7*np.std(ts.value)
+        outlier_values = np.arange(outliers_start,outliers_end,0.1)
+        index = np.random.randint(0,len(ts.value),6)
+        v_out = ts.value
+        for i,ind in enumerate(index):
+            v_out[ind] = outlier_values[i]
+        # Get a series object
+        ts2 = pyleo.Series(time = ts.time, value = v_out)
+        # Remove outliers
+        ts_out = ts2.outliers(method = 'DBSCAN', settings={'nbr_clusters':2})
+        
 
 class TestUISeriesGkernel:
     ''' Unit tests for the TestUISeriesGkernel function
@@ -820,32 +962,52 @@ class TestUISeriesSsa():
         '''Test Series.ssa() with var truncation
         '''
         ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
-        res = ts.ssa(trunc='var')
+        ts.ssa(trunc='var')
 
     def test_ssa_t2(self):
         '''Test Series.ssa() with Monte-Carlo truncation
         '''
 
         ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
+        ts.ssa(M=60, nMC=10, trunc='mcssa')
 
-        res = ts.ssa(M=60, nMC=10, trunc='mcssa')
-        fig, ax = res.screeplot()
-        pyleo.closefig(fig)
 
     def test_ssa_t3(self):
         '''Test Series.ssa() with Kaiser truncation
         '''
         ts = gen_ts(model = 'colored_noise', nt=500, alpha=1.0)
-        res = ts.ssa(trunc='kaiser')
-
+        ts.ssa(trunc='kaiser')
+    
     def test_ssa_t4(self):
-        '''Test Series.ssa() on Allen&Smith dataset
+        '''Test Series.ssa() with Knee truncation'''
+        ts = pyleo.utils.load_dataset('SOI')
+        ssa = ts.ssa(trunc='knee')
+        knee = 12
+        assert_array_equal(ssa.mode_idx, np.arange(knee+1))
+
+    def test_ssa_t5(self):
+        '''Test Series.ssa() with missing values
         '''
-        df = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/mratest.txt',delim_whitespace=True,names=['Total','Signal','Noise'])
-        mra = pyleo.Series(time=df.index, value=df['Total'], value_name='Allen&Smith test data', time_name='Time', time_unit='yr')
-        mraSsa = mra.ssa(nMC=10)
-        fig, ax = mraSsa.screeplot()
-        pyleo.closefig(fig)
+        soi = pyleo.utils.load_dataset('SOI')
+        # erase 20% of values
+        n = len(soi.value)
+        missing = np.random.choice(n,np.floor(0.2*n).astype('int'),replace=False)
+        soi_m = soi.copy()
+        soi_m.value[missing] = np.nan  # put NaNs at the randomly chosen locations
+        miss_ssa = soi_m.ssa()
+        assert all(miss_ssa.eigvals >= 0)
+        assert np.square(miss_ssa.RCseries - soi.value).mean() < 0.3
+
+
+
+    # def test_ssa_t5(self):
+    #     '''Test Series.ssa() on Allen&Smith dataset
+    #     '''
+    #     df = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/mratest.txt',delim_whitespace=True,names=['Total','Signal','Noise'])
+    #     mra = pyleo.Series(time=df.index, value=df['Total'], value_name='Allen&Smith test data', time_name='Time', time_unit='yr')
+    #     mraSsa = mra.ssa(nMC=10)
+    #     fig, ax = mraSsa.screeplot()
+    #     pyleo.closefig(fig)
 
 class TestUiSeriesPlot:
     '''Test for Series.plot()
@@ -884,30 +1046,6 @@ class TestUiSeriesStripes:
 
 class TestUiSeriesHistplot:
     '''Test for Series.histplot()'''
-
-    def test_histplot_t0(self, max_axis = 5):
-        ts = gen_normal()
-
-        fig, ax = ts.histplot()
-
-        line = ax.lines[0]
-
-        x_plot = line.get_xdata()
-        y_plot = line.get_ydata()
-
-        assert max(x_plot) < max_axis
-
-        pyleo.closefig(fig)
-
-    def test_histplot_t1(self, vertical = True):
-        ts = gen_normal()
-
-        fig, ax = ts.histplot(vertical=vertical)
-
-        pyleo.closefig(fig)
-
-class TestUiSeriesDistplot:
-    '''Test for Series.distplot()'''
 
     def test_histplot_t0(self, max_axis = 5):
         ts = gen_normal()
@@ -975,7 +1113,7 @@ class TestUISeriesConvertTimeUnit:
     def test_convert_time_unit_t1(self):
         ts = gen_ts(nt=550, alpha=1.0)
         ts.time_unit = 'nonsense'
-        with pytest.raises(ValueError):
+        with pytest.warns(UserWarning, match=r'Time unit "nonsense" unknown; triggering defaults'):
             ts.convert_time_unit('yr BP')
 
 class TestUISeriesFillNA:
@@ -1010,3 +1148,205 @@ class TestUISeriesSort:
         ts = pyleo.Series(t,v)
         ts.sort()
         assert np.all(np.diff(ts.time) >= 0)
+
+#@pytest.mark.xfail
+class TestResample:
+    @pytest.mark.parametrize('rule', pyleo.utils.tsbase.MATCH_A)
+    def test_resample_simple(self, rule, dataframe_dt, metadata):
+        ser = dataframe_dt.loc[:, 0]
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        result = ts.resample(rule).mean()
+        result_ser = result.to_pandas()
+        expected_values = np.array([0., 1., 2., 3., 4.])
+        expected_idx = pd.DatetimeIndex(
+            ['2018-07-02T12:00:00', '2019-07-02T12:00:00', '2020-07-01T12:00:00', '2021-07-02T12:00:00', '2022-07-02T12:00:00'],
+            name='datetime',
+        ).as_unit('s')
+        expected_ser = pd.Series(expected_values, expected_idx, name='SOI')
+        expected_metadata = {
+            'time_unit': 'years CE',
+            'time_name': 'Time',
+            'value_unit': 'mb',
+            'value_name': 'SOI',
+            'label': f'Southern Oscillation Index ({rule} resampling)',
+            'lat': None,
+            'lon': None,
+            'archiveType': 'Instrumental',
+            'importedFrom': None,
+            'log': (
+                    {0: 'dropna', 'applied': True, 'verbose': True},
+                    {1: 'sort_ts', 'direction': 'ascending'}
+                )
+        }
+        pd.testing.assert_series_equal(result_ser, expected_ser)
+        assert result.metadata == expected_metadata
+
+    @pytest.mark.parametrize(
+        ('rule', 'expected_idx', 'expected_values'),
+        [
+            (
+                '1ga',
+                pd.date_range(np.datetime64('500000000-01-01', 's'), np.datetime64('1500000000-01-01', 's'), freq='1000000000AS-JAN', unit='s'),
+                np.array([0., 1.]),
+            ),
+            (
+                '1ma',
+                pd.date_range(np.datetime64('500000-01-01', 's'), np.datetime64('1000500000-01-01', 's'), freq='1000000AS-JAN', unit='s'),
+                np.array([0.]+[np.nan]*999 + [1.]),
+            ),
+        ]
+    )
+    def test_resample_long_periods(self, rule, expected_idx, expected_values, metadata):
+        ser_index = pd.DatetimeIndex([
+            np.datetime64('0000-01-01', 's'),
+            np.datetime64('1000000000-01-01', 's'),
+        ])
+        ser = pd.Series(range(2), index=ser_index)
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        result =ts.resample(rule).mean()
+        result_ser = result.to_pandas()
+        expected_idx = pd.DatetimeIndex(expected_idx, freq=None, name='datetime')
+        expected_ser = pd.Series(expected_values, index=expected_idx, name='SOI')
+        expected_metadata = {
+            'time_unit': 'years CE',
+            'time_name': 'Time',
+            'value_unit': 'mb',
+            'value_name': 'SOI',
+            'label': f'Southern Oscillation Index ({rule} resampling)',
+            'lat': None,
+            'lon': None,
+            'archiveType': 'Instrumental',
+            'importedFrom': None,
+            'log': (
+                    {0: 'dropna', 'applied': True, 'verbose': True},
+                    {1: 'sort_ts', 'direction': 'ascending'}
+                )
+        }
+        # check indexes match to within 10 seconds
+        assert np.abs(result_ser.index.to_numpy() - expected_ser.index.to_numpy()).max() <= 10
+        np.testing.assert_array_equal(result_ser.to_numpy(), expected_ser.to_numpy())
+        assert result.metadata == expected_metadata
+ 
+ 
+    def test_resample_invalid(self, dataframe_dt, metadata):
+        ser = dataframe_dt.loc[:, 0]
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        with pytest.raises(ValueError, match='Invalid frequency: foo'):
+            ts.resample('foo').sum()
+        with pytest.raises(ValueError, match='Invalid rule provided, got: 412'):
+            ts.resample('412').sum()
+    
+
+    def test_resample_interpolate(self, metadata):
+        ser_index = pd.DatetimeIndex([
+            np.datetime64('0000-01-01', 's'),
+            np.datetime64('2000-01-01', 's'),
+        ])
+        ser = pd.Series(range(2), index=ser_index)
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        result_ser = ts.resample('ka').interpolate().to_pandas()
+        expected_idx = pd.DatetimeIndex(
+            [
+                np.datetime64('499-12-31 12:00:00', 's'),
+                np.datetime64('1500-01-01 12:00:00', 's'),
+                np.datetime64('2499-12-31 12:00:00', 's')
+            ],
+            name='datetime'
+        )
+        expected_ser = pd.Series([0, 0.5, 1], name='SOI', index=expected_idx)
+        pd.testing.assert_series_equal(result_ser, expected_ser)
+
+
+    @pytest.mark.parametrize(
+        ['rule', 'expected_idx', 'expected_values'],
+        (
+            (
+                'MS',
+                [0.9596372 , 1.04451238, 1.12938757, 1.20604903],
+                [8., 0., 3., 5.],
+            ),
+            (
+                'SMS',
+                [0.97880256, 1.02534702, 1.06367775, 1.11022221, 1.14855294, 1.18688367],
+                [8., 0., 0., 3., 0., 5.],
+            ),
+        )
+    )
+    def test_resample_non_pyleo_unit(self, rule, expected_idx, expected_values):
+        ts1 = pyleo.Series(time=np.array([1, 1.1, 1.2]), value=np.array([8, 3, 5]), time_unit='yr CE')
+        result= ts1.resample(rule).sum()
+        expected = pyleo.Series(
+            time=np.array(expected_idx),
+            value=np.array(expected_values),
+            time_unit='yr CE',
+        )
+        assert result.equals(expected) == (True, True)
+        
+    def test_resample_log(self, metadata):
+        ser_index = pd.DatetimeIndex([
+            np.datetime64('0000-01-01', 's'),
+            np.datetime64('2000-01-01', 's'),
+        ])
+        ser = pd.Series(range(2), index=ser_index)
+        ts = pyleo.Series.from_pandas(ser, metadata)
+        result_ser = ts.resample('ka',keep_log=True).interpolate()
+        expected_log = ({0: 'dropna', 'applied': True, 'verbose': True},
+                        {1: 'sort_ts', 'direction': 'ascending'},
+                        {2: 'resample', 'rule': '1000AS'})
+        assert result_ser.log == expected_log
+    
+
+    def test_resample_retrograde(self):
+        ts1 = pyleo.Series(
+            time=np.array([-3, -2, -1]),
+            value=np.array([8, 3, 5]),
+            time_unit='yrs BP',
+        )
+        result = ts1.resample('Y').mean().to_pandas()
+        expected = pd.Series(
+            [5.5, 5],
+            index=pd.DatetimeIndex(['1952-07-01 12:00:00', '1951-07-02 12:00:00'], name='datetime').as_unit('s')
+        )
+        pd.testing.assert_series_equal(result, expected)
+
+
+class TestUISeriesEquals():
+    ''' Test for equals() method '''
+    @pytest.mark.parametrize('ds_name',['SOI','NINO3'])
+    def test_equals_t0(self, ds_name):
+        # test equality of data when true
+        ts1 = pyleo.utils.load_dataset('SOI')
+        ts2 = pyleo.utils.load_dataset(ds_name)
+
+        same_data, _ = ts1.equals(ts2)
+        if ds_name == 'SOI':
+            assert same_data
+        else:
+            assert not same_data
+
+    def test_equals_t1(self):
+        # test equality of metadata
+        ts1 = pyleo.utils.load_dataset('SOI')
+        ts2 = ts1.copy()
+        ts2.label = 'Counterfeit SOI'
+        same_data, same_metadata = ts1.equals(ts2)
+        assert not same_metadata
+
+    def test_equals_t2(self):
+        # test value tolerance
+        tol = 1e-3
+        ts1 = pyleo.utils.load_dataset('SOI')
+        ts2 = ts1.copy()
+        ts2.value[0] = ts1.value[0]+tol
+        same_data, _ = ts1.equals(ts2, value_tol= 2*tol)
+        assert same_data
+
+    def test_equals_t3(self):
+        # test index tolerance
+        soi = pyleo.utils.load_dataset('SOI')
+        soi_pd = soi.to_pandas()
+        soi_pd.index = soi_pd.index + pd.DateOffset(1)
+        soi2 = pyleo.Series.from_pandas(soi_pd, soi.metadata)
+        same_data, _ = soi.equals(soi2, index_tol= 1.1*86400)
+        assert same_data
+        

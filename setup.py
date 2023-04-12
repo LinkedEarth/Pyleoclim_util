@@ -1,11 +1,10 @@
 import os
-import sys
-import io
+#import sys
+#import io
 
 from setuptools import setup, find_packages
 
-
-version = '0.10.0'
+version = '0.11.0'
 
 # Read the readme file contents into variable
 def read(fname):
@@ -29,7 +28,7 @@ setup(
     classifiers=[],
     install_requires=[
         "LiPD==0.2.8.8",
-        "pandas>=1.3.0",
+        "pandas>=2.0.0",
         "numpy<=1.24.0",
         "matplotlib>=3.6.0",
         "scipy>=1.9.1",
@@ -45,6 +44,8 @@ setup(
         "nitime>=0.9",
         "tabulate>=0.8.9",
         "Unidecode>=1.1.1",
+        "kneed>=0.7.0",
+        "pyyaml",
     ],
-    python_requires=">=3.8.0"
+    python_requires=">=3.9.0"
 )

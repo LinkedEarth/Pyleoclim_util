@@ -4,7 +4,7 @@ list) of multiple Series objects. This is handy in case you want to apply the sa
 to such a collection at once (e.g. process a bunch of series in a consistent fashion).
 """
 
-from ..utils import tsutils, plotting
+from ..utils import tsutils, plotting, jsonutils
 from ..utils import correlation as corrutils
 
 from ..core.correns import CorrEns
@@ -12,6 +12,7 @@ from ..core.scalograms import MultipleScalogram
 from ..core.psds import MultiplePSD
 from ..core.spatialdecomp import SpatialDecomp
 
+import warnings
 import numpy as np
 from copy import deepcopy
 
@@ -20,6 +21,7 @@ import matplotlib.transforms as transforms
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+import pandas as pd
 from tqdm import tqdm
 from scipy import stats
 from statsmodels.multivariate.pca import PCA
@@ -54,22 +56,22 @@ class MultipleSeries:
         :okwarning:
         :okexcept:
 
-        import pyleoclim as pyleo
-        import pandas as pd
-        data = pd.read_csv(
-            'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-            skiprows=0, header=1
-        )
-        time = data.iloc[:,1]
-        value = data.iloc[:,2]
-        ts1 = pyleo.Series(time=time, value=value, time_unit='years')
-        ts2 = pyleo.Series(time=time, value=value, time_unit='years')
-        ms = pyleo.MultipleSeries([ts1, ts2], name = 'SOI x2')
+        import pyleoclim as pyleo        
+        soi = pyleo.utils.load_dataset('SOI')
+        nino = pyleo.utils.load_dataset('NINO3')
+        ms = soi & nino
+        ms.name = 'ENSO'
+        ms
+                
     '''
-    def __init__(self, series_list, time_unit=None, name=None):
+    def __init__(self, series_list, time_unit=None, label=None, name=None):
         self.series_list = series_list
         self.time_unit = time_unit
+        self.label = label
         self.name = name
+        if name is not None:
+            warnings.warn("`name` is a deprecated property, which will be removed in future releases, Please use `label` instead",
+                          DeprecationWarning, stacklevel=2)
 
         if self.time_unit is not None:
             new_ts_list = []
@@ -78,8 +80,143 @@ class MultipleSeries:
                 new_ts_list.append(new_ts)
 
             self.series_list = new_ts_list
+            
+    def __repr__(self):
+        return repr(self.to_pandas()) 
+    
+    def view(self):
+        '''
+        Generates a DataFrame version of the MultipleSeries object, suitable for viewing in a Jupyter Notebook
 
-    def convert_time_unit(self, time_unit='years'):
+        Returns
+        -------
+        pd.DataFrame
+        
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo        
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
+            ms.name = 'ENSO'
+            ms.view()
+        '''
+        return self.to_pandas(paleo_style=True)
+    
+    def remove(self, label):
+        """
+        Remove Series based on given label.
+
+        Modifies the MultipleSeries, does not return anything.
+        """
+        to_remove = None
+        for series in self.series_list:
+            if series.metadata['label'] == label:
+                to_remove = series
+                break
+        if to_remove is None:
+            labels = [series.metadata['label'] for series in self.series_list]
+            raise ValueError(f"Label {label} not found, expected one of: {labels}")
+        self.series_list.remove(series)
+    
+    def __sub__(self, label):
+        """
+        Remove Series based on given label.
+
+        Modifies the MultipleSeries, does not return anything.
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import numpy as np
+            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='foo')
+            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='bar')
+            ms = pyleo.MultipleSeries([ts1, ts2])
+            # Remove pyleo.Series labelled 'bar' from the multiple series:
+            ms - 'bar'
+        """
+        self.remove(label)
+
+    def __add__(self, other):
+        """
+        Append a pyleo.Series, or combine with another pyleo.MultipleSeries.
+        
+        Parameters
+        ----------
+        other
+            pyleo.Series or pyleo.MultipleSeries to combine with.
+        
+        Returns
+        -------
+        pyleo.MultipleSeries
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import numpy as np
+            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1')
+            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2')
+            ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3')
+            ts4 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts4')
+            ts5 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts5')
+            ms1 = pyleo.MultipleSeries([ts1, ts2, ts3])
+            ms2 = pyleo.MultipleSeries([ts4, ts5])
+        
+            # Combine the Multiple Series ms1 and ms2 by using the addition operator:
+            ms = ms1 + ms2
+        """
+        from ..core.series import Series
+        if isinstance(other, Series):
+            return self.append(other)
+        if isinstance(other, MultipleSeries):
+            for series in other.series_list:
+                self = self.append(series)
+            return self
+        else:
+           raise TypeError(f"Expected pyleo.Series or pyleo.MultipleSeries, got: {type(other)}")
+         
+    
+    def __and__(self, other):
+        """
+        Append a Series.
+
+        Parameters
+        ----------
+        other
+            Series to append.
+
+        Examples
+        --------
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            import numpy as np
+            ts1 = pyleo.Series(time=np.array([1, 2, 4]), value=np.array([7, 4, 9]), time_unit='years CE', label='ts1')
+            ts2 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts2')
+            ts3 = pyleo.Series(time=np.array([1, 3, 4]), value=np.array([7, 8, 1]), time_unit='years CE', label='ts3')
+            # Combine ts1, ts2, and ts3 into a multiple series:
+            ms = ts1 & ts2 & ts3
+        """
+        from ..core.series import Series
+        if not isinstance(other, Series):
+            raise TypeError(f"Expected pyleo.Series, got: {type(other)}")
+        return self.append(other)
+
+    def convert_time_unit(self, time_unit=None):
         ''' Convert the time units of the object
 
         Parameters
@@ -120,6 +257,14 @@ class MultipleSeries:
             print('Converted timeseries:')
             print('time unit:', new_ms.time_unit)
         '''
+        
+        if time_unit is None: # if not provided, find a common time unit
+            units = [ts.time_unit for ts in self.series_list]
+            unique_units = np.unique(units).tolist()
+            count_units = np.zeros(len(unique_units))
+            for i, u in enumerate(unique_units):
+                count_units[i] = units.count(u)
+            time_unit = unique_units[count_units.argmax()]                
 
         new_ms = self.copy()
         new_ts_list = []
@@ -255,6 +400,9 @@ class MultipleSeries:
             ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
             ms.append(ts2)
         '''
+        for series in self.series_list:
+            if series.equals(ts) == (True, True):
+                raise ValueError(f"Given series is identical to existing series {series}")
         ms = self.copy()
         ts_list = deepcopy(ms.series_list)
         ts_list.append(ts)
@@ -440,8 +588,8 @@ class MultipleSeries:
             gp[idx,:] = tsutils.increments(item.time, step_style=step_style)
 
         return gp
-
-    def common_time(self, method='interp', step = None, start = None, stop = None, step_style = None, **kwargs):
+    
+    def common_time(self, method='interp', step = None, start = None, stop = None, step_style = None, time_axis = None, **kwargs):
         ''' Aligns the time axes of a MultipleSeries object
         
         The alignment is achieved via binning, interpolation, or Gaussian kernel. Alignment is critical for workflows
@@ -483,6 +631,9 @@ class MultipleSeries:
             Method to obtain a representative step among all Series (using tsutils.increments).
             Default value is None, so that it will be chosen according to the method: 'max' for bin and gkernel, 'mean' for interp. 
 
+        time_axis : array
+            Time axis onto which all the series will be aligned. Will override step,start,stop, and step_style if they are passed.
+
         kwargs: dict
         
             keyword arguments (dictionary) of the bin, gkernel or interp methods
@@ -493,6 +644,14 @@ class MultipleSeries:
         ms : MultipleSeries
         
             The MultipleSeries objects with all series aligned to the same time axis.
+
+        Notes
+        -----
+
+        `start`, `stop`, `step`, and `step_style` are interpreted differently depending on the method used. 
+        Interp uses these to specify the `time_axis` onto which interpolation will be applied.
+        Bin and gkernel use these to specify the `bin_edges` which define the "buckets" used for the
+        respective methods.
 
 
         See also
@@ -557,54 +716,61 @@ class MultipleSeries:
             pyleo.closefig(fig)
         '''
         
-        # specify stepping style
-        if step_style == None: # if step style isn't specified, pick a robust choice according to method
-            if method == 'bin' or method == 'gkernel':
-                step_style = 'max'
-            elif  method == 'interp':
-                step_style = 'mean'
-               
-        # obtain grid properties with given step_style
-        gp = self.increments(step_style=step_style)  
-        
-        # define grid step     
-        if step is not None and step > 0:
-            common_step = step 
+        if time_axis is not None:
+            if start is not None or stop is not None or step is not None or step_style is not None:
+                warnings.warn('The time axis has been passed with other time axis relevant arguments {start,stop,step,step_style}. Time_axis takes priority and will be used.')
+            even_axis=None
         else:
-            if step_style == 'mean':
-                common_step = gp[:,2].mean()
-            elif step_style == 'max':
-                common_step = gp[:,2].max()
-            elif step_style == 'mode':
-                common_step = stats.mode(gp[:,2])[0][0]
+            # specify stepping style
+            if step_style is None: # if step style isn't specified, pick a robust choice according to method
+                if method == 'bin' or method == 'gkernel':
+                    step_style = 'max'
+                elif  method == 'interp':
+                    step_style = 'mean'
+                
+            # obtain grid properties with given step_style
+            gp = self.increments(step_style=step_style)
+            
+            # define grid step     
+            if step is not None and step > 0:
+                common_step = step 
             else:
-                common_step = np.median(gp[:,2])
-   
-        # define start and stop
-        if start is None: 
-            start = gp[:,0].max() # pick the latest of the start times
+                if step_style == 'mean':
+                    common_step = gp[:,2].mean()
+                elif step_style == 'max':
+                    common_step = gp[:,2].max()
+                elif step_style == 'mode':
+                    common_step = stats.mode(gp[:,2])[0][0]
+                else:
+                    common_step = np.median(gp[:,2])
+            # define start and stop
+            if start is None: 
+                start = gp[:,0].max() # pick the latest of the start times
+            if stop is None:
+                stop  = gp[:,1].min() # pick the earliest of the stop times
+            if start > stop:
+                raise ValueError('At least one series has no common time interval with others. Please check the time axis of the series.')
+            
+            even_axis = tsutils.make_even_axis(start=start,stop=stop,step=common_step)
         
-        if stop is None:
-            stop  = gp[:,1].min() # pick the earliest of the stop times
-        
-        if start > stop:
-            raise ValueError('At least one series has no common time interval with others. Please check the time axis of the series.')
-    
         ms = self.copy()
 
         # apply each method
         if method == 'bin':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                d = tsutils.bin(ts.time, ts.value, bin_size=common_step, start=start, stop=stop, evenly_spaced = False, **kwargs)
+                d = tsutils.bin(ts.time, ts.value, bin_edges=even_axis, time_axis=time_axis, no_nans=False, **kwargs)
                 ts.time  = d['bins']
                 ts.value = d['binned_values']
                 ms.series_list[idx] = ts
 
         elif method == 'interp':
+
+            if time_axis is None:
+                time_axis = even_axis
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.interp(ts.time, ts.value, step=common_step, start=start, stop=stop,**kwargs)
+                ti, vi = tsutils.interp(ts.time, ts.value, time_axis=time_axis, **kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts
@@ -612,7 +778,7 @@ class MultipleSeries:
         elif method == 'gkernel':
             for idx,item in enumerate(self.series_list):
                 ts = item.copy()
-                ti, vi = tsutils.gkernel(ts.time,ts.value,step=common_step, start=start, stop=stop, **kwargs)
+                ti, vi = tsutils.gkernel(ts.time,ts.value,bin_edges=even_axis, time_axis=time_axis, no_nans=False,**kwargs)
                 ts.time  = ti
                 ts.value = vi
                 ms.series_list[idx] = ts.clean() # remove NaNs
@@ -1408,7 +1574,7 @@ class MultipleSeries:
     def plot(self, figsize=[10, 4],
              marker=None, markersize=None,
              linestyle=None, linewidth=None, colors=None, cmap='tab10', norm=None,
-             xlabel=None, ylabel=None, title=None,
+             xlabel=None, ylabel=None, title=None, time_unit = None,
              legend=True, plot_kwargs=None, lgd_kwargs=None,
              savefig_settings=None, ax=None, invert_xaxis=False):
 
@@ -1464,6 +1630,18 @@ class MultipleSeries:
         title : str, optional
         
             Title. The default is None.
+            
+        time_unit : str
+        
+            the target time unit, possible input:
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+            default is None, in which case the code picks the most common time unit in the collection.
+            If no unambiguous winner can be found, the unit of the first series in the collection is used. 
             
         legend : bool, optional
         
@@ -1533,8 +1711,14 @@ class MultipleSeries:
         plot_kwargs = {} if plot_kwargs is None else plot_kwargs.copy()
         lgd_kwargs = {} if lgd_kwargs is None else lgd_kwargs.copy()
 
+        # deal with time units
+        self = self.convert_time_unit(time_unit=time_unit)
+
         if ax is None:
             fig, ax = plt.subplots(figsize=figsize)
+            
+        if title is None and self.label is not None:
+            ax.set_title(self.label, fontweight='bold')
 
         if ylabel is None:
             consistent_ylabels = True
@@ -1585,10 +1769,11 @@ class MultipleSeries:
         else:
             return ax
 
-    def stackplot(self, figsize=None, savefig_settings=None,  xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
+    def stackplot(self, figsize=None, savefig_settings=None, time_unit = None, xlim=None, fill_between_alpha=0.2, colors=None, cmap='tab10', norm=None, labels='auto',
                   spine_lw=1.5, grid_lw=0.5, label_x_loc=-0.15, v_shift_factor=3/4, linewidth=1.5, plot_kwargs=None):
         ''' Stack plot of multiple series
 
+        TIme units are harmonized prior to plotting. 
         Note that the plotting style is uniquely designed for this one and cannot be properly reset with `pyleoclim.set_style()`.
 
         Parameters
@@ -1604,6 +1789,18 @@ class MultipleSeries:
             - "path" must be specified; it can be any existing or non-existing path,
               with or without a suffix; if the suffix is not given in "path", it will follow "format"
             - "format" can be one of {"pdf", "eps", "png", "ps"} The default is None.
+            
+        time_unit : str
+        
+            the target time unit, possible inputs:
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+            default is None, in which case the code picks the most common time unit in the collection.
+            If no discernible winner can be found, the unit of the first series in the collection is used. 
             
         xlim : list
         
@@ -1749,6 +1946,9 @@ class MultipleSeries:
         if type(labels)==list:
             if len(labels) != n_ts:
                 raise ValueError("The length of the label list should match the number of timeseries to be plotted")
+        
+        # deal with time units
+        self = self.convert_time_unit(time_unit=time_unit)
 
         # Deal with plotting arguments
         if type(plot_kwargs)==dict:
@@ -1759,7 +1959,7 @@ class MultipleSeries:
 
 
         fig = plt.figure(figsize=figsize)
-
+        
         if xlim is None:
             time_min = np.inf
             time_max = -np.inf
@@ -1874,7 +2074,7 @@ class MultipleSeries:
         else:
             return ax
         
-    def stripes(self, ref_period=None, figsize=None, savefig_settings=None,  
+    def stripes(self, ref_period=None, figsize=None, savefig_settings=None,  time_unit=None,
                 LIM = 2.8, thickness=1.0, labels='auto',  label_color = 'gray',
                 common_time_kwargs=None, xlim=None, font_scale=0.8, x_offset = 0.05):
         '''
@@ -1913,6 +2113,18 @@ class MultipleSeries:
               with or without a suffix; if the suffix is not given in 'path', it will follow 'format'
             - 'format' can be one of {"pdf", 'eps', 'png', ps'} The default is None.
             
+        time_unit : str
+        
+            the target time unit, possible inputs:
+            {
+                'year', 'years', 'yr', 'yrs',
+                'y BP', 'yr BP', 'yrs BP', 'year BP', 'years BP',
+                'ky BP', 'kyr BP', 'kyrs BP', 'ka BP', 'ka',
+                'my BP', 'myr BP', 'myrs BP', 'ma BP', 'ma',
+            }
+            default is None, in which case the code picks the most common time unit in the collection.
+            If no discernible winner can be found, the unit of the first series in the collection is used. 
+                
         xlim : list
             The x-axis limit.
             
@@ -1998,6 +2210,9 @@ class MultipleSeries:
         plotting.set_style('journal', font_scale=font_scale)
         savefig_settings = {} if savefig_settings is None else savefig_settings.copy()
         common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
+        
+        # deal with time units
+        self = self.convert_time_unit(time_unit=time_unit)
 
         # put on common timescale
         msc = self.common_time(**common_time_kwargs)
@@ -2047,3 +2262,170 @@ class MultipleSeries:
             # reset the plotting style
             mpl.rcParams.update(current_style)
             return ax
+
+    def to_pandas(self, paleo_style=False, *args, use_common_time=False, **kwargs):
+        """
+        Align Series and place in DataFrame.
+
+        Column names will be taken from each Series' label. 
+
+        Parameters
+        ----------
+        paleo_style : boolean, optional
+            If True, will format datetime as the common time vector and assign as 
+            index name the time_name of the first series in the object. 
+            
+        *args, **kwargs
+            Arguments and keyword arguments to pass to ``common_time``.
+        use_common_time, bool
+            Pass True if you want to use ``common_time`` to align the Series
+            to have common times. Else, times for which some Series doesn't
+            have values will be filled with NaN (default).
+         
+        Returns
+        -------
+        pandas.DataFrame
+        """
+        if use_common_time:
+            ms = self.common_time(*args, **kwargs)
+        else:
+            ms = self
+        
+        df = pd.DataFrame({ser.metadata['label']: ser.to_pandas(paleo_style=paleo_style) for ser in ms.series_list})
+        if paleo_style:
+            tl = ms.series_list[0].time_name
+            df.index.name = tl if tl is not None else 'time' 
+        return df
+        
+    def to_csv(self, path = None, *args, use_common_time=False,  **kwargs):
+        '''
+        Export MultipleSeries to CSV
+
+        Parameters
+        ----------
+        path : str, optional
+            system path to save the file. The default is None, in which case the filename defaults to the poetic 'MultipleSeries.csv' in the current directory.
+        *args, **kwargs
+            Arguments and keyword arguments to pass to ``common_time``.
+        use_common_time, bool
+            Set to True if you want to use ``common_time`` to align the Series
+            to a common timescale. Else, times for which some Series don't
+            have values will be filled with NaN (default).
+        Returns
+        -------
+        None.
+    
+        Examples
+        --------
+        This will place the NINO3 and SOI datasets into a MultipleSeries object and export it to enso.csv.
+        .. ipython:: python
+            :okwarning:
+            :okexcept:
+
+            import pyleoclim as pyleo
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
+            ms.label = 'enso'
+            ms.to_csv()      
+        '''
+        if path is None:  
+            path = self.label.split('.')[0].replace(" ", "_") + '.csv' if self.label is not None else 'MultipleSeries.csv' 
+            
+        self.to_pandas(paleo_style=True, *args,
+                       use_common_time=use_common_time,
+                       **kwargs).to_csv(path, header = True)
+    
+    def sel(self, value=None, time=None, tolerance=0):
+        '''
+        Slice MulitpleSeries based on 'value' or 'time'. See examples in pyleoclim.series.Series for usage. 
+
+        Parameters
+        ----------
+        value : int, float, slice
+            If int/float, then the Series will be sliced so that `self.value` is
+            equal to `value` (+/- `tolerance`).
+            If slice, then the Series will be sliced so `self.value` is between
+            slice.start and slice.stop (+/- tolerance).
+        time : int, float, slice
+            If int/float, then the Series will be sliced so that `self.time` is
+            equal to `time`. (+/- `tolerance`)
+            If slice of int/float, then the Series will be sliced so that
+            `self.time` is between slice.start and slice.stop.
+            If slice of `datetime` (or str containing datetime, such as `'2020-01-01'`),
+            then the Series will be sliced so that `self.datetime_index` is
+            between `time.start` and `time.stop` (+/- `tolerance`, which needs to be
+            a `timedelta`).
+        tolerance : int, float, default 0.
+            Used by `value` and `time`, see above.
+
+        Returns
+        -------
+        ms_new : pyleoclim.mulitpleseries.MultipleSeries
+            Copy of `self`, sliced according to `value` and `time`.
+            
+        See also
+        --------
+        
+        pyleoclim.series.Series.sel : Slicing a series by `value` and `time`. 
+
+        '''
+        
+        if value is not None:
+            warnings.warn('You are selecting by values. Make sure the units are consistent across all timeseries or that they have been standardized')
+            
+        #loop it
+        
+        new_list = []
+        
+        for item in self.series_list:
+            new_list.append(item.sel(value=value,time=time,tolerance=tolerance))
+        
+        ms_new = self.copy()
+        ms_new.series_list=new_list
+        
+        return ms_new
+    
+    
+    def to_json(self, path=None):
+        '''
+        Export the pyleoclim.MultipleSeries object to a json file
+
+        Parameters
+        ----------
+        path : string, optional
+            The path to the file. The default is None, resulting in a file saved in the current working directory using the label for the dataset as filename if available or 'mulitpleseries.json' if label is not provided.
+
+        Returns
+        -------
+        None.
+        
+        '''
+        
+        if path is None:        
+            path = self.series_list[0].label.replace(" ", "_") + '.json' if self.series_list[0].label is not None else 'multipleseries.json' 
+        
+        jsonutils.PyleoObj_to_json(self, path)
+    
+    @classmethod    
+    def from_json(cls, path):
+        ''' Creates a pyleoclim.MulitpleSeries from a JSON file
+        
+        The keys in the JSON file must correspond to the parameter associated with MulitpleSeries and Series objects
+
+        Parameters
+        ----------
+        path : str
+            Path to the JSON file
+
+        Returns
+        -------
+        ts : pyleoclim.core.series.MulitplesSeries
+            A Pyleoclim MultipleSeries object. 
+
+        '''
+        
+        a = jsonutils.open_json(path)
+        b = jsonutils.iterate_through_dict(a, 'MultipleSeries')
+        
+        return cls(**b)

@@ -17,6 +17,7 @@ Notes on how to test:
 import pytest
 import pyleoclim as pyleo
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 # Tests below
@@ -51,9 +52,10 @@ class TestUiSpatialDecompScreeplot:
         
         fig, ax = res.screeplot()
         pyleo.closefig(fig)
+        plt.close()
         
         
-class TestUipatialDecompModeplot:
+class TestUiSpatialDecompModeplot:
     ''' Tests for SSARes.modeplot()
     '''
     @pytest.mark.parametrize('spec_method', ['mtm', 'welch', 'periodogram','cwt', 'wwz'])

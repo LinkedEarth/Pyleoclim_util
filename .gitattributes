@@ -1,1 +1,2 @@
 environment.yml merge=ours
+*.py diff=python

@@ -34,4 +34,4 @@ jobs:
     - name: Test with pytest
       run: |
         conda activate pyleo
-        pytest pyleoclim/tests -svv
+        pytest pyleoclim/tests -svv -W ignore::UserWarning

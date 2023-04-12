@@ -3,7 +3,7 @@
 """
 Eigendecomposition methods:
 Singular Spectrum Analysis (SSA). 
-soon: Monte-Carlo Principal Component Analysis, Multi-Channel SSA
+soon: PCA, Monte-Carlo PCA, Multi-Channel SSA
 """
 
 __all__ = [
@@ -15,7 +15,10 @@ import numpy as np
 #from statsmodels.multivariate.pca import PCA
 from .tsutils import standardize
 from .tsmodel import ar1_sim
-from scipy.linalg import eigh, toeplitz
+from .correlation import cov_shrink_rblw
+from scipy.linalg import eigh, toeplitz, ishermitian, eig
+from kneed import KneeLocator
+import warnings
 #from nitime import algorithms as alg
 #import copy
 
@@ -252,7 +255,7 @@ from scipy.linalg import eigh, toeplitz
 
 #     return res
 
-def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
+def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80, online = True):
     '''Singular spectrum analysis
 
     Nonparametric eigendecomposition of timeseries into orthogonal oscillations.
@@ -277,14 +280,24 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         maximum allowable fraction of missing values. (Default is 0.5)
 
     trunc : str
-        if present, truncates the expansion to a level K < M owing to one of 3 criteria:
+        if present, truncates the expansion to a level K < M owing to one of 4 criteria:
             (1) 'kaiser': variant of the Kaiser-Guttman rule, retaining eigenvalues larger than the median
             (2) 'mcssa': Monte-Carlo SSA (use modes above the 95% quantile from an AR(1) process)
             (3) 'var': first K modes that explain at least var_thresh % of the variance.
         Default is None, which bypasses truncation (K = M)
+            (4) 'knee': Wherever the "knee" of the screeplot occurs.
+        Recommended as a first pass at identifying significant modes as it tends to be more robust than 'kaiser' or 'var', and faster than 'mcssa'.
+        While no truncation method is imposed by default, if the goal is to enhance the S/N ratio and reconstruct a smooth version of the attractor's skeleton, 
+        then the knee-finding method is a good compromise between objectivity and efficiency.
+        See kneed's `documentation <https://kneed.readthedocs.io/en/latest/index.html>`_ for more details on the knee finding algorithm.
 
     var_thresh : float
         variance threshold for reconstruction (only impactful if trunc is set to 'var')
+    
+    online : bool; {True,False}
+        Whether or not to conduct knee finding analysis online or offline. 
+        Only called when trunc = 'knee'. Default is True
+        See kneed's `documentation <https://kneed.readthedocs.io/en/latest/api.html#kneelocator>`_ for details.
 
     Returns
     -------
@@ -346,11 +359,26 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         prod = ys[0:N - j] * ys[j:N]
         c[j] = sum(prod[~np.isnan(prod)]) / (sum(~np.isnan(prod)) - 1)
 
+    C = toeplitz(c[0:M])  #form sample correlation matrix
+    d, _ = eigh(C)  # extract eigenvalues
+    
+    nmodes = np.where(np.real(d)>0)[0].size # effective number of modes
+    
+    if any(d <= np.finfo(d.dtype).eps): # if C is singular
+        Cr, g  = cov_shrink_rblw(C, n=nmodes)  # apply Rao-Blackwellized Ledoit-Wolf estimator 
+        warnings.warn('Ill-conditioned covariance matrix; regularized with shrinkage factor: {:3.2f}'.format(g),stacklevel=2) 
+    else:
+        Cr = C 
+    
+    # solve eigendecomposition 
+    if ishermitian(Cr):  
+        D, eigvecs = eigh(Cr) 
+    else:
+        D, eigvecs = eig(Cr) 
+            
+    D[D<0] = 0     # impose positive eigenvalues    
 
-    C = toeplitz(c[0:M])  #form correlation matrix
-
-    D, eigvecs = eigh(C) # solve eigendecomposition
-
+    # rank eigenvalues/vectors in decreasing order     
     sort_tmp = np.sort(D)
     eigvals = sort_tmp[::-1]
     sortarg = np.argsort(-D)
@@ -399,6 +427,10 @@ def ssa(y, M=None, nMC=0, f=0.5, trunc=None, var_thresh = 80):
         mode_idx = np.where(eigvals>=mval)[0]
     elif trunc == 'var':
         mode_idx = np.arange(np.argwhere(np.cumsum(pctvar)>=var_thresh)[0]+1)
+    elif trunc == 'knee':
+        modes = np.arange(len(eigvals))
+        knee = KneeLocator(x=modes,y=eigvals,curve='convex',direction='decreasing',online=online).knee
+        mode_idx = np.arange(knee+1)
     if nMC == 0 and trunc == 'mcssa':
         raise ValueError('nMC must be larger than 0 to enable MC-SSA truncation')
     elif nMC>0:
