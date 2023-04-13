@@ -23,4 +23,6 @@ Tutorials (and functional science examples) for Pyleoclim exist in the form of:
 
 * `The LinkedEarth YouTube Channel <https://www.youtube.com/playlist?list=PL93NbaRnKAuF4WpIQf-4y_U4lo-GqcrcW>`_.
 
+Note that additional packages may need to be installed to run these various scientific examples. 
+
 If you still have questions, please see our  `Discourse forum <https://discourse.linked.earth>`_.

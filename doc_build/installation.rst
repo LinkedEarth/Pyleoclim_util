@@ -54,9 +54,7 @@ More information about managing conda environments can be found `here <https://d
 
 Installing Pyleoclim
 """"""""""""""""""""
-Make sure that the pyleo environment is activated.
-
-First install Cartopy:
+Once the pyleo environment is activated, you'll want to first install Cartopy:
 
 .. code-block:: bash
 
@@ -69,12 +67,13 @@ Then install Pyleoclim through Pypi, which contains the most stable version of P
 
   pip install pyleoclim
 
-To install the development version, which contains the most up-to-date features:
+This will install the latest official release, which you can view `here <https://pypi.org/project/pyleoclim/>_`. To install the latest version, which contains the most up-to-date features, you can install directly from the GitHub source:
 
 .. code-block:: bash
 
-  pip install git+https://github.com/LinkedEarth/Pyleoclim_util.git@Development
+  pip install git+https://github.com/LinkedEarth/Pyleoclim_util.git
 
+This version may contain bugs not caught by our continuous integration test suite; if so, please report them via `github issues <https://github.com/LinkedEarth/Pyleoclim_util/issues>_`
 If you would like to use Jupyter Notebooks or Spyder for code development, install these packages in your environment:
 
 .. code-block:: bash
@@ -82,28 +81,13 @@ If you would like to use Jupyter Notebooks or Spyder for code development, insta
   conda install spyder
   conda install jupyter
 
-Optional libraries
-""""""""""""""""""
-
-To run the :ref:`tutorial notebooks <tutorials>`, we recommend installing the `xarray <https://docs.xarray.dev/en/stable/getting-started-guide/installing.html>`_ package suite.
-
-.. code-block:: bash
-
-  conda install -c conda-forge xarray dask netCDF4 bottleneck
-
-You will also need `climlab <https://climlab.readthedocs.io/en/latest/>`_:
-
-.. code-block:: bash
-
-  conda install climlab
-
 Building from source for the f2py feature of WWZ
 """"""""""""""""""""""""""""""""""""""""""""""""
 
 The default version of WWZ that comes with the installation steps mentioned above is relying on `Numba <http://numba.pydata.org/>`_.
 It is fast enough for lightweight spectral & wavelet analysis tasks, in which case we recommend using the default installation.
 
-However, it could be slow for heavy use (e.g. performing it for hundreds of times on timeseries with length longer than 1000 points), in which case we recommend activating the f2py feature to achieve an acceleration of around 50%.
+However, it could be slow for heavy use (e.g. performing it hundreds of times on timeseries longer than 1000 points), in which case we recommend activating the f2py feature to achieve a speedup of ~50%.
 
 To do that, a Fortran compiler (e.g. :code:`gfortran` or :code:`ifort`) is required on your local machine, and the related Fortran source code should be compiled locally following the steps below:
 
