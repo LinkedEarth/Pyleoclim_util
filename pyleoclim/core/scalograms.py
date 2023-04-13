@@ -192,10 +192,7 @@ class Scalogram:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
-            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
-
+            series = pyleo.utils.load_dataset('SOI')
             scalogram = series.wavelet()
             scalogram_copy = scalogram.copy()
 
@@ -320,11 +317,8 @@ class Scalogram:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
-            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
-
-            scalogram = series.wavelet()
+            ts = pyleo.utils.load_dataset('SOI')
+            scalogram = ts.wavelet()
 
             @savefig scal_basic.png
             fig,ax = scalogram.plot()
@@ -507,10 +501,8 @@ class Scalogram:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
-            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
-
+            ts = pyleo.utils.load_dataset('SOI')
+            
         By setting export_scal to True, the noise realizations used to generate the significance test will be saved. 
         These come in handy for generating summary plots and for running significance tests on spectral objects.
         
@@ -518,7 +510,7 @@ class Scalogram:
             :okwarning:
             :okexcept:
                 
-            scalogram = series.wavelet().signif_test(number=2, export_scal=True)
+            scalogram = ts.wavelet().signif_test(number=2, export_scal=True)
 
         '''
         if self.wave_method == 'wwz' and method == 'ar1asym':

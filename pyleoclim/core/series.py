@@ -448,17 +448,8 @@ class Series:
             :okexcept:
                 
             import pyleoclim as pyleo
-            import pandas as pd
-
-            url = 'https://raw.githubusercontent.com/LinkedEarth/PyleoTutorials/main/data/wtc_test_data_nino_even.csv'
-            data=pd.read_csv(url)
-            
-            ts_nino = pyleo.Series(time =  data['t'], value = data['nino'], label = 'Kaplan Niño3 SST',
-                              time_name = 'Year', value_name = 'NINO3 index',
-                              time_unit = 'CE',   value_unit = '$^{\circ}$C')            
-            
-            ts_nino.to_json('Nino.json')
-
+            ts = pyleo.utils.load_dataset('SOI')        
+            ts.to_json('soi.json')
         """
         
         if path is None:        
@@ -612,13 +603,7 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv(
-                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-                skiprows=0, header=1)
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts = pyleo.Series(time=time, value=value, time_unit='years')
+            ts = pyleo.utils.load_dataset('SOI')
             new_ts = ts.convert_time_unit(time_unit='yrs BP')
             print('Original timeseries:')
             print('time unit:', ts.time_unit)
@@ -726,20 +711,17 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time=data.iloc[:,1]
-            value=data.iloc[:,2]
-            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            ts = pyleo.utils.load_dataset('SOI') 
             ts.stats()
         """
+        # TODO: replace with pd.describe()
         mean, median, min_, max_, std, IQR = tsutils.simple_stats(self.value)
         res={'mean':mean,
-              'median':median,
-              'min':min_,
-              'max':max_,
-              'std':std,
-              'IQR': IQR}
+             'median':median,
+             'min':min_,
+             'max':max_,
+             'std':std,
+             'IQR': IQR}
         return res
 
     def flip(self, axis='value', keep_log = False):
@@ -769,11 +751,7 @@ class Series:
              :okexcept:
 
              import pyleoclim as pyleo
-             import pandas as pd
-             data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-             time = data.iloc[:,1]
-             value = data.iloc[:,2]
-             ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+             ts = pyleo.utils.load_dataset('SOI')
              tsf = ts.flip(keep_log=True)
              @savefig ts_flipped.png
              fig, ax = tsf.plot()
@@ -910,11 +888,7 @@ class Series:
                 :okexcept:
 
                 import pyleoclim as pyleo
-                import pandas as pd
-                data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-                time = data.iloc[:,1]
-                value = data.iloc[:,2]
-                ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+                ts = pyleo.utils.load_dataset('SOI')
                 @savefig ts_plot.png
                 fig, ax = ts.plot()
                 pyleo.closefig(fig)
@@ -1192,11 +1166,7 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts = pyleo.Series(time=time, value=value, time_name='Year C.E', value_name='SOI', label='SOI')
+            ts = pyleo.utils.load_dataset('SOI')
             @savefig ts_plot4.png
             fig, ax = ts.plot()
             pyleo.closefig(fig)
@@ -1560,12 +1530,7 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time=data.iloc[:,1]
-            value=data.iloc[:,2]
-            ts=pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
-
+            ts = pyleo.utils.load_dataset('SOI')
             @savefig ts_plot5.png
             fig, ax = ts.plot()
             pyleo.closefig(fig)
@@ -1790,10 +1755,7 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-
-            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
-            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+            series = pyleo.utils.load_dataset('SOI')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
 
@@ -1809,10 +1771,7 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-
-            ts=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
-            series = pyleo.Series(time = ts['Year'],value = ts['Value'], time_name = 'Years', time_unit = 'AD')
+            series = pyleo.utils.load_dataset('SOI')
             psd = series.spectral(freq_method = 'welch')
             scalogram = series.wavelet(freq_method = 'welch')
 
@@ -2634,16 +2593,12 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts = pyleo.Series(time=time, value=value, time_name='Year C.E', value_name='SOI', label='SOI')
-
+            ts = pyleo.utils.load_dataset('SOI')
             ts_slice = ts.slice([1972, 1998])
             print("New time bounds:",ts_slice.time.min(),ts_slice.time.max())
 
         '''
+        warn('`slice` is now deprecated; please use `sel` instead', DeprecationWarning, stacklevel=2)
         new = self.copy()
         n_elements = len(timespan)
         if n_elements % 2 == 1:
@@ -2907,12 +2862,7 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts = pyleo.Series(time=time, value=value, time_name='Year C.E', value_name='SOI', label='SOI')
-            # Standardize the time series
+            ts = pyleo.utils.load_dataset('SOI')
             ts_std = ts.standardize()
 
         - Lomb-Scargle
@@ -3180,11 +3130,7 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts = pyleo.Series(time=time,value=value,time_name='Year C.E', value_name='SOI', label='SOI')
+            ts = pyleo.utils.load_dataset('SOI')
 
             scal1 = ts.wavelet()
             scal_signif = scal1.signif_test(number=20)  # for research-grade work, use number=200 or larger
@@ -3359,15 +3305,8 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
-            time = data['t'].values
-            air = data['air'].values
-            nino = data['nino'].values
-            ts_air = pyleo.Series(time=time, value=data['air'].values, time_name='Year (CE)',
-                                  label='All India Rainfall', value_name='AIR (mm/month)')
-            ts_nino = pyleo.Series(time=time, value=data['nino'].values, time_name='Year (CE)',
-                                   label='NINO3', value_name='NINO3 (K)')
+            ts_air = pyleo.utils.load_dataset('AIR')
+            ts_nino = pyleo.utils.load_dataset('NINO3')
 
             coh = ts_air.wavelet_coherence(ts_nino)
             @savefig coh.png
@@ -3557,14 +3496,8 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
-            t = data.iloc[:, 0]
-            air = data.iloc[:, 1]
-            nino = data.iloc[:, 2]
-            ts_nino = pyleo.Series(time=t, value=nino)
-            ts_air = pyleo.Series(time=t, value=air)
+            ts_air = pyleo.utils.load_dataset('AIR')
+            ts_nino = pyleo.utils.load_dataset('NINO3')
 
             # with `nsim=20` and default `method='isospectral'`
             # set an arbitrary random seed to fix the result
@@ -3655,21 +3588,8 @@ class Series:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data=pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino.csv')
-            t=data.iloc[:,0]
-            air=data.iloc[:,1]
-            nino=data.iloc[:,2]
-            ts_nino=pyleo.Series(time=t,value=nino)
-            ts_air=pyleo.Series(time=t,value=air)
-
-            @savefig ts_nino.png
-            fig, ax = ts_nino.plot(title='NINO3 -- SST Anomalies')
-            pyleo.closefig(fig)
-
-            @savefig ts_air.png
-            fig, ax = ts_air.plot(title='Deasonalized All Indian Rainfall Index')
-            pyleo.closefig(fig)
+            ts_nino=pyleo.utils.load_dataset('NINO3')
+            ts_air=pyleo.utils.load_dataset('AIR')
 
         We use the specific params below to lighten computations; you may drop `settings` for real work
 
@@ -3699,11 +3619,9 @@ class Series:
         Note that the output is fundamentally different for the two methods. Granger causality cannot discriminate between NINO3 -> AIR or AIR -> NINO3, in this case. This is not unusual, and one reason why it is no longer in wide use.
         '''
 
-        # TODO: ensure prograde time
-
+        # ensure prograde time
+        ms = MultipleSeries([self.sort(), target_series.sort()])
         # Put on common axis if necessary
-
-        ms = MultipleSeries([self, target_series])
         if list(self.time) != list(target_series.time):
             common_time_kwargs = {} if common_time_kwargs is None else common_time_kwargs.copy()
             ct_args = {'method': 'interp'}

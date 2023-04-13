@@ -204,9 +204,8 @@ class PSD:
             :okwarning:
             :okexcept:
 
-            import pandas as pd
-            csv = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/master/example_data/soi_data.csv',skiprows = 1)
-            soi = pyleo.Series(time = csv['Year'],value = csv['Value'], time_name = 'Years', time_unit = 'AD')
+            import pyleoclim as pyleo
+            soi = pyleo.utils.load_dataset('SOI')
             psd = soi.standardize().spectral('mtm',settings={'NW':2})
             psd_sim = psd.signif_test(number=20)
             @savefig psd_sim.png
