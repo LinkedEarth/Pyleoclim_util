@@ -67,13 +67,13 @@ Then install Pyleoclim through Pypi, which contains the most stable version of P
 
   pip install pyleoclim
 
-This will install the latest official release, which you can view `here <https://pypi.org/project/pyleoclim/>_`. To install the latest version, which contains the most up-to-date features, you can install directly from the GitHub source:
+This will install the latest official release, which you can view `here <https://pypi.org/project/pyleoclim/>`_. To install the latest version, which contains the most up-to-date features, you can install directly from the GitHub source:
 
 .. code-block:: bash
 
   pip install git+https://github.com/LinkedEarth/Pyleoclim_util.git
 
-This version may contain bugs not caught by our continuous integration test suite; if so, please report them via `github issues <https://github.com/LinkedEarth/Pyleoclim_util/issues>_`
+This version may contain bugs not caught by our continuous integration test suite; if so, please report them via `github issues <https://github.com/LinkedEarth/Pyleoclim_util/issues>`_
 If you would like to use Jupyter Notebooks or Spyder for code development, install these packages in your environment:
 
 .. code-block:: bash
