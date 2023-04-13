@@ -244,16 +244,8 @@ class Coherence:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            import numpy as np
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
-            time = data['t'].values
-            air = data['air'].values
-            nino = data['nino'].values
-            ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)',
-                                  label='All India Rainfall', value_name='AIR (mm/month)')
-            ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)',
-                                   label='NINO3', value_name='NINO3 (K)')
+            ts_air = pyleo.utils.load_dataset('AIR')
+            ts_nino = pyleo.utils.load_dataset('NINO3')
 
             coh = ts_air.wavelet_coherence(ts_nino)
             @savefig coh_plot.png
@@ -542,14 +534,8 @@ class Coherence:
              :okexcept:
 
              import pyleoclim as pyleo
-             import pandas as pd
-             data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
-             time = data['t'].values
-             
-             ts_air = pyleo.Series(time=time, value=data['air'].values, time_name='Year (CE)',
-                                   label='All India Rainfall', value_name='AIR (mm/month)')
-             ts_nino = pyleo.Series(time=time, value=data['nino'].values, time_name='Year (CE)',
-                                    label='NINO3', value_name='NINO3 (K)')
+             ts_air = pyleo.utils.load_dataset('AIR')
+             ts_nino = pyleo.utils.load_dataset('NINO3')
 
              coh = ts_air.wavelet_coherence(ts_nino)
              coh_sig = coh.signif_test(number=10)
@@ -706,16 +692,8 @@ class Coherence:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            import numpy as np
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
-            time = data['t'].values
-            air = data['air'].values
-            nino = data['nino'].values
-            ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)',
-                                  label='All India Rainfall', value_name='AIR (mm/month)')
-            ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)',
-                                   label='NINO3', value_name='NINO3 (K)')
+            ts_air = pyleo.utils.load_dataset('AIR')
+            ts_nino = pyleo.utils.load_dataset('NINO3')
 
             coh = ts_air.wavelet_coherence(ts_nino)
             coh_sig = coh.signif_test(number=20)
@@ -926,17 +904,8 @@ class Coherence:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            import numpy as np
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/wtc_test_data_nino_even.csv')
-            time = data['t'].values
-            air = data['air'].values
-            nino = data['nino'].values
-            ts_air = pyleo.Series(time=time, value=air, time_name='Year (CE)',
-                                  label='All India Rainfall', value_name='AIR (mm/month)')
-            ts_nino = pyleo.Series(time=time, value=nino, time_name='Year (CE)',
-                                   label='NINO3', value_name='NINO3 (K)')
-
+            ts_air = pyleo.utils.load_dataset('AIR')
+            ts_nino = pyleo.utils.load_dataset('NINO3')
             coh = ts_air.wavelet_coherence(ts_nino)
             coh.phase_stats(scales=5)
         

@@ -141,8 +141,7 @@ class SsaRes:
             :okwarning:
             :okexcept:
 
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            ts = pyleo.Series(time=data.iloc[:,1], value=data.iloc[:,2], time_name='Year C.E', value_name='SOI', label='SOI')
+            ts = pyleo.utils.load_dataset('SOI')
             ssa = ts.ssa()
             
             @savefig ssa_screeplot.png
@@ -233,8 +232,7 @@ class SsaRes:
             :okwarning:
             :okexcept:
 
-            data = pd.read_csv('https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',skiprows=0,header=1)
-            ts = pyleo.Series(time=data.iloc[:,1], value=data.iloc[:,2], time_name='Year C.E', value_name='SOI', label='SOI')
+            ts  = pyleo.utils.load_dataset('SOI')
             ssa = ts.ssa()
             
             @savefig ssa_modeplot1.png

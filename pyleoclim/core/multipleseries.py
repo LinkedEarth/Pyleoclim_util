@@ -240,16 +240,9 @@ class MultipleSeries:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv(
-                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-                skiprows=0, header=1
-            )
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
-            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
-            ms = pyleo.MultipleSeries([ts1, ts2])
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             new_ms = ms.convert_time_unit('yr BP')
             print('Original timeseries:')
             print('time unit:', ms.time_unit)
@@ -334,16 +327,9 @@ class MultipleSeries:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv(
-                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-                skiprows=0, header=1
-            )
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
-            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
-            ms = pyleo.MultipleSeries([ts1, ts2], name = 'SOI x2')
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             ms_filter = ms.filter(method='lanczos',cutoff_scale=20)
         '''
 
@@ -388,17 +374,9 @@ class MultipleSeries:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv(
-                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-                skiprows=0, header=1
-            )
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
-            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
-            ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
-            ms.append(ts2)
+            soi = pyleo.utils.load_dataset('SOI')
+            ms = pyleo.MultipleSeries([soi], name = 'SOI x2')
+            ms.append(soi)
         '''
         for series in self.series_list:
             if series.equals(ts) == (True, True):
@@ -427,16 +405,9 @@ class MultipleSeries:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv(
-                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-                skiprows=0, header=1
-            )
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
-            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
-            ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             ms_copy = ms.copy()
         '''
         return deepcopy(self)
@@ -504,16 +475,9 @@ class MultipleSeries:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv(
-                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-                skiprows=0, header=1
-            )
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
-            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
-            ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             ms_std = ms.standardize()
         '''
         ms=self.copy()
@@ -569,16 +533,9 @@ class MultipleSeries:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv(
-                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-                skiprows=0, header=1
-            )
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
-            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
-            ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             increments = ms.increments()
 
         '''
@@ -951,16 +908,9 @@ class MultipleSeries:
             :okexcept:
 
             import pyleoclim as pyleo
-            import pandas as pd
-            data = pd.read_csv(
-                'https://raw.githubusercontent.com/LinkedEarth/Pyleoclim_util/Development/example_data/soi_data.csv',
-                skiprows=0, header=1
-            )
-            time = data.iloc[:,1]
-            value = data.iloc[:,2]
-            ts1 = pyleo.Series(time=time, value=value, time_unit='years')
-            ts2 = pyleo.Series(time=time, value=value, time_unit='years')
-            ms = pyleo.MultipleSeries([ts1], name = 'SOI x2')
+            soi = pyleo.utils.load_dataset('SOI')
+            nino = pyleo.utils.load_dataset('NINO3')
+            ms = soi & nino
             flag, lengths = ms.equal_lengths()
             print(flag)
         '''
