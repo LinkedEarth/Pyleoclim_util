@@ -2598,7 +2598,6 @@ class Series:
             print("New time bounds:",ts_slice.time.min(),ts_slice.time.max())
 
         '''
-        warn('`slice` is now deprecated; please use `sel` instead', DeprecationWarning, stacklevel=2)
         new = self.copy()
         n_elements = len(timespan)
         if n_elements % 2 == 1:
