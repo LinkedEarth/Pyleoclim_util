@@ -560,7 +560,7 @@ class Coherence:
              :okwarning:
              :okexcept:
              
-             coh_sig.dashboard(savefig_settings={'path':'coh_dash.png','dpi':300})
+             coh_sig.dashboard(savefig_settings={'path':'./coh_dash.png','dpi':300})
              pyleo.closefig(fig)
 
          '''
