@@ -378,7 +378,7 @@ class Series:
         print('Series exported to ' + path)
     
     @classmethod    
-    def from_csv(cls, filename, path = '.'):
+    def from_csv(cls, path):
         '''
         Read in Series object from CSV file. Expects a metadata header 
         dealineated by '###' lines, as written by the Series.to_csv() method. 
@@ -403,7 +403,7 @@ class Series:
         metadata = {}
         # read in metadata header
         # TODO: improve error handling
-        with open(path + '/' + filename, 'r')  as file: 
+        with open(path, 'r')  as file: 
             reader_obj = csv.reader(file)
             for i, row in enumerate(reader_obj):
                 if row[0] == '###' and i > 0:
@@ -422,7 +422,7 @@ class Series:
             metadata['log'] = eval(metadata['log']) # convert string to tuple
         
         # read in data    
-        df = pd.read_csv(path + '/' + filename, header=header)
+        df = pd.read_csv(path, header=header)
         # export to Series 
         return cls(time=df.iloc[:,0],value=df.iloc[:,1], **metadata)
     
