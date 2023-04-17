@@ -321,7 +321,7 @@ class Series:
         ser : pd.Series representation of the pyleo.Series object
 
         '''
-        ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name, verbose=False)
+        ser = pd.Series(self.value, index=self.datetime_index, name=self.value_name)
         if paleo_style:
             time_label, value_label = self.make_labels()
             ser = ser.set_axis(self.time).rename(value_label).rename_axis(time_label)
