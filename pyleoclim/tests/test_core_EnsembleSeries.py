@@ -13,10 +13,9 @@ Notes on how to test:
 5. for more details, see https://docs.pytest.org/en/stable/usage.html
 '''
 import numpy as np
-import pandas as pd
 
-from numpy.testing import assert_array_equal
-from pandas.testing import assert_frame_equal
+#from numpy.testing import assert_array_equal
+#from pandas.testing import assert_frame_equal
 
 import pytest
 
@@ -25,7 +24,6 @@ from pyleoclim.utils.tsmodel import (
     ar1_sim,
     colored_noise,
 )
-from pyleoclim.tests.examples import load_dataset
 
 # a collection of useful functions
 
