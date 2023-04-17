@@ -192,7 +192,7 @@ class EnsembleSeries(MultipleSeries):
 
         ts_list = []
         for i, quant in enumerate(ens_qs):
-            ts = Series(time=time, value=quant, label=f'{qs[i]*100:g}%')
+            ts = Series(time=time, value=quant, label=f'{qs[i]*100:g}%', verbose=False)
             ts_list.append(ts)
 
         ens_qs = EnsembleSeries(series_list=ts_list)
