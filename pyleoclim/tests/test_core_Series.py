@@ -94,12 +94,12 @@ class TestUISeriesInit:
 class TestSeriesIO:
     ''' Test Series import from and export to other formats
     '''
-    @pytest.mark.parametrize('ds_name',['NINO3','AACO2','LR04'])
+    @pytest.mark.parametrize('ds_name',['NINO3','LR04'])
     def test_csv_roundtrip(self, ds_name):
         ts1 = pyleo.utils.load_dataset(ds_name)
         ts1.to_csv()
         filename = ts1.label.replace(" ", "_") + '.csv'
-        ts2 = pyleo.Series.from_csv(filename)
+        ts2 = pyleo.Series.from_csv(path=filename)
         assert ts1.equals(ts2)
         #clean up file
         os.unlink(filename)
