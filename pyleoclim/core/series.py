@@ -3983,6 +3983,9 @@ class Series:
         as the default spacing. Unlike .bin(), gkernel() uses a gaussian kernel to
         calculate the weighted average of the time series over these intervals.
 
+        Note that if the series being examined has very low resolution sections with few points,
+        you may need to tune the parameter for the kernel e-folding scale (h).
+
         Parameters
         ----------
 
